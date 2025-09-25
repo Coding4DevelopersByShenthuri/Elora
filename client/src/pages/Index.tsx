@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useAnimateIn } from '@/lib/animations';
 import { HeroSection } from '@/components/landing/HeroSection';
 import { ManageSection } from '@/components/landing/ManageSection';
@@ -6,11 +6,9 @@ import { DesignSection } from '@/components/landing/DesignSection';
 import { DeploySection } from '@/components/landing/DeploySection';
 import { TestimonialsSection } from '@/components/landing/TestimonialsSection';
 import { CallToAction } from '@/components/landing/CallToAction';
-import { LoadingScreen } from '@/components/landing/LoadingScreen';
 import UseCasesSection from '@/components/landing/UseCasesSection';
 
 const Index = () => {
-  const [loading, setLoading] = useState(true);
   const showHero = useAnimateIn(false, 300);
   const showManage = useAnimateIn(false, 600);
   const showDesign = useAnimateIn(false, 900);
@@ -20,17 +18,9 @@ const Index = () => {
   const showCallToAction = useAnimateIn(false, 2100);
   
   useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-    
-    return () => clearTimeout(timer);
+    // Ensure we start at top when page sections animate in
+    window.scrollTo(0, 0);
   }, []);
-  
-  if (loading) {
-    return <LoadingScreen />;
-  }
   
   return (
     <div className="relative overflow-hidden">

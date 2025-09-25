@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import Index from "./pages/Index";
@@ -17,6 +17,7 @@ import SearchPage from "./pages/SearchPage";
 import Settings from "./pages/Settings";
 import ManagePage from "./pages/ManagePage";
 import Navbar from "./components/Navbar";
+import { LoadingScreen } from "@/components/landing/LoadingScreen";
 
 const queryClient = new QueryClient();
 
@@ -115,23 +116,37 @@ const AppRoutes = () => {
   );
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <div className="min-h-screen">
-              <Navbar />
-              <AppRoutes />
-            </div>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+
+  useEffect(() => {
+    // Show loader briefly on any hard refresh or first mount
+    const timer = window.setTimeout(() => setIsInitialLoading(false), 800);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              {isInitialLoading ? (
+                <LoadingScreen />
+              ) : (
+                <div className="min-h-screen">
+                  <Navbar />
+                  <AppRoutes />
+                </div>
+              )}
+            </BrowserRouter>
+          </TooltipProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
