@@ -17,6 +17,7 @@ import SearchPage from "./pages/SearchPage";
 import Settings from "./pages/Settings";
 import ManagePage from "./pages/ManagePage";
 import Navbar from "./components/Navbar";
+import FloatingIconsLayer from "./components/FloatingIconsLayer";
 import { LoadingScreen } from "@/components/landing/LoadingScreen";
 
 const queryClient = new QueryClient();
@@ -137,6 +138,7 @@ const App = () => {
                 <LoadingScreen />
               ) : (
                 <div className="min-h-screen">
+                  <FloatingIconsLayer />
                   <Navbar />
                   <AppRoutes />
                 </div>
