@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 // Material Design
 import { MdSchool, MdOutlineAppShortcut, MdOutlineLeaderboard } from 'react-icons/md';
@@ -52,6 +53,7 @@ function randomBetween(min: number, max: number) {
 }
 
 export const FloatingIconsLayer: React.FC = () => {
+  const { theme } = useTheme();
   // Precompute randomized positions and animation timing for a stable render per mount
   const items = useMemo(() => {
     const viewCount = 18; // render a few extras for density
@@ -72,7 +74,7 @@ export const FloatingIconsLayer: React.FC = () => {
   return (
     <div
       aria-hidden
-      className="pointer-events-none fixed inset-0 z-0 light:block dark:hidden"
+      className="pointer-events-none fixed inset-0 z-0"
       style={{ contain: 'layout style', isolation: 'isolate' }}
     >
       {items.map((item, i) => (
@@ -85,7 +87,7 @@ export const FloatingIconsLayer: React.FC = () => {
             animation: `floatingDrift ${item.duration}s ease-in-out ${item.delay}s infinite`,
             willChange: 'transform, opacity',
             transform: `rotate(${item.rotate}deg)`,
-            opacity: 0.35,
+            opacity: theme === 'dark' ? 0.2 : 0.35,
           }}
         >
           <item.Icon size={item.size} color={item.color} />
