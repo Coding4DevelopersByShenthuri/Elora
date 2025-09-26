@@ -6,7 +6,7 @@ import {
   Dialog,
   DialogContent,
 } from '@/components/ui/dialog';
-import { Loader2, Mail, Lock, User, Eye, EyeOff, Home, Github, Facebook, Linkedin, Chrome } from 'lucide-react';
+import { Loader2, Mail, Lock, User, Eye, EyeOff, Home, Github, Facebook, Linkedin, Chrome, AlertCircle } from 'lucide-react';
 import '../css/AuthModal.css';
 
 interface AuthModalProps {
@@ -16,6 +16,48 @@ interface AuthModalProps {
 
 type AuthMode = 'login' | 'register';
 
+// API service functions
+const authAPI = {
+  async login(email: string, password: string) {
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Login failed');
+    }
+
+    return response.json();
+  },
+
+  async register(name: string, email: string, password: string) {
+    const response = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, email, password, confirm_password: password }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Registration failed');
+    }
+
+    return response.json();
+  },
+
+  async socialLogin(provider: string) {
+    // Redirect to social login endpoint
+    window.location.href = `/api/auth/${provider}`;
+  }
+};
+
 const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   const { login } = useAuth();
   const [authMode, setAuthMode] = useState<AuthMode>('login');
@@ -23,6 +65,9 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isRightPanelActive, setIsRightPanelActive] = useState(false);
+  const [error, setError] = useState<string>('');
+  const [success, setSuccess] = useState<string>('');
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -33,6 +78,8 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   useEffect(() => {
     if (isOpen) {
       setIsRightPanelActive(authMode === 'register');
+      setError('');
+      setSuccess('');
     }
   }, [isOpen, authMode]);
 
@@ -42,32 +89,109 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
       ...prev,
       [name]: value,
     }));
+    // Clear errors when user starts typing
+    if (error) setError('');
+  };
+
+  const validateForm = () => {
+    if (authMode === 'register') {
+      if (formData.password.length < 8) {
+        setError('Password must be at least 8 characters long');
+        return false;
+      }
+      if (formData.password !== formData.confirmPassword) {
+        setError('Passwords do not match');
+        return false;
+      }
+      if (!formData.name.trim()) {
+        setError('Name is required');
+        return false;
+      }
+    }
+
+    if (!formData.email || !formData.password) {
+      setError('Please fill in all required fields');
+      return false;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError('Please enter a valid email address');
+      return false;
+    }
+
+    return true;
   };
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    if (!validateForm()) {
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      login();
-      onClose();
-      resetForm();
+      if (authMode === 'login') {
+        const { token } = await authAPI.login(formData.email, formData.password);
+        // Store token in localStorage or context
+        localStorage.setItem('authToken', token);
+        login(); // Update auth context (no arguments)
+        setSuccess('Login successful!');
+        
+        // Close modal after success
+        setTimeout(() => {
+          onClose();
+          resetForm();
+        }, 1000);
+      } else {
+        const { token } = await authAPI.register(
+          formData.name.trim(),
+          formData.email,
+          formData.password
+        );
+        // Store token in localStorage or context
+        localStorage.setItem('authToken', token);
+        login(); // Update auth context (no arguments)
+        setSuccess('Registration successful!');
+        
+        // Auto-switch to login mode after successful registration
+        setTimeout(() => {
+          setAuthMode('login');
+          setIsRightPanelActive(false);
+          setSuccess('Registration successful! Please login.');
+        }, 1000);
+      }
     } catch (error) {
       console.error('Authentication error:', error);
+      try {
+        // Try to extract server message from thrown Error where message may already be parsed
+        const message = error instanceof Error ? error.message : '';
+        setError(message || 'Authentication failed. Please try again.');
+      } catch (_) {
+        setError('Authentication failed. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSocialLogin = (provider: string) => {
+  const handleSocialLogin = async (provider: string) => {
     setIsLoading(true);
-    setTimeout(() => {
-      login();
-      onClose();
-      resetForm();
+    setError('');
+    
+    try {
+      await authAPI.socialLogin(provider);
+      // The social login will redirect, so we don't need to handle the response here
+    } catch (error) {
+      console.error('Social login error:', error);
+      setError(`Social login with ${provider} failed. Please try again.`);
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const resetForm = () => {
@@ -77,16 +201,12 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
       password: '',
       confirmPassword: '',
     });
+    setError('');
+    setSuccess('');
     setAuthMode('login');
     setIsRightPanelActive(false);
   };
 
-  const toggleAuthMode = () => {
-    const newMode = authMode === 'login' ? 'register' : 'login';
-    setAuthMode(newMode);
-    setIsRightPanelActive(newMode === 'register');
-    setFormData(prev => ({ ...prev, confirmPassword: '' }));
-  };
 
   const togglePasswordVisibility = () => {
     setShowPassword(prev => !prev);
@@ -109,7 +229,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
       }
     }}>
       <DialogContent className="sm:max-w-4xl p-0 overflow-hidden border-0 bg-transparent flex items-center justify-center min-h-screen">
-        {/* Home Button - Moved to top left corner of page */}
+        {/* Home Button */}
         <div className="auth-page-home-button">
           <button className="auth-home-button" onClick={onClose}>
             <Home className="w-6 h-6" />
@@ -122,6 +242,21 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
             <form onSubmit={handleAuth} className="h-full bg-[#143C3D] p-8 flex flex-col justify-center">
               <h1 className="text-3xl font-bold text-white mb-6 text-center">Vocario</h1>
               
+              {/* Error Message */}
+              {error && (
+                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center">
+                  <AlertCircle className="w-4 h-4 mr-2" />
+                  <span className="text-sm">{error}</span>
+                </div>
+              )}
+              
+              {/* Success Message */}
+              {success && (
+                <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg flex items-center">
+                  <span className="text-sm">{success}</span>
+                </div>
+              )}
+              
               {isRegisterMode && (
                 <div className="auth-input-container mb-4">
                   <div className="auth-input-wrapper">
@@ -129,11 +264,12 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                     <Input
                       name="name"
                       type="text"
-                      placeholder="Name"
+                      placeholder="Full Name"
                       value={formData.name}
                       onChange={handleInputChange}
                       className="h-12 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-10"
                       required
+                      disabled={isLoading}
                     />
                   </div>
                 </div>
@@ -145,11 +281,12 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                   <Input
                     name="email"
                     type="email"
-                    placeholder="Email"
+                    placeholder="Email Address"
                     value={formData.email}
                     onChange={handleInputChange}
                     className="h-12 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-10"
                     required
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -166,11 +303,13 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                     className="h-12 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-10 pr-10"
                     required
                     minLength={6}
+                    disabled={isLoading}
                   />
                   <button
                     type="button"
                     className="auth-password-toggle"
                     onClick={togglePasswordVisibility}
+                    disabled={isLoading}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -190,11 +329,13 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                       className="h-12 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-10 pr-10"
                       required
                       minLength={6}
+                      disabled={isLoading}
                     />
                     <button
                       type="button"
                       className="auth-password-toggle"
                       onClick={toggleConfirmPasswordVisibility}
+                      disabled={isLoading}
                     >
                       {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -202,14 +343,10 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                 </div>
               )}
 
-              {!passwordsMatch && isRegisterMode && (
-                <p className="text-red-400 text-sm mb-4">Passwords do not match</p>
-              )}
-
               <Button
                 type="submit"
-                className="w-full h-12 bg-[#022A2D] hover:bg-[#28CACD] text-white font-bold rounded-2xl transition-all duration-300 hover:tracking-widest"
-                disabled={!isFormValid || isLoading}
+                className="w-full h-12 bg-[#022A2D] hover:bg-[#28CACD] text-white font-bold rounded-2xl transition-all duration-300 hover:tracking-widest disabled:opacity-50"
+                disabled={!isFormValid || isLoading || !!error}
               >
                 {isLoading ? (
                   <>
@@ -217,22 +354,22 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                     {isRegisterMode ? 'Creating Account...' : 'Signing In...'}
                   </>
                 ) : (
-                  isRegisterMode ? 'Register' : 'Login'
+                  isRegisterMode ? 'Create Account' : 'Sign In'
                 )}
               </Button>
 
               {!isRegisterMode && (
                 <div className="auth-pass-link">
-                  <a href="#" className="text-[#4BB6B7] hover:text-[#28CACD] text-sm transition-colors">
+                  <a href="/forgot-password" className="text-[#4BB6B7] hover:text-[#28CACD] text-sm transition-colors">
                     Forgot your password?
                   </a>
                 </div>
               )}
 
               <div className="auth-terms-container">
-                <a href="#" className="auth-terms-link">Terms and Conditions</a>
+                <a href="/terms" className="auth-terms-link">Terms and Conditions</a>
                 |
-                <a href="#" className="auth-terms-link">Privacy Policy</a>
+                <a href="/privacy" className="auth-terms-link">Privacy Policy</a>
               </div>
 
               <div className="auth-social-container">
@@ -240,8 +377,9 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                   <button
                     key={provider}
                     onClick={() => handleSocialLogin(provider)}
-                    className="auth-social-icon"
+                    className="auth-social-icon disabled:opacity-50"
                     disabled={isLoading}
+                    type="button"
                   >
                     {provider === 'github' && <Github className="w-5 h-5" />}
                     {provider === 'facebook' && <Facebook className="w-5 h-5" />}
@@ -258,17 +396,33 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
             <form onSubmit={handleAuth} className="h-full bg-[#143C3D] p-8 flex flex-col justify-center">
               <h1 className="text-3xl font-bold text-white mb-6 text-center">Vocario</h1>
               
+              {/* Error Message */}
+              {error && (
+                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center">
+                  <AlertCircle className="w-4 h-4 mr-2" />
+                  <span className="text-sm">{error}</span>
+                </div>
+              )}
+              
+              {/* Success Message */}
+              {success && (
+                <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg flex items-center">
+                  <span className="text-sm">{success}</span>
+                </div>
+              )}
+              
               <div className="auth-input-container mb-4">
                 <div className="auth-input-wrapper">
                   <Mail className="auth-input-icon" />
                   <Input
                     name="email"
                     type="email"
-                    placeholder="Email"
+                    placeholder="Email Address"
                     value={formData.email}
                     onChange={handleInputChange}
                     className="h-12 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-10"
                     required
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -284,11 +438,13 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                     onChange={handleInputChange}
                     className="h-12 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-10 pr-10"
                     required
+                    disabled={isLoading}
                   />
                   <button
                     type="button"
                     className="auth-password-toggle"
                     onClick={togglePasswordVisibility}
+                    disabled={isLoading}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -297,8 +453,8 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
 
               <Button
                 type="submit"
-                className="w-full h-12 bg-[#022A2D] hover:bg-[#28CACD] text-white font-bold rounded-2xl transition-all duration-300 hover:tracking-widest"
-                disabled={!isFormValid || isLoading}
+                className="w-full h-12 bg-[#022A2D] hover:bg-[#28CACD] text-white font-bold rounded-2xl transition-all duration-300 hover:tracking-widest disabled:opacity-50"
+                disabled={!isFormValid || isLoading || !!error}
               >
                 {isLoading ? (
                   <>
@@ -306,20 +462,20 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                     Signing In...
                   </>
                 ) : (
-                  'Login'
+                  'Sign In'
                 )}
               </Button>
 
               <div className="auth-pass-link">
-                <a href="#" className="text-[#4BB6B7] hover:text-[#28CACD] text-sm transition-colors">
+                <a href="/forgot-password" className="text-[#4BB6B7] hover:text-[#28CACD] text-sm transition-colors">
                   Forgot your password?
                 </a>
               </div>
 
               <div className="auth-terms-container">
-                <a href="#" className="auth-terms-link">Terms and Conditions</a>
+                <a href="/terms" className="auth-terms-link">Terms and Conditions</a>
                 |
-                <a href="#" className="auth-terms-link">Privacy Policy</a>
+                <a href="/privacy" className="auth-terms-link">Privacy Policy</a>
               </div>
 
               <div className="auth-social-container">
@@ -327,8 +483,9 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                   <button
                     key={provider}
                     onClick={() => handleSocialLogin(provider)}
-                    className="auth-social-icon"
+                    className="auth-social-icon disabled:opacity-50"
                     disabled={isLoading}
+                    type="button"
                   >
                     {provider === 'github' && <Github className="w-5 h-5" />}
                     {provider === 'facebook' && <Facebook className="w-5 h-5" />}
@@ -349,6 +506,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                 <Button
                   className="ghost bg-transparent border-2 border-white text-white hover:bg-white hover:text-[#143C3D]"
                   onClick={() => setAuthMode('login')}
+                  disabled={isLoading}
                 >
                   Sign In
                 </Button>
@@ -359,6 +517,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                 <Button
                   className="ghost bg-transparent border-2 border-white text-white hover:bg-white hover:text-[#143C3D]"
                   onClick={() => setAuthMode('register')}
+                  disabled={isLoading}
                 >
                   Register
                 </Button>

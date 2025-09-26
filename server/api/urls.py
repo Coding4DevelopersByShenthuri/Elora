@@ -1,7 +1,8 @@
-from django.urls import path   # pyright: ignore[reportMissingImports]
-from .views import *
+from django.urls import path
+from . import views
 
 urlpatterns = [
-
-    path('', home)
+    path('api/auth/register', views.register, name='register'),
+    path('api/auth/login', views.login, name='login'),
+    path('api/auth/<str:provider>', views.social_login_redirect, name='social-login'),
 ]
