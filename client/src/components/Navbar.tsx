@@ -331,18 +331,6 @@ export const Navbar = () => {
                     : 'slideOutToLeft 0.3s ease-in forwards'
                 }}
               >
-                {/* Header with close button */}
-                <div className="flex items-center justify-end p-4 border-b">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="rounded-lg hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
-                  >
-                    <Menu size={22} />
-                  </Button>
-                </div>
-
                 {/* Scrollable content */}
                 <div className="flex-1 overflow-y-auto">
                   <div className="p-4 space-y-6">
