@@ -136,7 +136,10 @@ export const Navbar = () => {
 
   const handleNavItemClick = (id: string) => {
     setActive(id);
-    setIsMobileMenuOpen(false);
+    // Close mobile menu smoothly after a short delay
+    setTimeout(() => {
+      setIsMobileMenuOpen(false);
+    }, 300);
   };
 
   const cortexSubmenu = [
@@ -311,93 +314,51 @@ export const Navbar = () => {
           {showMenuIcon && (
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-lg glass-panel">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="rounded-lg glass-panel hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
+                >
                   <Menu size={22} />
                 </Button>
               </SheetTrigger>
               <SheetContent 
                 side="left" 
-                className="p-0 w-[280px] sm:w-[300px] transition-all duration-500 ease-in-out"
+                className="p-0 w-full max-w-[320px] sm:max-w-[350px] h-full flex flex-col border-r-0"
                 style={{
                   animation: isMobileMenuOpen 
-                    ? 'slideInFromLeft 0.5s ease-in-out forwards' 
-                    : 'slideOutToLeft 0.5s ease-in-out forwards'
+                    ? 'slideInFromLeft 0.3s ease-out forwards' 
+                    : 'slideOutToLeft 0.3s ease-in forwards'
                 }}
               >
-                <div className="p-4 space-y-4 transition-all duration-300 ease-in-out">
-                  {/* Cortex mobile */}
-                  <div className="transition-all duration-300 delay-75 ease-in-out">
-                    <div className="px-1 text-xs font-semibold text-muted-foreground uppercase">Mind</div>
-                    <div className="mt-2 grid gap-1">
-                      {cortexSubmenu.map((item) => (
-                        <Link
-                          key={item.id}
-                          to={item.to}
-                          className={cn(
-                            "flex items-center gap-3 rounded-md px-3 py-2 transition-all duration-300 hover:bg-muted",
-                            active === item.id ? "bg-primary/10 text-primary" : "hover:bg-muted"
-                          )}
-                          onClick={() => handleNavItemClick(item.id)}
-                        >
-                          {item.icon}
-                          <span className="font-medium">{item.label}</span>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
+                {/* Header with close button */}
+                <div className="flex items-center justify-end p-4 border-b">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="rounded-lg hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
+                  >
+                    <Menu size={22} />
+                  </Button>
+                </div>
 
-                  {/* Categories mobile */}
-                  <div className="transition-all duration-300 delay-150 ease-in-out">
-                    <div className="px-1 text-xs font-semibold text-muted-foreground uppercase">Categories</div>
-                    <div className="mt-2 grid gap-1">
-                      {categoriesSubmenu.map((item) => (
-                        <div key={item.id}>
-                          <Link
-                            to={item.to}
-                            className={cn(
-                              "flex items-center gap-3 rounded-md px-3 py-2 transition-all duration-300 hover:bg-muted",
-                              active === item.id ? "bg-primary/10 text-primary" : "hover:bg-muted"
-                            )}
-                            onClick={() => handleNavItemClick(item.id)}
-                          >
-                            {item.icon}
-                            <span className="font-medium">{item.label}</span>
-                          </Link>
-                          {item.children && (
-                            <div className="ml-6 mt-1 space-y-1 transition-all duration-300 delay-200 ease-in-out">
-                              {item.children.map((sub) => (
-                                <Link
-                                  key={sub.id}
-                                  to={sub.to}
-                                  className={cn(
-                                    "flex items-center gap-2 rounded-md px-3 py-1 text-sm transition-all duration-300 hover:bg-muted",
-                                    active === sub.id ? "bg-primary/10 text-primary" : "hover:bg-muted"
-                                  )}
-                                  onClick={() => handleNavItemClick(sub.id)}
-                                >
-                                  {sub.icon}
-                                  <span>{sub.label}</span>
-                                </Link>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Authenticated nav mobile */}
-                  {isAuthenticated && (
-                    <div className="transition-all duration-300 delay-300 ease-in-out">
-                      <div className="px-1 text-xs font-semibold text-muted-foreground uppercase">Navigation</div>
-                      <div className="mt-2 grid gap-1">
-                        {navItems.map((item) => (
+                {/* Scrollable content */}
+                <div className="flex-1 overflow-y-auto">
+                  <div className="p-4 space-y-6">
+                    {/* Cortex mobile */}
+                    <div className="transition-all duration-300 ease-out">
+                      <div className="px-1 text-xs font-semibold text-muted-foreground uppercase mb-2">Mind</div>
+                      <div className="space-y-1">
+                        {cortexSubmenu.map((item) => (
                           <Link
                             key={item.id}
                             to={item.to}
                             className={cn(
-                              "flex items-center gap-3 rounded-md px-3 py-2 transition-all duration-300 hover:bg-muted",
-                              active === item.id ? "bg-primary/10 text-primary" : "hover:bg-muted"
+                              "flex items-center gap-3 rounded-md px-3 py-3 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400",
+                              active === item.id 
+                                ? "bg-teal-500/20 text-teal-400" 
+                                : "text-foreground"
                             )}
                             onClick={() => handleNavItemClick(item.id)}
                           >
@@ -407,36 +368,133 @@ export const Navbar = () => {
                         ))}
                       </div>
                     </div>
-                  )}
 
-                  {/* Help option for mobile */}
-                  <div className="transition-all duration-300 delay-350 ease-in-out">
-                    <Link
-                      to="/help"
-                      className={cn(
-                        "flex items-center gap-3 rounded-md px-3 py-2 transition-all duration-300 hover:bg-muted",
-                        active === 'help' ? "bg-primary/10 text-primary" : "hover:bg-muted"
-                      )}
-                      onClick={() => handleNavItemClick('help')}
-                    >
-                      <HelpCircle size={20} />
-                      <span className="font-medium">Help</span>
-                    </Link>
+                    {/* Categories mobile */}
+                    <div className="transition-all duration-300 ease-out delay-75">
+                      <div className="px-1 text-xs font-semibold text-muted-foreground uppercase mb-2">Categories</div>
+                      <div className="space-y-1">
+                        {categoriesSubmenu.map((item) => (
+                          <div key={item.id} className="space-y-1">
+                            <Link
+                              to={item.to}
+                              className={cn(
+                                "flex items-center gap-3 rounded-md px-3 py-3 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400",
+                                active === item.id 
+                                  ? "bg-teal-500/20 text-teal-400" 
+                                  : "text-foreground"
+                              )}
+                              onClick={() => handleNavItemClick(item.id)}
+                            >
+                              {item.icon}
+                              <span className="font-medium">{item.label}</span>
+                            </Link>
+                            {item.children && (
+                              <div className="ml-4 space-y-1 border-l-2 border-muted/30 pl-2 transition-all duration-300">
+                                {item.children.map((sub) => (
+                                  <Link
+                                    key={sub.id}
+                                    to={sub.to}
+                                    className={cn(
+                                      "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-all duration-300 hover:bg-teal-500/15 hover:text-teal-400",
+                                      active === sub.id 
+                                        ? "bg-teal-500/15 text-teal-400" 
+                                        : "text-foreground"
+                                    )}
+                                    onClick={() => handleNavItemClick(sub.id)}
+                                  >
+                                    {sub.icon}
+                                    <span>{sub.label}</span>
+                                  </Link>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Authenticated nav mobile */}
+                    {isAuthenticated && (
+                      <div className="transition-all duration-300 ease-out delay-150">
+                        <div className="px-1 text-xs font-semibold text-muted-foreground uppercase mb-2">Navigation</div>
+                        <div className="space-y-1">
+                          {navItems.map((item) => (
+                            <Link
+                              key={item.id}
+                              to={item.to}
+                              className={cn(
+                                "flex items-center gap-3 rounded-md px-3 py-3 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400",
+                                active === item.id 
+                                  ? "bg-teal-500/20 text-teal-400" 
+                                  : "text-foreground"
+                              )}
+                              onClick={() => handleNavItemClick(item.id)}
+                            >
+                              {item.icon}
+                              <span className="font-medium">{item.label}</span>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Help option for mobile */}
+                    <div className="transition-all duration-300 ease-out delay-200">
+                      <Link
+                        to="/help"
+                        className={cn(
+                          "flex items-center gap-3 rounded-md px-3 py-3 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400",
+                          active === 'help' 
+                            ? "bg-teal-500/20 text-teal-400" 
+                            : "text-foreground"
+                        )}
+                        onClick={() => handleNavItemClick('help')}
+                      >
+                        <HelpCircle size={20} />
+                        <span className="font-medium">Help</span>
+                      </Link>
+                    </div>
                   </div>
-                  
-                  <div className="flex items-center justify-between gap-2 transition-all duration-300 delay-400 ease-in-out">
-                    <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-lg">
-                      {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                </div>
+
+                {/* Footer with theme and auth buttons */}
+                <div className="p-4 border-t transition-all duration-300 ease-out delay-300">
+                  <div className="flex items-center justify-between gap-3">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={toggleTheme} 
+                      className="flex-1 justify-center gap-2 hover:bg-teal-500/20 hover:text-teal-400 hover:border-teal-400 transition-all duration-300"
+                    >
+                      {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                      <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
                     </Button>
+                    
                     {isAuthenticated ? (
-                      <Button variant="ghost" onClick={logout} className="rounded-lg">
-                        <LogOut size={20} />
-                        <span className="ml-2">Logout</span>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => {
+                          logout();
+                          setIsMobileMenuOpen(false);
+                        }} 
+                        className="flex-1 justify-center gap-2 hover:bg-teal-500/20 hover:text-teal-400 hover:border-teal-400 transition-all duration-300"
+                      >
+                        <LogOut size={18} />
+                        <span>Logout</span>
                       </Button>
                     ) : (
-                      <Button variant="ghost" onClick={handleOpenAuthModal} className="rounded-lg">
-                        <LogIn size={20} />
-                        <span className="ml-2">Login</span>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => {
+                          handleOpenAuthModal();
+                          setIsMobileMenuOpen(false);
+                        }} 
+                        className="flex-1 justify-center gap-2 hover:bg-teal-500/20 hover:text-teal-400 hover:border-teal-400 transition-all duration-300"
+                      >
+                        <LogIn size={18} />
+                        <span>Login</span>
                       </Button>
                     )}
                   </div>
