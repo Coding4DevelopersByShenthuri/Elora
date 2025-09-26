@@ -249,6 +249,15 @@ export const Navbar = () => {
 
             {/* Right side navigation items */}
             <div className="flex items-center">
+              {/* Help option */}
+              <NavItem
+                to="/help"
+                icon={<HelpCircle size={20} />}
+                label="Help"
+                active={active === 'help'}
+                onClick={() => handleNavItemClick('help')}
+              />
+
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button variant="ghost" size="icon" className="rounded-lg" onClick={toggleTheme}>
@@ -399,6 +408,21 @@ export const Navbar = () => {
                       </div>
                     </div>
                   )}
+
+                  {/* Help option for mobile */}
+                  <div className="transition-all duration-300 delay-350 ease-in-out">
+                    <Link
+                      to="/help"
+                      className={cn(
+                        "flex items-center gap-3 rounded-md px-3 py-2 transition-all duration-300 hover:bg-muted",
+                        active === 'help' ? "bg-primary/10 text-primary" : "hover:bg-muted"
+                      )}
+                      onClick={() => handleNavItemClick('help')}
+                    >
+                      <HelpCircle size={20} />
+                      <span className="font-medium">Help</span>
+                    </Link>
+                  </div>
                   
                   <div className="flex items-center justify-between gap-2 transition-all duration-300 delay-400 ease-in-out">
                     <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-lg">
