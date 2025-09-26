@@ -10,3 +10,9 @@ INFO 2025-09-26 14:51:03,957 autoreload 5412 21584 Watching for file changes wit
 INFO 2025-09-26 14:54:08,531 autoreload 5412 21584 C:\Users\shent\OneDrive\Desktop\Vocario\server\crud\settings.py changed, reloading.
 INFO 2025-09-26 14:54:12,296 autoreload 21144 9032 Watching for file changes with StatReloader
 INFO 2025-09-26 14:54:35,166 autoreload 21176 5940 Watching for file changes with StatReloader
+WARNING 2025-09-26 14:54:39,512 log 21176 3364 Not Found: /
+WARNING 2025-09-26 14:54:39,513 basehttp 21176 3364 "GET / HTTP/1.1" 404 2610
+WARNING 2025-09-26 14:54:39,750 log 21176 3364 Not Found: /favicon.ico
+WARNING 2025-09-26 14:54:39,758 basehttp 21176 3364 "GET /favicon.ico HTTP/1.1" 404 2661
+INFO 2025-09-26 14:55:52,377 basehttp 21176 21224 "POST /api/auth/register HTTP/1.1" 201 350
+INFO 2025-09-26 14:55:56,470 basehttp 21176 18816 "POST /api/auth/login HTTP/1.1" 200 343
