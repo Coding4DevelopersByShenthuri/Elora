@@ -86,7 +86,7 @@ const ManagePage = () => {
                     autoFocus
                   />
                   <Button size="icon" variant="ghost" onClick={handleSaveClick}>
-                    <Check size={18} className="text-green-500" />
+                    <Check size={18} className="text-teal-500" />
                   </Button>
                   <Button size="icon" variant="ghost" onClick={handleCancelClick}>
                     <X size={18} className="text-red-500" />

@@ -24,7 +24,7 @@ export const FeatureSection = ({ showFeatures }: FeatureSectionProps) => {
       icon: <FileText size={20} className="sm:size-6" />,
       title: "Rich Content",
       description: "Store notes, links, files, images, and projects in one unified knowledge system.",
-      color: "from-green-400/60 to-green-600/40"
+      color: "from-teal-400/60 to-teal-600/40"
     },
     {
       icon: <LinkIcon size={20} className="sm:size-6" />,

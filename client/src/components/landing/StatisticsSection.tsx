@@ -28,7 +28,7 @@ export const StatisticsSection = ({
     value: 0,
     label: "Connections",
     suffix: "M",
-    color: "from-emerald-500 to-green-600"
+    color: "from-teal-500 to-teal-600"
   }, {
     value: 0,
     label: "Ideas Captured",
@@ -50,7 +50,7 @@ export const StatisticsSection = ({
     value: 12.5,
     label: "Connections",
     suffix: "M",
-    color: "from-green-500 to-emerald-600"
+    color: "from-teal-500 to-cyan-600"
   }, {
     value: 2300,
     label: "Ideas Captured",

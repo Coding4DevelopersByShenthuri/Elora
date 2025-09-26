@@ -19,7 +19,7 @@ const DevelopersCase = ({ data }: DevelopersProps) => {
           {/* Speaking Practice */}
           <div className="bg-[#1c1e20] rounded p-3">
             <div className="flex items-center mb-2">
-              <div className="size-4 rounded-full bg-green-400 mr-2"></div>
+              <div className="size-4 rounded-full bg-teal-400 mr-2"></div>
               <span className="text-sm text-white">Speaking</span>
             </div>
             <p className="text-xs text-gray-300">Daily conversation practice</p>

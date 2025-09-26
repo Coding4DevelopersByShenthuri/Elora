@@ -23,7 +23,7 @@ export const NeuralNode: React.FC<NeuralNodeProps> = ({
   const typeColors = {
     note: 'from-blue-400/60 to-blue-600/40',
     link: 'from-purple-400/60 to-purple-600/40',
-    file: 'from-green-400/60 to-green-600/40',
+    file: 'from-teal-400/60 to-teal-600/40',
     image: 'from-amber-400/60 to-amber-600/40',
     project: 'from-rose-400/60 to-rose-600/40',
   };

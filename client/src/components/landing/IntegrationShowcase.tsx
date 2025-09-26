@@ -17,7 +17,7 @@ export const IntegrationShowcase = ({
   }, {
     name: "Evernote",
     logo: "M17.5 14.2c-.17.4-.71.93-1.5.93h-8c-.35 0-.7-.12-.97-.34l-3-2.25h.02A1.52 1.52 0 0 1 4.5 9c0-.53-.21-1.04-.62-1.41l.03-.03 2.5-2a1 1 0 0 1 .62-.21H12c.29 0 .75.14.97.34l.03.03V9l2.03-2.31.24-.23a6.7 6.7 0 0 1 3.35-1.5c-.33.5-.54 1.69-.54 2.74v4c0 .76.08 1.84.4 2.5h-.98Z",
-    color: "bg-gradient-to-br from-green-600 to-green-400 dark:from-green-500 dark:to-green-700",
+    color: "bg-gradient-to-br from-teal-600 to-teal-400 dark:from-teal-500 dark:to-teal-700",
     description: "Convert your Evernote notes into connected knowledge nodes with one click."
   }, {
     name: "Google Docs",

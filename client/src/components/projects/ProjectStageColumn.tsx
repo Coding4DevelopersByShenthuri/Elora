@@ -34,7 +34,7 @@ const ProjectStageColumn: React.FC<ProjectStageColumnProps> = ({
       case 'review':
         return <MessageSquare className="h-5 w-5 text-purple-500" />;
       case 'completed':
-        return <CheckCircle2 className="h-5 w-5 text-green-500" />;
+        return <CheckCircle2 className="h-5 w-5 text-teal-500" />;
       default:
         return null;
     }
@@ -64,7 +64,7 @@ const ProjectStageColumn: React.FC<ProjectStageColumnProps> = ({
       case 'review':
         return 'bg-purple-500/10 text-purple-500 border-purple-200';
       case 'completed':
-        return 'bg-green-500/10 text-green-500 border-green-200';
+        return 'bg-teal-500/10 text-teal-500 border-teal-200';
       default:
         return 'bg-gray-500/10 text-gray-500 border-gray-200';
     }

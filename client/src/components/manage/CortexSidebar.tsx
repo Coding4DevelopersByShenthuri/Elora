@@ -40,7 +40,7 @@ const CortexSidebar = ({
     {
       id: 'team',
       name: 'Team Space',
-      icon: <Users size={16} className="text-green-500" />,
+      icon: <Users size={16} className="text-teal-500" />,
       items: [
         { id: 'team-1', name: 'Brainboard Competitors' },
         { id: 'team-2', name: 'Visualize Terraform' },

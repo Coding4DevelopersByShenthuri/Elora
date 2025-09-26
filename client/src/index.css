@@ -75,12 +75,12 @@
     --muted-deep: 180 25% 88%;
     --muted-interactive: 180 35% 92%;
  
-    /* Subtle Accent Colors */
-    --accent: 142 76% 36%;
+    /* Subtle Accent Colors (teal) */
+    --accent: 178 80% 42%;
     --accent-foreground: 0 0% 100%;
-    --accent-deep: 142 76% 26%;
-    --accent-light: 142 76% 46%;
-    --accent-vibrant: 142 86% 41%;
+    --accent-deep: 178 80% 32%;
+    --accent-light: 178 80% 62%;
+    --accent-vibrant: 178 90% 48%;
 
     /* Additional Refined Colors */
     --tertiary: 45 93% 47%;
@@ -109,20 +109,20 @@
     /* Professional Floating Animation Elements */
     --gradient-floating-element-1: radial-gradient(circle, hsl(180 84% 40%) 0%, hsl(180 84% 30%) 100%);
     --gradient-floating-element-2: radial-gradient(circle, hsl(217 91% 60%) 0%, hsl(217 91% 45%) 100%);
-    --gradient-floating-element-3: radial-gradient(circle, hsl(142 76% 36%) 0%, hsl(142 76% 26%) 100%);
+    --gradient-floating-element-3: radial-gradient(circle, hsl(178 80% 42%) 0%, hsl(178 80% 32%) 100%);
     --gradient-floating-element-4: radial-gradient(circle, hsl(45 93% 47%) 0%, hsl(45 93% 37%) 100%);
     --gradient-floating-element-5: radial-gradient(circle, hsl(262 83% 58%) 0%, hsl(262 83% 48%) 100%);
     
     /* Enhanced Vibrant Design Tokens */
     --gradient-primary: linear-gradient(135deg, hsl(180 84% 40%), hsl(180 94% 50%), hsl(180 84% 60%));
     --gradient-secondary: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 100% 70%), hsl(217 91% 80%));
-    --gradient-accent: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 86% 46%), hsl(142 76% 56%));
+    --gradient-accent: linear-gradient(135deg, hsl(178 80% 42%), hsl(178 90% 50%), hsl(178 80% 60%));
     --gradient-tertiary: linear-gradient(135deg, hsl(45 93% 47%), hsl(45 100% 57%), hsl(45 93% 67%));
     --gradient-quaternary: linear-gradient(135deg, hsl(262 83% 58%), hsl(262 93% 68%), hsl(262 83% 78%));
-    --gradient-rainbow: linear-gradient(135deg, hsl(180 84% 40%), hsl(217 91% 60%), hsl(142 76% 36%), hsl(45 93% 47%), hsl(262 83% 58%));
-    --gradient-professional: linear-gradient(120deg, hsl(180 84% 88%), hsl(217 91% 85%), hsl(142 76% 87%), hsl(45 93% 85%), hsl(262 83% 87%));
-    --gradient-dynamic: linear-gradient(150deg, hsl(180 94% 50%), hsl(217 100% 70%), hsl(142 86% 46%), hsl(45 100% 57%), hsl(262 93% 68%));
-    --gradient-vivid: linear-gradient(45deg, hsl(180 84% 45%), hsl(217 91% 65%), hsl(142 76% 41%), hsl(45 93% 52%), hsl(262 83% 63%), hsl(180 84% 50%));
+    --gradient-rainbow: linear-gradient(135deg, hsl(180 84% 40%), hsl(217 91% 60%), hsl(178 80% 42%), hsl(45 93% 47%), hsl(262 83% 58%));
+    --gradient-professional: linear-gradient(120deg, hsl(180 84% 88%), hsl(217 91% 85%), hsl(178 76% 87%), hsl(45 93% 85%), hsl(262 83% 87%));
+    --gradient-dynamic: linear-gradient(150deg, hsl(180 94% 50%), hsl(217 100% 70%), hsl(178 90% 48%), hsl(45 100% 57%), hsl(262 93% 68%));
+    --gradient-vivid: linear-gradient(45deg, hsl(180 84% 45%), hsl(217 91% 65%), hsl(178 80% 42%), hsl(45 93% 52%), hsl(262 83% 63%), hsl(180 84% 50%));
     
     /* Professional Teal Shadows */
     --shadow-colorful: 0 10px 30px -10px hsl(180 84% 40% / 0.3);

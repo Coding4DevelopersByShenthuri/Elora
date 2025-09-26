@@ -481,7 +481,7 @@
   left: 0;
   width: 100%;
   padding: 1rem;
-  background-color: green;
+  background-color: #14b8a6; /* teal */
   color: white;
   text-align: center;
   z-index: 1000;

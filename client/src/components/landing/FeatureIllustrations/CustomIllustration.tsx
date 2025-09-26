@@ -18,11 +18,11 @@ export const CustomIllustration: React.FC<CustomIllustrationProps> = ({
 }) => {
   const bgColors = [
     'from-blue-500/20 to-purple-500/20',
-    'from-green-500/20 to-blue-500/20',
+    'from-teal-500/20 to-blue-500/20',
     'from-purple-500/20 to-pink-500/20',
     'from-indigo-500/20 to-blue-500/20',
     'from-amber-500/20 to-orange-500/20',
-    'from-teal-500/20 to-green-500/20',
+    'from-teal-500/20 to-teal-600/20',
     'from-blue-500/20 to-indigo-500/20',
     'from-violet-500/20 to-purple-500/20',
     'from-emerald-500/20 to-teal-500/20',
@@ -30,7 +30,7 @@ export const CustomIllustration: React.FC<CustomIllustrationProps> = ({
     'from-cyan-500/20 to-blue-500/20',
     'from-orange-500/20 to-amber-500/20',
     'from-sky-500/20 to-cyan-500/20',
-    'from-lime-500/20 to-green-500/20',
+    'from-cyan-500/20 to-teal-500/20',
     'from-fuchsia-500/20 to-pink-500/20',
     'from-yellow-500/20 to-amber-500/20'
   ];

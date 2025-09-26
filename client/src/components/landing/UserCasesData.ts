@@ -80,7 +80,7 @@ export const booksData: Book[] = [
   {
     title: "Word Power Made Easy",
     author: "Norman Lewis",
-    coverColor: "bg-[#059669]", // green
+    coverColor: "bg-[#14b8a6]", // teal
     textColor: "text-white",
     image: "/images/word-power-made-easy.png"
   },
