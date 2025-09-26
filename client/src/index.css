@@ -44,8 +44,8 @@
  
 @layer base {
   :root {
-    /* Professional Subtle Light Mode Design System */
-    --background: 240 100% 98%;
+    /* Professional Teal-Focused Light Mode Design System */
+    --background: 180 25% 98%;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -54,77 +54,82 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
  
-    /* Subtle Primary Colors */
-    --primary: 217 60% 55%;
+    /* Teal Primary Colors */
+    --primary: 180 84% 40%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 217 60% 65%;
-    --primary-deep: 217 60% 40%;
-    --primary-light: 217 60% 80%;
-    --primary-vibrant: 217 70% 70%;
+    --primary-glow: 180 84% 50%;
+    --primary-deep: 180 84% 30%;
+    --primary-light: 180 84% 60%;
+    --primary-vibrant: 180 94% 45%;
  
-    /* Refined Secondary Palette */
-    --secondary: 142 50% 65%;
+    /* Complementary Secondary Palette */
+    --secondary: 217 91% 60%;
     --secondary-foreground: 0 0% 100%;
-    --secondary-deep: 142 50% 50%;
-    --secondary-light: 142 50% 85%;
-    --secondary-vibrant: 142 60% 75%;
+    --secondary-deep: 217 91% 45%;
+    --secondary-light: 217 91% 75%;
+    --secondary-vibrant: 217 100% 65%;
  
     /* Interactive Muted Colors */
-    --muted: 220 50% 95%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --muted-deep: 220 50% 88%;
-    --muted-interactive: 220 60% 92%;
+    --muted: 180 25% 95%;
+    --muted-foreground: 180 25% 40%;
+    --muted-deep: 180 25% 88%;
+    --muted-interactive: 180 35% 92%;
  
     /* Subtle Accent Colors */
-    --accent: 262 40% 75%;
-    --accent-foreground: 262 83% 25%;
-    --accent-deep: 262 40% 60%;
-    --accent-light: 262 40% 90%;
-    --accent-vibrant: 262 50% 80%;
+    --accent: 142 76% 36%;
+    --accent-foreground: 0 0% 100%;
+    --accent-deep: 142 76% 26%;
+    --accent-light: 142 76% 46%;
+    --accent-vibrant: 142 86% 41%;
 
     /* Additional Refined Colors */
-    --tertiary: 45 60% 70%;
-    --tertiary-foreground: 45 85% 20%;
-    --tertiary-deep: 45 60% 55%;
-    --tertiary-light: 45 60% 85%;
+    --tertiary: 45 93% 47%;
+    --tertiary-foreground: 0 0% 100%;
+    --tertiary-deep: 45 93% 37%;
+    --tertiary-light: 45 93% 57%;
 
-    --quaternary: 330 50% 70%;
-    --quaternary-foreground: 330 70% 20%;
-    --quaternary-deep: 330 50% 55%;
-    --quaternary-light: 330 50% 85%;
+    --quaternary: 262 83% 58%;
+    --quaternary-foreground: 0 0% 100%;
+    --quaternary-deep: 262 83% 48%;
+    --quaternary-light: 262 83% 68%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    /* Soft Borders */
-    --border: 220 43% 91%;
-    --input: 220 43% 96%;
-    --ring: 217 91% 60%;
+    /* Soft Teal Borders */
+    --border: 180 25% 85%;
+    --input: 180 25% 96%;
+    --ring: 180 84% 40%;
  
     --radius: 0.75rem;
 
-    /* Subtle Professional Background System with Light Teal */
-    --gradient-background: linear-gradient(135deg, hsl(240 100% 97%) 0%, hsl(217 60% 93%) 15%, hsl(180 25% 96%) 30%, hsl(180 30% 94%) 45%, hsl(262 40% 92%) 60%, hsl(142 50% 93%) 75%, hsl(180 20% 95%) 90%, hsl(240 100% 95%) 100%);
+    /* Enhanced Teal Gradient Background System */
+    --gradient-background: linear-gradient(135deg, hsl(180 25% 98%) 0%, hsl(180 30% 96%) 25%, hsl(180 35% 94%) 50%, hsl(180 25% 96%) 75%, hsl(180 20% 98%) 100%);
     
-    --gradient-floating: radial-gradient(circle at 50% 50%, hsl(180 25% 92% / 0.25) 0%, transparent 60%), radial-gradient(circle at 80% 20%, hsl(217 60% 88% / 0.2) 0%, transparent 50%), radial-gradient(circle at 20% 80%, hsl(180 30% 94% / 0.3) 0%, transparent 55%), radial-gradient(circle at 65% 75%, hsl(142 50% 88% / 0.15) 0%, transparent 45%), radial-gradient(circle at 30% 30%, hsl(180 20% 90% / 0.2) 0%, transparent 40%);
+    /* Professional Floating Animation Elements */
+    --gradient-floating-element-1: radial-gradient(circle, hsl(180 84% 40%) 0%, hsl(180 84% 30%) 100%);
+    --gradient-floating-element-2: radial-gradient(circle, hsl(217 91% 60%) 0%, hsl(217 91% 45%) 100%);
+    --gradient-floating-element-3: radial-gradient(circle, hsl(142 76% 36%) 0%, hsl(142 76% 26%) 100%);
+    --gradient-floating-element-4: radial-gradient(circle, hsl(45 93% 47%) 0%, hsl(45 93% 37%) 100%);
+    --gradient-floating-element-5: radial-gradient(circle, hsl(262 83% 58%) 0%, hsl(262 83% 48%) 100%);
     
     /* Enhanced Vibrant Design Tokens */
-    --gradient-primary: linear-gradient(135deg, hsl(217 91% 55%), hsl(217 100% 70%), hsl(217 91% 80%));
-    --gradient-secondary: linear-gradient(135deg, hsl(142 85% 65%), hsl(142 100% 75%), hsl(142 85% 85%));
-    --gradient-accent: linear-gradient(135deg, hsl(262 70% 75%), hsl(262 90% 80%), hsl(262 70% 90%));
-    --gradient-tertiary: linear-gradient(135deg, hsl(45 95% 70%), hsl(45 100% 80%), hsl(45 95% 85%));
-    --gradient-quaternary: linear-gradient(135deg, hsl(330 80% 70%), hsl(330 90% 80%), hsl(330 80% 85%));
-    --gradient-rainbow: linear-gradient(135deg, hsl(217 91% 55%), hsl(262 70% 75%), hsl(142 85% 65%), hsl(45 95% 70%), hsl(330 80% 70%));
-    --gradient-professional: linear-gradient(120deg, hsl(217 91% 88%), hsl(262 70% 85%), hsl(142 85% 87%), hsl(45 95% 85%), hsl(330 80% 87%));
-    --gradient-dynamic: linear-gradient(150deg, hsl(217 100% 70%), hsl(262 90% 80%), hsl(142 100% 75%), hsl(45 100% 80%), hsl(330 90% 80%));
-    --gradient-vivid: linear-gradient(45deg, hsl(217 91% 60%), hsl(262 70% 70%), hsl(142 85% 70%), hsl(45 95% 75%), hsl(330 80% 75%), hsl(217 91% 65%));
+    --gradient-primary: linear-gradient(135deg, hsl(180 84% 40%), hsl(180 94% 50%), hsl(180 84% 60%));
+    --gradient-secondary: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 100% 70%), hsl(217 91% 80%));
+    --gradient-accent: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 86% 46%), hsl(142 76% 56%));
+    --gradient-tertiary: linear-gradient(135deg, hsl(45 93% 47%), hsl(45 100% 57%), hsl(45 93% 67%));
+    --gradient-quaternary: linear-gradient(135deg, hsl(262 83% 58%), hsl(262 93% 68%), hsl(262 83% 78%));
+    --gradient-rainbow: linear-gradient(135deg, hsl(180 84% 40%), hsl(217 91% 60%), hsl(142 76% 36%), hsl(45 93% 47%), hsl(262 83% 58%));
+    --gradient-professional: linear-gradient(120deg, hsl(180 84% 88%), hsl(217 91% 85%), hsl(142 76% 87%), hsl(45 93% 85%), hsl(262 83% 87%));
+    --gradient-dynamic: linear-gradient(150deg, hsl(180 94% 50%), hsl(217 100% 70%), hsl(142 86% 46%), hsl(45 100% 57%), hsl(262 93% 68%));
+    --gradient-vivid: linear-gradient(45deg, hsl(180 84% 45%), hsl(217 91% 65%), hsl(142 76% 41%), hsl(45 93% 52%), hsl(262 83% 63%), hsl(180 84% 50%));
     
-    /* Professional Shadows */
-    --shadow-colorful: 0 10px 30px -10px hsl(217 91% 60% / 0.3);
-    --shadow-glow: 0 0 40px hsl(217 91% 70% / 0.4);
-    --shadow-soft: 0 4px 20px -4px hsl(220 43% 91% / 0.6);
-    --shadow-interactive: 0 8px 25px -8px hsl(217 91% 60% / 0.2);
-    --shadow-floating: 0 15px 35px -15px hsl(262 50% 85% / 0.3);
+    /* Professional Teal Shadows */
+    --shadow-colorful: 0 10px 30px -10px hsl(180 84% 40% / 0.3);
+    --shadow-glow: 0 0 40px hsl(180 84% 50% / 0.4);
+    --shadow-soft: 0 4px 20px -4px hsl(180 25% 85% / 0.6);
+    --shadow-interactive: 0 8px 25px -8px hsl(180 84% 40% / 0.2);
+    --shadow-floating: 0 15px 35px -15px hsl(180 84% 50% / 0.3);
     
     /* Enhanced Transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -177,7 +182,72 @@
   .animate-pulse-slow {
     animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
-  /* Smooth clockwise half-rotation (0 -> 180deg), then instant reset */
+  
+  /* Professional background animation elements */
+  .light .floating-element {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.08;
+    filter: blur(40px);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    animation-iteration-count: infinite;
+    pointer-events: none;
+  }
+  
+  .light .floating-element-1 {
+    width: 300px;
+    height: 300px;
+    background: var(--gradient-floating-element-1);
+    top: 10%;
+    left: 5%;
+    animation: professionalFloat1 25s infinite;
+  }
+  
+  .light .floating-element-2 {
+    width: 400px;
+    height: 400px;
+    background: var(--gradient-floating-element-2);
+    top: 60%;
+    right: 10%;
+    animation: professionalFloat2 30s infinite;
+  }
+  
+  .light .floating-element-3 {
+    width: 250px;
+    height: 250px;
+    background: var(--gradient-floating-element-3);
+    bottom: 10%;
+    left: 20%;
+    animation: professionalFloat3 20s infinite;
+  }
+  
+  .light .floating-element-4 {
+    width: 350px;
+    height: 350px;
+    background: var(--gradient-floating-element-4);
+    top: 20%;
+    right: 20%;
+    animation: professionalFloat4 35s infinite;
+  }
+  
+  .light .floating-element-5 {
+    width: 200px;
+    height: 200px;
+    background: var(--gradient-floating-element-5);
+    bottom: 30%;
+    right: 5%;
+    animation: professionalFloat5 28s infinite;
+  }
+  
+  /* Grid overlay utility */
+  .light .grid-overlay {
+    background-image: 
+      linear-gradient(rgba(20, 184, 166, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(20, 184, 166, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  /* Smooth clockwise half-rotation */
   .animate-rotate-half {
     animation: rotateHalfClockwise 3s ease-in-out infinite;
     transform-origin: center;
@@ -229,6 +299,13 @@
   .light .pulse-glow {
     animation: pulseGlow 2s infinite ease-in-out;
   }
+  
+  .light .teal-gradient-text {
+    background: linear-gradient(135deg, hsl(180 84% 40%), hsl(180 94% 50%));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 }
  
 @layer base {
@@ -240,14 +317,14 @@
     @apply text-foreground;
   }
   
-  /* Light mode professional subtle background system */
+  /* Light mode professional teal background system */
   .light body {
     background: var(--gradient-background);
     position: relative;
     overflow-x: hidden;
   }
   
-  /* Single smooth floating animation layer */
+  /* Professional animated background container */
   .light body::before {
     content: '';
     position: fixed;
@@ -255,11 +332,9 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: var(--gradient-floating);
     pointer-events: none;
     z-index: -1;
-    opacity: 0.4;
-    animation: float 12s ease-in-out infinite;
+    opacity: 0.6;
   }
   
   /* Dark mode simple background */
@@ -274,6 +349,42 @@
 
 .neural-node {
   @apply bg-gradient-to-br from-primary/20 to-primary/10 rounded-full shadow-lg;
+}
+
+/* Professional Floating Animations */
+@keyframes professionalFloat1 {
+  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  25% { transform: translate(40px, -30px) scale(1.1) rotate(5deg); }
+  50% { transform: translate(20px, 40px) scale(0.9) rotate(-3deg); }
+  75% { transform: translate(-30px, 20px) scale(1.05) rotate(2deg); }
+}
+
+@keyframes professionalFloat2 {
+  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  25% { transform: translate(-50px, 40px) scale(1.15) rotate(8deg); }
+  50% { transform: translate(60px, -20px) scale(0.85) rotate(-5deg); }
+  75% { transform: translate(-40px, -30px) scale(1.1) rotate(3deg); }
+}
+
+@keyframes professionalFloat3 {
+  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  25% { transform: translate(30px, -40px) scale(1.05) rotate(4deg); }
+  50% { transform: translate(-50px, 30px) scale(0.95) rotate(-2deg); }
+  75% { transform: translate(40px, 50px) scale(1.1) rotate(6deg); }
+}
+
+@keyframes professionalFloat4 {
+  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  25% { transform: translate(-60px, 20px) scale(1.2) rotate(10deg); }
+  50% { transform: translate(40px, -40px) scale(0.8) rotate(-6deg); }
+  75% { transform: translate(-20px, 60px) scale(1.15) rotate(4deg); }
+}
+
+@keyframes professionalFloat5 {
+  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  25% { transform: translate(50px, -30px) scale(1.1) rotate(3deg); }
+  50% { transform: translate(-30px, 50px) scale(0.9) rotate(-4deg); }
+  75% { transform: translate(40px, 30px) scale(1.05) rotate(7deg); }
 }
 
 @keyframes pulse {
@@ -514,7 +625,6 @@
     opacity: 0;
   }
   100% {
-    /* snap back to start to keep motion always clockwise */
     transform: rotate(0deg);
     opacity: 0;
   }
@@ -562,16 +672,5 @@
   66% {
     transform: scale(0.98) rotate(-0.3deg);
     opacity: 0.3;
-  }
-}
-
-@keyframes breathe {
-  0%, 100% {
-    transform: scale(1) translateY(0);
-    opacity: 0.25;
-  }
-  50% {
-    transform: scale(1.05) translateY(-5px);
-    opacity: 0.35;
   }
 }
