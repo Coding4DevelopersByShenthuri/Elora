@@ -294,8 +294,8 @@ export const Navbar = () => {
               )}
             </div>
 
-            {/* Mobile: hamburger */}
-            <div className="flex sm:hidden items-center ml-auto">
+            {/* Mobile: hamburger - moved to the right side */}
+            <div className="flex sm:hidden items-center ml-auto mr-[-210px] mt-[-10px]">
               {showMenuIcon && (
                 <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                   <SheetTrigger asChild>
