@@ -116,20 +116,30 @@ export const Navbar = () => {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showMenuIcon, setShowMenuIcon] = useState(true);
+  const [isNavbarVisible, setIsNavbarVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   useEffect(() => {
-    let lastScrollY = window.scrollY;
     const handleScroll = () => {
-      if (window.scrollY > lastScrollY) {
+      const currentScrollY = window.scrollY;
+      
+      // Show/hide navbar based on scroll direction
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scrolling down and past 100px - hide navbar
+        setIsNavbarVisible(false);
         setShowMenuIcon(false);
-      } else {
+      } else if (currentScrollY < lastScrollY) {
+        // Scrolling up - show navbar
+        setIsNavbarVisible(true);
         setShowMenuIcon(true);
       }
-      lastScrollY = window.scrollY;
+      
+      setLastScrollY(currentScrollY);
     };
-    window.addEventListener("scroll", handleScroll);
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [lastScrollY]);
 
   const handleOpenAuthModal = () => setIsAuthModalOpen(true);
   const handleCloseAuthModal = () => setIsAuthModalOpen(false);
@@ -178,7 +188,12 @@ export const Navbar = () => {
     <>
       <TooltipProvider>
         {/* Desktop Navigation - Only visible on desktop */}
-        <header className="glass-panel fixed top-6 left-1/2 transform -translate-x-1/2 z-40 rounded-lg px-1 py-1 hidden sm:block">
+        <header 
+          className={cn(
+            "glass-panel fixed top-6 left-1/2 transform -translate-x-1/2 z-40 rounded-lg px-1 py-1 hidden sm:block transition-transform duration-300 ease-in-out",
+            isNavbarVisible ? "translate-y-0" : "-translate-y-32"
+          )}
+        >
           <nav className="flex items-center justify-between w-full">
             {/* Left side navigation items */}
             <div className="flex items-center">
@@ -310,7 +325,12 @@ export const Navbar = () => {
         </header>
 
         {/* Mobile Navigation - Only visible on mobile */}
-        <header className="fixed top-6 right-6 z-40 sm:hidden">
+        <header 
+          className={cn(
+            "fixed top-6 right-6 z-40 sm:hidden transition-transform duration-300 ease-in-out",
+            isNavbarVisible ? "translate-y-0" : "-translate-y-32"
+          )}
+        >
           {showMenuIcon && (
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>

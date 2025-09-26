@@ -240,7 +240,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
           {/* Register Form */}
           <div className="auth-form-container auth-register-container">
             <form onSubmit={handleAuth} className="h-full bg-[#143C3D] p-8 flex flex-col justify-center">
-              <h1 className="text-3xl font-bold text-white mb-6 text-center">Vocario</h1>
+              <h1 className="text-3xl font-bold text-white mb-6 text-center">Spoke Bee</h1>
               
               {/* Error Message */}
               {error && (
@@ -394,7 +394,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
           {/* Login Form */}
           <div className="auth-form-container auth-login-container">
             <form onSubmit={handleAuth} className="h-full bg-[#143C3D] p-8 flex flex-col justify-center">
-              <h1 className="text-3xl font-bold text-white mb-6 text-center">Vocario</h1>
+              <h1 className="text-3xl font-bold text-white mb-6 text-center">Spoke Bee</h1>
               
               {/* Error Message */}
               {error && (

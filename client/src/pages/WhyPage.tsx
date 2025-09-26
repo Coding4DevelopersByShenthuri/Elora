@@ -81,7 +81,7 @@ const WhyPage = () => {
                 We've always approached language learning this way. We looked at the current tools and asked ourselves: why must learning spoken English rely on internet connectivity? Why are expensive cloud subscriptions required? Why do many apps collect user data unnecessarily? Are these features helping learners—or just creating clutter? What if we did it differently?
               </p>
               <p>
-                With Vocario, we asked ourselves: why not? Why not build a fully offline, AI-powered trainer that runs entirely on your device? Why not make it private, fast, and available anytime, anywhere? Why not create tailored lessons for kids, adults, and exam aspirants that actually help them speak English confidently? Forget how it’s usually done—let’s make learning better, simpler, and more engaging.
+                With Spoke Bee, we asked ourselves: why not? Why not build a fully offline, AI-powered trainer that runs entirely on your device? Why not make it private, fast, and available anytime, anywhere? Why not create tailored lessons for kids, adults, and exam aspirants that actually help them speak English confidently? Forget how it’s usually done—let’s make learning better, simpler, and more engaging.
               </p>
               <div className="mt-6">
                 <Button variant="outline" className="gap-2" asChild>
@@ -92,7 +92,7 @@ const WhyPage = () => {
                 </Button>
               </div>
               <div className="mt-4 text-sm text-muted-foreground">
-                <p className="font-medium">The beginning — How did we end up creating Vocario?</p>
+                <p className="font-medium">The beginning — How did we end up creating Spoke Bee?</p>
                 <p className="mt-2 font-medium">A letter — How can we help you speak confidently, anywhere, anytime, without relying on the internet?</p>
               </div>
             </>
