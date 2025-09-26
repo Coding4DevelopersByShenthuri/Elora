@@ -19,7 +19,6 @@ import { AiOutlineLaptop } from 'react-icons/ai';
 // Ionicons v5
 import { IoTrophyOutline } from 'react-icons/io5';
 
-type IconType = (props: { size?: number; color?: string; className?: string; style?: React.CSSProperties }) => JSX.Element;
 
 const tealPalette = [
   'hsl(178 80% 42%)',
@@ -29,7 +28,7 @@ const tealPalette = [
   'hsl(180 84% 30%)',
 ];
 
-const icons: IconType[] = [
+const icons = [
   MdSchool,
   FaBookOpen,
   GiTeacher,
@@ -76,9 +75,6 @@ export const FloatingIconsLayer: React.FC = () => {
       className="pointer-events-none fixed inset-0 z-0 light:block dark:hidden"
       style={{ contain: 'layout style', isolation: 'isolate' }}
     >
-      {/* Grid overlay from index.css pairs nicely */}
-      <div className="grid-overlay absolute inset-0" />
-
       {items.map((item, i) => (
         <div
           key={i}
