@@ -174,10 +174,11 @@ export const Navbar = () => {
   return (
     <>
       <TooltipProvider>
-        <header className="glass-panel fixed top-6 left-1/2 transform -translate-x-1/2 z-40 rounded-lg px-1 py-1">
+        {/* Desktop Navigation - Only visible on desktop */}
+        <header className="glass-panel fixed top-6 left-1/2 transform -translate-x-1/2 z-40 rounded-lg px-1 py-1 hidden sm:block">
           <nav className="flex items-center justify-between w-full">
-            {/* Desktop nav - left side */}
-            <div className="hidden sm:flex items-center">
+            {/* Left side navigation items */}
+            <div className="flex items-center">
               {/* Cortex with submenu */}
               <NavItem
                 to="#"
@@ -246,8 +247,8 @@ export const Navbar = () => {
               ))}
             </div>
 
-            {/* Desktop nav - right side */}
-            <div className="hidden sm:flex items-center">
+            {/* Right side navigation items */}
+            <div className="flex items-center">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button variant="ghost" size="icon" className="rounded-lg" onClick={toggleTheme}>
@@ -293,131 +294,132 @@ export const Navbar = () => {
                 </Tooltip>
               )}
             </div>
+          </nav>
+        </header>
 
-            {/* Mobile: hamburger - moved to the right side */}
-            <div className="flex sm:hidden items-center ml-auto mr-[-210px] mt-[-10px]">
-              {showMenuIcon && (
-                <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-                  <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon" className="rounded-lg">
-                      <Menu size={22} />
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent 
-                    side="left" 
-                    className="p-0 w-[280px] sm:w-[300px] transition-all duration-500 ease-in-out"
-                    style={{
-                      animation: isMobileMenuOpen 
-                        ? 'slideInFromLeft 0.5s ease-in-out forwards' 
-                        : 'slideOutToLeft 0.5s ease-in-out forwards'
-                    }}
-                  >
-                    <div className="p-4 space-y-4 transition-all duration-300 ease-in-out">
-                      {/* Cortex mobile */}
-                      <div className="transition-all duration-300 delay-75 ease-in-out">
-                        <div className="px-1 text-xs font-semibold text-muted-foreground uppercase">Mind</div>
-                        <div className="mt-2 grid gap-1">
-                          {cortexSubmenu.map((item) => (
-                            <Link
-                              key={item.id}
-                              to={item.to}
-                              className={cn(
-                                "flex items-center gap-3 rounded-md px-3 py-2 transition-all duration-300 hover:bg-muted",
-                                active === item.id ? "bg-primary/10 text-primary" : "hover:bg-muted"
-                              )}
-                              onClick={() => handleNavItemClick(item.id)}
-                            >
-                              {item.icon}
-                              <span className="font-medium">{item.label}</span>
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
+        {/* Mobile Navigation - Only visible on mobile */}
+        <header className="fixed top-6 right-6 z-40 sm:hidden">
+          {showMenuIcon && (
+            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="rounded-lg glass-panel">
+                  <Menu size={22} />
+                </Button>
+              </SheetTrigger>
+              <SheetContent 
+                side="left" 
+                className="p-0 w-[280px] sm:w-[300px] transition-all duration-500 ease-in-out"
+                style={{
+                  animation: isMobileMenuOpen 
+                    ? 'slideInFromLeft 0.5s ease-in-out forwards' 
+                    : 'slideOutToLeft 0.5s ease-in-out forwards'
+                }}
+              >
+                <div className="p-4 space-y-4 transition-all duration-300 ease-in-out">
+                  {/* Cortex mobile */}
+                  <div className="transition-all duration-300 delay-75 ease-in-out">
+                    <div className="px-1 text-xs font-semibold text-muted-foreground uppercase">Mind</div>
+                    <div className="mt-2 grid gap-1">
+                      {cortexSubmenu.map((item) => (
+                        <Link
+                          key={item.id}
+                          to={item.to}
+                          className={cn(
+                            "flex items-center gap-3 rounded-md px-3 py-2 transition-all duration-300 hover:bg-muted",
+                            active === item.id ? "bg-primary/10 text-primary" : "hover:bg-muted"
+                          )}
+                          onClick={() => handleNavItemClick(item.id)}
+                        >
+                          {item.icon}
+                          <span className="font-medium">{item.label}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
 
-                      {/* Categories mobile */}
-                      <div className="transition-all duration-300 delay-150 ease-in-out">
-                        <div className="px-1 text-xs font-semibold text-muted-foreground uppercase">Categories</div>
-                        <div className="mt-2 grid gap-1">
-                          {categoriesSubmenu.map((item) => (
-                            <div key={item.id}>
-                              <Link
-                                to={item.to}
-                                className={cn(
-                                  "flex items-center gap-3 rounded-md px-3 py-2 transition-all duration-300 hover:bg-muted",
-                                  active === item.id ? "bg-primary/10 text-primary" : "hover:bg-muted"
-                                )}
-                                onClick={() => handleNavItemClick(item.id)}
-                              >
-                                {item.icon}
-                                <span className="font-medium">{item.label}</span>
-                              </Link>
-                              {item.children && (
-                                <div className="ml-6 mt-1 space-y-1 transition-all duration-300 delay-200 ease-in-out">
-                                  {item.children.map((sub) => (
-                                    <Link
-                                      key={sub.id}
-                                      to={sub.to}
-                                      className={cn(
-                                        "flex items-center gap-2 rounded-md px-3 py-1 text-sm transition-all duration-300 hover:bg-muted",
-                                        active === sub.id ? "bg-primary/10 text-primary" : "hover:bg-muted"
-                                      )}
-                                      onClick={() => handleNavItemClick(sub.id)}
-                                    >
-                                      {sub.icon}
-                                      <span>{sub.label}</span>
-                                    </Link>
-                                  ))}
-                                </div>
-                              )}
+                  {/* Categories mobile */}
+                  <div className="transition-all duration-300 delay-150 ease-in-out">
+                    <div className="px-1 text-xs font-semibold text-muted-foreground uppercase">Categories</div>
+                    <div className="mt-2 grid gap-1">
+                      {categoriesSubmenu.map((item) => (
+                        <div key={item.id}>
+                          <Link
+                            to={item.to}
+                            className={cn(
+                              "flex items-center gap-3 rounded-md px-3 py-2 transition-all duration-300 hover:bg-muted",
+                              active === item.id ? "bg-primary/10 text-primary" : "hover:bg-muted"
+                            )}
+                            onClick={() => handleNavItemClick(item.id)}
+                          >
+                            {item.icon}
+                            <span className="font-medium">{item.label}</span>
+                          </Link>
+                          {item.children && (
+                            <div className="ml-6 mt-1 space-y-1 transition-all duration-300 delay-200 ease-in-out">
+                              {item.children.map((sub) => (
+                                <Link
+                                  key={sub.id}
+                                  to={sub.to}
+                                  className={cn(
+                                    "flex items-center gap-2 rounded-md px-3 py-1 text-sm transition-all duration-300 hover:bg-muted",
+                                    active === sub.id ? "bg-primary/10 text-primary" : "hover:bg-muted"
+                                  )}
+                                  onClick={() => handleNavItemClick(sub.id)}
+                                >
+                                  {sub.icon}
+                                  <span>{sub.label}</span>
+                                </Link>
+                              ))}
                             </div>
-                          ))}
+                          )}
                         </div>
-                      </div>
+                      ))}
+                    </div>
+                  </div>
 
-                      {/* Authenticated nav mobile */}
-                      {isAuthenticated && (
-                        <div className="transition-all duration-300 delay-300 ease-in-out">
-                          <div className="px-1 text-xs font-semibold text-muted-foreground uppercase">Navigation</div>
-                          <div className="mt-2 grid gap-1">
-                            {navItems.map((item) => (
-                              <Link
-                                key={item.id}
-                                to={item.to}
-                                className={cn(
-                                  "flex items-center gap-3 rounded-md px-3 py-2 transition-all duration-300 hover:bg-muted",
-                                  active === item.id ? "bg-primary/10 text-primary" : "hover:bg-muted"
-                                )}
-                                onClick={() => handleNavItemClick(item.id)}
-                              >
-                                {item.icon}
-                                <span className="font-medium">{item.label}</span>
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      <div className="flex items-center justify-between gap-2 transition-all duration-300 delay-400 ease-in-out">
-                        <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-lg">
-                          {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-                        </Button>
-                        {isAuthenticated ? (
-                          <Button variant="ghost" onClick={logout} className="rounded-lg">
-                            <LogOut size={20} />
-                            <span className="ml-2">Logout</span>
-                          </Button>
-                        ) : (
-                          <Button variant="ghost" onClick={handleOpenAuthModal} className="rounded-lg">
-                            <LogIn size={20} />
-                            <span className="ml-2">Login</span>
-                          </Button>
-                        )}
+                  {/* Authenticated nav mobile */}
+                  {isAuthenticated && (
+                    <div className="transition-all duration-300 delay-300 ease-in-out">
+                      <div className="px-1 text-xs font-semibold text-muted-foreground uppercase">Navigation</div>
+                      <div className="mt-2 grid gap-1">
+                        {navItems.map((item) => (
+                          <Link
+                            key={item.id}
+                            to={item.to}
+                            className={cn(
+                              "flex items-center gap-3 rounded-md px-3 py-2 transition-all duration-300 hover:bg-muted",
+                              active === item.id ? "bg-primary/10 text-primary" : "hover:bg-muted"
+                            )}
+                            onClick={() => handleNavItemClick(item.id)}
+                          >
+                            {item.icon}
+                            <span className="font-medium">{item.label}</span>
+                          </Link>
+                        ))}
                       </div>
                     </div>
-                  </SheetContent>
-                </Sheet>
-              )}
-            </div>
-          </nav>
+                  )}
+                  
+                  <div className="flex items-center justify-between gap-2 transition-all duration-300 delay-400 ease-in-out">
+                    <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-lg">
+                      {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                    </Button>
+                    {isAuthenticated ? (
+                      <Button variant="ghost" onClick={logout} className="rounded-lg">
+                        <LogOut size={20} />
+                        <span className="ml-2">Logout</span>
+                      </Button>
+                    ) : (
+                      <Button variant="ghost" onClick={handleOpenAuthModal} className="rounded-lg">
+                        <LogIn size={20} />
+                        <span className="ml-2">Login</span>
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+          )}
         </header>
       </TooltipProvider>
 
