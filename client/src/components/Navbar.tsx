@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Brain, LogIn, Search, Upload, User, Settings, LogOut, Moon, Sun, Table, Info, HelpCircle, Code, Menu, Users } from 'lucide-react';
+import { 
+  Brain, LogIn, Search, Upload, User, Settings, LogOut, Moon, Sun, 
+  Table, Info, HelpCircle, Code, Menu, Users, Baby, FolderTree, Lightbulb ,
+  GraduationCap, Layers, Award
+} from 'lucide-react';
 import { useRippleEffect } from '@/lib/animations';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -48,7 +52,7 @@ const NavItem = ({ to, icon, label, active, onClick, hasSubmenu, children }: Nav
               <span className="font-medium">{label}</span>
             </NavigationMenuTrigger>
             <NavigationMenuContent>
-              <div className="grid w-[200px] gap-1 p-2">{children}</div>
+              <div className="grid w-[220px] gap-1 p-2">{children}</div>
             </NavigationMenuContent>
           </NavigationMenuItem>
         </NavigationMenuList>
@@ -85,19 +89,22 @@ const NavItem = ({ to, icon, label, active, onClick, hasSubmenu, children }: Nav
   );
 };
 
-const SubMenuItem = ({ to, icon, label, active, onClick }: NavItemProps) => {
+const SubMenuItem = ({ to, icon, label, active, onClick, children }: NavItemProps) => {
   return (
-    <Link
-      to={to}
-      className={cn(
-        "flex items-center gap-2 p-2 rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-300",
-        active ? "bg-primary/10 text-primary" : ""
-      )}
-      onClick={onClick}
-    >
-      <span className={cn("transition-all duration-300", active ? "text-primary" : "text-foreground/60")}>{icon}</span>
-      <span>{label}</span>
-    </Link>
+    <div>
+      <Link
+        to={to}
+        className={cn(
+          "flex items-center gap-2 p-2 rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-300",
+          active ? "bg-primary/10 text-primary" : ""
+        )}
+        onClick={onClick}
+      >
+        <span className={cn("transition-all duration-300", active ? "text-primary" : "text-foreground/60")}>{icon}</span>
+        <span>{label}</span>
+      </Link>
+      {children && <div className="ml-6 mt-1 space-y-1">{children}</div>}
+    </div>
   );
 };
 
@@ -107,18 +114,16 @@ export const Navbar = () => {
   const { isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
-  // Mobile sheet open/close state
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  // Scroll behavior for hiding menu icon
   const [showMenuIcon, setShowMenuIcon] = useState(true);
+
   useEffect(() => {
     let lastScrollY = window.scrollY;
     const handleScroll = () => {
       if (window.scrollY > lastScrollY) {
-        setShowMenuIcon(false); // scrolling down → hide
+        setShowMenuIcon(false);
       } else {
-        setShowMenuIcon(true); // scrolling up → show
+        setShowMenuIcon(true);
       }
       lastScrollY = window.scrollY;
     };
@@ -131,7 +136,7 @@ export const Navbar = () => {
 
   const handleNavItemClick = (id: string) => {
     setActive(id);
-    setIsMobileMenuOpen(false); // close mobile menu after selecting
+    setIsMobileMenuOpen(false);
   };
 
   const cortexSubmenu = [
@@ -141,9 +146,19 @@ export const Navbar = () => {
   ];
 
   const categoriesSubmenu = [
-    { to: '/kids', icon: <Users size={18} />, label: 'Kids', id: 'kids' },
-    { to: '/adults', icon: <Users size={18} />, label: 'Adults', id: 'adults' },
-    { to: '/ielts-pte', icon: <Users size={18} />, label: 'IELTS/PTE', id: 'ielts-pte' },
+    { to: '/kids', icon: <Baby size={18} />, label: 'Kids', id: 'kids' },
+    { 
+      to: '/adults',
+      icon: <Users size={18} />, 
+      label: 'Adults', 
+      id: 'adults',
+      children: [
+        { to: '/adults/beginners', icon: <Lightbulb size={16} />, label: 'Beginners', id: 'adults-beginners' },
+        { to: '/adults/intermediates', icon: <Layers size={16} />, label: 'Intermediates', id: 'adults-intermediates' },
+        { to: '/adults/advanced', icon: <Award size={16} />, label: 'Advanced', id: 'adults-advanced' },
+      ]
+    },
+    { to: '/ielts-pte', icon: <GraduationCap size={18} />, label: 'IELTS/PTE', id: 'ielts-pte' },
   ];
 
   const authNavItems = [
@@ -169,7 +184,7 @@ export const Navbar = () => {
                 icon={<Brain size={20} />}
                 label="Mind"
                 active={['what', 'why', 'how'].includes(active)}
-                onClick={() => {}}
+                onClick={() => { }}
                 hasSubmenu={true}
               >
                 {cortexSubmenu.map((item) => (
@@ -187,10 +202,13 @@ export const Navbar = () => {
               {/* Categories with submenu */}
               <NavItem
                 to="#"
-                icon={<Users size={20} />}
+                icon={<FolderTree size={20} />}
                 label="Categories"
-                active={['kids', 'adults', 'ielts-pte'].includes(active)}
-                onClick={() => {}}
+                active={[
+                  'kids','adults','ielts-pte',
+                  'adults-beginners','adults-intermediates','adults-advanced'
+                ].includes(active)}
+                onClick={() => { }}
                 hasSubmenu={true}
               >
                 {categoriesSubmenu.map((item) => (
@@ -201,6 +219,16 @@ export const Navbar = () => {
                     label={item.label}
                     active={active === item.id}
                     onClick={() => handleNavItemClick(item.id)}
+                    children={item.children?.map((sub) => (
+                      <SubMenuItem
+                        key={sub.id}
+                        to={sub.to}
+                        icon={sub.icon}
+                        label={sub.label}
+                        active={active === sub.id}
+                        onClick={() => handleNavItemClick(sub.id)}
+                      />
+                    ))}
                   />
                 ))}
               </NavItem>
@@ -266,7 +294,7 @@ export const Navbar = () => {
               )}
             </div>
 
-            {/* Mobile: hamburger - moved to the right */}
+            {/* Mobile: hamburger */}
             <div className="flex sm:hidden items-center ml-auto">
               {showMenuIcon && (
                 <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
@@ -275,37 +303,26 @@ export const Navbar = () => {
                       <Menu size={22} />
                     </Button>
                   </SheetTrigger>
-                  <SheetContent side="left" className="p-0">
-                    <div className="p-4 space-y-4">
-                      <div>
-                        <div className="px-1 text-xs font-semibold text-muted-foreground uppercase">Cortex</div>
+                  <SheetContent 
+                    side="left" 
+                    className="p-0 w-[280px] sm:w-[300px] transition-all duration-500 ease-in-out"
+                    style={{
+                      animation: isMobileMenuOpen 
+                        ? 'slideInFromLeft 0.5s ease-in-out forwards' 
+                        : 'slideOutToLeft 0.5s ease-in-out forwards'
+                    }}
+                  >
+                    <div className="p-4 space-y-4 transition-all duration-300 ease-in-out">
+                      {/* Cortex mobile */}
+                      <div className="transition-all duration-300 delay-75 ease-in-out">
+                        <div className="px-1 text-xs font-semibold text-muted-foreground uppercase">Mind</div>
                         <div className="mt-2 grid gap-1">
                           {cortexSubmenu.map((item) => (
                             <Link
                               key={item.id}
                               to={item.to}
                               className={cn(
-                                "flex items-center gap-3 rounded-md px-3 py-2",
-                                active === item.id ? "bg-primary/10 text-primary" : "hover:bg-muted"
-                              )}
-                              onClick={() => handleNavItemClick(item.id)}
-                            >
-                              {item.icon}
-                              <span className="font-medium">{item.label}</span>
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <div className="px-1 text-xs font-semibold text-muted-foreground uppercase">Categories</div>
-                        <div className="mt-2 grid gap-1">
-                          {categoriesSubmenu.map((item) => (
-                            <Link
-                              key={item.id}
-                              to={item.to}
-                              className={cn(
-                                "flex items-center gap-3 rounded-md px-3 py-2",
+                                "flex items-center gap-3 rounded-md px-3 py-2 transition-all duration-300 hover:bg-muted",
                                 active === item.id ? "bg-primary/10 text-primary" : "hover:bg-muted"
                               )}
                               onClick={() => handleNavItemClick(item.id)}
@@ -317,8 +334,49 @@ export const Navbar = () => {
                         </div>
                       </div>
 
+                      {/* Categories mobile */}
+                      <div className="transition-all duration-300 delay-150 ease-in-out">
+                        <div className="px-1 text-xs font-semibold text-muted-foreground uppercase">Categories</div>
+                        <div className="mt-2 grid gap-1">
+                          {categoriesSubmenu.map((item) => (
+                            <div key={item.id}>
+                              <Link
+                                to={item.to}
+                                className={cn(
+                                  "flex items-center gap-3 rounded-md px-3 py-2 transition-all duration-300 hover:bg-muted",
+                                  active === item.id ? "bg-primary/10 text-primary" : "hover:bg-muted"
+                                )}
+                                onClick={() => handleNavItemClick(item.id)}
+                              >
+                                {item.icon}
+                                <span className="font-medium">{item.label}</span>
+                              </Link>
+                              {item.children && (
+                                <div className="ml-6 mt-1 space-y-1 transition-all duration-300 delay-200 ease-in-out">
+                                  {item.children.map((sub) => (
+                                    <Link
+                                      key={sub.id}
+                                      to={sub.to}
+                                      className={cn(
+                                        "flex items-center gap-2 rounded-md px-3 py-1 text-sm transition-all duration-300 hover:bg-muted",
+                                        active === sub.id ? "bg-primary/10 text-primary" : "hover:bg-muted"
+                                      )}
+                                      onClick={() => handleNavItemClick(sub.id)}
+                                    >
+                                      {sub.icon}
+                                      <span>{sub.label}</span>
+                                    </Link>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Authenticated nav mobile */}
                       {isAuthenticated && (
-                        <div>
+                        <div className="transition-all duration-300 delay-300 ease-in-out">
                           <div className="px-1 text-xs font-semibold text-muted-foreground uppercase">Navigation</div>
                           <div className="mt-2 grid gap-1">
                             {navItems.map((item) => (
@@ -326,7 +384,7 @@ export const Navbar = () => {
                                 key={item.id}
                                 to={item.to}
                                 className={cn(
-                                  "flex items-center gap-3 rounded-md px-3 py-2",
+                                  "flex items-center gap-3 rounded-md px-3 py-2 transition-all duration-300 hover:bg-muted",
                                   active === item.id ? "bg-primary/10 text-primary" : "hover:bg-muted"
                                 )}
                                 onClick={() => handleNavItemClick(item.id)}
@@ -338,7 +396,7 @@ export const Navbar = () => {
                           </div>
                         </div>
                       )}
-                      <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center justify-between gap-2 transition-all duration-300 delay-400 ease-in-out">
                         <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-lg">
                           {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
                         </Button>
@@ -364,6 +422,30 @@ export const Navbar = () => {
       </TooltipProvider>
 
       <AuthModal isOpen={isAuthModalOpen} onClose={handleCloseAuthModal} />
+
+      <style>{`
+        @keyframes slideInFromLeft {
+          0% {
+            transform: translateX(-100%);
+            opacity: 0;
+          }
+          100% {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes slideOutToLeft {
+          0% {
+            transform: translateX(0);
+            opacity: 1;
+          }
+          100% {
+            transform: translateX(-100%);
+            opacity: 0;
+          }
+        }
+      `}</style>
     </>
   );
 };
