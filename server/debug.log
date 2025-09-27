@@ -1,13 +1,13 @@
 INFO 2025-09-26 14:40:39,895 autoreload 8528 16808 Watching for file changes with StatReloader
-INFO 2025-09-26 14:41:20,116 autoreload 8528 16808 C:\Users\shent\OneDrive\Desktop\Spoke Bee\server\crud\urls.py changed, reloading.
+INFO 2025-09-26 14:41:20,116 autoreload 8528 16808 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\crud\urls.py changed, reloading.
 INFO 2025-09-26 14:41:21,011 autoreload 10208 19772 Watching for file changes with StatReloader
 WARNING 2025-09-26 14:42:38,098 log 10208 1904 Not Found: /
 WARNING 2025-09-26 14:42:38,111 basehttp 10208 1904 "GET / HTTP/1.1" 404 2610
 WARNING 2025-09-26 14:49:16,081 log 10208 15572 Not Found: /
 WARNING 2025-09-26 14:49:16,090 basehttp 10208 15572 "GET / HTTP/1.1" 404 2610
-INFO 2025-09-26 14:51:00,649 autoreload 10208 19772 C:\Users\shent\OneDrive\Desktop\Spoke Bee\server\crud\settings.py changed, reloading.
+INFO 2025-09-26 14:51:00,649 autoreload 10208 19772 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\crud\settings.py changed, reloading.
 INFO 2025-09-26 14:51:03,957 autoreload 5412 21584 Watching for file changes with StatReloader
-INFO 2025-09-26 14:54:08,531 autoreload 5412 21584 C:\Users\shent\OneDrive\Desktop\Spoke Bee\server\crud\settings.py changed, reloading.
+INFO 2025-09-26 14:54:08,531 autoreload 5412 21584 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\crud\settings.py changed, reloading.
 INFO 2025-09-26 14:54:12,296 autoreload 21144 9032 Watching for file changes with StatReloader
 INFO 2025-09-26 14:54:35,166 autoreload 21176 5940 Watching for file changes with StatReloader
 WARNING 2025-09-26 14:54:39,512 log 21176 3364 Not Found: /
@@ -28,3 +28,6 @@ INFO 2025-09-26 22:06:40,649 autoreload 7520 11524 Watching for file changes wit
 INFO 2025-09-26 22:07:26,943 basehttp 7520 5500 "POST /api/auth/register HTTP/1.1" 201 351
 INFO 2025-09-26 22:07:30,266 basehttp 7520 15320 "POST /api/auth/login HTTP/1.1" 200 344
 INFO 2025-09-27 11:26:33,458 autoreload 11016 23352 Watching for file changes with StatReloader
+INFO 2025-09-27 17:55:19,086 autoreload 22452 23540 Watching for file changes with StatReloader
+INFO 2025-09-27 20:16:58,713 autoreload 20340 1820 Watching for file changes with StatReloader
+INFO 2025-09-27 21:01:13,285 basehttp 20340 6468 "POST /api/auth/login HTTP/1.1" 200 344

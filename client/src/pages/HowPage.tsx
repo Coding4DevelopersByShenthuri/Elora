@@ -167,7 +167,7 @@ const HowPage = () => {
           <div ref={heroRef} className="relative w-full max-w-3xl mx-auto">
             <div className="absolute -z-10 w-[300px] h-[300px] rounded-full bg-gradient-to-r from-primary/30 to-accent/30 blur-3xl left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
             <div className="glass-panel rounded-full py-5 px-8 inline-block mx-auto mb-12">
-              <h1 className="text-2xl md:text-3xl font-bold text-primary">How does Spoke Bee work?</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-primary">How does Speak Bee work?</h1>
             </div>
 
             <p className="text-xl text-center text-foreground/80 max-w-2xl mx-auto mb-12">
@@ -223,7 +223,7 @@ const HowPage = () => {
 
           <FeatureShowcase
             title="Interactive Learning Modules"
-            description="Spoke Bee offers category-based modules for Kids, Adults, and IELTS/PTE learners, tailored to your skill level and learning goals."
+            description="Speak Bee offers category-based modules for Kids, Adults, and IELTS/PTE learners, tailored to your skill level and learning goals."
             image="./image6.png"
             features={[
               { icon: <CheckCircle size={24} />, text: "Kids: Vocabulary games, story listening, pronunciation practice" },
@@ -249,7 +249,7 @@ const HowPage = () => {
 
           <FeatureShowcase
             title="Access Lessons & Feedback Instantly"
-            description="Quickly find the lessons, exercises, and practice sessions you need. Spoke Bee helps you navigate your learning path efficiently and stay on track."
+            description="Quickly find the lessons, exercises, and practice sessions you need. Speak Bee helps you navigate your learning path efficiently and stay on track."
             image="./image7.png"
             features={[
               { icon: <CheckCircle size={24} />, text: "Instant access to Kids, Adults, and IELTS/PTE modules" },
@@ -262,7 +262,7 @@ const HowPage = () => {
 
           <FeatureShowcase
             title="AI-Powered Learning Insights"
-            description="Spoke Bee's AI helps you discover patterns in your learning, providing personalized guidance and suggestions to improve your English skills efficiently."
+            description="Speak Bee's AI helps you discover patterns in your learning, providing personalized guidance and suggestions to improve your English skills efficiently."
             image="./image8.png"
             features={[
               { icon: <CheckCircle size={24} />, text: "AI analyzes your progress to suggest next lessons and exercises" },
@@ -275,7 +275,7 @@ const HowPage = () => {
 
           <FeatureShowcase
             title="Your Private Learning Hub"
-            description="Spoke Bee keeps your learning progress and data completely private. All exercises, lessons, and feedback are stored locally, giving you full control and offline access."
+            description="Speak Bee keeps your learning progress and data completely private. All exercises, lessons, and feedback are stored locally, giving you full control and offline access."
             image="./image9.png"
             features={[
               { icon: <CheckCircle size={24} />, text: "All learning data stored locally on your device" },
@@ -288,7 +288,7 @@ const HowPage = () => {
 
           <FeatureShowcase
             title="Your Personal English Coach"
-            description="Spoke Bee acts as an extension of your learning journey, guiding you through interactive lessons, practice exercises, and real-time feedback across all your devices."
+            description="Speak Bee acts as an extension of your learning journey, guiding you through interactive lessons, practice exercises, and real-time feedback across all your devices."
             image="./image10.png"
             features={[
               { icon: <CheckCircle size={24} />, text: "Works offline on all your devices: Android, iOS, Windows, and macOS" },
@@ -303,14 +303,14 @@ const HowPage = () => {
         <div className="py-16 px-4 rounded-lg glass-panel my-24">
           <h2 className="text-3xl font-bold text-center mb-3">We believe learning should be effortless</h2>
           <p className="text-xl text-center text-foreground/80 max-w-3xl mx-auto mb-16">
-            Focus on improving your English skills while Spoke Bee handles the rest — practice, feedback, and progress tracking.
+            Focus on improving your English skills while Speak Bee handles the rest — practice, feedback, and progress tracking.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <ValueProp
               icon={<Brain className="w-8 h-8 text-primary" />}
               title="Learn with AI"
-              description="Spoke Bee uses offline AI to provide real-time conversation practice, pronunciation scoring, and personalized feedback."
+              description="Speak Bee uses offline AI to provide real-time conversation practice, pronunciation scoring, and personalized feedback."
             />
             <ValueProp
               icon={<Shield className="w-8 h-8 text-primary" />}
@@ -425,7 +425,7 @@ const HowPage = () => {
                 AI & Speech Technology
               </h3>
               <p className="text-foreground/80 mb-4">
-                Spoke Bee leverages cutting-edge AI and offline speech models to provide pronunciation feedback, interactive conversations, and personalized learning paths.
+                Speak Bee leverages cutting-edge AI and offline speech models to provide pronunciation feedback, interactive conversations, and personalized learning paths.
               </p>
 
               <h3 className="flex items-center text-xl font-bold mb-3 gap-2">

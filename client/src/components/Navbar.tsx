@@ -193,7 +193,7 @@ export const Navbar = () => {
           onClick={() => handleNavItemClick('what')}
         >
         <img
-          src="/Spokebee.png"
+          src="/Speak_Bee.png"
           alt="Logo"
           className="h-70 w-auto sm:h-56 md:h-56 lg:h-56 xl:h-90"
         />

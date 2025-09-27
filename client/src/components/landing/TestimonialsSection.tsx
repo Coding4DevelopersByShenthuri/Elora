@@ -67,7 +67,7 @@ export const TestimonialsSection = ({ showTestimonials }: TestimonialsSectionPro
         <div className="flex flex-col items-center gap-2 mb-12 text-center">
           <h2 className="text-4xl font-bold text-teal-500 md:text-8xl">
             What users say<br />
-            about Spoke Bee
+            about Speak Bee
           </h2>
         </div>
 
