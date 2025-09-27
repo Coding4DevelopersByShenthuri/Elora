@@ -27,3 +27,4 @@ INFO 2025-09-26 16:00:40,845 basehttp 21176 19796 "POST /api/auth/login HTTP/1.1
 INFO 2025-09-26 22:06:40,649 autoreload 7520 11524 Watching for file changes with StatReloader
 INFO 2025-09-26 22:07:26,943 basehttp 7520 5500 "POST /api/auth/register HTTP/1.1" 201 351
 INFO 2025-09-26 22:07:30,266 basehttp 7520 15320 "POST /api/auth/login HTTP/1.1" 200 344
+INFO 2025-09-27 11:26:33,458 autoreload 11016 23352 Watching for file changes with StatReloader

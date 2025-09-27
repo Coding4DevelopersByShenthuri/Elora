@@ -1,12 +1,16 @@
-import { Brain } from 'lucide-react';
+import beeImage from '@/assets/bee.png';
 
 export const LoadingScreen = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-muted/30">
-      <div className="animate-rotate-half w-16 h-16 text-primary">
-        <Brain size={64} className="drop-shadow-lg" />
+      <div className="relative">
+        <img 
+          src={beeImage} 
+          alt="Loading bee" 
+          className="w-50 h-50 drop-shadow-lg animate-graceful-bee-flight"
+        />
       </div>
-      <p className="mt-4 text-muted-foreground animate-pulse">Loading your second brain...</p>
+      <p className="mt-[-10px] text-muted-foreground animate-pulse text-lg">Buzzing through your thoughts...</p>
     </div>
   );
 };

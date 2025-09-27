@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Brain, LogIn, Search, Upload, User, Settings, LogOut, Moon, Sun, 
-  Table, Info, HelpCircle, Code, Menu, Users, Baby, FolderTree, Lightbulb ,
+import {
+  Brain, LogIn, Search, Upload, User, Settings, LogOut, Moon, Sun,
+  Table, Info, HelpCircle, Code, Menu, Users, Baby, FolderTree, Lightbulb,
   GraduationCap, Layers, Award
 } from 'lucide-react';
 import { useRippleEffect } from '@/lib/animations';
@@ -122,7 +122,7 @@ export const Navbar = () => {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      
+
       // Show/hide navbar based on scroll direction
       if (currentScrollY > lastScrollY && currentScrollY > 100) {
         // Scrolling down and past 100px - hide navbar
@@ -133,7 +133,7 @@ export const Navbar = () => {
         setIsNavbarVisible(true);
         setShowMenuIcon(true);
       }
-      
+
       setLastScrollY(currentScrollY);
     };
 
@@ -160,10 +160,10 @@ export const Navbar = () => {
 
   const categoriesSubmenu = [
     { to: '/kids', icon: <Baby size={18} />, label: 'Kids', id: 'kids' },
-    { 
+    {
       to: '/adults',
-      icon: <Users size={18} />, 
-      label: 'Adults', 
+      icon: <Users size={18} />,
+      label: 'Adults',
       id: 'adults',
       children: [
         { to: '/adults/beginners', icon: <Lightbulb size={16} />, label: 'Beginners', id: 'adults-beginners' },
@@ -186,21 +186,35 @@ export const Navbar = () => {
 
   return (
     <>
+      {/* Fixed Logo in Top Left Corner - Moved up for desktop */}
+        <Link
+          to="/"
+          className="fixed top-[-100px] left-[-60px] z-50 flex items-center gap-2 p-2 rounded-lg sm:top-[-135px] sm:left-[-80px]"
+          onClick={() => handleNavItemClick('what')}
+        >
+        <img
+          src="/Spokebee.png"
+          alt="Logo"
+          className="h-70 w-auto sm:h-56 md:h-56 lg:h-56 xl:h-90"
+        />
+      </Link>
+
       <TooltipProvider>
         {/* Desktop Navigation - Only visible on desktop */}
-        <header 
+        <header
           className={cn(
             "glass-panel fixed top-6 left-1/2 transform -translate-x-1/2 z-40 rounded-lg px-1 py-1 hidden sm:block transition-transform duration-300 ease-in-out",
             isNavbarVisible ? "translate-y-0" : "-translate-y-32"
           )}
         >
           <nav className="flex items-center justify-between w-full">
-            {/* Left side navigation items */}
+            {/* Left side - Navigation items */}
             <div className="flex items-center">
+
               {/* Cortex with submenu */}
               <NavItem
                 to="#"
-                icon={<Brain size={20} />}
+                icon={<Brain size={20} color="black" />}
                 label="Mind"
                 active={['what', 'why', 'how'].includes(active)}
                 onClick={() => { }}
@@ -224,8 +238,8 @@ export const Navbar = () => {
                 icon={<FolderTree size={20} />}
                 label="Categories"
                 active={[
-                  'kids','adults','ielts-pte',
-                  'adults-beginners','adults-intermediates','adults-advanced'
+                  'kids', 'adults', 'ielts-pte',
+                  'adults-beginners', 'adults-intermediates', 'adults-advanced'
                 ].includes(active)}
                 onClick={() => { }}
                 hasSubmenu={true}
@@ -325,115 +339,50 @@ export const Navbar = () => {
         </header>
 
         {/* Mobile Navigation - Only visible on mobile */}
-        <header 
+        <header
           className={cn(
-            "fixed top-6 right-6 z-40 sm:hidden transition-transform duration-300 ease-in-out",
+            "fixed top-6 left-6 right-6 z-40 sm:hidden transition-transform duration-300 ease-in-out",
             isNavbarVisible ? "translate-y-0" : "-translate-y-32"
           )}
         >
-          {showMenuIcon && (
-            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="rounded-lg glass-panel hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
+          <div className="flex items-center justify-end">
+            {/* Mobile Menu Button */}
+            {showMenuIcon && (
+              <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-lg glass-panel hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
+                  >
+                    <Menu size={22} />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent
+                  side="left"
+                  className="p-0 w-full max-w-[320px] sm:max-w-[350px] h-full flex flex-col border-r-0"
+                  style={{
+                    animation: isMobileMenuOpen
+                      ? 'slideInFromLeft 0.3s ease-out forwards'
+                      : 'slideOutToLeft 0.3s ease-in forwards'
+                  }}
                 >
-                  <Menu size={22} />
-                </Button>
-              </SheetTrigger>
-              <SheetContent 
-                side="left" 
-                className="p-0 w-full max-w-[320px] sm:max-w-[350px] h-full flex flex-col border-r-0"
-                style={{
-                  animation: isMobileMenuOpen 
-                    ? 'slideInFromLeft 0.3s ease-out forwards' 
-                    : 'slideOutToLeft 0.3s ease-in forwards'
-                }}
-              >
-                {/* Scrollable content */}
-                <div className="flex-1 overflow-y-auto">
-                  <div className="p-4 space-y-6">
-                    {/* Cortex mobile */}
-                    <div className="transition-all duration-300 ease-out">
-                      <div className="px-1 text-xs font-semibold text-muted-foreground uppercase mb-2">Mind</div>
-                      <div className="space-y-1">
-                        {cortexSubmenu.map((item) => (
-                          <Link
-                            key={item.id}
-                            to={item.to}
-                            className={cn(
-                              "flex items-center gap-3 rounded-md px-3 py-3 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400",
-                              active === item.id 
-                                ? "bg-teal-500/20 text-teal-400" 
-                                : "text-foreground"
-                            )}
-                            onClick={() => handleNavItemClick(item.id)}
-                          >
-                            {item.icon}
-                            <span className="font-medium">{item.label}</span>
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
 
-                    {/* Categories mobile */}
-                    <div className="transition-all duration-300 ease-out delay-75">
-                      <div className="px-1 text-xs font-semibold text-muted-foreground uppercase mb-2">Categories</div>
-                      <div className="space-y-1">
-                        {categoriesSubmenu.map((item) => (
-                          <div key={item.id} className="space-y-1">
-                            <Link
-                              to={item.to}
-                              className={cn(
-                                "flex items-center gap-3 rounded-md px-3 py-3 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400",
-                                active === item.id 
-                                  ? "bg-teal-500/20 text-teal-400" 
-                                  : "text-foreground"
-                              )}
-                              onClick={() => handleNavItemClick(item.id)}
-                            >
-                              {item.icon}
-                              <span className="font-medium">{item.label}</span>
-                            </Link>
-                            {item.children && (
-                              <div className="ml-4 space-y-1 border-l-2 border-muted/30 pl-2 transition-all duration-300">
-                                {item.children.map((sub) => (
-                                  <Link
-                                    key={sub.id}
-                                    to={sub.to}
-                                    className={cn(
-                                      "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-all duration-300 hover:bg-teal-500/15 hover:text-teal-400",
-                                      active === sub.id 
-                                        ? "bg-teal-500/15 text-teal-400" 
-                                        : "text-foreground"
-                                    )}
-                                    onClick={() => handleNavItemClick(sub.id)}
-                                  >
-                                    {sub.icon}
-                                    <span>{sub.label}</span>
-                                  </Link>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Authenticated nav mobile */}
-                    {isAuthenticated && (
-                      <div className="transition-all duration-300 ease-out delay-150">
-                        <div className="px-1 text-xs font-semibold text-muted-foreground uppercase mb-2">Navigation</div>
+                  {/* Scrollable content */}
+                  <div className="flex-1 overflow-y-auto">
+                    <div className="p-4 space-y-6">
+                      {/* Cortex mobile */}
+                      <div className="transition-all duration-300 ease-out">
+                        <div className="px-1 text-xs font-semibold text-muted-foreground uppercase mb-2">Mind</div>
                         <div className="space-y-1">
-                          {navItems.map((item) => (
+                          {cortexSubmenu.map((item) => (
                             <Link
                               key={item.id}
                               to={item.to}
                               className={cn(
                                 "flex items-center gap-3 rounded-md px-3 py-3 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400",
-                                active === item.id 
-                                  ? "bg-teal-500/20 text-teal-400" 
+                                active === item.id
+                                  ? "bg-teal-500/20 text-teal-400"
                                   : "text-foreground"
                               )}
                               onClick={() => handleNavItemClick(item.id)}
@@ -444,72 +393,141 @@ export const Navbar = () => {
                           ))}
                         </div>
                       </div>
-                    )}
 
-                    {/* Help option for mobile */}
-                    <div className="transition-all duration-300 ease-out delay-200">
-                      <Link
-                        to="/help"
-                        className={cn(
-                          "flex items-center gap-3 rounded-md px-3 py-3 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400",
-                          active === 'help' 
-                            ? "bg-teal-500/20 text-teal-400" 
-                            : "text-foreground"
-                        )}
-                        onClick={() => handleNavItemClick('help')}
-                      >
-                        <HelpCircle size={20} />
-                        <span className="font-medium">Help</span>
-                      </Link>
+                      {/* Categories mobile */}
+                      <div className="transition-all duration-300 ease-out delay-75">
+                        <div className="px-1 text-xs font-semibold text-muted-foreground uppercase mb-2">Categories</div>
+                        <div className="space-y-1">
+                          {categoriesSubmenu.map((item) => (
+                            <div key={item.id} className="space-y-1">
+                              <Link
+                                to={item.to}
+                                className={cn(
+                                  "flex items-center gap-3 rounded-md px-3 py-3 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400",
+                                  active === item.id
+                                    ? "bg-teal-500/20 text-teal-400"
+                                    : "text-foreground"
+                                )}
+                                onClick={() => handleNavItemClick(item.id)}
+                              >
+                                {item.icon}
+                                <span className="font-medium">{item.label}</span>
+                              </Link>
+                              {item.children && (
+                                <div className="ml-4 space-y-1 border-l-2 border-muted/30 pl-2 transition-all duration-300">
+                                  {item.children.map((sub) => (
+                                    <Link
+                                      key={sub.id}
+                                      to={sub.to}
+                                      className={cn(
+                                        "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-all duration-300 hover:bg-teal-500/15 hover:text-teal-400",
+                                        active === sub.id
+                                          ? "bg-teal-500/15 text-teal-400"
+                                          : "text-foreground"
+                                      )}
+                                      onClick={() => handleNavItemClick(sub.id)}
+                                    >
+                                      {sub.icon}
+                                      <span>{sub.label}</span>
+                                    </Link>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Authenticated nav mobile */}
+                      {isAuthenticated && (
+                        <div className="transition-all duration-300 ease-out delay-150">
+                          <div className="px-1 text-xs font-semibold text-muted-foreground uppercase mb-2">Navigation</div>
+                          <div className="space-y-1">
+                            {navItems.map((item) => (
+                              <Link
+                                key={item.id}
+                                to={item.to}
+                                className={cn(
+                                  "flex items-center gap-3 rounded-md px-3 py-3 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400",
+                                  active === item.id
+                                    ? "bg-teal-500/20 text-teal-400"
+                                    : "text-foreground"
+                                )}
+                                onClick={() => handleNavItemClick(item.id)}
+                              >
+                                {item.icon}
+                                <span className="font-medium">{item.label}</span>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Help option for mobile */}
+                      <div className="transition-all duration-300 ease-out delay-200">
+                        <Link
+                          to="/help"
+                          className={cn(
+                            "flex items-center gap-3 rounded-md px-3 py-3 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400",
+                            active === 'help'
+                              ? "bg-teal-500/20 text-teal-400"
+                              : "text-foreground"
+                          )}
+                          onClick={() => handleNavItemClick('help')}
+                        >
+                          <HelpCircle size={20} />
+                          <span className="font-medium">Help</span>
+                        </Link>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Footer with theme and auth buttons */}
-                <div className="p-4 border-t transition-all duration-300 ease-out delay-300">
-                  <div className="flex items-center justify-between gap-3">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={toggleTheme} 
-                      className="flex-1 justify-center gap-2 hover:bg-teal-500/20 hover:text-teal-400 hover:border-teal-400 transition-all duration-300"
-                    >
-                      {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-                      <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
-                    </Button>
-                    
-                    {isAuthenticated ? (
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => {
-                          logout();
-                          setIsMobileMenuOpen(false);
-                        }} 
+                  {/* Footer with theme and auth buttons */}
+                  <div className="p-4 border-t transition-all duration-300 ease-out delay-300">
+                    <div className="flex items-center justify-between gap-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={toggleTheme}
                         className="flex-1 justify-center gap-2 hover:bg-teal-500/20 hover:text-teal-400 hover:border-teal-400 transition-all duration-300"
                       >
-                        <LogOut size={18} />
-                        <span>Logout</span>
+                        {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                        <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
                       </Button>
-                    ) : (
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => {
-                          handleOpenAuthModal();
-                          setIsMobileMenuOpen(false);
-                        }} 
-                        className="flex-1 justify-center gap-2 hover:bg-teal-500/20 hover:text-teal-400 hover:border-teal-400 transition-all duration-300"
-                      >
-                        <LogIn size={18} />
-                        <span>Login</span>
-                      </Button>
-                    )}
+
+                      {isAuthenticated ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            logout();
+                            setIsMobileMenuOpen(false);
+                          }}
+                          className="flex-1 justify-center gap-2 hover:bg-teal-500/20 hover:text-teal-400 hover:border-teal-400 transition-all duration-300"
+                        >
+                          <LogOut size={18} />
+                          <span>Logout</span>
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            handleOpenAuthModal();
+                            setIsMobileMenuOpen(false);
+                          }}
+                          className="flex-1 justify-center gap-2 hover:bg-teal-500/20 hover:text-teal-400 hover:border-teal-400 transition-all duration-300"
+                        >
+                          <LogIn size={18} />
+                          <span>Login</span>
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </SheetContent>
-            </Sheet>
-          )}
+                </SheetContent>
+              </Sheet>
+            )}
+          </div>
         </header>
       </TooltipProvider>
 
