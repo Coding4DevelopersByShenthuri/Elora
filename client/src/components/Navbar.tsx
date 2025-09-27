@@ -367,6 +367,49 @@ export const Navbar = () => {
                       : 'slideOutToLeft 0.3s ease-in forwards'
                   }}
                 >
+                  {/* Mobile Menu Header with Login and Theme Toggle */}
+                  <div className="flex items-center justify-between p-4 border-b bg-background/50">
+                    <div className="flex items-center gap-2">
+                      {/* Theme Toggle */}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={toggleTheme}
+                        className="rounded-lg hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
+                      >
+                        {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                      </Button>
+                      
+                      {/* Login/Logout Button */}
+                      {isAuthenticated ? (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            logout();
+                            setIsMobileMenuOpen(false);
+                          }}
+                          className="rounded-lg hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
+                        >
+                          <LogOut size={18} />
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            handleOpenAuthModal();
+                            setIsMobileMenuOpen(false);
+                          }}
+                          className="rounded-lg hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
+                        >
+                          <LogIn size={18} />
+                        </Button>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                    </div>
+                  </div>
 
                   {/* Scrollable content */}
                   <div className="flex-1 overflow-y-auto">
@@ -482,46 +525,11 @@ export const Navbar = () => {
                     </div>
                   </div>
 
-                  {/* Footer with theme and auth buttons */}
-                  <div className="p-4 border-t transition-all duration-300 ease-out delay-300">
-                    <div className="flex items-center justify-between gap-3">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={toggleTheme}
-                        className="flex-1 justify-center gap-2 hover:bg-teal-500/20 hover:text-teal-400 hover:border-teal-400 transition-all duration-300"
-                      >
-                        {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-                        <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
-                      </Button>
-
-                      {isAuthenticated ? (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            logout();
-                            setIsMobileMenuOpen(false);
-                          }}
-                          className="flex-1 justify-center gap-2 hover:bg-teal-500/20 hover:text-teal-400 hover:border-teal-400 transition-all duration-300"
-                        >
-                          <LogOut size={18} />
-                          <span>Logout</span>
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            handleOpenAuthModal();
-                            setIsMobileMenuOpen(false);
-                          }}
-                          className="flex-1 justify-center gap-2 hover:bg-teal-500/20 hover:text-teal-400 hover:border-teal-400 transition-all duration-300"
-                        >
-                          <LogIn size={18} />
-                          <span>Login</span>
-                        </Button>
-                      )}
+                  {/* Footer with additional info */}
+                  <div className="p-4 border-t bg-muted/30 transition-all duration-300 ease-out delay-300">
+                    <div className="text-center text-sm text-muted-foreground">
+                      <p>© 2024 Vocario</p>
+                      <p className="text-xs mt-1">Language Learning Platform</p>
                     </div>
                   </div>
                 </SheetContent>
