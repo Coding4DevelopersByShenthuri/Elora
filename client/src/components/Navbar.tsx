@@ -118,21 +118,18 @@ export const Navbar = () => {
   const [showMenuIcon, setShowMenuIcon] = useState(true);
   const [isNavbarVisible, setIsNavbarVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
-      // Show/hide navbar based on scroll direction
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        // Scrolling down and past 100px - hide navbar
-        setIsNavbarVisible(false);
-        setShowMenuIcon(false);
-      } else if (currentScrollY < lastScrollY) {
-        // Scrolling up - show navbar
-        setIsNavbarVisible(true);
-        setShowMenuIcon(true);
-      }
+      // Update scrolled state for background transition
+      setIsScrolled(currentScrollY > 50);
+
+      // Keep header always visible - no hiding on scroll
+      setIsNavbarVisible(true);
+      setShowMenuIcon(true);
 
       setLastScrollY(currentScrollY);
     };
@@ -186,355 +183,359 @@ export const Navbar = () => {
 
   return (
     <>
-      {/* Fixed Logo in Top Left Corner - Moved up for desktop */}
-        <Link
-          to="/"
-          className="fixed top-[-100px] left-[-60px] z-50 flex items-center gap-2 p-2 rounded-lg sm:top-[-135px] sm:left-[-80px]"
-          onClick={() => handleNavItemClick('what')}
-        >
-        <img
-          src="/Speak_Bee.png"
-          alt="Logo"
-          className="h-70 w-auto sm:h-56 md:h-56 lg:h-56 xl:h-90"
-        />
-      </Link>
-
       <TooltipProvider>
-        {/* Desktop Navigation - Only visible on desktop */}
+        {/* Sticky Header Container */}
         <header
           className={cn(
-            "glass-panel fixed top-6 left-1/2 transform -translate-x-1/2 z-40 rounded-lg px-1 py-1 hidden sm:block transition-transform duration-300 ease-in-out",
-            isNavbarVisible ? "translate-y-0" : "-translate-y-32"
+            "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out",
+            "backdrop-blur-md border-b border-border/50",
+            isScrolled 
+              ? "bg-background/95 shadow-lg" 
+              : "bg-transparent"
           )}
         >
-          <nav className="flex items-center justify-between w-full">
-            {/* Left side - Navigation items */}
-            <div className="flex items-center">
-
-              {/* Cortex with submenu */}
-              <NavItem
-                to="#"
-                icon={<Brain size={20} color="black" />}
-                label="Mind"
-                active={['what', 'why', 'how'].includes(active)}
-                onClick={() => { }}
-                hasSubmenu={true}
+          <div className="container mx-auto px-4 py-3">
+            <div className="flex items-center justify-between">
+              {/* Logo */}
+              <Link
+                to="/"
+                className="flex items-center gap-2 transition-all duration-300 hover:scale-105"
+                onClick={() => handleNavItemClick('what')}
               >
-                {cortexSubmenu.map((item) => (
-                  <SubMenuItem
-                    key={item.id}
-                    to={item.to}
-                    icon={item.icon}
-                    label={item.label}
-                    active={active === item.id}
-                    onClick={() => handleNavItemClick(item.id)}
-                  />
-                ))}
-              </NavItem>
-
-              {/* Categories with submenu */}
-              <NavItem
-                to="#"
-                icon={<FolderTree size={20} />}
-                label="Categories"
-                active={[
-                  'kids', 'adults', 'ielts-pte',
-                  'adults-beginners', 'adults-intermediates', 'adults-advanced'
-                ].includes(active)}
-                onClick={() => { }}
-                hasSubmenu={true}
-              >
-                {categoriesSubmenu.map((item) => (
-                  <SubMenuItem
-                    key={item.id}
-                    to={item.to}
-                    icon={item.icon}
-                    label={item.label}
-                    active={active === item.id}
-                    onClick={() => handleNavItemClick(item.id)}
-                    children={item.children?.map((sub) => (
-                      <SubMenuItem
-                        key={sub.id}
-                        to={sub.to}
-                        icon={sub.icon}
-                        label={sub.label}
-                        active={active === sub.id}
-                        onClick={() => handleNavItemClick(sub.id)}
-                      />
-                    ))}
-                  />
-                ))}
-              </NavItem>
-
-              {/* Other nav items */}
-              {navItems.map((item) => (
-                <NavItem
-                  key={item.id}
-                  to={item.to}
-                  icon={item.icon}
-                  label={item.label}
-                  active={active === item.id}
-                  onClick={() => handleNavItemClick(item.id)}
+                <img
+                  src="/Speak_Bee.png"
+                  alt="Logo"
+                  className="h-16 w-auto sm:h-20 md:h-24 lg:h-28 xl:h-32"
                 />
-              ))}
-            </div>
+              </Link>
 
-            {/* Right side navigation items */}
-            <div className="flex items-center">
-              {/* Help option */}
-              <NavItem
-                to="/help"
-                icon={<HelpCircle size={20} />}
-                label="Help"
-                active={active === 'help'}
-                onClick={() => handleNavItemClick('help')}
-              />
+              {/* Desktop Navigation - Only visible on desktop */}
+              <nav className="hidden sm:flex items-center justify-center flex-1">
+                <div className="glass-panel rounded-lg px-1 py-1">
+                  <div className="flex items-center">
+                    {/* Left side - Navigation items */}
+                    <div className="flex items-center">
+                      {/* Cortex with submenu */}
+                      <NavItem
+                        to="#"
+                        icon={<Brain size={20} color="black" />}
+                        label="Mind"
+                        active={['what', 'why', 'how'].includes(active)}
+                        onClick={() => { }}
+                        hasSubmenu={true}
+                      >
+                        {cortexSubmenu.map((item) => (
+                          <SubMenuItem
+                            key={item.id}
+                            to={item.to}
+                            icon={item.icon}
+                            label={item.label}
+                            active={active === item.id}
+                            onClick={() => handleNavItemClick(item.id)}
+                          />
+                        ))}
+                      </NavItem>
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-lg" onClick={toggleTheme}>
-                    {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Toggle {theme === 'dark' ? 'light' : 'dark'} mode</p>
-                </TooltipContent>
-              </Tooltip>
+                      {/* Categories with submenu */}
+                      <NavItem
+                        to="#"
+                        icon={<FolderTree size={20} />}
+                        label="Categories"
+                        active={[
+                          'kids', 'adults', 'ielts-pte',
+                          'adults-beginners', 'adults-intermediates', 'adults-advanced'
+                        ].includes(active)}
+                        onClick={() => { }}
+                        hasSubmenu={true}
+                      >
+                        {categoriesSubmenu.map((item) => (
+                          <SubMenuItem
+                            key={item.id}
+                            to={item.to}
+                            icon={item.icon}
+                            label={item.label}
+                            active={active === item.id}
+                            onClick={() => handleNavItemClick(item.id)}
+                            children={item.children?.map((sub) => (
+                              <SubMenuItem
+                                key={sub.id}
+                                to={sub.to}
+                                icon={sub.icon}
+                                label={sub.label}
+                                active={active === sub.id}
+                                onClick={() => handleNavItemClick(sub.id)}
+                              />
+                            ))}
+                          />
+                        ))}
+                      </NavItem>
 
-              {isAuthenticated ? (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-primary hover:text-primary-foreground"
-                      onClick={logout}
-                    >
-                      <LogOut size={20} />
-                      {active === 'logout' && <span className="font-medium">Logout</span>}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Logout</p>
-                  </TooltipContent>
-                </Tooltip>
-              ) : (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-primary hover:text-primary-foreground"
-                      onClick={handleOpenAuthModal}
-                    >
-                      <LogIn size={20} />
-                      {active === 'login' && <span className="font-medium">Login</span>}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Login</p>
-                  </TooltipContent>
-                </Tooltip>
-              )}
-            </div>
-          </nav>
-        </header>
+                      {/* Other nav items */}
+                      {navItems.map((item) => (
+                        <NavItem
+                          key={item.id}
+                          to={item.to}
+                          icon={item.icon}
+                          label={item.label}
+                          active={active === item.id}
+                          onClick={() => handleNavItemClick(item.id)}
+                        />
+                      ))}
+                    </div>
 
-        {/* Mobile Navigation - Only visible on mobile */}
-        <header
-          className={cn(
-            "fixed top-6 left-6 right-6 z-40 sm:hidden transition-transform duration-300 ease-in-out",
-            isNavbarVisible ? "translate-y-0" : "-translate-y-32"
-          )}
-        >
-          <div className="flex items-center justify-end">
-            {/* Mobile Menu Button */}
-            {showMenuIcon && (
-              <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-                <SheetTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-lg glass-panel hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
-                  >
-                    <Menu size={22} />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent
-                  side="left"
-                  className="p-0 w-full max-w-[320px] sm:max-w-[350px] h-full flex flex-col border-r-0"
-                  style={{
-                    animation: isMobileMenuOpen
-                      ? 'slideInFromLeft 0.3s ease-out forwards'
-                      : 'slideOutToLeft 0.3s ease-in forwards'
-                  }}
-                >
-                  {/* Mobile Menu Header with Login and Theme Toggle */}
-                  <div className="flex items-center justify-between p-4 border-b bg-background/50">
-                    <div className="flex items-center gap-2">
-                      {/* Theme Toggle */}
+                    {/* Right side navigation items */}
+                    <div className="flex items-center">
+                      {/* Help option */}
+                      <NavItem
+                        to="/help"
+                        icon={<HelpCircle size={20} />}
+                        label="Help"
+                        active={active === 'help'}
+                        onClick={() => handleNavItemClick('help')}
+                      />
+
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="ghost" size="icon" className="rounded-lg" onClick={toggleTheme}>
+                            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Toggle {theme === 'dark' ? 'light' : 'dark'} mode</p>
+                        </TooltipContent>
+                      </Tooltip>
+
+                      {isAuthenticated ? (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-primary hover:text-primary-foreground"
+                              onClick={logout}
+                            >
+                              <LogOut size={20} />
+                              {active === 'logout' && <span className="font-medium">Logout</span>}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Logout</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      ) : (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-primary hover:text-primary-foreground"
+                              onClick={handleOpenAuthModal}
+                            >
+                              <LogIn size={20} />
+                              {active === 'login' && <span className="font-medium">Login</span>}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Login</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </nav>
+
+              {/* Mobile Navigation - Only visible on mobile */}
+              <div className="flex items-center gap-2 sm:hidden">
+                {/* Mobile Menu Button */}
+                {showMenuIcon && (
+                  <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                    <SheetTrigger asChild>
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={toggleTheme}
-                        className="rounded-lg hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
+                        className="rounded-lg glass-panel hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
                       >
-                        {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                        <Menu size={22} />
                       </Button>
-                      
-                      {/* Login/Logout Button */}
-                      {isAuthenticated ? (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            logout();
-                            setIsMobileMenuOpen(false);
-                          }}
-                          className="rounded-lg hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
-                        >
-                          <LogOut size={18} />
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            handleOpenAuthModal();
-                            setIsMobileMenuOpen(false);
-                          }}
-                          className="rounded-lg hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
-                        >
-                          <LogIn size={18} />
-                        </Button>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                    </div>
-                  </div>
+                    </SheetTrigger>
+                    <SheetContent
+                      side="left"
+                      className="p-0 w-full max-w-[320px] sm:max-w-[350px] h-full flex flex-col border-r-0"
+                      style={{
+                        animation: isMobileMenuOpen
+                          ? 'slideInFromLeft 0.3s ease-out forwards'
+                          : 'slideOutToLeft 0.3s ease-in forwards'
+                      }}
+                    >
+                      {/* Mobile Menu Header with Login and Theme Toggle */}
+                      <div className="flex items-center justify-between p-4 border-b bg-background/50">
+                        <div className="flex items-center gap-2">
+                          {/* Theme Toggle */}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={toggleTheme}
+                            className="rounded-lg hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
+                          >
+                            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                          </Button>
+                          
+                          {/* Login/Logout Button */}
+                          {isAuthenticated ? (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => {
+                                logout();
+                                setIsMobileMenuOpen(false);
+                              }}
+                              className="rounded-lg hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
+                            >
+                              <LogOut size={18} />
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => {
+                                handleOpenAuthModal();
+                                setIsMobileMenuOpen(false);
+                              }}
+                              className="rounded-lg hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
+                            >
+                              <LogIn size={18} />
+                            </Button>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                        </div>
+                      </div>
 
-                  {/* Scrollable content */}
-                  <div className="flex-1 overflow-y-auto">
-                    <div className="p-4 space-y-6">
-                      {/* Cortex mobile */}
-                      <div className="transition-all duration-300 ease-out">
-                        <div className="px-1 text-xs font-semibold text-muted-foreground uppercase mb-2">Mind</div>
-                        <div className="space-y-1">
-                          {cortexSubmenu.map((item) => (
+                      {/* Scrollable content */}
+                      <div className="flex-1 overflow-y-auto">
+                        <div className="p-4 space-y-6">
+                          {/* Cortex mobile */}
+                          <div className="transition-all duration-300 ease-out">
+                            <div className="px-1 text-xs font-semibold text-muted-foreground uppercase mb-2">Mind</div>
+                            <div className="space-y-1">
+                              {cortexSubmenu.map((item) => (
+                                <Link
+                                  key={item.id}
+                                  to={item.to}
+                                  className={cn(
+                                    "flex items-center gap-3 rounded-md px-3 py-3 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400",
+                                    active === item.id
+                                      ? "bg-teal-500/20 text-teal-400"
+                                      : "text-foreground"
+                                  )}
+                                  onClick={() => handleNavItemClick(item.id)}
+                                >
+                                  {item.icon}
+                                  <span className="font-medium">{item.label}</span>
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Categories mobile */}
+                          <div className="transition-all duration-300 ease-out delay-75">
+                            <div className="px-1 text-xs font-semibold text-muted-foreground uppercase mb-2">Categories</div>
+                            <div className="space-y-1">
+                              {categoriesSubmenu.map((item) => (
+                                <div key={item.id} className="space-y-1">
+                                  <Link
+                                    to={item.to}
+                                    className={cn(
+                                      "flex items-center gap-3 rounded-md px-3 py-3 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400",
+                                      active === item.id
+                                        ? "bg-teal-500/20 text-teal-400"
+                                        : "text-foreground"
+                                    )}
+                                    onClick={() => handleNavItemClick(item.id)}
+                                  >
+                                    {item.icon}
+                                    <span className="font-medium">{item.label}</span>
+                                  </Link>
+                                  {item.children && (
+                                    <div className="ml-4 space-y-1 border-l-2 border-muted/30 pl-2 transition-all duration-300">
+                                      {item.children.map((sub) => (
+                                        <Link
+                                          key={sub.id}
+                                          to={sub.to}
+                                          className={cn(
+                                            "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-all duration-300 hover:bg-teal-500/15 hover:text-teal-400",
+                                            active === sub.id
+                                              ? "bg-teal-500/15 text-teal-400"
+                                              : "text-foreground"
+                                          )}
+                                          onClick={() => handleNavItemClick(sub.id)}
+                                        >
+                                          {sub.icon}
+                                          <span>{sub.label}</span>
+                                        </Link>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Authenticated nav mobile */}
+                          {isAuthenticated && (
+                            <div className="transition-all duration-300 ease-out delay-150">
+                              <div className="px-1 text-xs font-semibold text-muted-foreground uppercase mb-2">Navigation</div>
+                              <div className="space-y-1">
+                                {navItems.map((item) => (
+                                  <Link
+                                    key={item.id}
+                                    to={item.to}
+                                    className={cn(
+                                      "flex items-center gap-3 rounded-md px-3 py-3 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400",
+                                      active === item.id
+                                        ? "bg-teal-500/20 text-teal-400"
+                                        : "text-foreground"
+                                    )}
+                                    onClick={() => handleNavItemClick(item.id)}
+                                  >
+                                    {item.icon}
+                                    <span className="font-medium">{item.label}</span>
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Help option for mobile */}
+                          <div className="transition-all duration-300 ease-out delay-200">
                             <Link
-                              key={item.id}
-                              to={item.to}
+                              to="/help"
                               className={cn(
                                 "flex items-center gap-3 rounded-md px-3 py-3 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400",
-                                active === item.id
+                                active === 'help'
                                   ? "bg-teal-500/20 text-teal-400"
                                   : "text-foreground"
                               )}
-                              onClick={() => handleNavItemClick(item.id)}
+                              onClick={() => handleNavItemClick('help')}
                             >
-                              {item.icon}
-                              <span className="font-medium">{item.label}</span>
+                              <HelpCircle size={20} />
+                              <span className="font-medium">Help</span>
                             </Link>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Categories mobile */}
-                      <div className="transition-all duration-300 ease-out delay-75">
-                        <div className="px-1 text-xs font-semibold text-muted-foreground uppercase mb-2">Categories</div>
-                        <div className="space-y-1">
-                          {categoriesSubmenu.map((item) => (
-                            <div key={item.id} className="space-y-1">
-                              <Link
-                                to={item.to}
-                                className={cn(
-                                  "flex items-center gap-3 rounded-md px-3 py-3 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400",
-                                  active === item.id
-                                    ? "bg-teal-500/20 text-teal-400"
-                                    : "text-foreground"
-                                )}
-                                onClick={() => handleNavItemClick(item.id)}
-                              >
-                                {item.icon}
-                                <span className="font-medium">{item.label}</span>
-                              </Link>
-                              {item.children && (
-                                <div className="ml-4 space-y-1 border-l-2 border-muted/30 pl-2 transition-all duration-300">
-                                  {item.children.map((sub) => (
-                                    <Link
-                                      key={sub.id}
-                                      to={sub.to}
-                                      className={cn(
-                                        "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-all duration-300 hover:bg-teal-500/15 hover:text-teal-400",
-                                        active === sub.id
-                                          ? "bg-teal-500/15 text-teal-400"
-                                          : "text-foreground"
-                                      )}
-                                      onClick={() => handleNavItemClick(sub.id)}
-                                    >
-                                      {sub.icon}
-                                      <span>{sub.label}</span>
-                                    </Link>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Authenticated nav mobile */}
-                      {isAuthenticated && (
-                        <div className="transition-all duration-300 ease-out delay-150">
-                          <div className="px-1 text-xs font-semibold text-muted-foreground uppercase mb-2">Navigation</div>
-                          <div className="space-y-1">
-                            {navItems.map((item) => (
-                              <Link
-                                key={item.id}
-                                to={item.to}
-                                className={cn(
-                                  "flex items-center gap-3 rounded-md px-3 py-3 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400",
-                                  active === item.id
-                                    ? "bg-teal-500/20 text-teal-400"
-                                    : "text-foreground"
-                                )}
-                                onClick={() => handleNavItemClick(item.id)}
-                              >
-                                {item.icon}
-                                <span className="font-medium">{item.label}</span>
-                              </Link>
-                            ))}
                           </div>
                         </div>
-                      )}
-
-                      {/* Help option for mobile */}
-                      <div className="transition-all duration-300 ease-out delay-200">
-                        <Link
-                          to="/help"
-                          className={cn(
-                            "flex items-center gap-3 rounded-md px-3 py-3 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400",
-                            active === 'help'
-                              ? "bg-teal-500/20 text-teal-400"
-                              : "text-foreground"
-                          )}
-                          onClick={() => handleNavItemClick('help')}
-                        >
-                          <HelpCircle size={20} />
-                          <span className="font-medium">Help</span>
-                        </Link>
                       </div>
-                    </div>
-                  </div>
 
-                  {/* Footer with additional info */}
-                  <div className="p-4 border-t bg-muted/30 transition-all duration-300 ease-out delay-300">
-                    <div className="text-center text-sm text-muted-foreground">
-                      <p>© 2024 Vocario</p>
-                      <p className="text-xs mt-1">Language Learning Platform</p>
-                    </div>
-                  </div>
-                </SheetContent>
-              </Sheet>
-            )}
+                      {/* Footer with additional info */}
+                      <div className="p-4 border-t bg-muted/30 transition-all duration-300 ease-out delay-300">
+                        <div className="text-center text-sm text-muted-foreground">
+                          <p>© 2024 Vocario</p>
+                          <p className="text-xs mt-1">Language Learning Platform</p>
+                        </div>
+                      </div>
+                    </SheetContent>
+                  </Sheet>
+                )}
+              </div>
+            </div>
           </div>
         </header>
       </TooltipProvider>
