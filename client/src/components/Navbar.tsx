@@ -171,7 +171,7 @@ export const Navbar = () => {
   return (
     <>
       <TooltipProvider>
-        {/* Compact Sticky Header with Larger Logo */}
+        {/* Compact Sticky Header - NO SIZE CHANGES */}
         <header
           className={cn(
             "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out",
@@ -183,20 +183,25 @@ export const Navbar = () => {
         >
           <div className="container mx-auto px-3 py-2">
             <div className="flex items-center justify-between">
-              {/* Larger Logo with Negative Margin */}
-              <Link
-                to="/"
-                className="flex items-center transition-all duration-300 hover:scale-105 -my-2"
-                onClick={() => handleNavItemClick('what')}
-              >
-                <img
-                  src="/Speak_Bee.png"
-                  alt="Logo"
-                  className="h-20 w-auto sm:h-24 md:h-28"
-                />
-              </Link>
+              {/* Logo Container with Absolute Positioning */}
+              <div className="relative">
+                <Link
+                  to="/"
+                  className="absolute -top-6 -left-2 z-50 flex items-center transition-all duration-300 hover:scale-105"
+                  onClick={() => handleNavItemClick('what')}
+                >
+                  <img
+                    src="/Speak_Bee.png"
+                    alt="Logo"
+                    className="h-20 w-auto sm:h-24 md:h-28 lg:h-32"
+                  />
+                </Link>
+                
+                {/* Spacer to maintain layout - invisible but takes same space */}
+                <div className="w-16 h-8 sm:w-20 sm:h-10 md:w-24 md:h-12 lg:w-28 lg:h-14 opacity-0 pointer-events-none" />
+              </div>
 
-              {/* Desktop Navigation - Compact */}
+              {/* Desktop Navigation - Compact - NO CHANGES */}
               <nav className="hidden sm:flex items-center justify-center flex-1">
                 <div className="glass-panel rounded-lg px-1 py-1 shadow-sm">
                   <div className="flex items-center gap-1">
@@ -358,6 +363,20 @@ export const Navbar = () => {
                   >
                     {/* Compact Mobile Menu Header */}
                     <div className="flex items-center justify-between p-3 border-b bg-background/50">
+                      {/* Larger Logo in Mobile Menu - using same absolute positioning approach */}
+                      <div className="relative">
+                        <Link
+                          to="/"
+                          className="absolute -top-4 -left-2 z-50 flex items-center transition-all duration-300 hover:scale-105"
+                          onClick={() => {
+                            handleNavItemClick('what');
+                            setIsMobileMenuOpen(false);
+                          }}
+                        >
+                        </Link>
+                        <div className="w-16 h-8 opacity-0 pointer-events-none" />
+                      </div>
+                      
                       <div className="flex items-center gap-1">
                         {/* Theme Toggle */}
                         <Button
