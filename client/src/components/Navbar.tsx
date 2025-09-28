@@ -363,20 +363,7 @@ export const Navbar = () => {
                   >
                     {/* Compact Mobile Menu Header */}
                     <div className="flex items-center justify-between p-3 border-b bg-background/50">
-                      {/* Larger Logo in Mobile Menu - using same absolute positioning approach */}
-                      <div className="relative">
-                        <Link
-                          to="/"
-                          className="absolute -top-4 -left-2 z-50 flex items-center transition-all duration-300 hover:scale-105"
-                          onClick={() => {
-                            handleNavItemClick('what');
-                            setIsMobileMenuOpen(false);
-                          }}
-                        >
-                        </Link>
-                        <div className="w-16 h-8 opacity-0 pointer-events-none" />
-                      </div>
-                      
+                      {/* Left side - Theme Toggle and Login/Logout */}
                       <div className="flex items-center gap-1">
                         {/* Theme Toggle */}
                         <Button
@@ -415,6 +402,23 @@ export const Navbar = () => {
                           </Button>
                         )}
                       </div>
+
+                      {/* Center - Logo */}
+                      <div className="relative">
+                        <Link
+                          to="/"
+                          className="absolute -top-4 -left-2 z-50 flex items-center transition-all duration-300 hover:scale-105"
+                          onClick={() => {
+                            handleNavItemClick('what');
+                            setIsMobileMenuOpen(false);
+                          }}
+                        >
+                        </Link>
+                        <div className="w-16 h-8 opacity-0 pointer-events-none" />
+                      </div>
+                      
+                      {/* Right side - Empty space for balance */}
+                      <div className="w-16 h-8" />
                     </div>
 
                     {/* Scrollable content */}
