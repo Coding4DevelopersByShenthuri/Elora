@@ -41,7 +41,7 @@ const NavItem = ({ to, icon, label, active, onClick, hasSubmenu, children }: Nav
           <NavigationMenuItem>
             <NavigationMenuTrigger
               className={cn(
-                "relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300",
+                "relative flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-300 text-sm",
                 "hover:bg-primary/10 hover:text-primary",
                 active ? "bg-primary/10 text-primary" : "text-foreground/80"
               )}
@@ -52,7 +52,7 @@ const NavItem = ({ to, icon, label, active, onClick, hasSubmenu, children }: Nav
               <span className="font-medium">{label}</span>
             </NavigationMenuTrigger>
             <NavigationMenuContent>
-              <div className="grid w-[220px] gap-1 p-2">{children}</div>
+              <div className="grid w-[200px] gap-1 p-2">{children}</div>
             </NavigationMenuContent>
           </NavigationMenuItem>
         </NavigationMenuList>
@@ -66,7 +66,7 @@ const NavItem = ({ to, icon, label, active, onClick, hasSubmenu, children }: Nav
         <Link
           to={to}
           className={cn(
-            "relative flex items-center justify-center px-4 py-3 rounded-lg transition-all duration-300",
+            "relative flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-300 text-sm",
             "hover:bg-primary/10 hover:text-primary",
             "overflow-hidden",
             active ? "bg-primary/10 text-primary" : "text-foreground/80"
@@ -95,7 +95,7 @@ const SubMenuItem = ({ to, icon, label, active, onClick, children }: NavItemProp
       <Link
         to={to}
         className={cn(
-          "flex items-center gap-2 p-2 rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-300",
+          "flex items-center gap-2 p-2 rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-300 text-sm",
           active ? "bg-primary/10 text-primary" : ""
         )}
         onClick={onClick}
@@ -103,7 +103,7 @@ const SubMenuItem = ({ to, icon, label, active, onClick, children }: NavItemProp
         <span className={cn("transition-all duration-300", active ? "text-primary" : "text-foreground/60")}>{icon}</span>
         <span>{label}</span>
       </Link>
-      {children && <div className="ml-6 mt-1 space-y-1">{children}</div>}
+      {children && <div className="ml-4 mt-1 space-y-1">{children}</div>}
     </div>
   );
 };
@@ -115,68 +115,55 @@ export const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [showMenuIcon, setShowMenuIcon] = useState(true);
-  const [isNavbarVisible, setIsNavbarVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-
-      // Update scrolled state for background transition
-      setIsScrolled(currentScrollY > 50);
-
-      // Keep header always visible - no hiding on scroll
-      setIsNavbarVisible(true);
-      setShowMenuIcon(true);
-
-      setLastScrollY(currentScrollY);
+      setIsScrolled(window.scrollY > 20);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+  }, []);
 
   const handleOpenAuthModal = () => setIsAuthModalOpen(true);
   const handleCloseAuthModal = () => setIsAuthModalOpen(false);
 
   const handleNavItemClick = (id: string) => {
     setActive(id);
-    // Close mobile menu smoothly after a short delay
     setTimeout(() => {
       setIsMobileMenuOpen(false);
     }, 300);
   };
 
   const cortexSubmenu = [
-    { to: '/', icon: <Info size={18} />, label: 'What', id: 'what' },
-    { to: '/why', icon: <HelpCircle size={18} />, label: 'Why', id: 'why' },
-    { to: '/how', icon: <Code size={18} />, label: 'How', id: 'how' },
+    { to: '/', icon: <Info size={16} />, label: 'What', id: 'what' },
+    { to: '/why', icon: <HelpCircle size={16} />, label: 'Why', id: 'why' },
+    { to: '/how', icon: <Code size={16} />, label: 'How', id: 'how' },
   ];
 
   const categoriesSubmenu = [
-    { to: '/kids', icon: <Baby size={18} />, label: 'Kids', id: 'kids' },
+    { to: '/kids', icon: <Baby size={16} />, label: 'Kids', id: 'kids' },
     {
       to: '/adults',
-      icon: <Users size={18} />,
+      icon: <Users size={16} />,
       label: 'Adults',
       id: 'adults',
       children: [
-        { to: '/adults/beginners', icon: <Lightbulb size={16} />, label: 'Beginners', id: 'adults-beginners' },
-        { to: '/adults/intermediates', icon: <Layers size={16} />, label: 'Intermediates', id: 'adults-intermediates' },
-        { to: '/adults/advanced', icon: <Award size={16} />, label: 'Advanced', id: 'adults-advanced' },
+        { to: '/adults/beginners', icon: <Lightbulb size={14} />, label: 'Beginners', id: 'adults-beginners' },
+        { to: '/adults/intermediates', icon: <Layers size={14} />, label: 'Intermediates', id: 'adults-intermediates' },
+        { to: '/adults/advanced', icon: <Award size={14} />, label: 'Advanced', id: 'adults-advanced' },
       ]
     },
-    { to: '/ielts-pte', icon: <GraduationCap size={18} />, label: 'IELTS/PTE', id: 'ielts-pte' },
+    { to: '/ielts-pte', icon: <GraduationCap size={16} />, label: 'IELTS/PTE', id: 'ielts-pte' },
   ];
 
   const authNavItems = [
-    { to: '/manage', icon: <Table size={20} />, label: 'Manage', id: 'manage' },
-    { to: '/search', icon: <Search size={20} />, label: 'Search', id: 'search' },
-    { to: '/import', icon: <Upload size={20} />, label: 'Import', id: 'import' },
-    { to: '/profile', icon: <User size={20} />, label: 'Profile', id: 'profile' },
-    { to: '/settings', icon: <Settings size={20} />, label: 'Settings', id: 'settings' },
+    { to: '/manage', icon: <Table size={18} />, label: 'Manage', id: 'manage' },
+    { to: '/search', icon: <Search size={18} />, label: 'Search', id: 'search' },
+    { to: '/import', icon: <Upload size={18} />, label: 'Import', id: 'import' },
+    { to: '/profile', icon: <User size={18} />, label: 'Profile', id: 'profile' },
+    { to: '/settings', icon: <Settings size={18} />, label: 'Settings', id: 'settings' },
   ];
 
   const navItems = isAuthenticated ? authNavItems : [];
@@ -184,41 +171,41 @@ export const Navbar = () => {
   return (
     <>
       <TooltipProvider>
-        {/* Sticky Header Container */}
+        {/* Compact Sticky Header with Larger Logo */}
         <header
           className={cn(
             "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out",
-            "backdrop-blur-md border-b border-border/50",
+            "backdrop-blur-md border-b border-border/40",
             isScrolled 
-              ? "bg-background/95 shadow-lg" 
-              : "bg-transparent"
+              ? "bg-background/95 shadow-sm" 
+              : "bg-background/90"
           )}
         >
-          <div className="container mx-auto px-4 py-3">
+          <div className="container mx-auto px-3 py-2">
             <div className="flex items-center justify-between">
-              {/* Logo - Increased size for both desktop and mobile */}
+              {/* Larger Logo with Negative Margin */}
               <Link
                 to="/"
-                className="flex items-center gap-2 transition-all duration-300 hover:scale-105"
+                className="flex items-center transition-all duration-300 hover:scale-105 -my-2"
                 onClick={() => handleNavItemClick('what')}
               >
                 <img
                   src="/Speak_Bee.png"
                   alt="Logo"
-                  className="h-20 w-auto sm:h-24 md:h-28 lg:h-32 xl:h-36"
+                  className="h-20 w-auto sm:h-24 md:h-28"
                 />
               </Link>
 
-              {/* Desktop Navigation - Only visible on desktop */}
+              {/* Desktop Navigation - Compact */}
               <nav className="hidden sm:flex items-center justify-center flex-1">
-                <div className="glass-panel rounded-lg px-1 py-1">
-                  <div className="flex items-center">
+                <div className="glass-panel rounded-lg px-1 py-1 shadow-sm">
+                  <div className="flex items-center gap-1">
                     {/* Left side - Navigation items */}
                     <div className="flex items-center">
                       {/* Cortex with submenu */}
                       <NavItem
                         to="#"
-                        icon={<Brain size={20} color="black" />}
+                        icon={<Brain size={18} />}
                         label="Mind"
                         active={['what', 'why', 'how'].includes(active)}
                         onClick={() => { }}
@@ -239,7 +226,7 @@ export const Navbar = () => {
                       {/* Categories with submenu */}
                       <NavItem
                         to="#"
-                        icon={<FolderTree size={20} />}
+                        icon={<FolderTree size={18} />}
                         label="Categories"
                         active={[
                           'kids', 'adults', 'ielts-pte',
@@ -284,11 +271,11 @@ export const Navbar = () => {
                     </div>
 
                     {/* Right side navigation items */}
-                    <div className="flex items-center">
+                    <div className="flex items-center gap-1">
                       {/* Help option */}
                       <NavItem
                         to="/help"
-                        icon={<HelpCircle size={20} />}
+                        icon={<HelpCircle size={18} />}
                         label="Help"
                         active={active === 'help'}
                         onClick={() => handleNavItemClick('help')}
@@ -296,8 +283,13 @@ export const Navbar = () => {
 
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button variant="ghost" size="icon" className="rounded-lg" onClick={toggleTheme}>
-                            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="rounded-lg h-9 w-9"
+                            onClick={toggleTheme}
+                          >
+                            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -310,10 +302,10 @@ export const Navbar = () => {
                           <TooltipTrigger asChild>
                             <Button
                               variant="ghost"
-                              className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-primary hover:text-primary-foreground"
+                              className="flex items-center gap-2 px-3 py-2 rounded-lg h-9 hover:bg-primary hover:text-primary-foreground text-sm"
                               onClick={logout}
                             >
-                              <LogOut size={20} />
+                              <LogOut size={16} />
                               {active === 'logout' && <span className="font-medium">Logout</span>}
                             </Button>
                           </TooltipTrigger>
@@ -326,10 +318,10 @@ export const Navbar = () => {
                           <TooltipTrigger asChild>
                             <Button
                               variant="ghost"
-                              className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-primary hover:text-primary-foreground"
+                              className="flex items-center gap-2 px-3 py-2 rounded-lg h-9 hover:bg-primary hover:text-primary-foreground text-sm"
                               onClick={handleOpenAuthModal}
                             >
-                              <LogIn size={20} />
+                              <LogIn size={16} />
                               {active === 'login' && <span className="font-medium">Login</span>}
                             </Button>
                           </TooltipTrigger>
@@ -343,86 +335,150 @@ export const Navbar = () => {
                 </div>
               </nav>
 
-              {/* Mobile Navigation - Only visible on mobile */}
-              <div className="flex items-center gap-2 sm:hidden">
-                {/* Mobile Menu Button */}
-                {showMenuIcon && (
-                  <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-                    <SheetTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="rounded-lg glass-panel hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
-                      >
-                        <Menu size={22} />
-                      </Button>
-                    </SheetTrigger>
-                    <SheetContent
-                      side="left"
-                      className="p-0 w-full max-w-[320px] sm:max-w-[350px] h-full flex flex-col border-r-0"
-                      style={{
-                        animation: isMobileMenuOpen
-                          ? 'slideInFromLeft 0.3s ease-out forwards'
-                          : 'slideOutToLeft 0.3s ease-in forwards'
-                      }}
+              {/* Mobile Navigation - Compact */}
+              <div className="flex items-center gap-1 sm:hidden">
+                <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                  <SheetTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-lg h-9 w-9 glass-panel hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
                     >
-                      {/* Mobile Menu Header with Login and Theme Toggle */}
-                      <div className="flex items-center justify-between p-4 border-b bg-background/50">
-                        <div className="flex items-center gap-2">
-                          {/* Theme Toggle */}
+                      <Menu size={18} />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent
+                    side="left"
+                    className="p-0 w-full max-w-[280px] sm:max-w-[300px] h-full flex flex-col border-r-0"
+                    style={{
+                      animation: isMobileMenuOpen
+                        ? 'slideInFromLeft 0.3s ease-out forwards'
+                        : 'slideOutToLeft 0.3s ease-in forwards'
+                    }}
+                  >
+                    {/* Compact Mobile Menu Header */}
+                    <div className="flex items-center justify-between p-3 border-b bg-background/50">
+                      <div className="flex items-center gap-1">
+                        {/* Theme Toggle */}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={toggleTheme}
+                          className="rounded-lg h-8 w-8 hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
+                        >
+                          {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+                        </Button>
+                        
+                        {/* Login/Logout Button */}
+                        {isAuthenticated ? (
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={toggleTheme}
-                            className="rounded-lg hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
+                            onClick={() => {
+                              logout();
+                              setIsMobileMenuOpen(false);
+                            }}
+                            className="rounded-lg h-8 w-8 hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
                           >
-                            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                            <LogOut size={16} />
                           </Button>
-                          
-                          {/* Login/Logout Button */}
-                          {isAuthenticated ? (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => {
-                                logout();
-                                setIsMobileMenuOpen(false);
-                              }}
-                              className="rounded-lg hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
-                            >
-                              <LogOut size={18} />
-                            </Button>
-                          ) : (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => {
-                                handleOpenAuthModal();
-                                setIsMobileMenuOpen(false);
-                              }}
-                              className="rounded-lg hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
-                            >
-                              <LogIn size={18} />
-                            </Button>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2">
-                        </div>
+                        ) : (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              handleOpenAuthModal();
+                              setIsMobileMenuOpen(false);
+                            }}
+                            className="rounded-lg h-8 w-8 hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
+                          >
+                            <LogIn size={16} />
+                          </Button>
+                        )}
                       </div>
+                    </div>
 
-                      {/* Scrollable content */}
-                      <div className="flex-1 overflow-y-auto">
-                        <div className="p-4 space-y-6">
-                          {/* Cortex mobile */}
-                          <div className="transition-all duration-300 ease-out">
-                            <div className="px-1 text-xs font-semibold text-muted-foreground uppercase mb-2">Mind</div>
+                    {/* Scrollable content */}
+                    <div className="flex-1 overflow-y-auto">
+                      <div className="p-3 space-y-4">
+                        {/* Cortex mobile */}
+                        <div className="transition-all duration-300 ease-out">
+                          <div className="px-1 text-xs font-semibold text-muted-foreground uppercase mb-2">Mind</div>
+                          <div className="space-y-1">
+                            {cortexSubmenu.map((item) => (
+                              <Link
+                                key={item.id}
+                                to={item.to}
+                                className={cn(
+                                  "flex items-center gap-2 rounded-md px-2 py-2 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400 text-sm",
+                                  active === item.id
+                                    ? "bg-teal-500/20 text-teal-400"
+                                    : "text-foreground"
+                                )}
+                                onClick={() => handleNavItemClick(item.id)}
+                              >
+                                {item.icon}
+                                <span className="font-medium">{item.label}</span>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Categories mobile */}
+                        <div className="transition-all duration-300 ease-out delay-75">
+                          <div className="px-1 text-xs font-semibold text-muted-foreground uppercase mb-2">Categories</div>
+                          <div className="space-y-1">
+                            {categoriesSubmenu.map((item) => (
+                              <div key={item.id} className="space-y-1">
+                                <Link
+                                  to={item.to}
+                                  className={cn(
+                                    "flex items-center gap-2 rounded-md px-2 py-2 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400 text-sm",
+                                    active === item.id
+                                      ? "bg-teal-500/20 text-teal-400"
+                                      : "text-foreground"
+                                  )}
+                                  onClick={() => handleNavItemClick(item.id)}
+                                >
+                                  {item.icon}
+                                  <span className="font-medium">{item.label}</span>
+                                </Link>
+                                {item.children && (
+                                  <div className="ml-3 space-y-1 border-l-2 border-muted/30 pl-2 transition-all duration-300">
+                                    {item.children.map((sub) => (
+                                      <Link
+                                        key={sub.id}
+                                        to={sub.to}
+                                        className={cn(
+                                          "flex items-center gap-2 rounded-md px-2 py-1 text-xs transition-all duration-300 hover:bg-teal-500/15 hover:text-teal-400",
+                                          active === sub.id
+                                            ? "bg-teal-500/15 text-teal-400"
+                                            : "text-foreground"
+                                        )}
+                                        onClick={() => handleNavItemClick(sub.id)}
+                                      >
+                                        {sub.icon}
+                                        <span>{sub.label}</span>
+                                      </Link>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Authenticated nav mobile */}
+                        {isAuthenticated && (
+                          <div className="transition-all duration-300 ease-out delay-150">
+                            <div className="px-1 text-xs font-semibold text-muted-foreground uppercase mb-2">Navigation</div>
                             <div className="space-y-1">
-                              {cortexSubmenu.map((item) => (
+                              {navItems.map((item) => (
                                 <Link
                                   key={item.id}
                                   to={item.to}
                                   className={cn(
-                                    "flex items-center gap-3 rounded-md px-3 py-3 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400",
+                                    "flex items-center gap-2 rounded-md px-2 py-2 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400 text-sm",
                                     active === item.id
                                       ? "bg-teal-500/20 text-teal-400"
                                       : "text-foreground"
@@ -435,105 +491,36 @@ export const Navbar = () => {
                               ))}
                             </div>
                           </div>
+                        )}
 
-                          {/* Categories mobile */}
-                          <div className="transition-all duration-300 ease-out delay-75">
-                            <div className="px-1 text-xs font-semibold text-muted-foreground uppercase mb-2">Categories</div>
-                            <div className="space-y-1">
-                              {categoriesSubmenu.map((item) => (
-                                <div key={item.id} className="space-y-1">
-                                  <Link
-                                    to={item.to}
-                                    className={cn(
-                                      "flex items-center gap-3 rounded-md px-3 py-3 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400",
-                                      active === item.id
-                                        ? "bg-teal-500/20 text-teal-400"
-                                        : "text-foreground"
-                                    )}
-                                    onClick={() => handleNavItemClick(item.id)}
-                                  >
-                                    {item.icon}
-                                    <span className="font-medium">{item.label}</span>
-                                  </Link>
-                                  {item.children && (
-                                    <div className="ml-4 space-y-1 border-l-2 border-muted/30 pl-2 transition-all duration-300">
-                                      {item.children.map((sub) => (
-                                        <Link
-                                          key={sub.id}
-                                          to={sub.to}
-                                          className={cn(
-                                            "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-all duration-300 hover:bg-teal-500/15 hover:text-teal-400",
-                                            active === sub.id
-                                              ? "bg-teal-500/15 text-teal-400"
-                                              : "text-foreground"
-                                          )}
-                                          onClick={() => handleNavItemClick(sub.id)}
-                                        >
-                                          {sub.icon}
-                                          <span>{sub.label}</span>
-                                        </Link>
-                                      ))}
-                                    </div>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-
-                          {/* Authenticated nav mobile */}
-                          {isAuthenticated && (
-                            <div className="transition-all duration-300 ease-out delay-150">
-                              <div className="px-1 text-xs font-semibold text-muted-foreground uppercase mb-2">Navigation</div>
-                              <div className="space-y-1">
-                                {navItems.map((item) => (
-                                  <Link
-                                    key={item.id}
-                                    to={item.to}
-                                    className={cn(
-                                      "flex items-center gap-3 rounded-md px-3 py-3 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400",
-                                      active === item.id
-                                        ? "bg-teal-500/20 text-teal-400"
-                                        : "text-foreground"
-                                    )}
-                                    onClick={() => handleNavItemClick(item.id)}
-                                  >
-                                    {item.icon}
-                                    <span className="font-medium">{item.label}</span>
-                                  </Link>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Help option for mobile */}
-                          <div className="transition-all duration-300 ease-out delay-200">
-                            <Link
-                              to="/help"
-                              className={cn(
-                                "flex items-center gap-3 rounded-md px-3 py-3 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400",
-                                active === 'help'
-                                  ? "bg-teal-500/20 text-teal-400"
-                                  : "text-foreground"
-                              )}
-                              onClick={() => handleNavItemClick('help')}
-                            >
-                              <HelpCircle size={20} />
-                              <span className="font-medium">Help</span>
-                            </Link>
-                          </div>
+                        {/* Help option for mobile */}
+                        <div className="transition-all duration-300 ease-out delay-200">
+                          <Link
+                            to="/help"
+                            className={cn(
+                              "flex items-center gap-2 rounded-md px-2 py-2 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400 text-sm",
+                              active === 'help'
+                                ? "bg-teal-500/20 text-teal-400"
+                                : "text-foreground"
+                            )}
+                            onClick={() => handleNavItemClick('help')}
+                          >
+                            <HelpCircle size={16} />
+                            <span className="font-medium">Help</span>
+                          </Link>
                         </div>
                       </div>
+                    </div>
 
-                      {/* Footer with additional info */}
-                      <div className="p-4 border-t bg-muted/30 transition-all duration-300 ease-out delay-300">
-                        <div className="text-center text-sm text-muted-foreground">
-                          <p>© 2024 Vocario</p>
-                          <p className="text-xs mt-1">Language Learning Platform</p>
-                        </div>
+                    {/* Compact Footer */}
+                    <div className="p-3 border-t bg-muted/30 transition-all duration-300 ease-out delay-300">
+                      <div className="text-center text-xs text-muted-foreground">
+                        <p>© 2024 Vocario</p>
+                        <p className="text-[10px] mt-1">Language Learning Platform</p>
                       </div>
-                    </SheetContent>
-                  </Sheet>
-                )}
+                    </div>
+                  </SheetContent>
+                </Sheet>
               </div>
             </div>
           </div>
