@@ -1,4 +1,3 @@
-// src/pages/Kids.tsx
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -70,53 +69,49 @@ const KidsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 pb-20 pt-32">
+    <div className="min-h-screen pb-20 pt-32">
       <div className="container mx-auto px-4">
         {/* Header Section */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="relative">
-              <Sparkles className="w-8 h-8 text-yellow-500 animate-pulse" />
-            </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold text-teal-600 flex items-center gap-2">
               Kids Learning Zone
             </h1>
-            <Sparkles className="w-8 h-8 text-yellow-500 animate-pulse" />
           </div>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
             Fun stories, exciting games, and magical adventures to learn English!
           </p>
         </div>
 
         {/* Stats Bar */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <Card className="bg-white/80 backdrop-blur-sm border-2 border-yellow-200">
+          <Card className="glass-panel border-2 border-yellow-200">
             <CardContent className="p-4 text-center">
               <div className="flex items-center justify-center gap-2">
                 <Trophy className="w-6 h-6 text-yellow-500" />
-                <span className="text-2xl font-bold text-gray-800">{points}</span>
+                <span className="text-2xl font-bold text-foreground">{points}</span>
               </div>
-              <p className="text-sm text-gray-600">Points</p>
+              <p className="text-sm text-muted-foreground">Points</p>
             </CardContent>
           </Card>
           
-          <Card className="bg-white/80 backdrop-blur-sm border-2 border-orange-200">
+          <Card className="glass-panel border-2 border-orange-200">
             <CardContent className="p-4 text-center">
               <div className="flex items-center justify-center gap-2">
                 <Zap className="w-6 h-6 text-orange-500" />
-                <span className="text-2xl font-bold text-gray-800">{streak} days</span>
+                <span className="text-2xl font-bold text-foreground">{streak} days</span>
               </div>
-              <p className="text-sm text-gray-600">Streak</p>
+              <p className="text-sm text-muted-foreground">Streak</p>
             </CardContent>
           </Card>
           
-          <Card className="bg-white/80 backdrop-blur-sm border-2 border-green-200">
+          <Card className="glass-panel border-2 border-green-200">
             <CardContent className="p-4 text-center">
               <div className="flex items-center justify-center gap-2">
                 <Award className="w-6 h-6 text-green-500" />
-                <span className="text-2xl font-bold text-gray-800">12/20</span>
+                <span className="text-2xl font-bold text-foreground">12/20</span>
               </div>
-              <p className="text-sm text-gray-600">Achievements</p>
+              <p className="text-sm text-muted-foreground">Achievements</p>
             </CardContent>
           </Card>
         </div>
@@ -130,10 +125,10 @@ const KidsPage = () => {
                 key={category.id}
                 variant={activeCategory === category.id ? "default" : "outline"}
                 className={cn(
-                  "rounded-full px-6 py-3 text-lg font-semibold transition-all duration-300",
+                  "rounded-full px-6 py-3 text-lg font-semibold transition-all duration-300 bounce-hover",
                   activeCategory === category.id 
-                    ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg" 
-                    : "bg-white/80 border-2 border-gray-200 hover:border-purple-300"
+                    ? "colorful-gradient text-white shadow-lg glow-effect" 
+                    : "bg-card/80 border-2 border-border hover:border-primary/50"
                 )}
                 onClick={() => setActiveCategory(category.id)}
               >
@@ -149,7 +144,7 @@ const KidsPage = () => {
           {stories.map((story, index) => (
             <Card 
               key={index} 
-              className="group cursor-pointer border-2 border-transparent hover:border-purple-300 hover:shadow-xl transition-all duration-300 bg-white/90 backdrop-blur-sm"
+              className="group cursor-pointer interactive-card"
             >
               <CardContent className="p-0 overflow-hidden rounded-2xl">
                 <div className={cn("p-6 text-white text-center bg-gradient-to-br", story.color)}>
@@ -159,14 +154,14 @@ const KidsPage = () => {
                 </div>
                 
                 <div className="p-4">
-                  <div className="flex justify-between text-sm text-gray-600 mb-4">
+                  <div className="flex justify-between text-sm text-muted-foreground mb-4">
                     <span>📚 {story.words} words</span>
                     <span>⏱️ {story.duration}</span>
                     <span>🎯 {story.difficulty}</span>
                   </div>
                   
                   <Button 
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3 rounded-xl transition-all duration-300 group-hover:scale-105"
+                    className="w-full colorful-gradient hover:shadow-lg text-white font-semibold py-3 rounded-xl transition-all duration-300 group-hover:scale-105"
                     onClick={() => handleStartLesson(index)}
                   >
                     <Play className="w-4 h-4 mr-2" />
@@ -179,8 +174,8 @@ const KidsPage = () => {
         </div>
 
         {/* Achievements Section */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border-2 border-purple-100">
-          <h2 className="text-2xl font-bold text-center mb-6 text-gray-800 flex items-center justify-center gap-2">
+        <div className="glass-panel rounded-2xl p-6 border-2 border-primary/20">
+          <h2 className="text-2xl font-bold text-center mb-6 text-foreground flex items-center justify-center gap-2">
             <Trophy className="w-6 h-6 text-yellow-500" />
             Your Achievements
           </h2>
@@ -193,20 +188,20 @@ const KidsPage = () => {
                   <div className="relative inline-block mb-2">
                     <Icon className={cn("w-8 h-8", achievement.color)} />
                     {achievement.progress === 100 && (
-                      <Sparkles className="w-4 h-4 text-yellow-500 absolute -top-1 -right-1" />
+                      <Sparkles className="w-4 h-4 text-yellow-500 absolute -top-1 -right-1 animate-pulse" />
                     )}
                   </div>
-                  <p className="text-sm font-semibold text-gray-800 mb-2">{achievement.name}</p>
-                  <Progress value={achievement.progress} className="h-2 bg-gray-200">
+                  <p className="text-sm font-semibold text-foreground mb-2">{achievement.name}</p>
+                  <Progress value={achievement.progress} className="h-2 bg-muted">
                     <div 
                       className={cn(
                         "h-full rounded-full transition-all duration-500",
-                        achievement.progress === 100 ? "bg-yellow-500" : "bg-purple-500"
+                        achievement.progress === 100 ? "bg-yellow-500" : "bg-primary"
                       )}
                       style={{ width: `${achievement.progress}%` }}
                     />
                   </Progress>
-                  <span className="text-xs text-gray-600 mt-1">{achievement.progress}%</span>
+                  <span className="text-xs text-muted-foreground mt-1">{achievement.progress}%</span>
                 </div>
               );
             })}
@@ -215,17 +210,17 @@ const KidsPage = () => {
 
         {/* Quick Actions */}
         <div className="text-center mt-8">
-          <p className="text-gray-600 mb-4">Practice makes perfect! 🎯</p>
+          <p className="text-muted-foreground mb-4">Practice makes perfect! 🎯</p>
           <div className="flex flex-wrap justify-center gap-3">
-            <Button variant="outline" className="rounded-full px-6 border-2 border-green-200 hover:border-green-300">
+            <Button variant="outline" className="rounded-full px-6 border-2 border-green-200 hover:border-green-300 bounce-hover">
               <Volume2 className="w-4 h-4 mr-2 text-green-500" />
               Listen & Repeat
             </Button>
-            <Button variant="outline" className="rounded-full px-6 border-2 border-blue-200 hover:border-blue-300">
+            <Button variant="outline" className="rounded-full px-6 border-2 border-blue-200 hover:border-blue-300 bounce-hover">
               <Mic className="w-4 h-4 mr-2 text-blue-500" />
               Speak Now
             </Button>
-            <Button variant="outline" className="rounded-full px-6 border-2 border-pink-200 hover:border-pink-300">
+            <Button variant="outline" className="rounded-full px-6 border-2 border-pink-200 hover:border-pink-300 bounce-hover">
               <Heart className="w-4 h-4 mr-2 text-pink-500" />
               Favorite Stories
             </Button>
@@ -235,9 +230,20 @@ const KidsPage = () => {
 
       {/* Floating Elements for Playfulness */}
       <div className="fixed bottom-4 right-4 animate-bounce">
-        <div className="bg-yellow-400 text-white p-3 rounded-full shadow-lg">
-          <Zap className="w-6 h-6" />
+        <div className="floating-icon-primary p-3 rounded-full shadow-lg">
+          <Zap className="w-6 h-6 text-primary" />
         </div>
+      </div>
+
+      {/* Additional Floating Icons */}
+      <div className="fixed top-20 left-4 animate-float-slow floating-icon-secondary p-2 rounded-full">
+        <Star className="w-5 h-5 text-secondary" />
+      </div>
+      <div className="fixed top-40 right-8 animate-float-medium floating-icon-accent p-2 rounded-full">
+        <Heart className="w-5 h-5 text-accent" />
+      </div>
+      <div className="fixed bottom-40 left-8 animate-float-fast floating-icon-glow p-2 rounded-full">
+        <Sparkles className="w-5 h-5 text-primary" />
       </div>
     </div>
   );

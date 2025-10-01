@@ -44,7 +44,7 @@
  
 @layer base {
   :root {
-    /* Warm Golden Light Mode Design System */
+    /* Light Mode - Consistent Warm Golden Background */
     --background: 52 43% 55%;
     --foreground: 222.2 84% 4.9%;
 
@@ -132,13 +132,14 @@
   }
  
   .dark {
+    /* Dark Mode - Consistent Dark Background */
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
  
-    --card: 222.2 84% 4.9%;
+    --card: 222.2 84% 4.9% / 0.9;
     --card-foreground: 210 40% 98%;
  
-    --popover: 222.2 84% 4.9%;
+    --popover: 222.2 84% 4.9% / 0.95;
     --popover-foreground: 210 40% 98%;
  
     --primary: 210 40% 98%;
@@ -160,11 +161,24 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
 
+    /* Dark mode gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(210 40% 20%), hsl(210 40% 30%), hsl(210 40% 40%));
+    --gradient-secondary: linear-gradient(135deg, hsl(217.2 32.6% 17.5%), hsl(217.2 32.6% 25%), hsl(217.2 32.6% 32%));
+    --gradient-accent: linear-gradient(135deg, hsl(215 20.2% 65.1%), hsl(215 20.2% 75%), hsl(215 20.2% 85%));
+    --gradient-rainbow: linear-gradient(135deg, hsl(210 40% 20%), hsl(217.2 32.6% 25%), hsl(215 20.2% 65.1%));
+
+    /* Dark mode shadows */
+    --shadow-colorful: 0 10px 30px -10px hsl(210 40% 98% / 0.1);
+    --shadow-glow: 0 0 40px hsl(210 40% 98% / 0.05);
+    --shadow-soft: 0 4px 20px -4px hsl(217.2 32.6% 17.5% / 0.8);
+    --shadow-interactive: 0 8px 25px -8px hsl(210 40% 98% / 0.08);
+    --shadow-floating: 0 15px 35px -15px hsl(210 40% 98% / 0.06);
+
     /* Dark mode floating icons */
-    --floating-icon-primary: 45 93% 67% / 0.1;
-    --floating-icon-secondary: 35 85% 65% / 0.08;
-    --floating-icon-accent: 40 80% 60% / 0.06;
-    --floating-icon-glow: 45 93% 77% / 0.05;
+    --floating-icon-primary: 210 40% 98% / 0.08;
+    --floating-icon-secondary: 217.2 32.6% 17.5% / 0.1;
+    --floating-icon-accent: 215 20.2% 65.1% / 0.06;
+    --floating-icon-glow: 210 40% 98% / 0.04;
   }
 }
 
@@ -268,6 +282,53 @@
     -webkit-text-fill-color: transparent;
   }
 
+  /* Dark Mode Interactive Effects */
+  .dark .colorful-gradient {
+    background: var(--gradient-primary);
+  }
+  
+  .dark .rainbow-gradient {
+    background: var(--gradient-rainbow);
+  }
+  
+  .dark .glow-effect {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .dark .colorful-shadow {
+    box-shadow: var(--shadow-colorful);
+  }
+  
+  .dark .bounce-hover {
+    transition: var(--transition-bounce);
+  }
+  
+  .dark .bounce-hover:hover {
+    transform: translateY(-2px) scale(1.02);
+  }
+  
+  .dark .interactive-card {
+    transition: var(--transition-smooth);
+    border: 1px solid hsl(var(--border));
+  }
+  
+  .dark .interactive-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-colorful);
+    border-color: hsl(var(--primary) / 0.3);
+  }
+  
+  .dark .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .dark .pulse-glow {
+    animation: pulseGlowDark 2s infinite ease-in-out;
+  }
+
   /* Floating Icons Styles */
   .light .floating-icon-primary {
     background: hsl(var(--floating-icon-primary));
@@ -295,26 +356,26 @@
 
   .dark .floating-icon-primary {
     background: hsl(var(--floating-icon-primary));
-    border: 1px solid hsl(45 93% 67% / 0.15);
-    box-shadow: 0 8px 32px hsl(45 93% 67% / 0.1);
+    border: 1px solid hsl(210 40% 98% / 0.15);
+    box-shadow: 0 8px 32px hsl(210 40% 98% / 0.1);
   }
   
   .dark .floating-icon-secondary {
     background: hsl(var(--floating-icon-secondary));
-    border: 1px solid hsl(35 85% 65% / 0.12);
-    box-shadow: 0 8px 32px hsl(35 85% 65% / 0.08);
+    border: 1px solid hsl(217.2 32.6% 17.5% / 0.3);
+    box-shadow: 0 8px 32px hsl(217.2 32.6% 17.5% / 0.2);
   }
   
   .dark .floating-icon-accent {
     background: hsl(var(--floating-icon-accent));
-    border: 1px solid hsl(40 80% 60% / 0.1);
-    box-shadow: 0 8px 32px hsl(40 80% 60% / 0.06);
+    border: 1px solid hsl(215 20.2% 65.1% / 0.2);
+    box-shadow: 0 8px 32px hsl(215 20.2% 65.1% / 0.15);
   }
   
   .dark .floating-icon-glow {
     background: hsl(var(--floating-icon-glow));
-    border: 1px solid hsl(45 93% 77% / 0.08);
-    box-shadow: 0 8px 32px hsl(45 93% 77% / 0.05);
+    border: 1px solid hsl(210 40% 98% / 0.1);
+    box-shadow: 0 8px 32px hsl(210 40% 98% / 0.08);
   }
 }
  
@@ -325,23 +386,24 @@
   
   body {
     @apply text-foreground;
+    position: relative;
+    overflow-x: hidden;
+    min-height: 100vh;
   }
   
-  /* Warm golden gradient background for light mode */
+  /* Consistent Warm Golden Background for ALL Light Mode Pages */
   .light body {
     background: hsla(52, 43%, 55%, 1);
     background: linear-gradient(90deg, hsla(52, 43%, 55%, 1) 0%, hsla(51, 33%, 75%, 1) 100%);
     background: -moz-linear-gradient(90deg, hsla(52, 43%, 55%, 1) 0%, hsla(51, 33%, 75%, 1) 100%);
     background: -webkit-linear-gradient(90deg, hsla(52, 43%, 55%, 1) 0%, hsla(51, 33%, 75%, 1) 100%);
     filter: progid: DXImageTransform.Microsoft.gradient( startColorstr="#BEB15B", endColorstr="#D5CFAC", GradientType=1 );
-    position: relative;
-    overflow-x: hidden;
-    min-height: 100vh;
   }
   
-  /* Dark mode simple background */
+  /* Consistent Dark Background for ALL Dark Mode Pages */
   .dark body {
-    @apply bg-background;
+    background: hsl(222.2 84% 4.9%);
+    background: linear-gradient(135deg, hsl(222.2 84% 4.9%) 0%, hsl(217.2 32.6% 17.5%) 100%);
   }
 }
 
@@ -449,6 +511,24 @@
   }
 }
 
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px hsl(var(--primary) / 0.6);
+  }
+}
+
+@keyframes pulseGlowDark {
+  0%, 100% {
+    box-shadow: 0 0 20px hsl(210 40% 98% / 0.1);
+  }
+  50% {
+    box-shadow: 0 0 40px hsl(210 40% 98% / 0.2);
+  }
+}
+
 /* Shared keyframes for route/page transitions */
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -488,15 +568,6 @@
 @keyframes slideDownOut {
   0% { opacity: 1; transform: translateY(0); }
   100% { opacity: 0; transform: translateY(8px); }
-}
-
-@keyframes pulseGlow {
-  0%, 100% {
-    box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
-  }
-  50% {
-    box-shadow: 0 0 40px hsl(var(--primary) / 0.6);
-  }
 }
 
 @keyframes rotateHalfClockwise {
