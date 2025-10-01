@@ -74,7 +74,11 @@ const WhyPage = () => {
         <WhySection
           id="why-1"
           icon={<Lightbulb className="w-6 h-6 text-primary" />}
-          title="Because why not make learning English truly accessible?"
+          title={
+            <span className="text-teal-600">
+              Because why not make learning English truly accessible?
+            </span>
+          }
           content={
             <>
               <p>
@@ -102,7 +106,11 @@ const WhyPage = () => {
         <WhySection
           id="why-2"
           icon={<Heart className="w-6 h-6 text-primary" />}
-          title="Because we need better relationships with technology."
+          title={
+            <span className="text-teal-600">
+              Because we need better relationships with technology.
+            </span>
+          }
           content={
             <>
               <p>
@@ -138,7 +146,11 @@ const WhyPage = () => {
         <WhySection
           id="why-3"
           icon={<RefreshCw className="w-6 h-6 text-primary" />}
-          title="Because new beginnings are beautiful."
+          title={
+            <span className="text-teal-600">
+              Because new beginnings are beautiful.
+            </span>
+          }
           content={
             <>
               <p>
@@ -154,7 +166,11 @@ const WhyPage = () => {
         <WhySection
           id="why-4"
           icon={<Zap className="w-6 h-6 text-primary" />}
-          title="Because learning English should empower you, not distract you."
+          title={
+            <span className="text-teal-600">
+              Because learning English should empower you, not distract you.
+            </span>
+          }
           content={
             <>
               <p>

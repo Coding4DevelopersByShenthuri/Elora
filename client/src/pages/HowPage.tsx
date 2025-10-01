@@ -222,7 +222,11 @@ const HowPage = () => {
           <h2 className="text-3xl font-bold text-center mb-12">Designed for Smarter English Learning</h2>
 
           <FeatureShowcase
-            title="Interactive Learning Modules"
+            title={
+              <span className="text-teal-600">
+                Interactive Learning Modules
+              </span>
+            }
             description="Speak Bee offers category-based modules for Kids, Adults, and IELTS/PTE learners, tailored to your skill level and learning goals."
             image="./image6.png"
             features={[
@@ -234,7 +238,11 @@ const HowPage = () => {
           />
 
           <FeatureShowcase
-            title="Real-Time Pronunciation & Conversation"
+            title={
+              <span className="text-teal-600">
+                Real-Time Pronunciation & Conversation.
+              </span>
+            }
             description="Practice speaking and get instant feedback with our offline Small Language Model, improving your fluency and confidence."
             image="./image5.png"
             features={[
@@ -248,7 +256,11 @@ const HowPage = () => {
 
 
           <FeatureShowcase
-            title="Access Lessons & Feedback Instantly"
+            title={
+              <span className="text-teal-600">
+                Access Lessons & Feedback Instantly.
+              </span>
+            }
             description="Quickly find the lessons, exercises, and practice sessions you need. Speak Bee helps you navigate your learning path efficiently and stay on track."
             image="./image7.png"
             features={[
@@ -261,7 +273,11 @@ const HowPage = () => {
           />
 
           <FeatureShowcase
-            title="AI-Powered Learning Insights"
+            title={
+              <span className="text-teal-600">
+                AI-Powered Learning Insights.
+              </span>
+            }
             description="Speak Bee's AI helps you discover patterns in your learning, providing personalized guidance and suggestions to improve your English skills efficiently."
             image="./image8.png"
             features={[
@@ -274,7 +290,11 @@ const HowPage = () => {
 
 
           <FeatureShowcase
-            title="Your Private Learning Hub"
+            title={
+              <span className="text-teal-600">
+                Your Private Learning Hub.
+              </span>
+            }
             description="Speak Bee keeps your learning progress and data completely private. All exercises, lessons, and feedback are stored locally, giving you full control and offline access."
             image="./image9.png"
             features={[
@@ -287,7 +307,11 @@ const HowPage = () => {
           />
 
           <FeatureShowcase
-            title="Your Personal English Coach"
+            title={
+              <span className="text-teal-600">
+                Your Personal English Coach.
+              </span>
+            }
             description="Speak Bee acts as an extension of your learning journey, guiding you through interactive lessons, practice exercises, and real-time feedback across all your devices."
             image="./image10.png"
             features={[

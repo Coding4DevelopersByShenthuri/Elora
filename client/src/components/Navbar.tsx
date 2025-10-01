@@ -536,8 +536,8 @@ export const Navbar = () => {
                     {/* Clean Footer */}
                     <div className="p-3 border-t bg-muted/30 transition-all duration-300 ease-out delay-300">
                       <div className="text-center text-xs text-muted-foreground">
-                        <p>© 2024 Vocario</p>
-                        <p className="text-[10px] mt-1">Language Learning Platform</p>
+                        <p>© 2025 Speak Bee</p>
+                        <p className="text-[10px] mt-1">Spoken English Learning Platform</p>
                       </div>
                     </div>
                   </SheetContent>
