@@ -17,6 +17,11 @@ import SearchPage from "./pages/SearchPage";
 import Settings from "./pages/Settings";
 import ManagePage from "./pages/ManagePage";
 import KidsPage from "./pages/Kids";
+import Adults from "./pages/adults/adults";
+import Beginners from "./pages/adults/Beginners";
+import Intermediates from "./pages/adults/Intermediates";
+import Advanced from "./pages/adults/Advanced";
+import IeltsPte from "./pages/IeltsPte";
 import Navbar from "./components/Navbar";
 import FloatingIconsLayer from "./components/FloatingIconsLayer";
 import { LoadingScreen } from "@/components/landing/LoadingScreen";
@@ -42,80 +47,84 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route 
-        path="/" 
+      <Route
+        path="/"
         element={
           <PageTransition>
             <Index />
           </PageTransition>
-        } 
+        }
       />
-      <Route 
-        path="/why" 
+      <Route
+        path="/why"
         element={
           <PageTransition>
             <WhyPage />
           </PageTransition>
-        } 
+        }
       />
-      <Route 
-        path="/how" 
+      <Route
+        path="/how"
         element={
           <PageTransition>
             <HowPage />
           </PageTransition>
-        } 
+        }
       />
-      <Route 
-        path="/manage" 
+      <Route
+        path="/manage"
         element={
           <PageTransition>
             <ManagePage />
           </PageTransition>
-        } 
+        }
       />
-      <Route 
-        path="/profile" 
+      <Route
+        path="/profile"
         element={
           <PageTransition>
             <Profile />
           </PageTransition>
-        } 
+        }
       />
-      <Route 
-        path="/import" 
+      <Route
+        path="/import"
         element={
           <PageTransition>
             <Import />
           </PageTransition>
-        } 
+        }
       />
-      <Route 
-        path="/search" 
+      <Route
+        path="/search"
         element={
           <PageTransition>
             <SearchPage />
           </PageTransition>
-        } 
+        }
       />
-      <Route 
-        path="/settings" 
+      <Route
+        path="/settings"
         element={
           <PageTransition>
             <Settings />
           </PageTransition>
-        } 
+        }
       />
-      <Route 
-        path="*" 
+      <Route
+        path="*"
         element={
           <PageTransition>
             <NotFound />
           </PageTransition>
-        } 
+        }
       />
-      <Route path="/404" element={<NotFound />} />
-      <Route path="/kids" element={<KidsPage />} />
+      <Route path="/kids" element={<PageTransition><KidsPage /></PageTransition>} />
+      <Route path="/adults" element={<PageTransition><Adults /></PageTransition>} />
+      <Route path="/adults/beginners" element={<PageTransition><Beginners /></PageTransition>}/>
+      <Route path="/adults/intermediates" element={<PageTransition><Intermediates /></PageTransition>}/>
+      <Route path="/adults/advanced" element={<PageTransition><Advanced /></PageTransition>} />
+      <Route path="/ielts-pte" element={<PageTransition><IeltsPte /></PageTransition>} />
     </Routes>
   );
 };
