@@ -16,6 +16,7 @@ import Import from "./pages/Import";
 import SearchPage from "./pages/SearchPage";
 import Settings from "./pages/Settings";
 import ManagePage from "./pages/ManagePage";
+import KidsPage from "./pages/Kids";
 import Navbar from "./components/Navbar";
 import FloatingIconsLayer from "./components/FloatingIconsLayer";
 import { LoadingScreen } from "@/components/landing/LoadingScreen";
@@ -113,6 +114,8 @@ const AppRoutes = () => {
           </PageTransition>
         } 
       />
+      <Route path="/404" element={<NotFound />} />
+      <Route path="/kids" element={<KidsPage />} />
     </Routes>
   );
 };
