@@ -44,85 +44,91 @@
  
 @layer base {
   :root {
-    /* Clean Professional Teal-Focused Light Mode Design System */
-    --background: 0 0% 100%;
+    /* Warm Golden Light Mode Design System */
+    --background: 52 43% 55%;
     --foreground: 222.2 84% 4.9%;
 
-    --card: 0 0% 100%;
+    --card: 0 0% 100% / 0.9;
     --card-foreground: 222.2 84% 4.9%;
  
-    --popover: 0 0% 100%;
+    --popover: 0 0% 100% / 0.95;
     --popover-foreground: 222.2 84% 4.9%;
  
-    /* Teal Primary Colors */
-    --primary: 180 84% 40%;
+    /* Warm Golden Primary Colors */
+    --primary: 45 93% 47%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 180 84% 50%;
-    --primary-deep: 180 84% 30%;
-    --primary-light: 180 84% 60%;
-    --primary-vibrant: 180 94% 45%;
+    --primary-glow: 45 93% 57%;
+    --primary-deep: 45 93% 37%;
+    --primary-light: 45 93% 67%;
+    --primary-vibrant: 45 100% 52%;
  
     /* Complementary Secondary Palette */
-    --secondary: 217 91% 60%;
+    --secondary: 35 85% 55%;
     --secondary-foreground: 0 0% 100%;
-    --secondary-deep: 217 91% 45%;
-    --secondary-light: 217 91% 75%;
-    --secondary-vibrant: 217 100% 65%;
+    --secondary-deep: 35 85% 45%;
+    --secondary-light: 35 85% 65%;
+    --secondary-vibrant: 35 95% 60%;
  
-    /* Interactive Muted Colors */
-    --muted: 180 25% 95%;
-    --muted-foreground: 180 25% 40%;
-    --muted-deep: 180 25% 88%;
-    --muted-interactive: 180 35% 92%;
+    /* Warm Muted Colors */
+    --muted: 50 30% 90%;
+    --muted-foreground: 50 30% 35%;
+    --muted-deep: 50 30% 85%;
+    --muted-interactive: 50 40% 88%;
  
-    /* Subtle Accent Colors (teal) */
-    --accent: 178 80% 42%;
+    /* Warm Accent Colors */
+    --accent: 40 80% 50%;
     --accent-foreground: 0 0% 100%;
-    --accent-deep: 178 80% 32%;
-    --accent-light: 178 80% 62%;
-    --accent-vibrant: 178 90% 48%;
+    --accent-deep: 40 80% 40%;
+    --accent-light: 40 80% 60%;
+    --accent-vibrant: 40 90% 55%;
 
-    /* Additional Refined Colors */
-    --tertiary: 45 93% 47%;
+    /* Additional Warm Colors */
+    --tertiary: 52 43% 55%;
     --tertiary-foreground: 0 0% 100%;
-    --tertiary-deep: 45 93% 37%;
-    --tertiary-light: 45 93% 57%;
+    --tertiary-deep: 52 43% 45%;
+    --tertiary-light: 52 43% 65%;
 
-    --quaternary: 262 83% 58%;
-    --quaternary-foreground: 0 0% 100%;
-    --quaternary-deep: 262 83% 48%;
-    --quaternary-light: 262 83% 68%;
+    --quaternary: 51 33% 75%;
+    --quaternary-foreground: 222.2 84% 4.9%;
+    --quaternary-deep: 51 33% 65%;
+    --quaternary-light: 51 33% 85%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Soft Teal Borders */
-    --border: 180 25% 85%;
-    --input: 180 25% 96%;
-    --ring: 180 84% 40%;
+    /* Warm Golden Borders */
+    --border: 45 30% 75%;
+    --input: 45 30% 92%;
+    --ring: 45 93% 47%;
  
     --radius: 0.75rem;
 
-    /* Clean Gradient System */
-    --gradient-primary: linear-gradient(135deg, hsl(180 84% 40%), hsl(180 94% 50%), hsl(180 84% 60%));
-    --gradient-secondary: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 100% 70%), hsl(217 91% 80%));
-    --gradient-accent: linear-gradient(135deg, hsl(178 80% 42%), hsl(178 90% 50%), hsl(178 80% 60%));
-    --gradient-tertiary: linear-gradient(135deg, hsl(45 93% 47%), hsl(45 100% 57%), hsl(45 93% 67%));
-    --gradient-quaternary: linear-gradient(135deg, hsl(262 83% 58%), hsl(262 93% 68%), hsl(262 83% 78%));
-    --gradient-rainbow: linear-gradient(135deg, hsl(180 84% 40%), hsl(217 91% 60%), hsl(178 80% 42%), hsl(45 93% 47%), hsl(262 83% 58%));
+    /* Warm Gradient System */
+    --gradient-primary: linear-gradient(135deg, hsl(45 93% 47%), hsl(45 100% 57%), hsl(45 93% 67%));
+    --gradient-secondary: linear-gradient(135deg, hsl(35 85% 55%), hsl(35 95% 65%), hsl(35 85% 75%));
+    --gradient-accent: linear-gradient(135deg, hsl(40 80% 50%), hsl(40 90% 60%), hsl(40 80% 70%));
+    --gradient-tertiary: linear-gradient(135deg, hsl(52 43% 55%), hsl(52 53% 65%), hsl(52 43% 75%));
+    --gradient-quaternary: linear-gradient(135deg, hsl(51 33% 75%), hsl(51 43% 85%), hsl(51 33% 95%));
+    --gradient-rainbow: linear-gradient(135deg, hsl(45 93% 47%), hsl(35 85% 55%), hsl(40 80% 50%), hsl(52 43% 55%), hsl(51 33% 75%));
     
-    /* Professional Teal Shadows */
-    --shadow-colorful: 0 10px 30px -10px hsl(180 84% 40% / 0.3);
-    --shadow-glow: 0 0 40px hsl(180 84% 50% / 0.4);
-    --shadow-soft: 0 4px 20px -4px hsl(180 25% 85% / 0.6);
-    --shadow-interactive: 0 8px 25px -8px hsl(180 84% 40% / 0.2);
-    --shadow-floating: 0 15px 35px -15px hsl(180 84% 50% / 0.3);
+    /* Warm Golden Shadows */
+    --shadow-colorful: 0 10px 30px -10px hsl(45 93% 47% / 0.3);
+    --shadow-glow: 0 0 40px hsl(45 93% 57% / 0.4);
+    --shadow-soft: 0 4px 20px -4px hsl(45 30% 75% / 0.6);
+    --shadow-interactive: 0 8px 25px -8px hsl(45 93% 47% / 0.2);
+    --shadow-floating: 0 15px 35px -15px hsl(45 93% 57% / 0.3);
     
     /* Enhanced Transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     --transition-professional: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     --transition-interactive: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Floating Icons Colors */
+    --floating-icon-primary: 45 93% 47% / 0.15;
+    --floating-icon-secondary: 35 85% 55% / 0.12;
+    --floating-icon-accent: 40 80% 50% / 0.1;
+    --floating-icon-glow: 45 93% 57% / 0.08;
   }
  
   .dark {
@@ -153,6 +159,12 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+
+    /* Dark mode floating icons */
+    --floating-icon-primary: 45 93% 67% / 0.1;
+    --floating-icon-secondary: 35 85% 65% / 0.08;
+    --floating-icon-accent: 40 80% 60% / 0.06;
+    --floating-icon-glow: 45 93% 77% / 0.05;
   }
 }
 
@@ -183,6 +195,23 @@
   .animate-rotate-half {
     animation: rotateHalfClockwise 3s ease-in-out infinite;
     transform-origin: center;
+  }
+
+  /* Floating Icons Animations */
+  .animate-float-slow {
+    animation: floatSlow 6s ease-in-out infinite;
+  }
+  
+  .animate-float-medium {
+    animation: floatMedium 4s ease-in-out infinite;
+  }
+  
+  .animate-float-fast {
+    animation: floatFast 3s ease-in-out infinite;
+  }
+  
+  .animate-rotate-slow {
+    animation: rotateSlow 8s linear infinite;
   }
   
   /* Light Mode Only Interactive Effects */
@@ -232,11 +261,60 @@
     animation: pulseGlow 2s infinite ease-in-out;
   }
   
-  .light .teal-gradient-text {
-    background: linear-gradient(135deg, hsl(180 84% 40%), hsl(180 94% 50%));
+  .light .golden-gradient-text {
+    background: linear-gradient(135deg, hsl(45 93% 47%), hsl(45 100% 57%));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+  }
+
+  /* Floating Icons Styles */
+  .light .floating-icon-primary {
+    background: hsl(var(--floating-icon-primary));
+    border: 1px solid hsl(45 93% 47% / 0.2);
+    box-shadow: 0 8px 32px hsl(45 93% 47% / 0.15);
+  }
+  
+  .light .floating-icon-secondary {
+    background: hsl(var(--floating-icon-secondary));
+    border: 1px solid hsl(35 85% 55% / 0.2);
+    box-shadow: 0 8px 32px hsl(35 85% 55% / 0.12);
+  }
+  
+  .light .floating-icon-accent {
+    background: hsl(var(--floating-icon-accent));
+    border: 1px solid hsl(40 80% 50% / 0.2);
+    box-shadow: 0 8px 32px hsl(40 80% 50% / 0.1);
+  }
+  
+  .light .floating-icon-glow {
+    background: hsl(var(--floating-icon-glow));
+    border: 1px solid hsl(45 93% 57% / 0.15);
+    box-shadow: 0 8px 32px hsl(45 93% 57% / 0.08);
+  }
+
+  .dark .floating-icon-primary {
+    background: hsl(var(--floating-icon-primary));
+    border: 1px solid hsl(45 93% 67% / 0.15);
+    box-shadow: 0 8px 32px hsl(45 93% 67% / 0.1);
+  }
+  
+  .dark .floating-icon-secondary {
+    background: hsl(var(--floating-icon-secondary));
+    border: 1px solid hsl(35 85% 65% / 0.12);
+    box-shadow: 0 8px 32px hsl(35 85% 65% / 0.08);
+  }
+  
+  .dark .floating-icon-accent {
+    background: hsl(var(--floating-icon-accent));
+    border: 1px solid hsl(40 80% 60% / 0.1);
+    box-shadow: 0 8px 32px hsl(40 80% 60% / 0.06);
+  }
+  
+  .dark .floating-icon-glow {
+    background: hsl(var(--floating-icon-glow));
+    border: 1px solid hsl(45 93% 77% / 0.08);
+    box-shadow: 0 8px 32px hsl(45 93% 77% / 0.05);
   }
 }
  
@@ -249,11 +327,16 @@
     @apply text-foreground;
   }
   
-  /* Clean light mode with pure white background */
+  /* Warm golden gradient background for light mode */
   .light body {
-    background: hsl(var(--background));
+    background: hsla(52, 43%, 55%, 1);
+    background: linear-gradient(90deg, hsla(52, 43%, 55%, 1) 0%, hsla(51, 33%, 75%, 1) 100%);
+    background: -moz-linear-gradient(90deg, hsla(52, 43%, 55%, 1) 0%, hsla(51, 33%, 75%, 1) 100%);
+    background: -webkit-linear-gradient(90deg, hsla(52, 43%, 55%, 1) 0%, hsla(51, 33%, 75%, 1) 100%);
+    filter: progid: DXImageTransform.Microsoft.gradient( startColorstr="#BEB15B", endColorstr="#D5CFAC", GradientType=1 );
     position: relative;
     overflow-x: hidden;
+    min-height: 100vh;
   }
   
   /* Dark mode simple background */
@@ -268,6 +351,11 @@
 
 .neural-node {
   @apply bg-gradient-to-br from-primary/20 to-primary/10 rounded-full shadow-lg;
+}
+
+/* Floating Icons Base Styles */
+.floating-icon {
+  @apply rounded-lg backdrop-blur-sm flex items-center justify-center;
 }
 
 /* Bee Flight Animations */
@@ -304,6 +392,49 @@
   }
   80% { 
     transform: translateY(-4px) translateX(-1px) rotate(-0.5deg) scale(1);
+  }
+}
+
+/* Floating Icons Animations */
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-20px) translateX(10px) rotate(120deg);
+  }
+  66% {
+    transform: translateY(10px) translateX(-15px) rotate(240deg);
+  }
+}
+
+@keyframes floatMedium {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-15px) translateX(8px) scale(1.05);
+  }
+}
+
+@keyframes floatFast {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px);
+  }
+  25% {
+    transform: translateY(-8px) translateX(5px);
+  }
+  75% {
+    transform: translateY(5px) translateX(-8px);
+  }
+}
+
+@keyframes rotateSlow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }
 

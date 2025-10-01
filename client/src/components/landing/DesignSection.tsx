@@ -110,7 +110,7 @@ export const DesignSection = ({ show }: DesignSectionProps) => {
       <div className="py-16 md:py-24">
         {/* Section Header */}
         <div className="flex flex-col items-center text-center gap-2 mb-12">
-          <h2 className="text-4xl font-bold text-teal-500 md:text-8xl">Design</h2>
+          <h2 className="text-4xl font-bold text-teal-600 md:text-8xl">Design</h2>
           <p className="text-foreground max-w-3xl text-xl md:text-2xl mt-2">
             Practice speaking, listening, reading, and writing English entirely offline with our ready-to-use exercises.
           </p>

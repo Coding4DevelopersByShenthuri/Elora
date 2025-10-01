@@ -25,7 +25,7 @@ const UseCasesSection = ({ show }: UseCasesSectionProps) => {
       <div className="py-12 md:py-24 lg:py-32 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto mb-12 md:mb-16">
           {/* Updated Title - Responsive */}
-          <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl text-center mb-8 md:mb-12 tracking-tight text-teal-500 font-bold leading-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl text-center mb-8 md:mb-12 tracking-tight text-teal-600 font-bold leading-tight">
             Interactive Spoken English Training for Everyone
           </h2>
           

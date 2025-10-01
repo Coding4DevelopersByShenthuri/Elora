@@ -34,7 +34,7 @@ export const DeploySection = ({ show }: DeploySectionProps) => {
       <div className="py-16 md:py-24">
         {/* Section Header */}
         <div className="flex flex-col items-center text-center gap-2 mb-12">
-          <h2 className="text-4xl font-bold text-teal-500 md:text-8xl">Learn & Improve</h2>
+          <h2 className="text-4xl font-bold text-teal-600 md:text-8xl">Learn & Improve</h2>
           <p className="text-foreground max-w-3xl text-xl md:text-2xl mt-2">
             Experience offline AI-powered English training designed to enhance your speaking and comprehension skills.
           </p>

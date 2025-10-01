@@ -180,22 +180,22 @@ export const Navbar = () => {
         >
           <div className="container mx-auto px-3 py-2">
             <div className="flex items-center justify-between">
-              {/* Logo Container with Absolute Positioning */}
+              {/* Logo Container with Larger Size */}
               <div className="relative">
                 <Link
                   to="/"
-                  className="absolute -top-6 -left-2 z-50 flex items-center transition-all duration-300 hover:scale-105"
+                  className="absolute -top-8 -left-2 z-50 flex items-center transition-all duration-300 hover:scale-105"
                   onClick={() => handleNavItemClick('what')}
                 >
                   <img
-                    src="/logo03.png"
+                    src="/logo01.png"
                     alt="Logo"
-                    className="h-20 w-auto sm:h-24 md:h-28 lg:h-32"
+                    className="h-28 w-auto sm:h-32 md:h-36 lg:h-40"
                   />
                 </Link>
                 
                 {/* Spacer to maintain layout - invisible but takes same space */}
-                <div className="w-16 h-8 sm:w-20 sm:h-10 md:w-24 md:h-12 lg:w-28 lg:h-14 opacity-0 pointer-events-none" />
+                <div className="w-24 h-12 sm:w-28 sm:h-14 md:w-32 md:h-16 lg:w-36 lg:h-20 opacity-0 pointer-events-none" />
               </div>
 
               {/* Desktop Navigation - Clean */}
@@ -400,18 +400,19 @@ export const Navbar = () => {
                         )}
                       </div>
 
-                      {/* Center - Logo */}
+                      {/* Center - Larger Logo for Mobile */}
                       <div className="relative">
                         <Link
                           to="/"
-                          className="absolute -top-4 -left-2 z-50 flex items-center transition-all duration-300 hover:scale-105"
+                          className="absolute -top-6 -left-2 z-50 flex items-center transition-all duration-300 hover:scale-105"
                           onClick={() => {
                             handleNavItemClick('what');
                             setIsMobileMenuOpen(false);
                           }}
                         >
+                          
                         </Link>
-                        <div className="w-16 h-8 opacity-0 pointer-events-none" />
+                        <div className="w-16 h-10 opacity-0 pointer-events-none" />
                       </div>
                       
                       {/* Right side - Empty space for balance */}

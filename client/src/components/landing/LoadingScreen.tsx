@@ -10,7 +10,7 @@ export const LoadingScreen = () => {
           className="w-50 h-50 drop-shadow-lg animate-graceful-bee-flight"
         />
       </div>
-      <p className="mt-[-10px] text-muted-foreground animate-pulse text-lg">Buzzing through your thoughts...</p>
+      <p className="mt-[-10px] text-muted-foreground animate-pulse text-lg">Let's Spell it Right...</p>
     </div>
   );
 };

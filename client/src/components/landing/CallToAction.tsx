@@ -17,7 +17,7 @@ export const CallToAction = ({ show }: CallToActionProps) => {
   return (
     <>
       <AnimatedTransition show={show} animation="slide-up" duration={600}>
-        <div className="py-16 md:py-24 text-primary-foreground rounded-2xl text-center bg-teal-500">
+        <div className="py-16 md:py-24 text-primary-foreground rounded-2xl text-center bg-teal-600">
           <h2 className="text-4xl font-bold mb-4 md:text-7xl">
             Improve Your English Today!
           </h2>
