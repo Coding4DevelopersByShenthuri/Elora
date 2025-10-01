@@ -36,3 +36,10 @@ INFO 2025-09-27 22:22:54,315 basehttp 20340 15680 "POST /api/auth/login HTTP/1.1
 INFO 2025-09-28 11:58:40,564 autoreload 17672 11420 Watching for file changes with StatReloader
 INFO 2025-09-28 13:04:01,667 autoreload 3620 18620 Watching for file changes with StatReloader
 INFO 2025-09-28 13:21:32,545 basehttp 3620 14344 "POST /api/auth/login HTTP/1.1" 200 344
+INFO 2025-09-28 21:19:28,119 autoreload 30172 31552 Watching for file changes with StatReloader
+INFO 2025-10-01 09:16:41,742 autoreload 5812 3744 Watching for file changes with StatReloader
+WARNING 2025-10-01 09:16:50,878 log 5812 11980 Not Found: /
+WARNING 2025-10-01 09:16:50,879 basehttp 5812 11980 "GET / HTTP/1.1" 404 2610
+WARNING 2025-10-01 09:16:52,026 log 5812 11980 Not Found: /favicon.ico
+WARNING 2025-10-01 09:16:52,027 basehttp 5812 11980 "GET /favicon.ico HTTP/1.1" 404 2661
+INFO 2025-10-01 10:02:36,514 basehttp 5812 12072 "POST /api/auth/login HTTP/1.1" 200 344

@@ -44,8 +44,8 @@
  
 @layer base {
   :root {
-    /* Professional Teal-Focused Light Mode Design System */
-    --background: 50 50% 85%;
+    /* Clean Professional Teal-Focused Light Mode Design System */
+    --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -103,26 +103,13 @@
  
     --radius: 0.75rem;
 
-    /* Enhanced Teal Gradient Background System */
-    --gradient-background: hsl(var(--background));
-    
-    /* Professional Floating Animation Elements */
-    --gradient-floating-element-1: radial-gradient(circle, hsl(180 84% 40%) 0%, hsl(180 84% 30%) 100%);
-    --gradient-floating-element-2: radial-gradient(circle, hsl(217 91% 60%) 0%, hsl(217 91% 45%) 100%);
-    --gradient-floating-element-3: radial-gradient(circle, hsl(178 80% 42%) 0%, hsl(178 80% 32%) 100%);
-    --gradient-floating-element-4: radial-gradient(circle, hsl(45 93% 47%) 0%, hsl(45 93% 37%) 100%);
-    --gradient-floating-element-5: radial-gradient(circle, hsl(262 83% 58%) 0%, hsl(262 83% 48%) 100%);
-    
-    /* Enhanced Vibrant Design Tokens */
+    /* Clean Gradient System */
     --gradient-primary: linear-gradient(135deg, hsl(180 84% 40%), hsl(180 94% 50%), hsl(180 84% 60%));
     --gradient-secondary: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 100% 70%), hsl(217 91% 80%));
     --gradient-accent: linear-gradient(135deg, hsl(178 80% 42%), hsl(178 90% 50%), hsl(178 80% 60%));
     --gradient-tertiary: linear-gradient(135deg, hsl(45 93% 47%), hsl(45 100% 57%), hsl(45 93% 67%));
     --gradient-quaternary: linear-gradient(135deg, hsl(262 83% 58%), hsl(262 93% 68%), hsl(262 83% 78%));
     --gradient-rainbow: linear-gradient(135deg, hsl(180 84% 40%), hsl(217 91% 60%), hsl(178 80% 42%), hsl(45 93% 47%), hsl(262 83% 58%));
-    --gradient-professional: linear-gradient(120deg, hsl(180 84% 88%), hsl(217 91% 85%), hsl(178 76% 87%), hsl(45 93% 85%), hsl(262 83% 87%));
-    --gradient-dynamic: linear-gradient(150deg, hsl(180 94% 50%), hsl(217 100% 70%), hsl(178 90% 48%), hsl(45 100% 57%), hsl(262 93% 68%));
-    --gradient-vivid: linear-gradient(45deg, hsl(180 84% 45%), hsl(217 91% 65%), hsl(178 80% 42%), hsl(45 93% 52%), hsl(262 83% 63%), hsl(180 84% 50%));
     
     /* Professional Teal Shadows */
     --shadow-colorful: 0 10px 30px -10px hsl(180 84% 40% / 0.3);
@@ -192,70 +179,6 @@
     animation: graceful-bee-flight 5s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
   }
   
-  /* Professional background animation elements */
-  .light .floating-element {
-    position: absolute;
-    border-radius: 50%;
-    opacity: 0.08;
-    filter: blur(40px);
-    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    animation-iteration-count: infinite;
-    pointer-events: none;
-  }
-  
-  .light .floating-element-1 {
-    width: 300px;
-    height: 300px;
-    background: var(--gradient-floating-element-1);
-    top: 10%;
-    left: 5%;
-    animation: professionalFloat1 25s infinite;
-  }
-  
-  .light .floating-element-2 {
-    width: 400px;
-    height: 400px;
-    background: var(--gradient-floating-element-2);
-    top: 60%;
-    right: 10%;
-    animation: professionalFloat2 30s infinite;
-  }
-  
-  .light .floating-element-3 {
-    width: 250px;
-    height: 250px;
-    background: var(--gradient-floating-element-3);
-    bottom: 10%;
-    left: 20%;
-    animation: professionalFloat3 20s infinite;
-  }
-  
-  .light .floating-element-4 {
-    width: 350px;
-    height: 350px;
-    background: var(--gradient-floating-element-4);
-    top: 20%;
-    right: 20%;
-    animation: professionalFloat4 35s infinite;
-  }
-  
-  .light .floating-element-5 {
-    width: 200px;
-    height: 200px;
-    background: var(--gradient-floating-element-5);
-    bottom: 30%;
-    right: 5%;
-    animation: professionalFloat5 28s infinite;
-  }
-  
-  /* Grid overlay utility */
-  .light .grid-overlay {
-    background-image: 
-      linear-gradient(rgba(20, 184, 166, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(20, 184, 166, 0.03) 1px, transparent 1px);
-    background-size: 50px 50px;
-  }
-
   /* Smooth clockwise half-rotation */
   .animate-rotate-half {
     animation: rotateHalfClockwise 3s ease-in-out infinite;
@@ -326,24 +249,11 @@
     @apply text-foreground;
   }
   
-  /* Light mode professional teal background system */
+  /* Clean light mode with pure white background */
   .light body {
-    background: var(--gradient-background);
+    background: hsl(var(--background));
     position: relative;
     overflow-x: hidden;
-  }
-  
-  /* Professional animated background container */
-  .light body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: -1;
-    opacity: 0.6;
   }
   
   /* Dark mode simple background */
@@ -395,42 +305,6 @@
   80% { 
     transform: translateY(-4px) translateX(-1px) rotate(-0.5deg) scale(1);
   }
-}
-
-/* Professional Floating Animations */
-@keyframes professionalFloat1 {
-  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
-  25% { transform: translate(40px, -30px) scale(1.1) rotate(5deg); }
-  50% { transform: translate(20px, 40px) scale(0.9) rotate(-3deg); }
-  75% { transform: translate(-30px, 20px) scale(1.05) rotate(2deg); }
-}
-
-@keyframes professionalFloat2 {
-  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
-  25% { transform: translate(-50px, 40px) scale(1.15) rotate(8deg); }
-  50% { transform: translate(60px, -20px) scale(0.85) rotate(-5deg); }
-  75% { transform: translate(-40px, -30px) scale(1.1) rotate(3deg); }
-}
-
-@keyframes professionalFloat3 {
-  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
-  25% { transform: translate(30px, -40px) scale(1.05) rotate(4deg); }
-  50% { transform: translate(-50px, 30px) scale(0.95) rotate(-2deg); }
-  75% { transform: translate(40px, 50px) scale(1.1) rotate(6deg); }
-}
-
-@keyframes professionalFloat4 {
-  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
-  25% { transform: translate(-60px, 20px) scale(1.2) rotate(10deg); }
-  50% { transform: translate(40px, -40px) scale(0.8) rotate(-6deg); }
-  75% { transform: translate(-20px, 60px) scale(1.15) rotate(4deg); }
-}
-
-@keyframes professionalFloat5 {
-  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
-  25% { transform: translate(50px, -30px) scale(1.1) rotate(3deg); }
-  50% { transform: translate(-30px, 50px) scale(0.9) rotate(-4deg); }
-  75% { transform: translate(40px, 30px) scale(1.05) rotate(7deg); }
 }
 
 @keyframes pulse {
@@ -494,166 +368,6 @@
   }
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0) translateX(0) rotate(0deg);
-  }
-  25% {
-    transform: translateY(-12px) translateX(8px) rotate(1.5deg);
-  }
-  50% {
-    transform: translateY(-8px) translateX(-8px) rotate(-1.5deg);
-  }
-  75% {
-    transform: translateY(-18px) translateX(12px) rotate(1deg);
-  }
-}
-
-@keyframes shimmerEffect {
-  0%, 100% {
-    transform: translateX(-100%) rotate(0deg);
-    opacity: 0;
-  }
-  25% {
-    transform: translateX(-50%) rotate(5deg);
-    opacity: 0.3;
-  }
-  50% {
-    transform: translateX(0%) rotate(0deg);
-    opacity: 0.6;
-  }
-  75% {
-    transform: translateX(50%) rotate(-5deg);
-    opacity: 0.3;
-  }
-}
-
-@keyframes professionalPulse {
-  0%, 100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 0.4;
-  }
-  33% {
-    transform: scale(1.03) rotate(1deg);
-    opacity: 0.5;
-  }
-  66% {
-    transform: scale(0.97) rotate(-0.8deg);
-    opacity: 0.35;
-  }
-}
-
-@keyframes breathe {
-  0%, 100% {
-    transform: scale(1) translateY(0) rotate(0deg);
-    opacity: 0.3;
-  }
-  50% {
-    transform: scale(1.08) translateY(-8px) rotate(2deg);
-    opacity: 0.4;
-  }
-}
-
-@keyframes rotateGlow {
-  0% {
-    transform: rotate(0deg) scale(1);
-  }
-  25% {
-    transform: rotate(90deg) scale(1.02);
-  }
-  50% {
-    transform: rotate(180deg) scale(1);
-  }
-  75% {
-    transform: rotate(270deg) scale(0.98);
-  }
-  100% {
-    transform: rotate(360deg) scale(1);
-  }
-}
-
-@keyframes interactiveGlow {
-  0%, 100% {
-    filter: brightness(1) hue-rotate(0deg);
-  }
-  50% {
-    filter: brightness(1.1) hue-rotate(10deg);
-  }
-}
-
-@keyframes floatingOrbs {
-  0%, 100% {
-    transform: translateY(0) translateX(0) scale(1);
-  }
-  33% {
-    transform: translateY(-15px) translateX(10px) scale(1.05);
-  }
-  66% {
-    transform: translateY(-5px) translateX(-10px) scale(0.95);
-  }
-}
-
-@keyframes colorShift {
-  0%, 100% {
-    filter: hue-rotate(0deg) saturate(1) brightness(1);
-  }
-  25% {
-    filter: hue-rotate(15deg) saturate(1.1) brightness(1.05);
-  }
-  50% {
-    filter: hue-rotate(30deg) saturate(1.2) brightness(1.1);
-  }
-  75% {
-    filter: hue-rotate(20deg) saturate(1.15) brightness(1.08);
-  }
-}
-
-@keyframes energyPulse {
-  0%, 100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 0.4;
-    filter: blur(0px);
-  }
-  25% {
-    transform: scale(1.02) rotate(5deg);
-    opacity: 0.5;
-    filter: blur(0.5px);
-  }
-  50% {
-    transform: scale(0.98) rotate(-3deg);
-    opacity: 0.45;
-    filter: blur(1px);
-  }
-  75% {
-    transform: scale(1.01) rotate(2deg);
-    opacity: 0.48;
-    filter: blur(0.3px);
-  }
-}
-
-@keyframes sparkleEffect {
-  0%, 100% {
-    transform: translateY(0) rotate(0deg) scale(1);
-    opacity: 0.3;
-  }
-  20% {
-    transform: translateY(-8px) rotate(45deg) scale(1.1);
-    opacity: 0.6;
-  }
-  40% {
-    transform: translateY(-12px) rotate(90deg) scale(0.9);
-    opacity: 0.8;
-  }
-  60% {
-    transform: translateY(-10px) rotate(135deg) scale(1.05);
-    opacity: 0.7;
-  }
-  80% {
-    transform: translateY(-6px) rotate(180deg) scale(0.95);
-    opacity: 0.5;
-  }
-}
-
 @keyframes rotateHalfClockwise {
   0% {
     transform: rotate(0deg);
@@ -673,50 +387,5 @@
   100% {
     transform: rotate(0deg);
     opacity: 0;
-  }
-}
-
-@keyframes dynamicShift {
-  0%, 100% {
-    transform: translateX(0) translateY(0) scale(1) rotate(0deg);
-    filter: brightness(1) contrast(1);
-  }
-  25% {
-    transform: translateX(5px) translateY(-3px) scale(1.02) rotate(2deg);
-    filter: brightness(1.05) contrast(1.05);
-  }
-  50% {
-    transform: translateX(-3px) translateY(-6px) scale(0.98) rotate(-1deg);
-    filter: brightness(1.1) contrast(1.1);
-  }
-  75% {
-    transform: translateX(7px) translateY(-4px) scale(1.01) rotate(1.5deg);
-    filter: brightness(1.08) contrast(1.08);
-  }
-}
-
-@keyframes shimmer {
-  0%, 100% {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  50% {
-    transform: translateX(100%);
-    opacity: 1;
-  }
-}
-
-@keyframes profesionalPulse {
-  0%, 100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 0.35;
-  }
-  33% {
-    transform: scale(1.02) rotate(0.5deg);
-    opacity: 0.4;
-  }
-  66% {
-    transform: scale(0.98) rotate(-0.3deg);
-    opacity: 0.3;
   }
 }

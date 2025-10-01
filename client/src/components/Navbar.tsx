@@ -171,14 +171,11 @@ export const Navbar = () => {
   return (
     <>
       <TooltipProvider>
-        {/* Compact Sticky Header - NO SIZE CHANGES */}
+        {/* Clean Sticky Header - Removed background colors */}
         <header
           className={cn(
             "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out",
-            "backdrop-blur-md border-b border-border/40",
-            isScrolled 
-              ? "bg-background/95 shadow-sm" 
-              : "bg-background/90"
+            "backdrop-blur-md border-b border-border/40"
           )}
         >
           <div className="container mx-auto px-3 py-2">
@@ -191,7 +188,7 @@ export const Navbar = () => {
                   onClick={() => handleNavItemClick('what')}
                 >
                   <img
-                    src="/Speak_Bee.png"
+                    src="/logo03.png"
                     alt="Logo"
                     className="h-20 w-auto sm:h-24 md:h-28 lg:h-32"
                   />
@@ -201,7 +198,7 @@ export const Navbar = () => {
                 <div className="w-16 h-8 sm:w-20 sm:h-10 md:w-24 md:h-12 lg:w-28 lg:h-14 opacity-0 pointer-events-none" />
               </div>
 
-              {/* Desktop Navigation - Compact - NO CHANGES */}
+              {/* Desktop Navigation - Clean */}
               <nav className="hidden sm:flex items-center justify-center flex-1">
                 <div className="glass-panel rounded-lg px-1 py-1 shadow-sm">
                   <div className="flex items-center gap-1">
@@ -340,7 +337,7 @@ export const Navbar = () => {
                 </div>
               </nav>
 
-              {/* Mobile Navigation - Compact */}
+              {/* Mobile Navigation - Clean */}
               <div className="flex items-center gap-1 sm:hidden">
                 <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                   <SheetTrigger asChild>
@@ -361,7 +358,7 @@ export const Navbar = () => {
                         : 'slideOutToLeft 0.3s ease-in forwards'
                     }}
                   >
-                    {/* Compact Mobile Menu Header */}
+                    {/* Clean Mobile Menu Header */}
                     <div className="flex items-center justify-between p-3 border-b bg-background/50">
                       {/* Left side - Theme Toggle and Login/Logout */}
                       <div className="flex items-center gap-1">
@@ -535,7 +532,7 @@ export const Navbar = () => {
                       </div>
                     </div>
 
-                    {/* Compact Footer */}
+                    {/* Clean Footer */}
                     <div className="p-3 border-t bg-muted/30 transition-all duration-300 ease-out delay-300">
                       <div className="text-center text-xs text-muted-foreground">
                         <p>© 2024 Vocario</p>
