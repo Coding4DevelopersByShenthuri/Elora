@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAnimateIn } from '@/lib/animations';
 import { Button } from '@/components/ui/button';

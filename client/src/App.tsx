@@ -15,6 +15,8 @@ import Profile from "./pages/Profile";
 import Import from "./pages/Import";
 import SearchPage from "./pages/SearchPage";
 import Settings from "./pages/Settings";
+import HelpPage from "./pages/HelpPage";
+import ContactPage from "./pages/ContactPage";
 import ManagePage from "./pages/ManagePage";
 import KidsPage from "./pages/Kids";
 import Adults from "./pages/adults/adults";
@@ -119,6 +121,8 @@ const AppRoutes = () => {
           </PageTransition>
         }
       />
+      <Route path="/help" element={<HelpPage />} />
+      <Route path="/contact" element={<ContactPage />} />
       <Route path="/kids" element={<PageTransition><KidsPage /></PageTransition>} />
       <Route path="/adults" element={<PageTransition><Adults /></PageTransition>} />
       <Route path="/adults/beginners" element={<PageTransition><Beginners /></PageTransition>}/>
