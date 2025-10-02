@@ -17,10 +17,10 @@ const KidsPage = () => {
   const [streak, setStreak] = useState(3);
 
   const categories = [
-    { id: 'stories', label: 'Story Time', icon: BookOpen, color: 'text-pink-500' },
-    { id: 'vocabulary', label: 'Word Games', icon: Zap, color: 'text-blue-500' },
-    { id: 'pronunciation', label: 'Speak & Repeat', icon: Mic, color: 'text-green-500' },
-    { id: 'games', label: 'Fun Games', icon: Trophy, color: 'text-yellow-500' },
+    { id: 'stories', label: 'Story Time', icon: BookOpen, color: 'text-[#D4A373]' },
+    { id: 'vocabulary', label: 'Word Games', icon: Zap, color: 'text-[#CCD5AE]' },
+    { id: 'pronunciation', label: 'Speak & Repeat', icon: Mic, color: 'text-[#E9EDC9]' },
+    { id: 'games', label: 'Fun Games', icon: Trophy, color: 'text-[#FAEDCD]' },
   ];
 
   const stories = [
@@ -54,10 +54,10 @@ const KidsPage = () => {
   ];
 
   const achievements = [
-    { name: 'First Words', icon: Star, progress: 100, color: 'text-yellow-500' },
-    { name: 'Story Master', icon: BookOpen, progress: 75, color: 'text-purple-500' },
-    { name: 'Pronunciation Pro', icon: Mic, progress: 50, color: 'text-green-500' },
-    { name: 'Vocabulary Builder', icon: Zap, progress: 25, color: 'text-blue-500' },
+    { name: 'First Words', icon: Star, progress: 100, color: 'text-[#D4A373]' },
+    { name: 'Story Master', icon: BookOpen, progress: 75, color: 'text-[#D4A373]' },
+    { name: 'Pronunciation Pro', icon: Mic, progress: 50, color: 'text-[#D4A373]' },
+    { name: 'Vocabulary Builder', icon: Zap, progress: 25, color: 'text-[#D4A373]' },
   ];
 
   const handleStartLesson = (storyIndex: number) => {
@@ -85,30 +85,30 @@ const KidsPage = () => {
 
         {/* Stats Bar */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <Card className="glass-panel border-2 border-yellow-200">
+          <Card className="glass-panel border-2 border-[#FAEDCD]">
             <CardContent className="p-4 text-center">
               <div className="flex items-center justify-center gap-2">
-                <Trophy className="w-6 h-6 text-yellow-500" />
+                <Trophy className="w-6 h-6 text-[#D4A373]" />
                 <span className="text-2xl font-bold text-foreground">{points}</span>
               </div>
               <p className="text-sm text-muted-foreground">Points</p>
             </CardContent>
           </Card>
           
-          <Card className="glass-panel border-2 border-orange-200">
+          <Card className="glass-panel border-2 border-[#E9EDC9]">
             <CardContent className="p-4 text-center">
               <div className="flex items-center justify-center gap-2">
-                <Zap className="w-6 h-6 text-orange-500" />
+                <Zap className="w-6 h-6 text-[#CCD5AE]" />
                 <span className="text-2xl font-bold text-foreground">{streak} days</span>
               </div>
               <p className="text-sm text-muted-foreground">Streak</p>
             </CardContent>
           </Card>
           
-          <Card className="glass-panel border-2 border-green-200">
+          <Card className="glass-panel border-2 border-[#CCD5AE]">
             <CardContent className="p-4 text-center">
               <div className="flex items-center justify-center gap-2">
-                <Award className="w-6 h-6 text-green-500" />
+                <Award className="w-6 h-6 text-[#D4A373]" />
                 <span className="text-2xl font-bold text-foreground">12/20</span>
               </div>
               <p className="text-sm text-muted-foreground">Achievements</p>
@@ -127,8 +127,8 @@ const KidsPage = () => {
                 className={cn(
                   "rounded-full px-6 py-3 text-lg font-semibold transition-all duration-300 bounce-hover",
                   activeCategory === category.id 
-                    ? "colorful-gradient text-white shadow-lg glow-effect" 
-                    : "bg-card/80 border-2 border-border hover:border-primary/50"
+                    ? "bg-gradient-to-r from-[#CCD5AE] to-[#D4A373] text-white shadow-lg glow-effect" 
+                    : "bg-card/80 border-2 border-border hover:border-[#D4A373]/50"
                 )}
                 onClick={() => setActiveCategory(category.id)}
               >
@@ -161,10 +161,10 @@ const KidsPage = () => {
                   </div>
                   
                   <Button 
-                    className="w-full colorful-gradient hover:shadow-lg text-white font-semibold py-3 rounded-xl transition-all duration-300 group-hover:scale-105"
+                    className="w-full bg-gradient-to-r from-[#CCD5AE] to-[#D4A373] hover:from-[#D4A373] hover:to-[#CCD5AE] hover:shadow-lg text-black font-semibold py-3 rounded-xl transition-all duration-300 group-hover:scale-105"
                     onClick={() => handleStartLesson(index)}
                   >
-                    <Play className="w-4 h-4 mr-2" />
+                    <Play className="w-4 h-4 mr-2 text-black" />
                     Start Adventure
                   </Button>
                 </div>
@@ -174,9 +174,9 @@ const KidsPage = () => {
         </div>
 
         {/* Achievements Section */}
-        <div className="glass-panel rounded-2xl p-6 border-2 border-primary/20">
+        <div className="glass-panel rounded-2xl p-6 border-2 border-[#CCD5AE]/20">
           <h2 className="text-2xl font-bold text-center mb-6 text-foreground flex items-center justify-center gap-2">
-            <Trophy className="w-6 h-6 text-yellow-500" />
+            <Trophy className="w-6 h-6 text-[#D4A373]" />
             Your Achievements
           </h2>
           
@@ -188,7 +188,7 @@ const KidsPage = () => {
                   <div className="relative inline-block mb-2">
                     <Icon className={cn("w-8 h-8", achievement.color)} />
                     {achievement.progress === 100 && (
-                      <Sparkles className="w-4 h-4 text-yellow-500 absolute -top-1 -right-1 animate-pulse" />
+                      <Sparkles className="w-4 h-4 text-[#D4A373] absolute -top-1 -right-1 animate-pulse" />
                     )}
                   </div>
                   <p className="text-sm font-semibold text-foreground mb-2">{achievement.name}</p>
@@ -196,7 +196,7 @@ const KidsPage = () => {
                     <div 
                       className={cn(
                         "h-full rounded-full transition-all duration-500",
-                        achievement.progress === 100 ? "bg-yellow-500" : "bg-primary"
+                        achievement.progress === 100 ? "bg-[#D4A373]" : "bg-[#CCD5AE]"
                       )}
                       style={{ width: `${achievement.progress}%` }}
                     />
@@ -212,16 +212,16 @@ const KidsPage = () => {
         <div className="text-center mt-8">
           <p className="text-muted-foreground mb-4">Practice makes perfect! 🎯</p>
           <div className="flex flex-wrap justify-center gap-3">
-            <Button variant="outline" className="rounded-full px-6 border-2 border-green-200 hover:border-green-300 bounce-hover">
-              <Volume2 className="w-4 h-4 mr-2 text-green-500" />
+            <Button variant="outline" className="rounded-full px-6 border-2 border-[#CCD5AE] hover:border-[#CCD5AE]/80 bounce-hover">
+              <Volume2 className="w-4 h-4 mr-2 text-[#CCD5AE]" />
               Listen & Repeat
             </Button>
-            <Button variant="outline" className="rounded-full px-6 border-2 border-blue-200 hover:border-blue-300 bounce-hover">
-              <Mic className="w-4 h-4 mr-2 text-blue-500" />
+            <Button variant="outline" className="rounded-full px-6 border-2 border-[#E9EDC9] hover:border-[#E9EDC9]/80 bounce-hover">
+              <Mic className="w-4 h-4 mr-2 text-[#E9EDC9]" />
               Speak Now
             </Button>
-            <Button variant="outline" className="rounded-full px-6 border-2 border-pink-200 hover:border-pink-300 bounce-hover">
-              <Heart className="w-4 h-4 mr-2 text-pink-500" />
+            <Button variant="outline" className="rounded-full px-6 border-2 border-[#FAEDCD] hover:border-[#FAEDCD]/80 bounce-hover">
+              <Heart className="w-4 h-4 mr-2 text-[#FAEDCD]" />
               Favorite Stories
             </Button>
           </div>
@@ -230,20 +230,20 @@ const KidsPage = () => {
 
       {/* Floating Elements for Playfulness */}
       <div className="fixed bottom-4 right-4 animate-bounce">
-        <div className="floating-icon-primary p-3 rounded-full shadow-lg">
-          <Zap className="w-6 h-6 text-primary" />
+        <div className="bg-[#CCD5AE] p-3 rounded-full shadow-lg">
+          <Zap className="w-6 h-6 text-white" />
         </div>
       </div>
 
       {/* Additional Floating Icons */}
-      <div className="fixed top-20 left-4 animate-float-slow floating-icon-secondary p-2 rounded-full">
-        <Star className="w-5 h-5 text-secondary" />
+      <div className="fixed top-20 left-4 animate-float-slow bg-[#E9EDC9] p-2 rounded-full">
+        <Star className="w-5 h-5 text-[#D4A373]" />
       </div>
-      <div className="fixed top-40 right-8 animate-float-medium floating-icon-accent p-2 rounded-full">
-        <Heart className="w-5 h-5 text-accent" />
+      <div className="fixed top-40 right-8 animate-float-medium bg-[#FAEDCD] p-2 rounded-full">
+        <Heart className="w-5 h-5 text-[#D4A373]" />
       </div>
-      <div className="fixed bottom-40 left-8 animate-float-fast floating-icon-glow p-2 rounded-full">
-        <Sparkles className="w-5 h-5 text-primary" />
+      <div className="fixed bottom-40 left-8 animate-float-fast bg-[#D4A373] p-2 rounded-full">
+        <Sparkles className="w-5 h-5 text-white" />
       </div>
     </div>
   );
