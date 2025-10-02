@@ -24,9 +24,12 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
 
-    "baseUrl": ".",
+    /* Migration fix */
+    "ignoreDeprecations": "6.0",
+
+    /* Updated path mapping (no baseUrl needed) */
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src"]
