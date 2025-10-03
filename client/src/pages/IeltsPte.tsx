@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import { 
   Play, Clock, Target, Award, BookOpen, MessageCircle, 
   Mic, Volume2, CheckCircle, TrendingUp, Zap,
@@ -11,15 +10,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
-import Footer from '@/components/landing/Footer';
 
 const IeltsPtePage = () => {
   const [activeTest, setActiveTest] = useState('ielts');
   const [activeSection, setActiveSection] = useState('speaking');
   const [mockTestProgress, setMockTestProgress] = useState(65);
-  const [targetScore, setTargetScore] = useState(7.5);
+  const [targetScore] = useState(7.5);
   const [currentScore, setCurrentScore] = useState(6.5);
   const [isHovered, setIsHovered] = useState<number | null>(null);
   const [activePractice, setActivePractice] = useState<number | null>(null);
@@ -222,7 +220,7 @@ const IeltsPtePage = () => {
     { name: "Listening Ace", earned: false, icon: Volume2, progress: 60 },
   ];
 
-  const handleStartTest = (testIndex: number) => {
+  const handleStartTest = () => {
     setMockTestProgress(prev => Math.min(prev + 5, 100));
     setCurrentScore(prev => Math.min(prev + 0.1, 9.0));
   };
@@ -563,14 +561,28 @@ const IeltsPtePage = () => {
                         <Clock className="w-4 h-4" />
                         {test.duration}
                       </span>
-                      <span className="flex items-center gap-2 font-medium">
-                        <MessageCircle className="w-4 h-4" />
-                        {test.parts}
-                      </span>
-                      <span className="flex items-center gap-2 font-medium">
-                        <Target className="w-4 h-4" />
-                        {test.questions} Qs
-                      </span>
+                      {"parts" in test && typeof (test as any).parts !== "undefined" ? (
+                        <span className="flex items-center gap-2 font-medium">
+                          <MessageCircle className="w-4 h-4" />
+                          {(test as any).parts}
+                        </span>
+                      ) : "topics" in test && typeof (test as any).topics !== "undefined" ? (
+                        <span className="flex items-center gap-2 font-medium">
+                          <MessageCircle className="w-4 h-4" />
+                          {(test as any).topics} Topics
+                        </span>
+                      ) : null}
+                      {"questions" in test && typeof (test as any).questions !== "undefined" ? (
+                        <span className="flex items-center gap-2 font-medium">
+                          <Target className="w-4 h-4" />
+                          {(test as any).questions} Qs
+                        </span>
+                      ) : "words" in test && typeof (test as any).words !== "undefined" ? (
+                        <span className="flex items-center gap-2 font-medium">
+                          <Target className="w-4 h-4" />
+                          {(test as any).words} Words
+                        </span>
+                      ) : null}
                     </div>
 
                     {/* Progress & Score */}
@@ -582,7 +594,7 @@ const IeltsPtePage = () => {
                             <span className={cn("text-lg font-bold", getScoreColor(test.score))}>
                               {test.score}
                             </span>
-                            {test.feedback && (
+                            {"feedback" in test && test.feedback && (
                               <Eye className="w-4 h-4 text-blue-500 cursor-pointer hover:scale-110 transition-transform" />
                             )}
                           </div>
@@ -608,7 +620,7 @@ const IeltsPtePage = () => {
                             ? "bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white"
                             : "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
                         )}
-                        onClick={() => handleStartTest(index)}
+                        onClick={handleStartTest}
                       >
                         {test.completed ? (
                           <>
@@ -730,9 +742,6 @@ const IeltsPtePage = () => {
           </CardContent>
         </Card>
       </div>
-
-      {/* Footer */}
-      <Footer />
     </div>
   );
 };

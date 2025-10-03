@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import { 
   Play, Volume2, Mic, CheckCircle, Clock, Users, 
   Target, Award, BookOpen, MessageCircle, Repeat, Zap, TrendingUp,
@@ -10,11 +9,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import Footer from '@/components/landing/Footer';
 
 const BeginnersPage = () => {
   const [activeTab, setActiveTab] = useState('lessons');
-  const [currentLesson, setCurrentLesson] = useState(0);
+  const [, setCurrentLesson] = useState(0);
   const [progress, setProgress] = useState(35);
   const [streak, setStreak] = useState(5);
   const [completedLessons, setCompletedLessons] = useState([0, 1, 2]);
@@ -472,9 +470,6 @@ const BeginnersPage = () => {
           </CardContent>
         </Card>
       </div>
-
-      {/* Footer */}
-      <Footer />
     </div>
   );
 };

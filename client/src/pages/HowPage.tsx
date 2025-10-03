@@ -19,10 +19,7 @@ import {
   Sliders
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import AnimatedTransition from '@/components/AnimatedTransition';
 import { Link } from 'react-router-dom';
-import Footer from '@/components/landing/Footer';
 
 const FeatureCard = ({
   icon,
@@ -223,11 +220,11 @@ const HowPage = () => {
           <h2 className="text-3xl font-bold text-center mb-12">Designed for Smarter English Learning</h2>
 
           <FeatureShowcase
-            title={
-              <span className="text-teal-600">
-                Interactive Learning Modules
-              </span>
-            }
+          title={
+            <span className="text-teal-600">
+              Interactive Learning Modules
+            </span>
+          }
             description="Speak Bee offers category-based modules for Kids, Adults, and IELTS/PTE learners, tailored to your skill level and learning goals."
             image="./image6.png"
             features={[
@@ -483,9 +480,6 @@ const HowPage = () => {
         </div>
 
       </div>
-
-      {/* Footer */}
-      <Footer />
     </div>
   );
 };

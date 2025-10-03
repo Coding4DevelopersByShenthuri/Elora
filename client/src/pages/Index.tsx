@@ -6,7 +6,6 @@ import { DesignSection } from '@/components/landing/DesignSection';
 import { DeploySection } from '@/components/landing/DeploySection';
 import { TestimonialsSection } from '@/components/landing/TestimonialsSection';
 import { CallToAction } from '@/components/landing/CallToAction';
-import Footer from '@/components/landing/Footer';
 import UseCasesSection from '@/components/landing/UseCasesSection';
 
 const Index = () => {
@@ -52,9 +51,6 @@ const Index = () => {
           
           {/* Call to Action */}
           <CallToAction show={showCallToAction} />
-
-          {/* Footer */}
-          <Footer />
         </div>
       </div>
     </div>

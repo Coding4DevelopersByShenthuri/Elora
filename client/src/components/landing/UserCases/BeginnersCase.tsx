@@ -3,7 +3,6 @@ interface DesignersProps {
   data: UserCase;
 }
 const DesignersCase = ({
-  data
 }: DesignersProps) => {
   return <div className="max-w-5xl mx-auto my-10">
       <div className="relative p-4 md:p-8 bg-white/10 backdrop-blur-sm rounded-xl">

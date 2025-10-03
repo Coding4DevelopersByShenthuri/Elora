@@ -1,31 +1,25 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import { 
-  Play, Volume2, Mic, CheckCircle, Clock, Users, 
-  Target, Award, BookOpen, MessageCircle, Repeat, 
-  Star, ChevronRight, Shield, Zap, TrendingUp,
-  Brain, Languages, GitMerge, ThumbsUp, BarChart3,
-  Video, Headphones, PenTool, Globe, Trophy, Crown,
+  CheckCircle, Clock, 
+  Target, BookOpen, Zap, Languages, Globe, Trophy, Crown,
   Lightbulb, GitBranch, Sparkles, TargetIcon,
   BarChart, Globe2, Mic2, BookOpenCheck, ArrowRight,
-  Rocket, ShieldCheck, Medal, StarIcon
+  Rocket, Medal
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
-import Footer from '@/components/landing/Footer';
 
 const AdvancedPage = () => {
   const [activeModule, setActiveModule] = useState('mastery');
   const [progress, setProgress] = useState(85);
-  const [streak, setStreak] = useState(28);
+  const [streak] = useState(28);
   const [fluencyScore, setFluencyScore] = useState(89);
   const [vocabularySize, setVocabularySize] = useState(2850);
   const [isHovered, setIsHovered] = useState<number | null>(null);
-  const [activeChallenge, setActiveChallenge] = useState<number | null>(null);
+  const [, setActiveChallenge] = useState<number | null>(null);
 
   const modules = [
     { 
@@ -644,9 +638,6 @@ const AdvancedPage = () => {
           </CardContent>
         </Card>
       </div>
-
-      {/* Footer */}
-      <Footer />
     </div>
   );
 };

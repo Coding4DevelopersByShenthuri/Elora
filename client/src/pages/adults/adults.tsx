@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Play, Target, Award, BookOpen, MessageCircle,
@@ -10,17 +10,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
-import Footer from '@/components/landing/Footer';
 
 const AdultsPage = () => {
-  const [activeLevel, setActiveLevel] = useState('overview');
+  const [] = useState('overview');
   const [progress, setProgress] = useState(42);
   const [streak, setStreak] = useState(7);
   const [fluencyScore, setFluencyScore] = useState(65);
   const [isHovered, setIsHovered] = useState<number | null>(null);
-  const [activePath, setActivePath] = useState<number | null>(null);
+  const [, setActivePath] = useState<number | null>(null);
 
   const levels = [
     {
@@ -193,7 +191,7 @@ const AdultsPage = () => {
     { name: "Vocabulary Specialist", earned: true, icon: Languages, progress: 100 },
   ];
 
-  const handleQuickStart = (actionIndex: number) => {
+  const handleQuickStart = () => {
     setProgress(prev => Math.min(prev + 2, 100));
     setStreak(prev => prev + 1);
     setFluencyScore(prev => Math.min(prev + 1, 100));
@@ -264,7 +262,7 @@ const AdultsPage = () => {
 
               {/* Level Progress */}
               <div className="space-y-6">
-                {levels.map((level, index) => {
+                {levels.map((level) => {
                   const Icon = level.icon;
                   return (
                     <div key={level.id} className="flex items-center gap-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600 transition-all duration-300 hover:border-blue-300 dark:hover:border-blue-600">
@@ -381,7 +379,7 @@ const AdultsPage = () => {
                 <Card
                   key={index}
                   className="group cursor-pointer bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 shadow-sm hover:shadow-lg"
-                  onClick={() => handleQuickStart(index)}
+                  onClick={handleQuickStart}
                   onMouseEnter={() => setIsHovered(index)}
                   onMouseLeave={() => setIsHovered(null)}
                 >
@@ -581,9 +579,6 @@ const AdultsPage = () => {
           </Card>
         </div>
       </div>
-
-      {/* Footer */}
-      <Footer />
     </div>
   );
 };

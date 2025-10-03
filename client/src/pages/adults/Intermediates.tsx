@@ -1,26 +1,22 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import { 
   Play, Mic, CheckCircle, Clock, Users, 
   Target, BookOpen, MessageCircle, Repeat, Zap, TrendingUp,
   Brain, Languages, GitMerge, ThumbsUp, BarChart3,
-  Video, Headphones, PenTool, Globe, ArrowRight, Award, Shield, Rocket, ChevronRight
-} from 'lucide-react';
+  Video, Headphones, PenTool, ArrowRight, Rocket} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
-import Footer from '@/components/landing/Footer';
 
 const IntermediatesPage = () => {
   const [activeModule, setActiveModule] = useState('conversation');
   const [progress, setProgress] = useState(65);
-  const [streak, setStreak] = useState(12);
+  const [streak] = useState(12);
   const [fluencyScore, setFluencyScore] = useState(72);
   const [isHovered, setIsHovered] = useState<number | null>(null);
-  const [activeTab, setActiveTab] = useState('modules');
+  const [] = useState('modules');
 
   const modules = [
     { id: 'conversation', label: 'Advanced Conversation', icon: MessageCircle, color: 'from-blue-500 to-cyan-500' },
@@ -196,7 +192,7 @@ const IntermediatesPage = () => {
     { name: "Pronunciation Pro", earned: false, icon: Mic, progress: 70 },
   ];
 
-  const handleStartLesson = (lessonIndex: number) => {
+  const handleStartLesson = () => {
     setProgress(prev => Math.min(prev + 8, 100));
     setFluencyScore(prev => Math.min(prev + 3, 100));
   };
@@ -513,7 +509,7 @@ const IntermediatesPage = () => {
                           ? "bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white"
                           : "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
                       )}
-                      onClick={() => handleStartLesson(index)}
+                      onClick={handleStartLesson}
                     >
                       <span className="relative z-10 flex items-center justify-center">
                         {lesson.completed ? (
@@ -572,9 +568,6 @@ const IntermediatesPage = () => {
           </CardContent>
         </Card>
       </div>
-
-      {/* Footer */}
-      <Footer />
     </div>
   );
 };

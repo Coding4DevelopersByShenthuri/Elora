@@ -1,21 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
 import { 
   Volume2, Star, Trophy, Play, BookOpen, 
   Mic, Award, Zap, Heart, Sparkles,
-  Rabbit, Fish, Rocket, Trees, Cloud,
-  Sun, Moon, CloudRain, CloudSnow
+  Rabbit, Fish, Rocket, Cloud,
+  Sun, CloudRain, CloudSnow
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
-import Footer from '@/components/landing/Footer';
 
 const KidsPage = () => {
   const [activeCategory, setActiveCategory] = useState('stories');
   const [currentStory, setCurrentStory] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [, setIsPlaying] = useState(false);
   const [points, setPoints] = useState(1250);
   const [streak, setStreak] = useState(3);
   const [floatingIcons, setFloatingIcons] = useState<Array<{id: number; type: string; x: number; y: number}>>([]);
@@ -226,7 +224,6 @@ const KidsPage = () => {
         {/* Categories Navigation */}
         <div className="flex flex-wrap justify-center gap-4 mb-12">
           {categories.map((category) => {
-            const Icon = category.icon;
             return (
               <Button
                 key={category.id}
@@ -333,7 +330,6 @@ const KidsPage = () => {
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {achievements.map((achievement, index) => {
-              const Icon = achievement.icon;
               const isComplete = achievement.progress === 100;
               return (
                 <div key={index} className="text-center group cursor-pointer transform hover:scale-110 transition-transform duration-300">
@@ -419,11 +415,8 @@ const KidsPage = () => {
         </div>
       </div>
 
-      {/* Footer */}
-      <Footer />
-
       {/* Add custom animations to global CSS */}
-      <style jsx>{`
+      <style>{`
         @keyframes float-random {
           0%, 100% { transform: translateY(0px) rotate(0deg); }
           33% { transform: translateY(-20px) rotate(120deg); }
@@ -433,6 +426,7 @@ const KidsPage = () => {
           0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
           100% { background-position: 0% 50%; }
+        }
         }
         .animate-float-random {
           animation: float-random 6s ease-in-out infinite;

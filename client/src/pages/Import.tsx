@@ -1,5 +1,3 @@
-
-import React from 'react';
 import ImportPanel from '@/components/ImportPanel';
 import { AnimatedTransition } from '@/components/AnimatedTransition';
 import { useAnimateIn } from '@/lib/animations';
