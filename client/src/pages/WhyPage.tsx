@@ -3,6 +3,7 @@ import { useAnimateIn } from '@/lib/animations';
 import { Button } from '@/components/ui/button';
 import { ExternalLink, Heart, Lightbulb, RefreshCw, Stars, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import Footer from '@/components/landing/Footer';
 
 const WhySection = ({
   title,
@@ -195,6 +196,9 @@ const WhyPage = () => {
           </Button>
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

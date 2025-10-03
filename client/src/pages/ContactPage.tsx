@@ -4,6 +4,7 @@ import GlassForm from '@/components/ui/GlassForm';
 import { Button } from '@/components/ui/button';
 import { AnimatedTransition } from '@/components/AnimatedTransition';
 import { useAnimateIn } from '@/lib/animations';
+import Footer from '@/components/landing/Footer';
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({
@@ -202,6 +203,9 @@ const ContactPage = () => {
           </div>
         </GlassForm>
       </AnimatedTransition>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

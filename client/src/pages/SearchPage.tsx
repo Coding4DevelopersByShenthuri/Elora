@@ -3,6 +3,7 @@ import React from 'react';
 import Search from '@/components/search';
 import { AnimatedTransition } from '@/components/AnimatedTransition';
 import { useAnimateIn } from '@/lib/animations';
+import Footer from '@/components/landing/Footer';
 
 const SearchPage = () => {
   const showContent = useAnimateIn(false, 300);
@@ -12,6 +13,9 @@ const SearchPage = () => {
       <AnimatedTransition show={showContent} animation="slide-up">
         <Search />
       </AnimatedTransition>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

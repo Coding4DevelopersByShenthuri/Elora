@@ -16,6 +16,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
+import Footer from '@/components/landing/Footer';
 
 const AdvancedPage = () => {
   const [activeModule, setActiveModule] = useState('mastery');
@@ -643,6 +644,9 @@ const AdvancedPage = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

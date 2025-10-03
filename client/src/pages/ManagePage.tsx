@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Check, Edit2, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Toaster } from 'sonner';
+import Footer from '@/components/landing/Footer';
 
 const ManagePage = () => {
   const showContent = useAnimateIn(false, 300);
@@ -141,6 +142,9 @@ const ManagePage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

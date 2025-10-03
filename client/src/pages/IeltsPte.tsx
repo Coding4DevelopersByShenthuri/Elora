@@ -13,6 +13,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
+import Footer from '@/components/landing/Footer';
 
 const IeltsPtePage = () => {
   const [activeTest, setActiveTest] = useState('ielts');
@@ -729,6 +730,9 @@ const IeltsPtePage = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

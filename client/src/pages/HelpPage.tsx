@@ -4,6 +4,7 @@ import { AnimatedTransition } from '@/components/AnimatedTransition';
 import { Button } from '@/components/ui/button';
 import { HelpCircle, Mail, MessageCircle, BookOpen, Stars } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import Footer from '@/components/landing/Footer';
 
 const HelpSection = ({
     title,
@@ -123,6 +124,9 @@ const HelpPage = () => {
                     </div>
                 </AnimatedTransition>
             </div>
+
+            {/* Footer */}
+            <Footer />
         </div>
     );
 };

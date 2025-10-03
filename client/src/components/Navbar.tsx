@@ -115,7 +115,7 @@ export const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {

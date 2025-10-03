@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import AnimatedTransition from '@/components/AnimatedTransition';
 import { Link } from 'react-router-dom';
+import Footer from '@/components/landing/Footer';
 
 const FeatureCard = ({
   icon,
@@ -482,6 +483,9 @@ const HowPage = () => {
         </div>
 
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

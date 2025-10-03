@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
+import Footer from '@/components/landing/Footer';
 
 const KidsPage = () => {
   const [activeCategory, setActiveCategory] = useState('stories');
@@ -417,6 +418,9 @@ const KidsPage = () => {
           <Sparkles className="w-6 h-6 text-purple-500 dark:text-purple-400" />
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
 
       {/* Add custom animations to global CSS */}
       <style jsx>{`
