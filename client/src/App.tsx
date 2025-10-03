@@ -153,10 +153,12 @@ const App = () => {
               {isInitialLoading ? (
                 <LoadingScreen />
               ) : (
-                <div className="min-h-screen">
+                <div className="min-h-screen flex flex-col">
                   <FloatingIconsLayer />
                   <Navbar />
-                  <AppRoutes />
+                  <main className="flex-1">
+                    <AppRoutes />
+                  </main>
                 </div>
               )}
             </BrowserRouter>
