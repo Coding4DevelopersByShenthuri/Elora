@@ -71,3 +71,20 @@ INFO 2025-10-02 20:20:02,055 basehttp 18908 11388 "POST /api/auth/login HTTP/1.1
 INFO 2025-10-03 09:33:26,933 autoreload 17576 20204 Watching for file changes with StatReloader
 INFO 2025-10-03 09:38:35,357 basehttp 17576 12112 "POST /api/auth/login HTTP/1.1" 200 344
 INFO 2025-10-03 12:00:12,594 autoreload 5480 15024 Watching for file changes with StatReloader
+INFO 2025-10-03 16:05:07,201 basehttp 5480 6796 "POST /api/auth/login HTTP/1.1" 200 344
+INFO 2025-10-03 17:05:50,839 autoreload 3892 18580 Watching for file changes with StatReloader
+WARNING 2025-10-04 17:32:55,537 log 3892 5184 Not Found: /
+WARNING 2025-10-04 17:32:55,539 basehttp 3892 5184 "GET / HTTP/1.1" 404 2610
+WARNING 2025-10-04 17:32:57,318 log 3892 2556 Not Found: /favicon.ico
+WARNING 2025-10-04 17:32:57,319 basehttp 3892 2556 "GET /favicon.ico HTTP/1.1" 404 2661
+INFO 2025-10-04 17:36:38,864 basehttp 3892 17436 "POST /api/auth/login HTTP/1.1" 200 344
+INFO 2025-10-04 17:40:55,450 basehttp 3892 15224 "POST /api/auth/login HTTP/1.1" 200 344
+INFO 2025-10-04 18:14:09,242 basehttp 3892 3440 "POST /api/auth/login HTTP/1.1" 200 344
+INFO 2025-10-04 23:03:05,989 autoreload 21592 20264 Watching for file changes with StatReloader
+WARNING 2025-10-04 23:04:05,557 log 21592 17976 Unauthorized: /api/auth/login
+WARNING 2025-10-04 23:04:05,562 basehttp 21592 17976 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-04 23:04:18,362 basehttp 21592 11536 "POST /api/auth/login HTTP/1.1" 200 344
+INFO 2025-10-07 19:21:45,590 autoreload 17472 1800 Watching for file changes with StatReloader
+INFO 2025-10-07 19:22:31,655 basehttp 17472 20640 "POST /api/auth/login HTTP/1.1" 200 344
+INFO 2025-10-08 09:14:37,497 autoreload 13992 9148 Watching for file changes with StatReloader
+INFO 2025-10-08 09:24:14,178 basehttp 13992 13552 "POST /api/auth/login HTTP/1.1" 200 344

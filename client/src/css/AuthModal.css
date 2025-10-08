@@ -488,6 +488,69 @@
   font-size: 1.2rem;
 }
 
+/* Register form specific optimizations - COMPACT VERSION */
+.auth-register-container form {
+  padding: 0 30px !important;
+  justify-content: center !important;
+  gap: 4px !important;
+}
+
+.auth-register-container .auth-input-container {
+  margin: 4px 0 !important;
+}
+
+.auth-register-container .auth-social-container {
+  margin: 8px 0 !important;
+  gap: 12px !important;
+}
+
+.auth-register-container .auth-terms-container {
+  margin-top: 8px !important;
+  margin-bottom: 4px !important;
+}
+
+.auth-register-container .auth-pass-link {
+  margin-top: 8px !important;
+  margin-bottom: 4px !important;
+}
+
+/* Make register form inputs and buttons more compact */
+.auth-register-container input,
+.auth-register-container select {
+  padding: 8px 12px 8px 35px !important;
+  font-size: 12px !important;
+  height: 32px !important;
+  margin: 2px 0 !important;
+}
+
+.auth-register-container .auth-input-icon {
+  left: 10px !important;
+  width: 14px !important;
+  height: 14px !important;
+}
+
+.auth-register-container .auth-password-toggle {
+  right: 10px !important;
+  padding: 2px !important;
+}
+
+.auth-register-container button[type="submit"] {
+  height: 32px !important;
+  font-size: 12px !important;
+  margin: 6px 0 !important;
+}
+
+/* Social icons smaller in register form */
+.auth-register-container .auth-social-container button {
+  width: 30px !important;
+  height: 30px !important;
+}
+
+.auth-register-container .auth-social-container svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+
 /* Mobile and Tablet Styles - Keep the same layout as desktop */
 @media (max-width: 1024px) {
   .auth-modal-container {

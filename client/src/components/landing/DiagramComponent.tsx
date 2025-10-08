@@ -11,9 +11,9 @@ interface DiagramComponentProps {
 }
 
 const DiagramComponent = ({ onSectionClick, activeSection }: DiagramComponentProps) => {
-  const scatteredText = "All your notes, bookmarks, inspirations, articles and images in one single, private second brain, accessible anywhere, anytime.";
-  const convergenceText = "Save anything with a click and stay in the flow. Cortex understands what it is and remembers the important details, so you don't have to.";
-  const organizedText = "Search by color, keyword, brand, date – whatever you think of first. Associative search & visual cues work with your brain to find it instantly.";
+  const scatteredText = "All your learning needs in one place: lessons, speaking practice, conversations, progress tracking, and feedback. Everything you need to improve your English is right here.";
+  const convergenceText = "Improve your English effortlessly with just a click. Our local language model understands your practice sessions and remembers key details, so you can focus on speaking confidently—no internet required.”";
+  const organizedText = "Search by topic, grammar point, skill level, or lesson — whatever comes to mind first. Smart suggestions and visual cues help you find what you need instantly.";
 
   return (
     <div className="w-full max-w-4xl mx-auto mb-8 relative h-[180px] md:h-[220px]">

@@ -11,7 +11,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 
 // ✅ Global Components
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/landing/Footer";       
+import Footer from "@/components/landing/Footer";
 import FloatingIconsLayer from "@/components/FloatingIconsLayer";
 import { LoadingScreen } from "@/components/landing/LoadingScreen";
 
@@ -34,7 +34,6 @@ import Advanced from "@/pages/adults/Advanced";
 import IeltsPte from "@/pages/IeltsPte";
 import NotFound from "@/pages/NotFound";
 
-// ✅ React Query Client
 const queryClient = new QueryClient();
 
 // ✅ Smooth Page Transition Wrapper
@@ -78,7 +77,7 @@ const AppRoutes = () => (
   </Routes>
 );
 
-// ✅ Main App
+// ✅ Main App Component
 const App = () => {
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 
@@ -104,7 +103,7 @@ const App = () => {
                   <main className="flex-1">
                     <AppRoutes />
                   </main>
-                  <Footer />   
+                  <Footer />
                 </div>
               )}
             </BrowserRouter>
