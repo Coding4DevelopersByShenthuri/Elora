@@ -813,7 +813,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                     </div>
                     <Button
                       onClick={handlePasswordReset}
-                      className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-bold rounded-2xl transition-all duration-300 hover:tracking-widest"
+                      className="w-full h-12 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-2xl transition-all duration-300 hover:tracking-widest"
                       disabled={!newPassword || newPassword.length < 8}
                     >
                       Reset Password
