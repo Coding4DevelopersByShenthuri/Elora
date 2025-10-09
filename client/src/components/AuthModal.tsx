@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
@@ -123,6 +123,9 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     securityAnswer: ''
   });
 
+  // Ref for terms content container
+  const termsContentRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (isOpen) {
       setIsRightPanelActive(authMode === 'register');
@@ -130,6 +133,19 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
       setSuccess('');
     }
   }, [isOpen, authMode]);
+
+  // Reset scroll position when terms modal opens
+  useEffect(() => {
+    if (authMode === 'terms') {
+      setScrollPosition(0);
+      // Reset scroll position of terms content
+      setTimeout(() => {
+        if (termsContentRef.current) {
+          termsContentRef.current.scrollTop = 0;
+        }
+      }, 100);
+    }
+  }, [authMode]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -365,7 +381,9 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const target = e.target as HTMLDivElement;
-    const scrollPercent = (target.scrollTop / (target.scrollHeight - target.clientHeight)) * 100;
+    const scrollTop = target.scrollTop;
+    const scrollHeight = target.scrollHeight - target.clientHeight;
+    const scrollPercent = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
     setScrollPosition(scrollPercent);
   };
 
@@ -378,17 +396,17 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
 
   // Modern Terms and Conditions Modal Component
   const TermsModal = () => (
-    <div className="auth-form-container auth-terms-container" style={{ zIndex: 20, width: '100%' }}>
+    <div className="auth-terms-full-container">
       <div className="h-full bg-[#143C3D] p-4 md:p-6 flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between mb-3 md:mb-4">
           <button
             type="button"
-            onClick={() => setAuthMode('register')}
+            onClick={() => setAuthMode('login')}
             className="flex items-center text-[#4BB6B7] hover:text-[#28CACD] transition-colors text-xs md:text-sm"
           >
             <ArrowLeft className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-            Back to Registration
+            Back to Login
           </button>
           <div className="flex items-center space-x-1 md:space-x-2">
             <FileText className="w-4 h-4 md:w-5 md:h-5 text-[#28CACD]" />
@@ -413,6 +431,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
 
         {/* Terms Content */}
         <div 
+          ref={termsContentRef}
           className="flex-1 overflow-y-auto bg-[#022A2D] p-3 md:p-4 rounded-lg mb-3 md:mb-4 custom-scrollbar"
           onScroll={handleScroll}
         >
@@ -446,7 +465,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
         {/* Action Buttons */}
         <div className="flex space-x-2 md:space-x-3">
           <Button
-            onClick={() => setAuthMode('register')}
+            onClick={() => setAuthMode('login')}
             className="flex-1 h-8 md:h-10 bg-transparent border border-[#4BB6B7] text-[#4BB6B7] hover:bg-[#4BB6B7] hover:text-white transition-all duration-300 text-xs md:text-sm"
           >
             Decline & Return
@@ -470,7 +489,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
         {/* Contact Information */}
         <div className="text-center mt-3 md:mt-4 pt-3 md:pt-4 border-t border-[#4BB6B7]/30">
           <p className="text-[#4BB6B7] text-xs">
-            Questions? Contact us at <strong>support@speakbee.com</strong> or visit <strong>www.speakbee.com</strong>
+            Questions? Contact us at <strong>support@speakbee.ai</strong> or visit <strong>www.speakbee.com</strong>
           </p>
         </div>
       </div>
@@ -492,8 +511,8 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
           </button>
         </div>
 
-        <div className={`auth-modal-container ${isRightPanelActive ? 'right-panel-active' : ''}`}>
-          {/* Terms and Conditions Modal */}
+        <div className={`auth-modal-container ${isRightPanelActive ? 'right-panel-active' : ''} ${isTermsMode ? 'terms-mode-active' : ''}`}>
+          {/* Terms and Conditions Modal - Full Screen Overlay */}
           {isTermsMode && <TermsModal />}
 
           {/* Register Form */}
@@ -839,7 +858,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
 
           {/* Forgot Password Form */}
           {!isTermsMode && isForgotPasswordMode && (
-            <div className="auth-form-container auth-forgot-password-container" style={{ zIndex: 10, width: '100%' }}>
+            <div className="auth-form-container auth-forgot-password-container">
               <div className="h-full bg-[#143C3D] p-4 md:p-8 flex flex-col justify-center">
                 {/* Back Button */}
                 <div className="mb-3 md:mb-4">

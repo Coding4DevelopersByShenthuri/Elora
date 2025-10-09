@@ -2,7 +2,7 @@ export const TERMS_AND_CONDITIONS = `
 # Terms and Conditions Agreement
 
 **www.speakbee.com**  
-**support@speakbee.com**  
+** support@speakbee.ai**  
 **Last Updated:** ${new Date().toLocaleDateString()}
 
 ## The Agreement
@@ -242,7 +242,7 @@ You agree to resolve disputes on an individual basis and waive any right to part
 
 For questions, concerns, or support regarding these Terms and Conditions, contact:
 
-**Email:** support@speakbee.com  
+**Email:**  support@speakbee.ai 
 **Website:** www.speakbee.com  
 **Support Hours:** Monday-Friday, 9:00 AM - 6:00 PM IST
 

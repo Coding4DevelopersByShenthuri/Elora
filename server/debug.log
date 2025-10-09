@@ -136,3 +136,5 @@ WARNING 2025-10-09 12:25:38,024 log 2040 18956 Unauthorized: /api/auth/login
 WARNING 2025-10-09 12:25:38,024 basehttp 2040 18956 "POST /api/auth/login HTTP/1.1" 401 39
 ERROR 2025-10-09 12:36:35,547 log 2040 3092 Not Implemented: /api/auth/google
 ERROR 2025-10-09 12:36:35,560 basehttp 2040 3092 "GET /api/auth/google HTTP/1.1" 501 81
+ERROR 2025-10-09 16:46:02,031 log 2040 2932 Not Implemented: /api/auth/linkedin
+ERROR 2025-10-09 16:46:02,048 basehttp 2040 2932 "GET /api/auth/linkedin HTTP/1.1" 501 85
