@@ -123,3 +123,16 @@ WARNING 2025-10-08 13:46:45,415 log 13992 5372 Unauthorized: /api/auth/login
 WARNING 2025-10-08 13:46:45,416 basehttp 13992 5372 "POST /api/auth/login HTTP/1.1" 401 39
 ERROR 2025-10-08 15:19:01,792 log 13992 23060 Not Implemented: /api/auth/github
 ERROR 2025-10-08 15:19:01,810 basehttp 13992 23060 "GET /api/auth/github HTTP/1.1" 501 81
+INFO 2025-10-09 10:15:10,374 autoreload 2040 8680 Watching for file changes with StatReloader
+WARNING 2025-10-09 10:18:32,238 log 2040 20348 Unauthorized: /api/auth/login
+WARNING 2025-10-09 10:18:32,245 basehttp 2040 20348 "POST /api/auth/login HTTP/1.1" 401 39
+ERROR 2025-10-09 11:31:49,399 log 2040 7664 Not Implemented: /api/auth/github
+ERROR 2025-10-09 11:31:49,410 basehttp 2040 7664 "GET /api/auth/github HTTP/1.1" 501 81
+WARNING 2025-10-09 12:22:44,189 log 2040 3024 Unauthorized: /api/auth/login
+WARNING 2025-10-09 12:22:44,198 basehttp 2040 3024 "POST /api/auth/login HTTP/1.1" 401 39
+WARNING 2025-10-09 12:25:34,376 log 2040 13376 Unauthorized: /api/auth/login
+WARNING 2025-10-09 12:25:34,381 basehttp 2040 13376 "POST /api/auth/login HTTP/1.1" 401 39
+WARNING 2025-10-09 12:25:38,024 log 2040 18956 Unauthorized: /api/auth/login
+WARNING 2025-10-09 12:25:38,024 basehttp 2040 18956 "POST /api/auth/login HTTP/1.1" 401 39
+ERROR 2025-10-09 12:36:35,547 log 2040 3092 Not Implemented: /api/auth/google
+ERROR 2025-10-09 12:36:35,560 basehttp 2040 3092 "GET /api/auth/google HTTP/1.1" 501 81

@@ -121,7 +121,7 @@ const Footer = () => {
         </div>
         <div className="flex items-center gap-1 justify-center">
           <span>Crafted with</span>
-          <span className="text-red-400">❤️</span>
+          <span className="text-white">♡</span>
           <span>by Shenthuri Maran</span>
         </div>
       </div>
