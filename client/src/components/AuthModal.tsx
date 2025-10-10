@@ -6,8 +6,9 @@ import {
   Dialog,
   DialogContent,
 } from '@/components/ui/dialog';
-import { Loader2, Mail, Lock, User, Eye, EyeOff, Home, Github, Facebook, Linkedin, Chrome, AlertCircle, ArrowLeft, FileText, Check, ExternalLink } from 'lucide-react';
-import { TERMS_AND_CONDITIONS, SECURITY_QUESTIONS } from './terms-and-conditions';
+import { Loader2, Mail, Lock, User, Eye, EyeOff, Home, AlertCircle, ArrowLeft, FileText, Check } from 'lucide-react';
+import { TERMS_AND_CONDITIONS, SECURITY_QUESTIONS } from '../data/terms-and-conditions';
+import { userDataService } from '@/services/UserDataService';
 import '../css/AuthModal.css';
 
 interface AuthModalProps {
@@ -18,6 +19,7 @@ interface AuthModalProps {
 type AuthMode = 'login' | 'register' | 'forgot-password' | 'terms';
 
 interface User {
+  id: string;
   username: string;
   password: string;
   securityQuestion: string;
@@ -25,72 +27,336 @@ interface User {
   email: string;
   name: string;
   createdAt: string;
+  lastLogin: string;
+  profile: {
+    level: 'beginner' | 'intermediate' | 'advanced';
+    points: number;
+    streak: number;
+    avatar?: string;
+  };
 }
 
-// API service functions
-const authAPI = {
-  async login(email: string, password: string) {
-    // Check localStorage for users
-    const users: User[] = JSON.parse(localStorage.getItem("users") || "[]");
-    const foundUser = users.find(u => 
-      u.email.toLowerCase() === email.toLowerCase() && 
-      u.password === password
-    );
+// Simple encryption for local storage (basic obfuscation)
+const simpleEncrypt = (text: string): string => {
+  return btoa(unescape(encodeURIComponent(text)));
+};
+
+const simpleDecrypt = (text: string): string => {
+  try {
+    return decodeURIComponent(escape(atob(text)));
+  } catch {
+    return text; // Return original if decryption fails (for backward compatibility)
+  }
+};
+
+// Offline-only authentication service
+const authService = {
+  // Generate unique ID for users
+  generateId(): string {
+    return `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  },
+  
+  // Verify security answer without changing password
+  async verifySecurityAnswer(email: string, securityAnswer: string): Promise<boolean> {
+    const users: User[] = JSON.parse(localStorage.getItem("speakbee_users") || "[]");
+    let user: any = users.find(u => u.email.toLowerCase() === email.toLowerCase());
     
-    if (foundUser) {
-      return { token: 'local-storage-token', user: foundUser };
+    if (!user) {
+      // Legacy fallback
+      const legacyUsers: any[] = JSON.parse(localStorage.getItem('users') || '[]');
+      const emailLc = email.toLowerCase();
+      const emailLocal = emailLc.split('@')[0];
+      user = Array.isArray(legacyUsers) ? legacyUsers.find((u: any) => (
+        (typeof u.email === 'string' && u.email.toLowerCase() === emailLc) ||
+        (typeof u.username === 'string' && (u.username.toLowerCase() === emailLc || u.username.toLowerCase() === emailLocal))
+      )) : undefined;
     }
 
-    // Fallback to API if no local user found
+    if (!user || !user.securityAnswer) return false;
+
+    const normalizedAnswer = securityAnswer.toLowerCase().trim();
+    
+    // Try direct comparison first (for unencrypted answers)
+    if (user.securityAnswer === normalizedAnswer) return true;
+    
+    // Try hashed comparison
+    const hashedInputAnswer = this.hashPassword(normalizedAnswer);
+    if (user.securityAnswer === hashedInputAnswer) return true;
+    
+    // Try decrypted comparison
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
-      }
-
-      return response.json();
-    } catch (error) {
-      throw new Error('Login failed. Please check your credentials.');
+      const decryptedAnswer = simpleDecrypt(user.securityAnswer);
+      return decryptedAnswer === normalizedAnswer;
+    } catch {
+      return false;
     }
   },
 
+  // Hash password (basic implementation for offline use)
+  hashPassword(password: string): string {
+    return simpleEncrypt(password);
+  },
+
+  // Verify password
+  verifyPassword(password: string, hashedPassword: string): boolean {
+    try {
+      return password === simpleDecrypt(hashedPassword);
+    } catch {
+      // For backward compatibility with existing unencrypted passwords
+      return password === hashedPassword;
+    }
+  },
+
+  async login(email: string, password: string) {
+    const users: User[] = JSON.parse(localStorage.getItem("speakbee_users") || "[]");
+    const emailLc = email.toLowerCase();
+    let foundUser = users.find(u => u.email.toLowerCase() === emailLc);
+
+    // Primary: modern users
+    if (foundUser && this.verifyPassword(password, foundUser.password)) {
+      const updatedUser = { ...foundUser, lastLogin: new Date().toISOString() };
+      const updatedUsers = users.map(u => u.id === foundUser!.id ? updatedUser : u);
+      localStorage.setItem("speakbee_users", JSON.stringify(updatedUsers));
+      return { token: 'local-token', user: { ...updatedUser, password: undefined as any } };
+    }
+
+    // Legacy fallback: users stored under 'users' with plain password and possibly username only
+    const legacyUsers: any[] = JSON.parse(localStorage.getItem('users') || '[]');
+    if (Array.isArray(legacyUsers) && legacyUsers.length > 0) {
+      const localPart = emailLc.split('@')[0];
+      const legacy = legacyUsers.find((u: any) => (
+        (typeof u.email === 'string' && u.email.toLowerCase() === emailLc) ||
+        (typeof u.username === 'string' && (u.username.toLowerCase() === emailLc || u.username.toLowerCase() === localPart))
+      ));
+
+      if (legacy && typeof legacy.password === 'string' && legacy.password === password) {
+        // Migrate legacy user into speakbee_users
+        const migrated: User = {
+          id: this.generateId(),
+          username: legacy.username || localPart,
+          name: legacy.name || legacy.username || localPart,
+          email: legacy.email || (localPart + '@local'),
+          password: this.hashPassword(password),
+          securityQuestion: legacy.securityQuestion || 'What is your favorite color?',
+          securityAnswer: legacy.securityAnswer ? legacy.securityAnswer : this.hashPassword(''),
+          createdAt: legacy.createdAt || new Date().toISOString(),
+          lastLogin: new Date().toISOString(),
+          profile: legacy.profile || { level: 'beginner', points: 0, streak: 0, avatar: undefined }
+        };
+        const newUsers = [...users, migrated];
+        localStorage.setItem('speakbee_users', JSON.stringify(newUsers));
+        return { token: 'local-token', user: { ...migrated, password: undefined as any } };
+      }
+    }
+
+    throw new Error('Invalid email or password');
+  },
+
   async register(name: string, email: string, password: string, securityQuestion: string, securityAnswer: string) {
-    // Save to localStorage for offline use
-    const users: User[] = JSON.parse(localStorage.getItem("users") || "[]");
+    const users: User[] = JSON.parse(localStorage.getItem("speakbee_users") || "[]");
     
     // Check if user already exists
     if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
       throw new Error('User with this email already exists');
     }
 
-    // Create new user with security question
+    // Create new user with encrypted password
     const newUser: User = {
+      id: this.generateId(),
       username: email.split('@')[0],
       name: name.trim(),
       email: email.toLowerCase(),
-      password: password,
+      password: this.hashPassword(password),
       securityQuestion,
-      securityAnswer: securityAnswer.toLowerCase().trim(),
-      createdAt: new Date().toISOString()
+      securityAnswer: this.hashPassword(securityAnswer.toLowerCase().trim()),
+      createdAt: new Date().toISOString(),
+      lastLogin: new Date().toISOString(),
+      profile: {
+        level: 'beginner',
+        points: 0,
+        streak: 0,
+        avatar: undefined
+      }
     };
 
     users.push(newUser);
-    localStorage.setItem("users", JSON.stringify(users));
+    localStorage.setItem("speakbee_users", JSON.stringify(users));
 
-    return { token: 'local-storage-token', user: newUser };
+    // Initialize user learning data
+    try {
+      await userDataService.initDB();
+      await userDataService.saveUserLearningData(newUser.id, {
+        userId: newUser.id,
+        currentLevel: 'beginner',
+        totalPoints: 0,
+        currentStreak: 0,
+        longestStreak: 0,
+        totalPracticeTime: 0,
+        lessonsCompleted: 0,
+        lessons: [],
+        practiceSessions: [],
+        vocabulary: [],
+        achievements: [],
+        settings: {
+          voiceSpeed: 'normal',
+          difficulty: 'medium',
+          notifications: true,
+          autoPlay: true,
+          theme: 'auto'
+        }
+      });
+    } catch (error) {
+      console.error('Error initializing user learning data:', error);
+      // Continue with registration even if learning data initialization fails
+    }
+
+    return { 
+      token: 'local-token', 
+      user: {
+        ...newUser,
+        password: undefined // Remove password from returned user object
+      }
+    };
   },
 
-  async socialLogin(provider: string) {
-    // Redirect to social login endpoint
-    window.location.href = `/api/auth/${provider}`;
+  async resetPassword(email: string, securityAnswer: string, newPassword: string) {
+    // Primary store
+    const users: User[] = JSON.parse(localStorage.getItem("speakbee_users") || "[]");
+    let userIndex = users.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
+
+    if (userIndex !== -1) {
+      const user = users[userIndex];
+      
+      // Verify security answer for modern users
+      const normalizedAnswer = securityAnswer.toLowerCase().trim();
+      const hashedInputAnswer = this.hashPassword(normalizedAnswer);
+      
+      let answerValid = false;
+      
+      if (user.securityAnswer === hashedInputAnswer) {
+        answerValid = true;
+      } else {
+        try {
+          const decryptedAnswer = simpleDecrypt(user.securityAnswer);
+          if (decryptedAnswer === normalizedAnswer) {
+            answerValid = true;
+          }
+        } catch {
+          // If decryption fails, try direct comparison for legacy
+          if (user.securityAnswer === normalizedAnswer) {
+            answerValid = true;
+          }
+        }
+      }
+
+      if (!answerValid) {
+        throw new Error('Incorrect security answer');
+      }
+
+      // Update password
+      users[userIndex] = {
+        ...user,
+        password: this.hashPassword(newPassword)
+      };
+      localStorage.setItem("speakbee_users", JSON.stringify(users));
+      return true;
+    }
+
+    // Legacy store fallback
+    const legacyUsersRaw = localStorage.getItem('users');
+    const legacyUsers: any[] = JSON.parse(legacyUsersRaw || '[]');
+    if (Array.isArray(legacyUsers) && legacyUsers.length > 0) {
+      const emailLc = email.toLowerCase();
+      const emailLocal = emailLc.split('@')[0];
+      const legacyIndex = legacyUsers.findIndex((u: any) => (
+        (typeof u.email === 'string' && u.email.toLowerCase() === emailLc) ||
+        (typeof u.username === 'string' && (u.username.toLowerCase() === emailLc || u.username.toLowerCase() === emailLocal))
+      ));
+
+      if (legacyIndex !== -1) {
+        const legacyUser = legacyUsers[legacyIndex];
+        
+        // For legacy users, if no security answer is set, allow reset without verification
+        if (!legacyUser.securityAnswer) {
+          legacyUsers[legacyIndex] = { 
+            ...legacyUser, 
+            password: newPassword 
+          };
+          localStorage.setItem('users', JSON.stringify(legacyUsers));
+          return true;
+        }
+
+        // Verify security answer for legacy users
+        const normalizedAnswer = securityAnswer.toLowerCase().trim();
+        let answerValid = false;
+
+        if (legacyUser.securityAnswer === normalizedAnswer) {
+          answerValid = true;
+        } else {
+          try {
+            const decryptedAnswer = simpleDecrypt(legacyUser.securityAnswer);
+            if (decryptedAnswer === normalizedAnswer) {
+              answerValid = true;
+            }
+          } catch {
+            // If decryption fails, try direct comparison
+            if (legacyUser.securityAnswer === normalizedAnswer) {
+              answerValid = true;
+            }
+          }
+        }
+
+        if (!answerValid) {
+          throw new Error('Incorrect security answer');
+        }
+
+        // Update legacy password
+        legacyUsers[legacyIndex] = { 
+          ...legacyUser, 
+          password: newPassword 
+        };
+        localStorage.setItem('users', JSON.stringify(legacyUsers));
+        return true;
+      }
+    }
+
+    throw new Error('User not found');
+  },
+
+  async getUserByEmail(email: string) {
+    const users: User[] = JSON.parse(localStorage.getItem("speakbee_users") || "[]");
+    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    if (user) {
+      return { ...user };
+    }
+
+    // Legacy fallback: search in 'users'
+    const legacyUsers: any[] = JSON.parse(localStorage.getItem('users') || '[]');
+    if (Array.isArray(legacyUsers) && legacyUsers.length > 0) {
+      const emailLc = email.toLowerCase();
+      const emailLocal = emailLc.split('@')[0];
+      const legacy = legacyUsers.find((u: any) => (
+        (typeof u.email === 'string' && u.email.toLowerCase() === emailLc) ||
+        (typeof u.username === 'string' && (u.username.toLowerCase() === emailLc || u.username.toLowerCase() === emailLocal))
+      ));
+      if (legacy) {
+        // Convert legacy user to modern format
+        return {
+          id: legacy.id || this.generateId(),
+          username: legacy.username || emailLocal,
+          name: legacy.name || legacy.username || emailLocal,
+          email: legacy.email || (emailLocal + '@local'),
+          password: legacy.password,
+          securityQuestion: legacy.securityQuestion || 'What is your favorite color?',
+          securityAnswer: legacy.securityAnswer || '',
+          createdAt: legacy.createdAt || new Date().toISOString(),
+          lastLogin: legacy.lastLogin || new Date().toISOString(),
+          profile: legacy.profile || { level: 'beginner', points: 0, streak: 0, avatar: undefined }
+        };
+      }
+    }
+
+    return null;
   }
 };
 
@@ -111,6 +377,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [securityAnswer, setSecurityAnswer] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [forgotPasswordStep, setForgotPasswordStep] = useState(1);
   
   // Registration states
@@ -128,7 +395,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
 
   useEffect(() => {
     if (isOpen) {
-      setIsRightPanelActive(authMode === 'register');
+      setIsRightPanelActive(authMode === 'register' || authMode === 'forgot-password');
       setError('');
       setSuccess('');
     }
@@ -138,7 +405,6 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   useEffect(() => {
     if (authMode === 'terms') {
       setScrollPosition(0);
-      // Reset scroll position of terms content
       setTimeout(() => {
         if (termsContentRef.current) {
           termsContentRef.current.scrollTop = 0;
@@ -180,13 +446,15 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
       }
     }
 
-    if (!formData.email || !formData.password) {
-      setError('Please fill in all required fields');
-      return false;
+    if (authMode === 'login') {
+      if (!formData.email || !formData.password) {
+        setError('Please fill in all required fields');
+        return false;
+      }
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
+    if (formData.email && !emailRegex.test(formData.email)) {
       setError('Please enter a valid email address');
       return false;
     }
@@ -195,41 +463,52 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   };
 
   // Forgot Password Functions
-  const handleEmailSubmit = () => {
+  const handleEmailSubmit = async () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
       setError('Please enter a valid email address');
       return;
     }
 
-    const users: User[] = JSON.parse(localStorage.getItem("users") || "[]");
-    const found = users.find((u) => u.email.toLowerCase() === email.trim().toLowerCase());
-    
-    if (found) {
-      setUser(found);
-      setForgotPasswordStep(2);
+    try {
+      setIsLoading(true);
       setError('');
-    } else {
-      setError("No account found with this email address. Please check your email or register for a new account.");
+      const foundUser = await authService.getUserByEmail(email);
+      if (foundUser) {
+        setUser(foundUser as User);
+        setForgotPasswordStep(2);
+      } else {
+        setError("No account found with this email address. Please check your email or register for a new account.");
+      }
+    } catch (error) {
+      setError("Error finding user account");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleAnswerSubmit = () => {
+  const handleAnswerSubmit = async () => {
     if (!user) return;
     
-    const userAnswer = securityAnswer.trim().toLowerCase();
-    const correctAnswer = user.securityAnswer.toLowerCase();
-    
-    if (userAnswer === correctAnswer) {
-      setForgotPasswordStep(3);
+    try {
+      setIsLoading(true);
       setError('');
-    } else {
-      setError("Incorrect security answer. Please try again.");
+      const isValid = await authService.verifySecurityAnswer(user.email, securityAnswer);
+      if (isValid) {
+        setForgotPasswordStep(3);
+      } else {
+        setError('Incorrect security answer. Please try again.');
+      }
+    } catch (error) {
+      setError('Error verifying security answer. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handlePasswordReset = () => {
+  const handlePasswordReset = async () => {
     if (!user) return;
+    
     if (newPassword.trim() === "") {
       setError("Password cannot be empty!");
       return;
@@ -240,40 +519,34 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
       return;
     }
 
-    const users: User[] = JSON.parse(localStorage.getItem("users") || "[]");
-    const userIndex = users.findIndex((u) => u.email.toLowerCase() === user.email.toLowerCase());
-    
-    if (userIndex === -1) {
-      setError("User not found in the system. Please try again.");
+    if (newPassword !== confirmNewPassword) {
+      setError("Passwords do not match");
       return;
     }
 
-    const updatedUser = {
-      ...users[userIndex],
-      password: newPassword
-    };
-
-    const updatedUsers = [...users];
-    updatedUsers[userIndex] = updatedUser;
-    
     try {
-      localStorage.setItem("users", JSON.stringify(updatedUsers));
+      setIsLoading(true);
+      setError('');
       
-      const verifyUsers: User[] = JSON.parse(localStorage.getItem("users") || "[]");
-      const verifiedUser = verifyUsers.find(u => u.email.toLowerCase() === user.email.toLowerCase());
+      // For legacy users without security question, allow reset without answer
+      const needsAnswer = !!user.securityQuestion && user.securityQuestion !== 'What is your favorite color?';
       
-      if (verifiedUser && verifiedUser.password === newPassword) {
-        setSuccess("Password reset successfully! You can now log in with your new password.");
-        
-        setTimeout(() => {
-          setAuthMode('login');
-          resetForgotPasswordFlow();
-        }, 2000);
-      } else {
-        setError("Password reset failed. Please try again.");
-      }
+      await authService.resetPassword(
+        user.email,
+        needsAnswer ? securityAnswer : '',
+        newPassword
+      );
+      
+      setSuccess("Password reset successfully! You can now log in with your new password.");
+      
+      setTimeout(() => {
+        setAuthMode('login');
+        resetForgotPasswordFlow();
+      }, 3000);
     } catch (error) {
-      setError("Failed to save password. Please try again.");
+      setError(error instanceof Error ? error.message : "Password reset failed");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -283,7 +556,9 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     setEmail("");
     setSecurityAnswer("");
     setNewPassword("");
+    setConfirmNewPassword("");
     setError('');
+    setIsLoading(false);
   };
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -299,11 +574,11 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
 
     try {
       if (authMode === 'login') {
-        const { token, user: userData } = await authAPI.login(formData.email, formData.password);
+        const { token, user: userData } = await authService.login(formData.email, formData.password);
         
-        localStorage.setItem('authToken', token);
-        localStorage.setItem('currentUser', JSON.stringify(userData));
-        login();
+        localStorage.setItem('speakbee_auth_token', token);
+        localStorage.setItem('speakbee_current_user', JSON.stringify(userData));
+        login(userData); // Pass userData to login
         
         setSuccess('Login successful!');
         
@@ -312,7 +587,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
           resetForm();
         }, 1000);
       } else {
-        const { token, user: userData } = await authAPI.register(
+        const { token, user: userData } = await authService.register(
           formData.name.trim(),
           formData.email,
           formData.password,
@@ -320,16 +595,15 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
           formData.securityAnswer
         );
         
-        localStorage.setItem('authToken', token);
-        localStorage.setItem('currentUser', JSON.stringify(userData));
-        login();
+        localStorage.setItem('speakbee_auth_token', token);
+        localStorage.setItem('speakbee_current_user', JSON.stringify(userData));
+        login(userData); // Pass userData to login
         
         setSuccess('Registration successful!');
         
         setTimeout(() => {
-          setAuthMode('login');
-          setIsRightPanelActive(false);
-          setSuccess('Registration successful! Please login.');
+          onClose();
+          resetForm();
         }, 1000);
       }
     } catch (error) {
@@ -337,19 +611,6 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
       const message = error instanceof Error ? error.message : 'Authentication failed. Please try again.';
       setError(message);
     } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSocialLogin = async (provider: string) => {
-    setIsLoading(true);
-    setError('');
-    
-    try {
-      await authAPI.socialLogin(provider);
-    } catch (error) {
-      console.error('Social login error:', error);
-      setError(`Social login with ${provider} failed. Please try again.`);
       setIsLoading(false);
     }
   };
@@ -432,7 +693,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
         {/* Terms Content */}
         <div 
           ref={termsContentRef}
-          className="flex-1 overflow-y-auto bg-[#022A2D] p-3 md:p-4 rounded-lg mb-3 md:mb-4 custom-scrollbar"
+          className="flex-1 overflow-y-auto bg-[#022A2D] p-3 md:p-4 rounded-lg mb-3 md:mb-4 terms-content-container custom-scrollbar"
           onScroll={handleScroll}
         >
           <div className="text-white text-xs md:text-sm leading-relaxed whitespace-pre-line terms-content">
@@ -489,7 +750,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
         {/* Contact Information */}
         <div className="text-center mt-3 md:mt-4 pt-3 md:pt-4 border-t border-[#4BB6B7]/30">
           <p className="text-[#4BB6B7] text-xs">
-            Questions? Contact us at <strong>support@speakbee.ai</strong> or visit <strong>www.speakbee.com</strong>
+            Questions? Contact us at <strong>support@speakbee.ai</strong>
           </p>
         </div>
       </div>
@@ -700,32 +961,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                   )}
                 </Button>
 
-                {authMode === 'login' && (
-                  <div className="auth-pass-link mb-1 md:mb-2">
-                    <button 
-                      type="button"
-                      onClick={() => setAuthMode('forgot-password')}
-                      className="text-[#4BB6B7] hover:text-[#28CACD] text-xs transition-colors"
-                    >
-                      Forgot your password?
-                    </button>
-                  </div>
-                )}
-
                 <div className="auth-terms-container mb-1 md:mb-2 flex items-center justify-center flex-wrap gap-1">
-                  <button 
-                    type="button"
-                    onClick={() => setAuthMode('terms')}
-                    className="auth-terms-link text-xs flex items-center"
-                  >
-                    <FileText className="w-3 h-3 mr-1" />
-                    Terms and Conditions
-                  </button>
-                  <span className="text-[#4BB6B7] text-xs">|</span>
-                  <a href="/privacy" className="auth-terms-link text-xs flex items-center">
-                    <ExternalLink className="w-3 h-3 mr-1" />
-                    Privacy Policy
-                  </a>
                 </div>
               </form>
             </div>
@@ -813,28 +1049,18 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                 <div className="auth-pass-link auth-compact-link">
                   <button 
                     type="button"
-                    onClick={() => setAuthMode('forgot-password')}
+                    onClick={() => {
+                      // Prefill email from login form and clear errors for smoother recovery
+                      setEmail(formData.email || '');
+                      setError('');
+                      setSuccess('');
+                      setForgotPasswordStep(1);
+                      setAuthMode('forgot-password');
+                    }}
                     className="text-[#4BB6B7] hover:text-[#28CACD] text-xs md:text-sm transition-colors font-medium"
                   >
                     Forgot your password?
                   </button>
-                </div>
-
-                <div className="auth-social-container auth-compact-social">
-                  {['github', 'facebook', 'google', 'linkedin'].map((provider) => (
-                    <button
-                      key={provider}
-                      onClick={() => handleSocialLogin(provider)}
-                      className="auth-social-icon disabled:opacity-50 transition-transform hover:scale-110"
-                      disabled={isLoading}
-                      type="button"
-                    >
-                      {provider === 'github' && <Github className="w-4 h-4 md:w-5 md:h-5" />}
-                      {provider === 'facebook' && <Facebook className="w-4 h-4 md:w-5 md:h-5" />}
-                      {provider === 'google' && <Chrome className="w-4 h-4 md:w-5 md:h-5" />}
-                      {provider === 'linkedin' && <Linkedin className="w-4 h-4 md:w-5 md:h-5" />}
-                    </button>
-                  ))}
                 </div>
 
                 <div className="auth-terms-container auth-compact-terms flex items-center justify-center flex-wrap gap-2">
@@ -846,11 +1072,6 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                     <FileText className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
                     Terms and Conditions
                   </button>
-                  <span className="text-[#4BB6B7]">|</span>
-                  <a href="/privacy" className="auth-terms-link flex items-center text-xs md:text-sm">
-                    <ExternalLink className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-                    Privacy Policy
-                  </a>
                 </div>
               </form>
             </div>
@@ -908,15 +1129,23 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                           onChange={(e) => setEmail(e.target.value)}
                           className="h-10 md:h-12 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-10 text-sm md:text-base"
                           required
+                          disabled={isLoading}
                         />
                       </div>
                     </div>
                     <Button
                       onClick={handleEmailSubmit}
                       className="w-full h-10 md:h-12 bg-[#022A2D] hover:bg-[#28CACD] text-white font-semibold rounded-2xl transition-all duration-300 hover:tracking-widest text-sm md:text-base"
-                      disabled={!email}
+                      disabled={!email || isLoading}
                     >
-                      Next
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                          Checking...
+                        </>
+                      ) : (
+                        'Next'
+                      )}
                     </Button>
                   </div>
                 )}
@@ -927,9 +1156,15 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                     <h2 className="text-lg md:text-xl font-medium mb-2 md:mb-3 text-center text-white">
                       Security Question
                     </h2>
-                    <p className="text-base md:text-lg text-white text-center mb-3 md:mb-4 font-semibold">
-                      {user.securityQuestion}
-                    </p>
+                    {user.securityQuestion ? (
+                      <p className="text-base md:text-lg text-white text-center mb-3 md:mb-4 font-semibold">
+                        {user.securityQuestion}
+                      </p>
+                    ) : (
+                      <p className="text-sm md:text-base text-[#4BB6B7] text-center mb-3 md:mb-4">
+                        This account has no security question set. You can reset your password directly.
+                      </p>
+                    )}
                     <div className="auth-input-container mb-3 md:mb-4">
                       <div className="auth-input-wrapper">
                         <Input
@@ -938,16 +1173,24 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                           value={securityAnswer}
                           onChange={(e) => setSecurityAnswer(e.target.value)}
                           className="h-10 md:h-12 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-4 text-sm md:text-base"
-                          required
+                          required={!!user.securityQuestion}
+                          disabled={isLoading}
                         />
                       </div>
                     </div>
                     <Button
-                      onClick={handleAnswerSubmit}
+                      onClick={user.securityQuestion ? handleAnswerSubmit : () => setForgotPasswordStep(3)}
                       className="w-full h-10 md:h-12 bg-[#022A2D] hover:bg-[#28CACD] text-white font-semibold rounded-2xl transition-all duration-300 hover:tracking-widest text-sm md:text-base"
-                      disabled={!securityAnswer}
+                      disabled={(!!user.securityQuestion && !securityAnswer) || isLoading}
                     >
-                      Verify Answer
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                          {user.securityQuestion ? 'Verifying...' : 'Continuing...'}
+                        </>
+                      ) : (
+                        user.securityQuestion ? 'Verify Answer' : 'Continue'
+                      )}
                     </Button>
                   </div>
                 )}
@@ -966,22 +1209,56 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                           className="h-10 md:h-12 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-10 pr-9 md:pr-10 text-sm md:text-base"
                           required
                           minLength={8}
+                          disabled={isLoading}
                         />
                         <button
                           type="button"
                           className="auth-password-toggle"
                           onClick={togglePasswordVisibility}
+                          disabled={isLoading}
                         >
                           {showPassword ? <EyeOff className="h-3 w-3 md:h-4 md:w-4" /> : <Eye className="h-3 w-3 md:h-4 md:w-4" />}
                         </button>
                       </div>
                     </div>
+
+                    <div className="auth-password-container mb-3 md:mb-4">
+                      <div className="auth-input-wrapper">
+                        <Lock className="auth-input-icon" />
+                        <Input
+                          type={showPassword ? 'text' : 'password'}
+                          placeholder="Confirm new password"
+                          value={confirmNewPassword}
+                          onChange={(e) => setConfirmNewPassword(e.target.value)}
+                          className="h-10 md:h-12 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-10 pr-9 md:pr-10 text-sm md:text-base"
+                          required
+                          minLength={8}
+                          disabled={isLoading}
+                        />
+                        <button
+                          type="button"
+                          className="auth-password-toggle"
+                          onClick={togglePasswordVisibility}
+                          disabled={isLoading}
+                        >
+                          {showPassword ? <EyeOff className="h-3 w-3 md:h-4 md:w-4" /> : <Eye className="h-3 w-3 md:h-4 md:w-4" />}
+                        </button>
+                      </div>
+                    </div>
+
                     <Button
                       onClick={handlePasswordReset}
-                      className="w-full h-10 md:h-12 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-2xl transition-all duration-300 hover:tracking-widest text-sm md:text-base"
-                      disabled={!newPassword || newPassword.length < 8}
+                      className="w-full h-10 md:h-12 bg-[#022A2D] hover:bg-[#28CACD] text-white font-semibold rounded-2xl transition-all duration-300 hover:tracking-widest text-sm md:text-base"
+                      disabled={!newPassword || newPassword.length < 8 || newPassword !== confirmNewPassword || isLoading}
                     >
-                      Reset Password
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                          Resetting...
+                        </>
+                      ) : (
+                        'Reset Password'
+                      )}
                     </Button>
                   </div>
                 )}

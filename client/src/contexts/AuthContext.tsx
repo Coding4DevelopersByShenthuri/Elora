@@ -1,44 +1,94 @@
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+// Make sure this interface matches exactly with AuthModal's User interface
+interface User {
+  id: string;
+  username: string;
+  email: string;
+  name: string;
+  createdAt: string;
+  lastLogin: string;
+  profile: {
+    level: 'beginner' | 'intermediate' | 'advanced';
+    points: number;
+    streak: number;
+    avatar?: string;
+  };
+}
 
 interface AuthContextType {
-  isAuthenticated: boolean;
-  login: () => void;
+  user: User | null;
+  login: (userData: User) => void; // Changed to require userData
   logout: () => void;
+  updateUserProfile: (updates: Partial<User['profile']>) => void;
+  isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
 
-  // This is a mock login function - will be replaced with actual auth later
-  const login = () => {
-    setIsAuthenticated(true);
-    localStorage.setItem('isAuthenticated', 'true');
-  };
-
-  const logout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem('isAuthenticated');
-  };
-
-  // Check if user was previously logged in
   useEffect(() => {
-    const authStatus = localStorage.getItem('isAuthenticated');
-    if (authStatus === 'true') {
-      setIsAuthenticated(true);
+    // Check if user is logged in on app start
+    const token = localStorage.getItem('speakbee_auth_token');
+    const userData = localStorage.getItem('speakbee_current_user');
+    
+    if (token && userData) {
+      try {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        logout();
+      }
     }
   }, []);
 
+  const login = (userData: User) => {
+    const updatedUser = {
+      ...userData,
+      lastLogin: new Date().toISOString()
+    };
+    setUser(updatedUser);
+    localStorage.setItem('speakbee_auth_token', 'local-token');
+    localStorage.setItem('speakbee_current_user', JSON.stringify(updatedUser));
+  };
+
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem('speakbee_auth_token');
+    localStorage.removeItem('speakbee_current_user');
+  };
+
+  const updateUserProfile = (updates: Partial<User['profile']>) => {
+    if (user) {
+      const updatedUser = {
+        ...user,
+        profile: {
+          ...user.profile,
+          ...updates
+        }
+      };
+      setUser(updatedUser);
+      localStorage.setItem('speakbee_current_user', JSON.stringify(updatedUser));
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{
+      user,
+      login,
+      logout,
+      updateUserProfile,
+      isAuthenticated: !!user
+    }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = (): AuthContextType => {
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');

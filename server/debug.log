@@ -138,3 +138,7 @@ ERROR 2025-10-09 12:36:35,547 log 2040 3092 Not Implemented: /api/auth/google
 ERROR 2025-10-09 12:36:35,560 basehttp 2040 3092 "GET /api/auth/google HTTP/1.1" 501 81
 ERROR 2025-10-09 16:46:02,031 log 2040 2932 Not Implemented: /api/auth/linkedin
 ERROR 2025-10-09 16:46:02,048 basehttp 2040 2932 "GET /api/auth/linkedin HTTP/1.1" 501 85
+INFO 2025-10-10 09:44:51,175 autoreload 17948 2168 Watching for file changes with StatReloader
+WARNING 2025-10-10 10:25:09,064 log 17948 8744 Unauthorized: /api/auth/login
+WARNING 2025-10-10 10:25:09,075 basehttp 17948 8744 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-10 12:17:35,557 autoreload 10980 10832 Watching for file changes with StatReloader

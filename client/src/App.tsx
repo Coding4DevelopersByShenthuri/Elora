@@ -34,6 +34,9 @@ import Advanced from "@/pages/adults/Advanced";
 import IeltsPte from "@/pages/IeltsPte";
 import NotFound from "@/pages/NotFound";
 
+// ✅ Import AuthModal
+import AuthModal from "@/components/AuthModal";
+
 const queryClient = new QueryClient();
 
 // ✅ Smooth Page Transition Wrapper
@@ -55,27 +58,39 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
 };
 
 // ✅ Route Definitions
-const AppRoutes = () => (
-  <Routes>
-    <Route path="/" element={<PageTransition><Index /></PageTransition>} />
-    <Route path="/why" element={<PageTransition><WhyPage /></PageTransition>} />
-    <Route path="/how" element={<PageTransition><HowPage /></PageTransition>} />
-    <Route path="/manage" element={<PageTransition><ManagePage /></PageTransition>} />
-    <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
-    <Route path="/import" element={<PageTransition><Import /></PageTransition>} />
-    <Route path="/search" element={<PageTransition><SearchPage /></PageTransition>} />
-    <Route path="/settings" element={<PageTransition><Settings /></PageTransition>} />
-    <Route path="/help" element={<PageTransition><HelpPage /></PageTransition>} />
-    <Route path="/contact" element={<PageTransition><ContactPage /></PageTransition>} />
-    <Route path="/kids" element={<PageTransition><KidsPage /></PageTransition>} />
-    <Route path="/adults" element={<PageTransition><Adults /></PageTransition>} />
-    <Route path="/adults/beginners" element={<PageTransition><Beginners /></PageTransition>} />
-    <Route path="/adults/intermediates" element={<PageTransition><Intermediates /></PageTransition>} />
-    <Route path="/adults/advanced" element={<PageTransition><Advanced /></PageTransition>} />
-    <Route path="/ielts-pte" element={<PageTransition><IeltsPte /></PageTransition>} />
-    <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
-  </Routes>
-);
+const AppRoutes = () => {
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  return (
+    <>
+      <Routes>
+        <Route path="/" element={<PageTransition><Index /></PageTransition>} />
+        <Route path="/why" element={<PageTransition><WhyPage /></PageTransition>} />
+        <Route path="/how" element={<PageTransition><HowPage /></PageTransition>} />
+        <Route path="/manage" element={<PageTransition><ManagePage /></PageTransition>} />
+        <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
+        <Route path="/import" element={<PageTransition><Import /></PageTransition>} />
+        <Route path="/search" element={<PageTransition><SearchPage /></PageTransition>} />
+        <Route path="/settings" element={<PageTransition><Settings /></PageTransition>} />
+        <Route path="/help" element={<PageTransition><HelpPage /></PageTransition>} />
+        <Route path="/contact" element={<PageTransition><ContactPage /></PageTransition>} />
+        <Route path="/kids" element={<PageTransition><KidsPage /></PageTransition>} />
+        <Route path="/adults" element={<PageTransition><Adults /></PageTransition>} />
+        <Route path="/adults/beginners" element={<PageTransition><Beginners /></PageTransition>} />
+        <Route path="/adults/intermediates" element={<PageTransition><Intermediates /></PageTransition>} />
+        <Route path="/adults/advanced" element={<PageTransition><Advanced /></PageTransition>} />
+        <Route path="/ielts-pte" element={<PageTransition><IeltsPte /></PageTransition>} />
+        <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+      </Routes>
+      
+      {/* Global Auth Modal */}
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
+      />
+    </>
+  );
+};
 
 // ✅ Main App Component
 const App = () => {
@@ -97,7 +112,7 @@ const App = () => {
               {isInitialLoading ? (
                 <LoadingScreen />
               ) : (
-                <div className="min-h-screen flex flex-col">
+                <div className="min-h-screen flex flex-col relative">
                   <FloatingIconsLayer />
                   <Navbar />
                   <main className="flex-1">
