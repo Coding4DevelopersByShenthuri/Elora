@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from .models import KidsLesson, KidsProgress, KidsAchievement
 from django.contrib.auth.password_validation import validate_password
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -36,3 +37,25 @@ class RegisterSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
+
+
+class KidsLessonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = KidsLesson
+        fields = ["id", "slug", "title", "lesson_type", "payload", "is_active", "created_at", "updated_at"]
+
+
+class KidsProgressSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+
+    class Meta:
+        model = KidsProgress
+        fields = ["user_id", "points", "streak", "details", "updated_at"]
+
+
+class KidsAchievementSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+
+    class Meta:
+        model = KidsAchievement
+        fields = ["user_id", "name", "icon", "progress", "unlocked", "updated_at"]

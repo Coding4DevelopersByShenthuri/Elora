@@ -9,19 +9,57 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
+import KidsProgressService from '@/services/KidsProgressService';
+import KidsApi from '@/services/KidsApi';
+import SpeechService from '@/services/SpeechService';
+import ReadAloud from '@/components/kids/ReadAloud';
+import Vocabulary from '@/components/kids/Vocabulary';
+import Pronunciation from '@/components/kids/Pronunciation';
 
 const KidsPage = () => {
   const [activeCategory, setActiveCategory] = useState('stories');
   const [currentStory, setCurrentStory] = useState(0);
   const [, setIsPlaying] = useState(false);
-  const [points, setPoints] = useState(1250);
-  const [streak, setStreak] = useState(3);
+  const { user } = useAuth();
+  const userId = user?.id ? String(user.id) : 'local-user';
+  const [points, setPoints] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [favorites, setFavorites] = useState<number[]>([]);
   const [floatingIcons, setFloatingIcons] = useState<Array<{id: number; type: string; x: number; y: number}>>([]);
   const [bounceAnimation, setBounceAnimation] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Generate floating icons
+  // Load progress and generate floating icons
   useEffect(() => {
+    // Load kids progress
+    (async () => {
+      try {
+        const token = localStorage.getItem('speakbee_auth_token');
+        if (token && token !== 'local-token') {
+          try {
+            const server = await KidsApi.getProgress(token);
+            setPoints(server.points ?? 0);
+            setStreak(server.streak ?? 0);
+            const fav = (server as any)?.details?.favorites ?? [];
+            setFavorites(Array.isArray(fav) ? fav : []);
+          } catch {
+            const prog = await KidsProgressService.get(userId);
+            setPoints(prog.points);
+            setStreak(prog.streak);
+            const fav = (prog as any).details?.favorites ?? [];
+            setFavorites(Array.isArray(fav) ? fav : []);
+          }
+        } else {
+          const prog = await KidsProgressService.get(userId);
+          setPoints(prog.points);
+          setStreak(prog.streak);
+          const fav = (prog as any).details?.favorites ?? [];
+          setFavorites(Array.isArray(fav) ? fav : []);
+        }
+      } catch {}
+    })();
+
     const icons = ['star', 'heart', 'sparkles', 'zap'];
     const newFloatingIcons = Array.from({ length: 8 }, (_, i) => ({
       id: i,
@@ -31,6 +69,8 @@ const KidsPage = () => {
     }));
     setFloatingIcons(newFloatingIcons);
   }, []);
+
+  // Pointer/touch following disabled per request
 
   const categories = [
     { id: 'stories', label: 'Story Time', icon: BookOpen, emoji: '📚' },
@@ -79,20 +119,75 @@ const KidsPage = () => {
   ];
 
   const achievements = [
-    { name: 'First Words', icon: Star, progress: 100, emoji: '🌟' },
-    { name: 'Story Master', icon: BookOpen, progress: 75, emoji: '📖' },
+    { name: 'First Words', icon: Star, progress: Math.min(100, Math.round((points / 1000) * 100)), emoji: '🌟' },
+    { name: 'Story Master', icon: BookOpen, progress: Math.min(100, favorites.length * 20), emoji: '📖' },
     { name: 'Pronunciation Pro', icon: Mic, progress: 50, emoji: '🎤' },
     { name: 'Vocabulary Builder', icon: Zap, progress: 25, emoji: '⚡' },
   ];
+  const completedAchievements = achievements.filter(a => a.progress === 100).length;
 
-  const handleStartLesson = (storyIndex: number) => {
+  // Offline kids lesson content for new modules
+  const readAloudLesson = {
+    id: 'magic-forest-1',
+    title: 'Magic Forest – Read Aloud',
+    text: 'Luna the rabbit hops through the forest to meet friendly animals.',
+    targetWords: ['rabbit', 'forest', 'animals']
+  };
+
+  const vocabWords = [
+    { word: 'rabbit', hint: '/ˈræb.ɪt/' },
+    { word: 'forest', hint: '/ˈfɒr.ɪst/' },
+    { word: 'planet', hint: '/ˈplæn.ɪt/' }
+  ];
+
+  const pronounceItems = [
+    { phrase: 'Hello Luna', phonemes: '/həˈləʊ ˈluː.nə/' },
+    { phrase: 'Magic forest', phonemes: '/ˈmædʒ.ɪk ˈfɒr.ɪst/' },
+    { phrase: 'Happy rabbit', phonemes: '/ˈhæp.i ˈræb.ɪt/' }
+  ];
+
+  const handleStartLesson = async (storyIndex: number) => {
     setCurrentStory(storyIndex);
     setIsPlaying(true);
     setBounceAnimation(true);
     
     // Add celebration effects
-    setPoints(prev => prev + 50);
-    setStreak(prev => prev + 1);
+    const newPoints = points + 50;
+    const newStreak = streak + 1;
+    setPoints(newPoints);
+    setStreak(newStreak);
+    // Persist to server first, fallback to local
+    try {
+      const token = localStorage.getItem('speakbee_auth_token');
+      const updateDetails = (details: any) => {
+        details.readAloud = details.readAloud || {};
+        const key = `story-${storyIndex}`;
+        const prev = details.readAloud[key] || { bestScore: 0, attempts: 0 };
+        details.readAloud[key] = { bestScore: Math.max(prev.bestScore, 80), attempts: prev.attempts + 1 };
+        return details;
+      };
+      if (token && token !== 'local-token') {
+        const current = await KidsApi.getProgress(token);
+        const details = updateDetails((current as any).details || {});
+        await KidsApi.updateProgress(token, { points: newPoints, streak: newStreak, details });
+      } else {
+        await KidsProgressService.update(userId, (p) => {
+          const details = updateDetails((p as any).details || {});
+          return { ...p, points: newPoints, streak: newStreak, details } as any;
+        });
+      }
+    } catch {
+      try {
+        await KidsProgressService.update(userId, (p) => {
+          const details = { ...(p as any).details };
+          details.readAloud = details.readAloud || {};
+          const key = `story-${storyIndex}`;
+          const prev = details.readAloud[key] || { bestScore: 0, attempts: 0 };
+          details.readAloud[key] = { bestScore: Math.max(prev.bestScore, 80), attempts: prev.attempts + 1 };
+          return { ...p, points: newPoints, streak: newStreak, details } as any;
+        });
+      } catch {}
+    }
     
     // Reset bounce animation
     setTimeout(() => setBounceAnimation(false), 1000);
@@ -110,6 +205,37 @@ const KidsPage = () => {
     setTimeout(() => {
       setFloatingIcons(prev => prev.filter(icon => !newParticles.find(p => p.id === icon.id)));
     }, 2000);
+
+    // Speak story intro (offline TTS baseline)
+    try {
+      const story = stories[storyIndex];
+      if (SpeechService.isTTSSupported()) {
+        await SpeechService.speak(`${story.title}. ${story.description}`, { rate: 0.95 });
+      }
+    } catch {}
+  };
+
+  const toggleFavorite = async (index: number) => {
+    const next = favorites.includes(index)
+      ? favorites.filter(i => i !== index)
+      : [...favorites, index];
+    setFavorites(next);
+    try {
+      const token = localStorage.getItem('speakbee_auth_token');
+      if (token && token !== 'local-token') {
+        try {
+          const current = await KidsApi.getProgress(token);
+          const details = { ...((current as any).details || {}), favorites: next };
+          await KidsApi.updateProgress(token, { details });
+          return;
+        } catch {}
+      }
+      await KidsProgressService.update(userId, (p) => {
+        const details = { ...(p as any).details };
+        details.favorites = next;
+        return { ...p, details } as any;
+      });
+    } catch {}
   };
 
   const getIconComponent = (type: string) => {
@@ -214,7 +340,7 @@ const KidsPage = () => {
             <CardContent className="p-6 text-center">
               <div className="flex items-center justify-center gap-3 mb-2">
                 <Award className="w-8 h-8 text-blue-500 dark:text-blue-400" />
-                <span className="text-3xl font-bold text-gray-800 dark:text-white">12/20</span>
+                <span className="text-3xl font-bold text-gray-800 dark:text-white">{completedAchievements}/{achievements.length}</span>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-300">Super Achievements 🏆</p>
             </CardContent>
@@ -246,80 +372,93 @@ const KidsPage = () => {
           })}
         </div>
 
-        {/* Stories Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {stories.map((story, index) => {
-            const CharacterIcon = story.character;
-            return (
-              <Card 
-                key={index} 
-                className={cn(
-                  "group cursor-pointer bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-2 border-transparent hover:border-[#FF6B6B] transition-all duration-500 hover:shadow-2xl overflow-hidden",
-                  bounceAnimation && currentStory === index && "animate-bounce"
-                )}
-                onMouseEnter={() => setCurrentStory(index)}
-              >
-                <CardContent className="p-0 overflow-hidden rounded-3xl">
-                  {/* Animated Header */}
-                  <div className={cn(
-                    "p-8 relative overflow-hidden bg-gradient-to-br",
-                    story.bgGradient
-                  )}>
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 dark:bg-black/20 rounded-full -mr-16 -mt-16"></div>
-                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/20 dark:bg-black/20 rounded-full -ml-12 -mb-12"></div>
-                    
-                    <div className="relative z-10 text-center">
-                      <div className={cn("text-6xl mb-4 transform transition-transform duration-300 group-hover:scale-110", story.animation)}>
-                        {story.image}
+        {/* Stories Grid or Module Content */}
+        {activeCategory === 'stories' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {stories.map((story, index) => {
+              const CharacterIcon = story.character;
+              return (
+                <Card 
+                  key={index} 
+                  className={cn(
+                    "group cursor-pointer bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-2 border-transparent hover:border-[#FF6B6B] transition-all duration-500 hover:shadow-2xl overflow-hidden",
+                    bounceAnimation && currentStory === index && "animate-bounce"
+                  )}
+                  onMouseEnter={() => setCurrentStory(index)}
+                >
+                  <CardContent className="p-0 overflow-hidden rounded-3xl">
+                    <div className={cn(
+                      "p-8 relative overflow-hidden bg-gradient-to-br",
+                      story.bgGradient
+                    )}>
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 dark:bg-black/20 rounded-full -mr-16 -mt-16"></div>
+                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/20 dark:bg-black/20 rounded-full -ml-12 -mb-12"></div>
+                      <div className="relative z-10 text-center">
+                        <div className={cn("text-6xl mb-4 transform transition-transform duration-300 group-hover:scale-110", story.animation)}>
+                          {story.image}
+                        </div>
+                        <CharacterIcon className="w-12 h-12 mx-auto mb-3 text-gray-600 dark:text-gray-300 opacity-80" />
+                        <h3 className="text-2xl font-bold mb-2 text-gray-800 dark:text-white">
+                          {story.title}
+                        </h3>
+                        <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                          {story.description}
+                        </p>
                       </div>
-                      <CharacterIcon className="w-12 h-12 mx-auto mb-3 text-gray-600 dark:text-gray-300 opacity-80" />
-                      <h3 className="text-2xl font-bold mb-2 text-gray-800 dark:text-white">
-                        {story.title}
-                      </h3>
-                      <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300">
-                        {story.description}
-                      </p>
                     </div>
-                  </div>
-                  
-                  {/* Content */}
-                  <div className="p-6">
-                    <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-6">
-                      <span className="flex items-center gap-1 font-semibold">
-                        📚 {story.words} words
-                      </span>
-                      <span className="flex items-center gap-1 font-semibold">
-                        ⏱️ {story.duration}
-                      </span>
-                      <span className={cn(
-                        "font-semibold",
-                        story.difficulty === 'Easy' && "text-green-500 dark:text-green-400",
-                        story.difficulty === 'Medium' && "text-yellow-500 dark:text-yellow-400",
-                        story.difficulty === 'Hard' && "text-red-500 dark:text-red-400"
-                      )}>
-                        🎯 {story.difficulty}
-                      </span>
+                    <div className="p-6">
+                      <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-6">
+                        <span className="flex items-center gap-1 font-semibold">📚 {story.words} words</span>
+                        <span className="flex items-center gap-1 font-semibold">⏱️ {story.duration}</span>
+                        <span className={cn(
+                          "font-semibold",
+                          story.difficulty === 'Easy' && "text-green-500 dark:text-green-400",
+                          story.difficulty === 'Medium' && "text-yellow-500 dark:text-yellow-400",
+                          story.difficulty === 'Hard' && "text-red-500 dark:text-red-400"
+                        )}>
+                          🎯 {story.difficulty}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <Button size="sm" variant="outline" onClick={() => toggleFavorite(index)} className={cn("rounded-xl", favorites.includes(index) && "border-pink-500 text-pink-600")}>❤</Button>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">{favorites.includes(index) ? 'In favorites' : 'Add to favorites'}</span>
+                      </div>
+                      <Button 
+                        className={cn(
+                          "w-full bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white font-bold py-4 rounded-2xl transition-all duration-300 group-hover:shadow-xl relative overflow-hidden",
+                          bounceAnimation && currentStory === index && "animate-pulse"
+                        )}
+                        onClick={() => handleStartLesson(index)}
+                      >
+                        <span className="relative z-10 flex items-center justify-center">
+                          <Play className="w-5 h-5 mr-2" />
+                          Start Adventure!
+                        </span>
+                        <div className="absolute inset-0 bg-white/20 transform scale-0 group-hover:scale-100 transition-transform duration-300"></div>
+                      </Button>
                     </div>
-                    
-                    <Button 
-                      className={cn(
-                        "w-full bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white font-bold py-4 rounded-2xl transition-all duration-300 group-hover:shadow-xl relative overflow-hidden",
-                        bounceAnimation && currentStory === index && "animate-pulse"
-                      )}
-                      onClick={() => handleStartLesson(index)}
-                    >
-                      <span className="relative z-10 flex items-center justify-center">
-                        <Play className="w-5 h-5 mr-2" />
-                        Start Adventure!
-                      </span>
-                      <div className="absolute inset-0 bg-white/20 transform scale-0 group-hover:scale-100 transition-transform duration-300"></div>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+
+        {activeCategory === 'vocabulary' && (
+          <div className="mb-12">
+            <Vocabulary words={vocabWords} />
+          </div>
+        )}
+        {activeCategory === 'pronunciation' && (
+          <div className="mb-12">
+            <Pronunciation items={pronounceItems} />
+          </div>
+        )}
+        {activeCategory === 'games' && (
+          <div className="mb-12">
+            <ReadAloud lesson={readAloudLesson} />
+          </div>
+        )}
 
         {/* Achievements Section */}
         <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-2 border-purple-200 dark:border-purple-600 rounded-3xl p-8 shadow-xl mb-8">
@@ -369,6 +508,7 @@ const KidsPage = () => {
             <Button 
               variant="outline" 
               className="rounded-2xl px-8 py-4 border-2 border-green-300 dark:border-green-600 hover:border-green-400 dark:hover:border-green-500 bg-white/90 dark:bg-gray-800/90 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all duration-300 hover:scale-105 group"
+              onClick={() => setActiveCategory('pronunciation')}
             >
               <Volume2 className="w-5 h-5 mr-2 text-green-500 dark:text-green-400 group-hover:animate-bounce" />
               <span className="font-semibold text-gray-700 dark:text-gray-200">Listen & Repeat</span>
@@ -376,6 +516,7 @@ const KidsPage = () => {
             <Button 
               variant="outline" 
               className="rounded-2xl px-8 py-4 border-2 border-blue-300 dark:border-blue-600 hover:border-blue-400 dark:hover:border-blue-500 bg-white/90 dark:bg-gray-800/90 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300 hover:scale-105 group"
+              onClick={() => setActiveCategory('pronunciation')}
             >
               <Mic className="w-5 h-5 mr-2 text-blue-500 dark:text-blue-400 group-hover:animate-pulse" />
               <span className="font-semibold text-gray-700 dark:text-gray-200">Speak Now</span>
@@ -383,6 +524,7 @@ const KidsPage = () => {
             <Button 
               variant="outline" 
               className="rounded-2xl px-8 py-4 border-2 border-pink-300 dark:border-pink-600 hover:border-pink-400 dark:hover:border-pink-500 bg-white/90 dark:bg-gray-800/90 hover:bg-pink-50 dark:hover:bg-pink-900/20 transition-all duration-300 hover:scale-105 group"
+              onClick={() => setActiveCategory('stories')}
             >
               <Heart className="w-5 h-5 mr-2 text-pink-500 dark:text-pink-400 group-hover:animate-pulse" />
               <span className="font-semibold text-gray-700 dark:text-gray-200">Favorite Stories</span>
@@ -426,7 +568,6 @@ const KidsPage = () => {
           0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
           100% { background-position: 0% 50%; }
-        }
         }
         .animate-float-random {
           animation: float-random 6s ease-in-out infinite;

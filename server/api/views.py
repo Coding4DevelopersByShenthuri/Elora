@@ -5,7 +5,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
-from .serializers import RegisterSerializer, LoginSerializer
+from .serializers import RegisterSerializer, LoginSerializer, KidsLessonSerializer, KidsProgressSerializer, KidsAchievementSerializer
+from .models import KidsLesson, KidsProgress, KidsAchievement
+from rest_framework.permissions import IsAuthenticated
 import logging
 
 logger = logging.getLogger(__name__)
@@ -128,3 +130,39 @@ def social_login_redirect(request, provider):
         "message": f"Social login with {provider} is not yet implemented",
         "provider": provider
     }, status=status.HTTP_501_NOT_IMPLEMENTED)
+
+
+# Kids endpoints
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def kids_lessons(request):
+    qs = KidsLesson.objects.filter(is_active=True).order_by('id')
+    serializer = KidsLessonSerializer(qs, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def kids_progress_get(request):
+    obj, _ = KidsProgress.objects.get_or_create(user=request.user)
+    serializer = KidsProgressSerializer(obj)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def kids_progress_update(request):
+    obj, _ = KidsProgress.objects.get_or_create(user=request.user)
+    serializer = KidsProgressSerializer(instance=obj, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def kids_achievements(request):
+    qs = KidsAchievement.objects.filter(user=request.user).order_by('name')
+    serializer = KidsAchievementSerializer(qs, many=True)
+    return Response(serializer.data)

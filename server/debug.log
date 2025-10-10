@@ -142,3 +142,18 @@ INFO 2025-10-10 09:44:51,175 autoreload 17948 2168 Watching for file changes wit
 WARNING 2025-10-10 10:25:09,064 log 17948 8744 Unauthorized: /api/auth/login
 WARNING 2025-10-10 10:25:09,075 basehttp 17948 8744 "POST /api/auth/login HTTP/1.1" 401 39
 INFO 2025-10-10 12:17:35,557 autoreload 10980 10832 Watching for file changes with StatReloader
+INFO 2025-10-10 16:43:32,883 autoreload 10980 10832 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\models.py changed, reloading.
+INFO 2025-10-10 16:43:45,219 autoreload 12012 7192 Watching for file changes with StatReloader
+INFO 2025-10-10 16:43:55,795 autoreload 12012 7192 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\views.py changed, reloading.
+INFO 2025-10-10 16:43:57,428 autoreload 4488 2652 Watching for file changes with StatReloader
+INFO 2025-10-10 16:44:01,540 autoreload 4488 2652 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\urls.py changed, reloading.
+INFO 2025-10-10 16:44:02,986 autoreload 20408 11232 Watching for file changes with StatReloader
+INFO 2025-10-10 16:44:35,064 autoreload 20408 11232 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\serializers.py changed, reloading.
+INFO 2025-10-10 16:44:35,927 autoreload 16364 4892 Watching for file changes with StatReloader
+INFO 2025-10-10 16:44:41,146 autoreload 16364 4892 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\models.py changed, reloading.
+INFO 2025-10-10 16:44:42,491 autoreload 388 1456 Watching for file changes with StatReloader
+INFO 2025-10-10 16:44:44,492 autoreload 388 1456 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\serializers.py changed, reloading.
+INFO 2025-10-10 16:44:46,040 autoreload 4424 14180 Watching for file changes with StatReloader
+INFO 2025-10-10 16:44:49,361 autoreload 4424 14180 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\urls.py changed, reloading.
+INFO 2025-10-10 16:44:50,864 autoreload 20408 3780 Watching for file changes with StatReloader
+INFO 2025-10-10 20:55:04,915 autoreload 11828 7896 Watching for file changes with StatReloader
