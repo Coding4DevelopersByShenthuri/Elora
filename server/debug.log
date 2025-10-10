@@ -157,3 +157,4 @@ INFO 2025-10-10 16:44:46,040 autoreload 4424 14180 Watching for file changes wit
 INFO 2025-10-10 16:44:49,361 autoreload 4424 14180 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\urls.py changed, reloading.
 INFO 2025-10-10 16:44:50,864 autoreload 20408 3780 Watching for file changes with StatReloader
 INFO 2025-10-10 20:55:04,915 autoreload 11828 7896 Watching for file changes with StatReloader
+INFO 2025-10-10 21:36:10,909 autoreload 4308 13104 Watching for file changes with StatReloader

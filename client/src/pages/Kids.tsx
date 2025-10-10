@@ -16,11 +16,14 @@ import SpeechService from '@/services/SpeechService';
 import ReadAloud from '@/components/kids/ReadAloud';
 import Vocabulary from '@/components/kids/Vocabulary';
 import Pronunciation from '@/components/kids/Pronunciation';
+import MagicForestAdventure from '@/components/kids/stories/MagicForestAdventure';
+import SpaceAdventure from '@/components/kids/stories/SpaceAdventure';
+import UnderwaterWorld from '@/components/kids/stories/UnderwaterWorld';
 
 const KidsPage = () => {
   const [activeCategory, setActiveCategory] = useState('stories');
   const [currentStory, setCurrentStory] = useState(0);
-  const [, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const { user } = useAuth();
   const userId = user?.id ? String(user.id) : 'local-user';
   const [points, setPoints] = useState(0);
@@ -28,37 +31,43 @@ const KidsPage = () => {
   const [favorites, setFavorites] = useState<number[]>([]);
   const [floatingIcons, setFloatingIcons] = useState<Array<{id: number; type: string; x: number; y: number}>>([]);
   const [bounceAnimation, setBounceAnimation] = useState(false);
+  const [showMagicForest, setShowMagicForest] = useState(false);
+  const [showSpaceAdventure, setShowSpaceAdventure] = useState(false);
+  const [showUnderwaterWorld, setShowUnderwaterWorld] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Load progress and generate floating icons
   useEffect(() => {
-    // Load kids progress
-    (async () => {
+    const loadProgress = async () => {
       try {
         const token = localStorage.getItem('speakbee_auth_token');
         if (token && token !== 'local-token') {
           try {
-            const server = await KidsApi.getProgress(token);
-            setPoints(server.points ?? 0);
-            setStreak(server.streak ?? 0);
-            const fav = (server as any)?.details?.favorites ?? [];
+            const serverProgress = await KidsApi.getProgress(token);
+            setPoints(serverProgress.points ?? 0);
+            setStreak(serverProgress.streak ?? 0);
+            const fav = (serverProgress as any)?.details?.favorites ?? [];
             setFavorites(Array.isArray(fav) ? fav : []);
           } catch {
-            const prog = await KidsProgressService.get(userId);
-            setPoints(prog.points);
-            setStreak(prog.streak);
-            const fav = (prog as any).details?.favorites ?? [];
+            const localProgress = await KidsProgressService.get(userId);
+            setPoints(localProgress.points);
+            setStreak(localProgress.streak);
+            const fav = (localProgress as any).details?.favorites ?? [];
             setFavorites(Array.isArray(fav) ? fav : []);
           }
         } else {
-          const prog = await KidsProgressService.get(userId);
-          setPoints(prog.points);
-          setStreak(prog.streak);
-          const fav = (prog as any).details?.favorites ?? [];
+          const localProgress = await KidsProgressService.get(userId);
+          setPoints(localProgress.points);
+          setStreak(localProgress.streak);
+          const fav = (localProgress as any).details?.favorites ?? [];
           setFavorites(Array.isArray(fav) ? fav : []);
         }
-      } catch {}
-    })();
+      } catch (error) {
+        console.error('Error loading progress:', error);
+      }
+    };
+
+    loadProgress();
 
     const icons = ['star', 'heart', 'sparkles', 'zap'];
     const newFloatingIcons = Array.from({ length: 8 }, (_, i) => ({
@@ -68,9 +77,7 @@ const KidsPage = () => {
       y: Math.random() * 80 + 10,
     }));
     setFloatingIcons(newFloatingIcons);
-  }, []);
-
-  // Pointer/touch following disabled per request
+  }, [userId]);
 
   const categories = [
     { id: 'stories', label: 'Story Time', icon: BookOpen, emoji: '📚' },
@@ -85,7 +92,7 @@ const KidsPage = () => {
       description: "Join Luna the rabbit on her adventure through the enchanted forest",
       difficulty: 'Easy',
       duration: '5 min',
-      words: 45,
+      words: 265,
       image: '🌳',
       character: Rabbit,
       gradient: 'from-green-400 to-emerald-400',
@@ -97,7 +104,7 @@ const KidsPage = () => {
       description: "Blast off with Cosmo the astronaut to explore distant planets",
       difficulty: 'Medium',
       duration: '8 min',
-      words: 68,
+      words: 290,
       image: '🚀',
       character: Rocket,
       gradient: 'from-purple-400 to-indigo-400',
@@ -109,7 +116,7 @@ const KidsPage = () => {
       description: "Dive deep with Finn the fish and meet ocean friends",
       difficulty: 'Easy',
       duration: '6 min',
-      words: 52,
+      words: 280,
       image: '🐠',
       character: Fish,
       gradient: 'from-blue-400 to-cyan-400',
@@ -151,11 +158,21 @@ const KidsPage = () => {
     setIsPlaying(true);
     setBounceAnimation(true);
     
+    // Open appropriate adventure module
+    if (storyIndex === 0) {
+      setShowMagicForest(true);
+    } else if (storyIndex === 1) {
+      setShowSpaceAdventure(true);
+    } else if (storyIndex === 2) {
+      setShowUnderwaterWorld(true);
+    }
+    
     // Add celebration effects
     const newPoints = points + 50;
     const newStreak = streak + 1;
     setPoints(newPoints);
     setStreak(newStreak);
+    
     // Persist to server first, fallback to local
     try {
       const token = localStorage.getItem('speakbee_auth_token');
@@ -163,30 +180,34 @@ const KidsPage = () => {
         details.readAloud = details.readAloud || {};
         const key = `story-${storyIndex}`;
         const prev = details.readAloud[key] || { bestScore: 0, attempts: 0 };
-        details.readAloud[key] = { bestScore: Math.max(prev.bestScore, 80), attempts: prev.attempts + 1 };
+        details.readAloud[key] = { 
+          bestScore: Math.max(prev.bestScore, 80), 
+          attempts: prev.attempts + 1 
+        };
         return details;
       };
+      
       if (token && token !== 'local-token') {
         const current = await KidsApi.getProgress(token);
         const details = updateDetails((current as any).details || {});
-        await KidsApi.updateProgress(token, { points: newPoints, streak: newStreak, details });
+        await KidsApi.updateProgress(token, { 
+          points: newPoints, 
+          streak: newStreak, 
+          details 
+        });
       } else {
         await KidsProgressService.update(userId, (p) => {
           const details = updateDetails((p as any).details || {});
-          return { ...p, points: newPoints, streak: newStreak, details } as any;
+          return { 
+            ...p, 
+            points: newPoints, 
+            streak: newStreak, 
+            details 
+          } as any;
         });
       }
-    } catch {
-      try {
-        await KidsProgressService.update(userId, (p) => {
-          const details = { ...(p as any).details };
-          details.readAloud = details.readAloud || {};
-          const key = `story-${storyIndex}`;
-          const prev = details.readAloud[key] || { bestScore: 0, attempts: 0 };
-          details.readAloud[key] = { bestScore: Math.max(prev.bestScore, 80), attempts: prev.attempts + 1 };
-          return { ...p, points: newPoints, streak: newStreak, details } as any;
-        });
-      } catch {}
+    } catch (error) {
+      console.error('Error updating progress:', error);
     }
     
     // Reset bounce animation
@@ -212,7 +233,11 @@ const KidsPage = () => {
       if (SpeechService.isTTSSupported()) {
         await SpeechService.speak(`${story.title}. ${story.description}`, { rate: 0.95 });
       }
-    } catch {}
+    } catch (error) {
+      console.error('Error speaking story intro:', error);
+    }
+    
+    setIsPlaying(false);
   };
 
   const toggleFavorite = async (index: number) => {
@@ -220,6 +245,7 @@ const KidsPage = () => {
       ? favorites.filter(i => i !== index)
       : [...favorites, index];
     setFavorites(next);
+    
     try {
       const token = localStorage.getItem('speakbee_auth_token');
       if (token && token !== 'local-token') {
@@ -228,14 +254,19 @@ const KidsPage = () => {
           const details = { ...((current as any).details || {}), favorites: next };
           await KidsApi.updateProgress(token, { details });
           return;
-        } catch {}
+        } catch (error) {
+          console.error('Error updating favorites on server:', error);
+        }
       }
+      
       await KidsProgressService.update(userId, (p) => {
         const details = { ...(p as any).details };
         details.favorites = next;
         return { ...p, details } as any;
       });
-    } catch {}
+    } catch (error) {
+      console.error('Error updating favorites:', error);
+    }
   };
 
   const getIconComponent = (type: string) => {
@@ -255,6 +286,52 @@ const KidsPage = () => {
       case 'sparkles': return 'text-purple-400 dark:text-purple-300';
       case 'zap': return 'text-blue-400 dark:text-blue-300';
       default: return 'text-yellow-400 dark:text-yellow-300';
+    }
+  };
+
+  const handleAdventureComplete = async (storyIndex: number, score: number) => {
+    const newPoints = points + 100;
+    const newStreak = streak + 1;
+    setPoints(newPoints);
+    setStreak(newStreak);
+    
+    try {
+      const token = localStorage.getItem('speakbee_auth_token');
+      const key = `story-${storyIndex}`;
+      
+      if (token && token !== 'local-token') {
+        const current = await KidsApi.getProgress(token);
+        const details = { ...((current as any).details || {}) };
+        details.readAloud = details.readAloud || {};
+        const prev = details.readAloud[key] || { bestScore: 0, attempts: 0 };
+        details.readAloud[key] = { 
+          bestScore: Math.max(prev.bestScore, score), 
+          attempts: prev.attempts + 1 
+        };
+        await KidsApi.updateProgress(token, { 
+          points: newPoints, 
+          streak: newStreak, 
+          details 
+        });
+      } else {
+        await KidsProgressService.update(userId, (p) => {
+          const details = { ...(p as any).details };
+          details.readAloud = details.readAloud || {};
+          const prev = details.readAloud[key] || { bestScore: 0, attempts: 0 };
+          details.readAloud[key] = { 
+            bestScore: Math.max(prev.bestScore, score), 
+            attempts: prev.attempts + 1 
+          };
+          return { 
+            ...p, 
+            points: newPoints, 
+            streak: newStreak, 
+            details 
+          } as any;
+        });
+      }
+    } catch (error) {
+      console.error('Error updating adventure progress:', error);
     }
   };
 
@@ -350,6 +427,7 @@ const KidsPage = () => {
         {/* Categories Navigation */}
         <div className="flex flex-wrap justify-center gap-4 mb-12">
           {categories.map((category) => {
+            const CategoryIcon = category.icon;
             return (
               <Button
                 key={category.id}
@@ -420,8 +498,23 @@ const KidsPage = () => {
                         </span>
                       </div>
                       <div className="flex items-center gap-2 mb-3">
-                        <Button size="sm" variant="outline" onClick={() => toggleFavorite(index)} className={cn("rounded-xl", favorites.includes(index) && "border-pink-500 text-pink-600")}>❤</Button>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">{favorites.includes(index) ? 'In favorites' : 'Add to favorites'}</span>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleFavorite(index);
+                          }} 
+                          className={cn(
+                            "rounded-xl", 
+                            favorites.includes(index) && "border-pink-500 text-pink-600"
+                          )}
+                        >
+                          ❤
+                        </Button>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {favorites.includes(index) ? 'In favorites' : 'Add to favorites'}
+                        </span>
                       </div>
                       <Button 
                         className={cn(
@@ -429,10 +522,11 @@ const KidsPage = () => {
                           bounceAnimation && currentStory === index && "animate-pulse"
                         )}
                         onClick={() => handleStartLesson(index)}
+                        disabled={isPlaying}
                       >
                         <span className="relative z-10 flex items-center justify-center">
                           <Play className="w-5 h-5 mr-2" />
-                          Start Adventure!
+                          {isPlaying && currentStory === index ? 'Starting...' : 'Start Adventure!'}
                         </span>
                         <div className="absolute inset-0 bg-white/20 transform scale-0 group-hover:scale-100 transition-transform duration-300"></div>
                       </Button>
@@ -449,11 +543,13 @@ const KidsPage = () => {
             <Vocabulary words={vocabWords} />
           </div>
         )}
+        
         {activeCategory === 'pronunciation' && (
           <div className="mb-12">
             <Pronunciation items={pronounceItems} />
           </div>
         )}
+        
         {activeCategory === 'games' && (
           <div className="mb-12">
             <ReadAloud lesson={readAloudLesson} />
@@ -557,7 +653,38 @@ const KidsPage = () => {
         </div>
       </div>
 
-      {/* Add custom animations to global CSS */}
+      {/* Adventure Modals */}
+      {showMagicForest && (
+        <MagicForestAdventure 
+          onClose={() => setShowMagicForest(false)} 
+          onComplete={(score) => {
+            setShowMagicForest(false);
+            handleAdventureComplete(0, score);
+          }}
+        />
+      )}
+
+      {showSpaceAdventure && (
+        <SpaceAdventure 
+          onClose={() => setShowSpaceAdventure(false)} 
+          onComplete={(score) => {
+            setShowSpaceAdventure(false);
+            handleAdventureComplete(1, score);
+          }}
+        />
+      )}
+
+      {showUnderwaterWorld && (
+        <UnderwaterWorld 
+          onClose={() => setShowUnderwaterWorld(false)} 
+          onComplete={(score) => {
+            setShowUnderwaterWorld(false);
+            handleAdventureComplete(2, score);
+          }}
+        />
+      )}
+
+      {/* Custom Animations */}
       <style>{`
         @keyframes float-random {
           0%, 100% { transform: translateY(0px) rotate(0deg); }
