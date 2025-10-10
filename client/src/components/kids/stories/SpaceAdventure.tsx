@@ -294,7 +294,6 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
 
   const getCharacterAnimation = () => {
     if (current.id.includes('star')) return 'animate-bounce';
-    if (current.id.includes('celebration')) return 'animate-spin';
     return 'animate-float';
   };
 
@@ -366,7 +365,11 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
                   "text-6xl sm:text-7xl md:text-8xl mb-3 sm:mb-4", 
                   getCharacterAnimation()
                 )}>
-                  {current.emoji}
+                  <span className={cn(
+                    current.id === 'celebration' && 'animate-celebration-party'
+                  )}>
+                    {current.emoji}
+                  </span>
                 </div>
                 
                 {/* Star Collection Display */}
@@ -627,6 +630,42 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
           50% { opacity: 0.8; }
         }
         
+        @keyframes celebration-party {
+          0% { 
+            transform: scale(1) rotate(0deg); 
+            filter: drop-shadow(0 0 5px gold);
+          }
+          25% { 
+            transform: scale(1.2) rotate(90deg); 
+            filter: drop-shadow(0 0 10px #ff6b6b);
+          }
+          50% { 
+            transform: scale(1.1) rotate(180deg); 
+            filter: drop-shadow(0 0 15px #4ecdc4);
+          }
+          75% { 
+            transform: scale(1.3) rotate(270deg); 
+            filter: drop-shadow(0 0 12px #45b7d1);
+          }
+          100% { 
+            transform: scale(1) rotate(360deg); 
+            filter: drop-shadow(0 0 5px gold);
+          }
+        }
+        
+        @keyframes celebration-sparkle {
+          0%, 100% { 
+            transform: scale(1);
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+          }
+          50% { 
+            transform: scale(1.15);
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8),
+                        0 0 30px rgba(255, 105, 180, 0.6),
+                        0 0 40px rgba(135, 206, 250, 0.4);
+          }
+        }
+        
         .animate-float-slow {
           animation: float-slow 4s ease-in-out infinite;
         }
@@ -651,6 +690,16 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
           animation: gentle-pulse 2s ease-in-out infinite;
         }
         
+        .animate-celebration-party {
+          animation: celebration-party 2s ease-in-out infinite;
+          display: inline-block;
+          transform-origin: center;
+        }
+        
+        .animate-celebration-sparkle {
+          animation: celebration-sparkle 1.5s ease-in-out infinite;
+        }
+        
         /* Mobile optimizations */
         @media (max-width: 640px) {
           .smooth-scroll {
@@ -660,6 +709,17 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
           
           .smooth-scroll::-webkit-scrollbar {
             display: none;
+          }
+          
+          .animate-celebration-party {
+            animation-duration: 2.5s;
+          }
+        }
+        
+        /* Reduced motion for accessibility */
+        @media (prefers-reduced-motion: reduce) {
+          .animate-celebration-party {
+            animation: celebration-sparkle 2s ease-in-out infinite;
           }
         }
       `}</style>

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Sparkles, Rabbit, Star, Volume2, Play, Heart, Zap, Flower, Trees, CloudRain, X } from 'lucide-react';
+import { Sparkles, Star, Volume2, Play, Heart, Zap, Flower, Cloud, X } from 'lucide-react';
 import SpeechService from '@/services/SpeechService';
 import { cn } from '@/lib/utils';
 
@@ -14,155 +14,155 @@ type Props = {
 const storySteps = [
   {
     id: 'intro',
-    title: '🌳 Magic Forest Adventure',
-    text: 'Hello little explorer! I am Luna the magical rabbit! Welcome to our enchanted forest where amazing adventures await us!',
-    emoji: '🐰',
-    character: 'Luna',
-    bgColor: 'from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900',
+    title: '🌈 Unicorn Magic!',
+    text: 'Welcome to Sparkle Kingdom! I\'m Stardust the unicorn! Everything here glows with rainbow colors. Can you see the magic sparkles?',
+    emoji: '🦄',
+    character: 'Stardust',
+    bgColor: 'from-pink-100 to-purple-100 dark:from-pink-900 dark:to-purple-900',
     interactive: false,
-    wordCount: 18,
+    wordCount: 20,
     duration: 25
   },
   {
-    id: 'whispering_trees',
-    title: '🌲 Whispering Trees',
-    text: 'Look at these magnificent trees! They whisper secrets when the wind blows. Can you count how many trees are dancing?',
-    emoji: '🌲',
-    character: 'Luna',
-    bgColor: 'from-green-200 to-teal-200 dark:from-green-800 dark:to-teal-800',
+    id: 'rainbow_bridge',
+    title: '🌉 Rainbow Bridge',
+    text: 'Let\'s cross this shimmering rainbow bridge! Each color has a special magic power. Which color should we step on first?',
+    emoji: '🌈',
+    character: 'Stardust',
+    bgColor: 'from-purple-100 to-indigo-100 dark:from-purple-900 dark:to-indigo-900',
     interactive: true,
-    audioText: 'tree',
-    choices: ['tree', 'flower', 'rock'],
-    wordCount: 19,
-    duration: 30,
-    question: 'What whispers in the wind?',
-    hint: 'It has leaves and branches'
+    audioText: 'rainbow',
+    choices: ['rainbow', 'cloud', 'river'],
+    wordCount: 22,
+    duration: 28,
+    question: 'What has seven colorful arches?',
+    hint: 'It appears after rain with pretty colors'
   },
   {
-    id: 'colorful_butterfly',
-    title: '🦋 Rainbow Butterfly',
-    text: 'Oh wonderful! A rainbow butterfly is flying toward us! Its wings have all the colors of the rainbow. What colors can you spot?',
-    emoji: '🦋',
-    character: 'Luna',
-    bgColor: 'from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900',
-    interactive: true,
-    audioText: 'butterfly',
-    choices: ['bird', 'bee', 'butterfly'],
-    wordCount: 24,
-    duration: 35,
-    question: 'What has colorful wings?',
-    hint: 'It flies and loves flowers'
-  },
-  {
-    id: 'sparkling_river',
-    title: '💧 Sparkling River',
-    text: 'Listen to the happy river! The water sparkles like diamonds under the sun. Can you hear the gentle water sounds?',
-    emoji: '💧',
-    character: 'Luna',
-    bgColor: 'from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900',
-    interactive: true,
-    audioText: 'water',
-    choices: ['river', 'water', 'stream'],
-    wordCount: 20,
-    duration: 30,
-    question: 'What sparkles and flows?',
-    hint: 'You can drink it and swim in it'
-  },
-  {
-    id: 'talking_flowers',
-    title: '🌸 Talking Flowers',
-    text: 'Amazing! These magical flowers can talk! They are telling us about friendship and kindness. What do flowers need to grow big and strong?',
-    emoji: '🌸',
-    character: 'Luna',
-    bgColor: 'from-pink-100 to-rose-100 dark:from-pink-900 dark:to-rose-900',
-    interactive: true,
-    audioText: 'flower',
-    choices: ['plant', 'grass', 'flower'],
-    wordCount: 25,
-    duration: 35,
-    question: 'What blooms and smells nice?',
-    hint: 'Bees love to visit them'
-  },
-  {
-    id: 'star_discovery',
-    title: '⭐ First Magic Star',
-    text: 'Hooray! We found our first glowing star! It fell from the night sky. Stars help plants grow and animals sleep. Two more to find!',
+    id: 'first_star',
+    title: '⭐ First Magic Star!',
+    text: 'Wonderful! We found our first glowing star! Stars in Sparkle Kingdom grant special wishes. Two more stars to collect!',
     emoji: '⭐',
-    character: 'Luna',
+    character: 'Stardust',
     bgColor: 'from-yellow-100 to-amber-100 dark:from-yellow-900 dark:to-amber-900',
     interactive: false,
     starsNeeded: 3,
-    wordCount: 28,
-    duration: 30
+    wordCount: 21,
+    duration: 25
   },
   {
-    id: 'friendly_squirrel',
-    title: '🐿️ Busy Squirrel',
-    text: 'Look up there! A friendly squirrel is gathering nuts for winter. Squirrels have fluffy tails and love to climb trees very fast!',
-    emoji: '🐿️',
-    character: 'Luna',
-    bgColor: 'from-orange-100 to-amber-100 dark:from-orange-900 dark:to-amber-900',
+    id: 'talking_flowers',
+    title: '🌸 Singing Flowers',
+    text: 'Listen! The magical flowers are singing a happy song! They bloom when they hear kind words.',
+    emoji: '🌸',
+    character: 'Stardust',
+    bgColor: 'from-pink-100 to-rose-100 dark:from-pink-900 dark:to-rose-900',
     interactive: true,
-    audioText: 'squirrel',
-    choices: ['rabbit', 'squirrel', 'mouse'],
-    wordCount: 22,
-    duration: 35,
-    question: 'Who collects nuts for winter?',
-    hint: 'It has a bushy tail and climbs trees'
+    audioText: 'flowers',
+    choices: ['trees', 'flowers', 'rocks'],
+    wordCount: 18,
+    duration: 26,
+    question: 'What blooms and sings in unicorn land?',
+    hint: 'They have petals and smell nice'
+  },
+  {
+    id: 'fluffy_clouds',
+    title: '☁️ Fluffy Cloud Friends',
+    text: 'Look at these happy clouds! They can change shapes and tell funny stories. That cloud looks like a bunny!',
+    emoji: '☁️',
+    character: 'Stardust',
+    bgColor: 'from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900',
+    interactive: true,
+    audioText: 'clouds',
+    choices: ['clouds', 'stars', 'rain'],
+    wordCount: 20,
+    duration: 28,
+    question: 'What is fluffy and floats in the sky?',
+    hint: 'They are white and sometimes look like animals'
   },
   {
     id: 'second_star',
-    title: '✨ Second Shining Star',
-    text: 'Incredible! Another star appeared near the old oak tree! Stars twinkle because they are happy to see us exploring. One last star to go!',
+    title: '✨ Second Sparkling Star!',
+    text: 'Amazing! Another star appeared near the singing flowers! Stars twinkle when they hear beautiful music. One more star to find!',
     emoji: '✨',
-    character: 'Luna',
-    bgColor: 'from-purple-100 to-indigo-100 dark:from-purple-900 dark:to-indigo-900',
+    character: 'Stardust',
+    bgColor: 'from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900',
     interactive: false,
     starsNeeded: 3,
-    wordCount: 26,
-    duration: 30
+    wordCount: 22,
+    duration: 25
   },
   {
-    id: 'wise_owl',
-    title: '🦉 Wise Old Owl',
-    text: 'Good evening! The wise owl says hello! Owls can turn their heads almost all the way around and see in the dark. Amazing!',
-    emoji: '🦉',
-    character: 'Luna',
-    bgColor: 'from-gray-100 to-blue-100 dark:from-gray-900 dark:to-blue-900',
+    id: 'crystal_cave',
+    title: '💎 Crystal Cave',
+    text: 'Wow! This cave is full of glowing crystals that hum beautiful music! Each crystal has a different note.',
+    emoji: '💎',
+    character: 'Stardust',
+    bgColor: 'from-indigo-100 to-blue-100 dark:from-indigo-900 dark:to-blue-900',
     interactive: true,
-    audioText: 'owl',
-    choices: ['owl', 'eagle', 'hawk'],
-    wordCount: 24,
-    duration: 35,
-    question: 'Who sees well at night?',
-    hint: 'It says "hoot hoot" and sleeps during day'
+    audioText: 'crystals',
+    choices: ['crystals', 'diamonds', 'pearls'],
+    wordCount: 19,
+    duration: 27,
+    question: 'What glows and makes music in the cave?',
+    hint: 'They are shiny and colorful rocks'
   },
   {
-    id: 'final_star',
-    title: '🌟 Third Magic Star',
-    text: 'We did it! All three magic stars are glowing brightly! They will keep our forest magical forever. You are an amazing explorer!',
+    id: 'butterfly_garden',
+    title: '🦋 Magic Butterflies',
+    text: 'Beautiful! The rainbow butterflies are dancing! Their wings spread magic dust that makes flowers grow instantly.',
+    emoji: '🦋',
+    character: 'Stardust',
+    bgColor: 'from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900',
+    interactive: true,
+    audioText: 'butterflies',
+    choices: ['bees', 'butterflies', 'birds'],
+    wordCount: 20,
+    duration: 29,
+    question: 'What has colorful wings and spreads magic?',
+    hint: 'They fly and love flowers'
+  },
+  {
+    id: 'third_star',
+    title: '🌟 Third Glowing Star!',
+    text: 'Fantastic! We found our third star near the butterflies! All three stars are glowing brightly now! The magic is complete!',
     emoji: '🌟',
-    character: 'Luna',
-    bgColor: 'from-yellow-100 to-orange-100 dark:from-yellow-900 dark:to-orange-900',
+    character: 'Stardust',
+    bgColor: 'from-yellow-200 to-orange-200 dark:from-yellow-800 dark:to-orange-800',
     interactive: false,
     starsNeeded: 3,
-    wordCount: 23,
-    duration: 30
+    wordCount: 21,
+    duration: 25
+  },
+  {
+    id: 'wishing_fountain',
+    title: '⛲ Magic Fountain',
+    text: 'Look at this sparkling fountain! The water glows with rainbow colors. Make a wish and watch the magic happen!',
+    emoji: '⛲',
+    character: 'Stardust',
+    bgColor: 'from-cyan-100 to-blue-100 dark:from-cyan-900 dark:to-blue-900',
+    interactive: true,
+    audioText: 'fountain',
+    choices: ['fountain', 'river', 'waterfall'],
+    wordCount: 19,
+    duration: 28,
+    question: 'What has magical glowing water?',
+    hint: 'It sprays water and grants wishes'
   },
   {
     id: 'grand_celebration',
-    title: '🎉 Forest Celebration!',
-    text: 'Congratulations superstar! The whole forest is celebrating! Animals are dancing, flowers are singing, and magic sparkles everywhere! You made the forest happy!',
+    title: '🎉 Sparkle Kingdom Celebration!',
+    text: 'Congratulations! You helped restore all the magic to Sparkle Kingdom! The flowers are singing, crystals are humming, and rainbows are everywhere!',
     emoji: '🎉',
-    character: 'Luna',
+    character: 'Stardust',
     bgColor: 'from-rainbow-100 to-sparkle-100 dark:from-rainbow-900 dark:to-sparkle-900',
     interactive: false,
-    wordCount: 22,
-    duration: 40
+    wordCount: 23,
+    duration: 35
   }
 ];
 
-const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
+const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
   const [stepIndex, setStepIndex] = useState(0);
   const [stars, setStars] = useState(0);
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null);
@@ -217,7 +217,7 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
     } else {
       // Calculate score based on correct answers and time
       const accuracyScore = correctAnswers * 20;
-      const timeBonus = Math.max(0, 300 - timeSpent) * 0.1; // Bonus for faster completion
+      const timeBonus = Math.max(0, 300 - timeSpent) * 0.1;
       const starBonus = stars * 10;
       const score = Math.min(100, 40 + accuracyScore + timeBonus + starBonus);
       onComplete(score);
@@ -285,17 +285,19 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
     return 'animate-float';
   };
 
-  const getEnvironmentIcon = () => {
+  const getMagicIcon = () => {
     switch (current.id) {
-      case 'whispering_trees': return Trees;
-      case 'colorful_butterfly': return Sparkles;
-      case 'sparkling_river': return CloudRain;
+      case 'rainbow_bridge': return Sparkles;
       case 'talking_flowers': return Flower;
+      case 'fluffy_clouds': return Cloud;
+      case 'crystal_cave': return Sparkles;
+      case 'butterfly_garden': return Sparkles;
+      case 'wishing_fountain': return Sparkles;
       default: return Sparkles;
     }
   };
 
-  const EnvironmentIcon = getEnvironmentIcon();
+  const MagicIcon = getMagicIcon();
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -320,11 +322,11 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3 flex-shrink-0">
             <div className="flex items-center gap-3">
               <div className="relative">
-                <Rabbit className="w-6 h-6 sm:w-8 sm:h-8 text-purple-600 animate-bounce" />
-                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 absolute -top-1 -right-1 animate-ping" />
+                <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-purple-600 animate-bounce" />
+                <Star className="w-3 h-3 sm:w-4 sm:h-4 text-pink-400 absolute -top-1 -right-1 animate-ping" />
               </div>
               <div>
-                <h2 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white">Luna's Magic Forest</h2>
+                <h2 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white">Stardust's Magic Adventure</h2>
                 <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
                   Step {stepIndex + 1} of {totalSteps} • {totalWords} words • {Math.round(totalDuration/60)}min
                 </p>
@@ -339,7 +341,7 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
 
           {/* Progress Bar */}
           <Progress value={progress} className="h-2 sm:h-3 mb-6 sm:mb-8 bg-white/30 flex-shrink-0">
-            <div className="h-full bg-gradient-to-r from-purple-400 to-pink-400 rounded-full transition-all duration-500" />
+            <div className="h-full bg-gradient-to-r from-pink-400 to-purple-400 rounded-full transition-all duration-500" />
           </Progress>
 
           {/* Scrollable Content Area */}
@@ -375,9 +377,9 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                   </div>
                 )}
 
-                {/* Environment Icon */}
+                {/* Magic Icon */}
                 <div className="absolute top-1 right-1 sm:top-2 sm:right-2 animate-float-slow">
-                  <EnvironmentIcon className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-green-500 opacity-70" />
+                  <MagicIcon className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-pink-500 opacity-70" />
                 </div>
               </div>
 
@@ -409,22 +411,22 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
               {current.interactive && (
                 <div className="space-y-4 sm:space-y-6">
                   {/* Question and Hint */}
-                  <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg sm:rounded-xl p-3 sm:p-4 border-2 border-yellow-200 dark:border-yellow-700">
+                  <div className="bg-pink-50 dark:bg-pink-900/20 rounded-lg sm:rounded-xl p-3 sm:p-4 border-2 border-pink-200 dark:border-pink-700">
                     <h4 className="text-base sm:text-lg font-bold text-gray-800 dark:text-white mb-2">
                       {current.question}
                     </h4>
                     {showHint ? (
                       <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
-                        💡 Hint: {current.hint}
+                        💡 Magic Hint: {current.hint}
                       </p>
                     ) : (
                       <Button 
                         variant="outline" 
                         size="sm" 
                         onClick={() => setShowHint(true)}
-                        className="text-yellow-600 border-yellow-300 hover:bg-yellow-100 text-xs sm:text-sm"
+                        className="text-pink-600 border-pink-300 hover:bg-pink-100 text-xs sm:text-sm"
                       >
-                        Need a hint? 🧩
+                        Need a magic hint? ✨
                       </Button>
                     )}
                   </div>
@@ -436,7 +438,7 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                         onClick={playAudio}
                         disabled={isPlaying}
                         className={cn(
-                          "rounded-xl sm:rounded-2xl px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold transition-all duration-300 transform hover:scale-105 text-sm sm:text-base",
+                          "rounded-xl sm:rounded-2xl px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-bold transition-all duration-300 transform hover:scale-105 text-sm sm:text-base",
                           isPlaying && "animate-pulse"
                         )}
                       >
@@ -473,28 +475,29 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                               "rounded-xl sm:rounded-2xl px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-lg font-bold transition-all duration-300 transform hover:scale-105 h-auto min-h-[60px] sm:min-h-[80px]",
                               showResult && isCorrect && "bg-green-500 hover:bg-green-600 text-white animate-bounce shadow-lg sm:shadow-2xl",
                               showResult && !isCorrect && "bg-red-500 hover:bg-red-600 text-white shadow-md sm:shadow-xl",
-                              !showResult && "bg-white/90 hover:bg-white text-gray-700 border-2 border-gray-200 hover:border-purple-300 hover:shadow-lg"
+                              !showResult && "bg-white/90 hover:bg-white text-gray-700 border-2 border-gray-200 hover:border-pink-300 hover:shadow-lg"
                             )}
                           >
                             <span className="flex flex-col items-center gap-1">
                               <span className="text-xl sm:text-2xl mb-1">
-                                {choice === 'tree' && '🌲'}
-                                {choice === 'butterfly' && '🦋'}
-                                {choice === 'water' && '💧'}
-                                {choice === 'flower' && '🌸'}
-                                {choice === 'squirrel' && '🐿️'}
-                                {choice === 'owl' && '🦉'}
-                                {choice === 'bird' && '🐦'}
-                                {choice === 'bee' && '🐝'}
-                                {choice === 'rock' && '🪨'}
+                                {choice === 'rainbow' && '🌈'}
+                                {choice === 'flowers' && '🌸'}
+                                {choice === 'clouds' && '☁️'}
+                                {choice === 'crystals' && '💎'}
+                                {choice === 'butterflies' && '🦋'}
+                                {choice === 'fountain' && '⛲'}
+                                {choice === 'cloud' && '☁️'}
                                 {choice === 'river' && '🌊'}
-                                {choice === 'stream' && '💦'}
-                                {choice === 'plant' && '🌱'}
-                                {choice === 'grass' && '🌿'}
-                                {choice === 'rabbit' && '🐰'}
-                                {choice === 'mouse' && '🐭'}
-                                {choice === 'eagle' && '🦅'}
-                                {choice === 'hawk' && '🦅'}
+                                {choice === 'trees' && '🌳'}
+                                {choice === 'rocks' && '🪨'}
+                                {choice === 'stars' && '⭐'}
+                                {choice === 'rain' && '🌧️'}
+                                {choice === 'diamonds' && '💎'}
+                                {choice === 'pearls' && '🔮'}
+                                {choice === 'bees' && '🐝'}
+                                {choice === 'birds' && '🐦'}
+                                {choice === 'river' && '🌊'}
+                                {choice === 'waterfall' && '💦'}
                               </span>
                               {choice}
                               {showResult && isCorrect && (
@@ -512,11 +515,11 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                     <div className="mt-3 sm:mt-4 animate-fade-in">
                       {selectedChoice === current.audioText ? (
                         <div className="text-green-600 dark:text-green-400 text-lg sm:text-xl font-bold animate-bounce bg-green-50 dark:bg-green-900/20 rounded-xl sm:rounded-2xl p-3 sm:p-4 border-2 border-green-200 dark:border-green-700">
-                          🎉 Fantastic! You're a nature expert! 🌟
+                          🎉 Magical! You're a unicorn expert! 🌟
                         </div>
                       ) : (
                         <div className="text-red-600 dark:text-red-400 text-lg sm:text-xl font-bold bg-red-50 dark:bg-red-900/20 rounded-xl sm:rounded-2xl p-3 sm:p-4 border-2 border-red-200 dark:border-red-700">
-                          💪 Great try! The magic word was "{current.audioText}" - Let's learn together!
+                          💪 Great try! The magic word was "{current.audioText}" - Let's explore together!
                         </div>
                       )}
                     </div>
@@ -540,8 +543,8 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                     ) : (
                       <>
                         <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                        <span className="hidden sm:inline">Continue Adventure! 🚀</span>
-                        <span className="sm:hidden">Continue 🚀</span>
+                        <span className="hidden sm:inline">Continue Magic Adventure! 🦄</span>
+                        <span className="sm:hidden">Continue 🦄</span>
                       </>
                     )}
                   </Button>
@@ -552,13 +555,13 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
 
           {/* Floating Elements */}
           <div className="hidden sm:block absolute top-4 left-4 animate-float-slow">
-            <Sparkles className="w-6 h-6 text-yellow-400" />
+            <Sparkles className="w-6 h-6 text-pink-400" />
           </div>
           <div className="hidden sm:block absolute bottom-4 left-4 animate-float-medium">
-            <Heart className="w-6 h-6 text-pink-400" />
+            <Heart className="w-6 h-6 text-purple-400" />
           </div>
           <div className="hidden sm:block absolute bottom-4 right-4 animate-float-fast">
-            <Flower className="w-6 h-6 text-green-400" />
+            <Star className="w-6 h-6 text-yellow-400" />
           </div>
         </CardContent>
       </Card>
@@ -580,12 +583,12 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
         }
         
         .smooth-scroll::-webkit-scrollbar-thumb {
-          background: rgba(139, 92, 246, 0.3);
+          background: rgba(236, 72, 153, 0.3);
           border-radius: 10px;
         }
         
         .smooth-scroll::-webkit-scrollbar-thumb:hover {
-          background: rgba(139, 92, 246, 0.5);
+          background: rgba(236, 72, 153, 0.5);
         }
         
         @keyframes float-slow {
@@ -716,4 +719,4 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
   );
 };
 
-export default MagicForestAdventure;
+export default UnicornMagicAdventure;

@@ -3,7 +3,8 @@ import {
   Volume2, Star, Trophy, Play, BookOpen, 
   Mic, Award, Zap, Heart, Sparkles,
   Rabbit, Fish, Rocket, Cloud,
-  Sun, CloudRain, CloudSnow
+  Sun, CloudRain, CloudSnow, Footprints,
+  ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -19,6 +20,8 @@ import Pronunciation from '@/components/kids/Pronunciation';
 import MagicForestAdventure from '@/components/kids/stories/MagicForestAdventure';
 import SpaceAdventure from '@/components/kids/stories/SpaceAdventure';
 import UnderwaterWorld from '@/components/kids/stories/UnderwaterWorld';
+import DinosaurDiscoveryAdventure from '@/components/kids/stories/DinosaurDiscoveryAdventure';
+import UnicornMagicAdventure from '@/components/kids/stories/UnicornMagicAdventure';
 
 const KidsPage = () => {
   const [activeCategory, setActiveCategory] = useState('stories');
@@ -34,6 +37,10 @@ const KidsPage = () => {
   const [showMagicForest, setShowMagicForest] = useState(false);
   const [showSpaceAdventure, setShowSpaceAdventure] = useState(false);
   const [showUnderwaterWorld, setShowUnderwaterWorld] = useState(false);
+  const [showDinosaurAdventure, setShowDinosaurAdventure] = useState(false);
+  const [showUnicornAdventure, setShowUnicornAdventure] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const storiesPerPage = 4;
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Load progress and generate floating icons
@@ -86,7 +93,7 @@ const KidsPage = () => {
     { id: 'games', label: 'Fun Games', icon: Trophy, emoji: '🏆' },
   ];
 
-  const stories = [
+  const allStories = [
     {
       title: "The Magic Forest",
       description: "Join Luna the rabbit on her adventure through the enchanted forest",
@@ -97,7 +104,8 @@ const KidsPage = () => {
       character: Rabbit,
       gradient: 'from-green-400 to-emerald-400',
       bgGradient: 'from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900',
-      animation: 'animate-float-slow'
+      animation: 'animate-float-slow',
+      type: 'forest'
     },
     {
       title: "Space Adventure",
@@ -109,7 +117,8 @@ const KidsPage = () => {
       character: Rocket,
       gradient: 'from-purple-400 to-indigo-400',
       bgGradient: 'from-purple-100 to-indigo-100 dark:from-purple-900 dark:to-indigo-900',
-      animation: 'animate-bounce'
+      animation: 'animate-bounce',
+      type: 'space'
     },
     {
       title: "Underwater World",
@@ -121,13 +130,84 @@ const KidsPage = () => {
       character: Fish,
       gradient: 'from-blue-400 to-cyan-400',
       bgGradient: 'from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900',
-      animation: 'animate-float-medium'
+      animation: 'animate-float-medium',
+      type: 'ocean'
+    },
+    {
+      title: "Dinosaur Discovery",
+      description: "Travel back in time with Dina to meet amazing dinosaurs",
+      difficulty: 'Hard',
+      duration: '7 min',
+      words: 250,
+      image: '🦖',
+      character: Footprints,
+      gradient: 'from-orange-400 to-red-400',
+      bgGradient: 'from-orange-100 to-red-100 dark:from-orange-900 dark:to-red-900',
+      animation: 'animate-float-slow',
+      type: 'dinosaur'
+    },
+    {
+      title: "Unicorn Magic",
+      description: "Join Stardust the unicorn in the magical Sparkle Kingdom",
+      difficulty: 'Easy',
+      duration: '6 min',
+      words: 225,
+      image: '🦄',
+      character: Sparkles,
+      gradient: 'from-pink-400 to-purple-400',
+      bgGradient: 'from-pink-100 to-purple-100 dark:from-pink-900 dark:to-purple-900',
+      animation: 'animate-float-medium',
+      type: 'unicorn'
+    },
+    {
+      title: "Pirate Treasure",
+      description: "Sail with Captain Finn to find buried treasure and secret islands",
+      difficulty: 'Medium',
+      duration: '7 min',
+      words: 285,
+      image: '🏴‍☠️',
+      character: Rocket,
+      gradient: 'from-amber-400 to-yellow-400',
+      bgGradient: 'from-amber-100 to-yellow-100 dark:from-amber-900 dark:to-yellow-900',
+      animation: 'animate-bounce',
+      type: 'pirate'
+    },
+    {
+      title: "Superhero School",
+      description: "Train with Captain Courage to become a superhero and help people",
+      difficulty: 'Medium',
+      duration: '8 min',
+      words: 295,
+      image: '🦸',
+      character: Zap,
+      gradient: 'from-blue-400 to-indigo-400',
+      bgGradient: 'from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900',
+      animation: 'animate-float-fast',
+      type: 'superhero'
+    },
+    {
+      title: "Fairy Garden",
+      description: "Explore the tiny magical world with Twinkle the fairy",
+      difficulty: 'Easy',
+      duration: '5 min',
+      words: 260,
+      image: '🧚',
+      character: Sparkles,
+      gradient: 'from-green-400 to-teal-400',
+      bgGradient: 'from-green-100 to-teal-100 dark:from-green-900 dark:to-teal-900',
+      animation: 'animate-float-slow',
+      type: 'fairy'
     }
   ];
 
+  // Calculate pagination
+  const totalPages = Math.ceil(allStories.length / storiesPerPage);
+  const startIndex = (currentPage - 1) * storiesPerPage;
+  const currentStories = allStories.slice(startIndex, startIndex + storiesPerPage);
+
   const achievements = [
     { name: 'First Words', icon: Star, progress: Math.min(100, Math.round((points / 1000) * 100)), emoji: '🌟' },
-    { name: 'Story Master', icon: BookOpen, progress: Math.min(100, favorites.length * 20), emoji: '📖' },
+    { name: 'Story Master', icon: BookOpen, progress: Math.min(100, favorites.length * 12.5), emoji: '📖' },
     { name: 'Pronunciation Pro', icon: Mic, progress: 50, emoji: '🎤' },
     { name: 'Vocabulary Builder', icon: Zap, progress: 25, emoji: '⚡' },
   ];
@@ -144,27 +224,37 @@ const KidsPage = () => {
   const vocabWords = [
     { word: 'rabbit', hint: '/ˈræb.ɪt/' },
     { word: 'forest', hint: '/ˈfɒr.ɪst/' },
-    { word: 'planet', hint: '/ˈplæn.ɪt/' }
+    { word: 'planet', hint: '/ˈplæn.ɪt/' },
+    { word: 'dinosaur', hint: '/ˈdaɪ.nə.sɔːr/' },
+    { word: 'unicorn', hint: '/ˈjuː.nɪ.kɔːrn/' }
   ];
 
   const pronounceItems = [
     { phrase: 'Hello Luna', phonemes: '/həˈləʊ ˈluː.nə/' },
     { phrase: 'Magic forest', phonemes: '/ˈmædʒ.ɪk ˈfɒr.ɪst/' },
-    { phrase: 'Happy rabbit', phonemes: '/ˈhæp.i ˈræb.ɪt/' }
+    { phrase: 'Happy rabbit', phonemes: '/ˈhæp.i ˈræb.ɪt/' },
+    { phrase: 'Big dinosaur', phonemes: '/bɪɡ ˈdaɪ.nə.sɔːr/' },
+    { phrase: 'Rainbow unicorn', phonemes: '/ˈreɪn.bəʊ ˈjuː.nɪ.kɔːrn/' }
   ];
 
   const handleStartLesson = async (storyIndex: number) => {
-    setCurrentStory(storyIndex);
+    const actualIndex = startIndex + storyIndex;
+    setCurrentStory(actualIndex);
     setIsPlaying(true);
     setBounceAnimation(true);
     
     // Open appropriate adventure module
-    if (storyIndex === 0) {
+    const storyType = allStories[actualIndex].type;
+    if (storyType === 'forest') {
       setShowMagicForest(true);
-    } else if (storyIndex === 1) {
+    } else if (storyType === 'space') {
       setShowSpaceAdventure(true);
-    } else if (storyIndex === 2) {
+    } else if (storyType === 'ocean') {
       setShowUnderwaterWorld(true);
+    } else if (storyType === 'dinosaur') {
+      setShowDinosaurAdventure(true);
+    } else if (storyType === 'unicorn') {
+      setShowUnicornAdventure(true);
     }
     
     // Add celebration effects
@@ -178,7 +268,7 @@ const KidsPage = () => {
       const token = localStorage.getItem('speakbee_auth_token');
       const updateDetails = (details: any) => {
         details.readAloud = details.readAloud || {};
-        const key = `story-${storyIndex}`;
+        const key = `story-${actualIndex}`;
         const prev = details.readAloud[key] || { bestScore: 0, attempts: 0 };
         details.readAloud[key] = { 
           bestScore: Math.max(prev.bestScore, 80), 
@@ -229,7 +319,7 @@ const KidsPage = () => {
 
     // Speak story intro (offline TTS baseline)
     try {
-      const story = stories[storyIndex];
+      const story = allStories[actualIndex];
       if (SpeechService.isTTSSupported()) {
         await SpeechService.speak(`${story.title}. ${story.description}`, { rate: 0.95 });
       }
@@ -241,9 +331,10 @@ const KidsPage = () => {
   };
 
   const toggleFavorite = async (index: number) => {
-    const next = favorites.includes(index)
-      ? favorites.filter(i => i !== index)
-      : [...favorites, index];
+    const actualIndex = startIndex + index;
+    const next = favorites.includes(actualIndex)
+      ? favorites.filter(i => i !== actualIndex)
+      : [...favorites, actualIndex];
     setFavorites(next);
     
     try {
@@ -333,6 +424,12 @@ const KidsPage = () => {
     } catch (error) {
       console.error('Error updating adventure progress:', error);
     }
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    // Scroll to top of stories section
+    containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -452,89 +549,144 @@ const KidsPage = () => {
 
         {/* Stories Grid or Module Content */}
         {activeCategory === 'stories' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {stories.map((story, index) => {
-              const CharacterIcon = story.character;
-              return (
-                <Card 
-                  key={index} 
-                  className={cn(
-                    "group cursor-pointer bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-2 border-transparent hover:border-[#FF6B6B] transition-all duration-500 hover:shadow-2xl overflow-hidden",
-                    bounceAnimation && currentStory === index && "animate-bounce"
-                  )}
-                  onMouseEnter={() => setCurrentStory(index)}
-                >
-                  <CardContent className="p-0 overflow-hidden rounded-3xl">
-                    <div className={cn(
-                      "p-8 relative overflow-hidden bg-gradient-to-br",
-                      story.bgGradient
-                    )}>
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 dark:bg-black/20 rounded-full -mr-16 -mt-16"></div>
-                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/20 dark:bg-black/20 rounded-full -ml-12 -mb-12"></div>
-                      <div className="relative z-10 text-center">
-                        <div className={cn("text-6xl mb-4 transform transition-transform duration-300 group-hover:scale-110", story.animation)}>
-                          {story.image}
+          <div className="mb-12">
+            {/* Stories Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-8 mb-8">
+              {currentStories.map((story, index) => {
+                const CharacterIcon = story.character;
+                const actualIndex = startIndex + index;
+                return (
+                  <Card 
+                    key={actualIndex} 
+                    className={cn(
+                      "group cursor-pointer bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-2 border-transparent hover:border-[#FF6B6B] transition-all duration-500 hover:shadow-2xl overflow-hidden",
+                      bounceAnimation && currentStory === actualIndex && "animate-bounce"
+                    )}
+                    onMouseEnter={() => setCurrentStory(actualIndex)}
+                  >
+                    <CardContent className="p-0 overflow-hidden rounded-3xl">
+                      <div className={cn(
+                        "p-8 relative overflow-hidden bg-gradient-to-br",
+                        story.bgGradient
+                      )}>
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 dark:bg-black/20 rounded-full -mr-16 -mt-16"></div>
+                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/20 dark:bg-black/20 rounded-full -ml-12 -mb-12"></div>
+                        <div className="relative z-10 text-center">
+                          <div className={cn("text-6xl mb-4 transform transition-transform duration-300 group-hover:scale-110", story.animation)}>
+                            {story.image}
+                          </div>
+                          <CharacterIcon className="w-12 h-12 mx-auto mb-3 text-gray-600 dark:text-gray-300 opacity-80" />
+                          <h3 className="text-2xl font-bold mb-2 text-gray-800 dark:text-white">
+                            {story.title}
+                          </h3>
+                          <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                            {story.description}
+                          </p>
                         </div>
-                        <CharacterIcon className="w-12 h-12 mx-auto mb-3 text-gray-600 dark:text-gray-300 opacity-80" />
-                        <h3 className="text-2xl font-bold mb-2 text-gray-800 dark:text-white">
-                          {story.title}
-                        </h3>
-                        <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300">
-                          {story.description}
-                        </p>
                       </div>
-                    </div>
-                    <div className="p-6">
-                      <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-6">
-                        <span className="flex items-center gap-1 font-semibold">📚 {story.words} words</span>
-                        <span className="flex items-center gap-1 font-semibold">⏱️ {story.duration}</span>
-                        <span className={cn(
-                          "font-semibold",
-                          story.difficulty === 'Easy' && "text-green-500 dark:text-green-400",
-                          story.difficulty === 'Medium' && "text-yellow-500 dark:text-yellow-400",
-                          story.difficulty === 'Hard' && "text-red-500 dark:text-red-400"
-                        )}>
-                          🎯 {story.difficulty}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 mb-3">
+                      <div className="p-6">
+                        <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-6">
+                          <span className="flex items-center gap-1 font-semibold">📚 {story.words} words</span>
+                          <span className="flex items-center gap-1 font-semibold">⏱️ {story.duration}</span>
+                          <span className={cn(
+                            "font-semibold",
+                            story.difficulty === 'Easy' && "text-green-500 dark:text-green-400",
+                            story.difficulty === 'Medium' && "text-yellow-500 dark:text-yellow-400",
+                            story.difficulty === 'Hard' && "text-red-500 dark:text-red-400"
+                          )}>
+                            🎯 {story.difficulty}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 mb-3">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleFavorite(index);
+                            }} 
+                            className={cn(
+                              "rounded-xl", 
+                              favorites.includes(actualIndex) && "border-pink-500 text-pink-600"
+                            )}
+                          >
+                            ❤
+                          </Button>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            {favorites.includes(actualIndex) ? 'In favorites' : 'Add to favorites'}
+                          </span>
+                        </div>
                         <Button 
-                          size="sm" 
-                          variant="outline" 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleFavorite(index);
-                          }} 
                           className={cn(
-                            "rounded-xl", 
-                            favorites.includes(index) && "border-pink-500 text-pink-600"
+                            "w-full bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white font-bold py-4 rounded-2xl transition-all duration-300 group-hover:shadow-xl relative overflow-hidden",
+                            bounceAnimation && currentStory === actualIndex && "animate-pulse"
                           )}
+                          onClick={() => handleStartLesson(index)}
+                          disabled={isPlaying}
                         >
-                          ❤
+                          <span className="relative z-10 flex items-center justify-center">
+                            <Play className="w-5 h-5 mr-2" />
+                            {isPlaying && currentStory === actualIndex ? 'Starting...' : 'Start Adventure!'}
+                          </span>
+                          <div className="absolute inset-0 bg-white/20 transform scale-0 group-hover:scale-100 transition-transform duration-300"></div>
                         </Button>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                          {favorites.includes(index) ? 'In favorites' : 'Add to favorites'}
-                        </span>
                       </div>
-                      <Button 
-                        className={cn(
-                          "w-full bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white font-bold py-4 rounded-2xl transition-all duration-300 group-hover:shadow-xl relative overflow-hidden",
-                          bounceAnimation && currentStory === index && "animate-pulse"
-                        )}
-                        onClick={() => handleStartLesson(index)}
-                        disabled={isPlaying}
-                      >
-                        <span className="relative z-10 flex items-center justify-center">
-                          <Play className="w-5 h-5 mr-2" />
-                          {isPlaying && currentStory === index ? 'Starting...' : 'Start Adventure!'}
-                        </span>
-                        <div className="absolute inset-0 bg-white/20 transform scale-0 group-hover:scale-100 transition-transform duration-300"></div>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-4 mt-8">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="rounded-xl px-6 py-3"
+                >
+                  <ChevronLeft className="w-4 h-4 mr-2" />
+                  Previous
+                </Button>
+                
+                <div className="flex items-center gap-2">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => handlePageChange(page)}
+                      className={cn(
+                        "w-10 h-10 rounded-xl",
+                        currentPage === page && "bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white"
+                      )}
+                    >
+                      {page}
+                    </Button>
+                  ))}
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="rounded-xl px-6 py-3"
+                >
+                  Next
+                  <ChevronRight className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
+            )}
+
+            {/* Page Info */}
+            <div className="text-center mt-4">
+              <p className="text-sm text-gray-500 dark:text-gray-600">
+                Showing {startIndex + 1}-{Math.min(startIndex + storiesPerPage, allStories.length)} of {allStories.length} amazing stories
+              </p>
+            </div>
           </div>
         )}
 
@@ -680,6 +832,26 @@ const KidsPage = () => {
           onComplete={(score) => {
             setShowUnderwaterWorld(false);
             handleAdventureComplete(2, score);
+          }}
+        />
+      )}
+
+      {showDinosaurAdventure && (
+        <DinosaurDiscoveryAdventure 
+          onClose={() => setShowDinosaurAdventure(false)} 
+          onComplete={(score) => {
+            setShowDinosaurAdventure(false);
+            handleAdventureComplete(3, score);
+          }}
+        />
+      )}
+
+      {showUnicornAdventure && (
+        <UnicornMagicAdventure 
+          onClose={() => setShowUnicornAdventure(false)} 
+          onComplete={(score) => {
+            setShowUnicornAdventure(false);
+            handleAdventureComplete(4, score);
           }}
         />
       )}
