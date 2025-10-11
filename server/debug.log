@@ -161,3 +161,4 @@ INFO 2025-10-10 21:36:10,909 autoreload 4308 13104 Watching for file changes wit
 INFO 2025-10-11 01:15:47,009 autoreload 4308 13104 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\serializers.py changed, reloading.
 INFO 2025-10-11 01:15:56,018 autoreload 14376 17544 Watching for file changes with StatReloader
 INFO 2025-10-11 12:17:21,528 autoreload 5348 5216 Watching for file changes with StatReloader
+INFO 2025-10-11 16:19:32,952 autoreload 9756 16168 Watching for file changes with StatReloader

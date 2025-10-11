@@ -5,7 +5,7 @@ import {
   Rabbit, Fish, Rocket, Cloud,
   Sun, CloudRain, CloudSnow, Footprints,
   ChevronLeft, ChevronRight, Anchor,
-  Shield, X
+  Shield
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -26,12 +26,14 @@ import UnicornMagicAdventure from '@/components/kids/stories/UnicornMagicAdventu
 import PirateTreasureAdventure from '@/components/kids/stories/PirateTreasureAdventure';
 import SuperheroAdventure from '@/components/kids/stories/SuperheroSchoolAdventure';
 import FairyGardenAdventure from '@/components/kids/stories/FairyGardenAdventure';
+import AuthModal from '@/components/AuthModal';
+import { useNavigate } from 'react-router-dom';
 
 const KidsPage = () => {
   const [activeCategory, setActiveCategory] = useState('stories');
   const [currentStory, setCurrentStory] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const userId = user?.id ? String(user.id) : 'local-user';
   const [points, setPoints] = useState(0);
   const [streak, setStreak] = useState(0);
@@ -47,11 +49,35 @@ const KidsPage = () => {
   const [showSuperheroAdventure, setShowSuperheroAdventure] = useState(false);
   const [showFairyGardenAdventure, setShowFairyGardenAdventure] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const storiesPerPage = 4;
   const containerRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
-  // Load progress and generate floating icons
+  // Check authentication and user existence on mount
   useEffect(() => {
+    const checkUserAndRedirect = async () => {
+      if (!isAuthenticated) {
+        // Check if there are any existing users in localStorage
+        const speakbeeUsers = JSON.parse(localStorage.getItem("speakbee_users") || "[]");
+        const legacyUsers = JSON.parse(localStorage.getItem('users') || "[]");
+        
+        const hasExistingUsers = speakbeeUsers.length > 0 || legacyUsers.length > 0;
+        
+        // FIXED: If there are existing users, show login form, otherwise show registration
+        setAuthMode(hasExistingUsers ? 'login' : 'register');
+        setShowAuthModal(true);
+      }
+    };
+
+    checkUserAndRedirect();
+  }, [isAuthenticated]);
+
+  // Load progress and generate floating icons only if authenticated
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
     const loadProgress = async () => {
       try {
         const token = localStorage.getItem('speakbee_auth_token');
@@ -91,7 +117,7 @@ const KidsPage = () => {
       y: Math.random() * 80 + 10,
     }));
     setFloatingIcons(newFloatingIcons);
-  }, [userId]);
+  }, [userId, isAuthenticated]);
 
   const categories = [
     { id: 'stories', label: 'Story Time', icon: BookOpen, emoji: '📚' },
@@ -263,6 +289,11 @@ const KidsPage = () => {
   ];
 
   const handleStartLesson = async (storyIndex: number) => {
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+      return;
+    }
+
     const actualIndex = startIndex + storyIndex;
     setCurrentStory(actualIndex);
     setIsPlaying(true);
@@ -362,6 +393,11 @@ const KidsPage = () => {
   };
 
   const toggleFavorite = async (index: number) => {
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+      return;
+    }
+
     const actualIndex = startIndex + index;
     const next = favorites.includes(actualIndex)
       ? favorites.filter(i => i !== actualIndex)
@@ -412,6 +448,8 @@ const KidsPage = () => {
   };
 
   const handleAdventureComplete = async (storyIndex: number, score: number) => {
+    if (!isAuthenticated) return;
+
     const newPoints = points + 100;
     const newStreak = streak + 1;
     setPoints(newPoints);
@@ -463,11 +501,79 @@ const KidsPage = () => {
     containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleCategoryClick = (categoryId: string) => {
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+      return;
+    }
+    setActiveCategory(categoryId);
+  };
+
+  const handleQuickActionClick = () => {
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+      return;
+    }
+  };
+
+  const handleAuthSuccess = () => {
+    setShowAuthModal(false);
+  };
+
+  const handleAuthModalClose = () => {
+    setShowAuthModal(false);
+    // Redirect to home page when user closes the auth modal without logging in
+    navigate('/');
+  };
+
+  // Show auth modal if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50/20 to-purple-50/20 dark:from-slate-900 dark:via-blue-950/10 dark:to-purple-950/10">
+        <AuthModal 
+          isOpen={showAuthModal} 
+          onClose={handleAuthModalClose}
+          initialMode={authMode}
+          redirectFromKids={true}
+          onAuthSuccess={handleAuthSuccess}
+        />
+        <div className="text-center p-8">
+          <div className="animate-bounce mb-4">
+            <Sparkles className="w-16 h-16 text-yellow-500 mx-auto" />
+          </div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#118AB2] bg-clip-text text-transparent mb-4">
+            Welcome to Kids Learning Zone!
+          </h1>
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-6">
+            {authMode === 'login' 
+              ? 'Please sign in to continue your magical learning adventure! 🎉' 
+              : 'Create an account to start your magical learning adventure! 🎉'}
+          </p>
+          <Button 
+            onClick={() => setShowAuthModal(true)}
+            className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white font-bold py-4 px-8 rounded-2xl text-lg"
+          >
+            {authMode === 'login' ? 'Sign In' : 'Create Account'}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div 
       ref={containerRef} 
       className="min-h-screen pb-20 pt-32 bg-gradient-to-br from-slate-50 via-blue-50/20 to-purple-50/20 dark:from-slate-900 dark:via-blue-950/10 dark:to-purple-950/10 relative overflow-hidden"
     >
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={handleAuthModalClose}
+        initialMode={authMode}
+        redirectFromKids={true}
+        onAuthSuccess={handleAuthSuccess}
+      />
+
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-10 left-10 animate-float-slow">
@@ -566,7 +672,7 @@ const KidsPage = () => {
                     ? "bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white shadow-2xl transform hover:scale-110" 
                     : "bg-white/90 dark:bg-gray-800/90 border-2 border-gray-200 dark:border-gray-600 hover:border-[#FF6B6B] dark:hover:border-[#FF6B6B] hover:bg-white dark:hover:bg-gray-700 hover:shadow-lg"
                 )}
-                onClick={() => setActiveCategory(category.id)}
+                onClick={() => handleCategoryClick(category.id)}
               >
                 <span className="text-2xl mr-3">{category.emoji}</span>
                 {category.label}
@@ -787,7 +893,7 @@ const KidsPage = () => {
             <Button 
               variant="outline" 
               className="rounded-2xl px-8 py-4 border-2 border-green-300 dark:border-green-600 hover:border-green-400 dark:hover:border-green-500 bg-white/90 dark:bg-gray-800/90 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all duration-300 hover:scale-105 group"
-              onClick={() => setActiveCategory('pronunciation')}
+              onClick={() => handleCategoryClick('pronunciation')}
             >
               <Volume2 className="w-5 h-5 mr-2 text-green-500 dark:text-green-400 group-hover:animate-bounce" />
               <span className="font-semibold text-gray-700 dark:text-gray-200">Listen & Repeat</span>
@@ -795,7 +901,7 @@ const KidsPage = () => {
             <Button 
               variant="outline" 
               className="rounded-2xl px-8 py-4 border-2 border-blue-300 dark:border-blue-600 hover:border-blue-400 dark:hover:border-blue-500 bg-white/90 dark:bg-gray-800/90 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300 hover:scale-105 group"
-              onClick={() => setActiveCategory('pronunciation')}
+              onClick={() => handleCategoryClick('pronunciation')}
             >
               <Mic className="w-5 h-5 mr-2 text-blue-500 dark:text-blue-400 group-hover:animate-pulse" />
               <span className="font-semibold text-gray-700 dark:text-gray-200">Speak Now</span>
@@ -803,7 +909,7 @@ const KidsPage = () => {
             <Button 
               variant="outline" 
               className="rounded-2xl px-8 py-4 border-2 border-pink-300 dark:border-pink-600 hover:border-pink-400 dark:hover:border-pink-500 bg-white/90 dark:bg-gray-800/90 hover:bg-pink-50 dark:hover:bg-pink-900/20 transition-all duration-300 hover:scale-105 group"
-              onClick={() => setActiveCategory('stories')}
+              onClick={() => handleCategoryClick('stories')}
             >
               <Heart className="w-5 h-5 mr-2 text-pink-500 dark:text-pink-400 group-hover:animate-pulse" />
               <span className="font-semibold text-gray-700 dark:text-gray-200">Favorite Stories</span>

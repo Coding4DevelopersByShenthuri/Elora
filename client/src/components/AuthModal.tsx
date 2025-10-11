@@ -14,6 +14,8 @@ import '../css/AuthModal.css';
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialMode?: 'login' | 'register'; // Add initialMode prop
+  redirectFromKids?: boolean; // New prop to indicate redirect from kids page
 }
 
 type AuthMode = 'login' | 'register' | 'forgot-password' | 'terms';
@@ -55,12 +57,12 @@ const authService = {
   generateId(): string {
     return `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   },
-  
+
   // Verify security answer without changing password
   async verifySecurityAnswer(email: string, securityAnswer: string): Promise<boolean> {
     const users: User[] = JSON.parse(localStorage.getItem("speakbee_users") || "[]");
     let user: any = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-    
+
     if (!user) {
       // Legacy fallback
       const legacyUsers: any[] = JSON.parse(localStorage.getItem('users') || '[]');
@@ -75,14 +77,14 @@ const authService = {
     if (!user || !user.securityAnswer) return false;
 
     const normalizedAnswer = securityAnswer.toLowerCase().trim();
-    
+
     // Try direct comparison first (for unencrypted answers)
     if (user.securityAnswer === normalizedAnswer) return true;
-    
+
     // Try hashed comparison
     const hashedInputAnswer = this.hashPassword(normalizedAnswer);
     if (user.securityAnswer === hashedInputAnswer) return true;
-    
+
     // Try decrypted comparison
     try {
       const decryptedAnswer = simpleDecrypt(user.securityAnswer);
@@ -154,7 +156,7 @@ const authService = {
 
   async register(name: string, email: string, password: string, securityQuestion: string, securityAnswer: string) {
     const users: User[] = JSON.parse(localStorage.getItem("speakbee_users") || "[]");
-    
+
     // Check if user already exists
     if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
       throw new Error('User with this email already exists');
@@ -210,8 +212,8 @@ const authService = {
       // Continue with registration even if learning data initialization fails
     }
 
-    return { 
-      token: 'local-token', 
+    return {
+      token: 'local-token',
       user: {
         ...newUser,
         password: undefined // Remove password from returned user object
@@ -226,13 +228,13 @@ const authService = {
 
     if (userIndex !== -1) {
       const user = users[userIndex];
-      
+
       // Verify security answer for modern users
       const normalizedAnswer = securityAnswer.toLowerCase().trim();
       const hashedInputAnswer = this.hashPassword(normalizedAnswer);
-      
+
       let answerValid = false;
-      
+
       if (user.securityAnswer === hashedInputAnswer) {
         answerValid = true;
       } else {
@@ -275,12 +277,12 @@ const authService = {
 
       if (legacyIndex !== -1) {
         const legacyUser = legacyUsers[legacyIndex];
-        
+
         // For legacy users, if no security answer is set, allow reset without verification
         if (!legacyUser.securityAnswer) {
-          legacyUsers[legacyIndex] = { 
-            ...legacyUser, 
-            password: newPassword 
+          legacyUsers[legacyIndex] = {
+            ...legacyUser,
+            password: newPassword
           };
           localStorage.setItem('users', JSON.stringify(legacyUsers));
           return true;
@@ -311,9 +313,9 @@ const authService = {
         }
 
         // Update legacy password
-        legacyUsers[legacyIndex] = { 
-          ...legacyUser, 
-          password: newPassword 
+        legacyUsers[legacyIndex] = {
+          ...legacyUser,
+          password: newPassword
         };
         localStorage.setItem('users', JSON.stringify(legacyUsers));
         return true;
@@ -357,12 +359,33 @@ const authService = {
     }
 
     return null;
+  },
+
+  // Check if user exists by email
+  async checkUserExists(email: string): Promise<boolean> {
+    const users: User[] = JSON.parse(localStorage.getItem("speakbee_users") || "[]");
+    const userExists = users.some(u => u.email.toLowerCase() === email.toLowerCase());
+
+    if (userExists) return true;
+
+    // Legacy fallback
+    const legacyUsers: any[] = JSON.parse(localStorage.getItem('users') || '[]');
+    if (Array.isArray(legacyUsers) && legacyUsers.length > 0) {
+      const emailLc = email.toLowerCase();
+      const emailLocal = emailLc.split('@')[0];
+      return legacyUsers.some((u: any) => (
+        (typeof u.email === 'string' && u.email.toLowerCase() === emailLc) ||
+        (typeof u.username === 'string' && (u.username.toLowerCase() === emailLc || u.username.toLowerCase() === emailLocal))
+      ));
+    }
+
+    return false;
   }
 };
 
-const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
+const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = false }: AuthModalProps) => {
   const { login } = useAuth();
-  const [authMode, setAuthMode] = useState<AuthMode>('login');
+  const [authMode, setAuthMode] = useState<AuthMode>(initialMode);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -371,7 +394,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   const [success, setSuccess] = useState<string>('');
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
-  
+
   // Forgot password states
   const [email, setEmail] = useState("");
   const [user, setUser] = useState<User | null>(null);
@@ -379,7 +402,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [forgotPasswordStep, setForgotPasswordStep] = useState(1);
-  
+
   // Registration states
   const [formData, setFormData] = useState({
     name: '',
@@ -390,16 +413,84 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     securityAnswer: ''
   });
 
+  // Store credentials for auto-fill after registration
+  const [autoFillCredentials, setAutoFillCredentials] = useState<{ email: string; password: string } | null>(null);
+
   // Ref for terms content container
   const termsContentRef = useRef<HTMLDivElement>(null);
 
+  // New state for kids page redirect handling
+  const [isCheckingUser, setIsCheckingUser] = useState(false);
+
   useEffect(() => {
     if (isOpen) {
-      setIsRightPanelActive(authMode === 'register' || authMode === 'forgot-password');
-      setError('');
-      setSuccess('');
+      // If redirected from kids page, determine if user exists
+      if (redirectFromKids) {
+        handleKidsPageRedirect();
+      } else {
+        setIsRightPanelActive(authMode === 'register' || authMode === 'forgot-password');
+        setError('');
+        setSuccess('');
+
+        // Auto-fill credentials when switching to login after registration
+        if (authMode === 'login' && autoFillCredentials) {
+          setFormData(prev => ({
+            ...prev,
+            email: autoFillCredentials.email,
+            password: autoFillCredentials.password
+          }));
+        }
+      }
     }
-  }, [isOpen, authMode]);
+  }, [isOpen, authMode, autoFillCredentials, redirectFromKids]);
+
+  // New function to handle kids page redirect
+  const handleKidsPageRedirect = async () => {
+    setIsCheckingUser(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      // Check if there's any existing user data to determine if user might be returning
+      const hasExistingUsers = await checkForExistingUsers();
+
+      if (hasExistingUsers) {
+        // If users exist, show login form with message
+        setAuthMode('login');
+        setIsRightPanelActive(false);
+        setSuccess('Welcome back! Please sign in to continue to Kids page.');
+      } else {
+        // If no users exist, show registration form with message
+        setAuthMode('register');
+        setIsRightPanelActive(true);
+        // setSuccess('Create an account to access the Kids page and start learning!');
+      }
+    } catch (error) {
+      console.error('Error checking for existing users:', error);
+      // Default to login on error
+      setAuthMode('login');
+      setIsRightPanelActive(false);
+    } finally {
+      setIsCheckingUser(false);
+    }
+  };
+
+  // Helper function to check if any users exist in the system
+  const checkForExistingUsers = async (): Promise<boolean> => {
+    // Check modern users storage
+    const modernUsers: User[] = JSON.parse(localStorage.getItem("speakbee_users") || "[]");
+    if (modernUsers.length > 0) {
+      return true;
+    }
+
+    // Check legacy users storage
+    const legacyUsers: any[] = JSON.parse(localStorage.getItem('users') || '[]');
+    if (Array.isArray(legacyUsers) && legacyUsers.length > 0) {
+      return true;
+    }
+
+    return false;
+  };
 
   // Reset scroll position when terms modal opens
   useEffect(() => {
@@ -489,7 +580,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
 
   const handleAnswerSubmit = async () => {
     if (!user) return;
-    
+
     try {
       setIsLoading(true);
       setError('');
@@ -508,7 +599,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
 
   const handlePasswordReset = async () => {
     if (!user) return;
-    
+
     if (newPassword.trim() === "") {
       setError("Password cannot be empty!");
       return;
@@ -527,18 +618,18 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     try {
       setIsLoading(true);
       setError('');
-      
+
       // For legacy users without security question, allow reset without answer
       const needsAnswer = !!user.securityQuestion && user.securityQuestion !== 'What is your favorite color?';
-      
+
       await authService.resetPassword(
         user.email,
         needsAnswer ? securityAnswer : '',
         newPassword
       );
-      
+
       setSuccess("Password reset successfully! You can now log in with your new password.");
-      
+
       setTimeout(() => {
         setAuthMode('login');
         resetForgotPasswordFlow();
@@ -575,13 +666,13 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     try {
       if (authMode === 'login') {
         const { token, user: userData } = await authService.login(formData.email, formData.password);
-        
+
         localStorage.setItem('speakbee_auth_token', token);
         localStorage.setItem('speakbee_current_user', JSON.stringify(userData));
         login(userData); // Pass userData to login
-        
+
         setSuccess('Login successful!');
-        
+
         setTimeout(() => {
           onClose();
           resetForm();
@@ -594,17 +685,25 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
           formData.securityQuestion,
           formData.securityAnswer
         );
-        
+
         localStorage.setItem('speakbee_auth_token', token);
         localStorage.setItem('speakbee_current_user', JSON.stringify(userData));
-        login(userData); // Pass userData to login
-        
-        setSuccess('Registration successful!');
-        
+
+        // Store credentials for auto-fill and switch to login
+        setAutoFillCredentials({
+          email: formData.email,
+          password: formData.password
+        });
+
+        setSuccess('Registration successful! Redirecting to login...');
+
+        // Switch to login mode after a short delay
         setTimeout(() => {
-          onClose();
-          resetForm();
-        }, 1000);
+          setAuthMode('login');
+          setIsRightPanelActive(false);
+        }, 1500);
+
+        // Don't close the modal yet, let user login immediately
       }
     } catch (error) {
       console.error('Authentication error:', error);
@@ -629,6 +728,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     setAuthMode('login');
     setIsRightPanelActive(false);
     setAcceptedTerms(false);
+    setAutoFillCredentials(null);
     resetForgotPasswordFlow();
   };
 
@@ -652,7 +752,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   const isForgotPasswordMode = authMode === 'forgot-password';
   const isTermsMode = authMode === 'terms';
   const passwordsMatch = !isRegisterMode || formData.password === formData.confirmPassword;
-  const isFormValid = formData.email && formData.password && 
+  const isFormValid = formData.email && formData.password &&
     (!isRegisterMode || (formData.name && passwordsMatch && formData.securityAnswer && acceptedTerms));
 
   // Modern Terms and Conditions Modal Component
@@ -681,17 +781,17 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
             Last Updated: {new Date().toLocaleDateString()}
           </p>
         </div>
-        
+
         {/* Scroll Progress Bar */}
         <div className="w-full bg-[#022A2D] rounded-full h-1 mb-3 md:mb-4">
-          <div 
+          <div
             className="bg-[#28CACD] h-1 rounded-full transition-all duration-300"
             style={{ width: `${scrollPosition}%` }}
           />
         </div>
 
         {/* Terms Content */}
-        <div 
+        <div
           ref={termsContentRef}
           className="flex-1 overflow-y-auto bg-[#022A2D] p-3 md:p-4 rounded-lg mb-3 md:mb-4 terms-content-container custom-scrollbar"
           onScroll={handleScroll}
@@ -707,11 +807,10 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
             <button
               type="button"
               onClick={() => setAcceptedTerms(!acceptedTerms)}
-              className={`w-4 h-4 md:w-5 md:h-5 rounded border-2 flex items-center justify-center transition-all mt-0.5 flex-shrink-0 ${
-                acceptedTerms 
-                  ? 'bg-[#28CACD] border-[#28CACD]' 
+              className={`w-4 h-4 md:w-5 md:h-5 rounded border-2 flex items-center justify-center transition-all mt-0.5 flex-shrink-0 ${acceptedTerms
+                  ? 'bg-[#28CACD] border-[#28CACD]'
                   : 'bg-transparent border-[#4BB6B7]'
-              }`}
+                }`}
             >
               {acceptedTerms && <Check className="w-2 h-2 md:w-3 md:h-3 text-white" />}
             </button>
@@ -784,7 +883,8 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                   <h1 className="text-lg md:text-xl font-bold text-white mb-1">Speak Bee</h1>
                   <p className="text-[#4BB6B7] text-xs">Create Your Account</p>
                 </div>
-                
+
+
                 {/* Error Message */}
                 {error && (
                   <div className="mb-2 p-2 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center text-xs">
@@ -792,177 +892,185 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                     <span className="flex-1">{error}</span>
                   </div>
                 )}
-                
+
                 {/* Success Message */}
                 {success && (
                   <div className="mb-2 p-2 bg-green-100 border border-green-400 text-green-700 rounded-lg flex items-center text-xs">
                     <span>{success}</span>
                   </div>
                 )}
-                
-                <div className="space-y-1 md:space-y-2 mb-2 md:mb-3">
-                  <div className="auth-input-container">
-                    <div className="auth-input-wrapper">
-                      <User className="auth-input-icon" />
-                      <Input
-                        name="name"
-                        type="text"
-                        placeholder="Full Name"
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        className="h-7 md:h-8 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-8 md:pl-10 text-xs"
-                        required
-                        disabled={isLoading}
-                      />
-                    </div>
+
+                {isCheckingUser ? (
+                  <div className="flex justify-center items-center py-8">
+                    <Loader2 className="w-6 h-6 animate-spin text-[#4BB6B7]" />
+                    <span className="ml-2 text-white text-sm">Checking your account...</span>
                   </div>
-                  
-                  <div className="auth-input-container">
-                    <div className="auth-input-wrapper">
-                      <Mail className="auth-input-icon" />
-                      <Input
-                        name="email"
-                        type="email"
-                        placeholder="Email Address"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        className="h-7 md:h-8 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-8 md:pl-10 text-xs"
-                        required
-                        disabled={isLoading}
-                      />
+                ) : (
+                  <>
+                    <div className="space-y-1 md:space-y-2 mb-2 md:mb-3">
+                      <div className="auth-input-container">
+                        <div className="auth-input-wrapper">
+                          <User className="auth-input-icon" />
+                          <Input
+                            name="name"
+                            type="text"
+                            placeholder="Full Name"
+                            value={formData.name}
+                            onChange={handleInputChange}
+                            className="h-7 md:h-8 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-8 md:pl-10 text-xs"
+                            required
+                            disabled={isLoading}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="auth-input-container">
+                        <div className="auth-input-wrapper">
+                          <Mail className="auth-input-icon" />
+                          <Input
+                            name="email"
+                            type="email"
+                            placeholder="Email Address"
+                            value={formData.email}
+                            onChange={handleInputChange}
+                            className="h-7 md:h-8 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-8 md:pl-10 text-xs"
+                            required
+                            disabled={isLoading}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="auth-password-container">
+                        <div className="auth-input-wrapper">
+                          <Lock className="auth-input-icon" />
+                          <Input
+                            name="password"
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="Password (min. 8 characters)"
+                            value={formData.password}
+                            onChange={handleInputChange}
+                            className="h-7 md:h-8 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-8 md:pl-10 pr-7 md:pr-8 text-xs"
+                            required
+                            minLength={8}
+                            disabled={isLoading}
+                          />
+                          <button
+                            type="button"
+                            className="auth-password-toggle"
+                            onClick={togglePasswordVisibility}
+                            disabled={isLoading}
+                          >
+                            {showPassword ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="auth-password-container">
+                        <div className="auth-input-wrapper">
+                          <Lock className="auth-input-icon" />
+                          <Input
+                            name="confirmPassword"
+                            type={showConfirmPassword ? 'text' : 'password'}
+                            placeholder="Confirm Password"
+                            value={formData.confirmPassword}
+                            onChange={handleInputChange}
+                            className="h-7 md:h-8 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-8 md:pl-10 pr-7 md:pr-8 text-xs"
+                            required
+                            minLength={8}
+                            disabled={isLoading}
+                          />
+                          <button
+                            type="button"
+                            className="auth-password-toggle"
+                            onClick={toggleConfirmPasswordVisibility}
+                            disabled={isLoading}
+                          >
+                            {showConfirmPassword ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Security Question Selection */}
+                      <div className="auth-input-container">
+                        <div className="auth-input-wrapper">
+                          <select
+                            name="securityQuestion"
+                            value={formData.securityQuestion}
+                            onChange={handleInputChange}
+                            className="h-7 md:h-8 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-8 md:pl-10 pr-3 md:pr-4 w-full rounded-md border text-xs"
+                            required
+                            disabled={isLoading}
+                          >
+                            {SECURITY_QUESTIONS.map((question, index) => (
+                              <option key={index} value={question} className="text-xs bg-[#022A2D]">
+                                {question}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="auth-input-container">
+                        <div className="auth-input-wrapper">
+                          <Input
+                            name="securityAnswer"
+                            type="text"
+                            placeholder="Your answer (for password recovery)"
+                            value={formData.securityAnswer}
+                            onChange={handleInputChange}
+                            className="h-7 md:h-8 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-8 md:pl-10 text-xs"
+                            required
+                            disabled={isLoading}
+                          />
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="auth-password-container">
-                    <div className="auth-input-wrapper">
-                      <Lock className="auth-input-icon" />
-                      <Input
-                        name="password"
-                        type={showPassword ? 'text' : 'password'}
-                        placeholder="Password (min. 8 characters)"
-                        value={formData.password}
-                        onChange={handleInputChange}
-                        className="h-7 md:h-8 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-8 md:pl-10 pr-7 md:pr-8 text-xs"
-                        required
-                        minLength={8}
-                        disabled={isLoading}
-                      />
+
+                    {/* Terms Acceptance */}
+                    <div className="flex items-start space-x-1 md:space-x-2 mb-2 md:mb-3 p-1 md:p-2 bg-[#022A2D] rounded border border-[#4BB6B7]/30">
                       <button
                         type="button"
-                        className="auth-password-toggle"
-                        onClick={togglePasswordVisibility}
+                        onClick={() => setAcceptedTerms(!acceptedTerms)}
+                        className={`w-3 h-3 md:w-4 md:h-4 rounded border flex items-center justify-center transition-all mt-0.5 flex-shrink-0 ${acceptedTerms
+                            ? 'bg-[#28CACD] border-[#28CACD]'
+                            : 'bg-transparent border-[#4BB6B7]'
+                          }`}
                         disabled={isLoading}
                       >
-                        {showPassword ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                        {acceptedTerms && <Check className="w-2 h-2 md:w-3 md:h-3 text-white" />}
                       </button>
+                      <span className="text-white text-xs leading-relaxed">
+                        I agree to the{' '}
+                        <button
+                          type="button"
+                          onClick={() => setAuthMode('terms')}
+                          className="text-[#4BB6B7] hover:text-[#28CACD] underline transition-colors font-semibold"
+                        >
+                          Terms and Conditions
+                        </button>
+                        {' '}and acknowledge that this is a legal agreement between me and Speak Bee.
+                      </span>
                     </div>
-                  </div>
 
-                  <div className="auth-password-container">
-                    <div className="auth-input-wrapper">
-                      <Lock className="auth-input-icon" />
-                      <Input
-                        name="confirmPassword"
-                        type={showConfirmPassword ? 'text' : 'password'}
-                        placeholder="Confirm Password"
-                        value={formData.confirmPassword}
-                        onChange={handleInputChange}
-                        className="h-7 md:h-8 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-8 md:pl-10 pr-7 md:pr-8 text-xs"
-                        required
-                        minLength={8}
-                        disabled={isLoading}
-                      />
-                      <button
-                        type="button"
-                        className="auth-password-toggle"
-                        onClick={toggleConfirmPasswordVisibility}
-                        disabled={isLoading}
-                      >
-                        {showConfirmPassword ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Security Question Selection */}
-                  <div className="auth-input-container">
-                    <div className="auth-input-wrapper">
-                      <select
-                        name="securityQuestion"
-                        value={formData.securityQuestion}
-                        onChange={handleInputChange}
-                        className="h-7 md:h-8 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-8 md:pl-10 pr-3 md:pr-4 w-full rounded-md border text-xs"
-                        required
-                        disabled={isLoading}
-                      >
-                        {SECURITY_QUESTIONS.map((question, index) => (
-                          <option key={index} value={question} className="text-xs bg-[#022A2D]">
-                            {question}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="auth-input-container">
-                    <div className="auth-input-wrapper">
-                      <Input
-                        name="securityAnswer"
-                        type="text"
-                        placeholder="Your answer (for password recovery)"
-                        value={formData.securityAnswer}
-                        onChange={handleInputChange}
-                        className="h-7 md:h-8 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-8 md:pl-10 text-xs"
-                        required
-                        disabled={isLoading}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Terms Acceptance */}
-                <div className="flex items-start space-x-1 md:space-x-2 mb-2 md:mb-3 p-1 md:p-2 bg-[#022A2D] rounded border border-[#4BB6B7]/30">
-                  <button
-                    type="button"
-                    onClick={() => setAcceptedTerms(!acceptedTerms)}
-                    className={`w-3 h-3 md:w-4 md:h-4 rounded border flex items-center justify-center transition-all mt-0.5 flex-shrink-0 ${
-                      acceptedTerms 
-                        ? 'bg-[#28CACD] border-[#28CACD]' 
-                        : 'bg-transparent border-[#4BB6B7]'
-                    }`}
-                    disabled={isLoading}
-                  >
-                    {acceptedTerms && <Check className="w-2 h-2 md:w-3 md:h-3 text-white" />}
-                  </button>
-                  <span className="text-white text-xs leading-relaxed">
-                    I agree to the{' '}
-                    <button
-                      type="button"
-                      onClick={() => setAuthMode('terms')}
-                      className="text-[#4BB6B7] hover:text-[#28CACD] underline transition-colors font-semibold"
+                    <Button
+                      type="submit"
+                      className="w-full h-7 md:h-8 bg-[#022A2D] hover:bg-[#28CACD] text-white font-semibold rounded-2xl transition-all duration-300 hover:tracking-widest disabled:opacity-50 text-xs mb-1 md:mb-2"
+                      disabled={!isFormValid || isLoading}
                     >
-                      Terms and Conditions
-                    </button>
-                    {' '}and acknowledge that this is a legal agreement between me and Speak Bee.
-                  </span>
-                </div>
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                          Creating Account...
+                        </>
+                      ) : (
+                        'Create Account'
+                      )}
+                    </Button>
 
-                <Button
-                  type="submit"
-                  className="w-full h-7 md:h-8 bg-[#022A2D] hover:bg-[#28CACD] text-white font-semibold rounded-2xl transition-all duration-300 hover:tracking-widest disabled:opacity-50 text-xs mb-1 md:mb-2"
-                  disabled={!isFormValid || isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-3 h-3 animate-spin mr-1" />
-                      Creating Account...
-                    </>
-                  ) : (
-                    'Create Account'
-                  )}
-                </Button>
-
-                <div className="auth-terms-container mb-1 md:mb-2 flex items-center justify-center flex-wrap gap-1">
-                </div>
+                    <div className="auth-terms-container mb-1 md:mb-2 flex items-center justify-center flex-wrap gap-1">
+                    </div>
+                  </>
+                )}
               </form>
             </div>
           )}
@@ -975,7 +1083,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                   <h1 className="text-2xl md:text-3xl font-bold text-white mb-1 md:mb-2">Speak Bee</h1>
                   <p className="text-[#4BB6B7] text-sm md:text-base">Welcome back to your English learning journey</p>
                 </div>
-                
+
                 {/* Error Message */}
                 {error && (
                   <div className="mb-3 md:mb-4 p-2 md:p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center text-sm">
@@ -983,96 +1091,105 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                     <span className="flex-1 text-xs md:text-sm">{error}</span>
                   </div>
                 )}
-                
+
                 {/* Success Message */}
                 {success && (
                   <div className="mb-3 md:mb-4 p-2 md:p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg flex items-center text-sm">
                     <span className="text-xs md:text-sm">{success}</span>
                   </div>
                 )}
-                
-                <div className="auth-input-container mb-3 md:mb-4">
-                  <div className="auth-input-wrapper">
-                    <Mail className="auth-input-icon" />
-                    <Input
-                      name="email"
-                      type="email"
-                      placeholder="Email Address"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="h-10 md:h-12 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-10 text-sm md:text-base"
-                      required
-                      disabled={isLoading}
-                    />
+
+                {isCheckingUser ? (
+                  <div className="flex justify-center items-center py-8">
+                    <Loader2 className="w-8 h-8 animate-spin text-[#4BB6B7]" />
+                    <span className="ml-2 text-white text-base">Checking your account...</span>
                   </div>
-                </div>
-                
-                <div className="auth-password-container mb-3 md:mb-4">
-                  <div className="auth-input-wrapper">
-                    <Lock className="auth-input-icon" />
-                    <Input
-                      name="password"
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Password"
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      className="h-10 md:h-12 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-10 pr-9 md:pr-10 text-sm md:text-base"
-                      required
-                      disabled={isLoading}
-                    />
-                    <button
-                      type="button"
-                      className="auth-password-toggle"
-                      onClick={togglePasswordVisibility}
-                      disabled={isLoading}
+                ) : (
+                  <>
+                    <div className="auth-input-container mb-3 md:mb-4">
+                      <div className="auth-input-wrapper">
+                        <Mail className="auth-input-icon" />
+                        <Input
+                          name="email"
+                          type="email"
+                          placeholder="Email Address"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          className="h-10 md:h-12 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-10 text-sm md:text-base"
+                          required
+                          disabled={isLoading}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="auth-password-container mb-3 md:mb-4">
+                      <div className="auth-input-wrapper">
+                        <Lock className="auth-input-icon" />
+                        <Input
+                          name="password"
+                          type={showPassword ? 'text' : 'password'}
+                          placeholder="Password"
+                          value={formData.password}
+                          onChange={handleInputChange}
+                          className="h-10 md:h-12 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-10 pr-9 md:pr-10 text-sm md:text-base"
+                          required
+                          disabled={isLoading}
+                        />
+                        <button
+                          type="button"
+                          className="auth-password-toggle"
+                          onClick={togglePasswordVisibility}
+                          disabled={isLoading}
+                        >
+                          {showPassword ? <EyeOff className="h-3 w-3 md:h-4 md:w-4" /> : <Eye className="h-3 w-3 md:h-4 md:w-4" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <Button
+                      type="submit"
+                      className="w-full h-10 md:h-12 bg-[#022A2D] hover:bg-[#28CACD] text-white font-semibold rounded-2xl transition-all duration-300 hover:tracking-widest disabled:opacity-50 text-sm md:text-base"
+                      disabled={!isFormValid || isLoading}
                     >
-                      {showPassword ? <EyeOff className="h-3 w-3 md:h-4 md:w-4" /> : <Eye className="h-3 w-3 md:h-4 md:w-4" />}
-                    </button>
-                  </div>
-                </div>
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="w-3 h-3 md:w-4 md:h-4 animate-spin mr-1 md:mr-2" />
+                          Signing In...
+                        </>
+                      ) : (
+                        'Sign In'
+                      )}
+                    </Button>
 
-                <Button
-                  type="submit"
-                  className="w-full h-10 md:h-12 bg-[#022A2D] hover:bg-[#28CACD] text-white font-semibold rounded-2xl transition-all duration-300 hover:tracking-widest disabled:opacity-50 text-sm md:text-base"
-                  disabled={!isFormValid || isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-3 h-3 md:w-4 md:h-4 animate-spin mr-1 md:mr-2" />
-                      Signing In...
-                    </>
-                  ) : (
-                    'Sign In'
-                  )}
-                </Button>
+                    <div className="auth-pass-link auth-compact-link">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          // Prefill email from login form and clear errors for smoother recovery
+                          setEmail(formData.email || '');
+                          setError('');
+                          setSuccess('');
+                          setForgotPasswordStep(1);
+                          setAuthMode('forgot-password');
+                        }}
+                        className="text-[#4BB6B7] hover:text-[#28CACD] text-xs md:text-sm transition-colors font-medium"
+                      >
+                        Forgot your password?
+                      </button>
+                    </div>
 
-                <div className="auth-pass-link auth-compact-link">
-                  <button 
-                    type="button"
-                    onClick={() => {
-                      // Prefill email from login form and clear errors for smoother recovery
-                      setEmail(formData.email || '');
-                      setError('');
-                      setSuccess('');
-                      setForgotPasswordStep(1);
-                      setAuthMode('forgot-password');
-                    }}
-                    className="text-[#4BB6B7] hover:text-[#28CACD] text-xs md:text-sm transition-colors font-medium"
-                  >
-                    Forgot your password?
-                  </button>
-                </div>
-
-                <div className="auth-terms-container auth-compact-terms flex items-center justify-center flex-wrap gap-2">
-                  <button 
-                    type="button"
-                    onClick={() => setAuthMode('terms')}
-                    className="auth-terms-link flex items-center text-xs md:text-sm"
-                  >
-                    <FileText className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-                    Terms and Conditions
-                  </button>
-                </div>
+                    <div className="auth-terms-container auth-compact-terms flex items-center justify-center flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setAuthMode('terms')}
+                        className="auth-terms-link flex items-center text-xs md:text-sm"
+                      >
+                        <FileText className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+                        Terms and Conditions
+                      </button>
+                    </div>
+                  </>
+                )}
               </form>
             </div>
           )}
@@ -1097,10 +1214,10 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                 </div>
 
                 <div className="text-center mb-4 md:mb-6">
-                  <h1 className="text-2xl md:text-3xl font-bold text-white mb-1 md:mb-2">Speak Bee</h1>
+                  <h1 className="text-2xl md:text-3xl font-bold text-white mb-1 md:mb-1">Speak Bee</h1>
                   <p className="text-[#4BB6B7] text-sm md:text-base">Reset Your Password</p>
                 </div>
-                
+
                 {/* Error Message */}
                 {error && (
                   <div className="mb-3 md:mb-4 p-2 md:p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center">
@@ -1108,7 +1225,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                     <span className="text-xs md:text-sm">{error}</span>
                   </div>
                 )}
-                
+
                 {/* Success Message */}
                 {success && (
                   <div className="mb-3 md:mb-4 p-2 md:p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg flex items-center">
