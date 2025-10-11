@@ -243,9 +243,8 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
     const isCorrect = choice === current.audioText;
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
-      if (current.id.includes('star')) {
-        setStars(prev => Math.min(3, prev + 1));
-      }
+      // Add star for every correct answer in interactive steps
+      setStars(prev => Math.min(3, prev + 1));
     }
     
     setShowFeedback(true);
@@ -360,22 +359,20 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
                   </span>
                 </div>
                 
-                {/* Star Collection Display */}
-                {(current.id.includes('star') || current.id === 'grand_celebration') && (
-                  <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                    {Array.from({ length: 3 }).map((_, i) => (
-                      <Star 
-                        key={i} 
-                        className={cn(
-                          "w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 transition-all duration-500 transform hover:scale-125",
-                          i < stars 
-                            ? 'text-yellow-400 animate-pulse drop-shadow-lg' 
-                            : 'text-gray-300 opacity-50'
-                        )} 
-                      />
-                    ))}
-                  </div>
-                )}
+                {/* Star Collection Display - Show in all steps like pirate story */}
+                <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <Star 
+                      key={i} 
+                      className={cn(
+                        "w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 transition-all duration-500 transform hover:scale-125",
+                        i < stars 
+                          ? 'text-yellow-400 animate-pulse drop-shadow-lg' 
+                          : 'text-gray-300 opacity-50'
+                      )} 
+                    />
+                  ))}
+                </div>
 
                 {/* Magic Icon */}
                 <div className="absolute top-1 right-1 sm:top-2 sm:right-2 animate-float-slow">
@@ -515,7 +512,7 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
                     <div className="mt-3 sm:mt-4 animate-fade-in">
                       {selectedChoice === current.audioText ? (
                         <div className="text-green-600 dark:text-green-400 text-lg sm:text-xl font-bold animate-bounce bg-green-50 dark:bg-green-900/20 rounded-xl sm:rounded-2xl p-3 sm:p-4 border-2 border-green-200 dark:border-green-700">
-                          🎉 Magical! You're a unicorn expert! 🌟
+                          🎉 Magical! You earned a star! 🌟
                         </div>
                       ) : (
                         <div className="text-red-600 dark:text-red-400 text-lg sm:text-xl font-bold bg-red-50 dark:bg-red-900/20 rounded-xl sm:rounded-2xl p-3 sm:p-4 border-2 border-red-200 dark:border-red-700">

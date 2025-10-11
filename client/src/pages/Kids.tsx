@@ -4,7 +4,8 @@ import {
   Mic, Award, Zap, Heart, Sparkles,
   Rabbit, Fish, Rocket, Cloud,
   Sun, CloudRain, CloudSnow, Footprints,
-  ChevronLeft, ChevronRight
+  ChevronLeft, ChevronRight, Anchor,
+  Shield, X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -22,6 +23,9 @@ import SpaceAdventure from '@/components/kids/stories/SpaceAdventure';
 import UnderwaterWorld from '@/components/kids/stories/UnderwaterWorld';
 import DinosaurDiscoveryAdventure from '@/components/kids/stories/DinosaurDiscoveryAdventure';
 import UnicornMagicAdventure from '@/components/kids/stories/UnicornMagicAdventure';
+import PirateTreasureAdventure from '@/components/kids/stories/PirateTreasureAdventure';
+import SuperheroAdventure from '@/components/kids/stories/SuperheroSchoolAdventure';
+import FairyGardenAdventure from '@/components/kids/stories/FairyGardenAdventure';
 
 const KidsPage = () => {
   const [activeCategory, setActiveCategory] = useState('stories');
@@ -39,6 +43,9 @@ const KidsPage = () => {
   const [showUnderwaterWorld, setShowUnderwaterWorld] = useState(false);
   const [showDinosaurAdventure, setShowDinosaurAdventure] = useState(false);
   const [showUnicornAdventure, setShowUnicornAdventure] = useState(false);
+  const [showPirateAdventure, setShowPirateAdventure] = useState(false);
+  const [showSuperheroAdventure, setShowSuperheroAdventure] = useState(false);
+  const [showFairyGardenAdventure, setShowFairyGardenAdventure] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const storiesPerPage = 4;
   const containerRef = useRef<HTMLDivElement>(null);
@@ -98,7 +105,7 @@ const KidsPage = () => {
       title: "The Magic Forest",
       description: "Join Luna the rabbit on her adventure through the enchanted forest",
       difficulty: 'Easy',
-      duration: '5 min',
+      duration: '6 min',
       words: 265,
       image: '🌳',
       character: Rabbit,
@@ -111,7 +118,7 @@ const KidsPage = () => {
       title: "Space Adventure",
       description: "Blast off with Cosmo the astronaut to explore distant planets",
       difficulty: 'Medium',
-      duration: '8 min',
+      duration: '6 min',
       words: 290,
       image: '🚀',
       character: Rocket,
@@ -137,7 +144,7 @@ const KidsPage = () => {
       title: "Dinosaur Discovery",
       description: "Travel back in time with Dina to meet amazing dinosaurs",
       difficulty: 'Hard',
-      duration: '7 min',
+      duration: '6 min',
       words: 250,
       image: '🦖',
       character: Footprints,
@@ -150,7 +157,7 @@ const KidsPage = () => {
       title: "Unicorn Magic",
       description: "Join Stardust the unicorn in the magical Sparkle Kingdom",
       difficulty: 'Easy',
-      duration: '6 min',
+      duration: '5 min',
       words: 225,
       image: '🦄',
       character: Sparkles,
@@ -163,10 +170,10 @@ const KidsPage = () => {
       title: "Pirate Treasure",
       description: "Sail with Captain Finn to find buried treasure and secret islands",
       difficulty: 'Medium',
-      duration: '7 min',
-      words: 285,
+      duration: '3 min',
+      words: 96,
       image: '🏴‍☠️',
-      character: Rocket,
+      character: Anchor,
       gradient: 'from-amber-400 to-yellow-400',
       bgGradient: 'from-amber-100 to-yellow-100 dark:from-amber-900 dark:to-yellow-900',
       animation: 'animate-bounce',
@@ -176,10 +183,10 @@ const KidsPage = () => {
       title: "Superhero School",
       description: "Train with Captain Courage to become a superhero and help people",
       difficulty: 'Medium',
-      duration: '8 min',
-      words: 295,
+      duration: '4 min',
+      words: 160,
       image: '🦸',
-      character: Zap,
+      character: Shield,
       gradient: 'from-blue-400 to-indigo-400',
       bgGradient: 'from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900',
       animation: 'animate-float-fast',
@@ -189,8 +196,8 @@ const KidsPage = () => {
       title: "Fairy Garden",
       description: "Explore the tiny magical world with Twinkle the fairy",
       difficulty: 'Easy',
-      duration: '5 min',
-      words: 260,
+      duration: '3 min',
+      words: 145,
       image: '🧚',
       character: Sparkles,
       gradient: 'from-green-400 to-teal-400',
@@ -226,7 +233,16 @@ const KidsPage = () => {
     { word: 'forest', hint: '/ˈfɒr.ɪst/' },
     { word: 'planet', hint: '/ˈplæn.ɪt/' },
     { word: 'dinosaur', hint: '/ˈdaɪ.nə.sɔːr/' },
-    { word: 'unicorn', hint: '/ˈjuː.nɪ.kɔːrn/' }
+    { word: 'unicorn', hint: '/ˈjuː.nɪ.kɔːrn/' },
+    { word: 'pirate', hint: '/ˈpaɪ.rət/' },
+    { word: 'treasure', hint: '/ˈtreʒ.ər/' },
+    { word: 'parrot', hint: '/ˈpær.ət/' },
+    { word: 'superhero', hint: '/ˈsuː.pə.hɪə.rəʊ/' },
+    { word: 'rescue', hint: '/ˈres.kjuː/' },
+    { word: 'fairy', hint: '/ˈfeə.ri/' },
+    { word: 'magic', hint: '/ˈmædʒ.ɪk/' },
+    { word: 'moonflower', hint: '/ˈmuːn.flaʊ.ər/' },
+    { word: 'sparkle', hint: '/ˈspɑː.kəl/' }
   ];
 
   const pronounceItems = [
@@ -234,7 +250,16 @@ const KidsPage = () => {
     { phrase: 'Magic forest', phonemes: '/ˈmædʒ.ɪk ˈfɒr.ɪst/' },
     { phrase: 'Happy rabbit', phonemes: '/ˈhæp.i ˈræb.ɪt/' },
     { phrase: 'Big dinosaur', phonemes: '/bɪɡ ˈdaɪ.nə.sɔːr/' },
-    { phrase: 'Rainbow unicorn', phonemes: '/ˈreɪn.bəʊ ˈjuː.nɪ.kɔːrn/' }
+    { phrase: 'Rainbow unicorn', phonemes: '/ˈreɪn.bəʊ ˈjuː.nɪ.kɔːrn/' },
+    { phrase: 'Pirate treasure', phonemes: '/ˈpaɪ.rət ˈtreʒ.ər/' },
+    { phrase: 'Captain Finn', phonemes: '/ˈkæp.tɪn fɪn/' },
+    { phrase: 'Buried treasure', phonemes: '/ˈber.id ˈtreʒ.ər/' },
+    { phrase: 'Superhero training', phonemes: '/ˈsuː.pə.hɪə.rəʊ ˈtreɪ.nɪŋ/' },
+    { phrase: 'Rescue mission', phonemes: '/ˈres.kjuː ˈmɪʃ.ən/' },
+    { phrase: 'Fairy dust', phonemes: '/ˈfeə.ri dʌst/' },
+    { phrase: 'Magic sparkles', phonemes: '/ˈmædʒ.ɪk ˈspɑː.kəlz/' },
+    { phrase: 'Talking bunnies', phonemes: '/ˈtɔː.kɪŋ ˈbʌn.iz/' },
+    { phrase: 'Glowing moonflowers', phonemes: '/ˈɡləʊ.ɪŋ ˈmuːn.flaʊ.əz/' }
   ];
 
   const handleStartLesson = async (storyIndex: number) => {
@@ -255,6 +280,12 @@ const KidsPage = () => {
       setShowDinosaurAdventure(true);
     } else if (storyType === 'unicorn') {
       setShowUnicornAdventure(true);
+    } else if (storyType === 'pirate') {
+      setShowPirateAdventure(true);
+    } else if (storyType === 'superhero') {
+      setShowSuperheroAdventure(true);
+    } else if (storyType === 'fairy') {
+      setShowFairyGardenAdventure(true);
     }
     
     // Add celebration effects
@@ -852,6 +883,36 @@ const KidsPage = () => {
           onComplete={(score) => {
             setShowUnicornAdventure(false);
             handleAdventureComplete(4, score);
+          }}
+        />
+      )}
+
+      {showPirateAdventure && (
+        <PirateTreasureAdventure 
+          onClose={() => setShowPirateAdventure(false)} 
+          onComplete={(score) => {
+            setShowPirateAdventure(false);
+            handleAdventureComplete(5, score);
+          }}
+        />
+      )}
+
+      {showSuperheroAdventure && (
+        <SuperheroAdventure 
+          onClose={() => setShowSuperheroAdventure(false)} 
+          onComplete={(score) => {
+            setShowSuperheroAdventure(false);
+            handleAdventureComplete(6, score);
+          }}
+        />
+      )}
+
+      {showFairyGardenAdventure && (
+        <FairyGardenAdventure 
+          onClose={() => setShowFairyGardenAdventure(false)} 
+          onComplete={(score) => {
+            setShowFairyGardenAdventure(false);
+            handleAdventureComplete(7, score);
           }}
         />
       )}

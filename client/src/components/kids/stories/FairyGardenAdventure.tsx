@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Sparkles, Zap, Volume2, Play, Heart, X, Mountain, Cloud, Sun, Footprints } from 'lucide-react';
+import { Sparkles, Star, Volume2, Play, Heart, Zap, Flower, X } from 'lucide-react';
 import SpeechService from '@/services/SpeechService';
 import { cn } from '@/lib/utils';
 
@@ -14,172 +14,112 @@ type Props = {
 const storySteps = [
   {
     id: 'intro',
-    title: '🦕 Dino World Adventure!',
-    text: 'Hello, paleontologist! I\'m Dina the dinosaur explorer! Our time machine is ready to take us back to the age of dinosaurs! Can you hear the ground shaking?',
-    emoji: '👩‍🔬',
-    character: 'Dina',
-    bgColor: 'from-orange-100 to-amber-100 dark:from-orange-900 dark:to-amber-900',
+    title: '🧚 Fairy World!',
+    text: 'Welcome to Blossom Meadow! I\'m Twinkle the fairy! Everything here is tiny and magical. Can you see the fairy dust sparkling?',
+    emoji: '🧚‍♀️',
+    character: 'Twinkle the Fairy',
+    bgColor: 'from-pink-100 to-purple-100 dark:from-pink-900 dark:to-purple-900',
     interactive: false,
-    wordCount: 25,
-    duration: 30
-  },
-  {
-    id: 't_rex',
-    title: '🦖 T-Rex Encounter!',
-    text: 'ROAR! Look at that enormous Tyrannosaurus Rex! It has giant teeth and tiny arms. Listen to its mighty roar!',
-    emoji: '🦖',
-    character: 'Dina',
-    bgColor: 'from-red-100 to-orange-100 dark:from-red-900 dark:to-orange-900',
-    interactive: true,
-    audioText: 'T-Rex',
-    choices: ['T-Rex', 'Stegosaurus', 'Triceratops'],
     wordCount: 18,
-    duration: 25,
-    question: 'Which dinosaur has tiny arms and giant teeth?',
-    hint: 'It\'s the king of dinosaurs!'
+    duration: 20
   },
   {
-    id: 'first_fossil',
-    title: '💎 First Dino Fossil!',
-    text: 'Fantastic! We found our first dinosaur fossil! Fossils help us learn about ancient creatures. Two more fossils to discover!',
-    emoji: '💎',
-    character: 'Dina',
+    id: 'fairy_dust',
+    title: '✨ Magic Dust',
+    text: 'Watch this! When I sprinkle fairy dust, flowers grow instantly and glow with pretty lights!',
+    emoji: '✨',
+    character: 'Twinkle the Fairy',
     bgColor: 'from-yellow-100 to-amber-100 dark:from-yellow-900 dark:to-amber-900',
-    interactive: false,
-    fossilsNeeded: 3,
-    wordCount: 20,
-    duration: 25
-  },
-  {
-    id: 'herbivore_herd',
-    title: '🦕 Gentle Giants',
-    text: 'Wow! A herd of long-necked Brachiosaurus are eating leaves from tall trees! They\'re as tall as buildings!',
-    emoji: '🦕',
-    character: 'Dina',
-    bgColor: 'from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900',
     interactive: true,
-    audioText: 'Brachiosaurus',
-    choices: ['Velociraptor', 'Brachiosaurus', 'Pterodactyl'],
-    wordCount: 19,
-    duration: 28,
-    question: 'Which dinosaur has a very long neck?',
-    hint: 'It eats leaves from treetops'
+    audioText: 'dust',
+    choices: ['dust', 'water', 'soil'],
+    wordCount: 15,
+    duration: 22,
+    question: 'What makes magic happen in fairy land?',
+    hint: 'It sparkles and helps fairies fly'
   },
   {
-    id: 'triceratops',
-    title: '🦏 Three-Horned Friend!',
-    text: 'Amazing! A Triceratops is munching on plants! It has three sharp horns on its face to protect itself from predators.',
-    emoji: '🦏',
-    character: 'Dina',
+    id: 'first_star',
+    title: '⭐ First Fairy Star!',
+    text: 'Wonderful! You earned your first fairy star! Stars show you\'re learning fairy magic. Two more stars to earn!',
+    emoji: '⭐',
+    character: 'Twinkle the Fairy',
+    bgColor: 'from-green-100 to-teal-100 dark:from-green-900 dark:to-teal-900',
+    interactive: false,
+    starsNeeded: 3,
+    wordCount: 20,
+    duration: 18
+  },
+  {
+    id: 'talking_animals',
+    title: '🐇 Bunny Friends',
+    text: 'Hello little bunnies! In our garden, all animals can talk and help us with fairy chores.',
+    emoji: '🐇',
+    character: 'Twinkle the Fairy',
     bgColor: 'from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900',
     interactive: true,
-    audioText: 'Triceratops',
-    choices: ['Triceratops', 'Stegosaurus', 'Ankylosaurus'],
-    wordCount: 22,
-    duration: 30,
-    question: 'Which dinosaur has three horns?',
-    hint: 'Its name means "three-horned face"'
+    audioText: 'bunnies',
+    choices: ['bunnies', 'birds', 'squirrels'],
+    wordCount: 16,
+    duration: 24,
+    question: 'Who hops and talks in the fairy garden?',
+    hint: 'They have long ears and fluffy tails'
   },
   {
-    id: 'second_fossil',
-    title: '✨ Second Ancient Fossil!',
-    text: 'Incredible! Another fossil appeared near the volcano! These bones tell stories from millions of years ago! One last fossil to find!',
+    id: 'second_star',
+    title: '✨ Second Fairy Star!',
+    text: 'Fantastic! Another fairy star for making bunny friends! You\'re becoming a real fairy! One more star to go!',
     emoji: '✨',
-    character: 'Dina',
+    character: 'Twinkle the Fairy',
     bgColor: 'from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900',
     interactive: false,
-    fossilsNeeded: 3,
-    wordCount: 21,
-    duration: 25
-  },
-  {
-    id: 'stegosaurus',
-    title: '🦎 Spiky Stegosaurus!',
-    text: 'Look at that Stegosaurus with its amazing back plates and tail spikes! The plates help it stay warm or cool.',
-    emoji: '🦎',
-    character: 'Dina',
-    bgColor: 'from-pink-100 to-rose-100 dark:from-pink-900 dark:to-rose-900',
-    interactive: true,
-    audioText: 'Stegosaurus',
-    choices: ['Stegosaurus', 'T-Rex', 'Brachiosaurus'],
-    wordCount: 20,
-    duration: 28,
-    question: 'Which dinosaur has plates on its back?',
-    hint: 'It has spikes on its tail too'
-  },
-  {
-    id: 'velociraptor',
-    title: '🐆 Speedy Raptor!',
-    text: 'Quick! A pack of Velociraptors is running by! They\'re small but very smart and hunt together in groups.',
-    emoji: '🐆',
-    character: 'Dina',
-    bgColor: 'from-gray-100 to-slate-100 dark:from-gray-900 dark:to-slate-900',
-    interactive: true,
-    audioText: 'Velociraptor',
-    choices: ['Velociraptor', 'Triceratops', 'Pterodactyl'],
+    starsNeeded: 3,
     wordCount: 19,
+    duration: 20
+  },
+  {
+    id: 'moonflower',
+    title: '🌙 Night Flowers',
+    text: 'Woww! The special moonflowers only bloom at night when the moon is out. They glow in the dark!',
+    emoji: '🌙',
+    character: 'Twinkle the Fairy',
+    bgColor: 'from-indigo-100 to-blue-100 dark:from-indigo-900 dark:to-blue-900',
+    interactive: true,
+    audioText: 'moonflowers',
+    choices: ['moonflowers', 'sunflowers', 'roses'],
+    wordCount: 17,
     duration: 26,
-    question: 'Which dinosaur is small and very fast?',
-    hint: 'They hunt in packs and are very clever'
+    question: 'What flowers glow when the moon shines?',
+    hint: 'They love the nighttime and moonlight'
   },
   {
-    id: 'third_fossil',
-    title: '🌟 Third Magic Fossil!',
-    text: 'We did it! All three fossils are glowing brightly! They will help scientists learn about dinosaur history forever. You\'re an amazing paleontologist!',
+    id: 'third_star',
+    title: '🌟 Third Fairy Star!',
+    text: 'Magical! You earned all three fairy stars! You discovered the secret moonflowers and showed true fairy wisdom!',
     emoji: '🌟',
-    character: 'Dina',
-    bgColor: 'from-yellow-200 to-orange-200 dark:from-yellow-800 dark:to-orange-800',
+    character: 'Twinkle the Fairy',
+    bgColor: 'from-teal-100 to-green-100 dark:from-teal-900 dark:to-green-900',
     interactive: false,
-    fossilsNeeded: 3,
-    wordCount: 23,
-    duration: 30
+    starsNeeded: 3,
+    wordCount: 18,
+    duration: 22
   },
   {
-    id: 'flying_dino',
-    title: '🦅 Flying Reptile!',
-    text: 'Look up in the sky! A Pterodactyl is soaring above us! It\'s not a dinosaur but a flying reptile from ancient times!',
-    emoji: '🦅',
-    character: 'Dina',
-    bgColor: 'from-blue-200 to-cyan-200 dark:from-blue-800 dark:to-cyan-800',
-    interactive: true,
-    audioText: 'Pterodactyl',
-    choices: ['Pterodactyl', 'Dragon', 'Eagle'],
-    wordCount: 22,
-    duration: 28,
-    question: 'What flies in the dinosaur sky?',
-    hint: 'It has wings but no feathers'
-  },
-  {
-    id: 'volcano',
-    title: '🌋 Ancient Volcano!',
-    text: 'Watch out! The volcano is rumbling! Dinosaurs lived when there were many active volcanoes shaping the land.',
-    emoji: '🌋',
-    character: 'Dina',
-    bgColor: 'from-red-200 to-orange-200 dark:from-red-800 dark:to-orange-800',
-    interactive: true,
-    audioText: 'volcano',
-    choices: ['mountain', 'volcano', 'waterfall'],
-    wordCount: 16,
-    duration: 25,
-    question: 'What is rumbling and has lava?',
-    hint: 'It can erupt with fire and ash'
-  },
-  {
-    id: 'final_celebration',
-    title: '🎉 Dino Discovery Celebration!',
-    text: 'Congratulations, dinosaur expert! You helped Dina complete the prehistoric mission! All the dinosaurs are celebrating, and we\'ve learned so much about ancient times!',
+    id: 'graduation',
+    title: '🎉 Fairy Celebration!',
+    text: 'Congratulations, little fairy! You completed your magical journey in Blossom Meadow! You\'re now an official fairy friend who understands nature\'s secrets!',
     emoji: '🎉',
-    character: 'Dina',
+    character: 'Twinkle the Fairy',
     bgColor: 'from-rainbow-100 to-sparkle-100 dark:from-rainbow-900 dark:to-sparkle-900',
     interactive: false,
-    wordCount: 24,
-    duration: 35
+    wordCount: 21,
+    duration: 30
   }
 ];
 
-const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
+const FairyGardenAdventure = ({ onClose, onComplete }: Props) => {
   const [stepIndex, setStepIndex] = useState(0);
-  const [fossils, setFossils] = useState(0);
+  const [stars, setStars] = useState(0);
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -214,7 +154,7 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
     if (current.text && SpeechService.isTTSSupported()) {
       const playNarration = async () => {
         try {
-          await SpeechService.speak(current.text, { rate: 0.8, pitch: 1.1 });
+          await SpeechService.speak(current.text, { rate: 0.8, pitch: 1.2 });
         } catch (error) {
           console.log('TTS not available');
         }
@@ -231,10 +171,10 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
       setShowHint(false);
     } else {
       // Calculate score based on correct answers and time
-      const accuracyScore = correctAnswers * 20;
-      const timeBonus = Math.max(0, 300 - timeSpent) * 0.1;
-      const fossilBonus = fossils * 10;
-      const score = Math.min(100, 40 + accuracyScore + timeBonus + fossilBonus);
+      const accuracyScore = correctAnswers * 25;
+      const timeBonus = Math.max(0, 180 - timeSpent) * 0.1;
+      const starBonus = stars * 10;
+      const score = Math.min(100, 40 + accuracyScore + timeBonus + starBonus);
       onComplete(score);
     }
   };
@@ -246,7 +186,7 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
     // Play the correct word with excitement
     if (current.audioText && SpeechService.isTTSSupported()) {
       try {
-        await SpeechService.speak(current.audioText, { rate: 0.7, pitch: 1.3 });
+        await SpeechService.speak(current.audioText, { rate: 0.7, pitch: 1.4 });
       } catch (error) {
         console.log('TTS not available');
       }
@@ -258,8 +198,8 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
     const isCorrect = choice === current.audioText;
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
-      // Add fossil for every correct answer in interactive steps
-      setFossils(prev => Math.min(3, prev + 1));
+      // Add star for every correct answer in interactive steps
+      setStars(prev => Math.min(3, prev + 1));
     }
     
     setShowFeedback(true);
@@ -274,7 +214,7 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
     if (current.audioText && SpeechService.isTTSSupported()) {
       setIsPlaying(true);
       try {
-        await SpeechService.speak(current.audioText, { rate: 0.7, pitch: 1.3 });
+        await SpeechService.speak(current.audioText, { rate: 0.7, pitch: 1.4 });
       } catch (error) {
         console.log('TTS not available');
       }
@@ -286,7 +226,7 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
     if (current.text && SpeechService.isTTSSupported()) {
       setIsPlaying(true);
       try {
-        await SpeechService.speak(current.text, { rate: 0.8, pitch: 1.1 });
+        await SpeechService.speak(current.text, { rate: 0.8, pitch: 1.2 });
       } catch (error) {
         console.log('TTS not available');
       }
@@ -295,24 +235,20 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
   };
 
   const getCharacterAnimation = () => {
-    if (current.id.includes('fossil')) return 'animate-bounce';
+    if (current.id.includes('star')) return 'animate-bounce';
     return 'animate-float';
   };
 
-  const getDinoIcon = () => {
+  const getFairyIcon = () => {
     switch (current.id) {
-      case 't_rex': return Footprints;
-      case 'herbivore_herd': return Mountain;
-      case 'triceratops': return Sun;
-      case 'stegosaurus': return Sparkles;
-      case 'velociraptor': return Footprints;
-      case 'flying_dino': return Cloud;
-      case 'volcano': return Sparkles;
+      case 'fairy_dust': return Sparkles;
+      case 'talking_animals': return Flower;
+      case 'moonflower': return Star;
       default: return Sparkles;
     }
   };
 
-  const DinoIcon = getDinoIcon();
+  const FairyIcon = getFairyIcon();
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -337,11 +273,11 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3 flex-shrink-0">
             <div className="flex items-center gap-3">
               <div className="relative">
-                <Footprints className="w-6 h-6 sm:w-8 sm:h-8 text-orange-600 animate-bounce" />
+                <Flower className="w-6 h-6 sm:w-8 sm:h-8 text-pink-600 animate-bounce" />
                 <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 absolute -top-1 -right-1 animate-ping" />
               </div>
               <div>
-                <h2 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white">Dina's Dino Adventure</h2>
+                <h2 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white">Twinkle's Fairy Garden</h2>
                 <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
                   Step {stepIndex + 1} of {totalSteps} • {totalWords} words • {Math.round(totalDuration/60)}min
                 </p>
@@ -349,14 +285,14 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
             </div>
             <div className="flex items-center gap-3 self-end sm:self-auto">
               <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap bg-white/50 dark:bg-gray-800/50 px-3 py-1 rounded-full border border-white/20">
-                💎 {fossils}/3 Fossils
+                ⭐ {stars}/3 Stars
               </div>
             </div>
           </div>
 
           {/* Progress Bar */}
           <Progress value={progress} className="h-2 sm:h-3 mb-6 sm:mb-8 bg-white/30 flex-shrink-0">
-            <div className="h-full bg-gradient-to-r from-orange-400 to-red-400 rounded-full transition-all duration-500" />
+            <div className="h-full bg-gradient-to-r from-pink-400 to-purple-400 rounded-full transition-all duration-500" />
           </Progress>
 
           {/* Scrollable Content Area */}
@@ -369,32 +305,32 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
                   getCharacterAnimation()
                 )}>
                   <span className={cn(
-                    current.id === 'final_celebration' && 'animate-celebration-party'
+                    current.id === 'graduation' && 'animate-celebration-party'
                   )}>
                     {current.emoji}
                   </span>
                 </div>
                 
-                {/* Fossil Collection Display - Show in all steps like other stories */}
+                {/* Star Collection Display */}
                 <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
                   {Array.from({ length: 3 }).map((_, i) => (
                     <div 
                       key={i} 
                       className={cn(
                         "w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 transition-all duration-500 transform hover:scale-125 flex items-center justify-center",
-                        i < fossils 
-                          ? 'text-amber-600 animate-pulse drop-shadow-lg' 
+                        i < stars 
+                          ? 'text-yellow-400 animate-pulse drop-shadow-lg' 
                           : 'text-gray-300 opacity-50'
                       )} 
                     >
-                      💎
+                      ⭐
                     </div>
                   ))}
                 </div>
 
-                {/* Dino Icon */}
+                {/* Fairy Icon */}
                 <div className="absolute top-1 right-1 sm:top-2 sm:right-2 animate-float-slow">
-                  <DinoIcon className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-orange-500 opacity-70" />
+                  <FairyIcon className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-pink-400 opacity-70" />
                 </div>
               </div>
 
@@ -406,7 +342,7 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
                     variant="ghost" 
                     size="sm" 
                     onClick={playStoryText}
-                    className="text-blue-500 hover:text-blue-600 h-6 w-6 sm:h-8 sm:w-8 p-0"
+                    className="text-pink-500 hover:text-pink-600 h-6 w-6 sm:h-8 sm:w-8 p-0"
                   >
                     <Volume2 className="w-3 h-3 sm:w-4 sm:h-4" />
                   </Button>
@@ -426,22 +362,22 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
               {current.interactive && (
                 <div className="space-y-4 sm:space-y-6">
                   {/* Question and Hint */}
-                  <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg sm:rounded-xl p-3 sm:p-4 border-2 border-orange-200 dark:border-orange-700">
+                  <div className="bg-pink-50 dark:bg-pink-900/20 rounded-lg sm:rounded-xl p-3 sm:p-4 border-2 border-pink-200 dark:border-pink-700">
                     <h4 className="text-base sm:text-lg font-bold text-gray-800 dark:text-white mb-2">
                       {current.question}
                     </h4>
                     {showHint ? (
                       <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
-                        💡 Dino Hint: {current.hint}
+                        💡 Fairy Hint: {current.hint}
                       </p>
                     ) : (
                       <Button 
                         variant="outline" 
                         size="sm" 
                         onClick={() => setShowHint(true)}
-                        className="text-orange-600 border-orange-300 hover:bg-orange-100 text-xs sm:text-sm"
+                        className="text-pink-600 border-pink-300 hover:bg-pink-100 text-xs sm:text-sm"
                       >
-                        Need a dino hint? 🦖
+                        Need a fairy hint? 🧚
                       </Button>
                     )}
                   </div>
@@ -453,7 +389,7 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
                         onClick={playAudio}
                         disabled={isPlaying}
                         className={cn(
-                          "rounded-xl sm:rounded-2xl px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold transition-all duration-300 transform hover:scale-105 text-sm sm:text-base",
+                          "rounded-xl sm:rounded-2xl px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-bold transition-all duration-300 transform hover:scale-105 text-sm sm:text-base",
                           isPlaying && "animate-pulse"
                         )}
                       >
@@ -465,7 +401,7 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
                         ) : (
                           <>
                             <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                            <span className="hidden sm:inline">🔊 Listen to the Dino Word</span>
+                            <span className="hidden sm:inline">🔊 Listen to the Magic Word</span>
                             <span className="sm:hidden">🔊 Listen</span>
                           </>
                         )}
@@ -490,23 +426,20 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
                               "rounded-xl sm:rounded-2xl px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-lg font-bold transition-all duration-300 transform hover:scale-105 h-auto min-h-[60px] sm:min-h-[80px]",
                               showResult && isCorrect && "bg-green-500 hover:bg-green-600 text-white animate-bounce shadow-lg sm:shadow-2xl",
                               showResult && !isCorrect && "bg-red-500 hover:bg-red-600 text-white shadow-md sm:shadow-xl",
-                              !showResult && "bg-white/90 hover:bg-white text-gray-700 border-2 border-gray-200 hover:border-orange-300 hover:shadow-lg"
+                              !showResult && "bg-white/90 hover:bg-white text-gray-700 border-2 border-gray-200 hover:border-pink-300 hover:shadow-lg"
                             )}
                           >
                             <span className="flex flex-col items-center gap-1">
                               <span className="text-xl sm:text-2xl mb-1">
-                                {choice === 'T-Rex' && '🦖'}
-                                {choice === 'Brachiosaurus' && '🦕'}
-                                {choice === 'Triceratops' && '🦏'}
-                                {choice === 'Stegosaurus' && '🦎'}
-                                {choice === 'Velociraptor' && '🐆'}
-                                {choice === 'Pterodactyl' && '🦅'}
-                                {choice === 'volcano' && '🌋'}
-                                {choice === 'Ankylosaurus' && '🛡️'}
-                                {choice === 'Dragon' && '🐉'}
-                                {choice === 'Eagle' && '🦅'}
-                                {choice === 'mountain' && '⛰️'}
-                                {choice === 'waterfall' && '🌊'}
+                                {choice === 'dust' && '✨'}
+                                {choice === 'bunnies' && '🐇'}
+                                {choice === 'moonflowers' && '🌙'}
+                                {choice === 'water' && '💧'}
+                                {choice === 'soil' && '🟫'}
+                                {choice === 'birds' && '🐦'}
+                                {choice === 'squirrels' && '🐿️'}
+                                {choice === 'sunflowers' && '🌻'}
+                                {choice === 'roses' && '🌹'}
                               </span>
                               {choice}
                               {showResult && isCorrect && (
@@ -524,11 +457,11 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
                     <div className="mt-3 sm:mt-4 animate-fade-in">
                       {selectedChoice === current.audioText ? (
                         <div className="text-green-600 dark:text-green-400 text-lg sm:text-xl font-bold animate-bounce bg-green-50 dark:bg-green-900/20 rounded-xl sm:rounded-2xl p-3 sm:p-4 border-2 border-green-200 dark:border-green-700">
-                          🎉 Rawr-some! You earned a fossil! 💎
+                          🎉 Magical! You earned a fairy star! ⭐
                         </div>
                       ) : (
                         <div className="text-red-600 dark:text-red-400 text-lg sm:text-xl font-bold bg-red-50 dark:bg-red-900/20 rounded-xl sm:rounded-2xl p-3 sm:p-4 border-2 border-red-200 dark:border-red-700">
-                          💪 Great try! The dino word was "{current.audioText}" - Let's explore together!
+                          💫 Good try! The magic word was "{current.audioText}" - Let's try again together!
                         </div>
                       )}
                     </div>
@@ -541,19 +474,19 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
                 <div className="flex justify-center pt-4">
                   <Button 
                     onClick={handleNext} 
-                    className="rounded-xl sm:rounded-2xl px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold transition-all duration-300 hover:scale-105 transform shadow-lg sm:shadow-2xl text-sm sm:text-base"
+                    className="rounded-xl sm:rounded-2xl px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-bold transition-all duration-300 hover:scale-105 transform shadow-lg sm:shadow-2xl text-sm sm:text-base"
                   >
                     {stepIndex === storySteps.length - 1 ? (
                       <>
-                        <Zap className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-pulse" />
-                        <span className="hidden sm:inline">Complete Dino Mission! ✨</span>
+                        <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-pulse" />
+                        <span className="hidden sm:inline">Complete Fairy Journey! ✨</span>
                         <span className="sm:hidden">Finish! ✨</span>
                       </>
                     ) : (
                       <>
                         <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                        <span className="hidden sm:inline">Continue Dino Adventure! 🦕</span>
-                        <span className="sm:hidden">Continue 🦕</span>
+                        <span className="hidden sm:inline">Continue Fairy Adventure! 🧚</span>
+                        <span className="sm:hidden">Continue 🧚</span>
                       </>
                     )}
                   </Button>
@@ -564,13 +497,13 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
 
           {/* Floating Elements */}
           <div className="hidden sm:block absolute top-4 left-4 animate-float-slow">
-            <Footprints className="w-6 h-6 text-orange-400" />
+            <Sparkles className="w-6 h-6 text-pink-400" />
           </div>
           <div className="hidden sm:block absolute bottom-4 left-4 animate-float-medium">
-            <Sparkles className="w-6 h-6 text-yellow-400" />
+            <Flower className="w-6 h-6 text-green-400" />
           </div>
           <div className="hidden sm:block absolute bottom-4 right-4 animate-float-fast">
-            <Mountain className="w-6 h-6 text-gray-400" />
+            <Star className="w-6 h-6 text-yellow-400" />
           </div>
         </CardContent>
       </Card>
@@ -592,12 +525,12 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
         }
         
         .smooth-scroll::-webkit-scrollbar-thumb {
-          background: rgba(249, 115, 22, 0.3);
+          background: rgba(236, 72, 153, 0.3);
           border-radius: 10px;
         }
         
         .smooth-scroll::-webkit-scrollbar-thumb:hover {
-          background: rgba(249, 115, 22, 0.5);
+          background: rgba(236, 72, 153, 0.5);
         }
         
         @keyframes float-slow {
@@ -728,4 +661,4 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
   );
 };
 
-export default DinosaurAdventure;
+export default FairyGardenAdventure;

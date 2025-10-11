@@ -270,9 +270,8 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
     const isCorrect = choice === current.audioText;
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
-      if (current.id.includes('pearl')) {
-        setPearls(prev => Math.min(4, prev + 1));
-      }
+      // Add pearl for every correct answer in interactive steps
+      setPearls(prev => Math.min(4, prev + 1));
     }
     
     setShowFeedback(true);
@@ -388,24 +387,22 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
                   </span>
                 </div>
                 
-                {/* Pearl Collection Display */}
-                {(current.id.includes('pearl') || current.id === 'celebration') && (
-                  <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                    {Array.from({ length: 4 }).map((_, i) => (
-                      <div 
-                        key={i} 
-                        className={cn(
-                          "w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full transition-all duration-500 transform hover:scale-125 border-2 flex items-center justify-center",
-                          i < pearls 
-                            ? 'bg-white border-white shadow-lg animate-pulse drop-shadow-lg' 
-                            : 'bg-gray-300/50 border-gray-400 opacity-50'
-                        )} 
-                      >
-                        {i < pearls && <span className="text-yellow-400 text-lg">●</span>}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                {/* Pearl Collection Display - Show in all steps like other stories */}
+                <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div 
+                      key={i} 
+                      className={cn(
+                        "w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full transition-all duration-500 transform hover:scale-125 border-2 flex items-center justify-center",
+                        i < pearls 
+                          ? 'bg-white border-white shadow-lg animate-pulse drop-shadow-lg' 
+                          : 'bg-gray-300/50 border-gray-400 opacity-50'
+                      )} 
+                    >
+                      {i < pearls && <span className="text-yellow-400 text-lg">●</span>}
+                    </div>
+                  ))}
+                </div>
 
                 {/* Ocean Icon */}
                 <div className="absolute top-1 right-1 sm:top-2 sm:right-2 animate-float-slow">
@@ -546,7 +543,7 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
                     <div className="mt-3 sm:mt-4 animate-fade-in">
                       {selectedChoice === current.audioText ? (
                         <div className="text-green-600 dark:text-green-400 text-lg sm:text-xl font-bold animate-bounce bg-green-50 dark:bg-green-900/20 rounded-xl sm:rounded-2xl p-3 sm:p-4 border-2 border-green-200 dark:border-green-700">
-                          🎉 Excellent! You're doing amazing! You're an ocean expert! 🌟
+                          🎉 Splash-tastic! You earned a pearl! 💎
                         </div>
                       ) : (
                         <div className="text-red-600 dark:text-red-400 text-lg sm:text-xl font-bold bg-red-50 dark:bg-red-900/20 rounded-xl sm:rounded-2xl p-3 sm:p-4 border-2 border-red-200 dark:border-red-700">
