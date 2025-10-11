@@ -16,6 +16,7 @@ interface AuthModalProps {
   onClose: () => void;
   initialMode?: 'login' | 'register'; // Add initialMode prop
   redirectFromKids?: boolean; // New prop to indicate redirect from kids page
+  onAuthSuccess?: () => void; // New prop to handle successful authentication
 }
 
 type AuthMode = 'login' | 'register' | 'forgot-password' | 'terms';
@@ -383,7 +384,7 @@ const authService = {
   }
 };
 
-const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = false }: AuthModalProps) => {
+const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = false, onAuthSuccess }: AuthModalProps) => {
   const { login } = useAuth();
   const [authMode, setAuthMode] = useState<AuthMode>(initialMode);
   const [isLoading, setIsLoading] = useState(false);
@@ -674,7 +675,12 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
         setSuccess('Login successful!');
 
         setTimeout(() => {
-          onClose();
+          // If redirected from kids page, don't close the modal but call onAuthSuccess
+          if (redirectFromKids && onAuthSuccess) {
+            onAuthSuccess();
+          } else {
+            onClose();
+          }
           resetForm();
         }, 1000);
       } else {
