@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Sparkles, Star, Volume2, Play, Heart, Zap, Shield, Zap as Lightning, X } from 'lucide-react';
+import { Sparkles, Volume2, Play, Heart, Zap, Shield, Zap as Lightning, X } from 'lucide-react';
 import SpeechService from '@/services/SpeechService';
 import { cn } from '@/lib/utils';
 

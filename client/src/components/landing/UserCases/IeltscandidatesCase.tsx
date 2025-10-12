@@ -4,7 +4,7 @@ interface DevelopersProps {
   data: UserCase;
 }
 
-const DevelopersCase = ({ data }: DevelopersProps) => {
+const DevelopersCase = (_props: DevelopersProps) => {
   return (
     <div className="max-w-3xl mx-auto my-12">
       <div className="bg-[#121416] text-white rounded-lg p-4 mt-4">

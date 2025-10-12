@@ -1,4 +1,4 @@
-import { ReactNode, FormEvent } from 'react';
+import type { ReactNode, FormEvent } from 'react';
 
 interface GlassFormProps {
   title?: string;

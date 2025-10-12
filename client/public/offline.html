@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4BB6B7">
+    <title>Offline - Speak Bee</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: linear-gradient(135deg, #143C3D 0%, #0d2c2d 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding: 20px;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 600px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(75, 182, 183, 0.2);
+        }
+        
+        .icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        h1 {
+            font-size: 32px;
+            margin-bottom: 16px;
+            color: #28CACD;
+        }
+        
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #E5E7EB;
+            margin-bottom: 24px;
+        }
+        
+        .features {
+            text-align: left;
+            margin: 30px auto;
+            max-width: 400px;
+        }
+        
+        .feature {
+            display: flex;
+            align-items: center;
+            margin: 12px 0;
+            padding: 12px;
+            background: rgba(75, 182, 183, 0.1);
+            border-radius: 8px;
+        }
+        
+        .feature-icon {
+            font-size: 24px;
+            margin-right: 12px;
+            color: #4BB6B7;
+        }
+        
+        .button {
+            display: inline-block;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #28CACD 0%, #4BB6B7 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-top: 20px;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(40, 202, 205, 0.3);
+        }
+        
+        .status {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid #FF6B6B;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #FF6B6B;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: blink 1.5s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .info {
+            font-size: 14px;
+            color: #9CA3AF;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">📡</div>
+        
+        <div class="status">
+            <span class="status-dot"></span>
+            <span>No Internet Connection</span>
+        </div>
+        
+        <h1>You're Offline</h1>
+        
+        <p>Don't worry! Speak Bee works offline. You can still access previously loaded content and continue learning.</p>
+        
+        <div class="features">
+            <div class="feature">
+                <span class="feature-icon">✅</span>
+                <span>View cached lessons</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">✅</span>
+                <span>Practice pronunciation</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">✅</span>
+                <span>Track your progress</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">✅</span>
+                <span>Access your profile</span>
+            </div>
+        </div>
+        
+        <button class="button" onclick="window.location.href='/'">
+            Return to App
+        </button>
+        
+        <p class="info">
+            Your progress will sync automatically when you're back online.
+        </p>
+    </div>
+    
+    <script>
+        // Check if we're back online
+        window.addEventListener('online', () => {
+            window.location.href = '/';
+        });
+        
+        // Retry button
+        document.querySelector('.button').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.reload();
+        });
+    </script>
+</body>
+</html>
+

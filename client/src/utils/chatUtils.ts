@@ -1,5 +1,5 @@
 
-import type { Chat, ChatMessage } from "@/types/chat";
+import type { Chat } from "@/types/chat";
 
 // Generate a random ID for chats and messages
 export const generateId = () => {

@@ -10,7 +10,7 @@ interface EveryoneProps {
   books: Book[];
 }
 
-const EveryoneCase = ({ data, books }: EveryoneProps) => {
+const EveryoneCase = ({ books }: EveryoneProps) => {
   const [activeBookIndex, setActiveBookIndex] = useState(0);
   
   const nextBook = () => {

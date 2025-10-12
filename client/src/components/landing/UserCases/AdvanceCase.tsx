@@ -6,7 +6,7 @@ interface AdvancedProps {
   data: UserCase;
 }
 
-const AdvanceCase = ({ data }: AdvancedProps) => {
+const AdvanceCase = (_props: AdvancedProps) => {
   return (
     <div className="flex flex-col items-center justify-center my-12">
       <div className="relative max-w-md mx-auto bg-white/20 backdrop-blur-sm p-6 rounded-lg shadow-sm">

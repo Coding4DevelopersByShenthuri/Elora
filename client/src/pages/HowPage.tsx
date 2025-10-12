@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { useAnimateIn } from '@/lib/animations';
 import {
   Brain,
   Lightbulb,
@@ -127,7 +126,6 @@ const ValueProp = ({
 
 const HowPage = () => {
   const [, setLoading] = useState(true);
-  const showContent = useAnimateIn(false, 300);
   const heroRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

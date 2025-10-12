@@ -1593,19 +1593,4 @@
   margin-bottom: 0.5em;
 }
 
-/* Dialog content adjustments for auth modal */
-.DialogContent.sm\\:max-w-4xl {
-  max-width: 900px !important;
-}
-
-.DialogContent.p-0 {
-  padding: 0 !important;
-}
-
-.DialogContent.border-0 {
-  border: 0 !important;
-}
-
-.DialogContent.bg-transparent {
-  background: transparent !important;
-}
+/* Dialog content adjustments for auth modal - Removed problematic escaped class selector */

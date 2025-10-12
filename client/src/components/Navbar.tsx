@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Brain, LogIn, Search, Upload, User, Settings, LogOut, Moon, Sun,
+  Brain, Search, Upload, User, Settings, LogOut, Moon, Sun,
   Table, Info, HelpCircle, Code, Menu, Users, Baby, FolderTree, Lightbulb,
   GraduationCap, Layers, Award
 } from 'lucide-react';

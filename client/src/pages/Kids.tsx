@@ -509,12 +509,6 @@ const KidsPage = () => {
     setActiveCategory(categoryId);
   };
 
-  const handleQuickActionClick = () => {
-    if (!isAuthenticated) {
-      setShowAuthModal(true);
-      return;
-    }
-  };
 
   const handleAuthSuccess = () => {
     setShowAuthModal(false);
@@ -661,7 +655,6 @@ const KidsPage = () => {
         {/* Categories Navigation */}
         <div className="flex flex-wrap justify-center gap-4 mb-12">
           {categories.map((category) => {
-            const CategoryIcon = category.icon;
             return (
               <Button
                 key={category.id}

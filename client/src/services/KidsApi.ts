@@ -182,7 +182,7 @@ class OfflineKidsApi {
   }
 
   // Helper to extract user ID from token (simplified)
-  private static getUserIdFromToken(token: string): string {
+  private static getUserIdFromToken(_token: string): string {
     try {
       // In a real app, decode JWT token
       // For now, use a simple approach

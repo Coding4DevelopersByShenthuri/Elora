@@ -7,7 +7,6 @@ import { generateId, createNewChat as createNewChatUtil } from '@/utils/chatUtil
 import ChatSidebar from './ChatSidebar';
 import ChatMessages from './ChatMessages';
 import ChatInput from './ChatInput';
-import { cn } from '@/lib/utils';
 
 export const Search: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');

@@ -1,5 +1,4 @@
 
-import React from 'react';
 import { Card } from '@/components/ui/card';
 import type { CortexItem } from '../cortex-data';
 

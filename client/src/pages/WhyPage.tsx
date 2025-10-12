@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useAnimateIn } from '@/lib/animations';
 import { Button } from '@/components/ui/button';
 import { ExternalLink, Heart, Lightbulb, RefreshCw, Stars, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -31,8 +30,7 @@ const WhySection = ({
 };
 
 const WhyPage = () => {
-  const [ setLoading] = useState(true);
-  const showContent = useAnimateIn(false, 300);
+  const [, setLoading] = useState(true);
 
   useEffect(() => {
     // Simulate loading

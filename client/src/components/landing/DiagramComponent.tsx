@@ -1,5 +1,4 @@
 
-import { useState } from 'react';
 import { Brain, BookOpen, MessageCircle, Star, ShieldCheck, Mic, Lightbulb, Search, ArrowRight, Activity, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

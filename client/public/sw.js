@@ -1,15 +1,17 @@
 // Service Worker for Speak Bee - Offline Support
-const CACHE_NAME = 'speakbee-v1';
-const RUNTIME_CACHE = 'speakbee-runtime-v1';
+// Version 1.0.0 - Production Ready
+const VERSION = '1.0.0';
+const CACHE_NAME = `speakbee-static-v${VERSION}`;
+const RUNTIME_CACHE = `speakbee-runtime-v${VERSION}`;
+const IMAGE_CACHE = `speakbee-images-v${VERSION}`;
 
 // Assets to cache immediately on install
 const PRECACHE_URLS = [
   '/',
   '/index.html',
-  '/src/main.tsx',
-  '/src/index.css',
   '/logo01.png',
-  '/image.gif'
+  '/manifest.json',
+  '/offline.html'
 ];
 
 // Install event - cache critical assets
@@ -28,8 +30,8 @@ self.addEventListener('install', (event) => {
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
-  console.log('[Service Worker] Activating...');
-  const currentCaches = [CACHE_NAME, RUNTIME_CACHE];
+  console.log('[Service Worker] Activating version:', VERSION);
+  const currentCaches = [CACHE_NAME, RUNTIME_CACHE, IMAGE_CACHE];
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return cacheNames.filter((cacheName) => !currentCaches.includes(cacheName));
@@ -38,70 +40,88 @@ self.addEventListener('activate', (event) => {
         console.log('[Service Worker] Deleting old cache:', cacheToDelete);
         return caches.delete(cacheToDelete);
       }));
-    }).then(() => self.clients.claim())
+    }).then(() => {
+      console.log('[Service Worker] Claiming clients');
+      return self.clients.claim();
+    })
   );
 });
 
 // Fetch event - serve from cache, fall back to network
 self.addEventListener('fetch', (event) => {
+  const { request } = event;
+  const url = new URL(request.url);
+
   // Skip cross-origin requests
-  if (!event.request.url.startsWith(self.location.origin)) {
+  if (url.origin !== location.origin) {
     return;
   }
 
   // Skip non-GET requests
-  if (event.request.method !== 'GET') {
+  if (request.method !== 'GET') {
     return;
   }
 
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        // Return cached version and update cache in background
-        event.waitUntil(
-          fetch(event.request).then((networkResponse) => {
-            if (networkResponse && networkResponse.status === 200) {
-              caches.open(RUNTIME_CACHE).then((cache) => {
-                cache.put(event.request, networkResponse.clone());
-              });
-            }
-          }).catch(() => {
-            // Network fetch failed, but we have cache
-            console.log('[Service Worker] Network failed, using cache for:', event.request.url);
-          })
-        );
-        return cachedResponse;
-      }
-
-      // Not in cache, try network
-      return fetch(event.request).then((response) => {
-        // Check if valid response
-        if (!response || response.status !== 200 || response.type === 'error') {
-          return response;
-        }
-
-        // Clone the response
-        const responseToCache = response.clone();
-
-        // Cache the fetched response for runtime
-        caches.open(RUNTIME_CACHE).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
-
-        return response;
-      }).catch((error) => {
-        console.error('[Service Worker] Fetch failed:', error);
-        
-        // Return offline page or fallback
-        if (event.request.mode === 'navigate') {
-          return caches.match('/index.html');
-        }
-        
-        throw error;
-      });
-    })
-  );
+  // Handle different types of requests with appropriate strategies
+  if (request.destination === 'image') {
+    // Images: Cache first, then network
+    event.respondWith(cacheFirst(request, IMAGE_CACHE));
+  } else if (request.mode === 'navigate') {
+    // Navigation: Network first, fall back to cache and offline page
+    event.respondWith(networkFirst(request));
+  } else if (request.url.includes('/assets/') || request.url.endsWith('.js') || request.url.endsWith('.css')) {
+    // Static assets: Cache first
+    event.respondWith(cacheFirst(request, CACHE_NAME));
+  } else {
+    // Other requests: Network first
+    event.respondWith(networkFirst(request));
+  }
 });
+
+// Cache-first strategy
+async function cacheFirst(request, cacheName = RUNTIME_CACHE) {
+  const cache = await caches.open(cacheName);
+  const cached = await cache.match(request);
+  if (cached) {
+    return cached;
+  }
+  try {
+    const response = await fetch(request);
+    if (response.ok) {
+      cache.put(request, response.clone());
+    }
+    return response;
+  } catch (error) {
+    console.error('[SW] Cache-first failed:', error);
+    throw error;
+  }
+}
+
+// Network-first strategy
+async function networkFirst(request) {
+  try {
+    const response = await fetch(request);
+    if (response.ok) {
+      const cache = await caches.open(RUNTIME_CACHE);
+      cache.put(request, response.clone());
+    }
+    return response;
+  } catch (error) {
+    const cached = await caches.match(request);
+    if (cached) {
+      return cached;
+    }
+    // Return offline page for navigation requests
+    if (request.mode === 'navigate') {
+      const offlinePage = await caches.match('/offline.html');
+      if (offlinePage) {
+        return offlinePage;
+      }
+      return caches.match('/index.html');
+    }
+    throw error;
+  }
+}
 
 // Handle messages from clients
 self.addEventListener('message', (event) => {
