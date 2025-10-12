@@ -14,6 +14,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/landing/Footer";
 import FloatingIconsLayer from "@/components/FloatingIconsLayer";
 import { LoadingScreen } from "@/components/landing/LoadingScreen";
+import OfflineIndicator from "@/components/OfflineIndicator";
 
 // ✅ Pages
 import Index from "@/pages/Index";
@@ -116,6 +117,7 @@ const App = () => {
               ) : (
                 <div className="min-h-screen flex flex-col relative">
                   <FloatingIconsLayer />
+                  <OfflineIndicator />
                   <Navbar />
                   <main className="flex-1">
                     <AppRoutes />

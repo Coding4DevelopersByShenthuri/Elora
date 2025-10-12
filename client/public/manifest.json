@@ -1,0 +1,58 @@
+{
+  "name": "Speak Bee - Language Learning",
+  "short_name": "SpeakBee",
+  "description": "Offline-first language learning app for kids and adults",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#4BB6B7",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo01.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo01.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "lifestyle"],
+  "screenshots": [
+    {
+      "src": "/image1.png",
+      "sizes": "540x720",
+      "type": "image/png"
+    },
+    {
+      "src": "/image2.png",
+      "sizes": "540x720",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Kids Learning",
+      "short_name": "Kids",
+      "description": "Quick access to kids learning section",
+      "url": "/kids",
+      "icons": [{ "src": "/logo01.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Adult Learning",
+      "short_name": "Adults",
+      "description": "Quick access to adult learning section",
+      "url": "/adults",
+      "icons": [{ "src": "/logo01.png", "sizes": "192x192" }]
+    }
+  ],
+  "prefer_related_applications": false,
+  "scope": "/",
+  "lang": "en-US",
+  "dir": "ltr"
+}
+

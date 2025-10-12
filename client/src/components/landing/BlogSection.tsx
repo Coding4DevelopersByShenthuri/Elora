@@ -17,7 +17,7 @@ export const BlogSection = ({ show }: BlogSectionProps) => {
       date: "May 15, 2023",
       readTime: "8 min read",
       category: "Methodology",
-      image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=400&auto=format"
+      image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%234BB6B7' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='30' font-family='Arial'%3EMethodology%3C/text%3E%3C/svg%3E"
     },
     {
       title: "How to Create Effective Knowledge Maps",
@@ -26,7 +26,7 @@ export const BlogSection = ({ show }: BlogSectionProps) => {
       date: "June 3, 2023",
       readTime: "6 min read",
       category: "Tutorials",
-      image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?q=80&w=400&auto=format"
+      image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%2328CACD' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='30' font-family='Arial'%3ETutorials%3C/text%3E%3C/svg%3E"
     },
     {
       title: "The Science of Neural Connections",
@@ -35,7 +35,7 @@ export const BlogSection = ({ show }: BlogSectionProps) => {
       date: "April 22, 2023",
       readTime: "10 min read",
       category: "Science",
-      image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=400&auto=format"
+      image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23022A2D' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='30' font-family='Arial'%3EScience%3C/text%3E%3C/svg%3E"
     }
   ];
   

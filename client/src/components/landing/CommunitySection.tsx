@@ -10,27 +10,27 @@ export const CommunitySection = ({
   const communityMembers = [{
     name: "Alex Thompson",
     role: "Data Scientist",
-    avatar: `https://source.unsplash.com/random/100x100?face-1`,
+    avatar: `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%234BB6B7' width='100' height='100'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='40' font-family='Arial'%3EAT%3C/text%3E%3C/svg%3E`,
     contribution: "Knowledge Graph Algorithms"
   }, {
     name: "Mira Chen",
     role: "Professor",
-    avatar: `https://source.unsplash.com/random/100x100?face-2`,
+    avatar: `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%2328CACD' width='100' height='100'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='40' font-family='Arial'%3EMC%3C/text%3E%3C/svg%3E`,
     contribution: "Educational Templates"
   }, {
     name: "Jason Wright",
     role: "Product Designer",
-    avatar: `https://source.unsplash.com/random/100x100?face-3`,
+    avatar: `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23022A2D' width='100' height='100'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='40' font-family='Arial'%3EJW%3C/text%3E%3C/svg%3E`,
     contribution: "UI Components"
   }, {
     name: "Sophia Kim",
     role: "Researcher",
-    avatar: `https://source.unsplash.com/random/100x100?face-4`,
+    avatar: `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23143C3D' width='100' height='100'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='40' font-family='Arial'%3ESK%3C/text%3E%3C/svg%3E`,
     contribution: "Citation System"
   }, {
     name: "Marcus Jones",
     role: "Student",
-    avatar: `https://source.unsplash.com/random/100x100?face-5`,
+    avatar: `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%236be1f9' width='100' height='100'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='40' font-family='Arial'%3EMJ%3C/text%3E%3C/svg%3E`,
     contribution: "Study Guides"
   }];
   const forums = [{

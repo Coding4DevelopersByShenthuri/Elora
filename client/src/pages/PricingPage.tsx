@@ -6,9 +6,11 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { AnimatedTransition } from '@/components/AnimatedTransition';
 
 const PricingPage = () => {
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
+  const [activeTab, setActiveTab] = useState<'kids' | 'adults' | 'ielts'>('kids');
 
   // Handle plan selection
   const handlePlanSelect = (planName: string, category: string, price: number, billingType: string) => {
@@ -330,17 +332,17 @@ const PricingPage = () => {
         </div>
 
         {/* Main Pricing Tabs */}
-        <Tabs defaultValue="kids" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
-            <TabsTrigger value="kids" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'kids' | 'adults' | 'ielts')} className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-8 transition-all duration-300">
+            <TabsTrigger value="kids" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm transition-all duration-200">
               <Baby size={14} className="sm:w-4 sm:h-4" />
               <span className="hidden xs:inline">Kids</span>
             </TabsTrigger>
-            <TabsTrigger value="adults" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+            <TabsTrigger value="adults" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm transition-all duration-200">
               <Users size={14} className="sm:w-4 sm:h-4" />
               <span className="hidden xs:inline">Adults</span>
             </TabsTrigger>
-            <TabsTrigger value="ielts" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+            <TabsTrigger value="ielts" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm transition-all duration-200">
               <GraduationCap size={14} className="sm:w-4 sm:h-4" />
               <span className="hidden xs:inline">IELTS/PTE</span>
             </TabsTrigger>
@@ -348,16 +350,21 @@ const PricingPage = () => {
 
           {/* Kids Plans */}
           <TabsContent value="kids">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-              {kidsPlans.map((plan, index) => (
-                <Card 
-                  key={index} 
-                  className={cn(
-                    "relative transition-all hover:shadow-lg",
-                    plan.popular && "ring-2 ring-blue-500",
-                    plan.color
-                  )}
-                >
+            <AnimatedTransition show={activeTab === 'kids'} animation="fade" duration={300}>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+                {kidsPlans.map((plan, index) => (
+                  <Card 
+                    key={index} 
+                    className={cn(
+                      "relative transition-all duration-300 hover:shadow-lg hover:-translate-y-1",
+                      plan.popular && "ring-2 ring-blue-500",
+                      plan.color
+                    )}
+                    style={{
+                      animationDelay: `${index * 100}ms`,
+                      animation: `fadeInUp 0.5s ease-out ${index * 100}ms both`
+                    }}
+                  >
                   {plan.popular && (
                     <div className="absolute -top-2 sm:-top-3 left-1/2 transform -translate-x-1/2">
                       <Badge className="bg-blue-500 text-white px-2 sm:px-3 py-1 text-xs">
@@ -408,20 +415,26 @@ const PricingPage = () => {
                   </CardFooter>
                 </Card>
               ))}
-            </div>
+              </div>
+            </AnimatedTransition>
           </TabsContent>
 
           {/* Adult Plans */}
           <TabsContent value="adults">
+            <AnimatedTransition show={activeTab === 'adults'} animation="fade" duration={300}>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {adultPlans.map((plan, index) => (
                 <Card 
                   key={index}
                   className={cn(
-                    "relative transition-all hover:shadow-lg",
+                    "relative transition-all duration-300 hover:shadow-lg hover:-translate-y-1",
                     plan.popular && "ring-2 ring-green-500",
                     plan.color
                   )}
+                  style={{
+                    animationDelay: `${index * 100}ms`,
+                    animation: `fadeInUp 0.5s ease-out ${index * 100}ms both`
+                  }}
                 >
                   {plan.popular && (
                     <div className="absolute -top-2 sm:-top-3 left-1/2 transform -translate-x-1/2">
@@ -470,19 +483,25 @@ const PricingPage = () => {
                 </Card>
               ))}
             </div>
+            </AnimatedTransition>
           </TabsContent>
 
           {/* IELTS/PTE Plans */}
           <TabsContent value="ielts">
+            <AnimatedTransition show={activeTab === 'ielts'} animation="fade" duration={300}>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {ieltsPlans.map((plan, index) => (
                 <Card 
                   key={index}
                   className={cn(
-                    "relative transition-all hover:shadow-lg",
+                    "relative transition-all duration-300 hover:shadow-lg hover:-translate-y-1",
                     plan.popular && "ring-2 ring-orange-500",
                     plan.color
                   )}
+                  style={{
+                    animationDelay: `${index * 100}ms`,
+                    animation: `fadeInUp 0.5s ease-out ${index * 100}ms both`
+                  }}
                 >
                   {plan.popular && (
                     <div className="absolute -top-2 sm:-top-3 left-1/2 transform -translate-x-1/2">
@@ -529,6 +548,7 @@ const PricingPage = () => {
                 </Card>
               ))}
             </div>
+            </AnimatedTransition>
           </TabsContent>
         </Tabs>
 
@@ -540,7 +560,14 @@ const PricingPage = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto">
             {addOns.map((addon, index) => (
-              <Card key={index} className="text-center">
+              <Card 
+                key={index} 
+                className="text-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+                style={{
+                  animationDelay: `${index * 100}ms`,
+                  animation: `fadeInUp 0.5s ease-out ${index * 100}ms both`
+                }}
+              >
                 <CardHeader className="pb-4">
                   <CardTitle className="text-lg sm:text-xl">{addon.name}</CardTitle>
                   <CardDescription className="text-sm sm:text-base">{addon.description}</CardDescription>

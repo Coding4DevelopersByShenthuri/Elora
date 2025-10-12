@@ -23,4 +23,36 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    // Optimize for offline usage
+    manifest: true,
+    rollupOptions: {
+      output: {
+        // Manual chunk splitting for better caching
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-vendor': ['lucide-react', '@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
+          'chart-vendor': ['recharts'],
+        },
+      },
+    },
+    // Enable source maps for debugging (can be disabled in production)
+    sourcemap: false,
+    // Increase chunk size warning limit
+    chunkSizeWarningLimit: 1000,
+    // Enable CSS code splitting
+    cssCodeSplit: true,
+    // Target modern browsers for better performance
+    target: 'esnext',
+    // Minification
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: false, // Keep console for offline debugging
+        drop_debugger: true,
+      },
+    },
+  },
+  // PWA and offline support
+  publicDir: 'public',
 })
