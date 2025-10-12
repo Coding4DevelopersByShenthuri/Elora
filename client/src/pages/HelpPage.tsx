@@ -16,7 +16,7 @@ const HelpSection = ({
     id: string;
 }) => {
     return (
-        <div id={id} className="mb-20 max-w-4xl mx-auto">
+        <div id={id} className="mb-16 max-w-4xl mx-auto">
             <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-full bg-primary/10">
                     {icon}
@@ -36,13 +36,13 @@ const HelpPage = () => {
     return (
         <div className="relative overflow-hidden">
             {/* Background */}
-            <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-primary/5 to-transparent -z-10"></div>
+            <div className="absolute top-0 left-0 w-full h-[400px] bg-gradient-to-b from-primary/5 to-transparent -z-10"></div>
             <div className="absolute top-1/3 right-0 w-[300px] h-[300px] rounded-full bg-primary/5 blur-3xl -z-10"></div>
             <div className="absolute bottom-1/3 left-0 w-[250px] h-[250px] rounded-full bg-accent/5 blur-3xl -z-10"></div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-36 pb-24">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20">
                 <AnimatedTransition show={showContent} animation="slide-up">
-                    <div className="flex flex-col items-center text-center mb-16">
+                    <div className="flex flex-col items-center text-center mb-12">
                         <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-teal-600">
                             Need Help?
                         </h1>
@@ -51,11 +51,11 @@ const HelpPage = () => {
                             We're here to support you—anytime, anywhere. Explore common questions, support options, and more.
                         </p>
 
-                        <div className="mt-10 glass-panel p-8 md:p-10 rounded-lg max-w-3xl mx-auto shadow-lg border-2 border-primary/20">
+                        <div className="mt-8 glass-panel p-6 md:p-8 rounded-lg max-w-3xl mx-auto shadow-lg border-2 border-primary/20">
                             <p className="text-xl md:text-2xl text-foreground/90">
-                                Whether you’re stuck, curious, or just getting started—this page is for you.
+                                Whether you're stuck, curious, or just getting started—this page is for you.
                             </p>
-                            <p className="text-xl md:text-2xl text-foreground/90 mt-6">
+                            <p className="text-xl md:text-2xl text-foreground/90 mt-4">
                                 Find answers, connect with support, and get the most out of Speak Bee.
                             </p>
                         </div>
@@ -91,8 +91,8 @@ const HelpPage = () => {
                                     No worries—our team is happy to help. You can email us directly or fill out a contact form.
                                 </p>
                                 <ul className="list-disc list-inside mt-4 space-y-1 text-foreground/80">
-                                    <li>Email: <a href="mailto:support@speakbee.ai" className="text-shadow-teal-600 underline">support@speakbee.ai</a></li>
-                                    <li><Link to="/contact" className="text-shadow-teal-600 underline">Contact Form</Link> — Get a response within 24 hours.</li>
+                                    <li>Email: <a href="mailto:support@speakbee.ai" className="text-teal-600 underline">support@speakbee.ai</a></li>
+                                    <li><Link to="/contact" className="text-teal-600 underline">Contact Form</Link> — Get a response within 24 hours.</li>
                                 </ul>
                             </>
                         }
@@ -109,13 +109,13 @@ const HelpPage = () => {
                                     Share your journey, ask questions, and connect with other English learners just like you.
                                 </p>
                                 <p>
-                                    We’re building a space for learners to support each other—coming soon!
+                                    We're building a space for learners to support each other—coming soon!
                                 </p>
                             </>
                         }
                     />
 
-                    <div className="mt-16 text-center">
+                    <div className="mt-12 text-center">
                         <Button size="lg" className="gap-2" asChild>
                             <Link to="/">
                                 Back to Home

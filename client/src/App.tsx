@@ -33,6 +33,7 @@ import Intermediates from "@/pages/adults/Intermediates";
 import Advanced from "@/pages/adults/Advanced";
 import IeltsPte from "@/pages/IeltsPte";
 import NotFound from "@/pages/NotFound";
+import PricingPage from "@/pages/PricingPage";
 
 // ✅ Import AuthModal
 import AuthModal from "@/components/AuthModal";
@@ -81,6 +82,7 @@ const AppRoutes = () => {
         <Route path="/adults/advanced" element={<PageTransition><Advanced /></PageTransition>} />
         <Route path="/ielts-pte" element={<PageTransition><IeltsPte /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+        <Route path="/pricing" element={<PageTransition><PricingPage /></PageTransition>} />
       </Routes>
       
       {/* Global Auth Modal */}
