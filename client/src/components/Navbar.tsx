@@ -198,6 +198,16 @@ export const Navbar = () => {
                 <div className="w-24 h-12 sm:w-28 sm:h-14 md:w-32 md:h-16 lg:w-36 lg:h-20 opacity-0 pointer-events-none" />
               </div>
 
+              {/* Get Started Button - Top Right Corner */}
+              <div className="absolute right-4 top-7 hidden sm:block">
+                <Button
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg"
+                  onClick={handleOpenAuthModal}
+                >
+                  Get Started
+                </Button>
+              </div>
+
               {/* Desktop Navigation - Clean */}
               <nav className="hidden sm:flex items-center justify-center flex-1">
                 <div className="glass-panel rounded-lg px-1 py-1 shadow-sm">
@@ -299,7 +309,8 @@ export const Navbar = () => {
                         </TooltipContent>
                       </Tooltip>
 
-                      {isAuthenticated ? (
+                      {/* Only show Logout button when authenticated */}
+                      {isAuthenticated && (
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
@@ -313,22 +324,6 @@ export const Navbar = () => {
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>Logout</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      ) : (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              className="flex items-center gap-2 px-3 py-2 rounded-lg h-9 hover:bg-primary hover:text-primary-foreground text-sm"
-                              onClick={handleOpenAuthModal}
-                            >
-                              <LogIn size={16} />
-                              {active === 'login' && <span className="font-medium">Login</span>}
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Login</p>
                           </TooltipContent>
                         </Tooltip>
                       )}
@@ -372,8 +367,8 @@ export const Navbar = () => {
                           {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
                         </Button>
                         
-                        {/* Login/Logout Button */}
-                        {isAuthenticated ? (
+                        {/* Only show Logout Button when authenticated */}
+                        {isAuthenticated && (
                           <Button
                             variant="ghost"
                             size="icon"
@@ -384,18 +379,6 @@ export const Navbar = () => {
                             className="rounded-lg h-8 w-8 hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
                           >
                             <LogOut size={16} />
-                          </Button>
-                        ) : (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                              handleOpenAuthModal();
-                              setIsMobileMenuOpen(false);
-                            }}
-                            className="rounded-lg h-8 w-8 hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-300"
-                          >
-                            <LogIn size={16} />
                           </Button>
                         )}
                       </div>
@@ -422,6 +405,17 @@ export const Navbar = () => {
                     {/* Scrollable content */}
                     <div className="flex-1 overflow-y-auto">
                       <div className="p-3 space-y-4">
+                        {/* Get Started Button for Mobile */}
+                        <Button
+                          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-2 rounded-lg font-medium transition-all duration-300 mb-2"
+                          onClick={() => {
+                            handleOpenAuthModal();
+                            setIsMobileMenuOpen(false);
+                          }}
+                        >
+                          Get Started
+                        </Button>
+
                         {/* Cortex mobile */}
                         <div className="transition-all duration-300 ease-out">
                           <div className="px-1 text-xs font-semibold text-muted-foreground uppercase mb-2">Mind</div>
