@@ -781,50 +781,120 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
     (!isRegisterMode || (formData.name && passwordsMatch && formData.securityAnswer && acceptedTerms));
 
   // Modern Terms and Conditions Modal Component
-  const TermsModal = () => (
-    <div className="auth-terms-full-container">
-      <div className="h-full bg-[#143C3D] p-4 md:p-6 flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-3 md:mb-4">
-          <button
-            type="button"
-            onClick={() => setAuthMode('login')}
-            className="flex items-center text-[#4BB6B7] hover:text-[#28CACD] transition-colors text-xs md:text-sm"
-          >
-            <ArrowLeft className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-            Back to Login
-          </button>
-          <div className="flex items-center space-x-1 md:space-x-2">
-            <FileText className="w-4 h-4 md:w-5 md:h-5 text-[#28CACD]" />
-            <span className="text-white font-semibold text-xs md:text-sm">Legal</span>
+  // Helper function to format terms content with proper HTML structure
+  const formatTermsContent = (text: string) => {
+    const lines = text.split('\n');
+    const formattedLines: React.ReactElement[] = [];
+    let currentSection: string[] = [];
+    let key = 0;
+
+    const majorHeadings = ['The Agreement', 'Introduction', 'Definitions/Terminology', 'User Obligations', 
+      'Product/Service Details', 'Intellectual Property Rights', 'Service Specifications', 
+      'Payment and Financial Terms', 'User Responsibilities and Conduct', 'Privacy and Data Protection',
+      'Disclaimer of Warranties', 'Limitation of Liability', 'Modifications to Terms', 
+      'Termination and Suspension', 'Special User Categories', 'Governing Law and Dispute Resolution',
+      'Contact Information and Support', 'Entire Agreement', 'Severability', 'No Waiver', 'Assignment'];
+
+    const subHeadings = ['Accurate Information', 'Compliance with Laws', 'Lawful Use', 'Account Security',
+      'Our Intellectual Property', 'Your Content', 'License Grant', 'Technical Requirements', 
+      'Offline Capabilities', 'Service Models', 'Payment Terms', 'Free Trial Offers',
+      'Permitted Uses', 'Prohibited Activities', 'Data Processing Architecture', 'Data Collection',
+      'Data Security', 'By You', 'By Speak Bee', 'Effect of Termination',
+      'For Parents/Guardians (Kids Module)', 'For Educational Institutions', 'For Examination Candidates',
+      'Governing Law', 'Dispute Resolution', 'Class Action Waiver'];
+
+    lines.forEach((line) => {
+      const trimmedLine = line.trim();
+      
+      if (majorHeadings.includes(trimmedLine)) {
+        formattedLines.push(<h1 key={key++}>{trimmedLine}</h1>);
+      } else if (subHeadings.includes(trimmedLine)) {
+        formattedLines.push(<h2 key={key++}>{trimmedLine}</h2>);
+      } else if (trimmedLine.startsWith('- ')) {
+        if (currentSection.length > 0) {
+          formattedLines.push(<p key={key++}>{currentSection.join(' ')}</p>);
+          currentSection = [];
+        }
+        formattedLines.push(<li key={key++}>{trimmedLine.substring(2)}</li>);
+      } else if (trimmedLine.length > 0) {
+        currentSection.push(trimmedLine);
+      } else if (currentSection.length > 0) {
+        formattedLines.push(<p key={key++}>{currentSection.join(' ')}</p>);
+        currentSection = [];
+      }
+    });
+
+    if (currentSection.length > 0) {
+      formattedLines.push(<p key={key++}>{currentSection.join(' ')}</p>);
+    }
+
+    return formattedLines;
+  };
+
+  const TermsModal = () => {
+    const scrollToTop = () => {
+      if (termsContentRef.current) {
+        termsContentRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+
+    return (
+      <div className="auth-terms-full-container">
+        <div className="h-full bg-[#143C3D] p-4 md:p-6 flex flex-col">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-3 md:mb-4">
+            <button
+              type="button"
+              onClick={() => setAuthMode('login')}
+              className="flex items-center text-[#4BB6B7] hover:text-[#28CACD] transition-colors text-xs md:text-sm"
+            >
+              <ArrowLeft className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+              Back to Login
+            </button>
+            <div className="flex items-center space-x-1 md:space-x-2">
+              <FileText className="w-4 h-4 md:w-5 md:h-5 text-[#28CACD]" />
+              <span className="text-white font-semibold text-xs md:text-sm">Legal Document</span>
+            </div>
           </div>
-        </div>
 
-        <div className="text-center mb-3 md:mb-4">
-          <h1 className="text-lg md:text-2xl font-bold text-white mb-1 md:mb-2">Terms and Conditions Agreement</h1>
-          <p className="text-[#4BB6B7] text-xs">
-            Last Updated: {new Date().toLocaleDateString()}
-          </p>
-        </div>
-
-        {/* Scroll Progress Bar */}
-        <div className="w-full bg-[#022A2D] rounded-full h-1 mb-3 md:mb-4">
-          <div
-            className="bg-[#28CACD] h-1 rounded-full transition-all duration-300"
-            style={{ width: `${scrollPosition}%` }}
-          />
-        </div>
-
-        {/* Terms Content */}
-        <div
-          ref={termsContentRef}
-          className="flex-1 overflow-y-auto bg-[#022A2D] p-3 md:p-4 rounded-lg mb-3 md:mb-4 terms-content-container custom-scrollbar"
-          onScroll={handleScroll}
-        >
-          <div className="text-white text-xs md:text-sm leading-relaxed whitespace-pre-line terms-content">
-            {TERMS_AND_CONDITIONS}
+          <div className="text-center mb-3 md:mb-4">
+            <h1 className="text-lg md:text-2xl font-bold text-white mb-1 md:mb-2">Terms and Conditions Agreement</h1>
+            <p className="text-[#4BB6B7] text-xs">
+              Last Updated: {new Date().toLocaleDateString()}
+            </p>
           </div>
-        </div>
+
+          {/* Scroll Progress Bar */}
+          <div className="w-full bg-[#022A2D] rounded-full h-1 mb-3 md:mb-4">
+            <div
+              className="bg-[#28CACD] h-1 rounded-full transition-all duration-300"
+              style={{ width: `${scrollPosition}%` }}
+            />
+          </div>
+
+          {/* Terms Content with Scroll to Top Button */}
+          <div className="relative flex-1 mb-3 md:mb-4">
+            <div
+              ref={termsContentRef}
+              className="h-full overflow-y-auto bg-[#022A2D] p-3 md:p-4 rounded-lg terms-content-container custom-scrollbar scroll-smooth"
+              onScroll={handleScroll}
+            >
+              <div className="text-white terms-content">
+                {formatTermsContent(TERMS_AND_CONDITIONS)}
+              </div>
+            </div>
+            
+            {/* Scroll to Top Button */}
+            {scrollPosition > 20 && (
+              <button
+                onClick={scrollToTop}
+                className="absolute bottom-4 right-4 bg-[#28CACD] hover:bg-[#4BB6B7] text-white rounded-full p-2 md:p-3 shadow-lg transition-all duration-300 hover:scale-110 z-10"
+                aria-label="Scroll to top"
+              >
+                <ArrowLeft className="w-4 h-4 md:w-5 md:h-5 transform rotate-90" />
+              </button>
+            )}
+          </div>
 
         {/* Acceptance Section */}
         <div className="bg-[#022A2D] p-3 md:p-4 rounded-lg mb-3 md:mb-4 border border-[#4BB6B7]">
@@ -879,7 +949,8 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
         </div>
       </div>
     </div>
-  );
+    );
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {

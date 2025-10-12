@@ -534,7 +534,7 @@
   font-size: 1.2rem;
 }
 
-/* Terms and Conditions specific styles - FIXED SCROLLING */
+/* Terms and Conditions specific styles - ENHANCED */
 .auth-terms-full-container {
   position: absolute;
   top: 0;
@@ -542,11 +542,21 @@
   width: 100%;
   height: 100%;
   z-index: 50;
-  background: #143C3D;
+  background: linear-gradient(135deg, #143C3D 0%, #0d2c2d 100%);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   padding: 0;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .terms-mode-active .auth-form-container:not(.auth-terms-full-container),
@@ -591,37 +601,102 @@
   background: #28CACD;
 }
 
-/* Terms content container - FIXED SCROLLING */
+/* Terms content container - ENHANCED SCROLLING */
 .terms-content-container {
   overflow-y: auto !important;
-  max-height: 300px !important;
-  min-height: 200px !important;
+  overflow-x: hidden !important;
+  flex: 1 1 auto !important;
+  max-height: 50vh !important;
+  min-height: 300px !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #4BB6B7 #022A2D !important;
+  scroll-behavior: smooth !important;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .terms-content {
-  line-height: 1.6;
-  padding-right: 8px;
+  line-height: 1.8;
+  padding-right: 12px;
+  color: #E5E7EB;
+  font-size: 14px;
+  letter-spacing: 0.3px;
 }
 
-.terms-content h1,
-.terms-content h2,
+/* Enhanced section styling */
+.terms-content h1 {
+  color: #28CACD;
+  font-size: 20px;
+  font-weight: 700;
+  margin-top: 2em;
+  margin-bottom: 0.8em;
+  padding-bottom: 0.3em;
+  border-bottom: 2px solid #4BB6B7;
+}
+
+.terms-content h2 {
+  color: #4BB6B7;
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+}
+
 .terms-content h3 {
   color: #28CACD;
+  font-size: 16px;
+  font-weight: 500;
   margin-top: 1.5em;
   margin-bottom: 0.5em;
 }
 
 .terms-content strong {
   color: #FFFFFF;
+  font-weight: 600;
 }
 
 .terms-content ul {
   margin: 1em 0;
-  padding-left: 1.5em;
+  padding-left: 1.8em;
+  list-style-type: disc;
 }
 
 .terms-content li {
-  margin: 0.5em 0;
+  margin: 0.6em 0;
+  line-height: 1.7;
+}
+
+.terms-content p {
+  margin-bottom: 1em;
+}
+
+/* Add subtle highlighting for important sections */
+.terms-content p:has(strong) {
+  background: linear-gradient(90deg, rgba(75, 182, 183, 0.05) 0%, transparent 100%);
+  padding: 0.5em;
+  border-left: 2px solid rgba(75, 182, 183, 0.3);
+  margin: 0.8em 0;
+}
+
+/* Smooth transitions for headings */
+.terms-content h1,
+.terms-content h2,
+.terms-content h3 {
+  transition: color 0.3s ease;
+}
+
+/* Add spacing for better readability */
+.terms-content > *:first-child {
+  margin-top: 0;
+}
+
+/* List styling improvements */
+.terms-content ul li {
+  position: relative;
+  padding-left: 0.5em;
+}
+
+.terms-content ul li::marker {
+  color: #4BB6B7;
 }
 
 /* Progress bar for terms scrolling */
@@ -632,13 +707,20 @@
   height: 4px;
   margin-bottom: 16px;
   overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .auth-terms-progress-bar {
   height: 100%;
-  background-color: #28CACD;
+  background: linear-gradient(90deg, #28CACD 0%, #4BB6B7 100%);
   border-radius: 4px;
   transition: width 0.3s ease;
+  box-shadow: 0 0 8px rgba(40, 202, 205, 0.5);
+}
+
+/* Smooth scroll utility */
+.scroll-smooth {
+  scroll-behavior: smooth;
 }
 
 /* Error and Success message styles */
@@ -678,6 +760,12 @@
   border-radius: 8px;
   border: 1px solid #4BB6B7;
   margin-bottom: 16px;
+  transition: all 0.3s ease;
+}
+
+.auth-terms-checkbox:hover {
+  border-color: #28CACD;
+  box-shadow: 0 0 10px rgba(40, 202, 205, 0.1);
 }
 
 .auth-terms-checkbox-input {
@@ -698,10 +786,12 @@
 .auth-terms-checkbox-input.checked {
   background-color: #28CACD;
   border-color: #28CACD;
+  transform: scale(1.05);
 }
 
 .auth-terms-checkbox-input:hover {
   border-color: #28CACD;
+  transform: scale(1.05);
 }
 
 .auth-terms-checkbox-label {
@@ -895,7 +985,8 @@
 
   /* Terms content responsive */
   .terms-content-container {
-    max-height: 250px !important;
+    max-height: 45vh !important;
+    min-height: 250px !important;
   }
 }
 
@@ -934,8 +1025,12 @@
 
   /* Terms content responsive */
   .terms-content-container {
-    max-height: 200px !important;
-    min-height: 150px !important;
+    max-height: 40vh !important;
+    min-height: 200px !important;
+  }
+  
+  .terms-content {
+    font-size: 13px;
   }
 
   /* Optimize register form spacing for mobile */
@@ -1085,8 +1180,12 @@
 
   /* Terms content responsive */
   .terms-content-container {
-    max-height: 180px !important;
-    min-height: 120px !important;
+    max-height: 35vh !important;
+    min-height: 180px !important;
+  }
+  
+  .terms-content {
+    font-size: 12px;
   }
 
   /* Further optimize register form for small screens */
@@ -1170,8 +1269,8 @@
 
   /* Terms content responsive */
   .terms-content-container {
-    max-height: 150px !important;
-    min-height: 100px !important;
+    max-height: 30vh !important;
+    min-height: 150px !important;
   }
 
   /* Social icons adjustment */
@@ -1245,8 +1344,8 @@
 
   /* Terms content responsive */
   .terms-content-container {
-    max-height: 120px !important;
-    min-height: 80px !important;
+    max-height: 25vh !important;
+    min-height: 120px !important;
   }
 
   /* Further compact register form */
@@ -1285,8 +1384,8 @@
 
   /* Terms content responsive for landscape */
   .terms-content-container {
-    max-height: 120px !important;
-    min-height: 80px !important;
+    max-height: 50vh !important;
+    min-height: 100px !important;
   }
 
   /* Further reduce spacing in landscape */
