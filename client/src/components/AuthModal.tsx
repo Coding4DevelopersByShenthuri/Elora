@@ -423,33 +423,37 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
   // New state for kids page redirect handling
   const [isCheckingUser, setIsCheckingUser] = useState(false);
 
+  // Add this useEffect to handle auth mode changes specifically for forgot password
   useEffect(() => {
     if (isOpen) {
-      // If redirected from kids page, determine if user exists
-      if (redirectFromKids) {
-        handleKidsPageRedirect();
+      // Update panel state based on current auth mode
+      if (authMode === 'register' || authMode === 'forgot-password') {
+        setIsRightPanelActive(true);
       } else {
-        setIsRightPanelActive(authMode === 'register' || authMode === 'forgot-password');
-        setError('');
-        setSuccess('');
+        setIsRightPanelActive(false);
+      }
+      
+      setError('');
+      setSuccess('');
 
-        // Auto-fill credentials when switching to login after registration
-        if (authMode === 'login' && autoFillCredentials) {
-          setFormData(prev => ({
-            ...prev,
-            email: autoFillCredentials.email,
-            password: autoFillCredentials.password
-          }));
-        }
+      // Auto-fill credentials when switching to login after registration
+      if (authMode === 'login' && autoFillCredentials) {
+        setFormData(prev => ({
+          ...prev,
+          email: autoFillCredentials.email,
+          password: autoFillCredentials.password
+        }));
       }
     }
-  }, [isOpen, authMode, autoFillCredentials, redirectFromKids]);
+  }, [isOpen, authMode, autoFillCredentials]);
 
   // New function to handle kids page redirect
   const handleKidsPageRedirect = async () => {
     setIsCheckingUser(true);
     setError('');
     setSuccess('');
+    // Reset forgot password states when coming from kids page
+    resetForgotPasswordFlow();
 
     try {
       // Check if there's any existing user data to determine if user might be returning
@@ -464,7 +468,6 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
         // If no users exist, show registration form with message
         setAuthMode('register');
         setIsRightPanelActive(true);
-        // setSuccess('Create an account to access the Kids page and start learning!');
       }
     } catch (error) {
       console.error('Error checking for existing users:', error);
@@ -492,6 +495,18 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
 
     return false;
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      // If redirected from kids page, determine if user exists
+      if (redirectFromKids) {
+        handleKidsPageRedirect();
+      } else {
+        setError('');
+        setSuccess('');
+      }
+    }
+  }, [isOpen, redirectFromKids]);
 
   // Reset scroll position when terms modal opens
   useEffect(() => {
@@ -651,6 +666,10 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
     setConfirmNewPassword("");
     setError('');
     setIsLoading(false);
+    // Ensure we're not stuck in forgot password mode when resetting
+    if (authMode === 'forgot-password') {
+      setAuthMode('login');
+    }
   };
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -1176,6 +1195,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
                           setError('');
                           setSuccess('');
                           setForgotPasswordStep(1);
+                          setIsRightPanelActive(true); // Add this line
                           setAuthMode('forgot-password');
                         }}
                         className="text-[#4BB6B7] hover:text-[#28CACD] text-xs md:text-sm transition-colors font-medium"
@@ -1210,6 +1230,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
                     type="button"
                     onClick={() => {
                       setAuthMode('login');
+                      setIsRightPanelActive(false); // Add this line
                       resetForgotPasswordFlow();
                     }}
                     className="flex items-center text-[#4BB6B7] hover:text-[#28CACD] transition-colors text-xs md:text-sm"
