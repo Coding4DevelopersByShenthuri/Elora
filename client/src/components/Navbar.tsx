@@ -198,8 +198,18 @@ export const Navbar = () => {
                 <div className="w-24 h-12 sm:w-28 sm:h-14 md:w-32 md:h-16 lg:w-36 lg:h-20 opacity-0 pointer-events-none" />
               </div>
 
-              {/* Get Started Button - Top Right Corner */}
-              <div className="absolute right-4 top-7 hidden sm:block">
+              {/* Buttons - Top Right Corner */}
+              <div className="absolute right-4 top-7 hidden sm:flex items-center gap-2">
+                {/* Start Free Trial Button */}
+                <Button
+                  variant="outline"
+                  className="border-primary text-foreground hover:bg-primary/10 px-4 py-2 rounded-lg font-medium transition-all duration-300"
+                  onClick={handleOpenAuthModal}
+                >
+                  Start Free Trial
+                </Button>
+                
+                {/* Get Started Button */}
                 <Button
                   className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg"
                   onClick={handleOpenAuthModal}
@@ -405,16 +415,31 @@ export const Navbar = () => {
                     {/* Scrollable content */}
                     <div className="flex-1 overflow-y-auto">
                       <div className="p-3 space-y-4">
-                        {/* Get Started Button for Mobile */}
-                        <Button
-                          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-2 rounded-lg font-medium transition-all duration-300 mb-2"
-                          onClick={() => {
-                            handleOpenAuthModal();
-                            setIsMobileMenuOpen(false);
-                          }}
-                        >
-                          Get Started
-                        </Button>
+                        {/* Buttons for Mobile */}
+                        <div className="space-y-2 mb-2">
+                          {/* Start Free Trial Button for Mobile */}
+                          <Button
+                            variant="outline"
+                            className="w-full border-primary text-foreground hover:bg-primary/10 py-2 rounded-lg font-medium transition-all duration-300"
+                            onClick={() => {
+                              handleOpenAuthModal();
+                              setIsMobileMenuOpen(false);
+                            }}
+                          >
+                            Start Free Trial
+                          </Button>
+                          
+                          {/* Get Started Button for Mobile */}
+                          <Button
+                            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-2 rounded-lg font-medium transition-all duration-300"
+                            onClick={() => {
+                              handleOpenAuthModal();
+                              setIsMobileMenuOpen(false);
+                            }}
+                          >
+                            Get Started
+                          </Button>
+                        </div>
 
                         {/* Cortex mobile */}
                         <div className="transition-all duration-300 ease-out">
