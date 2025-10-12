@@ -136,6 +136,15 @@ export const Navbar = () => {
     }, 300);
   };
 
+  const handleFreeTrialClick = () => {
+    // Redirect to pricing page for free trial
+    window.location.href = '/pricing';
+    // Alternatively, you can use:
+    // - Navigate programmatically: navigate('/pricing');
+    // - Open a specific trial modal
+    // - Redirect to signup with trial parameter
+  };
+
   const cortexSubmenu = [
     { to: '/', icon: <Info size={16} />, label: 'What', id: 'what' },
     { to: '/why', icon: <HelpCircle size={16} />, label: 'Why', id: 'why' },
@@ -171,7 +180,6 @@ export const Navbar = () => {
   return (
     <>
       <TooltipProvider>
-        {/* Clean Sticky Header - Removed background colors */}
         <header
           className={cn(
             "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out",
@@ -194,7 +202,6 @@ export const Navbar = () => {
                   />
                 </Link>
                 
-                {/* Spacer to maintain layout - invisible but takes same space */}
                 <div className="w-24 h-12 sm:w-28 sm:h-14 md:w-32 md:h-16 lg:w-36 lg:h-20 opacity-0 pointer-events-none" />
               </div>
 
@@ -204,7 +211,7 @@ export const Navbar = () => {
                 <Button
                   variant="outline"
                   className="border-primary text-foreground hover:bg-primary/10 px-4 py-2 rounded-lg font-medium transition-all duration-300"
-                  onClick={handleOpenAuthModal}
+                  onClick={handleFreeTrialClick}
                 >
                   Start Free Trial
                 </Button>
@@ -422,7 +429,7 @@ export const Navbar = () => {
                             variant="outline"
                             className="w-full border-primary text-foreground hover:bg-primary/10 py-2 rounded-lg font-medium transition-all duration-300"
                             onClick={() => {
-                              handleOpenAuthModal();
+                              handleFreeTrialClick();
                               setIsMobileMenuOpen(false);
                             }}
                           >
