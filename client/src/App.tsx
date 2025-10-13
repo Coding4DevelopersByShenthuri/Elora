@@ -41,6 +41,7 @@ import AuthModal from "@/components/AuthModal";
 import UserSurvey from "@/components/UserSurvey";
 import LanguageSurvey from "@/components/LanguageSurvey";
 import EnglishLevelSurvey from "@/components/EnglishLevelSurvey";
+import LearningPurposeSurvey from "@/components/LearningPurposeSurvey";
 import SurveyManager from "@/components/SurveyManager";
 
 const queryClient = new QueryClient();
@@ -68,6 +69,7 @@ const AppRoutes = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isSurveyOpen, setIsSurveyOpen] = useState(false);
   const [isLanguageSurveyOpen, setIsLanguageSurveyOpen] = useState(false);
+  const [isLearningPurposeSurveyOpen, setIsLearningPurposeSurveyOpen] = useState(false);
   const [isEnglishLevelSurveyOpen, setIsEnglishLevelSurveyOpen] = useState(false);
 
   // Handle survey state on page refresh - redirect to first survey page
@@ -80,7 +82,12 @@ const AppRoutes = () => {
       try {
         const user = JSON.parse(userData);
         // If survey is fully completed, clear the flag
-        if (user.surveyData?.ageRange && user.surveyData?.nativeLanguage && user.surveyData?.englishLevel) {
+        if (
+          user.surveyData?.ageRange &&
+          user.surveyData?.nativeLanguage &&
+          user.surveyData?.learningPurpose?.length &&
+          user.surveyData?.englishLevel
+        ) {
           sessionStorage.removeItem('speakbee_survey_in_progress');
           return;
         }
@@ -93,6 +100,7 @@ const AppRoutes = () => {
     if (surveyInProgress === 'true') {
       setIsSurveyOpen(true);
       setIsLanguageSurveyOpen(false);
+      setIsLearningPurposeSurveyOpen(false);
       setIsEnglishLevelSurveyOpen(false);
     }
   }, []);
@@ -165,14 +173,32 @@ const AppRoutes = () => {
 
       <EnglishLevelSurvey
         isOpen={isEnglishLevelSurveyOpen}
+        currentStep={3}
+        totalSteps={4}
         onComplete={() => {
           setIsEnglishLevelSurveyOpen(false);
-          // Survey completed - clear the flag
-          sessionStorage.removeItem('speakbee_survey_in_progress');
+          setIsLearningPurposeSurveyOpen(true);
+          // Keep in progress until final step completes
+          sessionStorage.setItem('speakbee_survey_in_progress', 'true');
         }}
         onBack={() => {
           setIsEnglishLevelSurveyOpen(false);
           setIsLanguageSurveyOpen(true);
+        }}
+      />
+
+      <LearningPurposeSurvey
+        isOpen={isLearningPurposeSurveyOpen}
+        currentStep={4}
+        totalSteps={4}
+        onComplete={() => {
+          setIsLearningPurposeSurveyOpen(false);
+          // Survey completed - clear the flag
+          sessionStorage.removeItem('speakbee_survey_in_progress');
+        }}
+        onBack={() => {
+          setIsLearningPurposeSurveyOpen(false);
+          setIsEnglishLevelSurveyOpen(true);
         }}
       />
     </>

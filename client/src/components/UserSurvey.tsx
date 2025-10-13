@@ -7,6 +7,7 @@ export interface SurveyData {
   ageRange?: string;
   nativeLanguage?: string;
   englishLevel?: string;
+  learningPurpose?: string[];
   completedAt: string;
 }
 
