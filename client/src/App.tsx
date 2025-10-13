@@ -39,6 +39,7 @@ import PricingPage from "@/pages/PricingPage";
 // ✅ Import AuthModal, UserSurvey, and SurveyManager
 import AuthModal from "@/components/AuthModal";
 import UserSurvey from "@/components/UserSurvey";
+import LanguageSurvey from "@/components/LanguageSurvey";
 import SurveyManager from "@/components/SurveyManager";
 
 const queryClient = new QueryClient();
@@ -65,6 +66,33 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
 const AppRoutes = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isSurveyOpen, setIsSurveyOpen] = useState(false);
+  const [isLanguageSurveyOpen, setIsLanguageSurveyOpen] = useState(false);
+
+  // Handle survey state on page refresh - redirect to first survey page
+  useEffect(() => {
+    const surveyInProgress = sessionStorage.getItem('speakbee_survey_in_progress');
+    const userData = localStorage.getItem('speakbee_current_user');
+    
+    // Check if survey is complete
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        // If survey is fully completed, clear the flag
+        if (user.surveyData?.ageRange && user.surveyData?.nativeLanguage) {
+          sessionStorage.removeItem('speakbee_survey_in_progress');
+          return;
+        }
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+      }
+    }
+    
+    // If survey is in progress and not completed, redirect to first page
+    if (surveyInProgress === 'true') {
+      setIsSurveyOpen(true);
+      setIsLanguageSurveyOpen(false);
+    }
+  }, []);
 
   return (
     <>
@@ -96,16 +124,39 @@ const AppRoutes = () => {
       />
       
       {/* Survey Manager - handles showing survey after login */}
-      <SurveyManager onShowSurvey={() => setIsSurveyOpen(true)} />
+      <SurveyManager onShowSurvey={() => {
+        setIsSurveyOpen(true);
+        // Mark survey as in progress when it first opens
+        sessionStorage.setItem('speakbee_survey_in_progress', 'true');
+      }} />
       
       {/* Global User Survey */}
       <UserSurvey 
         isOpen={isSurveyOpen}
         onComplete={() => {
           setIsSurveyOpen(false);
-          // Survey data will be saved by the AuthContext
+          setIsLanguageSurveyOpen(true);
+          // Mark survey as in progress
+          sessionStorage.setItem('speakbee_survey_in_progress', 'true');
         }}
-        onSkip={() => setIsSurveyOpen(false)}
+        onSkip={() => {
+          setIsSurveyOpen(false);
+          // Clear survey progress flag
+          sessionStorage.removeItem('speakbee_survey_in_progress');
+        }}
+      />
+
+      <LanguageSurvey
+        isOpen={isLanguageSurveyOpen}
+        onComplete={() => {
+          setIsLanguageSurveyOpen(false);
+          // Survey completed - clear the flag
+          sessionStorage.removeItem('speakbee_survey_in_progress');
+        }}
+        onBack={() => {
+          setIsLanguageSurveyOpen(false);
+          setIsSurveyOpen(true);
+        }}
       />
     </>
   );

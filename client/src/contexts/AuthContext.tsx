@@ -16,7 +16,8 @@ interface User {
     avatar?: string;
   };
   surveyData?: {
-    ageRange: string;
+    ageRange?: string;
+    nativeLanguage?: string;
     completedAt: string;
   };
 }
@@ -83,9 +84,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const updateUserSurveyData = (surveyData: User['surveyData']) => {
     if (user) {
+      const mergedSurveyData = {
+        ...(user.surveyData || {}),
+        ...surveyData
+      } as User['surveyData'];
+
       const updatedUser = {
         ...user,
-        surveyData
+        surveyData: mergedSurveyData
       };
       setUser(updatedUser);
       localStorage.setItem('speakbee_current_user', JSON.stringify(updatedUser));
@@ -94,7 +100,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       try {
         const users: User[] = JSON.parse(localStorage.getItem("speakbee_users") || "[]");
         const updatedUsers = users.map(u => 
-          u.id === user.id ? { ...u, surveyData } : u
+          u.id === user.id ? { ...u, surveyData: mergedSurveyData } : u
         );
         localStorage.setItem("speakbee_users", JSON.stringify(updatedUsers));
       } catch (error) {

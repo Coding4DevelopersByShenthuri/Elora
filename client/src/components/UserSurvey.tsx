@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useAuth } from '@/contexts/AuthContext';
+import SurveyProgress from '@/components/SurveyProgress';
 
 export interface SurveyData {
-  ageRange: string;
+  ageRange?: string;
+  nativeLanguage?: string;
   completedAt: string;
 }
 
@@ -98,6 +100,9 @@ const UserSurvey: React.FC<UserSurveyProps> = ({ isOpen, onComplete }) => {
             {/* Mobile Survey Content - NO CHANGES TO CONTENT BLOCK */}
             <div className="flex-1 bg-white px-4 flex flex-col items-center">
               <div className="text-center w-full">
+                {/* Progress Indicator */}
+                <SurveyProgress currentStep={1} totalSteps={2} variant="mobile" />
+                
                 <h1 className="text-2xl font-bold text-blue-900 mb-8">
                   What is your age?
                 </h1>
@@ -188,10 +193,16 @@ const UserSurvey: React.FC<UserSurveyProps> = ({ isOpen, onComplete }) => {
 
             {/* Right Panel - Survey Section */}
             <div className="w-1/2 bg-white p-8 lg:p-35 flex flex-col justify-center">
-              <div className="text-center mb-8">
-                <h1 className="text-4xl font-bold text-blue-900 mb-10">
+              <div className="max-w-lg mx-auto w-full">
+                {/* Progress Indicator */}
+                <SurveyProgress currentStep={1} totalSteps={2} variant="desktop" />
+                
+                <h1 className="text-4xl font-bold text-blue-900 mb-10 text-center">
                   What is your age?
                 </h1>
+              </div>
+              
+              <div className="text-center mb-8">
 
                 <div className="grid grid-cols-2 gap-4 gap-y-2 mb-6 place-items-center max-w-lg mx-auto px-4">
                   {ageOptions.map((option) => {
