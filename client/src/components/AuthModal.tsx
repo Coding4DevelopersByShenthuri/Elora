@@ -37,6 +37,10 @@ interface User {
     streak: number;
     avatar?: string;
   };
+  surveyData?: {
+    ageRange: string;
+    completedAt: string;
+  };
 }
 
 // Simple encryption for local storage (basic obfuscation)

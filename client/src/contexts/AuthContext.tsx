@@ -15,6 +15,10 @@ interface User {
     streak: number;
     avatar?: string;
   };
+  surveyData?: {
+    ageRange: string;
+    completedAt: string;
+  };
 }
 
 interface AuthContextType {
@@ -22,6 +26,7 @@ interface AuthContextType {
   login: (userData: User) => void; // Changed to require userData
   logout: () => void;
   updateUserProfile: (updates: Partial<User['profile']>) => void;
+  updateUserSurveyData: (surveyData: User['surveyData']) => void;
   isAuthenticated: boolean;
 }
 
@@ -76,12 +81,35 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const updateUserSurveyData = (surveyData: User['surveyData']) => {
+    if (user) {
+      const updatedUser = {
+        ...user,
+        surveyData
+      };
+      setUser(updatedUser);
+      localStorage.setItem('speakbee_current_user', JSON.stringify(updatedUser));
+      
+      // Also update the user data in the main users storage
+      try {
+        const users: User[] = JSON.parse(localStorage.getItem("speakbee_users") || "[]");
+        const updatedUsers = users.map(u => 
+          u.id === user.id ? { ...u, surveyData } : u
+        );
+        localStorage.setItem("speakbee_users", JSON.stringify(updatedUsers));
+      } catch (error) {
+        console.error('Error updating user survey data in storage:', error);
+      }
+    }
+  };
+
   return (
     <AuthContext.Provider value={{
       user,
       login,
       logout,
       updateUserProfile,
+      updateUserSurveyData,
       isAuthenticated: !!user
     }}>
       {children}

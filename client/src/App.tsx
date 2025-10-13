@@ -36,8 +36,10 @@ import IeltsPte from "@/pages/IeltsPte";
 import NotFound from "@/pages/NotFound";
 import PricingPage from "@/pages/PricingPage";
 
-// ✅ Import AuthModal
+// ✅ Import AuthModal, UserSurvey, and SurveyManager
 import AuthModal from "@/components/AuthModal";
+import UserSurvey from "@/components/UserSurvey";
+import SurveyManager from "@/components/SurveyManager";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +64,7 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
 // ✅ Route Definitions
 const AppRoutes = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isSurveyOpen, setIsSurveyOpen] = useState(false);
 
   return (
     <>
@@ -90,6 +93,19 @@ const AppRoutes = () => {
       <AuthModal 
         isOpen={isAuthModalOpen} 
         onClose={() => setIsAuthModalOpen(false)} 
+      />
+      
+      {/* Survey Manager - handles showing survey after login */}
+      <SurveyManager onShowSurvey={() => setIsSurveyOpen(true)} />
+      
+      {/* Global User Survey */}
+      <UserSurvey 
+        isOpen={isSurveyOpen}
+        onComplete={() => {
+          setIsSurveyOpen(false);
+          // Survey data will be saved by the AuthContext
+        }}
+        onSkip={() => setIsSurveyOpen(false)}
       />
     </>
   );
