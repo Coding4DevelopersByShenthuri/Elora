@@ -6,6 +6,7 @@ import SurveyProgress from '@/components/SurveyProgress';
 export interface SurveyData {
   ageRange?: string;
   nativeLanguage?: string;
+  englishLevel?: string;
   completedAt: string;
 }
 

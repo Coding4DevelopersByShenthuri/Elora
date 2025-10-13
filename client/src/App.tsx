@@ -40,6 +40,7 @@ import PricingPage from "@/pages/PricingPage";
 import AuthModal from "@/components/AuthModal";
 import UserSurvey from "@/components/UserSurvey";
 import LanguageSurvey from "@/components/LanguageSurvey";
+import EnglishLevelSurvey from "@/components/EnglishLevelSurvey";
 import SurveyManager from "@/components/SurveyManager";
 
 const queryClient = new QueryClient();
@@ -67,6 +68,7 @@ const AppRoutes = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isSurveyOpen, setIsSurveyOpen] = useState(false);
   const [isLanguageSurveyOpen, setIsLanguageSurveyOpen] = useState(false);
+  const [isEnglishLevelSurveyOpen, setIsEnglishLevelSurveyOpen] = useState(false);
 
   // Handle survey state on page refresh - redirect to first survey page
   useEffect(() => {
@@ -78,7 +80,7 @@ const AppRoutes = () => {
       try {
         const user = JSON.parse(userData);
         // If survey is fully completed, clear the flag
-        if (user.surveyData?.ageRange && user.surveyData?.nativeLanguage) {
+        if (user.surveyData?.ageRange && user.surveyData?.nativeLanguage && user.surveyData?.englishLevel) {
           sessionStorage.removeItem('speakbee_survey_in_progress');
           return;
         }
@@ -91,6 +93,7 @@ const AppRoutes = () => {
     if (surveyInProgress === 'true') {
       setIsSurveyOpen(true);
       setIsLanguageSurveyOpen(false);
+      setIsEnglishLevelSurveyOpen(false);
     }
   }, []);
 
@@ -150,12 +153,26 @@ const AppRoutes = () => {
         isOpen={isLanguageSurveyOpen}
         onComplete={() => {
           setIsLanguageSurveyOpen(false);
-          // Survey completed - clear the flag
-          sessionStorage.removeItem('speakbee_survey_in_progress');
+          setIsEnglishLevelSurveyOpen(true);
+          // Keep survey in progress
+          sessionStorage.setItem('speakbee_survey_in_progress', 'true');
         }}
         onBack={() => {
           setIsLanguageSurveyOpen(false);
           setIsSurveyOpen(true);
+        }}
+      />
+
+      <EnglishLevelSurvey
+        isOpen={isEnglishLevelSurveyOpen}
+        onComplete={() => {
+          setIsEnglishLevelSurveyOpen(false);
+          // Survey completed - clear the flag
+          sessionStorage.removeItem('speakbee_survey_in_progress');
+        }}
+        onBack={() => {
+          setIsEnglishLevelSurveyOpen(false);
+          setIsLanguageSurveyOpen(true);
         }}
       />
     </>

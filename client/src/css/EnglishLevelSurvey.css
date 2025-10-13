@@ -1,0 +1,157 @@
+/* Images Animation */
+@keyframes imagesEntrance {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 0) scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+@keyframes imagesBounce {
+  0%, 100% {
+    transform: translate(-50%, 0) rotate(0deg);
+  }
+  10% {
+    transform: translate(-50%, -10px) rotate(-2deg);
+  }
+  20% {
+    transform: translate(-50%, 0) rotate(2deg);
+  }
+  30% {
+    transform: translate(-50%, -8px) rotate(-1deg);
+  }
+  40% {
+    transform: translate(-50%, 0) rotate(1deg);
+  }
+  50% {
+    transform: translate(-50%, -5px) rotate(0deg);
+  }
+  60% {
+    transform: translate(-50%, 0) rotate(0deg);
+  }
+}
+
+.images-container {
+  position: relative;
+  width: 200px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.images-animation {
+  animation: 
+    imagesEntrance 0.8s ease-out forwards,
+    imagesBounce 2.5s ease-in-out 0.8s 1 forwards;
+}
+
+/* Level Image Styles */
+.level-image {
+  max-width: 60px;
+  max-height: 60px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.level-image:hover {
+  transform: scale(1.1);
+}
+
+
+/* Level Card Styles */
+.level-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 12px;
+  border: 2px solid #E5E7EB;
+  border-radius: 16px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  min-height: 120px;
+}
+
+.level-card:hover {
+  border-color: #3B82F6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+  transform: translateY(-2px);
+}
+
+.level-card.selected {
+  border-color: #3B82F6;
+  background-color: #EFF6FF;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.level-card.desktop {
+  min-height: 140px;
+  padding: 20px 16px;
+}
+
+.plant-icon {
+  margin-bottom: 12px;
+  transition: transform 0.3s ease;
+}
+
+.level-card:hover .plant-icon {
+  transform: scale(1.1);
+}
+
+.level-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.level-card.selected .level-label {
+  color: #1E40AF;
+}
+
+.level-card.desktop .level-label {
+  font-size: 16px;
+}
+
+/* Mobile specific adjustments */
+@media (max-width: 768px) {
+  .images-container {
+    width: 150px;
+    height: 120px;
+  }
+  
+  .level-image {
+    max-width: 45px;
+    max-height: 45px;
+  }
+  
+  .level-card {
+    min-height: 100px;
+    padding: 12px 8px;
+  }
+  
+  .level-label {
+    font-size: 12px;
+  }
+}
+
+/* Desktop specific adjustments */
+@media (min-width: 769px) {
+  .images-container {
+    width: 250px;
+    height: 180px;
+  }
+  
+  .level-image {
+    max-width: 80px;
+    max-height: 80px;
+  }
+}
