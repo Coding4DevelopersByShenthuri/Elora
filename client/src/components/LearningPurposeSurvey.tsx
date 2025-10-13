@@ -15,7 +15,7 @@ interface LearningPurposeSurveyProps {
 const PURPOSE_OPTIONS = [
 	'Daily conversations',
 	'Work and career',
-	'Exam preparation (IELTS / TOEFL)',
+	'Exam preparation (IELTS / PTE)',
 	'Moving or traveling abroad',
 	'For educational purposes',
 	'Communicating with partners',
@@ -26,15 +26,16 @@ const PURPOSE_OPTIONS = [
 const LearningPurposeSurvey: React.FC<LearningPurposeSurveyProps> = ({ isOpen, onComplete, onBack, currentStep = 1, totalSteps = 3 }) => {
 	const { updateUserSurveyData } = useAuth();
 	const [selectedPurposes, setSelectedPurposes] = React.useState<string[]>([]);
-	const [shouldAnimate, setShouldAnimate] = React.useState(false);
+	const [shouldBounce, setShouldBounce] = React.useState(false);
 
 	React.useEffect(() => {
 		if (isOpen) {
-			setShouldAnimate(true);
-			const timer = setTimeout(() => setShouldAnimate(false), 1200);
-			return () => clearTimeout(timer);
+			setShouldBounce(true);
+			const t = setTimeout(() => setShouldBounce(false), 900);
+			return () => clearTimeout(t);
 		}
 	}, [isOpen]);
+
 
 	const togglePurpose = (purpose: string) => {
 		setSelectedPurposes((prev) =>
@@ -61,7 +62,12 @@ const LearningPurposeSurvey: React.FC<LearningPurposeSurveyProps> = ({ isOpen, o
 						<div className="bg-blue-50 p-6 pb-0 flex flex-col relative">
 							<div className='flex items-center w-full mb-4 relative'>
 								<img src="/logo01.png" alt="Speak Bee Logo" className="w-20 h-20 object-contain ml-2" />
-								<img src="/Book.png" alt="Book" className={`w-32 h-32 object-contain absolute left-1/2 transform -translate-x-1/2 ${shouldAnimate ? 'animate-calendar-bounce' : ''}`} />
+                                {/* Book visual with subtle wobble animation */}
+                                <div className="absolute left-1/2 transform -translate-x-1/2">
+                                    <div className={`relative w-32 h-32 ${shouldBounce ? 'book-bounce-once' : ''}`}>
+                                        <img src="/Book.png" alt="Book" className="w-full h-full object-contain book-idle" />
+                                    </div>
+                                </div>
 							</div>
 							<div className="w-full h-[1px] bg-gray-300 mx-auto mt-2 mb-6"></div>
 						</div>
@@ -99,7 +105,9 @@ const LearningPurposeSurvey: React.FC<LearningPurposeSurveyProps> = ({ isOpen, o
 					<div className="hidden md:flex w-full h-full">
 						<div className="w-1/2 bg-blue-50 flex items-center justify-center p-8 relative">
 							<div className="text-center">
-								<img src="/Book.png" alt="Book" className={`w-72 h-72 lg:w-96 lg:h-96 mx-auto ${shouldAnimate ? 'animate-calendar-bounce' : ''}`} />
+                                <div className={`relative w-72 h-72 lg:w-96 lg:h-96 mx-auto ${shouldBounce ? 'book-bounce-once' : ''}`}>
+                                    <img src="/Book.png" alt="Book" className="w-full h-full object-contain book-idle" />
+                                </div>
 							</div>
 							<div className="absolute bottom-6 left-6">
 								<img src="/logo01.png" alt="Speak Bee Logo" className="w-32 h-32 object-contain" />
@@ -136,22 +144,37 @@ const LearningPurposeSurvey: React.FC<LearningPurposeSurveyProps> = ({ isOpen, o
 					</div>
 				</div>
 
-				{/* Reuse the calendar bounce for subtle pop-in */}
-				<style>{`
-					@keyframes calendar-bounce {
-						0% { transform: translateY(0) scale(1) rotate(0deg); }
-						15% { transform: translateY(-35px) scale(1.05) rotate(-1deg); }
-						30% { transform: translateY(-10px) scale(1.02) rotate(0.5deg); }
-						45% { transform: translateY(-20px) scale(1.03) rotate(-0.5deg); }
-						60% { transform: translateY(-5px) scale(1.01) rotate(0.3deg); }
-						70% { transform: translateY(-2px) scale(1) rotate(2deg); }
-						75% { transform: translateY(-2px) scale(1) rotate(-2deg); }
-						80% { transform: translateY(-2px) scale(1) rotate(1deg); }
-						85% { transform: translateY(-2px) scale(1) rotate(-1deg); }
-						100% { transform: translateY(0) scale(1) rotate(0deg); }
-					}
-					.animate-calendar-bounce { animation: calendar-bounce 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55); transform-origin: center bottom; }
-				`}</style>
+                {/* Subtle wobble animation ideal for a closed book */}
+                <style>{`
+                    /* Stronger one-time bounce on open (wrapper-level so wobble can run on image) */
+                    @keyframes book-bounce-once {
+                        0% { transform: translateY(16px) scale(0.98) rotateZ(0deg); }
+                        20% { transform: translateY(-24px) scale(1.07) rotateZ(-2deg); }
+                        45% { transform: translateY(8px) scale(0.99) rotateZ(1.2deg); }
+                        65% { transform: translateY(-12px) scale(1.03) rotateZ(-0.8deg); }
+                        82% { transform: translateY(4px) scale(1.005) rotateZ(0.4deg); }
+                        100% { transform: translateY(0) scale(1) rotateZ(0deg); }
+                    }
+                    .book-bounce-once {
+                        animation: book-bounce-once 1.2s cubic-bezier(.2,.8,.2,1.2) 1;
+                        transform-origin: 50% 90%;
+                        will-change: transform;
+                    }
+
+                    @keyframes book-wobble {
+                        0% { transform: translateY(0) rotateZ(0deg) rotateY(0deg); }
+                        20% { transform: translateY(-2px) rotateZ(-1.2deg) rotateY(-0.6deg); }
+                        40% { transform: translateY(0) rotateZ(0.8deg) rotateY(0.4deg); }
+                        60% { transform: translateY(1px) rotateZ(-0.8deg) rotateY(-0.3deg); }
+                        80% { transform: translateY(0) rotateZ(0.6deg) rotateY(0.2deg); }
+                        100% { transform: translateY(0) rotateZ(0deg) rotateY(0deg); }
+                    }
+                    .book-idle {
+                        animation: book-wobble 3.2s ease-in-out infinite;
+                        transform-origin: 50% 85%;
+                        will-change: transform;
+                    }
+                `}</style>
 			</DialogContent>
 		</Dialog>
 	);

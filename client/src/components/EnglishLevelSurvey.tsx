@@ -57,13 +57,13 @@ const EnglishLevelSurvey: React.FC<EnglishLevelSurveyProps> = ({ isOpen, onCompl
         <div className="w-full h-screen bg-white flex flex-col md:flex-row relative">
           {/* Mobile */}
           <div className="md:hidden w-full h-full flex flex-col">
-            <div className="bg-blue-50 p-2 pb-0 h-[190px] flex flex-col relative">
+            <div className="bg-blue-50 p-6 pb-0 flex flex-col relative">
               <div className='flex items-center w-full mb-4 relative'>
                 {/* Logo - Positioned on the left */}
-                <img src="/logo01.png" alt="Speak Bee Logo" className="w-16 h-16 object-contain ml-2" />
+                <img src="/logo01.png" alt="Speak Bee Logo" className="w-20 h-20 object-contain ml-2" />
                 
                 {/* Images illustration - Centered */}
-                <div className={`images-container absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 ${
+                <div className={`images-container absolute left-1/2 transform -translate-x-1/2 ${
                   shouldAnimate ? 'images-animation' : ''
                 }`}>
                   <img src="/need.png" alt="Level A1 - need" className="level-image a1-image" />
@@ -71,7 +71,7 @@ const EnglishLevelSurvey: React.FC<EnglishLevelSurveyProps> = ({ isOpen, onCompl
                   <img src="/necessitate.png" alt="Level C1 - necessitate" className="level-image c1-image" />
                 </div>
               </div>
-              <div className="w-full h-[1px] bg-gray-300 mx-auto mt-1 mb-4"></div>
+              <div className="w-full h-[1px] bg-gray-300 mx-auto mt-2 mb-8"></div>
             </div>
 
             <div className="flex-1 bg-white px-4 flex flex-col items-center">
