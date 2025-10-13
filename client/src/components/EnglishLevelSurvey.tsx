@@ -11,120 +11,15 @@ interface EnglishLevelSurveyProps {
   onBack?: () => void;
 }
 
-// SVG Components for each plant growth stage
-const BeginnerIcon = () => (
-  <div className="plant-icon beginner-icon">
-    <svg viewBox="0 0 100 100" className="w-16 h-16">
-      {/* Light blue circle background */}
-      <circle cx="50" cy="50" r="45" fill="#E3F2FD" stroke="#BBDEFB" strokeWidth="2"/>
-      {/* Seeds/Grains */}
-      <ellipse cx="35" cy="45" rx="4" ry="6" fill="#FFD54F" transform="rotate(-15 35 45)"/>
-      <ellipse cx="50" cy="40" rx="3" ry="5" fill="#FFD54F" transform="rotate(10 50 40)"/>
-      <ellipse cx="65" cy="45" rx="4" ry="6" fill="#FFD54F" transform="rotate(-25 65 45)"/>
-      <ellipse cx="42" cy="55" rx="3" ry="5" fill="#FFD54F" transform="rotate(20 42 55)"/>
-      <ellipse cx="58" cy="60" rx="3" ry="5" fill="#FFD54F" transform="rotate(-10 58 60)"/>
-      <ellipse cx="30" cy="60" rx="3" ry="5" fill="#FFD54F" transform="rotate(15 30 60)"/>
-      {/* Soil */}
-      <path d="M20 75 Q30 70 40 75 Q50 80 60 75 Q70 70 80 75 Q85 80 85 85 L15 85 Q15 80 20 75" fill="#5D4037"/>
-    </svg>
-  </div>
-);
-
-const PreIntermediateIcon = () => (
-  <div className="plant-icon pre-intermediate-icon">
-    <svg viewBox="0 0 100 100" className="w-16 h-16">
-      {/* Light blue circle background */}
-      <circle cx="50" cy="50" r="45" fill="#E3F2FD" stroke="#BBDEFB" strokeWidth="2"/>
-      {/* Sprout */}
-      <path d="M45 65 Q47 55 50 45 Q52 35 50 30" stroke="#4CAF50" strokeWidth="3" fill="none"/>
-      <path d="M50 30 Q48 25 45 28" stroke="#4CAF50" strokeWidth="2" fill="none"/>
-      {/* Soil */}
-      <path d="M20 75 Q30 70 40 75 Q50 80 60 75 Q70 70 80 75 Q85 80 85 85 L15 85 Q15 80 20 75" fill="#5D4037"/>
-    </svg>
-  </div>
-);
-
-const IntermediateIcon = () => (
-  <div className="plant-icon intermediate-icon">
-    <svg viewBox="0 0 100 100" className="w-16 h-16">
-      {/* Light blue circle background */}
-      <circle cx="50" cy="50" r="45" fill="#E3F2FD" stroke="#BBDEFB" strokeWidth="2"/>
-      {/* Plant with two leaves */}
-      <path d="M45 65 Q47 55 50 45 Q52 35 50 30" stroke="#4CAF50" strokeWidth="3" fill="none"/>
-      {/* Left leaf */}
-      <ellipse cx="42" cy="40" rx="8" ry="4" fill="#4CAF50" transform="rotate(-30 42 40)"/>
-      {/* Right leaf */}
-      <ellipse cx="58" cy="40" rx="8" ry="4" fill="#8BC34A" transform="rotate(30 58 40)"/>
-      {/* Soil */}
-      <path d="M20 75 Q30 70 40 75 Q50 80 60 75 Q70 70 80 75 Q85 80 85 85 L15 85 Q15 80 20 75" fill="#5D4037"/>
-    </svg>
-  </div>
-);
-
-const UpperIntermediateIcon = () => (
-  <div className="plant-icon upper-intermediate-icon">
-    <svg viewBox="0 0 100 100" className="w-16 h-16">
-      {/* Light blue circle background */}
-      <circle cx="50" cy="50" r="45" fill="#E3F2FD" stroke="#BBDEFB" strokeWidth="2"/>
-      {/* Plant with three leaves */}
-      <path d="M45 65 Q47 55 50 45 Q52 35 50 30" stroke="#4CAF50" strokeWidth="3" fill="none"/>
-      {/* Left leaf */}
-      <ellipse cx="42" cy="40" rx="8" ry="4" fill="#4CAF50" transform="rotate(-30 42 40)"/>
-      {/* Right leaf */}
-      <ellipse cx="58" cy="40" rx="8" ry="4" fill="#8BC34A" transform="rotate(30 58 40)"/>
-      {/* Top leaf */}
-      <ellipse cx="50" cy="28" rx="6" ry="3" fill="#66BB6A" transform="rotate(0 50 28)"/>
-      {/* Soil */}
-      <path d="M20 75 Q30 70 40 75 Q50 80 60 75 Q70 70 80 75 Q85 80 85 85 L15 85 Q15 80 20 75" fill="#5D4037"/>
-    </svg>
-  </div>
-);
-
-const AdvancedIcon = () => (
-  <div className="plant-icon advanced-icon">
-    <svg viewBox="0 0 100 100" className="w-16 h-16">
-      {/* Light blue circle background */}
-      <circle cx="50" cy="50" r="45" fill="#E3F2FD" stroke="#BBDEFB" strokeWidth="2"/>
-      {/* Plant with flower */}
-      <path d="M45 65 Q47 55 50 45 Q52 35 50 30" stroke="#4CAF50" strokeWidth="3" fill="none"/>
-      {/* Leaves */}
-      <ellipse cx="42" cy="40" rx="8" ry="4" fill="#4CAF50" transform="rotate(-30 42 40)"/>
-      <ellipse cx="58" cy="40" rx="8" ry="4" fill="#8BC34A" transform="rotate(30 58 40)"/>
-      {/* Flower */}
-      <circle cx="50" cy="25" r="8" fill="#FFD54F"/>
-      <circle cx="50" cy="25" r="6" fill="#FFA726"/>
-      <circle cx="50" cy="25" r="4" fill="#FF8F00"/>
-      {/* Soil */}
-      <path d="M20 75 Q30 70 40 75 Q50 80 60 75 Q70 70 80 75 Q85 80 85 85 L15 85 Q15 80 20 75" fill="#5D4037"/>
-    </svg>
-  </div>
-);
-
-const ProficientIcon = () => (
-  <div className="plant-icon proficient-icon">
-    <svg viewBox="0 0 100 100" className="w-16 h-16">
-      {/* Light blue circle background */}
-      <circle cx="50" cy="50" r="45" fill="#E3F2FD" stroke="#BBDEFB" strokeWidth="2"/>
-      {/* Tree trunk */}
-      <rect x="47" y="55" width="6" height="15" fill="#8D6E63" rx="1"/>
-      {/* Tree canopy */}
-      <circle cx="50" cy="45" r="20" fill="#4CAF50"/>
-      <circle cx="45" cy="40" r="12" fill="#66BB6A"/>
-      <circle cx="55" cy="40" r="12" fill="#4CAF50"/>
-      <circle cx="50" cy="35" r="10" fill="#8BC34A"/>
-      {/* Soil */}
-      <path d="M20 75 Q30 70 40 75 Q50 80 60 75 Q70 70 80 75 Q85 80 85 85 L15 85 Q15 80 20 75" fill="#5D4037"/>
-    </svg>
-  </div>
-);
+// Replaced in-grid SVG level icons with image assets.
 
 const englishLevels = [
-  { id: 'beginner', label: 'Beginner', icon: BeginnerIcon },
-  { id: 'pre-intermediate', label: 'Pre Intermediate', icon: PreIntermediateIcon },
-  { id: 'intermediate', label: 'Intermediate', icon: IntermediateIcon },
-  { id: 'upper-intermediate', label: 'Upper Intermediate', icon: UpperIntermediateIcon },
-  { id: 'advanced', label: 'Advanced', icon: AdvancedIcon },
-  { id: 'proficient', label: 'Proficient', icon: ProficientIcon },
+  { id: 'beginner', label: 'Beginner', image: '/beginner.png' },
+  { id: 'pre-intermediate', label: 'Pre Intermediate', image: '/Preintermediate.png' },
+  { id: 'intermediate', label: 'Intermediate', image: '/Intermediate.png' },
+  { id: 'upper-intermediate', label: 'Upper Intermediate', image: '/UpperIntermediate.png' },
+  { id: 'advanced', label: 'Advanced', image: '/advance.png' },
+  { id: 'proficient', label: 'Proficient', image: '/pro.png' },
 ];
 
 const EnglishLevelSurvey: React.FC<EnglishLevelSurveyProps> = ({ isOpen, onComplete, onBack }) => {
@@ -187,14 +82,13 @@ const EnglishLevelSurvey: React.FC<EnglishLevelSurveyProps> = ({ isOpen, onCompl
                 {/* Level Selection Grid */}
                 <div className="max-w-sm mx-auto w-full grid grid-cols-2 gap-3">
                   {englishLevels.map((level) => {
-                    const IconComponent = level.icon;
                     return (
                       <button
                         key={level.id}
                         onClick={() => handleLevelSelect(level.id)}
                         className={`level-card ${selectedLevel === level.id ? 'selected' : ''}`}
                       >
-                        <IconComponent />
+                        <img src={level.image} alt={`${level.label} level`} className="w-16 h-16 object-contain mb-2" />
                         <span className="level-label">{level.label}</span>
                       </button>
                     );
@@ -235,14 +129,13 @@ const EnglishLevelSurvey: React.FC<EnglishLevelSurveyProps> = ({ isOpen, onCompl
                 {/* Level Selection Grid */}
                 <div className="grid grid-cols-2 gap-4">
                   {englishLevels.map((level) => {
-                    const IconComponent = level.icon;
                     return (
                       <button
                         key={level.id}
                         onClick={() => handleLevelSelect(level.id)}
                         className={`level-card desktop ${selectedLevel === level.id ? 'selected' : ''}`}
                       >
-                        <IconComponent />
+                        <img src={level.image} alt={`${level.label} level`} className="w-20 h-20 object-contain mb-2" />
                         <span className="level-label">{level.label}</span>
                       </button>
                     );
