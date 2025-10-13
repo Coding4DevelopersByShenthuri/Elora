@@ -103,7 +103,7 @@ const LanguageSurvey: React.FC<LanguageSurveyProps> = ({ isOpen, onComplete, onB
                 <img 
                   src="/world.png" 
                   alt="Globe" 
-                  className={`w-72 h-72 lg:w-110 lg:h-96 mx-auto ${
+                  className={`w-72 h-72 lg:w-120 lg:h-96 mx-auto ${
                     shouldAnimate ? 'globe-animation' : ''
                   }`}
                 />
