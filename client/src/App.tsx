@@ -50,6 +50,8 @@ import SentenceFormationSurvey from "@/components/SentenceFormationSurvey";
 import CantSpeakSurvey from "@/components/CantSpeakSurvey";
 import NeedFluencySurvey from "@/components/NeedFluencySurvey";
 import HelloSurvey from "@/components/HelloSurvey";
+import MoviesSurvey from "@/components/MoviesSurvey";
+import VocabularySurvey from "@/components/VocabularySurvey";
 import SurveyManager from "@/components/SurveyManager";
 
 const queryClient = new QueryClient();
@@ -87,6 +89,8 @@ const AppRoutes = () => {
   const [isCantSpeakSurveyOpen, setIsCantSpeakSurveyOpen] = useState(false);
   const [isNeedFluencySurveyOpen, setIsNeedFluencySurveyOpen] = useState(false);
   const [isHelloSurveyOpen, setIsHelloSurveyOpen] = useState(false);
+  const [isMoviesSurveyOpen, setIsMoviesSurveyOpen] = useState(false);
+  const [isVocabularySurveyOpen, setIsVocabularySurveyOpen] = useState(false);
 
   // Handle survey state on page refresh - ALWAYS start from first survey page
   useEffect(() => {
@@ -176,7 +180,7 @@ const AppRoutes = () => {
       <UserSurvey 
         isOpen={isSurveyOpen}
         currentStep={1}
-        totalSteps={12}
+        totalSteps={14}
         onComplete={() => {
           setIsSurveyOpen(false);
           setIsLanguageSurveyOpen(true);
@@ -195,7 +199,7 @@ const AppRoutes = () => {
       <LanguageSurvey
         isOpen={isLanguageSurveyOpen}
         currentStep={2}
-        totalSteps={12}
+        totalSteps={14}
         onComplete={() => {
           setIsLanguageSurveyOpen(false);
           setIsEnglishLevelSurveyOpen(true);
@@ -213,7 +217,7 @@ const AppRoutes = () => {
       <EnglishLevelSurvey
         isOpen={isEnglishLevelSurveyOpen}
         currentStep={3}
-        totalSteps={12}
+        totalSteps={14}
         onComplete={() => {
           setIsEnglishLevelSurveyOpen(false);
           setIsLearningPurposeSurveyOpen(true);
@@ -231,7 +235,7 @@ const AppRoutes = () => {
       <LearningPurposeSurvey
         isOpen={isLearningPurposeSurveyOpen}
         currentStep={4}
-        totalSteps={12}
+        totalSteps={14}
         onComplete={() => {
           setIsLearningPurposeSurveyOpen(false);
           setIsSpeakOutSurveyOpen(true);
@@ -248,7 +252,7 @@ const AppRoutes = () => {
       <SpeakOutSurvey
         isOpen={isSpeakOutSurveyOpen}
         currentStep={5}
-        totalSteps={12}
+        totalSteps={14}
         onComplete={() => {
           setIsSpeakOutSurveyOpen(false);
           setIsAimSurveyOpen(true);
@@ -265,7 +269,7 @@ const AppRoutes = () => {
       <AimSurvey
         isOpen={isAimSurveyOpen}
         currentStep={6}
-        totalSteps={12}
+        totalSteps={14}
         onComplete={() => {
           setIsAimSurveyOpen(false);
           setIsFluentUnderstandingSurveyOpen(true);
@@ -283,7 +287,7 @@ const AppRoutes = () => {
       <FluentUnderstandingSurvey
         isOpen={isFluentUnderstandingSurveyOpen}
         currentStep={7}
-        totalSteps={12}
+        totalSteps={14}
         onComplete={() => {
           setIsFluentUnderstandingSurveyOpen(false);
           setIsLimitedWordsSurveyOpen(true);
@@ -300,7 +304,7 @@ const AppRoutes = () => {
       <LimitedWordsSurvey
         isOpen={isLimitedWordsSurveyOpen}
         currentStep={8}
-        totalSteps={12}
+        totalSteps={14}
         onComplete={() => {
           setIsLimitedWordsSurveyOpen(false);
           setIsSentenceFormationSurveyOpen(true);
@@ -317,7 +321,7 @@ const AppRoutes = () => {
       <SentenceFormationSurvey
         isOpen={isSentenceFormationSurveyOpen}
         currentStep={9}
-        totalSteps={12}
+        totalSteps={14}
         onComplete={() => {
           setIsSentenceFormationSurveyOpen(false);
           setIsCantSpeakSurveyOpen(true);
@@ -334,7 +338,7 @@ const AppRoutes = () => {
       <CantSpeakSurvey
         isOpen={isCantSpeakSurveyOpen}
         currentStep={10}
-        totalSteps={12}
+        totalSteps={14}
         onComplete={() => {
           setIsCantSpeakSurveyOpen(false);
           setIsNeedFluencySurveyOpen(true);
@@ -351,12 +355,12 @@ const AppRoutes = () => {
       <NeedFluencySurvey
         isOpen={isNeedFluencySurveyOpen}
         currentStep={11}
-        totalSteps={12}
+        totalSteps={14}
         onComplete={() => {
           setIsNeedFluencySurveyOpen(false);
-          setIsHelloSurveyOpen(true);
+          setIsMoviesSurveyOpen(true);
           sessionStorage.setItem('speakbee_survey_in_progress', 'true');
-          sessionStorage.setItem('speakbee_survey_step', 'hello');
+          sessionStorage.setItem('speakbee_survey_step', 'movies');
         }}
         onBack={() => {
           setIsNeedFluencySurveyOpen(false);
@@ -365,10 +369,44 @@ const AppRoutes = () => {
         }}
       />
 
+      <MoviesSurvey
+        isOpen={isMoviesSurveyOpen}
+        currentStep={12}
+        totalSteps={14}
+        onComplete={() => {
+          setIsMoviesSurveyOpen(false);
+          setIsVocabularySurveyOpen(true);
+          sessionStorage.setItem('speakbee_survey_in_progress', 'true');
+          sessionStorage.setItem('speakbee_survey_step', 'vocabulary');
+        }}
+        onBack={() => {
+          setIsMoviesSurveyOpen(false);
+          setIsNeedFluencySurveyOpen(true);
+          sessionStorage.setItem('speakbee_survey_step', 'needFluency');
+        }}
+      />
+
+      <VocabularySurvey
+        isOpen={isVocabularySurveyOpen}
+        currentStep={13}
+        totalSteps={14}
+        onComplete={() => {
+          setIsVocabularySurveyOpen(false);
+          setIsHelloSurveyOpen(true);
+          sessionStorage.setItem('speakbee_survey_in_progress', 'true');
+          sessionStorage.setItem('speakbee_survey_step', 'hello');
+        }}
+        onBack={() => {
+          setIsVocabularySurveyOpen(false);
+          setIsMoviesSurveyOpen(true);
+          sessionStorage.setItem('speakbee_survey_step', 'movies');
+        }}
+      />
+
       <HelloSurvey
         isOpen={isHelloSurveyOpen}
-        currentStep={12}
-        totalSteps={12}
+        currentStep={14}
+        totalSteps={14}
         onComplete={() => {
           setIsHelloSurveyOpen(false);
           // Survey completed - clear the flag
@@ -377,8 +415,8 @@ const AppRoutes = () => {
         }}
         onBack={() => {
           setIsHelloSurveyOpen(false);
-          setIsNeedFluencySurveyOpen(true);
-          sessionStorage.setItem('speakbee_survey_step', 'needFluency');
+          setIsMoviesSurveyOpen(true);
+          sessionStorage.setItem('speakbee_survey_step', 'movies');
         }}
       />
     </>
