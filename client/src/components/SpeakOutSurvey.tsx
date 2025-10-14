@@ -83,7 +83,7 @@ const SpeakOutSurvey: React.FC<SpeakOutSurveyProps> = ({
                 <SurveyProgress currentStep={currentStep} totalSteps={totalSteps} onBack={onBack} variant="desktop" />
 
                 <h1 className="text-2xl md:text-[40px] leading-snug md:leading-[1.2] font-bold text-blue-900 mb-10 md:mb-24 text-center">
-                  Speak out loud to learn English. With <span className="text-blue-600">Learna</span>, it's simple and fun.
+                  Speak out loud to learn English. With <span className="text-yellow-600">Speak Bee</span>, it's simple and fun.
                 </h1>
 
                 <div className="flex justify-center">

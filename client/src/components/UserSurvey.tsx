@@ -15,6 +15,8 @@ interface UserSurveyProps {
   isOpen: boolean;
   onComplete: (surveyData: SurveyData) => void;
   onSkip: () => void;
+  currentStep?: number;
+  totalSteps?: number;
 }
 
 const ageOptions = [
@@ -44,7 +46,7 @@ const ageOptions = [
   }
 ];
 
-const UserSurvey: React.FC<UserSurveyProps> = ({ isOpen, onComplete }) => {
+const UserSurvey: React.FC<UserSurveyProps> = ({ isOpen, onComplete, currentStep = 1, totalSteps = 10 }) => {
   const [selectedAge, setSelectedAge] = useState<string | null>(null);
   const [shouldAnimate, setShouldAnimate] = useState(false);
   const { updateUserSurveyData } = useAuth();
@@ -103,7 +105,7 @@ const UserSurvey: React.FC<UserSurveyProps> = ({ isOpen, onComplete }) => {
             <div className="flex-1 bg-white px-4 flex flex-col items-center">
               <div className="text-center w-full">
                 {/* Progress Indicator */}
-                <SurveyProgress currentStep={1} totalSteps={2} variant="mobile" />
+                <SurveyProgress currentStep={currentStep} totalSteps={totalSteps} variant="mobile" />
                 
                 <h1 className="text-2xl font-bold text-blue-900 mb-8">
                   What is your age?
@@ -197,7 +199,7 @@ const UserSurvey: React.FC<UserSurveyProps> = ({ isOpen, onComplete }) => {
             <div className="w-1/2 bg-white p-8 lg:p-35 flex flex-col justify-center">
               <div className="max-w-lg mx-auto w-full">
                 {/* Progress Indicator */}
-                <SurveyProgress currentStep={1} totalSteps={2} variant="desktop" />
+                <SurveyProgress currentStep={currentStep} totalSteps={totalSteps} variant="desktop" />
                 
                 <h1 className="text-4xl font-bold text-blue-900 mb-10 text-center">
                   What is your age?

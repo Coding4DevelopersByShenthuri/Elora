@@ -27,7 +27,7 @@ const SurveyProgress: React.FC<SurveyProgressProps> = ({
             />
           </div>
           <span className="text-xs font-medium text-gray-600 whitespace-nowrap">
-            Step {currentStep}/{totalSteps}
+            Step {currentStep} of {totalSteps}
           </span>
         </div>
         
