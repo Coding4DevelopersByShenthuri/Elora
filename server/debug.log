@@ -170,3 +170,20 @@ INFO 2025-10-13 22:00:29,415 autoreload 12252 16624 Watching for file changes wi
 INFO 2025-10-14 09:46:59,796 autoreload 9664 14716 Watching for file changes with StatReloader
 INFO 2025-10-14 16:23:40,252 autoreload 1148 16248 Watching for file changes with StatReloader
 INFO 2025-10-15 14:30:08,171 autoreload 11404 18096 Watching for file changes with StatReloader
+INFO 2025-10-15 17:06:37,140 autoreload 11404 18096 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\models.py changed, reloading.
+INFO 2025-10-15 17:06:42,584 autoreload 21432 3488 Watching for file changes with StatReloader
+INFO 2025-10-15 17:07:11,986 autoreload 21432 3488 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\serializers.py changed, reloading.
+INFO 2025-10-15 17:07:13,987 autoreload 15908 5396 Watching for file changes with StatReloader
+INFO 2025-10-15 17:08:25,289 autoreload 15908 5396 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\views.py changed, reloading.
+INFO 2025-10-15 17:08:27,214 autoreload 20584 21416 Watching for file changes with StatReloader
+INFO 2025-10-15 17:08:59,032 autoreload 20584 21416 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\urls.py changed, reloading.
+INFO 2025-10-15 17:09:01,321 autoreload 19480 18204 Watching for file changes with StatReloader
+INFO 2025-10-15 17:09:10,474 autoreload 19480 18204 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\models.py changed, reloading.
+INFO 2025-10-15 17:09:12,647 autoreload 20376 15264 Watching for file changes with StatReloader
+INFO 2025-10-15 17:09:15,103 autoreload 20376 15264 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\serializers.py changed, reloading.
+INFO 2025-10-15 17:09:18,508 autoreload 8540 10044 Watching for file changes with StatReloader
+INFO 2025-10-15 17:09:23,722 autoreload 8540 10044 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\urls.py changed, reloading.
+INFO 2025-10-15 17:09:24,890 autoreload 21336 11048 Watching for file changes with StatReloader
+INFO 2025-10-15 17:12:10,213 autoreload 21336 11048 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\admin.py changed, reloading.
+INFO 2025-10-15 17:12:13,312 autoreload 10548 228 Watching for file changes with StatReloader
+INFO 2025-10-15 17:25:34,897 autoreload 20248 13000 Watching for file changes with StatReloader
