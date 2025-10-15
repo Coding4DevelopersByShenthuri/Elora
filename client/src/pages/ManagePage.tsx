@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { AnimatedTransition } from '@/components/AnimatedTransition';
+import { AnimatedTransition } from '@/components/common/AnimatedTransition';
 import { useAnimateIn } from '@/lib/animations';
 import CortexTable from '@/components/manage/CortexTable';
 import CortexSidebar from '@/components/manage/CortexSidebar';

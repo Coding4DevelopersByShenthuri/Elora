@@ -11,16 +11,17 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { prefetchAppShell } from "@/services/OfflinePrefetch";
 
 // ✅ Global Components
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/landing/Footer";
-import FloatingIconsLayer from "@/components/FloatingIconsLayer";
+import FloatingIconsLayer from "@/components/common/FloatingIconsLayer";
 import { LoadingScreen } from "@/components/landing/LoadingScreen";
-import OfflineIndicator from "@/components/OfflineIndicator";
+import OfflineIndicator from "@/components/common/OfflineIndicator";
 
 // ✅ Pages
 import Index from "@/pages/Index";
 import WhyPage from "@/pages/WhyPage";
 import HowPage from "@/pages/HowPage";
+import AboutPage from "@/pages/AboutPage";
 import ManagePage from "@/pages/ManagePage";
 import Profile from "@/pages/Profile";
 import Import from "@/pages/Import";
@@ -38,25 +39,25 @@ import NotFound from "@/pages/NotFound";
 import PricingPage from "@/pages/PricingPage";
 
 // ✅ Import AuthModal, UserSurvey, and SurveyManager
-import AuthModal from "@/components/AuthModal";
-import UserSurvey from "@/components/UserSurvey";
-import LanguageSurvey from "@/components/LanguageSurvey";
-import EnglishLevelSurvey from "@/components/EnglishLevelSurvey";
-import LearningPurposeSurvey from "@/components/LearningPurposeSurvey";
-import SpeakOutSurvey from "@/components/SpeakOutSurvey";
-import AimSurvey from "@/components/AimSurvey";
-import FluentUnderstandingSurvey from "@/components/FluentUnderstandingSurvey";
-import LimitedWordsSurvey from "@/components/LimitedWordsSurvey";
-import SentenceFormationSurvey from "@/components/SentenceFormationSurvey";
-import CantSpeakSurvey from "@/components/CantSpeakSurvey";
-import NeedFluencySurvey from "@/components/NeedFluencySurvey";
-import HelloSurvey from "@/components/HelloSurvey";
-import MoviesSurvey from "@/components/MoviesSurvey";
-import VocabularySurvey from "@/components/VocabularySurvey";
-import IntermediateVocabularySurvey from "@/components/IntermediateVocabularySurvey";
-import AdvancedVocabularySurvey from "@/components/AdvancedVocabularySurvey";
-import InterestsSurvey from "@/components/InterestsSurvey";
-import SurveyManager from "@/components/SurveyManager";
+import AuthModal from "@/components/auth/AuthModal";
+import UserSurvey from "@/components/surveys/UserSurvey";
+import LanguageSurvey from "@/components/surveys/LanguageSurvey";
+import EnglishLevelSurvey from "@/components/surveys/EnglishLevelSurvey";
+import LearningPurposeSurvey from "@/components/surveys/LearningPurposeSurvey";
+import SpeakOutSurvey from "@/components/surveys/SpeakOutSurvey";
+import AimSurvey from "@/components/surveys/AimSurvey";
+import FluentUnderstandingSurvey from "@/components/surveys/FluentUnderstandingSurvey";
+import LimitedWordsSurvey from "@/components/surveys/LimitedWordsSurvey";
+import SentenceFormationSurvey from "@/components/surveys/SentenceFormationSurvey";
+import CantSpeakSurvey from "@/components/surveys/CantSpeakSurvey";
+import NeedFluencySurvey from "@/components/surveys/NeedFluencySurvey";
+import HelloSurvey from "@/components/surveys/HelloSurvey";
+import MoviesSurvey from "@/components/surveys/MoviesSurvey";
+import VocabularySurvey from "@/components/surveys/VocabularySurvey";
+import IntermediateVocabularySurvey from "@/components/surveys/IntermediateVocabularySurvey";
+import AdvancedVocabularySurvey from "@/components/surveys/AdvancedVocabularySurvey";
+import InterestsSurvey from "@/components/surveys/InterestsSurvey";
+import SurveyManager from "@/components/surveys/SurveyManager";
 
 const queryClient = new QueryClient();
 
@@ -152,6 +153,7 @@ const AppRoutes = () => {
         <Route path="/" element={<PageTransition><Index /></PageTransition>} />
         <Route path="/why" element={<PageTransition><WhyPage /></PageTransition>} />
         <Route path="/how" element={<PageTransition><HowPage /></PageTransition>} />
+        <Route path="/about" element={<PageTransition><AboutPage /></PageTransition>} />
         <Route path="/manage" element={<PageTransition><ManagePage /></PageTransition>} />
         <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
         <Route path="/import" element={<PageTransition><Import /></PageTransition>} />

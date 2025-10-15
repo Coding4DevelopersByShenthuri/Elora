@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { AnimatedTransition } from '@/components/AnimatedTransition';
+import { AnimatedTransition } from '@/components/common/AnimatedTransition';
 import { cn } from '@/lib/utils';
 import { CustomIllustration } from './FeatureIllustrations/CustomIllustration';
 

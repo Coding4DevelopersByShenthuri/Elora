@@ -1,6 +1,6 @@
 
 import { Newspaper, ArrowRight, Sparkles } from 'lucide-react';
-import { AnimatedTransition } from '@/components/AnimatedTransition';
+import { AnimatedTransition } from '@/components/common/AnimatedTransition';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 

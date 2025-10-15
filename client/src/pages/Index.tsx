@@ -4,18 +4,18 @@ import { HeroSection } from '@/components/landing/HeroSection';
 import { ManageSection } from '@/components/landing/ManageSection';
 import { DesignSection } from '@/components/landing/DesignSection';
 import { DeploySection } from '@/components/landing/DeploySection';
+import UseCasesSection from '@/components/landing/UseCasesSection';
 import { TestimonialsSection } from '@/components/landing/TestimonialsSection';
 import { CallToAction } from '@/components/landing/CallToAction';
-import UseCasesSection from '@/components/landing/UseCasesSection';
 
 const Index = () => {
   const showHero = useAnimateIn(false, 300);
-  const showManage = useAnimateIn(false, 600);
+  const showManage = useAnimateIn(false, 700);
   const showDesign = useAnimateIn(false, 900);
-  const showDeploy = useAnimateIn(false, 1200);
-  const showUseCases = useAnimateIn(false, 1500);
-  const showTestimonials = useAnimateIn(false, 1800);
-  const showCallToAction = useAnimateIn(false, 2100);
+  const showDeploy = useAnimateIn(false, 1100);
+  const showUseCases = useAnimateIn(false, 1300);
+  const showTestimonials = useAnimateIn(false, 1500);
+  const showCallToAction = useAnimateIn(false, 1700);
   
   useEffect(() => {
     // Ensure we start at top when page sections animate in
@@ -34,16 +34,16 @@ const Index = () => {
           {/* Hero Section */}
           <HeroSection showTitle={showHero} />
           
-          {/* Manage Section */}
+          {/* Features Section */}
           <ManageSection show={showManage} />
           
-          {/* Design Section */}
+          {/* Practice Exercises */}
           <DesignSection show={showDesign} />
           
-          {/* Deploy Section */}
+          {/* Learning Modes */}
           <DeploySection show={showDeploy} />
           
-          {/* Use Cases Section */}
+          {/* Use Cases - Features for Different Audiences */}
           <UseCasesSection show={showUseCases} />
           
           {/* Testimonials Section */}

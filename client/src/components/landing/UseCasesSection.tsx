@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AnimatedTransition } from '@/components/AnimatedTransition';
+import { AnimatedTransition } from '@/components/common/AnimatedTransition';
 import { cn } from '@/lib/utils';
 import type { UserType } from './UseCasesTypes';
 import { userCasesData, booksData } from './UserCasesData';

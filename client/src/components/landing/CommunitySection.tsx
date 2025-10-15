@@ -1,4 +1,4 @@
-import { AnimatedTransition } from '@/components/AnimatedTransition';
+import { AnimatedTransition } from '@/components/common/AnimatedTransition';
 
 interface CommunitySectionProps {
   show: boolean;

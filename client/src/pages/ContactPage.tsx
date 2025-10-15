@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { User, Mail, Phone, MessageSquare, Send } from 'lucide-react';
 import GlassForm from '@/components/ui/GlassForm';
 import { Button } from '@/components/ui/button';
-import { AnimatedTransition } from '@/components/AnimatedTransition';
+import { AnimatedTransition } from '@/components/common/AnimatedTransition';
 import { useAnimateIn } from '@/lib/animations';
 
 const ContactPage = () => {

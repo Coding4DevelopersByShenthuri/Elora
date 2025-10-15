@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { AnimatedTransition } from '@/components/AnimatedTransition';
+import { AnimatedTransition } from '@/components/common/AnimatedTransition';
 import { useAnimateIn } from '@/lib/animations';
 import ProjectRoadmap from '@/components/ProjectRoadmap';
 import { Button } from '@/components/ui/button';

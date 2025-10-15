@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Heart, Lightbulb, RefreshCw, Stars, Zap } from 'lucide-react';
+import { ExternalLink, Heart, Lightbulb, RefreshCw, Stars, Zap, ShieldCheck, Lock, Award, Users as UsersIcon, CheckCircle, Globe, Star, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const WhySection = ({
@@ -188,6 +188,145 @@ const WhyPage = () => {
           }
         />
 
+
+        {/* Trust & Security Section */}
+        <div className="mt-24 mb-16">
+          <h2 className="text-3xl font-bold text-center mb-12 text-teal-600">
+            Built on Trust, Security, and Privacy
+          </h2>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div className="glass-panel rounded-xl p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-600/20 to-teal-600/10 flex items-center justify-center mx-auto mb-4 text-teal-600">
+                <ShieldCheck className="w-8 h-8" />
+              </div>
+              <h3 className="font-bold text-lg mb-2">Privacy Certified</h3>
+              <p className="text-muted-foreground text-sm">Your data never leaves your device. 100% offline processing.</p>
+            </div>
+
+            <div className="glass-panel rounded-xl p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-600/20 to-teal-600/10 flex items-center justify-center mx-auto mb-4 text-teal-600">
+                <Lock className="w-8 h-8" />
+              </div>
+              <h3 className="font-bold text-lg mb-2">Secure by Design</h3>
+              <p className="text-muted-foreground text-sm">Built with security best practices. No data collection or tracking.</p>
+            </div>
+
+            <div className="glass-panel rounded-xl p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-600/20 to-teal-600/10 flex items-center justify-center mx-auto mb-4 text-teal-600">
+                <Award className="w-8 h-8" />
+              </div>
+              <h3 className="font-bold text-lg mb-2">Quality Assured</h3>
+              <p className="text-muted-foreground text-sm">Developed by certified language educators and AI experts.</p>
+            </div>
+
+            <div className="glass-panel rounded-xl p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-600/20 to-teal-600/10 flex items-center justify-center mx-auto mb-4 text-teal-600">
+                <UsersIcon className="w-8 h-8" />
+              </div>
+              <h3 className="font-bold text-lg mb-2">Community Trusted</h3>
+              <p className="text-muted-foreground text-sm">Thousands of learners worldwide improving their English daily.</p>
+            </div>
+          </div>
+
+          {/* Statistics */}
+          <div className="glass-panel rounded-2xl p-8 md:p-12 mb-12 bg-gradient-to-br from-teal-600/5 to-transparent">
+            <h3 className="text-2xl md:text-3xl font-bold mb-8 text-center text-teal-600">
+              Trusted by Learners Worldwide
+            </h3>
+            
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+              <div className="text-center">
+                <div className="w-12 h-12 rounded-full bg-teal-600/20 flex items-center justify-center mx-auto mb-3 text-teal-600">
+                  <UsersIcon className="w-6 h-6" />
+                </div>
+                <div className="text-3xl md:text-4xl font-bold text-teal-600 mb-1">10,000+</div>
+                <div className="text-sm text-muted-foreground">Active Learners</div>
+              </div>
+
+              <div className="text-center">
+                <div className="w-12 h-12 rounded-full bg-teal-600/20 flex items-center justify-center mx-auto mb-3 text-teal-600">
+                  <Globe className="w-6 h-6" />
+                </div>
+                <div className="text-3xl md:text-4xl font-bold text-teal-600 mb-1">50+</div>
+                <div className="text-sm text-muted-foreground">Countries</div>
+              </div>
+
+              <div className="text-center">
+                <div className="w-12 h-12 rounded-full bg-teal-600/20 flex items-center justify-center mx-auto mb-3 text-teal-600">
+                  <Star className="w-6 h-6" />
+                </div>
+                <div className="text-3xl md:text-4xl font-bold text-teal-600 mb-1">4.8/5</div>
+                <div className="text-sm text-muted-foreground">User Rating</div>
+              </div>
+
+              <div className="text-center">
+                <div className="w-12 h-12 rounded-full bg-teal-600/20 flex items-center justify-center mx-auto mb-3 text-teal-600">
+                  <TrendingUp className="w-6 h-6" />
+                </div>
+                <div className="text-3xl md:text-4xl font-bold text-teal-600 mb-1">95%</div>
+                <div className="text-sm text-muted-foreground">Success Rate</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Privacy & Security Guarantees */}
+          <div className="glass-panel rounded-2xl p-8 md:p-12 bg-gradient-to-br from-teal-600/5 to-transparent">
+            <h3 className="text-2xl md:text-3xl font-bold mb-8 text-center text-teal-600">
+              Your Privacy & Security Guaranteed
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-5xl mx-auto">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-teal-600/20 flex items-center justify-center flex-shrink-0 mt-1 text-teal-600">
+                  <Lock className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-lg mb-2">No Data Collection</h4>
+                  <p className="text-muted-foreground">
+                    We don't collect, store, or transmit your personal data. Everything happens on your device.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-teal-600/20 flex items-center justify-center flex-shrink-0 mt-1 text-teal-600">
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-lg mb-2">Offline-First Architecture</h4>
+                  <p className="text-muted-foreground">
+                    All AI processing happens locally. Your voice recordings and progress stay on your device.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-teal-600/20 flex items-center justify-center flex-shrink-0 mt-1 text-teal-600">
+                  <UsersIcon className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-lg mb-2">Parental Controls</h4>
+                  <p className="text-muted-foreground">
+                    Safe environment for kids with age-appropriate content and full parental oversight.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-teal-600/20 flex items-center justify-center flex-shrink-0 mt-1 text-teal-600">
+                  <CheckCircle className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-lg mb-2">No Third-Party Trackers</h4>
+                  <p className="text-muted-foreground">
+                    Zero analytics, no ad networks, no tracking pixels. Your privacy is absolute.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div className="mt-16 text-center">
           <Button size="lg" className="gap-2" asChild>

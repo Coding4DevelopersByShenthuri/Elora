@@ -1,4 +1,4 @@
-import { AnimatedTransition } from '@/components/AnimatedTransition';
+import { AnimatedTransition } from '@/components/common/AnimatedTransition';
 import { useState, useEffect, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 

@@ -1,4 +1,4 @@
-import { AnimatedTransition } from '@/components/AnimatedTransition';
+import { AnimatedTransition } from '@/components/common/AnimatedTransition';
 import { Card } from '@/components/ui/card';
 import { Star } from 'lucide-react';
 

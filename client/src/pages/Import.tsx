@@ -1,5 +1,5 @@
 import ImportPanel from '@/components/ImportPanel';
-import { AnimatedTransition } from '@/components/AnimatedTransition';
+import { AnimatedTransition } from '@/components/common/AnimatedTransition';
 import { useAnimateIn } from '@/lib/animations';
 
 const Import = () => {

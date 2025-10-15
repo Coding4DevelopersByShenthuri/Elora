@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { AnimatedTransition } from '@/components/AnimatedTransition';
+import { AnimatedTransition } from '@/components/common/AnimatedTransition';
 import { useState } from 'react';
 import { WaitlistModal } from '../../components/waitlist/WaitlistModal';
 import { Link } from 'react-router-dom';

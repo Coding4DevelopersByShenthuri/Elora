@@ -1,5 +1,5 @@
 import { Activity, TrendingUp, Layout, Maximize } from 'lucide-react';
-import { AnimatedTransition } from '@/components/AnimatedTransition';
+import { AnimatedTransition } from '@/components/common/AnimatedTransition';
 
 interface DeploySectionProps {
   show: boolean;

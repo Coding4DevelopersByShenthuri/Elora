@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Upload, FileText, Globe, Database, Type } from 'lucide-react';
 import type { ImportSource } from '@/lib/types';
-import AnimatedTransition from './AnimatedTransition';
+import AnimatedTransition from './common/AnimatedTransition';
 import { cn } from '@/lib/utils';
 
 const importSources: ImportSource[] = [

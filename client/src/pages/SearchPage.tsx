@@ -1,6 +1,6 @@
 
 import Search from '@/components/search';
-import { AnimatedTransition } from '@/components/AnimatedTransition';
+import { AnimatedTransition } from '@/components/common/AnimatedTransition';
 import { useAnimateIn } from '@/lib/animations';
 
 const SearchPage = () => {

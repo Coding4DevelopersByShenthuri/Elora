@@ -14,11 +14,19 @@ import {
   Clock,
   Cpu,
   Database,
-  Plug,
-  Sliders
+  Sliders,
+  Download,
+  Smartphone,
+  Monitor,
+  Apple,
+  Chrome,
+  Sparkles,
+  Zap,
+  Target
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { WaitlistModal } from '@/components/waitlist/WaitlistModal';
 
 const FeatureCard = ({
   icon,
@@ -126,6 +134,7 @@ const ValueProp = ({
 
 const HowPage = () => {
   const [, setLoading] = useState(true);
+  const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -442,9 +451,48 @@ const HowPage = () => {
 
 
         {/* Technical Details */}
-        <div className="mt-20 glass-panel p-8 rounded-lg">
-          <h2 className="text-3xl font-bold mb-6 text-center text-primary">Technical Details</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="mt-20 glass-panel p-8 rounded-lg mb-24">
+          <h2 className="text-3xl font-bold mb-6 text-center text-primary">Powered by Advanced Technology</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-xl bg-teal-600/20 flex items-center justify-center flex-shrink-0 text-teal-600">
+                <Sparkles className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-bold text-lg mb-2">Offline AI Technology</h3>
+                <p className="text-muted-foreground text-sm">
+                  Advanced machine learning models run locally on your device, providing instant feedback without internet.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-xl bg-teal-600/20 flex items-center justify-center flex-shrink-0 text-teal-600">
+                <Zap className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-bold text-lg mb-2">Speech Recognition</h3>
+                <p className="text-muted-foreground text-sm">
+                  Cutting-edge speech-to-text technology analyzes your pronunciation and provides detailed feedback.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-xl bg-teal-600/20 flex items-center justify-center flex-shrink-0 text-teal-600">
+                <Target className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-bold text-lg mb-2">Adaptive Learning</h3>
+                <p className="text-muted-foreground text-sm">
+                  Content adjusts to your pace and skill level, ensuring optimal learning efficiency.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
             <div>
               <h3 className="flex items-center text-xl font-bold mb-3 gap-2">
                 <Cpu className="w-6 h-6 text-primary" />
@@ -465,14 +513,6 @@ const HowPage = () => {
 
             <div>
               <h3 className="flex items-center text-xl font-bold mb-3 gap-2">
-                <Plug className="w-6 h-6 text-primary" />
-                Integration
-              </h3>
-              <p className="text-foreground/80 mb-4">
-                Seamlessly connect with educational tools, cloud storage, and learning resources to enhance your study workflow.
-              </p>
-
-              <h3 className="flex items-center text-xl font-bold mb-3 gap-2">
                 <Sliders className="w-6 h-6 text-primary" />
                 Personalization
               </h3>
@@ -483,7 +523,159 @@ const HowPage = () => {
           </div>
         </div>
 
+        {/* Download Section */}
+        <div className="mb-24">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center justify-center p-1.5 bg-teal-600/10 rounded-xl mb-6">
+              <div className="bg-background px-4 py-2 rounded-lg shadow-sm">
+                <Download size={22} className="inline-block mr-2 text-teal-600" />
+                <span className="font-semibold text-teal-600">Get Started Today</span>
+              </div>
+            </div>
+            
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 text-teal-600">
+              Download Speak Bee
+            </h2>
+            
+            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              Available on all your devices. Download once and learn English offline, anytime, anywhere.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-12">
+            {[
+              {
+                icon: <Smartphone className="w-8 h-8" />,
+                title: "Android",
+                description: "For phones and tablets. Android 8.0+"
+              },
+              {
+                icon: <Apple className="w-8 h-8" />,
+                title: "iOS",
+                description: "iPhone and iPad. iOS 14.0+"
+              },
+              {
+                icon: <Monitor className="w-8 h-8" />,
+                title: "Windows",
+                description: "Desktop app. Windows 10/11"
+              },
+              {
+                icon: <Apple className="w-8 h-8" />,
+                title: "macOS",
+                description: "Native Mac app. macOS 11+"
+              },
+              {
+                icon: <Chrome className="w-8 h-8" />,
+                title: "Web App",
+                description: "Works on any browser"
+              }
+            ].map((platform, idx) => (
+              <div key={idx} className="glass-panel rounded-xl p-6 md:p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group relative overflow-hidden">
+                <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-teal-600 rounded-full opacity-5 group-hover:opacity-10 transition-opacity duration-500"></div>
+                
+                <div className="relative z-10 flex flex-col items-center text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-600/20 to-teal-600/10 flex items-center justify-center mb-4 text-teal-600 group-hover:scale-110 transition-transform duration-300">
+                    {platform.icon}
+                  </div>
+                  
+                  <h3 className="text-xl font-bold mb-2">{platform.title}</h3>
+                  <p className="text-muted-foreground text-sm mb-6">{platform.description}</p>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-teal-600 text-teal-600 hover:bg-teal-600 hover:text-white transition-all duration-300"
+                    onClick={() => setIsWaitlistOpen(true)}
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* System Requirements */}
+          <div className="glass-panel rounded-2xl p-8 md:p-12 bg-gradient-to-br from-teal-600/5 to-transparent mb-12">
+            <h3 className="text-2xl md:text-3xl font-bold mb-8 text-center text-teal-600">
+              System Requirements
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+              <div>
+                <h4 className="font-bold text-lg mb-3 flex items-center">
+                  <Smartphone className="w-5 h-5 mr-2 text-teal-600" />
+                  Mobile
+                </h4>
+                <ul className="space-y-2 text-muted-foreground text-sm">
+                  <li>• Android 8.0+ or iOS 14.0+</li>
+                  <li>• 2GB RAM minimum (4GB recommended)</li>
+                  <li>• 500MB storage space</li>
+                  <li>• Microphone for speech practice</li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-lg mb-3 flex items-center">
+                  <Monitor className="w-5 h-5 mr-2 text-teal-600" />
+                  Desktop
+                </h4>
+                <ul className="space-y-2 text-muted-foreground text-sm">
+                  <li>• Windows 10/11 or macOS 11+</li>
+                  <li>• 4GB RAM minimum (8GB recommended)</li>
+                  <li>• 1GB storage space</li>
+                  <li>• Microphone for speech practice</li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-lg mb-3 flex items-center">
+                  <Chrome className="w-5 h-5 mr-2 text-teal-600" />
+                  Web App
+                </h4>
+                <ul className="space-y-2 text-muted-foreground text-sm">
+                  <li>• Modern browser (Chrome, Edge, Safari)</li>
+                  <li>• IndexedDB support required</li>
+                  <li>• 500MB available storage</li>
+                  <li>• Web Speech API support</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* FAQ about Download */}
+          <div className="max-w-4xl mx-auto">
+            <div className="glass-panel rounded-xl p-6 md:p-8">
+              <h4 className="font-bold text-xl mb-4 text-center">Download FAQ</h4>
+              
+              <div className="space-y-4">
+                <div>
+                  <h5 className="font-semibold mb-2 text-teal-600">Does it work completely offline?</h5>
+                  <p className="text-muted-foreground text-sm">
+                    Yes! After the initial download and setup, all features work 100% offline. No internet connection required for lessons, AI feedback, or progress tracking.
+                  </p>
+                </div>
+
+                <div>
+                  <h5 className="font-semibold mb-2 text-teal-600">Can I use it on multiple devices?</h5>
+                  <p className="text-muted-foreground text-sm">
+                    Absolutely! Download on all your devices. While each device maintains its own offline data, you can optionally sync progress across devices when connected.
+                  </p>
+                </div>
+
+                <div>
+                  <h5 className="font-semibold mb-2 text-teal-600">How big is the download?</h5>
+                  <p className="text-muted-foreground text-sm">
+                    The base app is around 150MB. Additional lesson packs and AI models are downloaded based on your selection (100-300MB per pack), ensuring you only download what you need.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
+
+      <WaitlistModal isOpen={isWaitlistOpen} onClose={() => setIsWaitlistOpen(false)} />
     </div>
   );
 };

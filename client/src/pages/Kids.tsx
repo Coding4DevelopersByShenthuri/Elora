@@ -26,7 +26,7 @@ import UnicornMagicAdventure from '@/components/kids/stories/UnicornMagicAdventu
 import PirateTreasureAdventure from '@/components/kids/stories/PirateTreasureAdventure';
 import SuperheroAdventure from '@/components/kids/stories/SuperheroSchoolAdventure';
 import FairyGardenAdventure from '@/components/kids/stories/FairyGardenAdventure';
-import AuthModal from '@/components/AuthModal';
+import AuthModal from '@/components/auth/AuthModal';
 import { useNavigate } from 'react-router-dom';
 
 const KidsPage = () => {

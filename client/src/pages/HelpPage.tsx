@@ -1,5 +1,5 @@
 import { useAnimateIn } from '@/lib/animations';
-import { AnimatedTransition } from '@/components/AnimatedTransition';
+import { AnimatedTransition } from '@/components/common/AnimatedTransition';
 import { Button } from '@/components/ui/button';
 import { Mail, MessageCircle, BookOpen, Stars } from 'lucide-react';
 import { Link } from 'react-router-dom';

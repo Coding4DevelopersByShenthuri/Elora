@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AnimatedTransition } from '@/components/AnimatedTransition';
+import { AnimatedTransition } from '@/components/common/AnimatedTransition';
 import CustomIllustration from './FeatureIllustrations/CustomIllustration';
 import { FeatureIcon } from './FeatureIllustrations/FeatureIcon';
 

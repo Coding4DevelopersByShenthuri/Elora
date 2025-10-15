@@ -70,6 +70,7 @@ const Footer = () => {
             <li><Link to="/" className="hover:text-primary transition">Home</Link></li>
             <li><Link to="/why" className="hover:text-primary transition">Why Speak Bee</Link></li>
             <li><Link to="/how" className="hover:text-primary transition">How It Works</Link></li>
+            <li><Link to="/about" className="hover:text-primary transition">About Us</Link></li>
             <li><Link to="/help" className="hover:text-primary transition">Help Center</Link></li>
             <li><Link to="/contact" className="hover:text-primary transition">Contact Us</Link></li>
           </ul>

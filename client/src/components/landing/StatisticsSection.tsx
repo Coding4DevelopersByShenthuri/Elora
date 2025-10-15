@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { AnimatedTransition } from '@/components/AnimatedTransition';
+import { AnimatedTransition } from '@/components/common/AnimatedTransition';
 interface StatisticsSectionProps {
   show: boolean;
 }

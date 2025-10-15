@@ -2,7 +2,7 @@
 import { Brain, BadgeDollarSign, Building, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { AnimatedTransition } from '@/components/AnimatedTransition';
+import { AnimatedTransition } from '@/components/common/AnimatedTransition';
 
 interface PricingSectionProps {
   showPricing: boolean;
