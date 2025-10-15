@@ -30,21 +30,32 @@ export class SLMEvaluator {
     const avgSentenceLen = sentences.length ? length / sentences.length : length;
     const grammar = Math.min(100, Math.max(30, Math.round(60 + Math.min(30, avgSentenceLen - 8))));
 
-    const feedbackParts: string[] = [];
-    if ((options?.targetWords?.length ?? 0) > 0) {
-      if (containsTarget > 0) feedbackParts.push('Great job using key words.');
-      else feedbackParts.push('Try to include the target words.');
-    }
-    if (fluency > 70) feedbackParts.push('Fluency is improving. Keep a steady pace.');
-    if (grammar > 70) feedbackParts.push('Grammar looks good. Watch subject-verb agreement.');
-    if (vocabulary > 70) feedbackParts.push('Nice vocabulary usage. Add one more descriptive word.');
+    // Prefer LocalLLM for richer but deterministic feedback when available
+    try {
+      const { LocalLLM } = await import('./LocalLLM');
+      const feedback = LocalLLM.generateFeedback({
+        userText,
+        scores: { fluency, grammar, vocabulary },
+        targetWords: options?.targetWords
+      });
+      return { fluency, grammar, vocabulary, feedback };
+    } catch {
+      const feedbackParts: string[] = [];
+      if ((options?.targetWords?.length ?? 0) > 0) {
+        if (containsTarget > 0) feedbackParts.push('Great job using key words.');
+        else feedbackParts.push('Try to include the target words.');
+      }
+      if (fluency > 70) feedbackParts.push('Fluency is improving. Keep a steady pace.');
+      if (grammar > 70) feedbackParts.push('Grammar looks good. Watch subject-verb agreement.');
+      if (vocabulary > 70) feedbackParts.push('Nice vocabulary usage. Add one more descriptive word.');
 
-    return {
-      fluency,
-      grammar,
-      vocabulary,
-      feedback: feedbackParts.join(' ')
-    };
+      return {
+        fluency,
+        grammar,
+        vocabulary,
+        feedback: feedbackParts.join(' ')
+      };
+    }
   }
 }
 

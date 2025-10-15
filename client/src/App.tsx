@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import { prefetchAppShell } from "@/services/OfflinePrefetch";
 
 // ✅ Global Components
 import Navbar from "@/components/Navbar";
@@ -487,6 +488,16 @@ const App = () => {
   useEffect(() => {
     const timer = window.setTimeout(() => setIsInitialLoading(false), 800);
     return () => window.clearTimeout(timer);
+  }, []);
+
+  // Ask service worker to pre-cache key routes shortly after mount
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      const id = window.setTimeout(() => {
+        prefetchAppShell();
+      }, 1200);
+      return () => window.clearTimeout(id);
+    }
   }, []);
 
   return (

@@ -4,9 +4,28 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { useEffect, useState } from 'react';
+import { prefetchAppShell } from "@/services/OfflinePrefetch";
 
 const Settings = () => {
   const showContent = useAnimateIn(false, 300);
+  const [useLocalModel, setUseLocalModel] = useState<boolean>(true);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('speakbee_use_local_model');
+    if (stored === null) {
+      localStorage.setItem('speakbee_use_local_model', 'true');
+      setUseLocalModel(true);
+    } else {
+      setUseLocalModel(stored === 'true');
+    }
+  }, []);
+
+  const toggleLocalModel = (next: boolean) => {
+    setUseLocalModel(next);
+    localStorage.setItem('speakbee_use_local_model', String(next));
+  };
   
   return (
     <div className="max-w-7xl mx-auto px-4 pt-24 pb-16">
@@ -63,6 +82,30 @@ const Settings = () => {
                       </p>
                     </div>
                     <Switch id="ai-suggestions" defaultChecked />
+                  </div>
+
+                  <div className="h-px bg-border" />
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label htmlFor="local-llm" className="text-base">Use Local Model</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Generate feedback entirely on-device for offline privacy
+                      </p>
+                    </div>
+                    <Switch id="local-llm" checked={useLocalModel} onCheckedChange={toggleLocalModel} />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-base">Prefetch Offline Content</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Cache core pages now so they work without internet
+                      </p>
+                    </div>
+                    <Button variant="secondary" onClick={() => prefetchAppShell()}>
+                      Prefetch
+                    </Button>
                   </div>
                 </CardContent>
               </Card>

@@ -4,6 +4,7 @@ const VERSION = '1.0.0';
 const CACHE_NAME = `speakbee-static-v${VERSION}`;
 const RUNTIME_CACHE = `speakbee-runtime-v${VERSION}`;
 const IMAGE_CACHE = `speakbee-images-v${VERSION}`;
+const API_CACHE = `speakbee-api-v${VERSION}`;
 
 // Assets to cache immediately on install
 const PRECACHE_URLS = [
@@ -31,7 +32,7 @@ self.addEventListener('install', (event) => {
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
   console.log('[Service Worker] Activating version:', VERSION);
-  const currentCaches = [CACHE_NAME, RUNTIME_CACHE, IMAGE_CACHE];
+  const currentCaches = [CACHE_NAME, RUNTIME_CACHE, IMAGE_CACHE, API_CACHE];
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return cacheNames.filter((cacheName) => !currentCaches.includes(cacheName));
@@ -72,6 +73,9 @@ self.addEventListener('fetch', (event) => {
   } else if (request.url.includes('/assets/') || request.url.endsWith('.js') || request.url.endsWith('.css')) {
     // Static assets: Cache first
     event.respondWith(cacheFirst(request, CACHE_NAME));
+  } else if (request.url.includes('/api/')) {
+    // API responses: Network first with background cache
+    event.respondWith(networkFirst(request));
   } else {
     // Other requests: Network first
     event.respondWith(networkFirst(request));
@@ -131,9 +135,29 @@ self.addEventListener('message', (event) => {
   
   if (event.data && event.data.type === 'CACHE_URLS') {
     event.waitUntil(
-      caches.open(RUNTIME_CACHE).then((cache) => {
-        return cache.addAll(event.data.urls);
-      })
+      (async () => {
+        const cache = await caches.open(RUNTIME_CACHE);
+        try {
+          await cache.addAll(event.data.urls);
+        } catch (e) {
+          // Ignore individual failures
+        }
+      })()
+    );
+  }
+  
+  if (event.data && event.data.type === 'CACHE_ASSETS') {
+    event.waitUntil(
+      (async () => {
+        const cache = await caches.open(CACHE_NAME);
+        const urls = event.data.urls || [];
+        for (const url of urls) {
+          try {
+            const res = await fetch(new Request(url, { cache: 'reload' }));
+            if (res.ok) await cache.put(url, res.clone());
+          } catch {}
+        }
+      })()
     );
   }
 });
