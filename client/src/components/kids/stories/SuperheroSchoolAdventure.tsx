@@ -26,17 +26,17 @@ const storySteps = [
   {
     id: 'flying_lesson',
     title: '✈️ Flying Practice',
-    text: 'First lesson: Flying! Watch how I soar through the sky! Superheroes need to fly fast to rescue people.',
+    text: 'Captain Courage says "I can fly high and help people!" Can you say that with confidence and power? Let\'s practice being heroes!',
     emoji: '✈️',
     character: 'Captain Courage',
     bgColor: 'from-sky-100 to-cyan-100 dark:from-sky-900 dark:to-cyan-900',
     interactive: true,
-    audioText: 'flying',
-    choices: ['swimming', 'flying', 'running'],
-    wordCount: 18,
-    duration: 25,
-    question: 'How do superheroes move through the air?',
-    hint: 'Like birds and airplanes in the sky'
+    audioText: 'I can fly high and help people',
+    choices: ['I can fly high and help people', 'I stay on the ground', 'I cannot help anyone'],
+    wordCount: 28,
+    duration: 38,
+    question: 'What can Captain Courage do to help others?',
+    hint: 'He uses his special power to fly and rescue'
   },
   {
     id: 'first_star',
@@ -53,17 +53,17 @@ const storySteps = [
   {
     id: 'super_vision',
     title: '👁️ X-Ray Vision',
-    text: 'Amazing! Now try using super vision to see through walls! We can spot people who need our help.',
+    text: 'Captain says "I see someone who needs help!" Can you say that with alert and focused voice? Let\'s be watchful heroes!',
     emoji: '👁️',
     character: 'Captain Courage',
     bgColor: 'from-purple-100 to-violet-100 dark:from-purple-900 dark:to-violet-900',
     interactive: true,
-    audioText: 'vision',
-    choices: ['vision', 'hearing', 'smell'],
-    wordCount: 19,
-    duration: 28,
-    question: 'What power lets us see through walls?',
-    hint: 'It helps see what\'s hidden'
+    audioText: 'I see someone who needs help',
+    choices: ['I see someone who needs help', 'I am not paying attention', 'I do not care about others'],
+    wordCount: 28,
+    duration: 38,
+    question: 'What does Captain Courage notice with his vision?',
+    hint: 'He spots when someone is in trouble'
   },
   {
     id: 'second_star',
@@ -80,17 +80,17 @@ const storySteps = [
   {
     id: 'rescue_mission',
     title: '🚨 Emergency!',
-    text: 'Quick! A kitten is stuck in a tree! We need to use our super powers to make a gentle rescue.',
+    text: 'Emergency! Let\'s shout "We will save the kitten right now!" Can you say that like a brave, quick hero? Let\'s rescue!',
     emoji: '🐱',
     character: 'Captain Courage',
     bgColor: 'from-red-100 to-orange-100 dark:from-red-900 dark:to-orange-900',
     interactive: true,
-    audioText: 'rescue',
-    choices: ['play', 'sleep', 'rescue'],
-    wordCount: 17,
-    duration: 26,
-    question: 'What do superheroes do to help others?',
-    hint: 'It means saving someone in trouble'
+    audioText: 'We will save the kitten right now',
+    choices: ['We will save the kitten right now', 'Let someone else do it', 'We are too scared to help'],
+    wordCount: 30,
+    duration: 38,
+    question: 'What do we promise to do for the kitten?',
+    hint: 'Heroes act quickly to help those in need'
   },
   {
     id: 'third_star',
@@ -401,7 +401,7 @@ const SuperheroAdventure = ({ onClose, onComplete }: Props) => {
                         ) : (
                           <>
                             <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                            <span className="hidden sm:inline">🔊 Listen to the Hero Word</span>
+                            <span className="hidden sm:inline">Listen to the Hero Word</span>
                             <span className="sm:hidden">🔊 Listen</span>
                           </>
                         )}

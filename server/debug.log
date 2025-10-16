@@ -187,3 +187,8 @@ INFO 2025-10-15 17:09:24,890 autoreload 21336 11048 Watching for file changes wi
 INFO 2025-10-15 17:12:10,213 autoreload 21336 11048 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\admin.py changed, reloading.
 INFO 2025-10-15 17:12:13,312 autoreload 10548 228 Watching for file changes with StatReloader
 INFO 2025-10-15 17:25:34,897 autoreload 20248 13000 Watching for file changes with StatReloader
+INFO 2025-10-15 22:56:34,454 autoreload 22028 4268 Watching for file changes with StatReloader
+INFO 2025-10-16 09:54:36,300 autoreload 21800 16312 Watching for file changes with StatReloader
+INFO 2025-10-16 13:35:49,494 basehttp 21800 17244 "OPTIONS /api/vocabulary/ HTTP/1.1" 200 0
+WARNING 2025-10-16 13:35:50,724 log 21800 17244 Not Found: /api/vocabulary/
+WARNING 2025-10-16 13:35:50,726 basehttp 21800 17244 "POST /api/vocabulary/ HTTP/1.1" 404 6344

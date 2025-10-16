@@ -26,47 +26,47 @@ const pirateStory = [
   {
     id: 'treasure_map',
     title: '🗺️ Secret Map!',
-    text: 'Shiver me timbers! We found an old treasure map with an X marking the spot! It shows mountains, palm trees, and a beach.',
+    text: 'The map says "X marks the spot where treasure hides!" Can you say that in an exciting pirate voice? Arrr, let\'s shout it!',
     emoji: '🗺️',
     character: 'Captain Finn',
     bgColor: 'from-amber-100 to-orange-100 dark:from-amber-900 dark:to-orange-900',
     interactive: true,
-    audioText: 'map',
-    choices: ['map', 'book', 'letter'],
-    wordCount: 20,
-    duration: 30,
-    question: 'What shows where treasure is hidden?',
-    hint: 'It has drawings and an X marks the spot'
+    audioText: 'X marks the spot where treasure hides',
+    choices: ['X marks the spot where treasure hides', 'The treasure is not here', 'We cannot find anything'],
+    wordCount: 28,
+    duration: 38,
+    question: 'What does the map tell us about the treasure?',
+    hint: 'It shows us exactly where to look'
   },
   {
     id: 'parrot_friend',
     title: '🦜 Polly the Parrot',
-    text: 'Squawk! Hello! I\'m Polly the pirate parrot! I can talk and help find treasure. Listen to what I say!',
+    text: 'Polly squawks "Follow me to the treasure island!" Can you squawk that like a parrot? Let\'s squawk together! Squawk!',
     emoji: '🦜',
     character: 'Polly',
     bgColor: 'from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900',
     interactive: true,
-    audioText: 'parrot',
-    choices: ['seagull', 'parrot', 'pelican'],
-    wordCount: 19,
-    duration: 35,
-    question: 'Who is the pirate\'s talking bird?',
-    hint: 'It has colorful feathers and can talk'
+    audioText: 'Follow me to the treasure island',
+    choices: ['Follow me to the treasure island', 'Stay right here forever', 'Go back to the ship'],
+    wordCount: 28,
+    duration: 38,
+    question: 'Where does Polly want to lead us?',
+    hint: 'She wants to take us somewhere special'
   },
   {
     id: 'treasure_chest',
     title: '📦 Buried Treasure!',
-    text: 'Yo ho ho! We found the treasure chest! It\'s full of gold coins, sparkling jewels, and precious gems!',
+    text: 'Yo ho ho! Let\'s all shout "We found the treasure chest!" Can you shout that with joy and excitement? Arrr, let\'s celebrate!',
     emoji: '📦',
     character: 'Captain Finn',
     bgColor: 'from-yellow-100 to-amber-100 dark:from-yellow-900 dark:to-amber-900',
     interactive: true,
-    audioText: 'treasure',
-    choices: ['shells', 'rocks', 'treasure'],
-    wordCount: 17,
-    duration: 30,
-    question: 'What did we dig up with gold inside?',
-    hint: 'It has coins and jewels pirates love'
+    audioText: 'We found the treasure chest',
+    choices: ['We found the treasure chest', 'We did not find anything', 'This is empty and sad'],
+    wordCount: 28,
+    duration: 38,
+    question: 'What amazing thing did we discover?',
+    hint: 'We found what we were looking for'
   },
   {
     id: 'victory_celebration',
@@ -364,7 +364,7 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
                         ) : (
                           <>
                             <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                            <span className="hidden sm:inline">🔊 Listen to the Pirate Word</span>
+                            <span className="hidden sm:inline">Listen to the Pirate Word</span>
                             <span className="sm:hidden">🔊 Listen</span>
                           </>
                         )}

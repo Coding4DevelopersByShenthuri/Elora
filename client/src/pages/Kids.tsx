@@ -5,7 +5,7 @@ import {
   Rabbit, Fish, Rocket, Cloud,
   Sun, CloudRain, CloudSnow, Footprints,
   ChevronLeft, ChevronRight, Anchor,
-  Shield
+  Shield, Download, Settings, Loader2, Lock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -15,9 +15,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import KidsProgressService from '@/services/KidsProgressService';
 import KidsApi from '@/services/KidsApi';
 import SpeechService from '@/services/SpeechService';
-import ReadAloud from '@/components/kids/ReadAloud';
 import Vocabulary from '@/components/kids/Vocabulary';
 import Pronunciation from '@/components/kids/Pronunciation';
+import InteractiveGames from '@/components/kids/InteractiveGames';
+import SyncStatusIndicator from '@/components/kids/SyncStatusIndicator';
 import MagicForestAdventure from '@/components/kids/stories/MagicForestAdventure';
 import SpaceAdventure from '@/components/kids/stories/SpaceAdventure';
 import UnderwaterWorld from '@/components/kids/stories/UnderwaterWorld';
@@ -28,6 +29,11 @@ import SuperheroAdventure from '@/components/kids/stories/SuperheroSchoolAdventu
 import FairyGardenAdventure from '@/components/kids/stories/FairyGardenAdventure';
 import AuthModal from '@/components/auth/AuthModal';
 import { useNavigate } from 'react-router-dom';
+import HybridServiceManager from '@/services/HybridServiceManager';
+import { ModelManager } from '@/services/ModelManager';
+import { WhisperService } from '@/services/WhisperService';
+import { TransformersService } from '@/services/TransformersService';
+import { TimeTracker } from '@/services/TimeTracker';
 
 const KidsPage = () => {
   const [activeCategory, setActiveCategory] = useState('stories');
@@ -55,6 +61,11 @@ const KidsPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
+  // SLM & Model Management State
+  const [modelsReady, setModelsReady] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
+  
+
   // Check authentication and user existence on mount
   useEffect(() => {
     const checkUserAndRedirect = async () => {
@@ -73,6 +84,73 @@ const KidsPage = () => {
 
     checkUserAndRedirect();
   }, [isAuthenticated]);
+
+  // Initialize SLM and Hybrid Services
+  useEffect(() => {
+    const initializeServices = async () => {
+      if (!isAuthenticated) return;
+
+      setIsInitializing(true);
+      console.log('🚀 Initializing Kids Learning Environment...');
+
+      try {
+        // 1. Initialize HybridServiceManager
+        await HybridServiceManager.initialize({
+          mode: 'hybrid',
+          preferOffline: false,
+          autoSync: true,
+          syncInterval: 15
+        });
+
+        // 2. Check system health
+        const health = await HybridServiceManager.getSystemHealth();
+        console.log('📊 System Health:', health);
+
+        // 3. Check if essential models are downloaded
+        const whisperReady = await ModelManager.isModelCached('whisper-tiny-en');
+        const llmReady = await ModelManager.isModelCached('distilgpt2');
+
+        setModelsReady(whisperReady || llmReady);
+
+        // 4. If models aren't ready, user can click "Download AI Tutor" button
+        if (!whisperReady && !llmReady) {
+          console.log('📦 Models not found. User can download from Model Manager page.');
+        } else {
+          console.log('✅ Models ready! Initializing services...');
+          
+          // Initialize services in parallel
+          await Promise.allSettled([
+            WhisperService.initialize().catch(err => 
+              console.warn('Whisper initialization skipped:', err)
+            ),
+            TransformersService.initialize().catch(err => 
+              console.warn('Transformers initialization skipped:', err)
+            )
+          ]);
+          
+          console.log('✅ Kids Learning Environment Ready!');
+        }
+      } catch (error) {
+        console.error('Error initializing services:', error);
+        // Continue anyway - some features may still work
+      } finally {
+        setIsInitializing(false);
+      }
+    };
+
+    initializeServices();
+  }, [isAuthenticated]);
+
+  // Initialize Time Tracker
+  useEffect(() => {
+    if (isAuthenticated && userId) {
+      TimeTracker.initialize(userId);
+      
+      return () => {
+        TimeTracker.cleanup();
+      };
+    }
+  }, [isAuthenticated, userId]);
 
   // Load progress and generate floating icons only if authenticated
   useEffect(() => {
@@ -246,14 +324,7 @@ const KidsPage = () => {
   ];
   const completedAchievements = achievements.filter(a => a.progress === 100).length;
 
-  // Offline kids lesson content for new modules
-  const readAloudLesson = {
-    id: 'magic-forest-1',
-    title: 'Magic Forest – Read Aloud',
-    text: 'Luna the rabbit hops through the forest to meet friendly animals.',
-    targetWords: ['rabbit', 'forest', 'animals']
-  };
-
+  // Offline kids lesson content for modules
   const vocabWords = [
     { word: 'rabbit', hint: '/ˈræb.ɪt/' },
     { word: 'forest', hint: '/ˈfɒr.ɪst/' },
@@ -523,7 +594,7 @@ const KidsPage = () => {
   // Show auth modal if not authenticated
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50/20 to-purple-50/20 dark:from-slate-900 dark:via-blue-950/10 dark:to-purple-950/10">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50/20 to-purple-50/20 dark:from-slate-900 dark:via-blue-950/10 dark:to-purple-950/10 px-4">
         <AuthModal 
           isOpen={showAuthModal} 
           onClose={handleAuthModalClose}
@@ -531,21 +602,21 @@ const KidsPage = () => {
           redirectFromKids={true}
           onAuthSuccess={handleAuthSuccess}
         />
-        <div className="text-center p-8">
+        <div className="text-center p-4 sm:p-8 max-w-2xl">
           <div className="animate-bounce mb-4">
-            <Sparkles className="w-16 h-16 text-yellow-500 mx-auto" />
+            <Sparkles className="w-12 h-12 sm:w-16 sm:h-16 text-yellow-500 mx-auto" />
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#118AB2] bg-clip-text text-transparent mb-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#118AB2] bg-clip-text text-transparent mb-4">
             Welcome to Kids Learning Zone!
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-6">
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-6">
             {authMode === 'login' 
               ? 'Please sign in to continue your magical learning adventure! 🎉' 
               : 'Create an account to start your magical learning adventure! 🎉'}
           </p>
           <Button 
             onClick={() => setShowAuthModal(true)}
-            className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white font-bold py-4 px-8 rounded-2xl text-lg"
+            className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-xl sm:rounded-2xl text-base sm:text-lg"
           >
             {authMode === 'login' ? 'Sign In' : 'Create Account'}
           </Button>
@@ -557,7 +628,7 @@ const KidsPage = () => {
   return (
     <div 
       ref={containerRef} 
-      className="min-h-screen pb-20 pt-32 bg-gradient-to-br from-slate-50 via-blue-50/20 to-purple-50/20 dark:from-slate-900 dark:via-blue-950/10 dark:to-purple-950/10 relative overflow-hidden"
+      className="min-h-screen pb-16 sm:pb-20 pt-24 sm:pt-32 md:pt-40 bg-gradient-to-br from-slate-50 via-blue-50/20 to-purple-50/20 dark:from-slate-900 dark:via-blue-950/10 dark:to-purple-950/10 relative overflow-hidden"
     >
       {/* Auth Modal */}
       <AuthModal 
@@ -568,19 +639,19 @@ const KidsPage = () => {
         onAuthSuccess={handleAuthSuccess}
       />
 
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 left-10 animate-float-slow">
-          <Cloud className="w-12 h-12 text-blue-200/60 dark:text-blue-700/60" />
+      {/* Animated Background Elements - Hidden on mobile for performance */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none hidden sm:block">
+        <div className="absolute top-10 left-4 sm:left-10 animate-float-slow">
+          <Cloud className="w-8 h-8 sm:w-12 sm:h-12 text-blue-200/60 dark:text-blue-700/60" />
         </div>
-        <div className="absolute top-20 right-20 animate-float-medium">
-          <Sun className="w-16 h-16 text-yellow-200/60 dark:text-yellow-800/60" />
+        <div className="absolute top-20 right-4 sm:right-20 animate-float-medium">
+          <Sun className="w-10 h-10 sm:w-16 sm:h-16 text-yellow-200/60 dark:text-yellow-800/60" />
         </div>
-        <div className="absolute bottom-20 left-20 animate-float-fast">
-          <CloudRain className="w-14 h-14 text-blue-300/60 dark:text-blue-600/60" />
+        <div className="absolute bottom-20 left-4 sm:left-20 animate-float-fast">
+          <CloudRain className="w-10 h-10 sm:w-14 sm:h-14 text-blue-300/60 dark:text-blue-600/60" />
         </div>
-        <div className="absolute bottom-10 right-10 animate-bounce">
-          <CloudSnow className="w-12 h-12 text-cyan-200/60 dark:text-cyan-700/60" />
+        <div className="absolute bottom-10 right-4 sm:right-10 animate-bounce">
+          <CloudSnow className="w-8 h-8 sm:w-12 sm:h-12 text-cyan-200/60 dark:text-cyan-700/60" />
         </div>
       </div>
 
@@ -603,74 +674,131 @@ const KidsPage = () => {
         );
       })}
 
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header Section */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] rounded-full blur-md opacity-60 animate-pulse"></div>
             </div>
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#118AB2] bg-clip-text text-transparent">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#118AB2] bg-clip-text text-transparent">
               Kids Learning Zone
             </h1>
           </div>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-6">
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-3 sm:mb-4 px-4">
             Fun stories, exciting games, and magical adventures to learn English! 🎉
           </p>
+          
+          {/* AI Status Badge */}
+          <div className="flex items-center justify-center gap-2 flex-wrap px-4">
+            {modelsReady && (
+              <span className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-green-100 dark:bg-green-900/20 border-2 border-green-300 rounded-full text-xs sm:text-sm font-semibold text-green-700 dark:text-green-400">
+                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">AI Teacher Ready (Offline)</span>
+                <span className="xs:hidden">AI Ready</span>
+              </span>
+            )}
+            {!modelsReady && !isInitializing && (
+              <button
+                onClick={() => navigate('/model-manager')}
+                className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-yellow-100 dark:bg-yellow-900/20 border-2 border-yellow-300 rounded-full text-xs sm:text-sm font-semibold text-yellow-700 dark:text-yellow-400 hover:bg-yellow-200 dark:hover:bg-yellow-900/30 transition-colors"
+              >
+                <Download className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">Download AI Tutor</span>
+                <span className="xs:hidden">Download AI</span>
+              </button>
+            )}
+            {isInitializing && (
+              <span className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-100 dark:bg-blue-900/20 border-2 border-blue-300 rounded-full text-xs sm:text-sm font-semibold text-blue-700 dark:text-blue-400">
+                <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                Setting up...
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Sync Status & Settings Bar */}
+        <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+          <SyncStatusIndicator showDetails={false} className="flex-shrink-0 w-full sm:w-auto" />
+          
+          <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/model-manager')}
+              className="rounded-xl flex-1 sm:flex-none text-xs sm:text-sm"
+            >
+              <Settings className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              <span className="hidden xs:inline">Manage Models</span>
+              <span className="xs:hidden">Models</span>
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/parental-controls')}
+              className="rounded-xl flex-1 sm:flex-none text-xs sm:text-sm border-2 border-purple-300 dark:border-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+            >
+              <Lock className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              <span className="hidden xs:inline">Parent Controls</span>
+              <span className="xs:hidden">Parent</span>
+            </Button>
+          </div>
         </div>
 
         {/* Stats Bar */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
           <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-2 border-yellow-200 dark:border-yellow-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <CardContent className="p-6 text-center">
-              <div className="flex items-center justify-center gap-3 mb-2">
-                <Trophy className="w-8 h-8 text-yellow-500 dark:text-yellow-400" />
-                <span className="text-3xl font-bold text-gray-800 dark:text-white">{points}</span>
+            <CardContent className="p-4 sm:p-6 text-center">
+              <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+                <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-500 dark:text-yellow-400" />
+                <span className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">{points}</span>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Sparkle Points ✨</p>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Sparkle Points ✨</p>
             </CardContent>
           </Card>
           
           <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-2 border-green-200 dark:border-green-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <CardContent className="p-6 text-center">
-              <div className="flex items-center justify-center gap-3 mb-2">
-                <Zap className="w-8 h-8 text-green-500 dark:text-green-400 animate-pulse" />
-                <span className="text-3xl font-bold text-gray-800 dark:text-white">{streak} days</span>
+            <CardContent className="p-4 sm:p-6 text-center">
+              <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+                <Zap className="w-6 h-6 sm:w-8 sm:h-8 text-green-500 dark:text-green-400 animate-pulse" />
+                <span className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">{streak} days</span>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Learning Streak 🔥</p>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Learning Streak 🔥</p>
             </CardContent>
           </Card>
           
           <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-2 border-blue-200 dark:border-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <CardContent className="p-6 text-center">
-              <div className="flex items-center justify-center gap-3 mb-2">
-                <Award className="w-8 h-8 text-blue-500 dark:text-blue-400" />
-                <span className="text-3xl font-bold text-gray-800 dark:text-white">{completedAchievements}/{achievements.length}</span>
+            <CardContent className="p-4 sm:p-6 text-center">
+              <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+                <Award className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500 dark:text-blue-400" />
+                <span className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">{completedAchievements}/{achievements.length}</span>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Super Achievements 🏆</p>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Super Achievements 🏆</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Categories Navigation */}
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 mb-8 sm:mb-10 md:mb-12">
           {categories.map((category) => {
             return (
               <Button
                 key={category.id}
                 variant={activeCategory === category.id ? "default" : "outline"}
                 className={cn(
-                  "rounded-2xl px-8 py-4 text-lg font-bold transition-all duration-300 relative overflow-hidden group",
+                  "rounded-xl sm:rounded-2xl px-3 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg font-bold transition-all duration-300 relative overflow-hidden group",
                   activeCategory === category.id 
                     ? "bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white shadow-2xl transform hover:scale-110" 
                     : "bg-white/90 dark:bg-gray-800/90 border-2 border-gray-200 dark:border-gray-600 hover:border-[#FF6B6B] dark:hover:border-[#FF6B6B] hover:bg-white dark:hover:bg-gray-700 hover:shadow-lg"
                 )}
                 onClick={() => handleCategoryClick(category.id)}
               >
-                <span className="text-2xl mr-3">{category.emoji}</span>
-                {category.label}
+                <span className="text-lg sm:text-xl md:text-2xl mr-1 sm:mr-2 md:mr-3">{category.emoji}</span>
+                <span className="hidden xs:inline">{category.label}</span>
+                <span className="xs:hidden text-xs">{category.label.split(' ')[0]}</span>
                 {activeCategory === category.id && (
-                  <Sparkles className="w-4 h-4 ml-2 animate-spin" />
+                  <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2 animate-spin" />
                 )}
               </Button>
             );
@@ -679,9 +807,9 @@ const KidsPage = () => {
 
         {/* Stories Grid or Module Content */}
         {activeCategory === 'stories' && (
-          <div className="mb-12">
+          <div className="mb-8 sm:mb-10 md:mb-12">
             {/* Stories Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-8 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-8">
               {currentStories.map((story, index) => {
                 const CharacterIcon = story.character;
                 const actualIndex = startIndex + index;
@@ -694,30 +822,30 @@ const KidsPage = () => {
                     )}
                     onMouseEnter={() => setCurrentStory(actualIndex)}
                   >
-                    <CardContent className="p-0 overflow-hidden rounded-3xl">
+                    <CardContent className="p-0 overflow-hidden rounded-2xl sm:rounded-3xl">
                       <div className={cn(
-                        "p-8 relative overflow-hidden bg-gradient-to-br",
+                        "p-4 sm:p-6 md:p-8 relative overflow-hidden bg-gradient-to-br",
                         story.bgGradient
                       )}>
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 dark:bg-black/20 rounded-full -mr-16 -mt-16"></div>
-                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/20 dark:bg-black/20 rounded-full -ml-12 -mb-12"></div>
+                        <div className="absolute top-0 right-0 w-20 h-20 sm:w-32 sm:h-32 bg-white/20 dark:bg-black/20 rounded-full -mr-10 sm:-mr-16 -mt-10 sm:-mt-16"></div>
+                        <div className="absolute bottom-0 left-0 w-16 h-16 sm:w-24 sm:h-24 bg-white/20 dark:bg-black/20 rounded-full -ml-8 sm:-ml-12 -mb-8 sm:-mb-12"></div>
                         <div className="relative z-10 text-center">
-                          <div className={cn("text-6xl mb-4 transform transition-transform duration-300 group-hover:scale-110", story.animation)}>
+                          <div className={cn("text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4 transform transition-transform duration-300 group-hover:scale-110", story.animation)}>
                             {story.image}
                           </div>
-                          <CharacterIcon className="w-12 h-12 mx-auto mb-3 text-gray-600 dark:text-gray-300 opacity-80" />
-                          <h3 className="text-2xl font-bold mb-2 text-gray-800 dark:text-white">
+                          <CharacterIcon className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 mx-auto mb-2 sm:mb-3 text-gray-600 dark:text-gray-300 opacity-80" />
+                          <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2 text-gray-800 dark:text-white">
                             {story.title}
                           </h3>
-                          <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                          <p className="text-xs sm:text-sm leading-relaxed text-gray-600 dark:text-gray-300 px-2">
                             {story.description}
                           </p>
                         </div>
                       </div>
-                      <div className="p-6">
-                        <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-6">
-                          <span className="flex items-center gap-1 font-semibold">📚 {story.words} words</span>
-                          <span className="flex items-center gap-1 font-semibold">⏱️ {story.duration}</span>
+                      <div className="p-4 sm:p-5 md:p-6">
+                        <div className="flex justify-between text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-4 sm:mb-6">
+                          <span className="flex items-center gap-0.5 sm:gap-1 font-semibold">📚 {story.words}</span>
+                          <span className="flex items-center gap-0.5 sm:gap-1 font-semibold">⏱️ {story.duration}</span>
                           <span className={cn(
                             "font-semibold",
                             story.difficulty === 'Easy' && "text-green-500 dark:text-green-400",
@@ -736,7 +864,7 @@ const KidsPage = () => {
                               toggleFavorite(index);
                             }} 
                             className={cn(
-                              "rounded-xl", 
+                              "rounded-lg sm:rounded-xl text-base sm:text-lg", 
                               favorites.includes(actualIndex) && "border-pink-500 text-pink-600"
                             )}
                           >
@@ -748,14 +876,14 @@ const KidsPage = () => {
                         </div>
                         <Button 
                           className={cn(
-                            "w-full bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white font-bold py-4 rounded-2xl transition-all duration-300 group-hover:shadow-xl relative overflow-hidden",
+                            "w-full bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white font-bold py-3 sm:py-4 rounded-xl sm:rounded-2xl transition-all duration-300 group-hover:shadow-xl relative overflow-hidden text-sm sm:text-base",
                             bounceAnimation && currentStory === actualIndex && "animate-pulse"
                           )}
                           onClick={() => handleStartLesson(index)}
                           disabled={isPlaying}
                         >
                           <span className="relative z-10 flex items-center justify-center">
-                            <Play className="w-5 h-5 mr-2" />
+                            <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
                             {isPlaying && currentStory === actualIndex ? 'Starting...' : 'Start Adventure!'}
                           </span>
                           <div className="absolute inset-0 bg-white/20 transform scale-0 group-hover:scale-100 transition-transform duration-300"></div>
@@ -769,19 +897,19 @@ const KidsPage = () => {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-4 mt-8">
+              <div className="flex justify-center items-center gap-2 sm:gap-4 mt-6 sm:mt-8">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="rounded-xl px-6 py-3"
+                  className="rounded-lg sm:rounded-xl px-3 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm"
                 >
-                  <ChevronLeft className="w-4 h-4 mr-2" />
-                  Previous
+                  <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Previous</span>
                 </Button>
                 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 sm:gap-2">
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                     <Button
                       key={page}
@@ -789,7 +917,7 @@ const KidsPage = () => {
                       size="sm"
                       onClick={() => handlePageChange(page)}
                       className={cn(
-                        "w-10 h-10 rounded-xl",
+                        "w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl text-xs sm:text-sm",
                         currentPage === page && "bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white"
                       )}
                     >
@@ -803,17 +931,17 @@ const KidsPage = () => {
                   size="sm"
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="rounded-xl px-6 py-3"
+                  className="rounded-lg sm:rounded-xl px-3 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm"
                 >
-                  Next
-                  <ChevronRight className="w-4 h-4 ml-2" />
+                  <span className="hidden sm:inline">Next</span>
+                  <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 sm:ml-2" />
                 </Button>
               </div>
             )}
 
             {/* Page Info */}
-            <div className="text-center mt-4">
-              <p className="text-sm text-gray-500 dark:text-gray-600">
+            <div className="text-center mt-3 sm:mt-4 px-4">
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-600">
                 Showing {startIndex + 1}-{Math.min(startIndex + storiesPerPage, allStories.length)} of {allStories.length} amazing stories
               </p>
             </div>
@@ -821,50 +949,50 @@ const KidsPage = () => {
         )}
 
         {activeCategory === 'vocabulary' && (
-          <div className="mb-12">
+          <div className="mb-8 sm:mb-10 md:mb-12">
             <Vocabulary words={vocabWords} />
           </div>
         )}
         
         {activeCategory === 'pronunciation' && (
-          <div className="mb-12">
+          <div className="mb-8 sm:mb-10 md:mb-12">
             <Pronunciation items={pronounceItems} />
           </div>
         )}
         
         {activeCategory === 'games' && (
-          <div className="mb-12">
-            <ReadAloud lesson={readAloudLesson} />
+          <div className="mb-8 sm:mb-10 md:mb-12">
+            <InteractiveGames />
           </div>
         )}
 
         {/* Achievements Section */}
-        <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-2 border-purple-200 dark:border-purple-600 rounded-3xl p-8 shadow-xl mb-8">
-          <h2 className="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white flex items-center justify-center gap-3">
-            <Trophy className="w-8 h-8 text-yellow-500 dark:text-yellow-400 animate-bounce" />
+        <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-2 border-purple-200 dark:border-purple-600 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl mb-6 sm:mb-8">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center mb-6 sm:mb-8 text-gray-800 dark:text-white flex items-center justify-center gap-2 sm:gap-3">
+            <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-500 dark:text-yellow-400 animate-bounce" />
             Your Super Achievements!
           </h2>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             {achievements.map((achievement, index) => {
               const isComplete = achievement.progress === 100;
               return (
                 <div key={index} className="text-center group cursor-pointer transform hover:scale-110 transition-transform duration-300">
-                  <div className="relative inline-block mb-3">
+                  <div className="relative inline-block mb-2 sm:mb-3">
                     <div className={cn(
-                      "w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-2 transition-all duration-300",
+                      "w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-1 sm:mb-2 transition-all duration-300",
                       isComplete 
                         ? "bg-gradient-to-r from-yellow-400 to-orange-400 shadow-lg" 
                         : "bg-gray-100 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600"
                     )}>
-                      <span className="text-2xl">{achievement.emoji}</span>
+                      <span className="text-xl sm:text-2xl">{achievement.emoji}</span>
                       {isComplete && (
-                        <Sparkles className="w-4 h-4 text-white absolute -top-1 -right-1 animate-ping" />
+                        <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-white absolute -top-1 -right-1 animate-ping" />
                       )}
                     </div>
                   </div>
-                  <p className="text-sm font-bold text-gray-800 dark:text-white mb-3">{achievement.name}</p>
-                  <Progress value={achievement.progress} className="h-3 bg-gray-200 dark:bg-gray-600 rounded-full mb-2">
+                  <p className="text-xs sm:text-sm font-bold text-gray-800 dark:text-white mb-2 sm:mb-3 px-1">{achievement.name}</p>
+                  <Progress value={achievement.progress} className="h-2 sm:h-3 bg-gray-200 dark:bg-gray-600 rounded-full mb-1 sm:mb-2">
                     <div 
                       className={cn(
                         "h-full rounded-full transition-all duration-1000",
@@ -872,7 +1000,7 @@ const KidsPage = () => {
                       )}
                     />
                   </Progress>
-                  <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">{achievement.progress}% Complete</span>
+                  <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">{achievement.progress}%</span>
                 </div>
               );
             })}
@@ -880,60 +1008,37 @@ const KidsPage = () => {
         </Card>
 
         {/* Quick Actions */}
-        <div className="text-center">
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-6 font-semibold">Ready for more fun? Let's play! 🎯</p>
-          <div className="flex flex-wrap justify-center gap-4">
+        <div className="text-center px-4">
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-4 sm:mb-6 font-semibold">Ready for more fun? Let's play! 🎯</p>
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4">
             <Button 
               variant="outline" 
-              className="rounded-2xl px-8 py-4 border-2 border-green-300 dark:border-green-600 hover:border-green-400 dark:hover:border-green-500 bg-white/90 dark:bg-gray-800/90 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all duration-300 hover:scale-105 group"
+              className="rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 border-2 border-green-300 dark:border-green-600 hover:border-green-400 dark:hover:border-green-500 bg-white/90 dark:bg-gray-800/90 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all duration-300 hover:scale-105 group text-sm sm:text-base"
               onClick={() => handleCategoryClick('pronunciation')}
             >
-              <Volume2 className="w-5 h-5 mr-2 text-green-500 dark:text-green-400 group-hover:animate-bounce" />
+              <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2 text-green-500 dark:text-green-400 group-hover:animate-bounce" />
               <span className="font-semibold text-gray-700 dark:text-gray-200">Listen & Repeat</span>
             </Button>
             <Button 
               variant="outline" 
-              className="rounded-2xl px-8 py-4 border-2 border-blue-300 dark:border-blue-600 hover:border-blue-400 dark:hover:border-blue-500 bg-white/90 dark:bg-gray-800/90 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300 hover:scale-105 group"
+              className="rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 border-2 border-blue-300 dark:border-blue-600 hover:border-blue-400 dark:hover:border-blue-500 bg-white/90 dark:bg-gray-800/90 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300 hover:scale-105 group text-sm sm:text-base"
               onClick={() => handleCategoryClick('pronunciation')}
             >
-              <Mic className="w-5 h-5 mr-2 text-blue-500 dark:text-blue-400 group-hover:animate-pulse" />
+              <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2 text-blue-500 dark:text-blue-400 group-hover:animate-pulse" />
               <span className="font-semibold text-gray-700 dark:text-gray-200">Speak Now</span>
             </Button>
             <Button 
               variant="outline" 
-              className="rounded-2xl px-8 py-4 border-2 border-pink-300 dark:border-pink-600 hover:border-pink-400 dark:hover:border-pink-500 bg-white/90 dark:bg-gray-800/90 hover:bg-pink-50 dark:hover:bg-pink-900/20 transition-all duration-300 hover:scale-105 group"
+              className="rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 border-2 border-pink-300 dark:border-pink-600 hover:border-pink-400 dark:hover:border-pink-500 bg-white/90 dark:bg-gray-800/90 hover:bg-pink-50 dark:hover:bg-pink-900/20 transition-all duration-300 hover:scale-105 group text-sm sm:text-base"
               onClick={() => handleCategoryClick('stories')}
             >
-              <Heart className="w-5 h-5 mr-2 text-pink-500 dark:text-pink-400 group-hover:animate-pulse" />
+              <Heart className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2 text-pink-500 dark:text-pink-400 group-hover:animate-pulse" />
               <span className="font-semibold text-gray-700 dark:text-gray-200">Favorite Stories</span>
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Interactive Floating Elements */}
-      <div className="fixed bottom-6 right-6 animate-bounce cursor-pointer hover:scale-110 transition-transform duration-300 z-20">
-        <div className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] p-4 rounded-full shadow-2xl">
-          <Zap className="w-8 h-8 text-white" />
-        </div>
-      </div>
-
-      {/* Additional Animated Icons */}
-      <div className="fixed top-24 left-6 animate-float-slow cursor-pointer hover:scale-110 transition-transform duration-300 z-20">
-        <div className="bg-yellow-100 dark:bg-yellow-900 p-3 rounded-2xl shadow-lg border-2 border-yellow-200 dark:border-yellow-700">
-          <Star className="w-6 h-6 text-yellow-500 dark:text-yellow-400" />
-        </div>
-      </div>
-      <div className="fixed top-48 right-10 animate-float-medium cursor-pointer hover:scale-110 transition-transform duration-300 z-20">
-        <div className="bg-pink-100 dark:bg-pink-900 p-3 rounded-2xl shadow-lg border-2 border-pink-200 dark:border-pink-700">
-          <Heart className="w-6 h-6 text-pink-500 dark:text-pink-400" />
-        </div>
-      </div>
-      <div className="fixed bottom-40 left-10 animate-float-fast cursor-pointer hover:scale-110 transition-transform duration-300 z-20">
-        <div className="bg-purple-100 dark:bg-purple-900 p-3 rounded-2xl shadow-lg border-2 border-purple-200 dark:border-purple-700">
-          <Sparkles className="w-6 h-6 text-purple-500 dark:text-purple-400" />
-        </div>
-      </div>
 
       {/* Adventure Modals */}
       {showMagicForest && (

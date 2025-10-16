@@ -26,17 +26,17 @@ const storySteps = [
   {
     id: 'rainbow_bridge',
     title: '🌉 Rainbow Bridge',
-    text: 'Let\'s cross this shimmering rainbow bridge! Each color has a special magic power. Which color should we step on first?',
+    text: 'The rainbow bridge says "Walk across me carefully!" Can you say that in a gentle, magical voice? Let\'s say it together!',
     emoji: '🌈',
     character: 'Stardust',
     bgColor: 'from-purple-100 to-indigo-100 dark:from-purple-900 dark:to-indigo-900',
     interactive: true,
-    audioText: 'rainbow',
-    choices: ['rainbow', 'cloud', 'river'],
-    wordCount: 22,
-    duration: 28,
-    question: 'What has seven colorful arches?',
-    hint: 'It appears after rain with pretty colors'
+    audioText: 'Walk across me carefully',
+    choices: ['Walk across me carefully', 'Run very fast across', 'Jump up and down'],
+    wordCount: 26,
+    duration: 36,
+    question: 'What does the rainbow bridge want us to do?',
+    hint: 'We should move slowly and safely'
   },
   {
     id: 'first_star',
@@ -53,32 +53,32 @@ const storySteps = [
   {
     id: 'talking_flowers',
     title: '🌸 Singing Flowers',
-    text: 'Listen! The magical flowers are singing a happy song! They bloom when they hear kind words.',
+    text: 'The flowers sing "Kind words make us bloom!" Can you sing that sweetly and gently? Let\'s sing with the flowers!',
     emoji: '🌸',
     character: 'Stardust',
     bgColor: 'from-pink-100 to-rose-100 dark:from-pink-900 dark:to-rose-900',
     interactive: true,
-    audioText: 'flowers',
-    choices: ['trees', 'flowers', 'rocks'],
-    wordCount: 18,
-    duration: 26,
-    question: 'What blooms and sings in unicorn land?',
-    hint: 'They have petals and smell nice'
+    audioText: 'Kind words make us bloom',
+    choices: ['Kind words make us bloom', 'Mean words are the best', 'We do not like singing'],
+    wordCount: 26,
+    duration: 36,
+    question: 'What makes the flowers bloom and grow?',
+    hint: 'They love hearing nice things'
   },
   {
     id: 'fluffy_clouds',
     title: '☁️ Fluffy Cloud Friends',
-    text: 'Look at these happy clouds! They can change shapes and tell funny stories. That cloud looks like a bunny!',
+    text: 'The clouds say "We love floating free in the sky!" Can you say that while imagining you\'re floating? Let\'s float!',
     emoji: '☁️',
     character: 'Stardust',
     bgColor: 'from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900',
     interactive: true,
-    audioText: 'clouds',
-    choices: ['clouds', 'stars', 'rain'],
-    wordCount: 20,
-    duration: 28,
-    question: 'What is fluffy and floats in the sky?',
-    hint: 'They are white and sometimes look like animals'
+    audioText: 'We love floating free in the sky',
+    choices: ['We love floating free in the sky', 'We fall down to the ground', 'We cannot move at all'],
+    wordCount: 28,
+    duration: 38,
+    question: 'What do the clouds enjoy doing?',
+    hint: 'They drift gently through the air'
   },
   {
     id: 'second_star',
@@ -95,32 +95,32 @@ const storySteps = [
   {
     id: 'crystal_cave',
     title: '💎 Crystal Cave',
-    text: 'Wow! This cave is full of glowing crystals that hum beautiful music! Each crystal has a different note.',
+    text: 'The crystals hum "We sing together in harmony!" Can you say that with a musical, flowing voice? Let\'s harmonize!',
     emoji: '💎',
     character: 'Stardust',
     bgColor: 'from-indigo-100 to-blue-100 dark:from-indigo-900 dark:to-blue-900',
     interactive: true,
-    audioText: 'crystals',
-    choices: ['crystals', 'diamonds', 'pearls'],
-    wordCount: 19,
-    duration: 27,
-    question: 'What glows and makes music in the cave?',
-    hint: 'They are shiny and colorful rocks'
+    audioText: 'We sing together in harmony',
+    choices: ['We sing together in harmony', 'We make terrible sounds', 'We are always silent'],
+    wordCount: 28,
+    duration: 36,
+    question: 'What do the crystals create together?',
+    hint: 'They make beautiful sounds that blend'
   },
   {
     id: 'butterfly_garden',
     title: '🦋 Magic Butterflies',
-    text: 'Beautiful! The rainbow butterflies are dancing! Their wings spread magic dust that makes flowers grow instantly.',
+    text: 'The butterflies say "Our wings spread beauty everywhere!" Can you say that while gently moving your arms? Let\'s flutter!',
     emoji: '🦋',
     character: 'Stardust',
     bgColor: 'from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900',
     interactive: true,
-    audioText: 'butterflies',
-    choices: ['bees', 'butterflies', 'birds'],
-    wordCount: 20,
-    duration: 29,
-    question: 'What has colorful wings and spreads magic?',
-    hint: 'They fly and love flowers'
+    audioText: 'Our wings spread beauty everywhere',
+    choices: ['Our wings spread beauty everywhere', 'We make everything ugly', 'We cannot fly at all'],
+    wordCount: 28,
+    duration: 38,
+    question: 'What do the butterflies do with their wings?',
+    hint: 'They make things beautiful as they fly'
   },
   {
     id: 'third_star',
@@ -137,17 +137,17 @@ const storySteps = [
   {
     id: 'wishing_fountain',
     title: '⛲ Magic Fountain',
-    text: 'Look at this sparkling fountain! The water glows with rainbow colors. Make a wish and watch the magic happen!',
+    text: 'The fountain says "Make a wish and believe in magic!" Can you say that with hope and wonder? Let\'s make wishes!',
     emoji: '⛲',
     character: 'Stardust',
     bgColor: 'from-cyan-100 to-blue-100 dark:from-cyan-900 dark:to-blue-900',
     interactive: true,
-    audioText: 'fountain',
-    choices: ['fountain', 'river', 'waterfall'],
-    wordCount: 19,
-    duration: 28,
-    question: 'What has magical glowing water?',
-    hint: 'It sprays water and grants wishes'
+    audioText: 'Make a wish and believe in magic',
+    choices: ['Make a wish and believe in magic', 'Wishes never come true', 'Magic is not real'],
+    wordCount: 28,
+    duration: 38,
+    question: 'What does the fountain encourage us to do?',
+    hint: 'It wants us to hope and dream'
   },
   {
     id: 'grand_celebration',
@@ -447,7 +447,7 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
                         ) : (
                           <>
                             <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                            <span className="hidden sm:inline">🔊 Listen to the Magic Word</span>
+                            <span className="hidden sm:inline">Listen to the Magic Word</span>
                             <span className="sm:hidden">🔊 Listen</span>
                           </>
                         )}

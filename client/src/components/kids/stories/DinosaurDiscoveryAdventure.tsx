@@ -26,17 +26,17 @@ const storySteps = [
   {
     id: 't_rex',
     title: '🦖 T-Rex Encounter!',
-    text: 'ROAR! Look at that enormous Tyrannosaurus Rex! It has giant teeth and tiny arms. Listen to its mighty roar!',
+    text: 'The T-Rex roars "I am the king of dinosaurs!" Can you roar that out loud with a big, powerful voice? Let\'s roar together!',
     emoji: '🦖',
     character: 'Dina',
     bgColor: 'from-red-100 to-orange-100 dark:from-red-900 dark:to-orange-900',
     interactive: true,
-    audioText: 'T-Rex',
-    choices: ['T-Rex', 'Stegosaurus', 'Triceratops'],
-    wordCount: 18,
-    duration: 25,
-    question: 'Which dinosaur has tiny arms and giant teeth?',
-    hint: 'It\'s the king of dinosaurs!'
+    audioText: 'I am the king of dinosaurs',
+    choices: ['I am the king of dinosaurs', 'I am very small and weak', 'I am scared of everything'],
+    wordCount: 28,
+    duration: 36,
+    question: 'What does the T-Rex say about itself?',
+    hint: 'The T-Rex is very strong and powerful'
   },
   {
     id: 'first_fossil',
@@ -53,32 +53,32 @@ const storySteps = [
   {
     id: 'herbivore_herd',
     title: '🦕 Gentle Giants',
-    text: 'Wow! A herd of long-necked Brachiosaurus are eating leaves from tall trees! They\'re as tall as buildings!',
+    text: 'The Brachiosaurus says "I can reach the highest leaves!" Can you say that while stretching up really tall? Let\'s stretch high!',
     emoji: '🦕',
     character: 'Dina',
     bgColor: 'from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900',
     interactive: true,
-    audioText: 'Brachiosaurus',
-    choices: ['Velociraptor', 'Brachiosaurus', 'Pterodactyl'],
-    wordCount: 19,
-    duration: 28,
-    question: 'Which dinosaur has a very long neck?',
-    hint: 'It eats leaves from treetops'
+    audioText: 'I can reach the highest leaves',
+    choices: ['I can reach the highest leaves', 'I cannot reach anything', 'I eat rocks not leaves'],
+    wordCount: 30,
+    duration: 38,
+    question: 'What special thing can the Brachiosaurus do?',
+    hint: 'Its long neck helps it reach very high'
   },
   {
     id: 'triceratops',
     title: '🦏 Three-Horned Friend!',
-    text: 'Amazing! A Triceratops is munching on plants! It has three sharp horns on its face to protect itself from predators.',
+    text: 'The Triceratops says "My horns keep me safe!" Can you say that in a strong, confident voice? Let\'s be strong together!',
     emoji: '🦏',
     character: 'Dina',
     bgColor: 'from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900',
     interactive: true,
-    audioText: 'Triceratops',
-    choices: ['Triceratops', 'Stegosaurus', 'Ankylosaurus'],
-    wordCount: 22,
-    duration: 30,
-    question: 'Which dinosaur has three horns?',
-    hint: 'Its name means "three-horned face"'
+    audioText: 'My horns keep me safe',
+    choices: ['My horns keep me safe', 'I have no protection', 'I am always in danger'],
+    wordCount: 28,
+    duration: 36,
+    question: 'How does the Triceratops protect itself?',
+    hint: 'It uses the horns on its head'
   },
   {
     id: 'second_fossil',
@@ -95,32 +95,32 @@ const storySteps = [
   {
     id: 'stegosaurus',
     title: '🦎 Spiky Stegosaurus!',
-    text: 'Look at that Stegosaurus with its amazing back plates and tail spikes! The plates help it stay warm or cool.',
+    text: 'The Stegosaurus says "My plates are special and unique!" Can you say that with pride and happiness? Let\'s be proud!',
     emoji: '🦎',
     character: 'Dina',
     bgColor: 'from-pink-100 to-rose-100 dark:from-pink-900 dark:to-rose-900',
     interactive: true,
-    audioText: 'Stegosaurus',
-    choices: ['Stegosaurus', 'T-Rex', 'Brachiosaurus'],
-    wordCount: 20,
-    duration: 28,
-    question: 'Which dinosaur has plates on its back?',
-    hint: 'It has spikes on its tail too'
+    audioText: 'My plates are special and unique',
+    choices: ['My plates are special and unique', 'I look like everyone else', 'I have nothing special'],
+    wordCount: 28,
+    duration: 36,
+    question: 'What makes the Stegosaurus unique?',
+    hint: 'The plates on its back make it special'
   },
   {
     id: 'velociraptor',
     title: '🐆 Speedy Raptor!',
-    text: 'Quick! A pack of Velociraptors is running by! They\'re small but very smart and hunt together in groups.',
+    text: 'The Velociraptors say "We work together as a team!" Can you say that quickly and excitedly? Let\'s be a team!',
     emoji: '🐆',
     character: 'Dina',
     bgColor: 'from-gray-100 to-slate-100 dark:from-gray-900 dark:to-slate-900',
     interactive: true,
-    audioText: 'Velociraptor',
-    choices: ['Velociraptor', 'Triceratops', 'Pterodactyl'],
-    wordCount: 19,
-    duration: 26,
-    question: 'Which dinosaur is small and very fast?',
-    hint: 'They hunt in packs and are very clever'
+    audioText: 'We work together as a team',
+    choices: ['We work together as a team', 'We always work alone', 'We never help each other'],
+    wordCount: 28,
+    duration: 36,
+    question: 'What do the Velociraptors do together?',
+    hint: 'They help and cooperate with each other'
   },
   {
     id: 'third_fossil',
@@ -137,32 +137,32 @@ const storySteps = [
   {
     id: 'flying_dino',
     title: '🦅 Flying Reptile!',
-    text: 'Look up in the sky! A Pterodactyl is soaring above us! It\'s not a dinosaur but a flying reptile from ancient times!',
+    text: 'The Pterodactyl calls "I fly high in the sky!" Can you say that while spreading your arms like wings? Let\'s fly!',
     emoji: '🦅',
     character: 'Dina',
     bgColor: 'from-blue-200 to-cyan-200 dark:from-blue-800 dark:to-cyan-800',
     interactive: true,
-    audioText: 'Pterodactyl',
-    choices: ['Pterodactyl', 'Dragon', 'Eagle'],
-    wordCount: 22,
-    duration: 28,
-    question: 'What flies in the dinosaur sky?',
-    hint: 'It has wings but no feathers'
+    audioText: 'I fly high in the sky',
+    choices: ['I fly high in the sky', 'I stay on the ground', 'I cannot fly at all'],
+    wordCount: 28,
+    duration: 36,
+    question: 'Where does the Pterodactyl travel?',
+    hint: 'It moves through the air above us'
   },
   {
     id: 'volcano',
     title: '🌋 Ancient Volcano!',
-    text: 'Watch out! The volcano is rumbling! Dinosaurs lived when there were many active volcanoes shaping the land.',
+    text: 'We see the volcano! Let\'s say "We need to stay far away!" Can you say that in a careful, warning voice? Let\'s be careful!',
     emoji: '🌋',
     character: 'Dina',
     bgColor: 'from-red-200 to-orange-200 dark:from-red-800 dark:to-orange-800',
     interactive: true,
-    audioText: 'volcano',
-    choices: ['mountain', 'volcano', 'waterfall'],
-    wordCount: 16,
-    duration: 25,
-    question: 'What is rumbling and has lava?',
-    hint: 'It can erupt with fire and ash'
+    audioText: 'We need to stay far away',
+    choices: ['We need to stay far away', 'Let us go very close', 'It is not dangerous'],
+    wordCount: 30,
+    duration: 38,
+    question: 'What should we do near the volcano?',
+    hint: 'We should keep a safe distance'
   },
   {
     id: 'final_celebration',
@@ -465,7 +465,7 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
                         ) : (
                           <>
                             <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                            <span className="hidden sm:inline">🔊 Listen to the Dino Word</span>
+                            <span className="hidden sm:inline">Listen to the Dino Word</span>
                             <span className="sm:hidden">🔊 Listen</span>
                           </>
                         )}

@@ -26,62 +26,62 @@ const storySteps = [
   {
     id: 'whispering_trees',
     title: '🌲 Whispering Trees',
-    text: 'Look at these magnificent trees! They whisper secrets when the wind blows. Can you count how many trees are dancing?',
+    text: 'Look at these magnificent trees! They whisper secrets when the wind blows. Can you hear them saying "Welcome to our forest!"? Let\'s say it together!',
     emoji: '🌲',
     character: 'Luna',
     bgColor: 'from-green-200 to-teal-200 dark:from-green-800 dark:to-teal-800',
     interactive: true,
-    audioText: 'tree',
-    choices: ['tree', 'flower', 'rock'],
-    wordCount: 19,
-    duration: 30,
-    question: 'What whispers in the wind?',
-    hint: 'It has leaves and branches'
+    audioText: 'Welcome to our forest',
+    choices: ['Welcome to our forest', 'Hello forest', 'Goodbye trees'],
+    wordCount: 25,
+    duration: 35,
+    question: 'What do the trees say to welcome us?',
+    hint: 'Listen carefully to their greeting'
   },
   {
     id: 'colorful_butterfly',
     title: '🦋 Rainbow Butterfly',
-    text: 'Oh wonderful! A rainbow butterfly is flying toward us! Its wings have all the colors of the rainbow. What colors can you spot?',
+    text: 'Oh wonderful! A rainbow butterfly is flying toward us! It says "I love this sunny day!" Can you repeat that with a happy voice?',
     emoji: '🦋',
     character: 'Luna',
     bgColor: 'from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900',
     interactive: true,
-    audioText: 'butterfly',
-    choices: ['bird', 'bee', 'butterfly'],
-    wordCount: 24,
-    duration: 35,
-    question: 'What has colorful wings?',
-    hint: 'It flies and loves flowers'
+    audioText: 'I love this sunny day',
+    choices: ['I love this sunny day', 'It is raining today', 'The sky is dark'],
+    wordCount: 28,
+    duration: 38,
+    question: 'What does the butterfly say about the weather?',
+    hint: 'The butterfly is happy about the weather'
   },
   {
     id: 'sparkling_river',
     title: '💧 Sparkling River',
-    text: 'Listen to the happy river! The water sparkles like diamonds under the sun. Can you hear the gentle water sounds?',
+    text: 'Listen to the happy river! It\'s singing "Flow, flow, flow so free!" Can you sing that song with the river? Let\'s practice together!',
     emoji: '💧',
     character: 'Luna',
     bgColor: 'from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900',
     interactive: true,
-    audioText: 'water',
-    choices: ['river', 'water', 'stream'],
-    wordCount: 20,
-    duration: 30,
-    question: 'What sparkles and flows?',
-    hint: 'You can drink it and swim in it'
+    audioText: 'Flow flow flow so free',
+    choices: ['Flow flow flow so free', 'Stop stop stop right now', 'Run run run away'],
+    wordCount: 28,
+    duration: 36,
+    question: 'What is the river singing about?',
+    hint: 'The river loves to move freely'
   },
   {
     id: 'talking_flowers',
     title: '🌸 Talking Flowers',
-    text: 'Amazing! These magical flowers can talk! They are telling us about friendship and kindness. What do flowers need to grow big and strong?',
+    text: 'Amazing! These magical flowers can talk! They say "Being kind makes everyone smile!" Can you say that with a warm, kind voice?',
     emoji: '🌸',
     character: 'Luna',
     bgColor: 'from-pink-100 to-rose-100 dark:from-pink-900 dark:to-rose-900',
     interactive: true,
-    audioText: 'flower',
-    choices: ['plant', 'grass', 'flower'],
-    wordCount: 25,
-    duration: 35,
-    question: 'What blooms and smells nice?',
-    hint: 'Bees love to visit them'
+    audioText: 'Being kind makes everyone smile',
+    choices: ['Being kind makes everyone smile', 'Being mean is fun', 'Nobody likes kindness'],
+    wordCount: 28,
+    duration: 38,
+    question: 'What important lesson do the flowers teach us?',
+    hint: 'It\'s about treating others nicely'
   },
   {
     id: 'star_discovery',
@@ -98,17 +98,17 @@ const storySteps = [
   {
     id: 'friendly_squirrel',
     title: '🐿️ Busy Squirrel',
-    text: 'Look up there! A friendly squirrel is gathering nuts for winter. Squirrels have fluffy tails and love to climb trees very fast!',
+    text: 'Look up there! A friendly squirrel is calling "Come play with me up high!" Can you say that with an excited, playful voice? Let\'s practice!',
     emoji: '🐿️',
     character: 'Luna',
     bgColor: 'from-orange-100 to-amber-100 dark:from-orange-900 dark:to-amber-900',
     interactive: true,
-    audioText: 'squirrel',
-    choices: ['rabbit', 'squirrel', 'mouse'],
-    wordCount: 22,
-    duration: 35,
-    question: 'Who collects nuts for winter?',
-    hint: 'It has a bushy tail and climbs trees'
+    audioText: 'Come play with me up high',
+    choices: ['Come play with me up high', 'Stay down on the ground', 'I am very sleepy'],
+    wordCount: 30,
+    duration: 38,
+    question: 'Where does the squirrel want us to play?',
+    hint: 'Squirrels love high places in trees'
   },
   {
     id: 'second_star',
@@ -125,17 +125,17 @@ const storySteps = [
   {
     id: 'wise_owl',
     title: '🦉 Wise Old Owl',
-    text: 'Good evening! The wise owl says hello! Owls can turn their heads almost all the way around and see in the dark. Amazing!',
+    text: 'Good evening! The wise owl greets us saying "Always be curious and ask questions!" Can you repeat that in a wise, gentle voice?',
     emoji: '🦉',
     character: 'Luna',
     bgColor: 'from-gray-100 to-blue-100 dark:from-gray-900 dark:to-blue-900',
     interactive: true,
-    audioText: 'owl',
-    choices: ['owl', 'eagle', 'hawk'],
-    wordCount: 24,
-    duration: 35,
-    question: 'Who sees well at night?',
-    hint: 'It says "hoot hoot" and sleeps during day'
+    audioText: 'Always be curious and ask questions',
+    choices: ['Always be curious and ask questions', 'Never ask anything ever', 'Be quiet all the time'],
+    wordCount: 28,
+    duration: 38,
+    question: 'What wise advice does the owl give us?',
+    hint: 'It\'s about learning and being interested'
   },
   {
     id: 'final_star',
@@ -445,7 +445,7 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                         ) : (
                           <>
                             <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                            <span className="hidden sm:inline">🔊 Listen to the Magic Word</span>
+                            <span className="hidden sm:inline">Listen to the Magic Word</span>
                             <span className="sm:hidden">🔊 Listen</span>
                           </>
                         )}

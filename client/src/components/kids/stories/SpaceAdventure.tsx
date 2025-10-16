@@ -26,47 +26,47 @@ const storySteps = [
   {
     id: 'rocket_launch',
     title: '🚀 Rocket Launch!',
-    text: '3... 2... 1... BLAST OFF! Our rocket is soaring through the stars! Can you hear the powerful engines roaring as we leave Earth behind?',
+    text: '3... 2... 1... BLAST OFF! Let\'s all shout "We are flying to the stars!" Can you say that with an excited, loud voice? Ready, go!',
     emoji: '🚀',
     character: 'Cosmo',
     bgColor: 'from-blue-200 to-purple-200 dark:from-blue-800 dark:to-purple-800',
     interactive: true,
-    audioText: 'rocket',
-    choices: ['planet', 'rocket', 'moon'],
-    wordCount: 22,
-    duration: 25,
-    question: 'What is taking us to space?',
-    hint: 'It has engines and flies very fast'
+    audioText: 'We are flying to the stars',
+    choices: ['We are flying to the stars', 'We are staying on Earth', 'We are going swimming'],
+    wordCount: 28,
+    duration: 36,
+    question: 'Where are we going on our rocket?',
+    hint: 'We\'re traveling up high in the sky'
   },
   {
     id: 'planet_exploration',
     title: '🪐 Amazing Planet Discovery!',
-    text: 'Wow! Look at that beautiful colorful planet spinning in space! It has rings around it like a giant hula hoop! What do you think this planet is called?',
+    text: 'Wow! This beautiful planet says "My rings make me special!" Can you repeat that with a proud, happy voice? Let\'s practice saying it!',
     emoji: '🪐',
     character: 'Cosmo',
     bgColor: 'from-orange-100 to-red-100 dark:from-orange-900 dark:to-red-900',
     interactive: true,
-    audioText: 'planet',
-    choices: ['planet', 'star', 'comet'],
-    wordCount: 26,
-    duration: 30,
-    question: 'What is round and spins in space?',
-    hint: 'Earth is one of these'
+    audioText: 'My rings make me special',
+    choices: ['My rings make me special', 'I have no rings at all', 'I am very boring'],
+    wordCount: 28,
+    duration: 36,
+    question: 'What makes this planet feel special?',
+    hint: 'Think about what makes it different'
   },
   {
     id: 'alien_meeting',
     title: '👽 Friendly Alien Encounter!',
-    text: 'Incredible! A friendly alien is waving at us from their spaceship! They\'re speaking in funny space language. Listen carefully to what they\'re saying!',
+    text: 'Incredible! The friendly alien says "Hello new friend from Earth!" Can you say that back in a friendly, welcoming voice? Let\'s greet them!',
     emoji: '👽',
     character: 'Cosmo',
     bgColor: 'from-green-100 to-teal-100 dark:from-green-900 dark:to-teal-900',
     interactive: true,
-    audioText: 'alien',
-    choices: ['robot', 'astronaut', 'alien'],
-    wordCount: 24,
-    duration: 28,
-    question: 'Who is visiting from another world?',
-    hint: 'They come from outer space'
+    audioText: 'Hello new friend from Earth',
+    choices: ['Hello new friend from Earth', 'Go away right now', 'I am scared of you'],
+    wordCount: 30,
+    duration: 38,
+    question: 'How do we greet the friendly alien?',
+    hint: 'We want to be nice and welcoming'
   },
   {
     id: 'first_star',
@@ -83,17 +83,17 @@ const storySteps = [
   {
     id: 'moon_landing',
     title: '🌙 Moon Landing Adventure!',
-    text: 'Amazing! We successfully landed on the moon! The surface is covered with soft moon dust and big craters. We can jump really high here!',
+    text: 'Amazing! We landed on the moon! Let\'s all say "I can jump so high here!" Can you say it like you\'re bouncing and having fun?',
     emoji: '🌙',
     character: 'Cosmo',
     bgColor: 'from-gray-100 to-slate-100 dark:from-gray-900 dark:to-slate-900',
     interactive: true,
-    audioText: 'moon',
-    choices: ['earth', 'moon', 'sun'],
-    wordCount: 25,
-    duration: 30,
-    question: 'Where did we just land?',
-    hint: 'It orbits around Earth at night'
+    audioText: 'I can jump so high here',
+    choices: ['I can jump so high here', 'I cannot move at all', 'I am very heavy here'],
+    wordCount: 30,
+    duration: 38,
+    question: 'What can we do differently on the moon?',
+    hint: 'The moon has less gravity than Earth'
   },
   {
     id: 'second_star',
@@ -110,17 +110,17 @@ const storySteps = [
   {
     id: 'black_hole',
     title: '🕳️ Mysterious Space Tunnel!',
-    text: 'Look at that amazing space tunnel! It\'s like a cosmic slide! Things go in and come out somewhere else in space. What do we call this space mystery?',
+    text: 'Look at that amazing black hole! Cosmo says "Stay far away, it\'s very powerful!" Can you say that in a careful, warning voice?',
     emoji: '🕳️',
     character: 'Cosmo',
     bgColor: 'from-gray-200 to-blue-200 dark:from-gray-800 dark:to-blue-800',
     interactive: true,
-    audioText: 'black hole',
-    choices: ['black hole', 'star', 'planet'],
-    wordCount: 28,
-    duration: 32,
-    question: 'What is this space tunnel called?',
-    hint: 'It has strong gravity and is very dark'
+    audioText: 'Stay far away it is very powerful',
+    choices: ['Stay far away it is very powerful', 'Let us go inside now', 'It is not dangerous'],
+    wordCount: 32,
+    duration: 38,
+    question: 'What does Cosmo warn us about the black hole?',
+    hint: 'We need to be safe and careful'
   },
   {
     id: 'third_star',
@@ -137,17 +137,17 @@ const storySteps = [
   {
     id: 'constellation',
     title: '🔭 Beautiful Star Patterns!',
-    text: 'Look up at the sky! The stars are forming magical patterns called constellations. Can you see the shapes they make in the dark space?',
+    text: 'Look at those star patterns! They say "We shine bright together!" Can you say that in a sparkly, proud voice? Let\'s practice!',
     emoji: '🔭',
     character: 'Cosmo',
     bgColor: 'from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900',
     interactive: true,
-    audioText: 'stars',
-    choices: ['clouds', 'stars', 'planets'],
-    wordCount: 24,
-    duration: 28,
-    question: 'What makes patterns in the night sky?',
-    hint: 'They twinkle and shine at night'
+    audioText: 'We shine bright together',
+    choices: ['We shine bright together', 'We hide from each other', 'We are always alone'],
+    wordCount: 28,
+    duration: 36,
+    question: 'What do the stars say about being together?',
+    hint: 'They are happy to be close to each other'
   },
   {
     id: 'final_star',
@@ -459,7 +459,7 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
                         ) : (
                           <>
                             <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                            <span className="hidden sm:inline">🔊 Listen to the Space Word</span>
+                            <span className="hidden sm:inline">Listen to the Space Word</span>
                             <span className="sm:hidden">🔊 Listen</span>
                           </>
                         )}

@@ -26,32 +26,32 @@ const storySteps = [
   {
     id: 'coral_reef',
     title: '🐚 Beautiful Coral Reef',
-    text: 'Wow! Look at this incredible coral reef! The colorful corals are like an underwater garden, home to many fish friends. Can you spot the sea star hiding?',
+    text: 'Wow! The coral reef says "Welcome to our colorful home!" Can you say that in a cheerful, welcoming voice? Let\'s greet the reef!',
     emoji: '🐚',
     character: 'Finn',
     bgColor: 'from-pink-100 to-orange-100 dark:from-pink-900 dark:to-orange-900',
     interactive: true,
-    audioText: 'coral',
-    choices: ['shell', 'coral', 'rock'],
-    wordCount: 22,
-    duration: 28,
-    question: 'What makes this colorful underwater garden?',
-    hint: 'It\'s like a colorful underwater plant'
+    audioText: 'Welcome to our colorful home',
+    choices: ['Welcome to our colorful home', 'Go away from here', 'This place is boring'],
+    wordCount: 26,
+    duration: 36,
+    question: 'What does the coral reef say to us?',
+    hint: 'The reef is happy to see us'
   },
   {
     id: 'dolphin_friend',
     title: '🐬 Playful Dolphin Friend!',
-    text: 'Amazing! A playful dolphin is swimming with us! Dolphins are very smart and love to jump and play in the waves. They can even talk to each other!',
+    text: 'Amazing! The dolphin says "Let\'s splash and play together!" Can you say that with a playful, excited voice? Ready to play!',
     emoji: '🐬',
     character: 'Finn',
     bgColor: 'from-cyan-100 to-blue-100 dark:from-cyan-900 dark:to-blue-900',
     interactive: true,
-    audioText: 'dolphin',
-    choices: ['whale', 'shark', 'dolphin'],
-    wordCount: 23,
-    duration: 30,
-    question: 'Who is this smart, playful swimmer?',
-    hint: 'It jumps out of water and is very friendly'
+    audioText: 'Let us splash and play together',
+    choices: ['Let us splash and play together', 'I want to be alone', 'Playing is not fun'],
+    wordCount: 28,
+    duration: 36,
+    question: 'What does the dolphin want to do with us?',
+    hint: 'Dolphins love to have fun in the water'
   },
   {
     id: 'first_pearl',
@@ -68,32 +68,32 @@ const storySteps = [
   {
     id: 'octopus_hide',
     title: '🐙 Clever Octopus Hideout!',
-    text: 'Look at that amazing octopus hiding! It can change colors to blend with the rocks and even squirt ink! How many arms does it have? Let\'s count!',
+    text: 'The clever octopus says "I can hide anywhere I want!" Can you say that in a sneaky, playful voice? Let\'s practice being sneaky!',
     emoji: '🐙',
     character: 'Finn',
     bgColor: 'from-purple-100 to-indigo-100 dark:from-purple-900 dark:to-indigo-900',
     interactive: true,
-    audioText: 'octopus',
-    choices: ['squid', 'jellyfish', 'octopus'],
-    wordCount: 25,
-    duration: 32,
-    question: 'Who can change colors and has eight arms?',
-    hint: 'It has many arms and can squirt ink'
+    audioText: 'I can hide anywhere I want',
+    choices: ['I can hide anywhere I want', 'Everyone can always see me', 'I never play hide and seek'],
+    wordCount: 28,
+    duration: 36,
+    question: 'What special skill does the octopus have?',
+    hint: 'It can change colors to hide'
   },
   {
     id: 'whale_song',
     title: '🐋 Magical Whale Song!',
-    text: 'Listen carefully! The humpback whale is singing a beautiful song that travels far across the ocean. Whales have the biggest hearts in the animal world!',
+    text: 'The whale sings "The ocean is my home so deep!" Can you sing that in a deep, slow voice like a big whale? Let\'s sing!',
     emoji: '🐋',
     character: 'Finn',
     bgColor: 'from-gray-100 to-blue-100 dark:from-gray-900 dark:to-blue-900',
     interactive: true,
-    audioText: 'whale',
-    choices: ['dolphin', 'whale', 'seal'],
-    wordCount: 24,
-    duration: 30,
-    question: 'Who sings beautiful ocean songs?',
-    hint: 'It\'s the biggest animal in the ocean'
+    audioText: 'The ocean is my home so deep',
+    choices: ['The ocean is my home so deep', 'I live in the sky', 'I do not have a home'],
+    wordCount: 30,
+    duration: 38,
+    question: 'What does the whale sing about?',
+    hint: 'The whale loves living in the deep ocean'
   },
   {
     id: 'second_pearl',
@@ -110,32 +110,32 @@ const storySteps = [
   {
     id: 'sea_turtle',
     title: '🐢 Wise Sea Turtle!',
-    text: 'Look! It\'s a wise old sea turtle swimming gracefully! Turtles can live for over 100 years and travel across entire oceans to lay their eggs.',
+    text: 'The turtle says "Take your time and enjoy the journey!" Can you say that in a slow, wise voice? Let\'s be calm and wise!',
     emoji: '🐢',
     character: 'Finn',
     bgColor: 'from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900',
     interactive: true,
-    audioText: 'turtle',
-    choices: ['turtle', 'crab', 'lobster'],
-    wordCount: 23,
-    duration: 30,
-    question: 'Who swims gracefully and lives very long?',
-    hint: 'It has a shell and swims with flippers'
+    audioText: 'Take your time and enjoy the journey',
+    choices: ['Take your time and enjoy the journey', 'Always rush and hurry', 'Never stop to rest'],
+    wordCount: 28,
+    duration: 36,
+    question: 'What wise lesson does the turtle teach us?',
+    hint: 'It\'s about not hurrying too much'
   },
   {
     id: 'seahorse_dance',
     title: '🦋 Magical Seahorse Dance!',
-    text: 'Oh beautiful! Look at the seahorses dancing in the current! Did you know daddy seahorses carry the babies in their pouch? Amazing!',
+    text: 'The seahorses say "Dancing makes us happy!" Can you say that while moving gently like you\'re dancing? Let\'s dance with them!',
     emoji: '🦋',
     character: 'Finn',
     bgColor: 'from-pink-100 to-purple-100 dark:from-pink-900 dark:to-purple-900',
     interactive: true,
-    audioText: 'seahorse',
-    choices: ['seahorse', 'starfish', 'jellyfish'],
-    wordCount: 22,
-    duration: 28,
-    question: 'Who dances in water and has a curly tail?',
-    hint: 'It looks like a tiny horse swimming'
+    audioText: 'Dancing makes us happy',
+    choices: ['Dancing makes us happy', 'We never move around', 'Moving is very sad'],
+    wordCount: 26,
+    duration: 36,
+    question: 'How do the seahorses feel when they dance?',
+    hint: 'They feel good and joyful'
   },
   {
     id: 'third_pearl',
@@ -152,17 +152,17 @@ const storySteps = [
   {
     id: 'treasure_chest',
     title: '📦 Sunken Treasure!',
-    text: 'Incredible! We discovered a sunken treasure chest! It\'s filled with golden coins and sparkling jewels from ancient pirate ships!',
+    text: 'We found treasure! Let\'s shout "We discovered something amazing!" Can you say that with surprise and excitement? Let\'s celebrate!',
     emoji: '📦',
     character: 'Finn',
     bgColor: 'from-amber-100 to-yellow-100 dark:from-amber-900 dark:to-yellow-900',
     interactive: true,
-    audioText: 'treasure',
-    choices: ['shells', 'treasure', 'rocks'],
-    wordCount: 18,
-    duration: 25,
-    question: 'What did we find from pirate ships?',
-    hint: 'It has gold coins and sparkly jewels'
+    audioText: 'We discovered something amazing',
+    choices: ['We discovered something amazing', 'We found nothing special', 'This is very boring'],
+    wordCount: 28,
+    duration: 36,
+    question: 'How do we feel about finding the treasure?',
+    hint: 'We are excited and surprised'
   },
   {
     id: 'final_pearl',
@@ -477,7 +477,7 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
                         ) : (
                           <>
                             <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                            <span className="hidden sm:inline">🔊 Listen to the Ocean Word</span>
+                            <span className="hidden sm:inline">Listen to the Ocean Word</span>
                             <span className="sm:hidden">🔊 Listen</span>
                           </>
                         )}

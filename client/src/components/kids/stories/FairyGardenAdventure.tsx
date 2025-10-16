@@ -26,17 +26,17 @@ const storySteps = [
   {
     id: 'fairy_dust',
     title: '✨ Magic Dust',
-    text: 'Watch this! When I sprinkle fairy dust, flowers grow instantly and glow with pretty lights!',
+    text: 'Watch me! Let\'s say "Fairy dust makes flowers bloom!" Can you say that in a soft, magical voice? Let\'s make magic!',
     emoji: '✨',
     character: 'Twinkle the Fairy',
     bgColor: 'from-yellow-100 to-amber-100 dark:from-yellow-900 dark:to-amber-900',
     interactive: true,
-    audioText: 'dust',
-    choices: ['dust', 'water', 'soil'],
-    wordCount: 15,
-    duration: 22,
-    question: 'What makes magic happen in fairy land?',
-    hint: 'It sparkles and helps fairies fly'
+    audioText: 'Fairy dust makes flowers bloom',
+    choices: ['Fairy dust makes flowers bloom', 'Nothing grows here ever', 'Flowers need no magic'],
+    wordCount: 26,
+    duration: 36,
+    question: 'What does fairy dust do to flowers?',
+    hint: 'It helps them grow magically'
   },
   {
     id: 'first_star',
@@ -53,17 +53,17 @@ const storySteps = [
   {
     id: 'talking_animals',
     title: '🐇 Bunny Friends',
-    text: 'Hello little bunnies! In our garden, all animals can talk and help us with fairy chores.',
+    text: 'The bunnies say "We love hopping in the garden!" Can you say that while hopping gently? Let\'s hop like bunnies!',
     emoji: '🐇',
     character: 'Twinkle the Fairy',
     bgColor: 'from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900',
     interactive: true,
-    audioText: 'bunnies',
-    choices: ['birds', 'bunnies', 'squirrels'],
-    wordCount: 16,
-    duration: 24,
-    question: 'Who hops and talks in the fairy garden?',
-    hint: 'They have long ears and fluffy tails'
+    audioText: 'We love hopping in the garden',
+    choices: ['We love hopping in the garden', 'We never move at all', 'Hopping is very boring'],
+    wordCount: 26,
+    duration: 36,
+    question: 'What do the bunnies enjoy doing?',
+    hint: 'They like jumping around happily'
   },
   {
     id: 'second_star',
@@ -80,17 +80,17 @@ const storySteps = [
   {
     id: 'moonflower',
     title: '🌙 Night Flowers',
-    text: 'Woww! The special moonflowers only bloom at night when the moon is out. They glow in the dark!',
+    text: 'The moonflowers whisper "We glow when the moon shines bright!" Can you whisper that softly and gently? Let\'s whisper together!',
     emoji: '🌙',
     character: 'Twinkle the Fairy',
     bgColor: 'from-indigo-100 to-blue-100 dark:from-indigo-900 dark:to-blue-900',
     interactive: true,
-    audioText: 'moonflowers',
-    choices: ['sunflowers', 'roses','moonflowers',],
-    wordCount: 17,
-    duration: 26,
-    question: 'What flowers glow when the moon shines?',
-    hint: 'They love the nighttime and moonlight'
+    audioText: 'We glow when the moon shines bright',
+    choices: ['We glow when the moon shines bright', 'We only bloom in daytime', 'We do not like the moon'],
+    wordCount: 28,
+    duration: 38,
+    question: 'When do the moonflowers glow?',
+    hint: 'They need moonlight to shine'
   },
   {
     id: 'third_star',
@@ -401,7 +401,7 @@ const FairyGardenAdventure = ({ onClose, onComplete }: Props) => {
                         ) : (
                           <>
                             <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                            <span className="hidden sm:inline">🔊 Listen to the Magic Word</span>
+                            <span className="hidden sm:inline">Listen to the Magic Word</span>
                             <span className="sm:hidden">🔊 Listen</span>
                           </>
                         )}
