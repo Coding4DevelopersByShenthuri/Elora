@@ -15,7 +15,7 @@ const storySteps = [
   {
     id: 'intro',
     title: '🦕 Dino World Adventure!',
-    text: 'Hello, paleontologist! I\'m Dina the dinosaur explorer! Our time machine is ready to take us back to the age of dinosaurs! Can you hear the ground shaking?',
+    text: 'Hello, paleontologist! ... I am Dina the dinosaur explorer! ... (Use an excited, scientific voice—like a curious scientist!) Our time machine is ready to take us back to the age of dinosaurs! ... Can you hear the ground shaking? Have you ever seen dinosaur bones in a museum? We are going back in time!',
     emoji: '👩‍🔬',
     character: 'Dina',
     bgColor: 'from-orange-100 to-amber-100 dark:from-orange-900 dark:to-amber-900',
@@ -26,7 +26,7 @@ const storySteps = [
   {
     id: 't_rex',
     title: '🦖 T-Rex Encounter!',
-    text: 'The T-Rex roars "I am the king of dinosaurs!" Can you roar that out loud with a big, powerful voice? Let\'s roar together!',
+    text: 'WOW! Look at that HUGE T-Rex! ... The T-Rex roars "I am the king of dinosaurs!" ... (Roar it in a BIG, DEEP, POWERFUL voice—as loud and strong as you can, like a mighty king!) Can you roar that out loud? ... Let us roar together! T-Rex was the strongest dinosaur!',
     emoji: '🦖',
     character: 'Dina',
     bgColor: 'from-red-100 to-orange-100 dark:from-red-900 dark:to-orange-900',
@@ -41,7 +41,7 @@ const storySteps = [
   {
     id: 'first_fossil',
     title: '💎 First Dino Fossil!',
-    text: 'Fantastic! We found our first dinosaur fossil! Fossils help us learn about ancient creatures. Two more fossils to discover!',
+    text: 'Fantastic! ... WOW! ... We found our first dinosaur fossil! ... You are being such an amazing paleontologist! ... Fossils help us learn about ancient creatures—just like puzzle pieces from long ago! ... Two more fossils to discover! ... What dinosaur do you think we will find next?',
     emoji: '💎',
     character: 'Dina',
     bgColor: 'from-yellow-100 to-amber-100 dark:from-yellow-900 dark:to-amber-900',
@@ -53,7 +53,7 @@ const storySteps = [
   {
     id: 'herbivore_herd',
     title: '🦕 Gentle Giants',
-    text: 'The Brachiosaurus says "I can reach the highest leaves!" Can you say that while stretching up really tall? Let\'s stretch high!',
+    text: 'Look how tall this dinosaur is! ... The Brachiosaurus says "I can reach the highest leaves!" ... (Say it in a GENTLE, SLOW, TALL voice—stretch up as you say it, like a giraffe!) Can you say that while stretching up really tall? ... Let us stretch high! This dinosaur was as tall as a building!',
     emoji: '🦕',
     character: 'Dina',
     bgColor: 'from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900',
@@ -68,7 +68,7 @@ const storySteps = [
   {
     id: 'triceratops',
     title: '🦏 Three-Horned Friend!',
-    text: 'The Triceratops says "My horns keep me safe!" Can you say that in a strong, confident voice? Let\'s be strong together!',
+    text: 'Here comes a Triceratops with three horns! ... The Triceratops says "My horns keep me safe!" ... (Say it in a STRONG, CONFIDENT, BRAVE voice—like a superhero protecting others!) Can you say that? ... Let us be strong together! Those horns are like a knight\'s shield!',
     emoji: '🦏',
     character: 'Dina',
     bgColor: 'from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900',
@@ -83,7 +83,7 @@ const storySteps = [
   {
     id: 'second_fossil',
     title: '✨ Second Ancient Fossil!',
-    text: 'Incredible! Another fossil appeared near the volcano! These bones tell stories from millions of years ago! One last fossil to find!',
+    text: 'Incredible! ... You are such a great dinosaur detective! ... Another fossil appeared near the volcano! ... These bones tell stories from millions of years ago—before you, me, or even your grandparents were born! ... One last fossil to find! ... We are almost done!',
     emoji: '✨',
     character: 'Dina',
     bgColor: 'from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900',
@@ -95,7 +95,7 @@ const storySteps = [
   {
     id: 'stegosaurus',
     title: '🦎 Spiky Stegosaurus!',
-    text: 'The Stegosaurus says "My plates are special and unique!" Can you say that with pride and happiness? Let\'s be proud!',
+    text: 'Look at those amazing plates on its back! ... The Stegosaurus says "My plates are special and unique!" ... (Say it with a PROUD, HAPPY voice—like showing off something you made!) Can you say that? ... Let us be proud! Everyone is unique and special, just like you!',
     emoji: '🦎',
     character: 'Dina',
     bgColor: 'from-pink-100 to-rose-100 dark:from-pink-900 dark:to-rose-900',
@@ -110,7 +110,7 @@ const storySteps = [
   {
     id: 'velociraptor',
     title: '🐆 Speedy Raptor!',
-    text: 'The Velociraptors say "We work together as a team!" Can you say that quickly and excitedly? Let\'s be a team!',
+    text: 'Here come some fast Velociraptors! ... The Velociraptors say "We work together as a team!" ... (Say it QUICKLY and EXCITEDLY—like when you play with your friends!) Can you say that? ... Let us be a team! Working together makes us stronger!',
     emoji: '🐆',
     character: 'Dina',
     bgColor: 'from-gray-100 to-slate-100 dark:from-gray-900 dark:to-slate-900',
@@ -125,7 +125,7 @@ const storySteps = [
   {
     id: 'third_fossil',
     title: '🌟 Third Magic Fossil!',
-    text: 'We did it! All three fossils are glowing brightly! They will help scientists learn about dinosaur history forever. You\'re an amazing paleontologist!',
+    text: 'We did it! ... YES! ... All three fossils are glowing brightly! ... (They are shining because YOU found them!) They will help scientists learn about dinosaur history forever. ... You are an AMAZING paleontologist! ... I am so proud of how much you have learned!',
     emoji: '🌟',
     character: 'Dina',
     bgColor: 'from-yellow-200 to-orange-200 dark:from-yellow-800 dark:to-orange-800',
@@ -137,7 +137,7 @@ const storySteps = [
   {
     id: 'flying_dino',
     title: '🦅 Flying Reptile!',
-    text: 'The Pterodactyl calls "I fly high in the sky!" Can you say that while spreading your arms like wings? Let\'s fly!',
+    text: 'Look up in the sky! ... The Pterodactyl calls "I fly high in the sky!" ... (Say it in a HIGH, SOARING voice while spreading your arms like wings—imagine you are flying!) Can you say that? ... Let us fly! Pterodactyls were like the birds of dinosaur times!',
     emoji: '🦅',
     character: 'Dina',
     bgColor: 'from-blue-200 to-cyan-200 dark:from-blue-800 dark:to-cyan-800',
@@ -152,7 +152,7 @@ const storySteps = [
   {
     id: 'volcano',
     title: '🌋 Ancient Volcano!',
-    text: 'We see the volcano! Let\'s say "We need to stay far away!" Can you say that in a careful, warning voice? Let\'s be careful!',
+    text: 'Oh my! We see the volcano smoking! ... Let us say "We need to stay far away!" ... (Say it in a CAREFUL, WARNING voice—like when someone says "Watch out!" to keep you safe!) Can you say that? ... Let us be careful! Volcanoes are hot and powerful!',
     emoji: '🌋',
     character: 'Dina',
     bgColor: 'from-red-200 to-orange-200 dark:from-red-800 dark:to-orange-800',
@@ -167,7 +167,7 @@ const storySteps = [
   {
     id: 'final_celebration',
     title: '🎉 Dino Discovery Celebration!',
-    text: 'Congratulations, dinosaur expert! You helped Dina complete the prehistoric mission! All the dinosaurs are celebrating, and we\'ve learned so much about ancient times!',
+    text: 'Congratulations, dinosaur expert! ... You helped Dina complete the prehistoric mission! ... All the dinosaurs are celebrating YOU, and we have learned so much about ancient times! ... You listened so carefully and spoke with such wonderful voices! ... You are a SUPERSTAR paleontologist! ... Give yourself a ROAR of celebration! 🦖',
     emoji: '🎉',
     character: 'Dina',
     bgColor: 'from-rainbow-100 to-sparkle-100 dark:from-rainbow-900 dark:to-sparkle-900',
@@ -317,9 +317,9 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <Card className={cn(
-        "w-full max-w-4xl rounded-3xl overflow-hidden transition-all duration-500",
+        "w-full max-w-5xl h-[95vh] rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-500",
         "bg-gradient-to-br", current.bgColor,
-        "max-h-[90vh] flex flex-col"
+        "flex flex-col"
       )}>
         {/* Always Visible Close Button */}
         <div className="absolute top-4 right-4 z-10">
@@ -332,9 +332,9 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
           </Button>
         </div>
 
-        <CardContent className="p-4 sm:p-6 md:p-8 flex-1 flex flex-col overflow-hidden" ref={contentRef}>
+        <CardContent className="p-2 sm:p-4 md:p-6 lg:p-8 flex-1 flex flex-col overflow-hidden" ref={contentRef}>
           {/* Header */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3 flex-shrink-0">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 sm:mb-3 gap-2 flex-shrink-0">
             <div className="flex items-center gap-3">
               <div className="relative">
                 <Footprints className="w-6 h-6 sm:w-8 sm:h-8 text-orange-600 animate-bounce" />
@@ -355,17 +355,17 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
           </div>
 
           {/* Progress Bar */}
-          <Progress value={progress} className="h-2 sm:h-3 mb-6 sm:mb-8 bg-white/30 flex-shrink-0">
+          <Progress value={progress} className="h-2 mb-3 sm:mb-4 bg-white/30 flex-shrink-0">
             <div className="h-full bg-gradient-to-r from-orange-400 to-red-400 rounded-full transition-all duration-500" />
           </Progress>
 
-          {/* Scrollable Content Area */}
-          <div className="flex-1 overflow-y-auto smooth-scroll pb-4">
-            <div className="text-center">
+          {/* Content Area */}
+          <div className="flex-1 overflow-hidden pb-2">
+            <div className="text-center h-full flex flex-col justify-center">
               {/* Character and Scene */}
-              <div className="relative mb-4 sm:mb-6">
+              <div className="relative mb-1 sm:mb-2 md:mb-3">
                 <div className={cn(
-                  "text-6xl sm:text-7xl md:text-8xl mb-3 sm:mb-4", 
+                  "text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-1 sm:mb-2", 
                   getCharacterAnimation()
                 )}>
                   <span className={cn(
@@ -376,12 +376,12 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
                 </div>
                 
                 {/* Fossil Collection Display - Show in all steps like other stories */}
-                <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                <div className="flex items-center justify-center gap-1 sm:gap-2 mb-1 sm:mb-2">
                   {Array.from({ length: 3 }).map((_, i) => (
                     <div 
                       key={i} 
                       className={cn(
-                        "w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 transition-all duration-500 transform hover:scale-125 flex items-center justify-center",
+                        "w-4 h-4 sm:w-6 sm:h-6 md:w-7 md:h-7 transition-all duration-500 transform hover:scale-125 flex items-center justify-center",
                         i < fossils 
                           ? 'text-amber-600 animate-pulse drop-shadow-lg' 
                           : 'text-gray-300 opacity-50'
@@ -399,8 +399,8 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
               </div>
 
               {/* Story Text */}
-              <div className="bg-white/80 dark:bg-gray-800/80 rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6 backdrop-blur-sm border-2 border-white/20 shadow-lg sm:shadow-2xl">
-                <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-gray-800 dark:text-white flex items-center justify-center gap-2">
+              <div className="bg-white/80 dark:bg-gray-800/80 rounded-lg sm:rounded-xl md:rounded-2xl p-2 sm:p-3 md:p-4 mb-2 sm:mb-3 backdrop-blur-sm border-2 border-white/20 shadow-lg sm:shadow-2xl max-w-4xl mx-auto">
+                <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold mb-1 sm:mb-2 text-gray-800 dark:text-white flex items-center justify-center gap-2">
                   {current.title}
                   <Button 
                     variant="ghost" 
@@ -411,12 +411,12 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
                     <Volume2 className="w-3 h-3 sm:w-4 sm:h-4" />
                   </Button>
                 </h3>
-                <p className="text-base sm:text-lg text-gray-700 dark:text-gray-200 leading-relaxed mx-auto">
+                <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-700 dark:text-gray-200 leading-snug sm:leading-relaxed mx-auto max-w-3xl">
                   {current.text}
                 </p>
                 
                 {/* Word Count and Duration */}
-                <div className="flex justify-center gap-3 sm:gap-4 mt-3 sm:mt-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                <div className="flex justify-center gap-2 mt-1 sm:mt-2 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
                   <span>📝 {current.wordCount} words</span>
                   <span>⏱️ {current.duration}s</span>
                 </div>
@@ -424,10 +424,10 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
 
               {/* Interactive Elements */}
               {current.interactive && (
-                <div className="space-y-4 sm:space-y-6">
+                <div className="space-y-1.5 sm:space-y-2 md:space-y-3 max-w-4xl mx-auto w-full">
                   {/* Question and Hint */}
-                  <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg sm:rounded-xl p-3 sm:p-4 border-2 border-orange-200 dark:border-orange-700">
-                    <h4 className="text-base sm:text-lg font-bold text-gray-800 dark:text-white mb-2">
+                  <div className="bg-orange-50 dark:bg-orange-900/20 rounded-md sm:rounded-lg md:rounded-xl p-1.5 sm:p-2 md:p-3 border border-orange-200 dark:border-orange-700">
+                    <h4 className="text-xs sm:text-sm md:text-base font-bold text-gray-800 dark:text-white mb-1">
                       {current.question}
                     </h4>
                     {showHint ? (
@@ -448,23 +448,23 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
 
                   {/* Audio Play Button */}
                   {current.audioText && (
-                    <div className="flex justify-center mb-3 sm:mb-4">
+                    <div className="flex justify-center mb-1.5 sm:mb-2">
                       <Button 
                         onClick={playAudio}
                         disabled={isPlaying}
                         className={cn(
-                          "rounded-xl sm:rounded-2xl px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold transition-all duration-300 transform hover:scale-105 text-sm sm:text-base",
+                          "rounded-lg sm:rounded-xl md:rounded-2xl px-3 sm:px-5 md:px-6 py-1.5 sm:py-2 md:py-2.5 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold transition-all duration-300 transform hover:scale-105 text-[10px] sm:text-xs md:text-sm",
                           isPlaying && "animate-pulse"
                         )}
                       >
                         {isPlaying ? (
                           <>
-                            <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
+                            <Volume2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 animate-spin" />
                             Listening...
                           </>
                         ) : (
                           <>
-                            <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                            <Volume2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                             <span className="hidden sm:inline">Listen to the Dino Word</span>
                             <span className="sm:hidden">🔊 Listen</span>
                           </>
@@ -475,7 +475,7 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
 
                   {/* Choice Buttons */}
                   {current.choices && (
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 md:gap-4 justify-center">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 md:gap-3 justify-center">
                       {current.choices.map((choice) => {
                         const isSelected = selectedChoice === choice;
                         const isCorrect = choice === current.audioText;
@@ -487,14 +487,14 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
                             onClick={() => handleChoice(choice)}
                             disabled={showFeedback}
                             className={cn(
-                              "rounded-xl sm:rounded-2xl px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-lg font-bold transition-all duration-300 transform hover:scale-105 h-auto min-h-[60px] sm:min-h-[80px]",
+                              "rounded-md sm:rounded-lg md:rounded-xl px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 text-[10px] sm:text-xs md:text-sm font-bold transition-all duration-300 transform hover:scale-105 h-auto min-h-[45px] sm:min-h-[50px] md:min-h-[55px]",
                               showResult && isCorrect && "bg-green-500 hover:bg-green-600 text-white animate-bounce shadow-lg sm:shadow-2xl",
                               showResult && !isCorrect && "bg-red-500 hover:bg-red-600 text-white shadow-md sm:shadow-xl",
                               !showResult && "bg-white/90 hover:bg-white text-gray-700 border-2 border-gray-200 hover:border-orange-300 hover:shadow-lg"
                             )}
                           >
-                            <span className="flex flex-col items-center gap-1">
-                              <span className="text-xl sm:text-2xl mb-1">
+                            <span className="flex flex-col items-center gap-0.5 sm:gap-1">
+                              <span className="text-base sm:text-lg md:text-xl mb-0.5">
                                 {choice === 'T-Rex' && '🦖'}
                                 {choice === 'Brachiosaurus' && '🦕'}
                                 {choice === 'Triceratops' && '🦏'}
@@ -521,14 +521,14 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
 
                   {/* Feedback */}
                   {showFeedback && (
-                    <div className="mt-3 sm:mt-4 animate-fade-in">
+                    <div className="mt-2 sm:mt-3 animate-fade-in">
                       {selectedChoice === current.audioText ? (
-                        <div className="text-green-600 dark:text-green-400 text-lg sm:text-xl font-bold animate-bounce bg-green-50 dark:bg-green-900/20 rounded-xl sm:rounded-2xl p-3 sm:p-4 border-2 border-green-200 dark:border-green-700">
-                          🎉 Rawr-some! You earned a fossil! 💎
+                        <div className="text-green-600 dark:text-green-400 text-xs sm:text-sm md:text-base font-bold animate-bounce bg-green-50 dark:bg-green-900/20 rounded-md sm:rounded-lg md:rounded-xl p-1.5 sm:p-2 md:p-3 border border-green-200 dark:border-green-700">
+                          🎉 RAWR-SOME! You used such a great dinosaur voice and listened perfectly! You earned a fossil! 💎 You are a brilliant paleontologist!
                         </div>
                       ) : (
-                        <div className="text-red-600 dark:text-red-400 text-lg sm:text-xl font-bold bg-red-50 dark:bg-red-900/20 rounded-xl sm:rounded-2xl p-3 sm:p-4 border-2 border-red-200 dark:border-red-700">
-                          💪 Great try! The dino word was "{current.audioText}" - Let's explore together!
+                        <div className="text-red-600 dark:text-red-400 text-xs sm:text-sm md:text-base font-bold bg-red-50 dark:bg-red-900/20 rounded-md sm:rounded-lg md:rounded-xl p-1.5 sm:p-2 md:p-3 border border-red-200 dark:border-red-700">
+                          💪 GREAT effort! You are trying so hard and that is wonderful! The dino word was "{current.audioText}" - Let us explore it together! You are doing SUPER!
                         </div>
                       )}
                     </div>
@@ -538,20 +538,20 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
 
               {/* Non-interactive steps */}
               {!current.interactive && (
-                <div className="flex justify-center pt-4">
+                <div className="flex justify-center pt-1.5 sm:pt-2">
                   <Button 
                     onClick={handleNext} 
-                    className="rounded-xl sm:rounded-2xl px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold transition-all duration-300 hover:scale-105 transform shadow-lg sm:shadow-2xl text-sm sm:text-base"
+                    className="rounded-lg sm:rounded-xl md:rounded-2xl px-4 sm:px-5 md:px-6 py-1.5 sm:py-2 md:py-2.5 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold transition-all duration-300 hover:scale-105 transform shadow-lg sm:shadow-2xl text-[10px] sm:text-xs md:text-sm"
                   >
                     {stepIndex === storySteps.length - 1 ? (
                       <>
-                        <Zap className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-pulse" />
+                        <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 animate-pulse" />
                         <span className="hidden sm:inline">Complete Dino Mission! ✨</span>
                         <span className="sm:hidden">Finish! ✨</span>
                       </>
                     ) : (
                       <>
-                        <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                        <Play className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                         <span className="hidden sm:inline">Continue Dino Adventure! 🦕</span>
                         <span className="sm:hidden">Continue 🦕</span>
                       </>

@@ -15,7 +15,7 @@ const pirateStory = [
   {
     id: 'intro',
     title: '🏴‍☠️ Ahoy, Matey!',
-    text: 'Ahoy there, shipmate! I\'m Captain Finn! Our pirate ship is ready to find buried treasure! Can you hear the ocean waves?',
+    text: 'Ahoy there, shipmate! ... I\'m Captain Finn! ... (Use a brave, pirate voice - like a sea captain!) Our pirate ship is ready to find buried treasure! ... Can you hear the ocean waves? Have you ever been on a boat or seen the ocean? This is a pirate adventure!',
     emoji: '🧔‍♂️',
     character: 'Captain Finn',
     bgColor: 'from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900',
@@ -26,7 +26,7 @@ const pirateStory = [
   {
     id: 'treasure_map',
     title: '🗺️ Secret Map!',
-    text: 'The map says "X marks the spot where treasure hides!" Can you say that in an exciting pirate voice? Arrr, let\'s shout it!',
+    text: 'Look at this old treasure map! ... The map says "X marks the spot where treasure hides!" ... (Say it in an exciting pirate voice - like "Arrr!" - deep and strong!) Can you say that? ... Arrr, let\'s shout it! X means "here" on a treasure map!',
     emoji: '🗺️',
     character: 'Captain Finn',
     bgColor: 'from-amber-100 to-orange-100 dark:from-amber-900 dark:to-orange-900',
@@ -41,7 +41,7 @@ const pirateStory = [
   {
     id: 'parrot_friend',
     title: '🦜 Polly the Parrot',
-    text: 'Polly squawks "Follow me to the treasure island!" Can you squawk that like a parrot? Let\'s squawk together! Squawk!',
+    text: 'Here\'s Polly the colorful parrot! ... Polly squawks "Follow me to the treasure island!" ... (Squawk it like a parrot - high and fun!) Can you squawk that? ... Let\'s squawk together! Squawk! Have you ever seen a parrot talk?',
     emoji: '🦜',
     character: 'Polly',
     bgColor: 'from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900',
@@ -56,7 +56,7 @@ const pirateStory = [
   {
     id: 'treasure_chest',
     title: '📦 Buried Treasure!',
-    text: 'Yo ho ho! Let\'s all shout "We found the treasure chest!" Can you shout that with joy and excitement? Arrr, let\'s celebrate!',
+    text: 'Yo ho ho! ... We did it! ... Let\'s all shout "We found the treasure chest!" ... (Shout it with joy and excitement - as LOUD as you can like a happy pirate!) Can you shout that? ... Arrr, let\'s celebrate! The treasure is full of gold and jewels!',
     emoji: '📦',
     character: 'Captain Finn',
     bgColor: 'from-yellow-100 to-amber-100 dark:from-yellow-900 dark:to-amber-900',
@@ -71,7 +71,7 @@ const pirateStory = [
   {
     id: 'victory_celebration',
     title: '🎉 Pirate Party!',
-    text: 'Hooray! We\'re rich pirates now! Time to celebrate with music, dancing, and a grand pirate feast! You\'re a true pirate adventurer!',
+    text: 'Hooray! ... We\'re rich pirates now! ... Time to celebrate with music, dancing, and a grand pirate feast! ... You\'re a TRUE pirate adventurer! ... You listened perfectly and spoke like a real pirate! ... Give yourself a BIG CHEER! Arrr! 🏴‍☠️',
     emoji: '🎉',
     character: 'Captain Finn & Polly',
     bgColor: 'from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900',
@@ -216,9 +216,9 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <Card className={cn(
-        "w-full max-w-4xl rounded-3xl overflow-hidden transition-all duration-500",
+        "w-full max-w-5xl h-[95vh] rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-500",
         "bg-gradient-to-br", current.bgColor,
-        "max-h-[90vh] flex flex-col"
+        "flex flex-col"
       )}>
         {/* Always Visible Close Button */}
         <div className="absolute top-4 right-4 z-10">
@@ -231,9 +231,9 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
           </Button>
         </div>
 
-        <CardContent className="p-4 sm:p-6 md:p-8 flex-1 flex flex-col overflow-hidden" ref={contentRef}>
+        <CardContent className="p-2 sm:p-4 md:p-6 lg:p-8 flex-1 flex flex-col overflow-hidden" ref={contentRef}>
           {/* Header */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3 flex-shrink-0">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 sm:mb-3 gap-2 flex-shrink-0">
             <div className="flex items-center gap-3">
               <div className="relative">
                 <Anchor className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 animate-bounce" />
@@ -254,17 +254,17 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
           </div>
 
           {/* Progress Bar */}
-          <Progress value={progress} className="h-2 sm:h-3 mb-6 sm:mb-8 bg-white/30 flex-shrink-0">
+          <Progress value={progress} className="h-2 mb-3 sm:mb-4 bg-white/30 flex-shrink-0">
             <div className="h-full bg-gradient-to-r from-blue-400 to-amber-400 rounded-full transition-all duration-500" />
           </Progress>
 
-          {/* Scrollable Content Area */}
-          <div className="flex-1 overflow-y-auto smooth-scroll pb-4">
-            <div className="text-center">
+          {/* Content Area */}
+          <div className="flex-1 overflow-hidden pb-2">
+            <div className="text-center h-full flex flex-col justify-center">
               {/* Character and Scene */}
-              <div className="relative mb-4 sm:mb-6">
+              <div className="relative mb-1 sm:mb-2 md:mb-3">
                 <div className={cn(
-                  "text-6xl sm:text-7xl md:text-8xl mb-3 sm:mb-4", 
+                  "text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-1 sm:mb-2", 
                   getCharacterAnimation()
                 )}>
                   <span className={cn(
@@ -276,12 +276,12 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
                 
                 {/* Treasure Collection Display */}
                 {(current.id.includes('treasure') || current.id === 'victory_celebration') && (
-                  <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                  <div className="flex items-center justify-center gap-1 sm:gap-2 mb-1 sm:mb-2">
                     {Array.from({ length: 3 }).map((_, i) => (
                       <Star 
                         key={i} 
-                        className={cn(
-                          "w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 transition-all duration-500 transform hover:scale-125",
+                      className={cn(
+                        "w-4 h-4 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 transition-all duration-500 transform hover:scale-125",
                           i < treasurePieces 
                             ? 'text-yellow-400 animate-pulse drop-shadow-lg' 
                             : 'text-gray-300 opacity-50'
@@ -298,8 +298,8 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
               </div>
 
               {/* Story Text */}
-              <div className="bg-white/80 dark:bg-gray-800/80 rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6 backdrop-blur-sm border-2 border-white/20 shadow-lg sm:shadow-2xl">
-                <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-gray-800 dark:text-white flex items-center justify-center gap-2">
+              <div className="bg-white/80 dark:bg-gray-800/80 rounded-lg sm:rounded-xl md:rounded-2xl p-2 sm:p-3 md:p-4 mb-2 sm:mb-3 backdrop-blur-sm border-2 border-white/20 shadow-lg sm:shadow-2xl max-w-4xl mx-auto">
+                <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold mb-1 sm:mb-2 text-gray-800 dark:text-white flex items-center justify-center gap-2">
                   {current.title}
                   <Button 
                     variant="ghost" 
@@ -310,12 +310,12 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
                     <Volume2 className="w-3 h-3 sm:w-4 sm:h-4" />
                   </Button>
                 </h3>
-                <p className="text-base sm:text-lg text-gray-700 dark:text-gray-200 leading-relaxed mx-auto">
+                <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-700 dark:text-gray-200 leading-snug sm:leading-relaxed mx-auto max-w-3xl">
                   {current.text}
                 </p>
                 
                 {/* Word Count and Duration */}
-                <div className="flex justify-center gap-3 sm:gap-4 mt-3 sm:mt-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                <div className="flex justify-center gap-2 mt-1 sm:mt-2 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
                   <span>📝 {current.wordCount} words</span>
                   <span>⏱️ {current.duration}s</span>
                 </div>
@@ -323,10 +323,10 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
 
               {/* Interactive Elements */}
               {current.interactive && (
-                <div className="space-y-4 sm:space-y-6">
+                <div className="space-y-1.5 sm:space-y-2 md:space-y-3 max-w-4xl mx-auto w-full">
                   {/* Question and Hint */}
-                  <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg sm:rounded-xl p-3 sm:p-4 border-2 border-amber-200 dark:border-amber-700">
-                    <h4 className="text-base sm:text-lg font-bold text-gray-800 dark:text-white mb-2">
+                  <div className="bg-amber-50 dark:bg-amber-900/20 rounded-md sm:rounded-lg md:rounded-xl p-1.5 sm:p-2 md:p-3 border border-amber-200 dark:border-amber-700">
+                    <h4 className="text-xs sm:text-sm md:text-base font-bold text-gray-800 dark:text-white mb-1">
                       {current.question}
                     </h4>
                     {showHint ? (
@@ -347,23 +347,23 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
 
                   {/* Audio Play Button */}
                   {current.audioText && (
-                    <div className="flex justify-center mb-3 sm:mb-4">
+                    <div className="flex justify-center mb-1.5 sm:mb-2">
                       <Button 
                         onClick={playAudio}
                         disabled={isPlaying}
                         className={cn(
-                          "rounded-xl sm:rounded-2xl px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-amber-500 to-red-500 hover:from-amber-600 hover:to-red-600 text-white font-bold transition-all duration-300 transform hover:scale-105 text-sm sm:text-base",
+                          "rounded-lg sm:rounded-xl md:rounded-2xl px-3 sm:px-5 md:px-6 py-1.5 sm:py-2 md:py-2.5 bg-gradient-to-r from-amber-500 to-red-500 hover:from-amber-600 hover:to-red-600 text-white font-bold transition-all duration-300 transform hover:scale-105 text-[10px] sm:text-xs md:text-sm",
                           isPlaying && "animate-pulse"
                         )}
                       >
                         {isPlaying ? (
                           <>
-                            <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
+                            <Volume2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 animate-spin" />
                             Listening...
                           </>
                         ) : (
                           <>
-                            <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                            <Volume2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                             <span className="hidden sm:inline">Listen to the Pirate Word</span>
                             <span className="sm:hidden">🔊 Listen</span>
                           </>
@@ -374,7 +374,7 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
 
                   {/* Choice Buttons */}
                   {current.choices && (
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 md:gap-4 justify-center">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 md:gap-3 justify-center">
                       {current.choices.map((choice) => {
                         const isSelected = selectedChoice === choice;
                         const isCorrect = choice === current.audioText;
@@ -386,14 +386,14 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
                             onClick={() => handleChoice(choice)}
                             disabled={showFeedback}
                             className={cn(
-                              "rounded-xl sm:rounded-2xl px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-lg font-bold transition-all duration-300 transform hover:scale-105 h-auto min-h-[60px] sm:min-h-[80px]",
+                              "rounded-md sm:rounded-lg md:rounded-xl px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 text-[10px] sm:text-xs md:text-sm font-bold transition-all duration-300 transform hover:scale-105 h-auto min-h-[45px] sm:min-h-[50px] md:min-h-[55px]",
                               showResult && isCorrect && "bg-green-500 hover:bg-green-600 text-white animate-bounce shadow-lg sm:shadow-2xl",
                               showResult && !isCorrect && "bg-red-500 hover:bg-red-600 text-white shadow-md sm:shadow-xl",
                               !showResult && "bg-white/90 hover:bg-white text-gray-700 border-2 border-gray-200 hover:border-amber-300 hover:shadow-lg"
                             )}
                           >
-                            <span className="flex flex-col items-center gap-1">
-                              <span className="text-xl sm:text-2xl mb-1">
+                            <span className="flex flex-col items-center gap-0.5 sm:gap-1">
+                              <span className="text-base sm:text-lg md:text-xl mb-0.5">
                                 {choice === 'map' && '🗺️'}
                                 {choice === 'parrot' && '🦜'}
                                 {choice === 'treasure' && '💎'}
@@ -417,14 +417,14 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
 
                   {/* Feedback */}
                   {showFeedback && (
-                    <div className="mt-3 sm:mt-4 animate-fade-in">
+                    <div className="mt-2 sm:mt-3 animate-fade-in">
                       {selectedChoice === current.audioText ? (
-                        <div className="text-green-600 dark:text-green-400 text-lg sm:text-xl font-bold animate-bounce bg-green-50 dark:bg-green-900/20 rounded-xl sm:rounded-2xl p-3 sm:p-4 border-2 border-green-200 dark:border-green-700">
-                          🎉 Yo ho ho! Great pirate skills! 💎
+                        <div className="text-green-600 dark:text-green-400 text-xs sm:text-sm md:text-base font-bold animate-bounce bg-green-50 dark:bg-green-900/20 rounded-md sm:rounded-lg md:rounded-xl p-1.5 sm:p-2 md:p-3 border border-green-200 dark:border-green-700">
+                          🎉 YO HO HO! You listened like a true pirate and spoke perfectly! Great pirate skills! 💎 Arrr, I\'m proud of you!
                         </div>
                       ) : (
-                        <div className="text-red-600 dark:text-red-400 text-lg sm:text-xl font-bold bg-red-50 dark:bg-red-900/20 rounded-xl sm:rounded-2xl p-3 sm:p-4 border-2 border-red-200 dark:border-red-700">
-                          💪 Shiver me timbers! The pirate word was "{current.audioText}" - Let's try again!
+                        <div className="text-red-600 dark:text-red-400 text-xs sm:text-sm md:text-base font-bold bg-red-50 dark:bg-red-900/20 rounded-md sm:rounded-lg md:rounded-xl p-1.5 sm:p-2 md:p-3 border border-red-200 dark:border-red-700">
+                          💪 Shiver me timbers! That was a brave try! The pirate word was "{current.audioText}" - Let's practice it together, matey! You\'re doing GREAT!
                         </div>
                       )}
                     </div>
@@ -434,20 +434,20 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
 
               {/* Non-interactive steps */}
               {!current.interactive && (
-                <div className="flex justify-center pt-4">
+                <div className="flex justify-center pt-1.5 sm:pt-2">
                   <Button 
                     onClick={handleNext} 
-                    className="rounded-xl sm:rounded-2xl px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-amber-500 to-red-500 hover:from-amber-600 hover:to-red-600 text-white font-bold transition-all duration-300 hover:scale-105 transform shadow-lg sm:shadow-2xl text-sm sm:text-base"
+                    className="rounded-lg sm:rounded-xl md:rounded-2xl px-4 sm:px-5 md:px-6 py-1.5 sm:py-2 md:py-2.5 bg-gradient-to-r from-amber-500 to-red-500 hover:from-amber-600 hover:to-red-600 text-white font-bold transition-all duration-300 hover:scale-105 transform shadow-lg sm:shadow-2xl text-[10px] sm:text-xs md:text-sm"
                   >
                     {stepIndex === pirateStory.length - 1 ? (
                       <>
-                        <Zap className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-pulse" />
+                        <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 animate-pulse" />
                         <span className="hidden sm:inline">Complete Pirate Adventure! 🏴‍☠️</span>
                         <span className="sm:hidden">Finish! 🏴‍☠️</span>
                       </>
                     ) : (
                       <>
-                        <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                        <Play className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                         <span className="hidden sm:inline">Continue Adventure! ⚓</span>
                         <span className="sm:hidden">Continue ⚓</span>
                       </>

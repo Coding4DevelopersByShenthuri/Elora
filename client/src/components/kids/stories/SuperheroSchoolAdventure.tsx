@@ -15,7 +15,7 @@ const storySteps = [
   {
     id: 'intro',
     title: '🦸 Superhero School!',
-    text: 'Welcome to Hero Academy! I\'m Captain Courage! Here we train to become superheroes and help people. Are you ready for training?',
+    text: 'Welcome to Hero Academy! ... I am Captain Courage! ... (Use a BOLD, HEROIC, STRONG voice—like a superhero!) Here we train to become superheroes and help people. ... Have you ever pretended to be a superhero? Now you will train like one! ... Are you ready for training?',
     emoji: '🦸‍♂️',
     character: 'Captain Courage',
     bgColor: 'from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900',
@@ -26,7 +26,7 @@ const storySteps = [
   {
     id: 'flying_lesson',
     title: '✈️ Flying Practice',
-    text: 'Captain Courage says "I can fly high and help people!" Can you say that with confidence and power? Let\'s practice being heroes!',
+    text: 'Time to learn flying! ... Captain Courage says "I can fly high and help people!" ... (Say it with CONFIDENCE and POWER—strong and brave like a superhero!) Can you say that? ... Let us practice being heroes! Imagine soaring through the sky to save someone!',
     emoji: '✈️',
     character: 'Captain Courage',
     bgColor: 'from-sky-100 to-cyan-100 dark:from-sky-900 dark:to-cyan-900',
@@ -41,7 +41,7 @@ const storySteps = [
   {
     id: 'first_star',
     title: '⭐ First Hero Badge!',
-    text: 'Amazing! You earned your first hero badge! Badges show you\'re learning super powers. Two more badges to earn!',
+    text: 'Amazing! ... WOW! ... You earned your first hero badge! ... You are training so well! ... Badges show you are learning super powers—just like real superheroes! ... Two more badges to earn! ... What superpower do you think you will learn next?',
     emoji: '⭐',
     character: 'Captain Courage',
     bgColor: 'from-yellow-100 to-amber-100 dark:from-yellow-900 dark:to-amber-900',
@@ -53,7 +53,7 @@ const storySteps = [
   {
     id: 'super_vision',
     title: '👁️ X-Ray Vision',
-    text: 'Captain says "I see someone who needs help!" Can you say that with alert and focused voice? Let\'s be watchful heroes!',
+    text: 'Using special superhero vision! ... Captain says "I see someone who needs help!" ... (Say it with an ALERT, FOCUSED voice—like when you spot something important!) Can you say that? ... Let us be watchful heroes! Superheroes always pay attention to help others!',
     emoji: '👁️',
     character: 'Captain Courage',
     bgColor: 'from-purple-100 to-violet-100 dark:from-purple-900 dark:to-violet-900',
@@ -68,7 +68,7 @@ const storySteps = [
   {
     id: 'second_star',
     title: '✨ Second Hero Badge!',
-    text: 'Fantastic! Another hero badge for using super vision! You\'re becoming a real superhero! One more badge to go!',
+    text: 'Fantastic! ... You are such a great hero trainee! ... Another hero badge for using super vision! ... You are becoming a real superhero—just like Captain Courage! ... One more badge to go! ... You are almost a full superhero!',
     emoji: '✨',
     character: 'Captain Courage',
     bgColor: 'from-blue-200 to-purple-200 dark:from-blue-800 dark:to-purple-800',
@@ -80,7 +80,7 @@ const storySteps = [
   {
     id: 'rescue_mission',
     title: '🚨 Emergency!',
-    text: 'Emergency! Let\'s shout "We will save the kitten right now!" Can you say that like a brave, quick hero? Let\'s rescue!',
+    text: 'Emergency! A kitten needs help! ... Let us shout "We will save the kitten right now!" ... (Say it like a BRAVE, QUICK, DETERMINED hero—ready to help immediately!) Can you say that? ... Let us rescue! Heroes help those who need them, just like helping a friend!',
     emoji: '🐱',
     character: 'Captain Courage',
     bgColor: 'from-red-100 to-orange-100 dark:from-red-900 dark:to-orange-900',
@@ -95,7 +95,7 @@ const storySteps = [
   {
     id: 'third_star',
     title: '🌟 Third Hero Badge!',
-    text: 'Incredible! You earned all three hero badges! You successfully rescued the kitten and showed true superhero spirit!',
+    text: 'Incredible! ... YES! ... You earned all three hero badges! ... (YOU are a real hero!) You successfully rescued the kitten and showed true superhero spirit! ... You are an AMAZING hero! ... I am so proud of your bravery and kindness!',
     emoji: '🌟',
     character: 'Captain Courage',
     bgColor: 'from-yellow-200 to-orange-200 dark:from-yellow-800 dark:to-orange-800',
@@ -107,7 +107,7 @@ const storySteps = [
   {
     id: 'graduation',
     title: '🎓 Superhero Graduation!',
-    text: 'Congratulations, superhero! You completed all the training at Hero Academy! You\'re now an official superhero ready to help people and make the world better!',
+    text: 'Congratulations, superhero! ... You completed all the training at Hero Academy! ... You are now an official superhero ready to help people and make the world better! ... You listened with super focus and spoke with super power! ... You are a TRUE SUPERHERO! ... Give yourself a super victory pose! 💪',
     emoji: '🎓',
     character: 'Captain Courage',
     bgColor: 'from-rainbow-100 to-sparkle-100 dark:from-rainbow-900 dark:to-sparkle-900',
@@ -253,9 +253,9 @@ const SuperheroAdventure = ({ onClose, onComplete }: Props) => {
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <Card className={cn(
-        "w-full max-w-4xl rounded-3xl overflow-hidden transition-all duration-500",
+        "w-full max-w-5xl h-[95vh] rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-500",
         "bg-gradient-to-br", current.bgColor,
-        "max-h-[90vh] flex flex-col"
+        "flex flex-col"
       )}>
         {/* Always Visible Close Button */}
         <div className="absolute top-4 right-4 z-10">
@@ -268,16 +268,16 @@ const SuperheroAdventure = ({ onClose, onComplete }: Props) => {
           </Button>
         </div>
 
-        <CardContent className="p-4 sm:p-6 md:p-8 flex-1 flex flex-col overflow-hidden" ref={contentRef}>
+        <CardContent className="p-2 sm:p-4 md:p-6 lg:p-8 flex-1 flex flex-col overflow-hidden" ref={contentRef}>
           {/* Header */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3 flex-shrink-0">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 sm:mb-3 gap-2 flex-shrink-0">
             <div className="flex items-center gap-3">
               <div className="relative">
                 <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 animate-bounce" />
                 <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 absolute -top-1 -right-1 animate-ping" />
               </div>
               <div>
-                <h2 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white">Captain Courage's Hero Academy</h2>
+                <h2 className="text-base sm:text-xl font-bold text-gray-800 dark:text-white">Captain Courage's Hero Academy</h2>
                 <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
                   Step {stepIndex + 1} of {totalSteps} • {totalWords} words • {Math.round(totalDuration/60)}min
                 </p>
@@ -291,17 +291,17 @@ const SuperheroAdventure = ({ onClose, onComplete }: Props) => {
           </div>
 
           {/* Progress Bar */}
-          <Progress value={progress} className="h-2 sm:h-3 mb-6 sm:mb-8 bg-white/30 flex-shrink-0">
+          <Progress value={progress} className="h-2 mb-3 sm:mb-4 bg-white/30 flex-shrink-0">
             <div className="h-full bg-gradient-to-r from-blue-400 to-red-400 rounded-full transition-all duration-500" />
           </Progress>
 
-          {/* Scrollable Content Area */}
-          <div className="flex-1 overflow-y-auto smooth-scroll pb-4">
-            <div className="text-center">
+          {/* Content Area */}
+          <div className="flex-1 overflow-hidden pb-2">
+            <div className="text-center h-full flex flex-col justify-center">
               {/* Character and Scene */}
-              <div className="relative mb-4 sm:mb-6">
+              <div className="relative mb-2 sm:mb-2 md:mb-3">
                 <div className={cn(
-                  "text-6xl sm:text-7xl md:text-8xl mb-3 sm:mb-4", 
+                  "text-5xl sm:text-5xl md:text-6xl lg:text-7xl mb-2 sm:mb-2", 
                   getCharacterAnimation()
                 )}>
                   <span className={cn(
@@ -312,12 +312,12 @@ const SuperheroAdventure = ({ onClose, onComplete }: Props) => {
                 </div>
                 
                 {/* Star Collection Display - Show in all steps like other stories */}
-                <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                <div className="flex items-center justify-center gap-1.5 sm:gap-2 mb-2 sm:mb-2">
                   {Array.from({ length: 3 }).map((_, i) => (
                     <div 
                       key={i} 
                       className={cn(
-                        "w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 transition-all duration-500 transform hover:scale-125 flex items-center justify-center",
+                        "w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 transition-all duration-500 transform hover:scale-125 flex items-center justify-center",
                         i < stars 
                           ? 'text-yellow-400 animate-pulse drop-shadow-lg' 
                           : 'text-gray-300 opacity-50'
@@ -330,29 +330,29 @@ const SuperheroAdventure = ({ onClose, onComplete }: Props) => {
 
                 {/* Superhero Icon */}
                 <div className="absolute top-1 right-1 sm:top-2 sm:right-2 animate-float-slow">
-                  <SuperheroIcon className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-blue-400 opacity-70" />
+                  <SuperheroIcon className="w-6 h-6 sm:w-6 sm:h-6 md:w-8 md:h-8 text-blue-400 opacity-70" />
                 </div>
               </div>
 
               {/* Story Text */}
-              <div className="bg-white/80 dark:bg-gray-800/80 rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6 backdrop-blur-sm border-2 border-white/20 shadow-lg sm:shadow-2xl">
-                <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-gray-800 dark:text-white flex items-center justify-center gap-2">
+              <div className="bg-white/80 dark:bg-gray-800/80 rounded-lg sm:rounded-xl md:rounded-2xl p-3 sm:p-3 md:p-4 mb-3 sm:mb-3 backdrop-blur-sm border-2 border-white/20 shadow-lg sm:shadow-2xl max-w-4xl mx-auto">
+                <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold mb-1.5 sm:mb-2 text-gray-800 dark:text-white flex items-center justify-center gap-2">
                   {current.title}
                   <Button 
                     variant="ghost" 
                     size="sm" 
                     onClick={playStoryText}
-                    className="text-blue-500 hover:text-blue-600 h-6 w-6 sm:h-8 sm:w-8 p-0"
+                    className="text-blue-500 hover:text-blue-600 h-7 w-7 sm:h-8 sm:w-8 p-0"
                   >
-                    <Volume2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </Button>
                 </h3>
-                <p className="text-base sm:text-lg text-gray-700 dark:text-gray-200 leading-relaxed mx-auto">
+                <p className="text-sm sm:text-sm md:text-base lg:text-lg text-gray-700 dark:text-gray-200 leading-relaxed sm:leading-relaxed mx-auto max-w-3xl">
                   {current.text}
                 </p>
                 
                 {/* Word Count and Duration */}
-                <div className="flex justify-center gap-3 sm:gap-4 mt-3 sm:mt-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                <div className="flex justify-center gap-2 mt-2 sm:mt-2 text-xs sm:text-xs text-gray-500 dark:text-gray-400">
                   <span>📝 {current.wordCount} words</span>
                   <span>⏱️ {current.duration}s</span>
                 </div>
@@ -360,10 +360,10 @@ const SuperheroAdventure = ({ onClose, onComplete }: Props) => {
 
               {/* Interactive Elements */}
               {current.interactive && (
-                <div className="space-y-4 sm:space-y-6">
+                <div className="space-y-2 sm:space-y-2 md:space-y-3 max-w-4xl mx-auto w-full">
                   {/* Question and Hint */}
-                  <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg sm:rounded-xl p-3 sm:p-4 border-2 border-blue-200 dark:border-blue-700">
-                    <h4 className="text-base sm:text-lg font-bold text-gray-800 dark:text-white mb-2">
+                  <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg sm:rounded-lg md:rounded-xl p-2.5 sm:p-2 md:p-3 border border-blue-200 dark:border-blue-700">
+                    <h4 className="text-sm sm:text-sm md:text-base font-bold text-gray-800 dark:text-white mb-1.5">
                       {current.question}
                     </h4>
                     {showHint ? (
@@ -384,23 +384,23 @@ const SuperheroAdventure = ({ onClose, onComplete }: Props) => {
 
                   {/* Audio Play Button */}
                   {current.audioText && (
-                    <div className="flex justify-center mb-3 sm:mb-4">
+                    <div className="flex justify-center mb-2 sm:mb-2">
                       <Button 
                         onClick={playAudio}
                         disabled={isPlaying}
                         className={cn(
-                          "rounded-xl sm:rounded-2xl px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-500 to-red-500 hover:from-blue-600 hover:to-red-600 text-white font-bold transition-all duration-300 transform hover:scale-105 text-sm sm:text-base",
+                          "rounded-lg sm:rounded-xl md:rounded-2xl px-4 sm:px-5 md:px-6 py-2.5 sm:py-2 md:py-2.5 bg-gradient-to-r from-blue-500 to-red-500 hover:from-blue-600 hover:to-red-600 text-white font-bold transition-all duration-300 transform hover:scale-105 text-xs sm:text-xs md:text-sm",
                           isPlaying && "animate-pulse"
                         )}
                       >
                         {isPlaying ? (
                           <>
-                            <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
+                            <Volume2 className="w-4 h-4 sm:w-4 sm:h-4 mr-2 sm:mr-2 animate-spin" />
                             Listening...
                           </>
                         ) : (
                           <>
-                            <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                            <Volume2 className="w-4 h-4 sm:w-4 sm:h-4 mr-2 sm:mr-2" />
                             <span className="hidden sm:inline">Listen to the Hero Word</span>
                             <span className="sm:hidden">🔊 Listen</span>
                           </>
@@ -411,7 +411,7 @@ const SuperheroAdventure = ({ onClose, onComplete }: Props) => {
 
                   {/* Choice Buttons */}
                   {current.choices && (
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 md:gap-4 justify-center">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 md:gap-3 justify-center">
                       {current.choices.map((choice) => {
                         const isSelected = selectedChoice === choice;
                         const isCorrect = choice === current.audioText;
@@ -423,14 +423,14 @@ const SuperheroAdventure = ({ onClose, onComplete }: Props) => {
                             onClick={() => handleChoice(choice)}
                             disabled={showFeedback}
                             className={cn(
-                              "rounded-xl sm:rounded-2xl px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-lg font-bold transition-all duration-300 transform hover:scale-105 h-auto min-h-[60px] sm:min-h-[80px]",
+                              "rounded-lg sm:rounded-lg md:rounded-xl px-3 sm:px-3 md:px-4 py-2.5 sm:py-2 md:py-2.5 text-xs sm:text-xs md:text-sm font-bold transition-all duration-300 transform hover:scale-105 h-auto min-h-[55px] sm:min-h-[50px] md:min-h-[55px]",
                               showResult && isCorrect && "bg-green-500 hover:bg-green-600 text-white animate-bounce shadow-lg sm:shadow-2xl",
                               showResult && !isCorrect && "bg-red-500 hover:bg-red-600 text-white shadow-md sm:shadow-xl",
                               !showResult && "bg-white/90 hover:bg-white text-gray-700 border-2 border-gray-200 hover:border-blue-300 hover:shadow-lg"
                             )}
                           >
-                            <span className="flex flex-col items-center gap-1">
-                              <span className="text-xl sm:text-2xl mb-1">
+                            <span className="flex flex-col items-center gap-1 sm:gap-1">
+                              <span className="text-lg sm:text-lg md:text-xl mb-0.5">
                                 {choice === 'flying' && '✈️'}
                                 {choice === 'vision' && '👁️'}
                                 {choice === 'rescue' && '🚨'}
@@ -454,14 +454,14 @@ const SuperheroAdventure = ({ onClose, onComplete }: Props) => {
 
                   {/* Feedback */}
                   {showFeedback && (
-                    <div className="mt-3 sm:mt-4 animate-fade-in">
+                    <div className="mt-2 sm:mt-3 animate-fade-in">
                       {selectedChoice === current.audioText ? (
-                        <div className="text-green-600 dark:text-green-400 text-lg sm:text-xl font-bold animate-bounce bg-green-50 dark:bg-green-900/20 rounded-xl sm:rounded-2xl p-3 sm:p-4 border-2 border-green-200 dark:border-green-700">
-                          🎉 Super! You earned a hero badge! 🛡️
+                        <div className="text-green-600 dark:text-green-400 text-xs sm:text-sm md:text-base font-bold animate-bounce bg-green-50 dark:bg-green-900/20 rounded-lg sm:rounded-lg md:rounded-xl p-2.5 sm:p-2 md:p-3 border border-green-200 dark:border-green-700">
+                          🎉 SUPER! You used such a powerful hero voice and listened perfectly! You earned a hero badge! 🛡️ You are a brilliant superhero!
                         </div>
                       ) : (
-                        <div className="text-red-600 dark:text-red-400 text-lg sm:text-xl font-bold bg-red-50 dark:bg-red-900/20 rounded-xl sm:rounded-2xl p-3 sm:p-4 border-2 border-red-200 dark:border-red-700">
-                          💪 Great try! The hero word was "{current.audioText}" - Let's train together!
+                        <div className="text-red-600 dark:text-red-400 text-xs sm:text-sm md:text-base font-bold bg-red-50 dark:bg-red-900/20 rounded-lg sm:rounded-lg md:rounded-xl p-2.5 sm:p-2 md:p-3 border border-red-200 dark:border-red-700">
+                          💪 BRAVE try! You are showing great courage! The hero word was "{current.audioText}" - Let us train it together! You are doing SUPER!
                         </div>
                       )}
                     </div>
@@ -471,20 +471,20 @@ const SuperheroAdventure = ({ onClose, onComplete }: Props) => {
 
               {/* Non-interactive steps */}
               {!current.interactive && (
-                <div className="flex justify-center pt-4">
+                <div className="flex justify-center pt-2 sm:pt-2">
                   <Button 
                     onClick={handleNext} 
-                    className="rounded-xl sm:rounded-2xl px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-500 to-red-500 hover:from-blue-600 hover:to-red-600 text-white font-bold transition-all duration-300 hover:scale-105 transform shadow-lg sm:shadow-2xl text-sm sm:text-base"
+                    className="rounded-lg sm:rounded-xl md:rounded-2xl px-5 sm:px-5 md:px-6 py-2.5 sm:py-2 md:py-2.5 bg-gradient-to-r from-blue-500 to-red-500 hover:from-blue-600 hover:to-red-600 text-white font-bold transition-all duration-300 hover:scale-105 transform shadow-lg sm:shadow-2xl text-xs sm:text-xs md:text-sm"
                   >
                     {stepIndex === storySteps.length - 1 ? (
                       <>
-                        <Zap className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-pulse" />
+                        <Zap className="w-4 h-4 sm:w-4 sm:h-4 mr-2 sm:mr-2 animate-pulse" />
                         <span className="hidden sm:inline">Complete Hero Training! ✨</span>
                         <span className="sm:hidden">Finish! ✨</span>
                       </>
                     ) : (
                       <>
-                        <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                        <Play className="w-4 h-4 sm:w-4 sm:h-4 mr-2 sm:mr-2" />
                         <span className="hidden sm:inline">Continue Hero Training! 🦸</span>
                         <span className="sm:hidden">Continue 🦸</span>
                       </>

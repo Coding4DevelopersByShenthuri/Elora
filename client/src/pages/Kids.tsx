@@ -214,7 +214,7 @@ const KidsPage = () => {
       image: '🌳',
       character: Rabbit,
       gradient: 'from-green-400 to-emerald-400',
-      bgGradient: 'from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900',
+      bgGradient: 'from-green-50 to-emerald-50 dark:from-green-900 dark:to-emerald-900',
       animation: 'animate-float-slow',
       type: 'forest'
     },
@@ -227,7 +227,7 @@ const KidsPage = () => {
       image: '🚀',
       character: Rocket,
       gradient: 'from-purple-400 to-indigo-400',
-      bgGradient: 'from-purple-100 to-indigo-100 dark:from-purple-900 dark:to-indigo-900',
+      bgGradient: 'from-purple-50 to-indigo-50 dark:from-purple-900 dark:to-indigo-900',
       animation: 'animate-bounce',
       type: 'space'
     },
@@ -240,7 +240,7 @@ const KidsPage = () => {
       image: '🐠',
       character: Fish,
       gradient: 'from-blue-400 to-cyan-400',
-      bgGradient: 'from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900',
+      bgGradient: 'from-blue-50 to-cyan-50 dark:from-blue-900 dark:to-cyan-900',
       animation: 'animate-float-medium',
       type: 'ocean'
     },
@@ -253,7 +253,7 @@ const KidsPage = () => {
       image: '🦖',
       character: Footprints,
       gradient: 'from-orange-400 to-red-400',
-      bgGradient: 'from-orange-100 to-red-100 dark:from-orange-900 dark:to-red-900',
+      bgGradient: 'from-orange-50 to-red-50 dark:from-orange-900 dark:to-red-900',
       animation: 'animate-float-slow',
       type: 'dinosaur'
     },
@@ -266,7 +266,7 @@ const KidsPage = () => {
       image: '🦄',
       character: Sparkles,
       gradient: 'from-pink-400 to-purple-400',
-      bgGradient: 'from-pink-100 to-purple-100 dark:from-pink-900 dark:to-purple-900',
+      bgGradient: 'from-pink-50 to-purple-50 dark:from-pink-900 dark:to-purple-900',
       animation: 'animate-float-medium',
       type: 'unicorn'
     },
@@ -279,7 +279,7 @@ const KidsPage = () => {
       image: '🏴‍☠️',
       character: Anchor,
       gradient: 'from-amber-400 to-yellow-400',
-      bgGradient: 'from-amber-100 to-yellow-100 dark:from-amber-900 dark:to-yellow-900',
+      bgGradient: 'from-amber-50 to-yellow-50 dark:from-amber-900 dark:to-yellow-900',
       animation: 'animate-bounce',
       type: 'pirate'
     },
@@ -292,7 +292,7 @@ const KidsPage = () => {
       image: '🦸',
       character: Shield,
       gradient: 'from-blue-400 to-indigo-400',
-      bgGradient: 'from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900',
+      bgGradient: 'from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900',
       animation: 'animate-float-fast',
       type: 'superhero'
     },
@@ -305,7 +305,7 @@ const KidsPage = () => {
       image: '🧚',
       character: Sparkles,
       gradient: 'from-green-400 to-teal-400',
-      bgGradient: 'from-green-100 to-teal-100 dark:from-green-900 dark:to-teal-900',
+      bgGradient: 'from-green-50 to-teal-50 dark:from-green-900 dark:to-teal-900',
       animation: 'animate-float-slow',
       type: 'fairy'
     }
@@ -726,9 +726,9 @@ const KidsPage = () => {
               variant="outline"
               size="sm"
               onClick={() => navigate('/model-manager')}
-              className="rounded-xl flex-1 sm:flex-none text-xs sm:text-sm"
+              className="rounded-xl flex-1 sm:flex-none text-xs sm:text-sm border-2 border-blue-300 dark:border-blue-600 bg-blue-50/40 dark:bg-blue-900/10 hover:bg-blue-100/60 dark:hover:bg-blue-900/20 text-gray-800 dark:text-white font-semibold backdrop-blur-sm"
             >
-              <Settings className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              <Settings className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-blue-600 dark:text-blue-400" />
               <span className="hidden xs:inline">Manage Models</span>
               <span className="xs:hidden">Models</span>
             </Button>
@@ -737,9 +737,9 @@ const KidsPage = () => {
               variant="outline"
               size="sm"
               onClick={() => navigate('/parental-controls')}
-              className="rounded-xl flex-1 sm:flex-none text-xs sm:text-sm border-2 border-purple-300 dark:border-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+              className="rounded-xl flex-1 sm:flex-none text-xs sm:text-sm border-2 border-purple-300 dark:border-purple-600 bg-purple-50/40 dark:bg-purple-900/10 hover:bg-purple-100/60 dark:hover:bg-purple-900/20 text-gray-800 dark:text-white font-semibold backdrop-blur-sm"
             >
-              <Lock className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              <Lock className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-purple-600 dark:text-purple-400" />
               <span className="hidden xs:inline">Parent Controls</span>
               <span className="xs:hidden">Parent</span>
             </Button>
@@ -748,7 +748,7 @@ const KidsPage = () => {
 
         {/* Stats Bar */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
-          <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-2 border-yellow-200 dark:border-yellow-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+          <Card className="bg-yellow-50/30 dark:bg-yellow-900/10 backdrop-blur-sm border-2 border-yellow-200 dark:border-yellow-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
             <CardContent className="p-4 sm:p-6 text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
                 <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-500 dark:text-yellow-400" />
@@ -758,7 +758,7 @@ const KidsPage = () => {
             </CardContent>
           </Card>
           
-          <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-2 border-green-200 dark:border-green-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+          <Card className="bg-green-50/30 dark:bg-green-900/10 backdrop-blur-sm border-2 border-green-200 dark:border-green-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
             <CardContent className="p-4 sm:p-6 text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
                 <Zap className="w-6 h-6 sm:w-8 sm:h-8 text-green-500 dark:text-green-400 animate-pulse" />
@@ -768,7 +768,7 @@ const KidsPage = () => {
             </CardContent>
           </Card>
           
-          <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-2 border-blue-200 dark:border-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+          <Card className="bg-blue-50/30 dark:bg-blue-900/10 backdrop-blur-sm border-2 border-blue-200 dark:border-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
             <CardContent className="p-4 sm:p-6 text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
                 <Award className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500 dark:text-blue-400" />
@@ -782,6 +782,16 @@ const KidsPage = () => {
         {/* Categories Navigation */}
         <div className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 mb-8 sm:mb-10 md:mb-12">
           {categories.map((category) => {
+            const getCategoryColor = () => {
+              switch(category.id) {
+                case 'stories': return 'bg-pink-50/40 dark:bg-pink-900/10 border-pink-300 dark:border-pink-600 hover:border-pink-400 dark:hover:border-pink-500';
+                case 'vocabulary': return 'bg-yellow-50/40 dark:bg-yellow-900/10 border-yellow-300 dark:border-yellow-600 hover:border-yellow-400 dark:hover:border-yellow-500';
+                case 'pronunciation': return 'bg-orange-50/40 dark:bg-orange-900/10 border-orange-300 dark:border-orange-600 hover:border-orange-400 dark:hover:border-orange-500';
+                case 'games': return 'bg-purple-50/40 dark:bg-purple-900/10 border-purple-300 dark:border-purple-600 hover:border-purple-400 dark:hover:border-purple-500';
+                default: return 'bg-gray-50/40 dark:bg-gray-900/10 border-gray-300 dark:border-gray-600';
+              }
+            };
+            
             return (
               <Button
                 key={category.id}
@@ -790,7 +800,7 @@ const KidsPage = () => {
                   "rounded-xl sm:rounded-2xl px-3 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg font-bold transition-all duration-300 relative overflow-hidden group",
                   activeCategory === category.id 
                     ? "bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white shadow-2xl transform hover:scale-110" 
-                    : "bg-white/90 dark:bg-gray-800/90 border-2 border-gray-200 dark:border-gray-600 hover:border-[#FF6B6B] dark:hover:border-[#FF6B6B] hover:bg-white dark:hover:bg-gray-700 hover:shadow-lg"
+                    : `${getCategoryColor()} backdrop-blur-sm text-gray-800 dark:text-white border-2 hover:shadow-lg`
                 )}
                 onClick={() => handleCategoryClick(category.id)}
               >
@@ -967,8 +977,8 @@ const KidsPage = () => {
         )}
 
         {/* Achievements Section */}
-        <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-2 border-purple-200 dark:border-purple-600 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl mb-6 sm:mb-8">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center mb-6 sm:mb-8 text-gray-800 dark:text-white flex items-center justify-center gap-2 sm:gap-3">
+        <Card className="bg-purple-100/50 dark:bg-purple-950/30 backdrop-blur-sm border-2 border-purple-300 dark:border-purple-600 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl mb-6 sm:mb-8">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center mb-6 sm:mb-8 text-gray-900 dark:text-white flex items-center justify-center gap-2 sm:gap-3">
             <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-500 dark:text-yellow-400 animate-bounce" />
             Your Super Achievements!
           </h2>
@@ -983,7 +993,7 @@ const KidsPage = () => {
                       "w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-1 sm:mb-2 transition-all duration-300",
                       isComplete 
                         ? "bg-gradient-to-r from-yellow-400 to-orange-400 shadow-lg" 
-                        : "bg-gray-100 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600"
+                        : "bg-white/80 dark:bg-gray-700 border-2 border-purple-200 dark:border-gray-600"
                     )}>
                       <span className="text-xl sm:text-2xl">{achievement.emoji}</span>
                       {isComplete && (
@@ -991,8 +1001,8 @@ const KidsPage = () => {
                       )}
                     </div>
                   </div>
-                  <p className="text-xs sm:text-sm font-bold text-gray-800 dark:text-white mb-2 sm:mb-3 px-1">{achievement.name}</p>
-                  <Progress value={achievement.progress} className="h-2 sm:h-3 bg-gray-200 dark:bg-gray-600 rounded-full mb-1 sm:mb-2">
+                  <p className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white mb-2 sm:mb-3 px-1">{achievement.name}</p>
+                  <Progress value={achievement.progress} className="h-2 sm:h-3 bg-purple-200/60 dark:bg-gray-600 rounded-full mb-1 sm:mb-2">
                     <div 
                       className={cn(
                         "h-full rounded-full transition-all duration-1000",
@@ -1000,7 +1010,7 @@ const KidsPage = () => {
                       )}
                     />
                   </Progress>
-                  <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">{achievement.progress}%</span>
+                  <span className="text-xs font-semibold text-gray-700 dark:text-gray-400">{achievement.progress}%</span>
                 </div>
               );
             })}
@@ -1013,27 +1023,27 @@ const KidsPage = () => {
           <div className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4">
             <Button 
               variant="outline" 
-              className="rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 border-2 border-green-300 dark:border-green-600 hover:border-green-400 dark:hover:border-green-500 bg-white/90 dark:bg-gray-800/90 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all duration-300 hover:scale-105 group text-sm sm:text-base"
+              className="rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 border-2 border-green-300 dark:border-green-600 hover:border-green-400 dark:hover:border-green-500 bg-green-50/40 dark:bg-green-900/10 hover:bg-green-100/60 dark:hover:bg-green-900/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 group text-sm sm:text-base"
               onClick={() => handleCategoryClick('pronunciation')}
             >
-              <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2 text-green-500 dark:text-green-400 group-hover:animate-bounce" />
-              <span className="font-semibold text-gray-700 dark:text-gray-200">Listen & Repeat</span>
+              <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2 text-green-600 dark:text-green-400 group-hover:animate-bounce" />
+              <span className="font-semibold text-gray-800 dark:text-gray-200">Listen & Repeat</span>
             </Button>
             <Button 
               variant="outline" 
-              className="rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 border-2 border-blue-300 dark:border-blue-600 hover:border-blue-400 dark:hover:border-blue-500 bg-white/90 dark:bg-gray-800/90 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300 hover:scale-105 group text-sm sm:text-base"
+              className="rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 border-2 border-blue-300 dark:border-blue-600 hover:border-blue-400 dark:hover:border-blue-500 bg-blue-50/40 dark:bg-blue-900/10 hover:bg-blue-100/60 dark:hover:bg-blue-900/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 group text-sm sm:text-base"
               onClick={() => handleCategoryClick('pronunciation')}
             >
-              <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2 text-blue-500 dark:text-blue-400 group-hover:animate-pulse" />
-              <span className="font-semibold text-gray-700 dark:text-gray-200">Speak Now</span>
+              <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2 text-blue-600 dark:text-blue-400 group-hover:animate-pulse" />
+              <span className="font-semibold text-gray-800 dark:text-gray-200">Speak Now</span>
             </Button>
             <Button 
               variant="outline" 
-              className="rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 border-2 border-pink-300 dark:border-pink-600 hover:border-pink-400 dark:hover:border-pink-500 bg-white/90 dark:bg-gray-800/90 hover:bg-pink-50 dark:hover:bg-pink-900/20 transition-all duration-300 hover:scale-105 group text-sm sm:text-base"
+              className="rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 border-2 border-pink-300 dark:border-pink-600 hover:border-pink-400 dark:hover:border-pink-500 bg-pink-50/40 dark:bg-pink-900/10 hover:bg-pink-100/60 dark:hover:bg-pink-900/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 group text-sm sm:text-base"
               onClick={() => handleCategoryClick('stories')}
             >
-              <Heart className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2 text-pink-500 dark:text-pink-400 group-hover:animate-pulse" />
-              <span className="font-semibold text-gray-700 dark:text-gray-200">Favorite Stories</span>
+              <Heart className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2 text-pink-600 dark:text-pink-400 group-hover:animate-pulse" />
+              <span className="font-semibold text-gray-800 dark:text-gray-200">Favorite Stories</span>
             </Button>
           </div>
         </div>

@@ -38,11 +38,12 @@ const ModelManagerPage = () => {
             className="rounded-full flex-shrink-0 hover:bg-gray-200 dark:hover:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 h-10 w-10 sm:h-12 sm:w-12 p-0 transition-all hover:scale-110"
             type="button"
           >
-            <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+            <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 dark:text-gray-300" />
           </Button>
           
-          <h1 className="text-3xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] bg-clip-text text-transparent">
-            AI Tutor Manager
+          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] bg-clip-text text-transparent">
+            <span className="hidden sm:inline">AI Tutor Manager</span>
+            <span className="sm:hidden">AI Manager</span>
           </h1>
           
           <div className="w-10 sm:w-12"></div> {/* Spacer for alignment */}

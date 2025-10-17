@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
 import { Volume2, ChevronRight, ChevronLeft, Star, Trophy, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import EnhancedTTS from '@/services/EnhancedTTS';
@@ -151,11 +150,16 @@ export default function Vocabulary({ words }: { words: WordCard[] }) {
                 </p>
               </div>
             </div>
-            <div className="text-3xl font-bold text-purple-600">
+            <div className="text-3xl font-bold text-purple-800">
               {Math.round(progress)}%
             </div>
           </div>
-          <Progress value={progress} className="h-3" />
+          <div className="h-3 bg-purple-200 dark:bg-purple-800 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-gradient-to-r from-purple-500 to-purple-600 transition-all duration-500"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
         </CardContent>
       </Card>
 
@@ -168,7 +172,7 @@ export default function Vocabulary({ words }: { words: WordCard[] }) {
       )}>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span className="text-gray-600 dark:text-gray-300">
+            <span className="text-gray-600 dark:text-gray-500">
               Word {current + 1} of {words.length}
             </span>
             {masteredWords.has(current) && (
@@ -226,7 +230,7 @@ export default function Vocabulary({ words }: { words: WordCard[] }) {
           {isProcessing && (
             <div className="text-center space-y-4 py-6">
               <Loader2 className="w-12 h-12 text-blue-500 animate-spin mx-auto" />
-              <p className="text-lg font-semibold text-gray-800 dark:text-white">
+              <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 Checking your pronunciation...
               </p>
             </div>

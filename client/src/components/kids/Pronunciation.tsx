@@ -110,12 +110,12 @@ export default function Pronunciation({ items }: { items: PronounceItem[] }) {
     <div className="space-y-6">
       {/* Main Card */}
       {(step === 'intro' || step === 'record') && (
-        <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-2 border-orange-200">
+        <Card className="bg-transparent backdrop-blur-sm border-2 border-orange-200">
           <CardHeader>
             <CardTitle className="flex items-center justify-between text-2xl">
               <span className="flex items-center gap-3">
                 <Mic className="w-6 h-6 text-orange-500" />
-                Speak & Repeat
+                <span className="text-gray-800 dark:text-white">Speak & Repeat</span>
               </span>
               <span className="text-sm text-gray-600 dark:text-gray-300">
                 {idx + 1} / {items.length}

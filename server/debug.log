@@ -192,3 +192,4 @@ INFO 2025-10-16 09:54:36,300 autoreload 21800 16312 Watching for file changes wi
 INFO 2025-10-16 13:35:49,494 basehttp 21800 17244 "OPTIONS /api/vocabulary/ HTTP/1.1" 200 0
 WARNING 2025-10-16 13:35:50,724 log 21800 17244 Not Found: /api/vocabulary/
 WARNING 2025-10-16 13:35:50,726 basehttp 21800 17244 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+INFO 2025-10-17 13:41:50,048 autoreload 17164 3428 Watching for file changes with StatReloader

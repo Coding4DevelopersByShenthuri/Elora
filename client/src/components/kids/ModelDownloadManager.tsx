@@ -231,16 +231,23 @@ const ModelDownloadManager = ({ onComplete, userLevel = 'beginner', hideHeader =
           <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
             <HardDrive className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600 dark:text-purple-400 flex-shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="font-bold text-sm sm:text-base text-gray-900 dark:text-white">Storage Used</p>
+              <div className="flex items-center justify-between mb-1">
+                <p className="font-bold text-sm sm:text-base text-gray-900 dark:text-white">Storage Used</p>
+                <p className="text-xs sm:text-sm font-bold text-purple-700 dark:text-purple-300">
+                  {Math.round((storageInfo.used / storageInfo.available) * 100)}%
+                </p>
+              </div>
               <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 truncate">
                 {formatBytes(storageInfo.used)} used / {formatBytes(storageInfo.available)} available
               </p>
             </div>
           </div>
-          <Progress 
-            value={(storageInfo.used / storageInfo.available) * 100} 
-            className="h-2"
-          />
+          <div className="relative h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+            <div 
+              className="h-full bg-gradient-to-r from-purple-500 to-blue-500 dark:from-purple-400 dark:to-blue-400 transition-all duration-500"
+              style={{ width: `${Math.min(100, (storageInfo.used / storageInfo.available) * 100)}%` }}
+            />
+          </div>
         </CardContent>
       </Card>
 

@@ -80,41 +80,58 @@ const GameMenu = ({ onSelectGame, totalScore }: { onSelectGame: (game: GameType)
 
       {/* Game Selection */}
       <div className="text-center mb-6">
-        <h2 className="text-3xl font-bold bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] bg-clip-text text-transparent mb-2">
+        <h2 className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#118AB2] bg-clip-text text-transparent mb-2 drop-shadow-sm">
           Choose Your Game!
         </h2>
-        <p className="text-gray-600 dark:text-gray-300">
+        <p className="text-gray-700 dark:text-gray-300 font-medium">
           Pick a fun game to practice English! 🎮
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {games.map(game => (
-          <Card
-            key={game.id}
-            className="border-2 border-transparent hover:border-[#FF6B6B] transition-all duration-300 hover:scale-105 cursor-pointer group"
-            onClick={() => onSelectGame(game.id)}
-          >
-            <CardContent className="p-6 text-center space-y-4">
-              <div className={cn(
-                "w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl bg-gradient-to-br",
-                game.color,
-                "group-hover:scale-110 transition-transform duration-300"
-              )}>
-                {game.emoji}
-              </div>
-              <h3 className="text-xl font-bold text-gray-800 dark:text-white">
-                {game.title}
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-300">
-                {game.description}
-              </p>
-              <Button className="w-full rounded-xl bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B]">
-                Play Now!
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
+        {games.map((game, index) => {
+          const cardBgColors = [
+            'bg-pink-50/60 dark:bg-pink-900/10',
+            'bg-blue-50/60 dark:bg-blue-900/10',
+            'bg-purple-50/60 dark:bg-purple-900/10'
+          ];
+          const cardBorders = [
+            'border-pink-200 dark:border-pink-600',
+            'border-blue-200 dark:border-blue-600',
+            'border-purple-200 dark:border-purple-600'
+          ];
+          
+          return (
+            <Card
+              key={game.id}
+              className={cn(
+                "border-2 hover:border-[#FF6B6B] dark:hover:border-[#FF6B6B] transition-all duration-300 hover:scale-105 cursor-pointer group backdrop-blur-sm",
+                cardBgColors[index],
+                cardBorders[index]
+              )}
+              onClick={() => onSelectGame(game.id)}
+            >
+              <CardContent className="p-6 text-center space-y-4">
+                <div className={cn(
+                  "w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl bg-gradient-to-br",
+                  game.color,
+                  "group-hover:scale-110 transition-transform duration-300"
+                )}>
+                  {game.emoji}
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                  {game.title}
+                </h3>
+                <p className="text-sm text-gray-800 dark:text-gray-300 font-medium">
+                  {game.description}
+                </p>
+                <Button className="w-full rounded-xl bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B]">
+                  Play Now!
+                </Button>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
@@ -165,13 +182,13 @@ const RhymeTime = ({ onBack, onScoreUpdate }: { onBack: () => void; onScoreUpdat
   };
 
   return (
-    <Card className="border-2 border-pink-200">
+    <Card className="border-2 border-pink-300 dark:border-pink-600 bg-pink-50/50 dark:bg-pink-900/10 backdrop-blur-sm">
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
+        <CardTitle className="flex items-center justify-between text-gray-900 dark:text-white">
           <span className="flex items-center gap-3">
             🎵 Rhyme Time
           </span>
-          <Button variant="outline" size="sm" onClick={onBack} className="rounded-xl">
+          <Button variant="outline" size="sm" onClick={onBack} className="rounded-xl border-2 border-pink-300 dark:border-pink-600 bg-pink-100/50 dark:bg-pink-900/20 hover:bg-pink-200/60 dark:hover:bg-pink-900/30 text-gray-900 dark:text-white font-semibold">
             Back to Menu
           </Button>
         </CardTitle>
@@ -327,13 +344,13 @@ const SentenceBuilder = ({ onBack, onScoreUpdate }: { onBack: () => void; onScor
   };
 
   return (
-    <Card className="border-2 border-blue-200">
+    <Card className="border-2 border-blue-300 dark:border-blue-600 bg-blue-50/50 dark:bg-blue-900/10 backdrop-blur-sm">
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
+        <CardTitle className="flex items-center justify-between text-gray-900 dark:text-white">
           <span className="flex items-center gap-3">
             🧩 Sentence Builder
           </span>
-          <Button variant="outline" size="sm" onClick={onBack} className="rounded-xl">
+          <Button variant="outline" size="sm" onClick={onBack} className="rounded-xl border-2 border-blue-300 dark:border-blue-600 bg-blue-100/50 dark:bg-blue-900/20 hover:bg-blue-200/60 dark:hover:bg-blue-900/30 text-gray-900 dark:text-white font-semibold">
             Back to Menu
           </Button>
         </CardTitle>
@@ -345,7 +362,7 @@ const SentenceBuilder = ({ onBack, onScoreUpdate }: { onBack: () => void; onScor
             Level {currentLevel + 1} of {levels.length}
           </p>
           <div className="text-8xl mb-4">{current.image}</div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-gray-500 dark:text-gray-200">
             Build the sentence by tapping the words below
           </p>
         </div>
@@ -353,7 +370,7 @@ const SentenceBuilder = ({ onBack, onScoreUpdate }: { onBack: () => void; onScor
         {/* Selected Words (Sentence Area) */}
         <div className="min-h-24 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-2xl p-6 border-2 border-blue-200">
           {selectedWords.length === 0 ? (
-            <p className="text-center text-gray-400 text-lg">Tap words to build your sentence</p>
+            <p className="text-center text-gray-300 text-lg">Tap words to build your sentence</p>
           ) : (
             <div className="flex flex-wrap gap-2 justify-center">
               {selectedWords.map((word, idx) => (
@@ -518,13 +535,13 @@ const EchoChallenge = ({ onBack, onScoreUpdate }: { onBack: () => void; onScoreU
   };
 
   return (
-    <Card className="border-2 border-purple-200">
+    <Card className="border-2 border-purple-300 dark:border-purple-600 bg-purple-50/50 dark:bg-purple-900/10 backdrop-blur-sm">
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
+        <CardTitle className="flex items-center justify-between text-gray-900 dark:text-white">
           <span className="flex items-center gap-3">
             ⚡ Echo Challenge
           </span>
-          <Button variant="outline" size="sm" onClick={onBack} className="rounded-xl">
+          <Button variant="outline" size="sm" onClick={onBack} className="rounded-xl border-2 border-purple-300 dark:border-purple-600 bg-purple-100/50 dark:bg-purple-900/20 hover:bg-purple-200/60 dark:hover:bg-purple-900/30 text-gray-900 dark:text-white font-semibold">
             Back to Menu
           </Button>
         </CardTitle>
@@ -544,7 +561,7 @@ const EchoChallenge = ({ onBack, onScoreUpdate }: { onBack: () => void; onScoreU
             ))}
           </div>
           
-          <h3 className="text-2xl font-bold text-purple-600">
+          <h3 className="text-2xl font-bold text-purple-300">
             Level {level + 1} - Speed {current.speed.toFixed(1)}x
           </h3>
           
@@ -552,7 +569,7 @@ const EchoChallenge = ({ onBack, onScoreUpdate }: { onBack: () => void; onScoreU
             {current.phrase}
           </div>
           
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-gray-500 dark:text-gray-300">
             Listen and repeat as fast as you can! ⚡
           </p>
         </div>

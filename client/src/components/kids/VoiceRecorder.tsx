@@ -195,7 +195,7 @@ const VoiceRecorder = ({
 
       {/* Instructions */}
       {!isRecording && !audioBlob && (
-        <p className="text-sm text-gray-500 dark:text-gray-400 text-center max-w-xs">
+        <p className="text-sm text-gray-600 dark:text-gray-500 text-center max-w-xs">
           🎤 Tap the microphone to start recording
         </p>
       )}
