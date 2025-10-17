@@ -169,9 +169,9 @@ const ModelDownloadManager = ({ onComplete, userLevel = 'beginner', hideHeader =
 
   const getCategoryLabel = (category: string) => {
     switch (category) {
-      case 'essential': return '⭐ Essential';
-      case 'recommended': return '👍 Recommended';
-      case 'optional': return '💡 Optional';
+      case 'essential': return 'Essential';
+      case 'recommended': return 'Recommended';
+      case 'optional': return 'Optional';
       default: return '';
     }
   };
@@ -193,7 +193,7 @@ const ModelDownloadManager = ({ onComplete, userLevel = 'beginner', hideHeader =
           </h2>
         )}
         <p className="text-sm sm:text-base md:text-lg font-semibold text-gray-800 dark:text-gray-200 px-2">
-          Download these files once to practice English offline! 🚀
+          Download these files once to practice English offline!
         </p>
       </div>
 
@@ -353,7 +353,7 @@ const ModelDownloadManager = ({ onComplete, userLevel = 'beginner', hideHeader =
               🎉 All Set! Ready to Learn Offline!
             </h3>
             <p className="text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300">
-              You can now practice English without internet! 🚀
+              You can now practice English without internet!
             </p>
           </CardContent>
         </Card>

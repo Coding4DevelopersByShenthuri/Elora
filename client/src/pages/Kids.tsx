@@ -718,15 +718,15 @@ const KidsPage = () => {
         </div>
 
         {/* Sync Status & Settings Bar */}
-        <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
+        <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 px-2 sm:px-0">
           <SyncStatusIndicator showDetails={false} className="flex-shrink-0 w-full sm:w-auto" />
           
-          <div className="flex gap-2 sm:gap-3 w-full sm:w-auto justify-stretch sm:justify-end">
+          <div className="flex gap-2 sm:gap-3 w-full sm:w-auto justify-stretch sm:justify-end flex-wrap">
             <Button
               variant="outline"
               size="sm"
               onClick={() => navigate('/model-manager')}
-              className="rounded-xl flex-1 sm:flex-initial sm:min-w-[140px] md:min-w-[160px] text-xs sm:text-sm border-2 border-blue-300 dark:border-blue-600 bg-blue-50/40 dark:bg-blue-900/10 hover:bg-blue-100/60 dark:hover:bg-blue-900/20 text-gray-800 dark:text-white font-semibold backdrop-blur-sm transition-all hover:scale-105"
+              className="rounded-xl flex-1 sm:flex-initial sm:w-auto sm:max-w-[160px] text-xs sm:text-sm border-2 border-blue-300 dark:border-blue-600 bg-blue-50/40 dark:bg-blue-900/10 hover:bg-blue-100/60 dark:hover:bg-blue-900/20 text-gray-800 dark:text-white font-semibold backdrop-blur-sm transition-colors whitespace-nowrap"
             >
               <Settings className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-blue-600 dark:text-blue-400 flex-shrink-0" />
               <span className="hidden sm:inline">Manage Models</span>
@@ -737,7 +737,7 @@ const KidsPage = () => {
               variant="outline"
               size="sm"
               onClick={() => navigate('/parental-controls')}
-              className="rounded-xl flex-1 sm:flex-initial sm:min-w-[140px] md:min-w-[160px] text-xs sm:text-sm border-2 border-purple-300 dark:border-purple-600 bg-purple-50/40 dark:bg-purple-900/10 hover:bg-purple-100/60 dark:hover:bg-purple-900/20 text-gray-800 dark:text-white font-semibold backdrop-blur-sm transition-all hover:scale-105"
+              className="rounded-xl flex-1 sm:flex-initial sm:w-auto sm:max-w-[160px] text-xs sm:text-sm border-2 border-purple-300 dark:border-purple-600 bg-purple-50/40 dark:bg-purple-900/10 hover:bg-purple-100/60 dark:hover:bg-purple-900/20 text-gray-800 dark:text-white font-semibold backdrop-blur-sm transition-colors whitespace-nowrap"
             >
               <Lock className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-purple-600 dark:text-purple-400 flex-shrink-0" />
               <span className="hidden sm:inline">Parent Controls</span>
