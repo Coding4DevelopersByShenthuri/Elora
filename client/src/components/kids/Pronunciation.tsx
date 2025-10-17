@@ -67,7 +67,6 @@ export default function Pronunciation({ items }: { items: PronounceItem[] }) {
         overall: pronScore.overall,
         accuracy: pronScore.accuracy,
         fluency: pronScore.fluency,
-        completeness: pronScore.completeness,
         wordScores: pronScore.wordScores,
         recommendations: pronScore.recommendations,
         transcript,
@@ -107,30 +106,30 @@ export default function Pronunciation({ items }: { items: PronounceItem[] }) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto">
       {/* Main Card */}
       {(step === 'intro' || step === 'record') && (
-        <Card className="bg-transparent backdrop-blur-sm border-2 border-orange-200">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between text-2xl">
-              <span className="flex items-center gap-3">
-                <Mic className="w-6 h-6 text-orange-500" />
+        <Card className="bg-transparent backdrop-blur-sm border-2 border-orange-200 dark:border-orange-600">
+          <CardHeader className="px-3 sm:px-4 md:px-6 py-3 sm:py-4">
+            <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 text-lg sm:text-xl md:text-2xl">
+              <span className="flex items-center gap-2 sm:gap-3">
+                <Mic className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500 flex-shrink-0" />
                 <span className="text-gray-800 dark:text-white">Speak & Repeat</span>
               </span>
-              <span className="text-sm text-gray-600 dark:text-gray-300">
+              <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
                 {idx + 1} / {items.length}
               </span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-4 sm:space-y-6 px-3 sm:px-4 md:px-6">
             {/* Phrase Display */}
-            <div className="text-center space-y-4">
-              <div className="text-4xl font-extrabold text-gray-800 dark:text-white bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 rounded-2xl p-6">
+            <div className="text-center space-y-3 sm:space-y-4">
+              <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-800 dark:text-white bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 rounded-xl sm:rounded-2xl p-4 sm:p-6">
                 {current.phrase}
               </div>
               
               {current.phonemes && (
-                <div className="text-xl text-pink-500 dark:text-pink-400 bg-pink-50 dark:bg-pink-900/20 rounded-lg p-4">
+                <div className="text-base sm:text-lg md:text-xl text-pink-500 dark:text-pink-400 bg-pink-50 dark:bg-pink-900/20 rounded-lg sm:rounded-xl p-3 sm:p-4 max-w-2xl mx-auto">
                   {current.phonemes}
                 </div>
               )}
@@ -140,17 +139,18 @@ export default function Pronunciation({ items }: { items: PronounceItem[] }) {
                 size="lg"
                 onClick={listen}
                 disabled={isSpeaking}
-                className="rounded-2xl px-8 bg-gradient-to-r from-orange-500 to-red-500 hover:from-red-500 hover:to-orange-500"
+                className="rounded-xl sm:rounded-2xl px-6 sm:px-8 md:px-10 py-3 sm:py-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-red-500 hover:to-orange-500 text-sm sm:text-base md:text-lg font-bold transition-all hover:scale-105 w-full sm:w-auto"
               >
                 {isSpeaking ? (
                   <>
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin flex-shrink-0" />
                     Speaking...
                   </>
                 ) : (
                   <>
-                    <Volume2 className="w-5 h-5 mr-2" />
-                    Listen to Teacher
+                    <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
+                    <span className="hidden sm:inline">Listen to Teacher</span>
+                    <span className="sm:hidden">Listen</span>
                   </>
                 )}
               </Button>
@@ -158,19 +158,19 @@ export default function Pronunciation({ items }: { items: PronounceItem[] }) {
 
             {/* Intro Step */}
             {step === 'intro' && (
-              <div className="text-center space-y-4 pt-6 border-t-2 border-gray-200 dark:border-gray-700">
-                <p className="text-lg text-gray-600 dark:text-gray-300">
+              <div className="text-center space-y-3 sm:space-y-4 pt-4 sm:pt-6 border-t-2 border-gray-200 dark:border-gray-700">
+                <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 font-semibold px-4">
                   👂 First, listen to the teacher
                 </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 px-4">
                   Then record yourself saying the same phrase
                 </p>
                 <Button
                   size="lg"
                   onClick={startRecording}
-                  className="rounded-2xl px-8 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-purple-500 hover:to-blue-500"
+                  className="rounded-xl sm:rounded-2xl px-6 sm:px-8 md:px-10 py-3 sm:py-4 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-purple-500 hover:to-blue-500 text-sm sm:text-base md:text-lg font-bold transition-all hover:scale-105 w-full sm:w-auto"
                 >
-                  <Mic className="w-5 h-5 mr-2" />
+                  <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
                   Ready to Record
                 </Button>
               </div>
@@ -178,8 +178,8 @@ export default function Pronunciation({ items }: { items: PronounceItem[] }) {
 
             {/* Record Step */}
             {step === 'record' && !isProcessing && (
-              <div className="space-y-4 pt-6 border-t-2 border-gray-200 dark:border-gray-700">
-                <p className="text-center text-lg text-gray-600 dark:text-gray-300">
+              <div className="space-y-3 sm:space-y-4 pt-4 sm:pt-6 border-t-2 border-gray-200 dark:border-gray-700">
+                <p className="text-center text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 font-semibold px-4">
                   🎤 Say the phrase above
                 </p>
                 <VoiceRecorder
@@ -192,35 +192,35 @@ export default function Pronunciation({ items }: { items: PronounceItem[] }) {
 
             {/* Processing */}
             {isProcessing && (
-              <div className="text-center space-y-4 py-8">
-                <Loader2 className="w-16 h-16 text-orange-500 animate-spin mx-auto" />
-                <p className="text-xl font-semibold text-gray-800 dark:text-white">
+              <div className="text-center space-y-3 sm:space-y-4 py-6 sm:py-8">
+                <Loader2 className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 text-orange-500 animate-spin mx-auto" />
+                <p className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-800 dark:text-white px-4">
                   Analyzing your pronunciation...
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 px-4">
                   Checking each sound 🔊
                 </p>
               </div>
             )}
 
             {/* Navigation */}
-            <div className="flex items-center justify-between gap-4 pt-4">
+            <div className="flex items-center justify-between gap-2 sm:gap-4 pt-4 sm:pt-6">
               <Button
                 variant="outline"
                 onClick={prev}
-                className="rounded-xl"
+                className="rounded-lg sm:rounded-xl px-3 sm:px-4 md:px-6 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-semibold bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               >
-                <ChevronLeft className="w-4 h-4 mr-2" />
-                Previous
+                <ChevronLeft className="w-4 h-4 sm:mr-1 md:mr-2 flex-shrink-0" />
+                <span className="hidden md:inline">Previous</span>
               </Button>
 
-              <div className="flex gap-2">
+              <div className="flex gap-1 sm:gap-2 flex-wrap justify-center">
                 {items.map((_, i) => (
                   <div
                     key={i}
                     className={cn(
-                      "w-2 h-2 rounded-full transition-all duration-300",
-                      i === idx ? "bg-orange-500 scale-150" : "bg-gray-300"
+                      "w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all duration-300",
+                      i === idx ? "bg-orange-500 scale-125 sm:scale-150" : "bg-gray-300 dark:bg-gray-600"
                     )}
                   />
                 ))}
@@ -229,10 +229,10 @@ export default function Pronunciation({ items }: { items: PronounceItem[] }) {
               <Button
                 variant="outline"
                 onClick={next}
-                className="rounded-xl"
+                className="rounded-lg sm:rounded-xl px-3 sm:px-4 md:px-6 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-semibold bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               >
-                Next
-                <ChevronRight className="w-4 h-4 ml-2" />
+                <span className="hidden md:inline">Next</span>
+                <ChevronRight className="w-4 h-4 sm:ml-1 md:ml-2 flex-shrink-0" />
               </Button>
             </div>
           </CardContent>

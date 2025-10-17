@@ -16,19 +16,25 @@ const ParentalControlsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16 sm:pt-20">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-purple-50/20 dark:from-slate-900 dark:via-blue-950/10 dark:to-purple-950/10 pt-16 sm:pt-20">
       <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8 lg:p-10 pb-20">
-        {/* Header with Back Button */}
-        <div className="flex items-center mb-6 sm:mb-8">
+        {/* Header with Back Button and Title */}
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
           <Button
             variant="outline"
             size="sm"
             onClick={(e) => handleBack(e)}
-            className="rounded-full flex-shrink-0 hover:bg-gray-200 dark:hover:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 h-10 w-10 sm:h-12 sm:w-12 p-0 transition-all hover:scale-110"
+            className="rounded-full flex-shrink-0 hover:bg-gray-200 dark:hover:bg-gray-700 border-2 border-transparent dark:border-gray-600 bg-transparent hover:border-gray-300 dark:hover:border-gray-500 h-10 w-10 sm:h-12 sm:w-12 p-0 transition-all hover:scale-110"
             type="button"
           >
-            <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+            <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-gray-900 dark:text-gray-100" />
           </Button>
+          
+          <h1 className="text-2xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] bg-clip-text text-transparent px-2">
+            Parental Controls
+          </h1>
+          
+          <div className="w-10 sm:w-12"></div> {/* Spacer for alignment */}
         </div>
         
         {/* Parental Controls Component */}

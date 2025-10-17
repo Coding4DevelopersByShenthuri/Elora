@@ -594,7 +594,7 @@ const KidsPage = () => {
   // Show auth modal if not authenticated
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50/20 to-purple-50/20 dark:from-slate-900 dark:via-blue-950/10 dark:to-purple-950/10 px-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50/20 to-purple-50/20 dark:from-slate-900 dark:via-blue-950/10 dark:to-purple-950/10 px-3 sm:px-4 md:px-6">
         <AuthModal 
           isOpen={showAuthModal} 
           onClose={handleAuthModalClose}
@@ -602,21 +602,21 @@ const KidsPage = () => {
           redirectFromKids={true}
           onAuthSuccess={handleAuthSuccess}
         />
-        <div className="text-center p-4 sm:p-8 max-w-2xl">
-          <div className="animate-bounce mb-4">
-            <Sparkles className="w-12 h-12 sm:w-16 sm:h-16 text-yellow-500 mx-auto" />
+        <div className="text-center p-4 sm:p-6 md:p-8 max-w-2xl w-full">
+          <div className="animate-bounce mb-4 sm:mb-6">
+            <Sparkles className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 text-yellow-500 mx-auto" />
           </div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#118AB2] bg-clip-text text-transparent mb-4">
+          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#118AB2] bg-clip-text text-transparent mb-3 sm:mb-4 md:mb-6 px-2">
             Welcome to Kids Learning Zone!
           </h1>
-          <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-6">
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 dark:text-gray-300 mb-6 sm:mb-8 px-2">
             {authMode === 'login' 
               ? 'Please sign in to continue your magical learning adventure! 🎉' 
               : 'Create an account to start your magical learning adventure! 🎉'}
           </p>
           <Button 
             onClick={() => setShowAuthModal(true)}
-            className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-xl sm:rounded-2xl text-base sm:text-lg"
+            className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white font-bold py-3 sm:py-4 px-6 sm:px-8 md:px-10 rounded-xl sm:rounded-2xl text-sm sm:text-base md:text-lg w-full sm:w-auto transition-all hover:scale-105"
           >
             {authMode === 'login' ? 'Sign In' : 'Create Account'}
           </Button>
@@ -674,18 +674,18 @@ const KidsPage = () => {
         );
       })}
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative z-10">
         {/* Header Section */}
         <div className="text-center mb-6 sm:mb-8">
-          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4 px-2">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] rounded-full blur-md opacity-60 animate-pulse"></div>
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#118AB2] bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#118AB2] bg-clip-text text-transparent">
               Kids Learning Zone
             </h1>
           </div>
-          <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-3 sm:mb-4 px-4">
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-3 sm:mb-4 px-4">
             Fun stories, exciting games, and magical adventures to learn English! 🎉
           </p>
           
@@ -693,9 +693,9 @@ const KidsPage = () => {
           <div className="flex items-center justify-center gap-2 flex-wrap px-4">
             {modelsReady && (
               <span className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-green-100 dark:bg-green-900/20 border-2 border-green-300 rounded-full text-xs sm:text-sm font-semibold text-green-700 dark:text-green-400">
-                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden xs:inline">AI Teacher Ready (Offline)</span>
-                <span className="xs:hidden">AI Ready</span>
+                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                <span className="hidden sm:inline">AI Teacher Ready (Offline)</span>
+                <span className="sm:hidden">AI Ready</span>
               </span>
             )}
             {!modelsReady && !isInitializing && (
@@ -703,14 +703,14 @@ const KidsPage = () => {
                 onClick={() => navigate('/model-manager')}
                 className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-yellow-100 dark:bg-yellow-900/20 border-2 border-yellow-300 rounded-full text-xs sm:text-sm font-semibold text-yellow-700 dark:text-yellow-400 hover:bg-yellow-200 dark:hover:bg-yellow-900/30 transition-colors"
               >
-                <Download className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden xs:inline">Download AI Tutor</span>
-                <span className="xs:hidden">Download AI</span>
+                <Download className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                <span className="hidden sm:inline">Download AI Tutor</span>
+                <span className="sm:hidden">Download AI</span>
               </button>
             )}
             {isInitializing && (
               <span className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-100 dark:bg-blue-900/20 border-2 border-blue-300 rounded-full text-xs sm:text-sm font-semibold text-blue-700 dark:text-blue-400">
-                <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin flex-shrink-0" />
                 Setting up...
               </span>
             )}
@@ -718,61 +718,61 @@ const KidsPage = () => {
         </div>
 
         {/* Sync Status & Settings Bar */}
-        <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+        <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
           <SyncStatusIndicator showDetails={false} className="flex-shrink-0 w-full sm:w-auto" />
           
-          <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+          <div className="flex gap-2 sm:gap-3 w-full sm:w-auto justify-stretch sm:justify-end">
             <Button
               variant="outline"
               size="sm"
               onClick={() => navigate('/model-manager')}
-              className="rounded-xl flex-1 sm:flex-none text-xs sm:text-sm border-2 border-blue-300 dark:border-blue-600 bg-blue-50/40 dark:bg-blue-900/10 hover:bg-blue-100/60 dark:hover:bg-blue-900/20 text-gray-800 dark:text-white font-semibold backdrop-blur-sm"
+              className="rounded-xl flex-1 sm:flex-initial sm:min-w-[140px] md:min-w-[160px] text-xs sm:text-sm border-2 border-blue-300 dark:border-blue-600 bg-blue-50/40 dark:bg-blue-900/10 hover:bg-blue-100/60 dark:hover:bg-blue-900/20 text-gray-800 dark:text-white font-semibold backdrop-blur-sm transition-all hover:scale-105"
             >
-              <Settings className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-blue-600 dark:text-blue-400" />
-              <span className="hidden xs:inline">Manage Models</span>
-              <span className="xs:hidden">Models</span>
+              <Settings className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+              <span className="hidden sm:inline">Manage Models</span>
+              <span className="sm:hidden">Models</span>
             </Button>
             
             <Button
               variant="outline"
               size="sm"
               onClick={() => navigate('/parental-controls')}
-              className="rounded-xl flex-1 sm:flex-none text-xs sm:text-sm border-2 border-purple-300 dark:border-purple-600 bg-purple-50/40 dark:bg-purple-900/10 hover:bg-purple-100/60 dark:hover:bg-purple-900/20 text-gray-800 dark:text-white font-semibold backdrop-blur-sm"
+              className="rounded-xl flex-1 sm:flex-initial sm:min-w-[140px] md:min-w-[160px] text-xs sm:text-sm border-2 border-purple-300 dark:border-purple-600 bg-purple-50/40 dark:bg-purple-900/10 hover:bg-purple-100/60 dark:hover:bg-purple-900/20 text-gray-800 dark:text-white font-semibold backdrop-blur-sm transition-all hover:scale-105"
             >
-              <Lock className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-purple-600 dark:text-purple-400" />
-              <span className="hidden xs:inline">Parent Controls</span>
-              <span className="xs:hidden">Parent</span>
+              <Lock className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-purple-600 dark:text-purple-400 flex-shrink-0" />
+              <span className="hidden sm:inline">Parent Controls</span>
+              <span className="sm:hidden">Parent</span>
             </Button>
           </div>
         </div>
 
         {/* Stats Bar */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-5 lg:gap-6 mb-6 sm:mb-8 px-2 sm:px-0">
           <Card className="bg-yellow-50/30 dark:bg-yellow-900/10 backdrop-blur-sm border-2 border-yellow-200 dark:border-yellow-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <CardContent className="p-4 sm:p-6 text-center">
+            <CardContent className="p-4 sm:p-5 md:p-6 text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-                <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-500 dark:text-yellow-400" />
-                <span className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">{points}</span>
+                <Trophy className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-yellow-500 dark:text-yellow-400 flex-shrink-0" />
+                <span className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">{points}</span>
               </div>
               <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Sparkle Points ✨</p>
             </CardContent>
           </Card>
           
           <Card className="bg-green-50/30 dark:bg-green-900/10 backdrop-blur-sm border-2 border-green-200 dark:border-green-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <CardContent className="p-4 sm:p-6 text-center">
+            <CardContent className="p-4 sm:p-5 md:p-6 text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-                <Zap className="w-6 h-6 sm:w-8 sm:h-8 text-green-500 dark:text-green-400 animate-pulse" />
-                <span className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">{streak} days</span>
+                <Zap className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-green-500 dark:text-green-400 animate-pulse flex-shrink-0" />
+                <span className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">{streak} days</span>
               </div>
               <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Learning Streak 🔥</p>
             </CardContent>
           </Card>
           
           <Card className="bg-blue-50/30 dark:bg-blue-900/10 backdrop-blur-sm border-2 border-blue-200 dark:border-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <CardContent className="p-4 sm:p-6 text-center">
+            <CardContent className="p-4 sm:p-5 md:p-6 text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-                <Award className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500 dark:text-blue-400" />
-                <span className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">{completedAchievements}/{achievements.length}</span>
+                <Award className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-blue-500 dark:text-blue-400 flex-shrink-0" />
+                <span className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">{completedAchievements}/{achievements.length}</span>
               </div>
               <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Super Achievements 🏆</p>
             </CardContent>
@@ -780,46 +780,83 @@ const KidsPage = () => {
         </div>
 
         {/* Categories Navigation */}
-        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 mb-8 sm:mb-10 md:mb-12">
-          {categories.map((category) => {
-            const getCategoryColor = () => {
-              switch(category.id) {
-                case 'stories': return 'bg-pink-50/40 dark:bg-pink-900/10 border-pink-300 dark:border-pink-600 hover:border-pink-400 dark:hover:border-pink-500';
-                case 'vocabulary': return 'bg-yellow-50/40 dark:bg-yellow-900/10 border-yellow-300 dark:border-yellow-600 hover:border-yellow-400 dark:hover:border-yellow-500';
-                case 'pronunciation': return 'bg-orange-50/40 dark:bg-orange-900/10 border-orange-300 dark:border-orange-600 hover:border-orange-400 dark:hover:border-orange-500';
-                case 'games': return 'bg-purple-50/40 dark:bg-purple-900/10 border-purple-300 dark:border-purple-600 hover:border-purple-400 dark:hover:border-purple-500';
-                default: return 'bg-gray-50/40 dark:bg-gray-900/10 border-gray-300 dark:border-gray-600';
-              }
-            };
-            
-            return (
-              <Button
-                key={category.id}
-                variant={activeCategory === category.id ? "default" : "outline"}
-                className={cn(
-                  "rounded-xl sm:rounded-2xl px-3 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg font-bold transition-all duration-300 relative overflow-hidden group",
-                  activeCategory === category.id 
-                    ? "bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white shadow-2xl transform hover:scale-110" 
-                    : `${getCategoryColor()} backdrop-blur-sm text-gray-800 dark:text-white border-2 hover:shadow-lg`
-                )}
-                onClick={() => handleCategoryClick(category.id)}
-              >
-                <span className="text-lg sm:text-xl md:text-2xl mr-1 sm:mr-2 md:mr-3">{category.emoji}</span>
-                <span className="hidden xs:inline">{category.label}</span>
-                <span className="xs:hidden text-xs">{category.label.split(' ')[0]}</span>
-                {activeCategory === category.id && (
-                  <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2 animate-spin" />
-                )}
-              </Button>
-            );
-          })}
+        <div className="mb-8 sm:mb-10 md:mb-12">
+          {/* Mobile: Vertical Stack */}
+          <div className="grid grid-cols-2 sm:hidden gap-2 px-2">
+            {categories.map((category) => {
+              const getCategoryColor = () => {
+                switch(category.id) {
+                  case 'stories': return 'bg-pink-50/40 dark:bg-pink-900/10 border-pink-300 dark:border-pink-600 hover:border-pink-400 dark:hover:border-pink-500';
+                  case 'vocabulary': return 'bg-yellow-50/40 dark:bg-yellow-900/10 border-yellow-300 dark:border-yellow-600 hover:border-yellow-400 dark:hover:border-yellow-500';
+                  case 'pronunciation': return 'bg-orange-50/40 dark:bg-orange-900/10 border-orange-300 dark:border-orange-600 hover:border-orange-400 dark:hover:border-orange-500';
+                  case 'games': return 'bg-purple-50/40 dark:bg-purple-900/10 border-purple-300 dark:border-purple-600 hover:border-purple-400 dark:hover:border-purple-500';
+                  default: return 'bg-gray-50/40 dark:bg-gray-900/10 border-gray-300 dark:border-gray-600';
+                }
+              };
+              
+              return (
+                <Button
+                  key={category.id}
+                  variant={activeCategory === category.id ? "default" : "outline"}
+                  className={cn(
+                    "rounded-xl px-3 py-4 text-sm font-bold transition-all duration-300 relative overflow-hidden group h-auto min-h-[80px] flex flex-col items-center justify-center gap-2",
+                    activeCategory === category.id 
+                      ? "bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white shadow-xl" 
+                      : `${getCategoryColor()} backdrop-blur-sm text-gray-800 dark:text-white border-2 hover:shadow-md`
+                  )}
+                  onClick={() => handleCategoryClick(category.id)}
+                >
+                  <span className="text-3xl flex-shrink-0">{category.emoji}</span>
+                  <span className="text-xs font-semibold text-center leading-tight">{category.label}</span>
+                  {activeCategory === category.id && (
+                    <Sparkles className="w-3 h-3 absolute top-1 right-1 animate-spin flex-shrink-0" />
+                  )}
+                </Button>
+              );
+            })}
+          </div>
+
+          {/* Tablet & Desktop: Horizontal */}
+          <div className="hidden sm:flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 lg:gap-5 px-2">
+            {categories.map((category) => {
+              const getCategoryColor = () => {
+                switch(category.id) {
+                  case 'stories': return 'bg-pink-50/40 dark:bg-pink-900/10 border-pink-300 dark:border-pink-600 hover:border-pink-400 dark:hover:border-pink-500';
+                  case 'vocabulary': return 'bg-yellow-50/40 dark:bg-yellow-900/10 border-yellow-300 dark:border-yellow-600 hover:border-yellow-400 dark:hover:border-yellow-500';
+                  case 'pronunciation': return 'bg-orange-50/40 dark:bg-orange-900/10 border-orange-300 dark:border-orange-600 hover:border-orange-400 dark:hover:border-orange-500';
+                  case 'games': return 'bg-purple-50/40 dark:bg-purple-900/10 border-purple-300 dark:border-purple-600 hover:border-purple-400 dark:hover:border-purple-500';
+                  default: return 'bg-gray-50/40 dark:bg-gray-900/10 border-gray-300 dark:border-gray-600';
+                }
+              };
+              
+              return (
+                <Button
+                  key={category.id}
+                  variant={activeCategory === category.id ? "default" : "outline"}
+                  className={cn(
+                    "rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 lg:px-10 py-2.5 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg lg:text-xl font-bold transition-all duration-300 relative overflow-hidden group",
+                    activeCategory === category.id 
+                      ? "bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white shadow-2xl transform hover:scale-110" 
+                      : `${getCategoryColor()} backdrop-blur-sm text-gray-800 dark:text-white border-2 hover:shadow-lg hover:scale-105`
+                  )}
+                  onClick={() => handleCategoryClick(category.id)}
+                >
+                  <span className="text-lg sm:text-xl md:text-2xl lg:text-3xl mr-1.5 sm:mr-2 md:mr-3 flex-shrink-0">{category.emoji}</span>
+                  <span className="whitespace-nowrap">{category.label}</span>
+                  {activeCategory === category.id && (
+                    <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 ml-1.5 sm:ml-2 animate-spin flex-shrink-0" />
+                  )}
+                </Button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Stories Grid or Module Content */}
         {activeCategory === 'stories' && (
-          <div className="mb-8 sm:mb-10 md:mb-12">
+          <div className="mb-8 sm:mb-10 md:mb-12 px-2 sm:px-0">
             {/* Stories Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6 lg:gap-8 mb-6 sm:mb-8">
               {currentStories.map((story, index) => {
                 const CharacterIcon = story.character;
                 const actualIndex = startIndex + index;
@@ -827,12 +864,12 @@ const KidsPage = () => {
                   <Card 
                     key={actualIndex} 
                     className={cn(
-                      "group cursor-pointer bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-2 border-transparent hover:border-[#FF6B6B] transition-all duration-500 hover:shadow-2xl overflow-hidden",
+                      "group cursor-pointer bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-2 border-transparent hover:border-[#FF6B6B] transition-all duration-500 hover:shadow-2xl overflow-hidden w-full",
                       bounceAnimation && currentStory === actualIndex && "animate-bounce"
                     )}
                     onMouseEnter={() => setCurrentStory(actualIndex)}
                   >
-                    <CardContent className="p-0 overflow-hidden rounded-2xl sm:rounded-3xl">
+                    <CardContent className="p-0 overflow-hidden rounded-xl sm:rounded-2xl lg:rounded-3xl">
                       <div className={cn(
                         "p-4 sm:p-6 md:p-8 relative overflow-hidden bg-gradient-to-br",
                         story.bgGradient
@@ -874,8 +911,8 @@ const KidsPage = () => {
                               toggleFavorite(index);
                             }} 
                             className={cn(
-                              "rounded-lg sm:rounded-xl text-base sm:text-lg", 
-                              favorites.includes(actualIndex) && "border-pink-500 text-pink-600"
+                              "rounded-lg sm:rounded-xl text-base sm:text-lg bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors", 
+                              favorites.includes(actualIndex) && "border-pink-500 text-pink-600 hover:bg-pink-50 dark:hover:bg-pink-900/20"
                             )}
                           >
                             ❤
@@ -907,16 +944,16 @@ const KidsPage = () => {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2 sm:gap-4 mt-6 sm:mt-8">
+              <div className="flex justify-center items-center gap-2 sm:gap-3 md:gap-4 mt-6 sm:mt-8 px-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="rounded-lg sm:rounded-xl px-3 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm"
+                  className="rounded-lg sm:rounded-xl px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-xs sm:text-sm font-semibold disabled:opacity-50 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300"
                 >
-                  <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
-                  <span className="hidden sm:inline">Previous</span>
+                  <ChevronLeft className="w-4 h-4 sm:w-4 sm:h-4 sm:mr-1 md:mr-2" />
+                  <span className="hidden md:inline">Previous</span>
                 </Button>
                 
                 <div className="flex items-center gap-1 sm:gap-2">
@@ -927,8 +964,10 @@ const KidsPage = () => {
                       size="sm"
                       onClick={() => handlePageChange(page)}
                       className={cn(
-                        "w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl text-xs sm:text-sm",
-                        currentPage === page && "bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white"
+                        "w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl text-xs sm:text-sm md:text-base font-bold",
+                        currentPage === page 
+                          ? "bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white shadow-lg" 
+                          : "bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300"
                       )}
                     >
                       {page}
@@ -941,10 +980,10 @@ const KidsPage = () => {
                   size="sm"
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="rounded-lg sm:rounded-xl px-3 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm"
+                  className="rounded-lg sm:rounded-xl px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-xs sm:text-sm font-semibold disabled:opacity-50 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300"
                 >
-                  <span className="hidden sm:inline">Next</span>
-                  <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 sm:ml-2" />
+                  <span className="hidden md:inline">Next</span>
+                  <ChevronRight className="w-4 h-4 sm:w-4 sm:h-4 sm:ml-1 md:ml-2" />
                 </Button>
               </div>
             )}
@@ -959,31 +998,31 @@ const KidsPage = () => {
         )}
 
         {activeCategory === 'vocabulary' && (
-          <div className="mb-8 sm:mb-10 md:mb-12">
+          <div className="mb-8 sm:mb-10 md:mb-12 px-2 sm:px-0">
             <Vocabulary words={vocabWords} />
           </div>
         )}
         
         {activeCategory === 'pronunciation' && (
-          <div className="mb-8 sm:mb-10 md:mb-12">
+          <div className="mb-8 sm:mb-10 md:mb-12 px-2 sm:px-0">
             <Pronunciation items={pronounceItems} />
           </div>
         )}
         
         {activeCategory === 'games' && (
-          <div className="mb-8 sm:mb-10 md:mb-12">
+          <div className="mb-8 sm:mb-10 md:mb-12 px-2 sm:px-0">
             <InteractiveGames />
           </div>
         )}
 
         {/* Achievements Section */}
-        <Card className="bg-purple-100/50 dark:bg-purple-950/30 backdrop-blur-sm border-2 border-purple-300 dark:border-purple-600 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl mb-6 sm:mb-8">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center mb-6 sm:mb-8 text-gray-900 dark:text-white flex items-center justify-center gap-2 sm:gap-3">
-            <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-500 dark:text-yellow-400 animate-bounce" />
-            Your Super Achievements!
+        <Card className="bg-purple-100/50 dark:bg-purple-950/30 backdrop-blur-sm border-2 border-purple-300 dark:border-purple-600 rounded-xl sm:rounded-2xl lg:rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl mb-6 sm:mb-8 mx-2 sm:mx-0">
+          <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-center mb-4 sm:mb-6 md:mb-8 text-gray-900 dark:text-white flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
+            <Trophy className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-yellow-500 dark:text-yellow-400 animate-bounce flex-shrink-0" />
+            <span>Your Super Achievements!</span>
           </h2>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
             {achievements.map((achievement, index) => {
               const isComplete = achievement.progress === 100;
               return (
@@ -1018,32 +1057,32 @@ const KidsPage = () => {
         </Card>
 
         {/* Quick Actions */}
-        <div className="text-center px-4">
-          <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-4 sm:mb-6 font-semibold">Ready for more fun? Let's play! 🎯</p>
-          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4">
+        <div className="text-center px-4 sm:px-6">
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 dark:text-gray-300 mb-4 sm:mb-6 font-semibold">Ready for more fun? Let's play! 🎯</p>
+          <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 max-w-4xl mx-auto">
             <Button 
               variant="outline" 
-              className="rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 border-2 border-green-300 dark:border-green-600 hover:border-green-400 dark:hover:border-green-500 bg-green-50/40 dark:bg-green-900/10 hover:bg-green-100/60 dark:hover:bg-green-900/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 group text-sm sm:text-base"
+              className="rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-3 sm:py-3 md:py-4 border-2 border-green-300 dark:border-green-600 hover:border-green-400 dark:hover:border-green-500 bg-green-50/40 dark:bg-green-900/10 hover:bg-green-100/60 dark:hover:bg-green-900/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 group text-sm sm:text-base w-full sm:w-auto sm:flex-1 sm:min-w-[160px]"
               onClick={() => handleCategoryClick('pronunciation')}
             >
-              <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2 text-green-600 dark:text-green-400 group-hover:animate-bounce" />
-              <span className="font-semibold text-gray-800 dark:text-gray-200">Listen & Repeat</span>
+              <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-green-600 dark:text-green-400 group-hover:animate-bounce flex-shrink-0" />
+              <span className="font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap">Listen & Repeat</span>
             </Button>
             <Button 
               variant="outline" 
-              className="rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 border-2 border-blue-300 dark:border-blue-600 hover:border-blue-400 dark:hover:border-blue-500 bg-blue-50/40 dark:bg-blue-900/10 hover:bg-blue-100/60 dark:hover:bg-blue-900/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 group text-sm sm:text-base"
+              className="rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-3 sm:py-3 md:py-4 border-2 border-blue-300 dark:border-blue-600 hover:border-blue-400 dark:hover:border-blue-500 bg-blue-50/40 dark:bg-blue-900/10 hover:bg-blue-100/60 dark:hover:bg-blue-900/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 group text-sm sm:text-base w-full sm:w-auto sm:flex-1 sm:min-w-[160px]"
               onClick={() => handleCategoryClick('pronunciation')}
             >
-              <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2 text-blue-600 dark:text-blue-400 group-hover:animate-pulse" />
-              <span className="font-semibold text-gray-800 dark:text-gray-200">Speak Now</span>
+              <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-blue-600 dark:text-blue-400 group-hover:animate-pulse flex-shrink-0" />
+              <span className="font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap">Speak Now</span>
             </Button>
             <Button 
               variant="outline" 
-              className="rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 border-2 border-pink-300 dark:border-pink-600 hover:border-pink-400 dark:hover:border-pink-500 bg-pink-50/40 dark:bg-pink-900/10 hover:bg-pink-100/60 dark:hover:bg-pink-900/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 group text-sm sm:text-base"
+              className="rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-3 sm:py-3 md:py-4 border-2 border-pink-300 dark:border-pink-600 hover:border-pink-400 dark:hover:border-pink-500 bg-pink-50/40 dark:bg-pink-900/10 hover:bg-pink-100/60 dark:hover:bg-pink-900/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 group text-sm sm:text-base w-full sm:w-auto sm:flex-1 sm:min-w-[160px]"
               onClick={() => handleCategoryClick('stories')}
             >
-              <Heart className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2 text-pink-600 dark:text-pink-400 group-hover:animate-pulse" />
-              <span className="font-semibold text-gray-800 dark:text-gray-200">Favorite Stories</span>
+              <Heart className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-pink-600 dark:text-pink-400 group-hover:animate-pulse flex-shrink-0" />
+              <span className="font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap">Favorite Stories</span>
             </Button>
           </div>
         </div>

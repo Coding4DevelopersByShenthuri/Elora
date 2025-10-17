@@ -15,7 +15,7 @@ const storySteps = [
   {
     id: 'intro',
     title: '🌳 Magic Forest Adventure',
-    text: 'Hello little explorer! ... I am Luna the magical rabbit! ... (Use an excited, friendly voice!) Welcome to our enchanted forest where amazing adventures await us! Have you ever been to a forest or park? This one is extra magical!',
+    text: 'Hello little explorer! I am Luna the magical rabbit!.. Welcome to our enchanted forest where amazing adventures await us! Have you ever been to a forest or park? This one is extra magical!',
     emoji: '🐰',
     character: 'Luna',
     bgColor: 'from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900',
@@ -26,7 +26,7 @@ const storySteps = [
   {
     id: 'whispering_trees',
     title: '🌲 Whispering Trees',
-    text: 'Look at these magnificent trees! ... They whisper secrets when the wind blows. ... (Use a soft, whisper voice - like when you tell a secret to a friend!) Can you hear them saying "Welcome to our forest!"? ... Let\'s say it together in a gentle whisper!',
+    text: 'Look at these magnificent trees! ... They whisper secrets when the wind blows. ... Can you hear them saying "Welcome to our forest!"? ... Let\'s say it together in a gentle whisper!',
     emoji: '🌲',
     character: 'Luna',
     bgColor: 'from-green-200 to-teal-200 dark:from-green-800 dark:to-teal-800',
@@ -41,7 +41,7 @@ const storySteps = [
   {
     id: 'colorful_butterfly',
     title: '🦋 Rainbow Butterfly',
-    text: 'Oh wonderful! ... A rainbow butterfly is flying toward us! ... Its wings are so colorful - like a rainbow after rain! ... It says "I love this sunny day!" ... (Use a cheerful, sing-song voice - like when you\'re really happy!) Can you repeat that with a happy voice?',
+    text: 'Oh wonderful! ... A rainbow butterfly is flying toward us! ... Its wings are so colorful - like a rainbow after rain! ... It says "I love this sunny day!" ... Can you repeat that with a happy voice?',
     emoji: '🦋',
     character: 'Luna',
     bgColor: 'from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900',
@@ -56,7 +56,7 @@ const storySteps = [
   {
     id: 'sparkling_river',
     title: '💧 Sparkling River',
-    text: 'Listen to the happy river! ... Do you hear the water flowing? ... It\'s singing "Flow, flow, flow so free!" ... (Sing it like a gentle song - imagine water flowing smoothly like when you pour water from a cup!) Can you sing that song with the river? ... Let\'s practice together!',
+    text: 'Listen to the happy river! ... Do you hear the water flowing? ... It\'s singing "Flow, flow, flow so free!" ... Can you sing that song with the river? ... Let\'s practice together!',
     emoji: '💧',
     character: 'Luna',
     bgColor: 'from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900',
@@ -71,7 +71,7 @@ const storySteps = [
   {
     id: 'talking_flowers',
     title: '🌸 Talking Flowers',
-    text: 'Amazing! ... These magical flowers can talk! ... They smell so sweet! ... They say "Being kind makes everyone smile!" ... (Say it with a warm, kind voice - like when you say "I love you" to someone special!) Can you say that? ... Remember, being kind is like giving someone a warm hug with your words!',
+    text: 'Amazing! ... These magical flowers can talk! ... They smell so sweet! ... They say "Being kind makes everyone smile!" ... Can you say that? ... Remember, being kind is like giving someone a warm hug with your words!',
     emoji: '🌸',
     character: 'Luna',
     bgColor: 'from-pink-100 to-rose-100 dark:from-pink-900 dark:to-rose-900',
@@ -98,7 +98,7 @@ const storySteps = [
   {
     id: 'friendly_squirrel',
     title: '🐿️ Busy Squirrel',
-    text: 'Look up there! ... Can you see the squirrel jumping on the branches? ... A friendly squirrel is calling "Come play with me up high!" ... (Use an excited, playful voice - like when you invite a friend to play on the playground!) Can you say that? ... Let\'s practice! Have you ever seen a squirrel climb a tree?',
+    text: 'Look up there! ... Can you see the squirrel jumping on the branches? ... A friendly squirrel is calling "Come play with me up high!" ... Can you say that? ... Let\'s practice! Have you ever seen a squirrel climb a tree?',
     emoji: '🐿️',
     character: 'Luna',
     bgColor: 'from-orange-100 to-amber-100 dark:from-orange-900 dark:to-amber-900',
@@ -125,7 +125,7 @@ const storySteps = [
   {
     id: 'wise_owl',
     title: '🦉 Wise Old Owl',
-    text: 'Good evening! ... The wise owl greets us ... (Say it in a deep, slow, wise voice - like a grandparent giving special advice!) "Always be curious and ask questions!" ... Can you repeat that? ... Owls are very wise - they know that asking questions helps us learn, just like when you ask "Why?" at home!',
+    text: 'Good evening! ... The wise owl greets us ... "Always be curious and ask questions!" ... Can you repeat that? ... Owls are very wise - they know that asking questions helps us learn, just like when you ask "Why?" at home!',
     emoji: '🦉',
     character: 'Luna',
     bgColor: 'from-gray-100 to-blue-100 dark:from-gray-900 dark:to-blue-900',
@@ -194,19 +194,20 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
     return () => clearInterval(timer);
   }, []);
 
-  // Auto-play story narration
+  // Auto-play story narration with character voice
   useEffect(() => {
     if (current.text && SpeechService.isTTSSupported()) {
       const playNarration = async () => {
         try {
-          await SpeechService.speak(current.text, { rate: 0.8, pitch: 1.2 });
+          // Use character-specific voice based on the current character
+          await SpeechService.speakAsCharacter(current.text, current.character as any);
         } catch (error) {
           console.log('TTS not available');
         }
       };
       playNarration();
     }
-  }, [current.text]);
+  }, [current.text, current.character]);
 
   const handleNext = () => {
     if (stepIndex < storySteps.length - 1) {
@@ -228,10 +229,10 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
     setSelectedChoice(choice);
     setIsPlaying(true);
     
-    // Play the correct word with excitement
+    // Play the correct word with character voice
     if (current.audioText && SpeechService.isTTSSupported()) {
       try {
-        await SpeechService.speak(current.audioText, { rate: 0.7, pitch: 1.3 });
+        await SpeechService.speakAsCharacter(current.audioText, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }
@@ -259,7 +260,7 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
     if (current.audioText && SpeechService.isTTSSupported()) {
       setIsPlaying(true);
       try {
-        await SpeechService.speak(current.audioText, { rate: 0.7, pitch: 1.3 });
+        await SpeechService.speakAsCharacter(current.audioText, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }
@@ -271,7 +272,7 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
     if (current.text && SpeechService.isTTSSupported()) {
       setIsPlaying(true);
       try {
-        await SpeechService.speak(current.text, { rate: 0.8, pitch: 1.2 });
+        await SpeechService.speakAsCharacter(current.text, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }

@@ -15,7 +15,7 @@ const pirateStory = [
   {
     id: 'intro',
     title: '🏴‍☠️ Ahoy, Matey!',
-    text: 'Ahoy there, shipmate! ... I\'m Captain Finn! ... (Use a brave, pirate voice - like a sea captain!) Our pirate ship is ready to find buried treasure! ... Can you hear the ocean waves? Have you ever been on a boat or seen the ocean? This is a pirate adventure!',
+    text: 'Ahoy there, shipmate! ... I\'m Captain Finn! ... Our pirate ship is ready to find buried treasure! ... Can you hear the ocean waves? Have you ever been on a boat or seen the ocean? This is a pirate adventure!',
     emoji: '🧔‍♂️',
     character: 'Captain Finn',
     bgColor: 'from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900',
@@ -26,7 +26,7 @@ const pirateStory = [
   {
     id: 'treasure_map',
     title: '🗺️ Secret Map!',
-    text: 'Look at this old treasure map! ... The map says "X marks the spot where treasure hides!" ... (Say it in an exciting pirate voice - like "Arrr!" - deep and strong!) Can you say that? ... Arrr, let\'s shout it! X means "here" on a treasure map!',
+    text: 'Look at this old treasure map! ... The map says "X marks the spot where treasure hides!" ... Can you say that? ... Arrr, let\'s shout it! X means "here" on a treasure map!',
     emoji: '🗺️',
     character: 'Captain Finn',
     bgColor: 'from-amber-100 to-orange-100 dark:from-amber-900 dark:to-orange-900',
@@ -113,19 +113,20 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
     return () => clearInterval(timer);
   }, []);
 
-  // Auto-play story narration
+  // Auto-play story narration with character voice
   useEffect(() => {
     if (current.text && SpeechService.isTTSSupported()) {
       const playNarration = async () => {
         try {
-          await SpeechService.speak(current.text, { rate: 0.8, pitch: 1.1 });
+          // Use character-specific voice (Captain Finn or Polly)
+          await SpeechService.speakAsCharacter(current.text, current.character as any);
         } catch (error) {
           console.log('TTS not available');
         }
       };
       playNarration();
     }
-  }, [current.text]);
+  }, [current.text, current.character]);
 
   const handleNext = () => {
     if (stepIndex < pirateStory.length - 1) {
@@ -147,10 +148,10 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
     setSelectedChoice(choice);
     setIsPlaying(true);
     
-    // Play the correct word with excitement
+    // Play the correct word with character voice
     if (current.audioText && SpeechService.isTTSSupported()) {
       try {
-        await SpeechService.speak(current.audioText, { rate: 0.7, pitch: 1.2 });
+        await SpeechService.speakAsCharacter(current.audioText, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }
@@ -177,7 +178,7 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
     if (current.audioText && SpeechService.isTTSSupported()) {
       setIsPlaying(true);
       try {
-        await SpeechService.speak(current.audioText, { rate: 0.7, pitch: 1.2 });
+        await SpeechService.speakAsCharacter(current.audioText, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }
@@ -189,7 +190,7 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
     if (current.text && SpeechService.isTTSSupported()) {
       setIsPlaying(true);
       try {
-        await SpeechService.speak(current.text, { rate: 0.8, pitch: 1.1 });
+        await SpeechService.speakAsCharacter(current.text, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }

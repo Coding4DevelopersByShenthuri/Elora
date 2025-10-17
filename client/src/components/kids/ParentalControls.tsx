@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Progress } from '@/components/ui/progress';
 import { Lock, Unlock, Clock, BarChart3, Settings, Eye, EyeOff, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -116,7 +115,7 @@ const ParentalControls = ({ userId, onClose }: ParentalControlsProps) => {
   if (isLocked) {
     return (
       <div className="flex items-center justify-center min-h-[60vh] p-4">
-        <Card className="w-full max-w-md border-2 border-purple-300 dark:border-purple-600 bg-white dark:bg-gray-800">
+        <Card className="w-full max-w-md border-2 border-purple-300 dark:border-purple-600 bg-white/40 dark:bg-gray-800/50 backdrop-blur-sm shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center justify-between text-lg sm:text-xl md:text-2xl">
               <span className="flex items-center gap-2">
@@ -182,71 +181,43 @@ const ParentalControls = ({ userId, onClose }: ParentalControlsProps) => {
   }
 
   return (
-    <div className="w-full">
-      <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-2xl max-w-4xl w-full mx-auto overflow-hidden flex flex-col">
-        {/* Header */}
-        <div className="flex-shrink-0 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-b-2 border-purple-200 dark:border-purple-700 px-4 sm:px-6 py-4 sm:py-5">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2 sm:gap-3">
-              <Settings className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-purple-500 dark:text-purple-400" />
-              <span className="hidden sm:inline">Parental Controls</span>
-              <span className="sm:hidden">Controls</span>
-            </h2>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onClose}
-              className="rounded-full border-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-            >
-              <X className="w-4 h-4 sm:w-5 sm:h-5" />
-            </Button>
-          </div>
-        </div>
+    <div className="w-full space-y-4 sm:space-y-6">
+      {/* Tabs */}
+      <div className="flex gap-2 sm:gap-4 border-b-2 border-purple-200 dark:border-purple-700 pb-2">
+        <button
+          onClick={() => setActiveTab('settings')}
+          className={cn(
+            "px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold transition-all rounded-t-lg",
+            activeTab === 'settings'
+              ? "bg-white/40 dark:bg-gray-800/50 text-purple-600 dark:text-purple-400 border-2 border-purple-300 dark:border-purple-600 border-b-0"
+              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/20 dark:hover:bg-gray-800/20"
+          )}
+        >
+          <Settings className="w-4 h-4 inline mr-1 sm:mr-2" />
+          <span className="hidden sm:inline">Settings</span>
+          <span className="sm:hidden">⚙️</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('stats')}
+          className={cn(
+            "px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold transition-all rounded-t-lg",
+            activeTab === 'stats'
+              ? "bg-white/40 dark:bg-gray-800/50 text-purple-600 dark:text-purple-400 border-2 border-purple-300 dark:border-purple-600 border-b-0"
+              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/20 dark:hover:bg-gray-800/20"
+          )}
+        >
+          <BarChart3 className="w-4 h-4 inline mr-1 sm:mr-2" />
+          <span className="hidden sm:inline">Statistics</span>
+          <span className="sm:hidden">📊</span>
+        </button>
+      </div>
 
-        {/* Tabs */}
-        <div className="flex-shrink-0 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
-          <div className="flex gap-1 sm:gap-2 px-3 sm:px-6">
-            <button
-              onClick={() => setActiveTab('settings')}
-              className={cn(
-                "px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold transition-all relative",
-                activeTab === 'settings'
-                  ? "text-purple-600 dark:text-purple-400"
-                  : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-              )}
-            >
-              <Settings className="w-4 h-4 inline mr-1 sm:mr-2" />
-              <span className="hidden sm:inline">Settings</span>
-              <span className="sm:hidden">⚙️</span>
-              {activeTab === 'settings' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600 dark:bg-purple-400" />
-              )}
-            </button>
-            <button
-              onClick={() => setActiveTab('stats')}
-              className={cn(
-                "px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold transition-all relative",
-                activeTab === 'stats'
-                  ? "text-purple-600 dark:text-purple-400"
-                  : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-              )}
-            >
-              <BarChart3 className="w-4 h-4 inline mr-1 sm:mr-2" />
-              <span className="hidden sm:inline">Statistics</span>
-              <span className="sm:hidden">📊</span>
-              {activeTab === 'stats' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600 dark:bg-purple-400" />
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 p-4 sm:p-6 bg-gray-50 dark:bg-gray-900">
-          {activeTab === 'settings' && (
+      {/* Content */}
+      <div className="w-full">
+        {activeTab === 'settings' && (
             <div className="space-y-4 sm:space-y-6">
               {/* Daily Time Limit */}
-              <Card className="border-2 border-blue-300 dark:border-blue-600 bg-white dark:bg-gray-800">
+              <Card className="border-2 border-blue-300 dark:border-blue-600 bg-white/40 dark:bg-gray-800/50 backdrop-blur-sm shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-base sm:text-lg md:text-xl">
                     <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 dark:text-blue-400" />
@@ -285,7 +256,7 @@ const ParentalControls = ({ userId, onClose }: ParentalControlsProps) => {
               </Card>
 
               {/* PIN Management */}
-              <Card className="border-2 border-purple-300 dark:border-purple-600 bg-white dark:bg-gray-800">
+              <Card className="border-2 border-purple-300 dark:border-purple-600 bg-white/40 dark:bg-gray-800/50 backdrop-blur-sm shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-base sm:text-lg md:text-xl">
                     <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500 dark:text-purple-400" />
@@ -293,52 +264,54 @@ const ParentalControls = ({ userId, onClose }: ParentalControlsProps) => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3 sm:space-y-4">
-                  <div>
-                    <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                      New PIN (4-6 digits)
-                    </label>
-                    <Input
-                      type="password"
-                      value={newPin}
-                      onChange={(e) => setNewPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                      placeholder="Enter new PIN"
-                      className="text-center text-lg sm:text-xl tracking-widest font-mono bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600"
-                      maxLength={6}
-                    />
-                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    <div className="w-full">
+                      <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        New PIN (4-6 digits)
+                      </label>
+                      <Input
+                        type="password"
+                        value={newPin}
+                        onChange={(e) => setNewPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                        placeholder="Enter new PIN"
+                        className="w-full text-center text-lg sm:text-xl tracking-widest font-mono bg-white/60 dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600 h-12 sm:h-14"
+                        maxLength={6}
+                      />
+                    </div>
 
-                  <div>
-                    <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                      Confirm PIN
-                    </label>
-                    <Input
-                      type="password"
-                      value={confirmPin}
-                      onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                      placeholder="Confirm new PIN"
-                      className="text-center text-lg sm:text-xl tracking-widest font-mono bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600"
-                      maxLength={6}
-                    />
+                    <div className="w-full">
+                      <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        Confirm PIN
+                      </label>
+                      <Input
+                        type="password"
+                        value={confirmPin}
+                        onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                        placeholder="Confirm new PIN"
+                        className="w-full text-center text-lg sm:text-xl tracking-widest font-mono bg-white/60 dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600 h-12 sm:h-14"
+                        maxLength={6}
+                      />
+                    </div>
                   </div>
 
                   {error && (
-                    <p className="text-red-600 dark:text-red-400 text-xs sm:text-sm font-semibold bg-red-50 dark:bg-red-900/20 p-2 rounded-lg">
+                    <p className="text-red-600 dark:text-red-400 text-xs sm:text-sm font-semibold bg-red-50 dark:bg-red-900/20 p-2 sm:p-3 rounded-lg">
                       ⚠️ {error}
                     </p>
                   )}
 
-                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 pt-2">
                     <Button
                       onClick={handleSetupPin}
                       disabled={!newPin || !confirmPin}
-                      className="flex-1 bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-500 text-sm sm:text-base font-bold"
+                      className="w-full bg-purple-500/20 hover:bg-purple-500/30 dark:bg-purple-600/80 dark:hover:bg-purple-500 border-2 border-purple-400 dark:border-purple-500 text-purple-700 dark:text-white backdrop-blur-sm text-sm sm:text-base font-bold h-10 sm:h-11 shadow-md transition-all"
                     >
                       Set New PIN
                     </Button>
                     <Button
                       onClick={handleResetPin}
                       variant="outline"
-                      className="border-2 border-red-300 dark:border-red-600 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 text-sm sm:text-base font-bold"
+                      className="w-full border-2 border-red-400 dark:border-red-600 bg-red-500/20 hover:bg-red-500/30 dark:bg-red-900/20 dark:hover:bg-red-900/40 text-red-700 dark:text-red-400 text-sm sm:text-base font-bold h-10 sm:h-11 backdrop-blur-sm transition-all"
                     >
                       Reset PIN
                     </Button>
@@ -349,9 +322,9 @@ const ParentalControls = ({ userId, onClose }: ParentalControlsProps) => {
               {/* Save Button */}
               <Button
                 onClick={handleSaveSettings}
-                className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-emerald-500 hover:to-green-500 dark:from-green-600 dark:to-emerald-600 dark:hover:from-emerald-600 dark:hover:to-green-600 h-10 sm:h-12 text-base sm:text-lg font-bold rounded-lg sm:rounded-xl shadow-md"
+                className="w-full bg-gradient-to-r from-green-500/20 to-emerald-500/20 hover:from-green-500/30 hover:to-emerald-500/30 dark:from-green-600/80 dark:to-emerald-600/80 dark:hover:from-emerald-600 dark:hover:to-green-600 border-2 border-green-500 dark:border-green-600 text-green-700 dark:text-white h-10 sm:h-12 text-base sm:text-lg font-bold rounded-lg sm:rounded-xl shadow-md backdrop-blur-sm transition-all"
               >
-                💾 Save All Settings
+                Save All Settings
               </Button>
             </div>
           )}
@@ -359,7 +332,7 @@ const ParentalControls = ({ userId, onClose }: ParentalControlsProps) => {
           {activeTab === 'stats' && (
             <div className="space-y-4 sm:space-y-6">
               {/* Usage Today */}
-              <Card className="border-2 border-orange-300 dark:border-orange-600 bg-white dark:bg-gray-800">
+              <Card className="border-2 border-orange-300 dark:border-orange-600 bg-white/40 dark:bg-gray-800/50 backdrop-blur-sm shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-base sm:text-lg md:text-xl">
                     <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500 dark:text-orange-400" />
@@ -409,7 +382,7 @@ const ParentalControls = ({ userId, onClose }: ParentalControlsProps) => {
               </Card>
 
               {/* Learning Progress */}
-              <Card className="border-2 border-green-300 dark:border-green-600 bg-white dark:bg-gray-800">
+              <Card className="border-2 border-green-300 dark:border-green-600 bg-white/40 dark:bg-gray-800/50 backdrop-blur-sm shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-base sm:text-lg md:text-xl">
                     <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 dark:text-green-400" />
@@ -457,7 +430,6 @@ const ParentalControls = ({ userId, onClose }: ParentalControlsProps) => {
             </div>
           )}
         </div>
-      </div>
     </div>
   );
 };

@@ -15,7 +15,7 @@ const storySteps = [
   {
     id: 'intro',
     title: '🧚 Fairy World!',
-    text: 'Welcome to Blossom Meadow! ... I am Twinkle the fairy! ... (Use a SOFT, MAGICAL, GENTLE voice—like a tiny fairy speaking sweetly!) Everything here is tiny and magical. ... Can you see the fairy dust sparkling? Have you ever seen sparkles or glitter? That is like fairy dust!',
+    text: 'Welcome to Blossom Meadow! ... I am Twinkle the fairy! ... Everything here is tiny and magical. ... Can you see the fairy dust sparkling? Have you ever seen sparkles or glitter? That is like fairy dust!',
     emoji: '🧚‍♀️',
     character: 'Twinkle the Fairy',
     bgColor: 'from-pink-100 to-purple-100 dark:from-pink-900 dark:to-purple-900',
@@ -26,7 +26,7 @@ const storySteps = [
   {
     id: 'fairy_dust',
     title: '✨ Magic Dust',
-    text: 'Watch me sprinkle magic! ... Let us say "Fairy dust makes flowers bloom!" ... (Say it in a SOFT, MAGICAL, TWINKLING voice—like sprinkling sparkly magic everywhere!) Can you say that? ... Let us make magic! Imagine the flowers growing and opening up!',
+    text: 'Watch me sprinkle magic! ... Let us say "Fairy dust makes flowers bloom!" ... Can you say that? ... Let us make magic! Imagine the flowers growing and opening up!',
     emoji: '✨',
     character: 'Twinkle the Fairy',
     bgColor: 'from-yellow-100 to-amber-100 dark:from-yellow-900 dark:to-amber-900',
@@ -53,7 +53,7 @@ const storySteps = [
   {
     id: 'talking_animals',
     title: '🐇 Bunny Friends',
-    text: 'Look at the cute bunnies! ... The bunnies say "We love hopping in the garden!" ... (Say it in a HAPPY, BOUNCY, PLAYFUL voice while hopping gently—hop hop hop!) Can you say that? ... Let us hop like bunnies! Have you ever seen a bunny hop?',
+    text: 'Look at the cute bunnies! ... The bunnies say "We love hopping in the garden!" ... Can you say that? ... Let us hop like bunnies! Have you ever seen a bunny hop?',
     emoji: '🐇',
     character: 'Twinkle the Fairy',
     bgColor: 'from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900',
@@ -149,19 +149,20 @@ const FairyGardenAdventure = ({ onClose, onComplete }: Props) => {
     return () => clearInterval(timer);
   }, []);
 
-  // Auto-play story narration
+  // Auto-play story narration with character voice
   useEffect(() => {
     if (current.text && SpeechService.isTTSSupported()) {
       const playNarration = async () => {
         try {
-          await SpeechService.speak(current.text, { rate: 0.8, pitch: 1.2 });
+          // Use character-specific voice (Fairy)
+          await SpeechService.speakAsCharacter(current.text, current.character as any);
         } catch (error) {
           console.log('TTS not available');
         }
       };
       playNarration();
     }
-  }, [current.text]);
+  }, [current.text, current.character]);
 
   const handleNext = () => {
     if (stepIndex < storySteps.length - 1) {
@@ -183,10 +184,10 @@ const FairyGardenAdventure = ({ onClose, onComplete }: Props) => {
     setSelectedChoice(choice);
     setIsPlaying(true);
     
-    // Play the correct word with excitement
+    // Play the correct word with character voice
     if (current.audioText && SpeechService.isTTSSupported()) {
       try {
-        await SpeechService.speak(current.audioText, { rate: 0.7, pitch: 1.4 });
+        await SpeechService.speakAsCharacter(current.audioText, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }
@@ -214,7 +215,7 @@ const FairyGardenAdventure = ({ onClose, onComplete }: Props) => {
     if (current.audioText && SpeechService.isTTSSupported()) {
       setIsPlaying(true);
       try {
-        await SpeechService.speak(current.audioText, { rate: 0.7, pitch: 1.4 });
+        await SpeechService.speakAsCharacter(current.audioText, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }
@@ -226,7 +227,7 @@ const FairyGardenAdventure = ({ onClose, onComplete }: Props) => {
     if (current.text && SpeechService.isTTSSupported()) {
       setIsPlaying(true);
       try {
-        await SpeechService.speak(current.text, { rate: 0.8, pitch: 1.2 });
+        await SpeechService.speakAsCharacter(current.text, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }
@@ -454,16 +455,8 @@ const FairyGardenAdventure = ({ onClose, onComplete }: Props) => {
 
                   {/* Feedback */}
                   {showFeedback && (
-                    <div className="mt-2 sm:mt-3 animate-fade-in">
-                      {selectedChoice === current.audioText ? (
-                        <div className="text-green-600 dark:text-green-400 text-xs sm:text-sm md:text-base font-bold animate-bounce bg-green-50 dark:bg-green-900/20 rounded-lg sm:rounded-lg md:rounded-xl p-2.5 sm:p-2 md:p-3 border border-green-200 dark:border-green-700">
-                          🎉 MAGICAL! You used such a beautiful fairy voice and listened perfectly! You earned a fairy star! ⭐ You are a wonderful fairy friend!
-                        </div>
-                      ) : (
-                        <div className="text-red-600 dark:text-red-400 text-xs sm:text-sm md:text-base font-bold bg-red-50 dark:bg-red-900/20 rounded-lg sm:rounded-lg md:rounded-xl p-2.5 sm:p-2 md:p-3 border border-red-200 dark:border-red-700">
-                          💫 LOVELY try! You are working so beautifully! The magic word was "{current.audioText}" - Let us practice it together! You are doing WONDERFUL!
-                        </div>
-                      )}
+                    <div className="text-red-600 dark:text-red-400 text-xs sm:text-sm md:text-base font-bold bg-red-50 dark:bg-red-900/20 rounded-lg sm:rounded-lg md:rounded-xl p-2.5 sm:p-2 md:p-3 border border-red-200 dark:border-red-700">
+                      💫 LOVELY try! You are working so beautifully! The magic word was "{current.audioText}" - Let us practice it together! You are doing WONDERFUL!
                     </div>
                   )}
                 </div>

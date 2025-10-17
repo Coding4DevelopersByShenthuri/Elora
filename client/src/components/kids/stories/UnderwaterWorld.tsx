@@ -15,7 +15,7 @@ const storySteps = [
   {
     id: 'intro',
     title: '🌊 Ocean Adventure Begins!',
-    text: 'Hello there, ocean explorer! ... I am Finn the friendly fish! ... (Use a bubbly, underwater voice!) Come dive with me into the magical underwater world where we\'ll meet amazing sea creatures and discover ocean secrets! ... Have you ever been swimming or seen fish in an aquarium? We\'re going even deeper!',
+    text: 'Hello there, ocean explorer! ... I am Finn the friendly fish! ... Come dive with me into the magical underwater world where we\'ll meet amazing sea creatures and discover ocean secrets! ... Have you ever been swimming or seen fish in an aquarium? We\'re going even deeper!',
     emoji: '🐠',
     character: 'Finn',
     bgColor: 'from-blue-100 to-teal-100 dark:from-blue-900 dark:to-teal-900',
@@ -26,7 +26,7 @@ const storySteps = [
   {
     id: 'coral_reef',
     title: '🐚 Beautiful Coral Reef',
-    text: 'Wow! ... Look at all these beautiful colors! ... The coral reef says "Welcome to our colorful home!" ... (Say it in a cheerful, welcoming voice - like inviting a friend into your house!) Can you say that? ... Let\'s greet the reef! The coral looks like an underwater rainbow garden!',
+    text: 'Wow! ... Look at all these beautiful colors! ... The coral reef says "Welcome to our colorful home!" ... Can you say that? ... Let\'s greet the reef! The coral looks like an underwater rainbow garden!',
     emoji: '🐚',
     character: 'Finn',
     bgColor: 'from-pink-100 to-orange-100 dark:from-pink-900 dark:to-orange-900',
@@ -41,7 +41,7 @@ const storySteps = [
   {
     id: 'dolphin_friend',
     title: '🐬 Playful Dolphin Friend!',
-    text: 'Amazing! ... Here comes a dolphin jumping through the waves! ... The dolphin says "Let\'s splash and play together!" ... (Say it with a playful, excited voice - like when you\'re super happy to play!) Can you say that? ... Ready to play! Dolphins love to jump and splash just like you!',
+    text: 'Amazing! ... Here comes a dolphin jumping through the waves! ... The dolphin says "Let\'s splash and play together!" ... Can you say that? ... Ready to play! Dolphins love to jump and splash just like you!',
     emoji: '🐬',
     character: 'Finn',
     bgColor: 'from-cyan-100 to-blue-100 dark:from-cyan-900 dark:to-blue-900',
@@ -68,7 +68,7 @@ const storySteps = [
   {
     id: 'octopus_hide',
     title: '🐙 Clever Octopus Hideout!',
-    text: 'Look! ... The clever octopus can change colors! ... It says "I can hide anywhere I want!" ... (Say it in a sneaky, playful voice - like when you\'re playing hide and seek!) Can you say that? ... Let\'s practice being sneaky! Have you ever played hide and seek?',
+    text: 'Look! ... The clever octopus can change colors! ... It says "I can hide anywhere I want!" ... Can you say that? ... Let\'s practice being sneaky! Have you ever played hide and seek?',
     emoji: '🐙',
     character: 'Finn',
     bgColor: 'from-purple-100 to-indigo-100 dark:from-purple-900 dark:to-indigo-900',
@@ -83,7 +83,7 @@ const storySteps = [
   {
     id: 'whale_song',
     title: '🐋 Magical Whale Song!',
-    text: 'WOW! ... A giant whale! ... The whale sings "The ocean is my home so deep!" ... (Sing it in a deep, slow voice like a big whale - use your deepest voice!) Can you sing that? ... Let\'s sing! Whales are the biggest animals in the ocean!',
+    text: 'WOW! ... A giant whale! ... The whale sings "The ocean is my home so deep!" ... Can you sing that? ... Let\'s sing! Whales are the biggest animals in the ocean!',
     emoji: '🐋',
     character: 'Finn',
     bgColor: 'from-gray-100 to-blue-100 dark:from-gray-900 dark:to-blue-900',
@@ -110,7 +110,7 @@ const storySteps = [
   {
     id: 'sea_turtle',
     title: '🐢 Wise Sea Turtle!',
-    text: 'Here comes an old, wise turtle! ... The turtle says "Take your time and enjoy the journey!" ... (Say it in a slow, calm, wise voice - like taking a peaceful walk!) Can you say that? ... Let\'s be calm and wise! Turtles move slowly and that\'s perfectly okay!',
+    text: 'Here comes an old, wise turtle! ... The turtle says "Take your time and enjoy the journey!" ... Can you say that? ... Let\'s be calm and wise! Turtles move slowly and that\'s perfectly okay!',
     emoji: '🐢',
     character: 'Finn',
     bgColor: 'from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900',
@@ -125,7 +125,7 @@ const storySteps = [
   {
     id: 'seahorse_dance',
     title: '🦋 Magical Seahorse Dance!',
-    text: 'Look at these tiny, graceful seahorses! ... The seahorses say "Dancing makes us happy!" ... (Say it while moving gently like you\'re dancing - wiggle a little!) Can you say that? ... Let\'s dance with them! Do you like to dance too?',
+    text: 'Look at these tiny, graceful seahorses! ... The seahorses say "Dancing makes us happy!" ... Can you say that? ... Let\'s dance with them! Do you like to dance too?',
     emoji: '🦋',
     character: 'Finn',
     bgColor: 'from-pink-100 to-purple-100 dark:from-pink-900 dark:to-purple-900',
@@ -152,7 +152,7 @@ const storySteps = [
   {
     id: 'treasure_chest',
     title: '📦 Sunken Treasure!',
-    text: 'Oh my goodness! ... We found treasure! ... Let\'s shout "We discovered something amazing!" ... (Say it with surprise and excitement - like opening a birthday present!) Can you say that? ... Let\'s celebrate! Have you ever found something special?',
+    text: 'Oh my goodness! ... We found treasure! ... Let\'s shout "We discovered something amazing!" ... Can you say that? ... Let\'s celebrate! Have you ever found something special?',
     emoji: '📦',
     character: 'Finn',
     bgColor: 'from-amber-100 to-yellow-100 dark:from-amber-900 dark:to-yellow-900',
@@ -221,19 +221,20 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
     return () => clearInterval(timer);
   }, []);
 
-  // Auto-play story narration
+  // Auto-play story narration with character voice
   useEffect(() => {
     if (current.text && SpeechService.isTTSSupported()) {
       const playNarration = async () => {
         try {
-          await SpeechService.speak(current.text, { rate: 0.8, pitch: 1.1 });
+          // Use character-specific voice (Finn or other ocean characters)
+          await SpeechService.speakAsCharacter(current.text, current.character as any);
         } catch (error) {
           console.log('TTS not available');
         }
       };
       playNarration();
     }
-  }, [current.text]);
+  }, [current.text, current.character]);
 
   const handleNext = () => {
     if (stepIndex < storySteps.length - 1) {
@@ -255,10 +256,10 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
     setSelectedChoice(choice);
     setIsPlaying(true);
     
-    // Play the correct word with excitement
+    // Play the correct word with character voice
     if (current.audioText && SpeechService.isTTSSupported()) {
       try {
-        await SpeechService.speak(current.audioText, { rate: 0.7, pitch: 1.3 });
+        await SpeechService.speakAsCharacter(current.audioText, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }
@@ -286,7 +287,7 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
     if (current.audioText && SpeechService.isTTSSupported()) {
       setIsPlaying(true);
       try {
-        await SpeechService.speak(current.audioText, { rate: 0.7, pitch: 1.3 });
+        await SpeechService.speakAsCharacter(current.audioText, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }
@@ -298,7 +299,7 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
     if (current.text && SpeechService.isTTSSupported()) {
       setIsPlaying(true);
       try {
-        await SpeechService.speak(current.text, { rate: 0.8, pitch: 1.1 });
+        await SpeechService.speakAsCharacter(current.text, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }

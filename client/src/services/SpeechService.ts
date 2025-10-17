@@ -2,8 +2,11 @@
   SpeechService provides offline-friendly TTS and STT facades.
   - TTS: Uses Web Speech API speechSynthesis when available (runs locally in modern browsers/OS voices)
   - STT: Uses Web Speech API SpeechRecognition when available (implementation varies by browser)
+  - Character Voices: Each character has unique voice settings for expressive storytelling
   For strict offline with deterministic models (e.g., Vosk/Whisper.cpp), integrate via WebAssembly/WebWorker later.
 */
+
+import { getCharacterVoice, type CharacterType } from './CharacterVoiceService';
 
 export type SpeechRecognitionResult = {
   transcript: string;
@@ -48,6 +51,46 @@ export class SpeechService {
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utterance);
     });
+  }
+
+  /**
+   * Speak text using a specific character's voice
+   * Each character has unique pitch, rate, and volume for expressive storytelling
+   * Text is split by natural pauses (...) for better pacing
+   */
+  static async speakAsCharacter(text: string, character: CharacterType, opts?: { lang?: string; voiceName?: string }): Promise<void> {
+    const characterVoice = getCharacterVoice(character);
+    
+    // Debug log to verify character voice is being used
+    console.log(`🎭 Speaking as "${character}":`, {
+      pitch: characterVoice.pitch,
+      rate: characterVoice.rate,
+      volume: characterVoice.volume,
+      description: characterVoice.description
+    });
+    
+    // Split by natural pauses (...) for better pacing
+    const segments = text.split(/\s*\.\.\.\s*/).filter(seg => seg.trim());
+    
+    // Speak each segment sequentially with pauses
+    for (let i = 0; i < segments.length; i++) {
+      const segment = segments[i].trim();
+      
+      if (segment) {
+        await this.speak(segment, {
+          rate: characterVoice.rate,
+          pitch: characterVoice.pitch,
+          volume: characterVoice.volume,
+          lang: opts?.lang ?? this.ttsDefaultLang,
+          voiceName: opts?.voiceName
+        });
+
+        // Add a natural pause between segments (except after the last one)
+        if (i < segments.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 400));
+        }
+      }
+    }
   }
 
   static cancelSpeak(): void {

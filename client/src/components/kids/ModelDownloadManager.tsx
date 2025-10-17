@@ -184,15 +184,15 @@ const ModelDownloadManager = ({ onComplete, userLevel = 'beginner', hideHeader =
   const totalEssentialSize = essentialModels.reduce((sum, m) => sum + m.sizeBytes, 0);
 
   return (
-    <div className="space-y-4 sm:space-y-6 pt-6 sm:pt-8">
+    <div className="space-y-4 sm:space-y-6 pt-2 sm:pt-3">
       {/* Header */}
-      <div className="text-center mb-4 sm:mb-6">
+      <div className="text-center mb-3 sm:mb-4">
         {!hideHeader && (
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] bg-clip-text text-transparent mb-2">
             Download AI Tutor
           </h2>
         )}
-        <p className="text-sm sm:text-base font-semibold text-gray-800 dark:text-gray-200">
+        <p className="text-sm sm:text-base md:text-lg font-semibold text-gray-800 dark:text-gray-200 px-2">
           Download these files once to practice English offline! 🚀
         </p>
       </div>
@@ -226,7 +226,7 @@ const ModelDownloadManager = ({ onComplete, userLevel = 'beginner', hideHeader =
       </Card>
 
       {/* Storage Info */}
-      <Card className="border-2 border-purple-300 dark:border-purple-600 bg-white dark:bg-gray-800 shadow-sm">
+      <Card className="border-2 border-purple-300 dark:border-purple-600 bg-white/40 dark:bg-gray-800/50 shadow-sm backdrop-blur-sm">
         <CardContent className="py-3 sm:py-4">
           <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
             <HardDrive className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600 dark:text-purple-400 flex-shrink-0" />
@@ -253,7 +253,7 @@ const ModelDownloadManager = ({ onComplete, userLevel = 'beginner', hideHeader =
 
       {/* Quick Download All Essential */}
       {!allEssentialDownloaded && (
-        <Card className="border-2 border-yellow-400 dark:border-yellow-500 bg-yellow-100 dark:bg-yellow-900/30 shadow-sm">
+        <Card className="border-2 border-yellow-400 dark:border-yellow-500 bg-yellow-50/50 dark:bg-yellow-900/30 shadow-sm">
           <CardContent className="py-3 sm:py-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex-1">
@@ -346,7 +346,7 @@ const ModelDownloadManager = ({ onComplete, userLevel = 'beginner', hideHeader =
 
       {/* All Downloaded Success Message */}
       {allEssentialDownloaded && (
-        <Card className="border-2 border-green-400 dark:border-green-500 bg-green-100 dark:bg-green-900/30 shadow-sm">
+        <Card className="border-2 border-green-400 dark:border-green-500 bg-green-50/50 dark:bg-green-900/30 shadow-sm">
           <CardContent className="py-4 sm:py-6 text-center">
             <CheckCircle className="w-12 h-12 sm:w-16 sm:h-16 text-green-600 dark:text-green-400 mx-auto mb-3 sm:mb-4" />
             <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-2">
@@ -375,10 +375,10 @@ interface ModelCardProps {
 const ModelCard = ({ model, isDownloading, downloadProgress, onDownload, onDelete, isOnline }: ModelCardProps) => {
   return (
     <Card className={cn(
-      "border-2 transition-all duration-300 shadow-sm",
+      "border-2 transition-all duration-300 shadow-sm backdrop-blur-sm",
       model.cached 
-        ? "border-green-400 dark:border-green-500 bg-green-100 dark:bg-green-900/30" 
-        : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
+        ? "border-green-400 dark:border-green-500 bg-white/30 dark:bg-green-900/30" 
+        : "border-gray-300 dark:border-gray-600 bg-white/40 dark:bg-gray-800/50"
     )}>
       <CardContent className="py-3 sm:py-4">
         <div className="flex items-start justify-between gap-3 sm:gap-4">
@@ -411,7 +411,7 @@ const ModelCard = ({ model, isDownloading, downloadProgress, onDownload, onDelet
                 variant="outline"
                 size="sm"
                 onClick={() => onDelete(model.id)}
-                className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 text-xs sm:text-sm h-8 sm:h-9 font-bold border-2 border-red-300 dark:border-red-600"
+                className="text-red-600 hover:text-red-700 bg-transparent hover:bg-red-50 dark:bg-transparent dark:hover:bg-red-900/20 text-xs sm:text-sm h-8 sm:h-9 font-bold border-2 border-red-400 dark:border-red-600"
               >
                 Delete
               </Button>

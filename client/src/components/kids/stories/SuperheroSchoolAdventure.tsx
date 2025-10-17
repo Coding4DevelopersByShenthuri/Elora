@@ -15,7 +15,7 @@ const storySteps = [
   {
     id: 'intro',
     title: '🦸 Superhero School!',
-    text: 'Welcome to Hero Academy! ... I am Captain Courage! ... (Use a BOLD, HEROIC, STRONG voice—like a superhero!) Here we train to become superheroes and help people. ... Have you ever pretended to be a superhero? Now you will train like one! ... Are you ready for training?',
+    text: 'Welcome to Hero Academy! ... I am Captain Courage! ... Here we train to become superheroes and help people. ... Have you ever pretended to be a superhero? Now you will train like one! ... Are you ready for training?',
     emoji: '🦸‍♂️',
     character: 'Captain Courage',
     bgColor: 'from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900',
@@ -26,7 +26,7 @@ const storySteps = [
   {
     id: 'flying_lesson',
     title: '✈️ Flying Practice',
-    text: 'Time to learn flying! ... Captain Courage says "I can fly high and help people!" ... (Say it with CONFIDENCE and POWER—strong and brave like a superhero!) Can you say that? ... Let us practice being heroes! Imagine soaring through the sky to save someone!',
+    text: 'Time to learn flying! ... Captain Courage says "I can fly high and help people!" ... Can you say that? ... Let us practice being heroes! Imagine soaring through the sky to save someone!',
     emoji: '✈️',
     character: 'Captain Courage',
     bgColor: 'from-sky-100 to-cyan-100 dark:from-sky-900 dark:to-cyan-900',
@@ -53,7 +53,7 @@ const storySteps = [
   {
     id: 'super_vision',
     title: '👁️ X-Ray Vision',
-    text: 'Using special superhero vision! ... Captain says "I see someone who needs help!" ... (Say it with an ALERT, FOCUSED voice—like when you spot something important!) Can you say that? ... Let us be watchful heroes! Superheroes always pay attention to help others!',
+    text: 'Using special superhero vision! ... Captain says "I see someone who needs help!" ... Can you say that? ... Let us be watchful heroes! Superheroes always pay attention to help others!',
     emoji: '👁️',
     character: 'Captain Courage',
     bgColor: 'from-purple-100 to-violet-100 dark:from-purple-900 dark:to-violet-900',
@@ -80,7 +80,7 @@ const storySteps = [
   {
     id: 'rescue_mission',
     title: '🚨 Emergency!',
-    text: 'Emergency! A kitten needs help! ... Let us shout "We will save the kitten right now!" ... (Say it like a BRAVE, QUICK, DETERMINED hero—ready to help immediately!) Can you say that? ... Let us rescue! Heroes help those who need them, just like helping a friend!',
+    text: 'Emergency! A kitten needs help! ... Let us shout "We will save the kitten right now!" ... Can you say that? ... Let us rescue! Heroes help those who need them, just like helping a friend!',
     emoji: '🐱',
     character: 'Captain Courage',
     bgColor: 'from-red-100 to-orange-100 dark:from-red-900 dark:to-orange-900',
@@ -149,19 +149,20 @@ const SuperheroAdventure = ({ onClose, onComplete }: Props) => {
     return () => clearInterval(timer);
   }, []);
 
-  // Auto-play story narration
+  // Auto-play story narration with character voice
   useEffect(() => {
     if (current.text && SpeechService.isTTSSupported()) {
       const playNarration = async () => {
         try {
-          await SpeechService.speak(current.text, { rate: 0.8, pitch: 1.1 });
+          // Use character-specific voice (Superhero)
+          await SpeechService.speakAsCharacter(current.text, current.character as any);
         } catch (error) {
           console.log('TTS not available');
         }
       };
       playNarration();
     }
-  }, [current.text]);
+  }, [current.text, current.character]);
 
   const handleNext = () => {
     if (stepIndex < storySteps.length - 1) {
@@ -183,10 +184,10 @@ const SuperheroAdventure = ({ onClose, onComplete }: Props) => {
     setSelectedChoice(choice);
     setIsPlaying(true);
     
-    // Play the correct word with excitement
+    // Play the correct word with character voice
     if (current.audioText && SpeechService.isTTSSupported()) {
       try {
-        await SpeechService.speak(current.audioText, { rate: 0.7, pitch: 1.3 });
+        await SpeechService.speakAsCharacter(current.audioText, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }
@@ -214,7 +215,7 @@ const SuperheroAdventure = ({ onClose, onComplete }: Props) => {
     if (current.audioText && SpeechService.isTTSSupported()) {
       setIsPlaying(true);
       try {
-        await SpeechService.speak(current.audioText, { rate: 0.7, pitch: 1.3 });
+        await SpeechService.speakAsCharacter(current.audioText, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }
@@ -226,7 +227,7 @@ const SuperheroAdventure = ({ onClose, onComplete }: Props) => {
     if (current.text && SpeechService.isTTSSupported()) {
       setIsPlaying(true);
       try {
-        await SpeechService.speak(current.text, { rate: 0.8, pitch: 1.1 });
+        await SpeechService.speakAsCharacter(current.text, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }
@@ -454,16 +455,8 @@ const SuperheroAdventure = ({ onClose, onComplete }: Props) => {
 
                   {/* Feedback */}
                   {showFeedback && (
-                    <div className="mt-2 sm:mt-3 animate-fade-in">
-                      {selectedChoice === current.audioText ? (
-                        <div className="text-green-600 dark:text-green-400 text-xs sm:text-sm md:text-base font-bold animate-bounce bg-green-50 dark:bg-green-900/20 rounded-lg sm:rounded-lg md:rounded-xl p-2.5 sm:p-2 md:p-3 border border-green-200 dark:border-green-700">
-                          🎉 SUPER! You used such a powerful hero voice and listened perfectly! You earned a hero badge! 🛡️ You are a brilliant superhero!
-                        </div>
-                      ) : (
-                        <div className="text-red-600 dark:text-red-400 text-xs sm:text-sm md:text-base font-bold bg-red-50 dark:bg-red-900/20 rounded-lg sm:rounded-lg md:rounded-xl p-2.5 sm:p-2 md:p-3 border border-red-200 dark:border-red-700">
-                          💪 BRAVE try! You are showing great courage! The hero word was "{current.audioText}" - Let us train it together! You are doing SUPER!
-                        </div>
-                      )}
+                    <div className="text-red-600 dark:text-red-400 text-xs sm:text-sm md:text-base font-bold bg-red-50 dark:bg-red-900/20 rounded-lg sm:rounded-lg md:rounded-xl p-2.5 sm:p-2 md:p-3 border border-red-200 dark:border-red-700">
+                      💪 BRAVE try! You are showing great courage! The hero word was "{current.audioText}" - Let us train it together! You are doing SUPER!
                     </div>
                   )}
                 </div>

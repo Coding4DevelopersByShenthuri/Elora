@@ -15,7 +15,7 @@ const storySteps = [
   {
     id: 'intro',
     title: '🌈 Unicorn Magic!',
-    text: 'Welcome to Sparkle Kingdom! ... I am Stardust the unicorn! ... (Use a MAGICAL, SPARKLY, ENCHANTING voice—like a beautiful unicorn!) Everything here glows with rainbow colors. ... Can you see the magic sparkles? Have you ever seen a rainbow? This kingdom has rainbows everywhere!',
+    text: 'Welcome to Sparkle Kingdom! ... I am Stardust the unicorn! ... Everything here glows with rainbow colors. ... Can you see the magic sparkles? Have you ever seen a rainbow? This kingdom has rainbows everywhere!',
     emoji: '🦄',
     character: 'Stardust',
     bgColor: 'from-pink-100 to-purple-100 dark:from-pink-900 dark:to-purple-900',
@@ -26,7 +26,7 @@ const storySteps = [
   {
     id: 'rainbow_bridge',
     title: '🌉 Rainbow Bridge',
-    text: 'Look at this beautiful rainbow bridge! ... The rainbow bridge says "Walk across me carefully!" ... (Say it in a GENTLE, MAGICAL, PEACEFUL voice—like walking on something precious!) Can you say that? ... Let us say it together! Rainbows are delicate and special!',
+    text: 'Look at this beautiful rainbow bridge! ... The rainbow bridge says "Walk across me carefully!" ... Can you say that? ... Let us say it together! Rainbows are delicate and special!',
     emoji: '🌈',
     character: 'Stardust',
     bgColor: 'from-purple-100 to-indigo-100 dark:from-purple-900 dark:to-indigo-900',
@@ -53,7 +53,7 @@ const storySteps = [
   {
     id: 'talking_flowers',
     title: '🌸 Singing Flowers',
-    text: 'Listen to the beautiful flowers! ... The flowers sing "Kind words make us bloom!" ... (Sing it SWEETLY and GENTLY—like a soft, beautiful song!) Can you sing that? ... Let us sing with the flowers! Kind words are like sunshine for flowers and friends!',
+    text: 'Listen to the beautiful flowers! ... The flowers sing "Kind words make us bloom!" ... Can you sing that? ... Let us sing with the flowers! Kind words are like sunshine for flowers and friends!',
     emoji: '🌸',
     character: 'Stardust',
     bgColor: 'from-pink-100 to-rose-100 dark:from-pink-900 dark:to-rose-900',
@@ -68,7 +68,7 @@ const storySteps = [
   {
     id: 'fluffy_clouds',
     title: '☁️ Fluffy Cloud Friends',
-    text: 'Look at these soft, fluffy clouds! ... The clouds say "We love floating free in the sky!" ... (Say it in a LIGHT, AIRY, FLOATING voice while imagining you are drifting gently!) Can you say that? ... Let us float! Have you ever watched clouds float by?',
+    text: 'Look at these soft, fluffy clouds! ... The clouds say "We love floating free in the sky!" ... Can you say that? ... Let us float! Have you ever watched clouds float by?',
     emoji: '☁️',
     character: 'Stardust',
     bgColor: 'from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900',
@@ -95,7 +95,7 @@ const storySteps = [
   {
     id: 'crystal_cave',
     title: '💎 Crystal Cave',
-    text: 'Listen to the singing crystals! ... The crystals hum "We sing together in harmony!" ... (Say it with a MUSICAL, FLOWING, HARMONIOUS voice—like beautiful notes blending together!) Can you say that? ... Let us harmonize! Crystals make beautiful sounds when they sing together!',
+    text: 'Listen to the singing crystals! ... The crystals hum "We sing together in harmony!" ... Can you say that? ... Let us harmonize! Crystals make beautiful sounds when they sing together!',
     emoji: '💎',
     character: 'Stardust',
     bgColor: 'from-indigo-100 to-blue-100 dark:from-indigo-900 dark:to-blue-900',
@@ -110,7 +110,7 @@ const storySteps = [
   {
     id: 'butterfly_garden',
     title: '🦋 Magic Butterflies',
-    text: 'Here come the colorful butterflies! ... The butterflies say "Our wings spread beauty everywhere!" ... (Say it in a GENTLE, FLUTTERING, GRACEFUL voice while moving your arms like butterfly wings!) Can you say that? ... Let us flutter! Have you ever seen butterflies flying in a garden?',
+    text: 'Here come the colorful butterflies! ... The butterflies say "Our wings spread beauty everywhere!" ... Can you say that? ... Let us flutter! Have you ever seen butterflies flying in a garden?',
     emoji: '🦋',
     character: 'Stardust',
     bgColor: 'from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900',
@@ -137,7 +137,7 @@ const storySteps = [
   {
     id: 'wishing_fountain',
     title: '⛲ Magic Fountain',
-    text: 'Here is the magical wishing fountain! ... The fountain says "Make a wish and believe in magic!" ... (Say it with HOPE and WONDER—like making a birthday wish!) Can you say that? ... Let us make wishes! What would you wish for?',
+    text: 'Here is the magical wishing fountain! ... The fountain says "Make a wish and believe in magic!" ... Can you say that? ... Let us make wishes! What would you wish for?',
     emoji: '⛲',
     character: 'Stardust',
     bgColor: 'from-cyan-100 to-blue-100 dark:from-cyan-900 dark:to-blue-900',
@@ -194,19 +194,20 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
     return () => clearInterval(timer);
   }, []);
 
-  // Auto-play story narration
+  // Auto-play story narration with character voice
   useEffect(() => {
     if (current.text && SpeechService.isTTSSupported()) {
       const playNarration = async () => {
         try {
-          await SpeechService.speak(current.text, { rate: 0.8, pitch: 1.2 });
+          // Use character-specific voice (Stardust the unicorn)
+          await SpeechService.speakAsCharacter(current.text, current.character as any);
         } catch (error) {
           console.log('TTS not available');
         }
       };
       playNarration();
     }
-  }, [current.text]);
+  }, [current.text, current.character]);
 
   const handleNext = () => {
     if (stepIndex < storySteps.length - 1) {
@@ -228,10 +229,10 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
     setSelectedChoice(choice);
     setIsPlaying(true);
     
-    // Play the correct word with excitement
+    // Play the correct word with character voice
     if (current.audioText && SpeechService.isTTSSupported()) {
       try {
-        await SpeechService.speak(current.audioText, { rate: 0.7, pitch: 1.3 });
+        await SpeechService.speakAsCharacter(current.audioText, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }
@@ -259,7 +260,7 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
     if (current.audioText && SpeechService.isTTSSupported()) {
       setIsPlaying(true);
       try {
-        await SpeechService.speak(current.audioText, { rate: 0.7, pitch: 1.3 });
+        await SpeechService.speakAsCharacter(current.audioText, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }
@@ -271,7 +272,7 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
     if (current.text && SpeechService.isTTSSupported()) {
       setIsPlaying(true);
       try {
-        await SpeechService.speak(current.text, { rate: 0.8, pitch: 1.2 });
+        await SpeechService.speakAsCharacter(current.text, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }
@@ -509,16 +510,8 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
 
                   {/* Feedback */}
                   {showFeedback && (
-                    <div className="mt-2 sm:mt-3 animate-fade-in">
-                      {selectedChoice === current.audioText ? (
-                        <div className="text-green-600 dark:text-green-400 text-xs sm:text-sm md:text-base font-bold animate-bounce bg-green-50 dark:bg-green-900/20 rounded-md sm:rounded-lg md:rounded-xl p-1.5 sm:p-2 md:p-3 border border-green-200 dark:border-green-700">
-                          🎉 MAGICAL! You used such a beautiful, enchanting voice and listened perfectly! You earned a star! 🌟 You are a wonderful unicorn friend!
-                        </div>
-                      ) : (
-                        <div className="text-red-600 dark:text-red-400 text-xs sm:text-sm md:text-base font-bold bg-red-50 dark:bg-red-900/20 rounded-md sm:rounded-lg md:rounded-xl p-1.5 sm:p-2 md:p-3 border border-red-200 dark:border-red-700">
-                          💪 BEAUTIFUL try! You are working so magically! The magic word was "{current.audioText}" - Let us practice it together! You are doing WONDERFUL!
-                        </div>
-                      )}
+                    <div className="text-red-600 dark:text-red-400 text-xs sm:text-sm md:text-base font-bold bg-red-50 dark:bg-red-900/20 rounded-md sm:rounded-lg md:rounded-xl p-1.5 sm:p-2 md:p-3 border border-red-200 dark:border-red-700">
+                      💪 BEAUTIFUL try! You are working so magically! The magic word was "{current.audioText}" - Let us practice it together! You are doing WONDERFUL!
                     </div>
                   )}
                 </div>

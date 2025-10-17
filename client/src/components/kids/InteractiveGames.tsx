@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Trophy, Volume2, Mic, RefreshCw, ChevronRight, Loader2 } from 'lucide-react';
+import { Trophy, Volume2, RefreshCw, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import EnhancedTTS from '@/services/EnhancedTTS';
 import { WhisperService } from '@/services/WhisperService';
@@ -68,27 +68,27 @@ const GameMenu = ({ onSelectGame, totalScore }: { onSelectGame: (game: GameType)
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 max-w-6xl mx-auto">
       {/* Score Display */}
       <Card className="border-2 border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20">
-        <CardContent className="py-6 text-center">
-          <Trophy className="w-12 h-12 text-yellow-500 mx-auto mb-3" />
-          <div className="text-4xl font-bold text-yellow-600 mb-2">{totalScore}</div>
-          <p className="text-gray-600 dark:text-gray-300">Total Game Points</p>
+        <CardContent className="py-4 sm:py-6 text-center px-3 sm:px-4">
+          <Trophy className="w-10 h-10 sm:w-12 sm:h-12 text-yellow-500 mx-auto mb-2 sm:mb-3" />
+          <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-yellow-600 dark:text-yellow-500 mb-2">{totalScore}</div>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 font-semibold">Total Game Points</p>
         </CardContent>
       </Card>
 
       {/* Game Selection */}
-      <div className="text-center mb-6">
-        <h2 className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#118AB2] bg-clip-text text-transparent mb-2 drop-shadow-sm">
+      <div className="text-center mb-4 sm:mb-6 px-3 sm:px-4">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#118AB2] bg-clip-text text-transparent mb-2 drop-shadow-sm">
           Choose Your Game!
         </h2>
-        <p className="text-gray-700 dark:text-gray-300 font-medium">
+        <p className="text-sm sm:text-base md:text-lg text-gray-700 dark:text-gray-300 font-medium">
           Pick a fun game to practice English! 🎮
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
         {games.map((game, index) => {
           const cardBgColors = [
             'bg-pink-50/60 dark:bg-pink-900/10',
@@ -111,21 +111,21 @@ const GameMenu = ({ onSelectGame, totalScore }: { onSelectGame: (game: GameType)
               )}
               onClick={() => onSelectGame(game.id)}
             >
-              <CardContent className="p-6 text-center space-y-4">
+              <CardContent className="p-4 sm:p-5 md:p-6 text-center space-y-3 sm:space-y-4">
                 <div className={cn(
-                  "w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl bg-gradient-to-br",
+                  "w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto rounded-full flex items-center justify-center text-3xl sm:text-4xl md:text-5xl bg-gradient-to-br",
                   game.color,
                   "group-hover:scale-110 transition-transform duration-300"
                 )}>
                   {game.emoji}
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
                   {game.title}
                 </h3>
-                <p className="text-sm text-gray-800 dark:text-gray-300 font-medium">
+                <p className="text-xs sm:text-sm md:text-base text-gray-800 dark:text-gray-300 font-medium">
                   {game.description}
                 </p>
-                <Button className="w-full rounded-xl bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B]">
+                <Button className="w-full rounded-lg sm:rounded-xl px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-sm sm:text-base font-bold transition-all hover:scale-105">
                   Play Now!
                 </Button>
               </CardContent>
@@ -140,7 +140,6 @@ const GameMenu = ({ onSelectGame, totalScore }: { onSelectGame: (game: GameType)
 // Rhyme Time Game
 const RhymeTime = ({ onBack, onScoreUpdate }: { onBack: () => void; onScoreUpdate: (points: number) => void }) => {
   const [currentPair, setCurrentPair] = useState(0);
-  const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState<{ correct: boolean; message: string } | null>(null);
 
   const rhymePairs = [

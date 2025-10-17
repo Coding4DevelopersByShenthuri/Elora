@@ -15,7 +15,7 @@ const storySteps = [
   {
     id: 'intro',
     title: '🚀 Space Adventure Begins!',
-    text: "Hi there, space explorer! ... I'm Cosmo the astronaut! ... (Use an adventurous, brave voice!) Our spaceship is ready to explore distant planets and discover amazing space secrets. ... Have you ever looked up at the stars at night? We're going there! ... Are you ready for this incredible journey?",
+    text: "Hi there, space explorer! ... I'm Cosmo the astronaut! ... Our spaceship is ready to explore distant planets and discover amazing space secrets. ... Have you ever looked up at the stars at night? We're going there! ... Are you ready for this incredible journey?",
     emoji: '👨‍🚀',
     character: 'Cosmo',
     bgColor: 'from-purple-100 to-indigo-100 dark:from-purple-900 dark:to-indigo-900',
@@ -26,7 +26,7 @@ const storySteps = [
   {
     id: 'rocket_launch',
     title: '🚀 Rocket Launch!',
-    text: "3... 2... 1... BLAST OFF! ... (Feel the rocket shaking like when you're in a car!) Let's all shout \"We are flying to the stars!\" ... (Use a LOUD, EXCITED voice - as loud as you can!) Can you say that? ... Ready, go! Have you ever been on a really fast ride? This is even faster!",
+    text: "3... 2... 1... BLAST OFF! ... Let's all shout \"We are flying to the stars!\" ... Can you say that? ... Ready, go! Have you ever been on a really fast ride? This is even faster!",
     emoji: '🚀',
     character: 'Cosmo',
     bgColor: 'from-blue-200 to-purple-200 dark:from-blue-800 dark:to-purple-800',
@@ -41,7 +41,7 @@ const storySteps = [
   {
     id: 'planet_exploration',
     title: '🪐 Amazing Planet Discovery!',
-    text: 'Wow! ... Look at this beautiful planet! ... This planet says "My rings make me special!" ... (Say it with a proud, happy voice - like when you show someone something you made!) Can you repeat that? ... Let\'s practice saying it! Everyone is special in their own way, just like this planet!',
+    text: 'Wow! ... Look at this beautiful planet! ... This planet says "My rings make me special!" ... Can you repeat that? ... Let\'s practice saying it! Everyone is special in their own way, just like this planet!',
     emoji: '🪐',
     character: 'Cosmo',
     bgColor: 'from-orange-100 to-red-100 dark:from-orange-900 dark:to-red-900',
@@ -56,7 +56,7 @@ const storySteps = [
   {
     id: 'alien_meeting',
     title: '👽 Friendly Alien Encounter!',
-    text: 'Incredible! ... Look, an alien friend! ... The friendly alien says "Hello new friend from Earth!" ... (Say it in a friendly, welcoming voice - like when you meet someone new at school or the park!) Can you say that back? ... Let\'s greet them! It\'s nice to make new friends, even in space!',
+    text: 'Incredible! ... Look, an alien friend! ... The friendly alien says "Hello new friend from Earth!" ... Can you say that back? ... Let\'s greet them! It\'s nice to make new friends, even in space!',
     emoji: '👽',
     character: 'Cosmo',
     bgColor: 'from-green-100 to-teal-100 dark:from-green-900 dark:to-teal-900',
@@ -83,7 +83,7 @@ const storySteps = [
   {
     id: 'moon_landing',
     title: '🌙 Moon Landing Adventure!',
-    text: 'Amazing! ... We landed on the moon! ... It\'s like a giant gray bouncy castle! ... Let\'s all say "I can jump so high here!" ... (Say it with an excited, bouncy voice - and maybe even jump a little!) Can you say it? ... Imagine jumping higher than on a trampoline!',
+    text: 'Amazing! ... We landed on the moon! ... It\'s like a giant gray bouncy castle! ... Let\'s all say "I can jump so high here!" ... Can you say it? ... Imagine jumping higher than on a trampoline!',
     emoji: '🌙',
     character: 'Cosmo',
     bgColor: 'from-gray-100 to-slate-100 dark:from-gray-900 dark:to-slate-900',
@@ -110,7 +110,7 @@ const storySteps = [
   {
     id: 'black_hole',
     title: '🕳️ Mysterious Space Tunnel!',
-    text: 'Look at that amazing black hole! ... It\'s spinning like a giant whirlpool! ... Cosmo says, "Stay far away, it\'s very powerful!" ... (Use a careful, warning voice—like when grown-ups say, "Be careful!" near something hot or sharp!) Can you say that? ... We need to stay safe in space!',
+    text: 'Look at that amazing black hole! ... It\'s spinning like a giant whirlpool! ... Cosmo says, "Stay far away, it\'s very powerful!" ... Can you say that? ... We need to stay safe in space!',
     emoji: '🕳️',
     character: 'Cosmo',
     bgColor: 'from-gray-200 to-blue-200 dark:from-gray-800 dark:to-blue-800',
@@ -137,7 +137,7 @@ const storySteps = [
   {
     id: 'constellation',
     title: '🔭 Beautiful Star Patterns!',
-    text: 'Look at those star patterns! ... They make pictures in the sky! ... They say "We shine bright together!" ... (Say it in a sparkly, proud voice - imagine you and your friends shining!) Can you say that? ... Let\'s practice! Just like friends are better together, stars are too!',
+    text: 'Look at those star patterns! ... They make pictures in the sky! ... They say "We shine bright together!" ... Can you say that? ... Let\'s practice! Just like friends are better together, stars are too!',
     emoji: '🔭',
     character: 'Cosmo',
     bgColor: 'from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900',
@@ -206,19 +206,20 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
     return () => clearInterval(timer);
   }, []);
 
-  // Auto-play story narration
+  // Auto-play story narration with character voice
   useEffect(() => {
     if (current.text && SpeechService.isTTSSupported()) {
       const playNarration = async () => {
         try {
-          await SpeechService.speak(current.text, { rate: 0.8, pitch: 1.1 });
+          // Use character-specific voice (Cosmo or other space characters)
+          await SpeechService.speakAsCharacter(current.text, current.character as any);
         } catch (error) {
           console.log('TTS not available');
         }
       };
       playNarration();
     }
-  }, [current.text]);
+  }, [current.text, current.character]);
 
   const handleNext = () => {
     if (stepIndex < storySteps.length - 1) {
@@ -240,10 +241,10 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
     setSelectedChoice(choice);
     setIsPlaying(true);
     
-    // Play the correct word with excitement
+    // Play the correct word with character voice
     if (current.audioText && SpeechService.isTTSSupported()) {
       try {
-        await SpeechService.speak(current.audioText, { rate: 0.7, pitch: 1.3 });
+        await SpeechService.speakAsCharacter(current.audioText, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }
@@ -271,7 +272,7 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
     if (current.audioText && SpeechService.isTTSSupported()) {
       setIsPlaying(true);
       try {
-        await SpeechService.speak(current.audioText, { rate: 0.7, pitch: 1.3 });
+        await SpeechService.speakAsCharacter(current.audioText, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }
@@ -283,7 +284,7 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
     if (current.text && SpeechService.isTTSSupported()) {
       setIsPlaying(true);
       try {
-        await SpeechService.speak(current.text, { rate: 0.8, pitch: 1.1 });
+        await SpeechService.speakAsCharacter(current.text, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }

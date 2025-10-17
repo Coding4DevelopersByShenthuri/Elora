@@ -15,7 +15,7 @@ const storySteps = [
   {
     id: 'intro',
     title: '🦕 Dino World Adventure!',
-    text: 'Hello, paleontologist! ... I am Dina the dinosaur explorer! ... (Use an excited, scientific voice—like a curious scientist!) Our time machine is ready to take us back to the age of dinosaurs! ... Can you hear the ground shaking? Have you ever seen dinosaur bones in a museum? We are going back in time!',
+    text: 'Hello, paleontologist! ... I am Dina the dinosaur explorer! ... Our time machine is ready to take us back to the age of dinosaurs! ... Can you hear the ground shaking? Have you ever seen dinosaur bones in a museum? We are going back in time!',
     emoji: '👩‍🔬',
     character: 'Dina',
     bgColor: 'from-orange-100 to-amber-100 dark:from-orange-900 dark:to-amber-900',
@@ -26,7 +26,7 @@ const storySteps = [
   {
     id: 't_rex',
     title: '🦖 T-Rex Encounter!',
-    text: 'WOW! Look at that HUGE T-Rex! ... The T-Rex roars "I am the king of dinosaurs!" ... (Roar it in a BIG, DEEP, POWERFUL voice—as loud and strong as you can, like a mighty king!) Can you roar that out loud? ... Let us roar together! T-Rex was the strongest dinosaur!',
+    text: 'WOW! Look at that HUGE T-Rex! ... The T-Rex roars "I am the king of dinosaurs!" ... Can you roar that out loud? ... Let us roar together! T-Rex was the strongest dinosaur!',
     emoji: '🦖',
     character: 'Dina',
     bgColor: 'from-red-100 to-orange-100 dark:from-red-900 dark:to-orange-900',
@@ -53,7 +53,7 @@ const storySteps = [
   {
     id: 'herbivore_herd',
     title: '🦕 Gentle Giants',
-    text: 'Look how tall this dinosaur is! ... The Brachiosaurus says "I can reach the highest leaves!" ... (Say it in a GENTLE, SLOW, TALL voice—stretch up as you say it, like a giraffe!) Can you say that while stretching up really tall? ... Let us stretch high! This dinosaur was as tall as a building!',
+    text: 'Look how tall this dinosaur is! ... The Brachiosaurus says "I can reach the highest leaves!" ... Can you say that while stretching up really tall? ... Let us stretch high! This dinosaur was as tall as a building!',
     emoji: '🦕',
     character: 'Dina',
     bgColor: 'from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900',
@@ -68,7 +68,7 @@ const storySteps = [
   {
     id: 'triceratops',
     title: '🦏 Three-Horned Friend!',
-    text: 'Here comes a Triceratops with three horns! ... The Triceratops says "My horns keep me safe!" ... (Say it in a STRONG, CONFIDENT, BRAVE voice—like a superhero protecting others!) Can you say that? ... Let us be strong together! Those horns are like a knight\'s shield!',
+    text: 'Here comes a Triceratops with three horns! ... The Triceratops says "My horns keep me safe!" ... Can you say that? ... Let us be strong together! Those horns are like a knight\'s shield!',
     emoji: '🦏',
     character: 'Dina',
     bgColor: 'from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900',
@@ -95,7 +95,7 @@ const storySteps = [
   {
     id: 'stegosaurus',
     title: '🦎 Spiky Stegosaurus!',
-    text: 'Look at those amazing plates on its back! ... The Stegosaurus says "My plates are special and unique!" ... (Say it with a PROUD, HAPPY voice—like showing off something you made!) Can you say that? ... Let us be proud! Everyone is unique and special, just like you!',
+    text: 'Look at those amazing plates on its back! ... The Stegosaurus says "My plates are special and unique!" ... Can you say that? ... Let us be proud! Everyone is unique and special, just like you!',
     emoji: '🦎',
     character: 'Dina',
     bgColor: 'from-pink-100 to-rose-100 dark:from-pink-900 dark:to-rose-900',
@@ -110,7 +110,7 @@ const storySteps = [
   {
     id: 'velociraptor',
     title: '🐆 Speedy Raptor!',
-    text: 'Here come some fast Velociraptors! ... The Velociraptors say "We work together as a team!" ... (Say it QUICKLY and EXCITEDLY—like when you play with your friends!) Can you say that? ... Let us be a team! Working together makes us stronger!',
+    text: 'Here come some fast Velociraptors! ... The Velociraptors say "We work together as a team!" ... Can you say that? ... Let us be a team! Working together makes us stronger!',
     emoji: '🐆',
     character: 'Dina',
     bgColor: 'from-gray-100 to-slate-100 dark:from-gray-900 dark:to-slate-900',
@@ -137,7 +137,7 @@ const storySteps = [
   {
     id: 'flying_dino',
     title: '🦅 Flying Reptile!',
-    text: 'Look up in the sky! ... The Pterodactyl calls "I fly high in the sky!" ... (Say it in a HIGH, SOARING voice while spreading your arms like wings—imagine you are flying!) Can you say that? ... Let us fly! Pterodactyls were like the birds of dinosaur times!',
+    text: 'Look up in the sky! ... The Pterodactyl calls "I fly high in the sky!" ... Can you say that? ... Let us fly! Pterodactyls were like the birds of dinosaur times!',
     emoji: '🦅',
     character: 'Dina',
     bgColor: 'from-blue-200 to-cyan-200 dark:from-blue-800 dark:to-cyan-800',
@@ -152,7 +152,7 @@ const storySteps = [
   {
     id: 'volcano',
     title: '🌋 Ancient Volcano!',
-    text: 'Oh my! We see the volcano smoking! ... Let us say "We need to stay far away!" ... (Say it in a CAREFUL, WARNING voice—like when someone says "Watch out!" to keep you safe!) Can you say that? ... Let us be careful! Volcanoes are hot and powerful!',
+    text: 'Oh my! We see the volcano smoking! ... Let us say "We need to stay far away!" ... Can you say that? ... Let us be careful! Volcanoes are hot and powerful!',
     emoji: '🌋',
     character: 'Dina',
     bgColor: 'from-red-200 to-orange-200 dark:from-red-800 dark:to-orange-800',
@@ -209,19 +209,19 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
     return () => clearInterval(timer);
   }, []);
 
-  // Auto-play story narration
+  // Auto-play story narration with character voice
   useEffect(() => {
     if (current.text && SpeechService.isTTSSupported()) {
       const playNarration = async () => {
         try {
-          await SpeechService.speak(current.text, { rate: 0.8, pitch: 1.1 });
+          await SpeechService.speakAsCharacter(current.text, current.character as any);
         } catch (error) {
           console.log('TTS not available');
         }
       };
       playNarration();
     }
-  }, [current.text]);
+  }, [current.text, current.character]);
 
   const handleNext = () => {
     if (stepIndex < storySteps.length - 1) {
@@ -243,10 +243,10 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
     setSelectedChoice(choice);
     setIsPlaying(true);
     
-    // Play the correct word with excitement
+    // Play the correct word with character voice
     if (current.audioText && SpeechService.isTTSSupported()) {
       try {
-        await SpeechService.speak(current.audioText, { rate: 0.7, pitch: 1.3 });
+        await SpeechService.speakAsCharacter(current.audioText, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }
@@ -258,7 +258,6 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
     const isCorrect = choice === current.audioText;
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
-      // Add fossil for every correct answer in interactive steps
       setFossils(prev => Math.min(3, prev + 1));
     }
     
@@ -274,7 +273,7 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
     if (current.audioText && SpeechService.isTTSSupported()) {
       setIsPlaying(true);
       try {
-        await SpeechService.speak(current.audioText, { rate: 0.7, pitch: 1.3 });
+        await SpeechService.speakAsCharacter(current.audioText, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }
@@ -286,7 +285,7 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
     if (current.text && SpeechService.isTTSSupported()) {
       setIsPlaying(true);
       try {
-        await SpeechService.speak(current.text, { rate: 0.8, pitch: 1.1 });
+        await SpeechService.speakAsCharacter(current.text, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }
@@ -521,16 +520,8 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
 
                   {/* Feedback */}
                   {showFeedback && (
-                    <div className="mt-2 sm:mt-3 animate-fade-in">
-                      {selectedChoice === current.audioText ? (
-                        <div className="text-green-600 dark:text-green-400 text-xs sm:text-sm md:text-base font-bold animate-bounce bg-green-50 dark:bg-green-900/20 rounded-md sm:rounded-lg md:rounded-xl p-1.5 sm:p-2 md:p-3 border border-green-200 dark:border-green-700">
-                          🎉 RAWR-SOME! You used such a great dinosaur voice and listened perfectly! You earned a fossil! 💎 You are a brilliant paleontologist!
-                        </div>
-                      ) : (
-                        <div className="text-red-600 dark:text-red-400 text-xs sm:text-sm md:text-base font-bold bg-red-50 dark:bg-red-900/20 rounded-md sm:rounded-lg md:rounded-xl p-1.5 sm:p-2 md:p-3 border border-red-200 dark:border-red-700">
-                          💪 GREAT effort! You are trying so hard and that is wonderful! The dino word was "{current.audioText}" - Let us explore it together! You are doing SUPER!
-                        </div>
-                      )}
+                    <div className="text-red-600 dark:text-red-400 text-xs sm:text-sm md:text-base font-bold bg-red-50 dark:bg-red-900/20 rounded-md sm:rounded-lg md:rounded-xl p-1.5 sm:p-2 md:p-3 border border-red-200 dark:border-red-700">
+                      💪 GREAT effort! You are trying so hard and that is wonderful! The dino word was "{current.audioText}" - Let us explore it together! You are doing SUPER!
                     </div>
                   )}
                 </div>
