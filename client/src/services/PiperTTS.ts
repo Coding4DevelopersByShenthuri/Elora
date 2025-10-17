@@ -10,6 +10,7 @@
 */
 
 import { ModelManager } from './ModelManager';
+import { VoiceModelManager } from './VoiceModelManager';
 
 export interface PiperVoice {
   id: string;
@@ -75,6 +76,24 @@ class PiperTTSClass {
   ];
 
   /**
+   * Get voice model from VoiceModelManager (for hybrid voice system)
+   */
+  private async getVoiceFromVoiceModelManager(voiceModelId: string): Promise<ArrayBuffer | null> {
+    try {
+      // Try to get from VoiceModelManager's cache
+      // VoiceModelManager stores with IDs like 'piper-en-us-lessac-medium'
+      const cached = await VoiceModelManager.getCachedModel(voiceModelId);
+      if (cached) {
+        // Convert Uint8Array to ArrayBuffer (slice creates a copy)
+        return cached.buffer.slice(0) as ArrayBuffer;
+      }
+      return null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  /**
    * Initialize Piper TTS
    */
   async initialize(voiceId?: string): Promise<void> {
@@ -93,14 +112,31 @@ class PiperTTSClass {
         throw new Error('Voice not found');
       }
 
-      // Check if voice model is cached
-      const modelCached = await ModelManager.isModelCached(`piper-${voice.id}`);
+      // Check if voice model is cached (try VoiceModelManager first for new downloads)
+      const voiceModelId = `piper-${voice.id}`;
+      let voiceData: ArrayBuffer | null = null;
       
-      if (!modelCached) {
-        console.log(`Downloading Piper voice: ${voice.name}...`);
-        // In production, this would download the ONNX model
-        // await this.downloadVoice(voice);
-        console.warn('⚠️ Piper voice download not implemented. Using Web Speech API fallback.');
+      // Try VoiceModelManager (for HybridVoiceService downloads)
+      try {
+        voiceData = await this.getVoiceFromVoiceModelManager(voiceModelId);
+      } catch (error) {
+        console.log('Voice not in VoiceModelManager, trying ModelManager...');
+      }
+      
+      // Fallback to ModelManager (for legacy/AI Tutor system)
+      if (!voiceData) {
+        const modelCached = await ModelManager.isModelCached(voiceModelId);
+        if (modelCached) {
+          const modelData = await ModelManager.getModelData(voiceModelId);
+          if (modelData) {
+            voiceData = modelData.buffer.slice(0) as ArrayBuffer;
+          }
+        }
+      }
+      
+      if (!voiceData) {
+        console.log(`Piper voice not cached: ${voice.name}`);
+        console.warn('⚠️ Voice model not found. Will use Web Speech API fallback.');
         this.isInitialized = false;
         return;
       }
@@ -111,11 +147,7 @@ class PiperTTSClass {
         { type: 'module' }
       );
 
-      // Load voice in worker
-      const voiceData = await ModelManager.getModelData(`piper-${voice.id}`);
-      if (!voiceData) {
-        throw new Error('Failed to load voice model');
-      }
+      // Load voice in worker (voiceData already checked above)
 
       await this.sendWorkerMessage({
         type: 'load',

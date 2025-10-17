@@ -174,11 +174,17 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
     }, 2500);
   };
 
+  // Helper function to remove emojis from text before TTS
+  const stripEmojis = (text: string): string => {
+    return text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{FE00}-\u{FE0F}]|[\u{E0020}-\u{E007F}]/gu, '').trim();
+  };
+
   const playAudio = async () => {
     if (current.audioText && SpeechService.isTTSSupported()) {
       setIsPlaying(true);
       try {
-        await SpeechService.speakAsCharacter(current.audioText, current.character as any);
+        const cleanText = stripEmojis(current.audioText);
+        await SpeechService.speakAsCharacter(cleanText, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }
@@ -190,7 +196,8 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
     if (current.text && SpeechService.isTTSSupported()) {
       setIsPlaying(true);
       try {
-        await SpeechService.speakAsCharacter(current.text, current.character as any);
+        const cleanText = stripEmojis(current.text);
+        await SpeechService.speakAsCharacter(cleanText, current.character as any);
       } catch (error) {
         console.log('TTS not available');
       }

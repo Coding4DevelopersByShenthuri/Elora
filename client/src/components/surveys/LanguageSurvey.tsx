@@ -57,7 +57,7 @@ const LanguageSurvey: React.FC<LanguageSurveyProps> = ({ isOpen, onComplete, onB
                 
                 {/* Globe - Centered */}
                 <img 
-                  src="/world.png" 
+                  src="/globe.png" 
                   alt="Globe" 
                   className={`w-36 h-36 object-contain absolute left-1/2 transform -translate-x-1/2 ${
                     shouldAnimate ? 'globe-animation' : ''
@@ -103,7 +103,7 @@ const LanguageSurvey: React.FC<LanguageSurveyProps> = ({ isOpen, onComplete, onB
             <div className="w-1/2 bg-blue-50 flex items-center justify-center p-8 relative">
               <div className="text-center">
                 <img 
-                  src="/world.png" 
+                  src="/globe.png" 
                   alt="Globe" 
                   className={`w-72 h-72 lg:w-120 lg:h-96 mx-auto ${
                     shouldAnimate ? 'globe-animation' : ''

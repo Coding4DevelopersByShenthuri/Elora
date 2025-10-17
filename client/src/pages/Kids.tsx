@@ -207,7 +207,7 @@ const KidsPage = () => {
   const allStories = [
     {
       title: "The Magic Forest",
-      description: "Join Luna the rabbit on her adventure through the enchanted forest",
+      description: "Listen to Luna the rabbit's adventure and answer questions to collect magic stars!",
       difficulty: 'Easy',
       duration: '6 min',
       words: 265,
@@ -220,7 +220,7 @@ const KidsPage = () => {
     },
     {
       title: "Space Adventure",
-      description: "Blast off with Cosmo the astronaut to explore distant planets",
+      description: "Listen to Cosmo's space journey and help him explore by answering questions!",
       difficulty: 'Medium',
       duration: '6 min',
       words: 290,
@@ -233,7 +233,7 @@ const KidsPage = () => {
     },
     {
       title: "Underwater World",
-      description: "Dive deep with Finn the fish and meet ocean friends",
+      description: "Listen carefully to Finn the fish and discover ocean secrets together!",
       difficulty: 'Easy',
       duration: '6 min',
       words: 280,
@@ -246,7 +246,7 @@ const KidsPage = () => {
     },
     {
       title: "Dinosaur Discovery",
-      description: "Travel back in time with Dina to meet amazing dinosaurs",
+      description: "Listen to Dina's prehistoric tales and answer her dino-mite questions!",
       difficulty: 'Hard',
       duration: '6 min',
       words: 250,
@@ -259,7 +259,7 @@ const KidsPage = () => {
     },
     {
       title: "Unicorn Magic",
-      description: "Join Stardust the unicorn in the magical Sparkle Kingdom",
+      description: "Listen to Stardust's magical story and earn stars in the Sparkle Kingdom!",
       difficulty: 'Easy',
       duration: '5 min',
       words: 225,
@@ -272,7 +272,7 @@ const KidsPage = () => {
     },
     {
       title: "Pirate Treasure",
-      description: "Sail with Captain Finn to find buried treasure and secret islands",
+      description: "Listen to Captain Finn's treasure hunt and help him find the hidden gold!",
       difficulty: 'Medium',
       duration: '3 min',
       words: 96,
@@ -285,7 +285,7 @@ const KidsPage = () => {
     },
     {
       title: "Superhero School",
-      description: "Train with Captain Courage to become a superhero and help people",
+      description: "Listen to Captain Courage's training and become a superhero together!",
       difficulty: 'Medium',
       duration: '4 min',
       words: 160,
@@ -298,7 +298,7 @@ const KidsPage = () => {
     },
     {
       title: "Fairy Garden",
-      description: "Explore the tiny magical world with Twinkle the fairy",
+      description: "Listen to Twinkle the fairy's magical tales and discover tiny wonders!",
       difficulty: 'Easy',
       duration: '3 min',
       words: 145,
