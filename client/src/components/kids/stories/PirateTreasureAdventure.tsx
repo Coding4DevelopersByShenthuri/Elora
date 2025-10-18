@@ -1,190 +1,468 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Sparkles, Anchor, Star, Volume2, Play, Heart, Zap, Telescope, Ship, X } from 'lucide-react';
-import SpeechService from '@/services/SpeechService';
+import { Sparkles, Anchor, Star, Volume2, Play, Zap, X, Ear, Gauge, RotateCcw } from 'lucide-react';
+import HybridVoiceService, { STORY_VOICES } from '@/services/HybridVoiceService';
+import KidsListeningAnalytics, { type StorySession } from '@/services/KidsListeningAnalytics';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 
 type Props = {
   onClose: () => void;
   onComplete: (score: number) => void;
 };
 
-const pirateStory = [
+const CAPTAIN_VOICE = STORY_VOICES.Captain;
+
+const storySteps = [
   {
     id: 'intro',
-    title: '🏴‍☠️ Ahoy, Matey!',
-    text: 'Ahoy there, shipmate! ... I\'m Captain Finn! ... Our pirate ship is ready to find buried treasure! ... Can you hear the ocean waves? Have you ever been on a boat or seen the ocean? This is a pirate adventure!',
-    emoji: '🧔‍♂️',
-    character: 'Captain Finn',
-    bgColor: 'from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900',
+    title: '🏴‍☠️ Welcome Aboard!',
+    text: 'Ahoy there, young sailor! I am Captain Finn, and you\'re joining my crew today!... We\'re sailing across the seven seas on an exciting treasure hunt adventure!... You will explore mysterious islands, solve pirate riddles, and discover hidden gold!... Your pirate mission is to listen carefully and collect THREE treasure maps!... Ready to set sail? Let\'s begin our voyage!',
+    emoji: '🏴‍☠️',
+    character: 'Captain',
+    bgColor: 'from-amber-100 to-orange-100 dark:from-amber-900 dark:to-orange-900',
     interactive: false,
-    wordCount: 18,
-    duration: 25
+    wordCount: 62,
+    duration: 36
+  },
+  {
+    id: 'setting_sail',
+    title: '⛵ Setting Sail',
+    emoji: '⛵',
+    character: 'Captain',
+    bgColor: 'from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900',
+    interactive: true,
+    listeningFirst: true,
+    
+    audioText: 'Hoist the sails and catch the wind',
+    audioInstruction: 'Listen to the sailing command!',
+    
+    question: 'What does Captain Finn command?',
+    hint: 'It\'s about getting the ship moving',
+    
+    choices: [
+      { text: 'Drop the anchor right now', emoji: '⛵⚓', meaning: 'stopping the ship' },
+      { text: 'Hoist the sails and catch the wind', emoji: '⛵💨', meaning: 'raising sails to move' },
+      { text: 'Jump into the ocean deep', emoji: '⛵🌊', meaning: 'leaving the ship' }
+    ],
+    
+    revealText: 'Excellent! Captain Finn shouts "Hoist the sails and catch the wind!" We pull the ropes and up go the big white sails! The wind fills them like balloons and whoosh—our ship starts moving! Can you feel the ocean breeze? Adventure awaits!',
+    
+    maxReplays: 5,
+    wordCount: 45,
+    duration: 38
   },
   {
     id: 'treasure_map',
-    title: '🗺️ Secret Map!',
-    text: 'Look at this old treasure map! ... The map says "X marks the spot where treasure hides!" ... Can you say that? ... Arrr, let\'s shout it! X means "here" on a treasure map!',
+    title: '🗺️ Secret Map',
     emoji: '🗺️',
-    character: 'Captain Finn',
-    bgColor: 'from-amber-100 to-orange-100 dark:from-amber-900 dark:to-orange-900',
+    character: 'Captain',
+    bgColor: 'from-yellow-100 to-amber-100 dark:from-yellow-900 dark:to-amber-900',
     interactive: true,
+    listeningFirst: true,
+    
     audioText: 'X marks the spot where treasure hides',
-    choices: ['X marks the spot where treasure hides', 'The treasure is not here', 'We cannot find anything'],
-    wordCount: 28,
-    duration: 38,
-    question: 'What does the map tell us about the treasure?',
-    hint: 'It shows us exactly where to look'
+    audioInstruction: 'Listen to the map\'s secret!',
+    
+    question: 'What does the treasure map say?',
+    hint: 'Look for the X!',
+    
+    choices: [
+      { text: 'The treasure is already gone', emoji: '🗺️❌', meaning: 'no treasure left' },
+      { text: 'X marks the spot where treasure hides', emoji: '🗺️💰', meaning: 'X shows location' },
+      { text: 'Maps never show the truth', emoji: '🗺️🤷', meaning: 'maps are false' }
+    ],
+    
+    revealText: 'Perfect! The old map reveals "X marks the spot where treasure hides!" Pirates always mark their treasure with a big X! We follow the map carefully—through jungles, over hills, past waterfalls! The X shows exactly where to dig!',
+    
+    maxReplays: 5,
+    wordCount: 45,
+    duration: 38
   },
   {
     id: 'parrot_friend',
-    title: '🦜 Polly the Parrot',
-    text: 'Here\'s Polly the colorful parrot! ... Polly squawks "Follow me to the treasure island!" ... (Squawk it like a parrot - high and fun!) Can you squawk that? ... Let\'s squawk together! Squawk! Have you ever seen a parrot talk?',
+    title: '🦜 Parrot Pete',
     emoji: '🦜',
-    character: 'Polly',
+    character: 'Captain',
     bgColor: 'from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900',
     interactive: true,
-    audioText: 'Follow me to the treasure island',
-    choices: ['Follow me to the treasure island', 'Stay right here forever', 'Go back to the ship'],
-    wordCount: 28,
-    duration: 38,
-    question: 'Where does Polly want to lead us?',
-    hint: 'She wants to take us somewhere special'
+    listeningFirst: true,
+    
+    audioText: 'Follow me to the treasure',
+    audioInstruction: 'Listen to what the parrot squawks!',
+    
+    question: 'What does Parrot Pete say?',
+    hint: 'The parrot wants to help us',
+    
+    choices: [
+      { text: 'Follow me to the treasure', emoji: '🦜💎', meaning: 'showing the way' },
+      { text: 'I know nothing at all', emoji: '🦜🤷', meaning: 'no information' },
+      { text: 'Fly away from here now', emoji: '🦜✈️', meaning: 'leaving us' }
+    ],
+    
+    revealText: 'Brilliant! Parrot Pete squawks loudly "Follow me to the treasure!" Parrots are smart and this one knows where the gold is buried! Pete flies ahead, stops, and waits for us. What a helpful feathered friend! Let\'s follow those colorful wings!',
+    
+    maxReplays: 5,
+    wordCount: 45,
+    duration: 38
   },
   {
-    id: 'treasure_chest',
-    title: '📦 Buried Treasure!',
-    text: 'Yo ho ho! ... We did it! ... Let\'s all shout "We found the treasure chest!" ... (Shout it with joy and excitement - as LOUD as you can like a happy pirate!) Can you shout that? ... Arrr, let\'s celebrate! The treasure is full of gold and jewels!',
-    emoji: '📦',
-    character: 'Captain Finn',
-    bgColor: 'from-yellow-100 to-amber-100 dark:from-yellow-900 dark:to-amber-900',
+    id: 'first_map',
+    title: '🗺️ First Treasure Map',
+    emoji: '🗺️',
+    character: 'Captain',
+    bgColor: 'from-orange-100 to-red-100 dark:from-orange-900 dark:to-red-900',
     interactive: true,
-    audioText: 'We found the treasure chest',
-    choices: ['We found the treasure chest', 'We did not find anything', 'This is empty and sad'],
-    wordCount: 28,
-    duration: 38,
-    question: 'What amazing thing did we discover?',
-    hint: 'We found what we were looking for'
+    listeningFirst: true,
+    questionType: 'true-false',
+    
+    audioText: 'Pirates share treasure with their crew',
+    audioInstruction: 'Listen to this pirate rule!',
+    
+    question: 'True or False: Pirates share treasure with their crew?',
+    hint: 'Think about teamwork',
+    
+    choices: [
+      { text: 'False - Pirates keep it all', emoji: '❌', meaning: 'incorrect - sharing is important' },
+      { text: 'Pirates share treasure with their crew', emoji: '✅', meaning: 'true - teamwork matters' }
+    ],
+    
+    revealText: 'Outstanding! We found our first treasure map! It\'s TRUE - good pirates DO share treasure with their crew! Everyone who helps gets a fair share because teamwork makes the dream work! Being fair and sharing is what real captains do! Two more maps ahead!',
+    
+    maxReplays: 5,
+    starsNeeded: 3,
+    wordCount: 48,
+    duration: 36
   },
   {
-    id: 'victory_celebration',
-    title: '🎉 Pirate Party!',
-    text: 'Hooray! ... We\'re rich pirates now! ... Time to celebrate with music, dancing, and a grand pirate feast! ... You\'re a TRUE pirate adventurer! ... You listened perfectly and spoke like a real pirate! ... Give yourself a BIG CHEER! Arrr! 🏴‍☠️',
-    emoji: '🎉',
-    character: 'Captain Finn & Polly',
+    id: 'stormy_seas',
+    title: '⛈️ Brave the Storm',
+    emoji: '⛈️',
+    character: 'Captain',
+    bgColor: 'from-gray-100 to-blue-100 dark:from-gray-900 dark:to-blue-900',
+    interactive: true,
+    listeningFirst: true,
+    
+    audioText: 'Stay brave through the storm',
+    audioInstruction: 'Listen to the captain\'s encouragement!',
+    
+    question: 'What should we do during the storm?',
+    hint: 'We need courage!',
+    
+    choices: [
+      { text: 'Give up and turn back', emoji: '⛈️😰', meaning: 'quitting' },
+      { text: 'Stay brave through the storm', emoji: '⛈️💪', meaning: 'being courageous' },
+      { text: 'Jump overboard quickly', emoji: '⛈️🏊', meaning: 'abandoning ship' }
+    ],
+    
+    revealText: 'Courageous! Captain Finn encourages "Stay brave through the storm!" The waves are big and the rain is heavy, but we hold on tight and stay strong together! Bravery means facing challenges! Soon the storm passes and sunshine returns! We did it!',
+    
+    maxReplays: 5,
+    wordCount: 45,
+    duration: 38
+  },
+  {
+    id: 'second_map',
+    title: '✨ Second Treasure Map',
+    emoji: '✨',
+    character: 'Captain',
     bgColor: 'from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900',
+    interactive: true,
+    listeningFirst: true,
+    questionType: 'inference',
+    
+    audioText: 'The best treasure is friendship',
+    audioInstruction: 'Listen to what treasure really means!',
+    
+    question: 'What is the best treasure?',
+    hint: 'It\'s not gold or jewels',
+    
+    choices: [
+      { text: 'Only gold coins matter', emoji: '✨💰', meaning: 'just money' },
+      { text: 'The best treasure is friendship', emoji: '✨❤️', meaning: 'relationships matter most' },
+      { text: 'Treasure is not important', emoji: '✨🚫', meaning: 'nothing valuable' }
+    ],
+    
+    revealText: 'Wise choice! Another map appears with wisdom: "The best treasure is friendship!" While gold and jewels sparkle, having good friends and crew members is worth more than any treasure chest! Friends help, support, and share adventures! One final map!',
+    
+    maxReplays: 5,
+    starsNeeded: 3,
+    wordCount: 45,
+    duration: 38
+  },
+  {
+    id: 'final_map',
+    title: '🏆 Third Treasure Map',
+    text: 'Ahoy! ... Success! ... We found all three treasure maps! ... (You\'re a true pirate legend!) The maps lead us to a magnificent treasure chest overflowing with gold! ... You are an AMAZING adventurer! ... Captain Finn is proud to have you as crew! ... You never gave up!',
+    emoji: '🏆',
+    character: 'Captain',
+    bgColor: 'from-yellow-200 to-orange-200 dark:from-yellow-800 dark:to-orange-800',
     interactive: false,
-    wordCount: 22,
-    duration: 35
+    starsNeeded: 3,
+    wordCount: 45,
+    duration: 30
+  },
+  {
+    id: 'celebration',
+    title: '🎉 Treasure Found!',
+    text: 'Congratulations, brave pirate! ... You helped find the legendary treasure! ... The whole crew is celebrating with singing, dancing, and cheering! ... You listened well, stayed brave, and worked as a team! ... You earned your place as a TRUE PIRATE! ... Set sail for more adventures! ... Yo ho ho! 🏴‍☠️⚓',
+    emoji: '🎉',
+    character: 'Captain',
+    bgColor: 'from-rainbow-100 to-sparkle-100 dark:from-rainbow-900 dark:to-sparkle-900',
+    interactive: false,
+    wordCount: 48,
+    duration: 38
   }
 ];
 
 const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
+  const { user } = useAuth();
+  const userId = user?.id ? String(user.id) : 'local-user';
+  
   const [stepIndex, setStepIndex] = useState(0);
-  const [treasurePieces, setTreasurePieces] = useState(0);
+  const [stars, setStars] = useState(0);
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [timeSpent, setTimeSpent] = useState(0);
   const [showHint, setShowHint] = useState(false);
-  const contentRef = useRef<HTMLDivElement>(null);
+  
+  const [listeningPhase, setListeningPhase] = useState<'listening' | 'question' | 'reveal'>('listening');
+  const [replaysUsed, setReplaysUsed] = useState(0);
+  const [hasListened, setHasListened] = useState(false);
+  const [audioWaveform, setAudioWaveform] = useState(false);
+  
+  const [playbackSpeed, setPlaybackSpeed] = useState<'normal' | 'slow' | 'slower'>('slow'); // Default to slow for better comprehension
+  const [retryMode, setRetryMode] = useState(false);
+  const [attemptCount, setAttemptCount] = useState(0);
+  const [ttsAvailable, setTtsAvailable] = useState(true);
+  
+  const [currentSession, setCurrentSession] = useState<StorySession | null>(null);
+  const [questionStartTime, setQuestionStartTime] = useState(0);
 
-  const current = pirateStory[stepIndex];
-  const progress = Math.round(((stepIndex + 1) / pirateStory.length) * 100);
-  const totalSteps = pirateStory.length;
-  const totalWords = pirateStory.reduce((sum, step) => sum + step.wordCount, 0);
-  const totalDuration = pirateStory.reduce((sum, step) => sum + step.duration, 0);
+  const current = storySteps[stepIndex];
+  const progress = Math.round(((stepIndex + 1) / storySteps.length) * 100);
+  const totalSteps = storySteps.length;
+  const totalWords = storySteps.reduce((sum, step) => sum + step.wordCount, 0);
+  const totalDuration = storySteps.reduce((sum, step) => sum + step.duration, 0);
 
-  // Smooth scroll to top on step change
+  const maxReplays = (current as any).maxReplays || 5;
+  const unlimitedReplays = true;
+
   useEffect(() => {
-    if (contentRef.current) {
-      contentRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    const initializeVoice = async () => {
+      await HybridVoiceService.initialize();
+      const available = HybridVoiceService.isAvailable();
+      setTtsAvailable(available);
+    };
+    initializeVoice();
+    
+    const initSession = async () => {
+      await KidsListeningAnalytics.initialize(userId);
+      const session = KidsListeningAnalytics.startSession(userId, 'pirate-treasure', 'Pirate Treasure');
+      setCurrentSession(session);
+    };
+    initSession();
+  }, [userId]);
+
+  useEffect(() => {
+    if (current.listeningFirst) {
+      setListeningPhase('listening');
+      setReplaysUsed(0);
+      setHasListened(false);
+      setAttemptCount(0);
+      setRetryMode(false);
+    } else {
+      setListeningPhase('reveal');
     }
+    setSelectedChoice(null);
+    setShowFeedback(false);
+    setShowHint(false);
   }, [stepIndex]);
 
-  // Timer for tracking session duration
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeSpent(prev => prev + 1);
-    }, 1000);
+    const timer = setInterval(() => setTimeSpent(prev => prev + 1), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  // Auto-play story narration with character voice
+  const stripEmojis = (text: string): string => {
+    return text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{FE00}-\u{FE0F}]|[\u{E0020}-\u{E007F}]/gu, '').trim();
+  };
+
+  const playAudioWithCaptions = async (text: string) => {
+    try {
+      const cleanText = stripEmojis(text);
+      await HybridVoiceService.speak(cleanText, CAPTAIN_VOICE, {
+        speed: playbackSpeed
+      });
+    } catch (error) {
+      setTtsAvailable(false);
+      throw error;
+    }
+  };
+
   useEffect(() => {
-    if (current.text && SpeechService.isTTSSupported()) {
-      const playNarration = async () => {
+    if (listeningPhase === 'listening' && current.listeningFirst && (current as any).audioText) {
+      const playListeningAudio = async () => {
+        setIsPlaying(true);
+        setAudioWaveform(true);
         try {
-          // Use character-specific voice (Captain Finn or Polly)
-          await SpeechService.speakAsCharacter(current.text, current.character as any);
+          await playAudioWithCaptions((current as any).audioText);
+          setHasListened(true);
+        } catch (error) {
+          setHasListened(true);
+        }
+        setIsPlaying(false);
+        setAudioWaveform(false);
+      };
+      playListeningAudio();
+    }
+    
+    // Auto-play for reveal phase (after correct answer)
+    if (listeningPhase === 'reveal' && current.listeningFirst && (current as any).revealText && ttsAvailable) {
+      const playReveal = async () => {
+        setIsPlaying(true);
+        try {
+          await playAudioWithCaptions((current as any).revealText);
+        } catch (error) {
+          console.log('TTS not available');
+        }
+        setIsPlaying(false);
+      };
+      playReveal();
+    }
+    
+    if (!current.listeningFirst && current.text && ttsAvailable) {
+      const playNarration = async () => {
+        let textToRead = current.text;
+        
+        // Handle dynamic celebration text based on stars collected
+        if (current.id === 'grand_celebration') {
+          if (stars >= 3) {
+            textToRead = "Congratulations brave pirate! ... The WHOLE crew is celebrating YOU! ... Pirates are cheering, treasure is glowing, and adventure magic fills the ship! ... You made the seven seas proud with your amazing listening! You should feel SO brave! ... Give yourself a hearty ARRR!";
+          } else {
+            textToRead = `Great adventure, young pirate! ... You found ${Math.floor(stars)} treasure map${Math.floor(stars) !== 1 ? 's' : ''}! ... The crew is impressed by your courage! ... Captain Finn is proud of you! ... Every voyage teaches us something. Keep sailing and you'll find all the treasure next time! 🏴‍☠️`;
+          }
+        }
+        
+        try {
+          await playAudioWithCaptions(textToRead);
         } catch (error) {
           console.log('TTS not available');
         }
       };
       playNarration();
     }
-  }, [current.text, current.character]);
+  }, [listeningPhase, stepIndex, playbackSpeed, stars]);
 
   const handleNext = () => {
-    if (stepIndex < pirateStory.length - 1) {
+    if (stepIndex < storySteps.length - 1) {
       setStepIndex(stepIndex + 1);
       setSelectedChoice(null);
       setShowFeedback(false);
       setShowHint(false);
     } else {
-      // Calculate score based on correct answers and time
-      const accuracyScore = correctAnswers * 25;
-      const timeBonus = Math.max(0, 200 - timeSpent) * 0.1;
-      const treasureBonus = treasurePieces * 15;
-      const score = Math.min(100, 40 + accuracyScore + timeBonus + treasureBonus);
+      const accuracyScore = correctAnswers * 20;
+      const timeBonus = Math.max(0, 300 - timeSpent) * 0.1;
+      const starBonus = stars * 10;
+      const score = Math.min(100, 40 + accuracyScore + timeBonus + starBonus);
+      
+      if (currentSession) {
+        KidsListeningAnalytics.completeSession(userId, currentSession, score, stars);
+      }
       onComplete(score);
     }
   };
 
-  const handleChoice = async (choice: string) => {
-    setSelectedChoice(choice);
-    setIsPlaying(true);
+  const handleReplayAudio = async () => {
+    if (!unlimitedReplays && replaysUsed >= maxReplays) return;
+    if (!current.listeningFirst) return;
     
-    // Play the correct word with character voice
-    if (current.audioText && SpeechService.isTTSSupported()) {
-      try {
-        await SpeechService.speakAsCharacter(current.audioText, current.character as any);
-      } catch (error) {
-        console.log('TTS not available');
-      }
+    setReplaysUsed(prev => prev + 1);
+    setIsPlaying(true);
+    setAudioWaveform(true);
+    
+    try {
+      await playAudioWithCaptions((current as any).audioText);
+      setHasListened(true);
+    } catch (error) {
+      setHasListened(true);
     }
     
     setIsPlaying(false);
+    setAudioWaveform(false);
+  };
+  
+  const handleProceedToQuestion = () => {
+    if (!hasListened) return;
+    setListeningPhase('question');
+    setQuestionStartTime(Date.now());
+  };
+
+  const handleChoice = async (choiceObj: any) => {
+    const choice = typeof choiceObj === 'string' ? choiceObj : choiceObj.text;
+    setSelectedChoice(choice);
+    const currentAttempt = attemptCount + 1;
+    setAttemptCount(currentAttempt);
     
-    // Check if choice is correct
-    const isCorrect = choice === current.audioText;
+    const questionTime = Math.round((Date.now() - questionStartTime) / 1000);
+    const isCorrect = choice === (current as any).audioText;
+    
+    if (currentSession && current.listeningFirst) {
+      const updatedSession = KidsListeningAnalytics.recordAttempt(
+        currentSession,
+        current.id,
+        (current as any).question || '',
+        isCorrect,
+        currentAttempt,
+        replaysUsed,
+        questionTime
+      );
+      setCurrentSession(updatedSession);
+    }
+    
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
-      setTreasurePieces(prev => Math.min(3, prev + 1));
+      const starReward = currentAttempt === 1 ? 1 : 0.5;
+      setStars(prev => Math.min(3, prev + starReward));
+      setShowFeedback(true);
+      setRetryMode(false);
+      
+      setTimeout(() => setListeningPhase('reveal'), 2500);
+      setTimeout(() => handleNext(), 5000);
+    } else {
+      setShowFeedback(true);
+      setRetryMode(true);
+    }
+  };
+  
+  const handleRetry = () => {
+    setSelectedChoice(null);
+    setShowFeedback(false);
+    setRetryMode(false);
+    setListeningPhase('listening');
+    setReplaysUsed(0);
+  };
+
+  const playRevealText = async () => {
+    let textToSpeak = (current as any).revealText || current.text;
+    
+    // Handle dynamic celebration text based on stars collected
+    if (current.id === 'grand_celebration') {
+      if (stars >= 3) {
+        textToSpeak = "Congratulations brave pirate! ... The WHOLE crew is celebrating YOU! ... Pirates are cheering, treasure is glowing, and adventure magic fills the ship! ... You made the seven seas proud with your amazing listening! You should feel SO brave! ... Give yourself a hearty ARRR!";
+      } else {
+        textToSpeak = `Great adventure, young pirate! ... You found ${Math.floor(stars)} treasure map${Math.floor(stars) !== 1 ? 's' : ''}! ... The crew is impressed by your courage! ... Captain Finn is proud of you! ... Every voyage teaches us something. Keep sailing and you'll find all the treasure next time! 🏴‍☠️`;
+      }
     }
     
-    setShowFeedback(true);
-    
-    // Auto-advance after showing feedback
-    setTimeout(() => {
-      handleNext();
-    }, 2500);
-  };
-
-  // Helper function to remove emojis from text before TTS
-  const stripEmojis = (text: string): string => {
-    return text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{FE00}-\u{FE0F}]|[\u{E0020}-\u{E007F}]/gu, '').trim();
-  };
-
-  const playAudio = async () => {
-    if (current.audioText && SpeechService.isTTSSupported()) {
+    if (textToSpeak && ttsAvailable) {
       setIsPlaying(true);
       try {
-        const cleanText = stripEmojis(current.audioText);
-        await SpeechService.speakAsCharacter(cleanText, current.character as any);
+        await playAudioWithCaptions(textToSpeak);
       } catch (error) {
         console.log('TTS not available');
       }
@@ -192,247 +470,182 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
     }
   };
 
-  const playStoryText = async () => {
-    if (current.text && SpeechService.isTTSSupported()) {
-      setIsPlaying(true);
-      try {
-        const cleanText = stripEmojis(current.text);
-        await SpeechService.speakAsCharacter(cleanText, current.character as any);
-      } catch (error) {
-        console.log('TTS not available');
-      }
-      setIsPlaying(false);
+  const getCorrectFeedback = () => {
+    const messages = [
+      "🏴‍☠️ AHOY! You earned a map! 🗺️",
+      "⚓ SHIP-SHAPE! Perfect!",
+      "✨ TREASURE-IFIC! Amazing!",
+      "🎯 SWASHBUCKLING! Great!",
+      "💫 YO HO HO! Map earned!"
+    ];
+    return messages[Math.floor(Math.random() * messages.length)];
+  };
+  
+  const getWrongFeedback = (attempt: number) => {
+    if (attempt === 1) {
+      return `💪 Not quite, matey! Listen to the voice and try again! 🎧`;
+    } else {
+      return `🏴‍☠️ Keep sailing! Listen one more time to find the treasure answer! 👂`;
     }
   };
-
-  const getCharacterAnimation = () => {
-    if (current.id.includes('treasure')) return 'animate-bounce';
-    return 'animate-float';
-  };
-
-  const getPirateIcon = () => {
-    switch (current.id) {
-      case 'treasure_map': return Telescope;
-      case 'parrot_friend': return Sparkles;
-      case 'treasure_chest': return Star;
-      default: return Anchor;
-    }
-  };
-
-  const PirateIcon = getPirateIcon();
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <Card className={cn(
-        "w-full max-w-5xl h-[95vh] rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-500",
-        "bg-gradient-to-br", current.bgColor,
-        "flex flex-col"
-      )}>
-        {/* Always Visible Close Button */}
+      <Card className={cn("w-full max-w-5xl sm:max-w-6xl lg:max-w-7xl h-[95vh] rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-500 bg-gradient-to-br", current.bgColor, "flex flex-col")}>
         <div className="absolute top-4 right-4 z-10">
-          <Button 
-            variant="ghost" 
-            onClick={onClose} 
-            className="h-10 w-10 p-0 rounded-full bg-white/80 hover:bg-white backdrop-blur-sm border border-gray-200 hover:border-gray-300 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 z-50"
-          >
-            <X className="w-5 h-5 text-gray-700 hover:text-gray-900" />
+          <Button variant="ghost" onClick={onClose} className="h-10 w-10 p-0 rounded-full bg-white/80 hover:bg-white backdrop-blur-sm border shadow-lg z-50">
+            <X className="w-5 h-5 text-gray-700" />
           </Button>
         </div>
 
-        <CardContent className="p-2 sm:p-4 md:p-6 lg:p-8 flex-1 flex flex-col overflow-hidden" ref={contentRef}>
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 sm:mb-3 gap-2 flex-shrink-0">
-            <div className="flex items-center gap-3">
+        <CardContent className="p-2 sm:p-4 md:p-6 lg:p-8 flex-1 flex flex-col overflow-hidden">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 gap-2 flex-shrink-0">
+            <div className="flex items-center gap-2 sm:gap-3">
               <div className="relative">
-                <Anchor className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 animate-bounce" />
-                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 absolute -top-1 -right-1 animate-ping" />
+                <Anchor className="w-6 h-6 sm:w-8 sm:h-8 text-amber-600 animate-bounce" />
+                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-orange-400 absolute -top-1 -right-1 animate-ping" />
               </div>
               <div>
-                <h2 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white">Pirate Treasure Hunt</h2>
+                <h2 className="text-base sm:text-xl font-bold text-gray-800 dark:text-white">Captain Finn's Treasure Hunt</h2>
                 <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
                   Step {stepIndex + 1} of {totalSteps} • {totalWords} words • {Math.round(totalDuration/60)}min
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3 self-end sm:self-auto">
-              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap bg-white/50 dark:bg-gray-800/50 px-3 py-1 rounded-full border border-white/20">
-                💎 {treasurePieces}/3 Treasure
-              </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="text-xs bg-white/50 px-3 py-1 rounded-full">🗺️ {stars}/3 Maps</div>
+              <Button variant="ghost" size="sm" onClick={async () => {
+                HybridVoiceService.stop();
+                const newSpeed = playbackSpeed === 'slow' ? 'slower' : playbackSpeed === 'slower' ? 'normal' : 'slow';
+                setPlaybackSpeed(newSpeed);
+                try {
+                  let textToPlay = '';
+                  if (listeningPhase === 'listening' && current.listeningFirst && (current as any).audioText) {
+                    textToPlay = (current as any).audioText;
+                  } else if (listeningPhase === 'reveal' && current.listeningFirst && (current as any).revealText) {
+                    textToPlay = (current as any).revealText;
+                  } else if (!current.listeningFirst && current.text) {
+                    if (current.id === 'grand_celebration') {
+                      textToPlay = stars >= 3 ? "Congratulations brave pirate! ... The WHOLE crew is celebrating YOU! ... Pirates are cheering, treasure is glowing, and adventure magic fills the ship! ... You made the seven seas proud with your amazing listening! You should feel SO brave! ... Give yourself a hearty ARRR!" : `Great adventure, young pirate! ... You found ${Math.floor(stars)} treasure map${Math.floor(stars) !== 1 ? 's' : ''}! ... The crew is impressed by your courage! ... Captain Finn is proud of you! ... Every voyage teaches us something. Keep sailing and you'll find all the treasure next time! 🏴‍☠️`;
+                    } else {
+                      textToPlay = current.text;
+                    }
+                  }
+                  if (textToPlay && ttsAvailable) {
+                    await HybridVoiceService.speak(textToPlay, CAPTAIN_VOICE, { speed: newSpeed });
+                  }
+                } catch (error) {
+                  console.log('Could not replay at new speed');
+                }
+              }} className="h-7 px-2 rounded-full text-xs bg-amber-50 border" title={`Playback speed: ${playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow (Default)' : 'Very Slow'}`}>
+                <Gauge className="w-3.5 h-3.5 mr-1" />
+                {playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow' : 'Very Slow'}
+              </Button>
             </div>
           </div>
 
-          {/* Progress Bar */}
-          <Progress value={progress} className="h-2 mb-3 sm:mb-4 bg-white/30 flex-shrink-0">
-            <div className="h-full bg-gradient-to-r from-blue-400 to-amber-400 rounded-full transition-all duration-500" />
+          <Progress value={progress} className="h-2 mb-3 bg-white/30 flex-shrink-0">
+            <div className="h-full bg-gradient-to-r from-amber-400 to-orange-400 rounded-full transition-all duration-500" />
           </Progress>
 
-          {/* Content Area */}
-          <div className="flex-1 overflow-hidden pb-2">
+          <div className="flex-1 overflow-y-auto pb-2">
             <div className="text-center h-full flex flex-col justify-center">
-              {/* Character and Scene */}
-              <div className="relative mb-1 sm:mb-2 md:mb-3">
-                <div className={cn(
-                  "text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-1 sm:mb-2", 
-                  getCharacterAnimation()
-                )}>
-                  <span className={cn(
-                    current.id === 'victory_celebration' && 'animate-celebration-party'
-                  )}>
-                    {current.emoji}
-                  </span>
+              <div className="relative mb-2">
+                <div className="text-5xl mb-2 animate-float">{current.emoji}</div>
+                <div className="flex items-center justify-center gap-1.5 mb-2">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <Star key={i} className={cn("w-5 h-5 transition-all", i < stars ? 'text-amber-400 animate-pulse' : 'text-gray-300 opacity-50')} />
+                  ))}
                 </div>
-                
-                {/* Treasure Collection Display */}
-                {(current.id.includes('treasure') || current.id === 'victory_celebration') && (
-                  <div className="flex items-center justify-center gap-1 sm:gap-2 mb-1 sm:mb-2">
-                    {Array.from({ length: 3 }).map((_, i) => (
-                      <Star 
-                        key={i} 
-                      className={cn(
-                        "w-4 h-4 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 transition-all duration-500 transform hover:scale-125",
-                          i < treasurePieces 
-                            ? 'text-yellow-400 animate-pulse drop-shadow-lg' 
-                            : 'text-gray-300 opacity-50'
-                        )} 
-                      />
-                    ))}
+              </div>
+
+              {current.listeningFirst && listeningPhase === 'listening' && (
+                <div className="space-y-4 max-w-3xl mx-auto w-full">
+                  <div className="bg-amber-100/80 rounded-2xl p-6 backdrop-blur-sm border-2 border-amber-300 shadow-2xl">
+                    <h3 className="text-lg font-bold mb-4 flex items-center justify-center gap-2">
+                      <Ear className="w-6 h-6 text-amber-600 animate-bounce" />
+                      {(current as any).audioInstruction}
+                    </h3>
+                    {audioWaveform && (
+                      <div className="flex items-center justify-center gap-2 mb-4">
+                        {[...Array(5)].map((_, i) => (
+                          <div key={i} className="w-2 bg-amber-500 rounded-full animate-waveform" style={{ height: '40px', animationDelay: `${i * 0.1}s` }} />
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex flex-col items-center gap-3 mt-4">
+                      <Button onClick={handleReplayAudio} disabled={isPlaying} className={cn("rounded-xl px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold", isPlaying && "animate-pulse")}>
+                        <Volume2 className="w-5 h-5 mr-2" />
+                        {isPlaying ? 'Playing...' : `Listen Again (${replaysUsed} plays)`}
+                      </Button>
+                      {hasListened && (
+                        <Button onClick={handleProceedToQuestion} className="bg-green-500 text-white rounded-xl px-6 py-3 font-bold animate-bounce">
+                          Ready! ✓
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                )}
-
-                {/* Pirate Icon */}
-                <div className="absolute top-1 right-1 sm:top-2 sm:right-2 animate-float-slow">
-                  <PirateIcon className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-amber-500 opacity-70" />
                 </div>
-              </div>
+              )}
 
-              {/* Story Text */}
-              <div className="bg-white/80 dark:bg-gray-800/80 rounded-lg sm:rounded-xl md:rounded-2xl p-2 sm:p-3 md:p-4 mb-2 sm:mb-3 backdrop-blur-sm border-2 border-white/20 shadow-lg sm:shadow-2xl max-w-4xl mx-auto">
-                <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold mb-1 sm:mb-2 text-gray-800 dark:text-white flex items-center justify-center gap-2">
-                  {current.title}
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={playStoryText}
-                    className="text-blue-500 hover:text-blue-600 h-6 w-6 sm:h-8 sm:w-8 p-0"
-                  >
-                    <Volume2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                  </Button>
-                </h3>
-                <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-700 dark:text-gray-200 leading-snug sm:leading-relaxed mx-auto max-w-3xl">
-                  {current.text}
-                </p>
-                
-                {/* Word Count and Duration */}
-                <div className="flex justify-center gap-2 mt-1 sm:mt-2 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-                  <span>📝 {current.wordCount} words</span>
-                  <span>⏱️ {current.duration}s</span>
-                </div>
-              </div>
-
-              {/* Interactive Elements */}
-              {current.interactive && (
-                <div className="space-y-1.5 sm:space-y-2 md:space-y-3 max-w-4xl mx-auto w-full">
-                  {/* Question and Hint */}
-                  <div className="bg-amber-50 dark:bg-amber-900/20 rounded-md sm:rounded-lg md:rounded-xl p-1.5 sm:p-2 md:p-3 border border-amber-200 dark:border-amber-700">
-                    <h4 className="text-xs sm:text-sm md:text-base font-bold text-gray-800 dark:text-white mb-1">
-                      {current.question}
-                    </h4>
+              {current.listeningFirst && listeningPhase === 'question' && (
+                <div className="space-y-2 max-w-4xl mx-auto w-full">
+                  <div className="bg-yellow-50 rounded-lg p-2.5 border border-yellow-200">
+                    <h4 className="text-sm font-bold mb-1.5">{(current as any).question}</h4>
                     {showHint ? (
-                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
-                        💡 Hint: {current.hint}
-                      </p>
+                      <p className="text-xs">💡 {(current as any).hint}</p>
                     ) : (
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => setShowHint(true)}
-                        className="text-amber-600 border-amber-300 hover:bg-amber-100 text-xs sm:text-sm"
-                      >
-                        Need a hint? 🏴‍☠️
+                      <Button variant="outline" size="sm" onClick={() => setShowHint(true)} className="text-yellow-600 text-xs">
+                        Pirate Hint? 🏴‍☠️
                       </Button>
                     )}
                   </div>
-
-                  {/* Audio Play Button */}
-                  {current.audioText && (
-                    <div className="flex justify-center mb-1.5 sm:mb-2">
-                      <Button 
-                        onClick={playAudio}
-                        disabled={isPlaying}
-                        className={cn(
-                          "rounded-lg sm:rounded-xl md:rounded-2xl px-3 sm:px-5 md:px-6 py-1.5 sm:py-2 md:py-2.5 bg-gradient-to-r from-amber-500 to-red-500 hover:from-amber-600 hover:to-red-600 text-white font-bold transition-all duration-300 transform hover:scale-105 text-[10px] sm:text-xs md:text-sm",
-                          isPlaying && "animate-pulse"
-                        )}
-                      >
-                        {isPlaying ? (
-                          <>
-                            <Volume2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 animate-spin" />
-                            Listening...
-                          </>
-                        ) : (
-                          <>
-                            <Volume2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                            <span className="hidden sm:inline">Listen to the Pirate Word</span>
-                            <span className="sm:hidden">🔊 Listen</span>
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  )}
-
-                  {/* Choice Buttons */}
-                  {current.choices && (
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 md:gap-3 justify-center">
-                      {current.choices.map((choice) => {
-                        const isSelected = selectedChoice === choice;
-                        const isCorrect = choice === current.audioText;
+                  <div className="flex justify-center mb-2">
+                    <Button onClick={handleReplayAudio} disabled={isPlaying} className={cn("rounded-xl px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold text-xs", isPlaying && "animate-pulse")}>
+                      <Volume2 className="w-4 h-4 mr-2" />
+                      🔊 Listen
+                    </Button>
+                  </div>
+                  {(current as any).choices && (
+                    <div className="grid grid-cols-1 gap-2.5">
+                      {(current as any).choices.map((choice: any, idx: number) => {
+                        const isSelected = selectedChoice === choice.text;
+                        const isCorrect = choice.text === (current as any).audioText;
                         const showResult = showFeedback && isSelected;
-                        
                         return (
-                          <Button
-                            key={choice}
-                            onClick={() => handleChoice(choice)}
-                            disabled={showFeedback}
-                            className={cn(
-                              "rounded-md sm:rounded-lg md:rounded-xl px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 text-[10px] sm:text-xs md:text-sm font-bold transition-all duration-300 transform hover:scale-105 h-auto min-h-[45px] sm:min-h-[50px] md:min-h-[55px]",
-                              showResult && isCorrect && "bg-green-500 hover:bg-green-600 text-white animate-bounce shadow-lg sm:shadow-2xl",
-                              showResult && !isCorrect && "bg-red-500 hover:bg-red-600 text-white shadow-md sm:shadow-xl",
-                              !showResult && "bg-white/90 hover:bg-white text-gray-700 border-2 border-gray-200 hover:border-amber-300 hover:shadow-lg"
-                            )}
-                          >
-                            <span className="flex flex-col items-center gap-0.5 sm:gap-1">
-                              <span className="text-base sm:text-lg md:text-xl mb-0.5">
-                                {choice === 'map' && '🗺️'}
-                                {choice === 'parrot' && '🦜'}
-                                {choice === 'treasure' && '💎'}
-                                {choice === 'book' && '📖'}
-                                {choice === 'letter' && '✉️'}
-                                {choice === 'seagull' && '🐦'}
-                                {choice === 'pelican' && '🐦'}
-                                {choice === 'shells' && '🐚'}
-                                {choice === 'rocks' && '🪨'}
-                              </span>
-                              {choice}
-                              {showResult && isCorrect && (
-                                <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-pink-300 animate-pulse" />
-                              )}
-                            </span>
+                          <Button key={idx} onClick={() => handleChoice(choice)} disabled={showFeedback} className={cn("rounded-lg px-3 py-2.5 text-xs font-bold h-auto min-h-[55px]", showResult && isCorrect && "bg-green-500 text-white animate-bounce", showResult && !isCorrect && "bg-red-500 text-white", !showResult && "bg-white/90 text-gray-700 border-2")}>
+                            <div className="flex items-center gap-2 w-full">
+                              <span className="text-lg">{choice.emoji}</span>
+                              <div className="flex-1 text-left">
+                                <p className="font-bold text-xs">{choice.text}</p>
+                                <p className="text-xs opacity-70">{choice.meaning}</p>
+                              </div>
+                            </div>
                           </Button>
                         );
                       })}
                     </div>
                   )}
-
-                  {/* Feedback */}
                   {showFeedback && (
-                    <div className="mt-2 sm:mt-3 animate-fade-in">
-                      {selectedChoice === current.audioText ? (
-                        <div className="text-green-600 dark:text-green-400 text-xs sm:text-sm md:text-base font-bold animate-bounce bg-green-50 dark:bg-green-900/20 rounded-md sm:rounded-lg md:rounded-xl p-1.5 sm:p-2 md:p-3 border border-green-200 dark:border-green-700">
-                          🎉 YO HO HO! You listened like a true pirate and spoke perfectly! Great pirate skills! 💎 Arrr, I\'m proud of you!
+                    <div className="mt-2">
+                      {selectedChoice === (current as any).audioText ? (
+                        <div className="text-green-600 text-xs font-bold bg-green-50 rounded-lg p-2.5 border">
+                          {getCorrectFeedback()}
                         </div>
                       ) : (
-                        <div className="text-red-600 dark:text-red-400 text-xs sm:text-sm md:text-base font-bold bg-red-50 dark:bg-red-900/20 rounded-md sm:rounded-lg md:rounded-xl p-1.5 sm:p-2 md:p-3 border border-red-200 dark:border-red-700">
-                          💪 Shiver me timbers! That was a brave try! The pirate word was "{current.audioText}" - Let's practice it together, matey! You\'re doing GREAT!
+                        <div className="space-y-3">
+                          <div className="text-red-600 text-xs font-bold bg-red-50 rounded-lg p-2.5 border">
+                            {getWrongFeedback(attemptCount)}
+                          </div>
+                          {retryMode && (
+                            <div className="flex gap-2">
+                              <Button onClick={handleRetry} className="bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg px-4 py-2.5 text-sm font-bold">
+                                <RotateCcw className="w-4 h-4 mr-2" />
+                                Try Again
+                              </Button>
+                              <Button onClick={handleNext} variant="outline" className="rounded-lg px-4 py-2.5 text-sm">Skip</Button>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -440,193 +653,57 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
                 </div>
               )}
 
-              {/* Non-interactive steps */}
-              {!current.interactive && (
-                <div className="flex justify-center pt-1.5 sm:pt-2">
-                  <Button 
-                    onClick={handleNext} 
-                    className="rounded-lg sm:rounded-xl md:rounded-2xl px-4 sm:px-5 md:px-6 py-1.5 sm:py-2 md:py-2.5 bg-gradient-to-r from-amber-500 to-red-500 hover:from-amber-600 hover:to-red-600 text-white font-bold transition-all duration-300 hover:scale-105 transform shadow-lg sm:shadow-2xl text-[10px] sm:text-xs md:text-sm"
-                  >
-                    {stepIndex === pirateStory.length - 1 ? (
-                      <>
-                        <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 animate-pulse" />
-                        <span className="hidden sm:inline">Complete Pirate Adventure! 🏴‍☠️</span>
-                        <span className="sm:hidden">Finish! 🏴‍☠️</span>
-                      </>
-                    ) : (
-                      <>
-                        <Play className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                        <span className="hidden sm:inline">Continue Adventure! ⚓</span>
-                        <span className="sm:hidden">Continue ⚓</span>
-                      </>
-                    )}
-                  </Button>
+              {current.listeningFirst && listeningPhase === 'reveal' && (
+                <div className="space-y-4 max-w-4xl mx-auto w-full">
+                  <div className="bg-green-100/80 rounded-2xl p-6 backdrop-blur-sm border-2 border-green-300">
+                    <h3 className="text-lg font-bold mb-3 flex items-center justify-center gap-2">
+                      {current.title}
+                      <Button variant="ghost" size="sm" onClick={playRevealText} className="text-amber-500 h-7 w-7 p-0">
+                        <Volume2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </h3>
+                    <p className="text-sm leading-relaxed">{(current as any).revealText}</p>
+                    <div className="mt-4 flex justify-center">
+                      <Button onClick={handleNext} className="bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-2xl px-8 py-3">
+                        Continue! ⚓
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               )}
-            </div>
-          </div>
 
-          {/* Floating Elements */}
-          <div className="hidden sm:block absolute top-4 left-4 animate-float-slow">
-            <Sparkles className="w-6 h-6 text-yellow-400" />
-          </div>
-          <div className="hidden sm:block absolute bottom-4 left-4 animate-float-medium">
-            <Ship className="w-6 h-6 text-blue-400" />
-          </div>
-          <div className="hidden sm:block absolute bottom-4 right-4 animate-float-fast">
-            <Anchor className="w-6 h-6 text-gray-400" />
+              {!current.listeningFirst && (
+                <>
+                  <div className="bg-white/80 rounded-2xl p-6 mb-4 backdrop-blur-sm border-2 shadow-2xl max-w-4xl mx-auto">
+                    <h3 className="text-lg font-bold mb-3 flex items-center justify-center gap-2">
+                      {current.title}
+                      <Button variant="ghost" size="sm" onClick={playRevealText} className="text-amber-600">
+                        <Volume2 className="w-5 h-5" />
+                      </Button>
+                    </h3>
+                    <p className="text-base leading-relaxed">{current.text}</p>
+                    <div className="flex justify-center gap-3 mt-4 text-sm text-gray-500">
+                      <span>📝 {current.wordCount}</span>
+                      <span>⏱️ {current.duration}s</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-center">
+                    <Button onClick={handleNext} className="rounded-2xl px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold shadow-2xl">
+                      {stepIndex === storySteps.length - 1 ? <><Zap className="w-4 h-4 mr-2 animate-pulse" />Complete! ✨</> : <><Play className="w-4 h-4 mr-2" />Continue ⚓</>}
+                    </Button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Enhanced Custom Animations */}
       <style>{`
-        .smooth-scroll {
-          scroll-behavior: smooth;
-          -webkit-overflow-scrolling: touch;
-        }
-        
-        .smooth-scroll::-webkit-scrollbar {
-          width: 6px;
-        }
-        
-        .smooth-scroll::-webkit-scrollbar-track {
-          background: rgba(255, 255, 255, 0.1);
-          border-radius: 10px;
-        }
-        
-        .smooth-scroll::-webkit-scrollbar-thumb {
-          background: rgba(245, 158, 11, 0.3);
-          border-radius: 10px;
-        }
-        
-        .smooth-scroll::-webkit-scrollbar-thumb:hover {
-          background: rgba(245, 158, 11, 0.5);
-        }
-        
-        @keyframes float-slow {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          33% { transform: translateY(-10px) rotate(5deg); }
-          66% { transform: translateY(-5px) rotate(-5deg); }
-        }
-        
-        @keyframes float-medium {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-15px); }
-        }
-        
-        @keyframes float-fast {
-          0%, 100% { transform: translateY(0px) scale(1); }
-          50% { transform: translateY(-8px) scale(1.1); }
-        }
-        
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-        
-        @keyframes fade-in {
-          from { opacity: 0; transform: scale(0.8); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        
-        @keyframes gentle-pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.8; }
-        }
-        
-        @keyframes celebration-party {
-          0% { 
-            transform: scale(1) rotate(0deg); 
-            filter: drop-shadow(0 0 5px gold);
-          }
-          25% { 
-            transform: scale(1.2) rotate(90deg); 
-            filter: drop-shadow(0 0 10px #ff6b6b);
-          }
-          50% { 
-            transform: scale(1.1) rotate(180deg); 
-            filter: drop-shadow(0 0 15px #4ecdc4);
-          }
-          75% { 
-            transform: scale(1.3) rotate(270deg); 
-            filter: drop-shadow(0 0 12px #45b7d1);
-          }
-          100% { 
-            transform: scale(1) rotate(360deg); 
-            filter: drop-shadow(0 0 5px gold);
-          }
-        }
-        
-        @keyframes celebration-sparkle {
-          0%, 100% { 
-            transform: scale(1);
-            text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
-          }
-          50% { 
-            transform: scale(1.15);
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8),
-                        0 0 30px rgba(255, 105, 180, 0.6),
-                        0 0 40px rgba(135, 206, 250, 0.4);
-          }
-        }
-        
-        .animate-float-slow {
-          animation: float-slow 4s ease-in-out infinite;
-        }
-        
-        .animate-float-medium {
-          animation: float-medium 3s ease-in-out infinite;
-        }
-        
-        .animate-float-fast {
-          animation: float-fast 2s ease-in-out infinite;
-        }
-        
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
-        
-        .animate-fade-in {
-          animation: fade-in 0.5s ease-out;
-        }
-        
-        .animate-gentle-pulse {
-          animation: gentle-pulse 2s ease-in-out infinite;
-        }
-        
-        .animate-celebration-party {
-          animation: celebration-party 2s ease-in-out infinite;
-          display: inline-block;
-          transform-origin: center;
-        }
-        
-        .animate-celebration-sparkle {
-          animation: celebration-sparkle 1.5s ease-in-out infinite;
-        }
-        
-        /* Mobile optimizations */
-        @media (max-width: 640px) {
-          .smooth-scroll {
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-          }
-          
-          .smooth-scroll::-webkit-scrollbar {
-            display: none;
-          }
-          
-          .animate-celebration-party {
-            animation-duration: 2.5s;
-          }
-        }
-        
-        /* Reduced motion for accessibility */
-        @media (prefers-reduced-motion: reduce) {
-          .animate-celebration-party {
-            animation: celebration-sparkle 2s ease-in-out infinite;
-          }
-        }
+        @keyframes waveform { 0%, 100% { height: 20px; } 50% { height: 50px; } }
+        .animate-waveform { animation: waveform 0.6s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+        .animate-float { animation: float 3s ease-in-out infinite; }
       `}</style>
     </div>
   );

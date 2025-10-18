@@ -11,7 +11,12 @@ import PronunciationFeedbackDisplay from './PronunciationFeedbackDisplay';
 
 type PronounceItem = { phrase: string; phonemes?: string };
 
-export default function Pronunciation({ items }: { items: PronounceItem[] }) {
+interface PronunciationProps {
+  items: PronounceItem[];
+  onPhrasePracticed?: (phrase: string) => void;
+}
+
+export default function Pronunciation({ items, onPhrasePracticed }: PronunciationProps) {
   const [idx, setIdx] = useState(0);
   const [step, setStep] = useState<'intro' | 'record' | 'feedback'>('intro');
   const [feedback, setFeedback] = useState<any>(null);
@@ -75,6 +80,11 @@ export default function Pronunciation({ items }: { items: PronounceItem[] }) {
 
       setFeedback(combinedFeedback);
       setStep('feedback');
+      
+      // Notify parent component if score is good
+      if (onPhrasePracticed && pronScore.overall >= 60) {
+        onPhrasePracticed(current.phrase);
+      }
     } catch (error) {
       console.error('Error processing pronunciation:', error);
       alert('Sorry, there was an error. Please try again.');

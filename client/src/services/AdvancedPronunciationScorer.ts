@@ -49,7 +49,7 @@ export interface AcousticFeatures {
 }
 
 class AdvancedPronunciationScorerClass {
-  // IPA Phoneme dictionary for English (extended)
+  // IPA Phoneme dictionary for English (extended with kids vocabulary)
   private phonemeDict: Record<string, string[]> = {
     // Common words with phoneme breakdowns
     'hello': ['h', 'ə', 'ˈl', 'oʊ'],
@@ -64,7 +64,37 @@ class AdvancedPronunciationScorerClass {
     'pronunciation': ['p', 'r', 'ə', 'ˌn', 'ʌ', 'n', 's', 'i', 'ˈeɪ', 'ʃ', 'ə', 'n'],
     'education': ['ˌe', 'd', 'j', 'ʊ', 'ˈk', 'eɪ', 'ʃ', 'ə', 'n'],
     'important': ['ɪ', 'm', 'ˈp', 'ɔː', 'r', 't', 'ə', 'n', 't'],
-    'interesting': ['ˈɪ', 'n', 't', 'r', 'ə', 's', 't', 'ɪ', 'ŋ']
+    'interesting': ['ˈɪ', 'n', 't', 'r', 'ə', 's', 't', 'ɪ', 'ŋ'],
+    
+    // Kids vocabulary words
+    'rabbit': ['r', 'æ', 'b', 'ɪ', 't'],
+    'forest': ['f', 'ɔː', 'r', 'ɪ', 's', 't'],
+    'planet': ['p', 'l', 'æ', 'n', 'ɪ', 't'],
+    'dinosaur': ['d', 'aɪ', 'n', 'ə', 's', 'ɔː', 'r'],
+    'unicorn': ['j', 'uː', 'n', 'ɪ', 'k', 'ɔː', 'r', 'n'],
+    'pirate': ['p', 'aɪ', 'r', 'ə', 't'],
+    'treasure': ['t', 'r', 'ɛ', 'ʒ', 'ə', 'r'],
+    'parrot': ['p', 'æ', 'r', 'ə', 't'],
+    'superhero': ['s', 'uː', 'p', 'ə', 'r', 'h', 'ɪə', 'r', 'oʊ'],
+    'rescue': ['r', 'ɛ', 's', 'k', 'j', 'uː'],
+    'fairy': ['f', 'ɛː', 'r', 'i'],
+    'magic': ['m', 'æ', 'dʒ', 'ɪ', 'k'],
+    'moonflower': ['m', 'uː', 'n', 'f', 'l', 'aʊ', 'ə', 'r'],
+    'sparkle': ['s', 'p', 'ɑː', 'r', 'k', 'ə', 'l'],
+    'luna': ['l', 'uː', 'n', 'ə'],
+    'happy': ['h', 'æ', 'p', 'i'],
+    'big': ['b', 'ɪ', 'ɡ'],
+    'rainbow': ['r', 'eɪ', 'n', 'b', 'oʊ'],
+    'captain': ['k', 'æ', 'p', 't', 'ɪ', 'n'],
+    'finn': ['f', 'ɪ', 'n'],
+    'buried': ['b', 'ɛ', 'r', 'i', 'd'],
+    'training': ['t', 'r', 'eɪ', 'n', 'ɪ', 'ŋ'],
+    'mission': ['m', 'ɪ', 'ʃ', 'ə', 'n'],
+    'dust': ['d', 'ʌ', 's', 't'],
+    'talking': ['t', 'ɔː', 'k', 'ɪ', 'ŋ'],
+    'bunnies': ['b', 'ʌ', 'n', 'i', 'z'],
+    'glowing': ['ɡ', 'l', 'oʊ', 'ɪ', 'ŋ'],
+    'moonflowers': ['m', 'uː', 'n', 'f', 'l', 'aʊ', 'ə', 'r', 'z']
   };
 
   // Common pronunciation issues and their patterns
@@ -617,6 +647,73 @@ class AdvancedPronunciationScorerClass {
     Object.entries(mappings).forEach(([word, phonemes]) => {
       this.phonemeDict[word.toLowerCase()] = phonemes;
     });
+  }
+
+  /**
+   * Score pronunciation for kids with more lenient thresholds
+   * Kids' voices are higher pitched and they may pronounce words slightly differently
+   */
+  async scoreForKids(
+    expectedText: string,
+    spokenText: string,
+    audioData?: Blob
+  ): Promise<DetailedPronunciationScore> {
+    // Get base score
+    const baseScore = await this.scoreDetailed(expectedText, spokenText, audioData);
+    
+    // Apply kid-friendly adjustments
+    // Kids often have:
+    // 1. Higher pitch (accounted for in acoustic analysis)
+    // 2. Less consistent articulation (more forgiving on clarity)
+    // 3. Faster or slower speech rate (more forgiving on timing)
+    
+    // Boost scores slightly to be more encouraging
+    const kidsBoost = 5; // 5% boost for encouragement
+    
+    const adjustedScore: DetailedPronunciationScore = {
+      ...baseScore,
+      overall: Math.min(100, baseScore.overall + kidsBoost),
+      accuracy: Math.min(100, baseScore.accuracy + kidsBoost),
+      fluency: Math.min(100, baseScore.fluency + kidsBoost),
+      clarity: Math.min(100, baseScore.clarity + kidsBoost),
+      recommendations: this.generateKidFriendlyRecommendations(baseScore)
+    };
+    
+    return adjustedScore;
+  }
+
+  /**
+   * Generate kid-friendly recommendations
+   */
+  private generateKidFriendlyRecommendations(score: DetailedPronunciationScore): string[] {
+    const recommendations: string[] = [];
+    
+    if (score.overall >= 90) {
+      recommendations.push('🌟 Wow! Amazing job! You sound fantastic!');
+      recommendations.push('🎉 Keep practicing and you\'ll be a pronunciation superstar!');
+    } else if (score.overall >= 75) {
+      recommendations.push('😊 Great effort! You\'re doing really well!');
+      recommendations.push('💪 Keep practicing and you\'ll master this word!');
+    } else if (score.overall >= 60) {
+      recommendations.push('👍 Good try! Let\'s practice together again!');
+      recommendations.push('🎤 Listen carefully and try to copy the sounds!');
+    } else {
+      recommendations.push('🤗 Don\'t worry! Learning is all about practice!');
+      recommendations.push('👂 Listen to the word again and say it slowly!');
+      recommendations.push('💝 Remember, every great speaker started just like you!');
+    }
+    
+    return recommendations;
+  }
+
+  /**
+   * Quick check if pronunciation is correct for kids (used for auto-stop)
+   * Returns true if the child pronounced it well enough (70%+ threshold for kids)
+   */
+  async isCorrectForKids(expectedText: string, spokenText: string, audioData?: Blob): Promise<boolean> {
+    const score = await this.scoreForKids(expectedText, spokenText, audioData);
+    // Lower threshold for kids - 70% is considered "mastered" to encourage them
+    return score.overall >= 70;
   }
 }
 

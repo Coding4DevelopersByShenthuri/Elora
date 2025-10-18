@@ -1,192 +1,279 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Sparkles, Zap, Volume2, Play, Heart, X, Mountain, Cloud, Sun, Footprints } from 'lucide-react';
-import SpeechService from '@/services/SpeechService';
+import { Sparkles, Mountain, Star, Volume2, Play, Zap, X, Ear, Award, Eye, Gauge, RotateCcw, FileText, Footprints } from 'lucide-react';
+import HybridVoiceService, { STORY_VOICES, type DownloadStatus } from '@/services/HybridVoiceService';
+import KidsListeningAnalytics, { type StorySession } from '@/services/KidsListeningAnalytics';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 
 type Props = {
   onClose: () => void;
   onComplete: (score: number) => void;
 };
 
+const DINA_VOICE = STORY_VOICES.Dina;
+
 const storySteps = [
   {
     id: 'intro',
-    title: '🦕 Dino World Adventure!',
-    text: 'Hello, paleontologist! ... I am Dina the dinosaur explorer! ... Our time machine is ready to take us back to the age of dinosaurs! ... Can you hear the ground shaking? Have you ever seen dinosaur bones in a museum? We are going back in time!',
+    title: '🦕 Welcome to Prehistoric Times!',
+    text: 'Hello young paleontologist! I am Dina, your dinosaur exploration guide!... Today we\'re traveling back millions of years to discover the magnificent world of dinosaurs!... You will encounter enormous reptiles, learn about their fascinating behaviors, and uncover ancient secrets!... Your scientific mission is to listen carefully and collect THREE rare fossils by answering challenging questions!... Are you prepared for this extraordinary journey? Let\'s venture back in time!',
     emoji: '👩‍🔬',
     character: 'Dina',
     bgColor: 'from-orange-100 to-amber-100 dark:from-orange-900 dark:to-amber-900',
     interactive: false,
-    wordCount: 25,
-    duration: 30
+    wordCount: 70,
+    duration: 40
   },
   {
-    id: 't_rex',
-    title: '🦖 T-Rex Encounter!',
-    text: 'WOW! Look at that HUGE T-Rex! ... The T-Rex roars "I am the king of dinosaurs!" ... Can you roar that out loud? ... Let us roar together! T-Rex was the strongest dinosaur!',
+    id: 't_rex_roar',
+    title: '🦖 Tyrannosaurus Rex',
     emoji: '🦖',
     character: 'Dina',
     bgColor: 'from-red-100 to-orange-100 dark:from-red-900 dark:to-orange-900',
     interactive: true,
-    audioText: 'I am the king of dinosaurs',
-    choices: ['I am the king of dinosaurs', 'I am very small and weak', 'I am scared of everything'],
-    wordCount: 28,
-    duration: 36,
-    question: 'What does the T-Rex say about itself?',
-    hint: 'The T-Rex is very strong and powerful'
+    listeningFirst: true,
+    
+    audioText: 'I dominated the Cretaceous period',
+    audioInstruction: 'Listen to what the mighty T-Rex declares!',
+    
+    question: 'What does the T-Rex say about its time period?',
+    hint: 'T-Rex was the apex predator of its era',
+    
+    choices: [
+      { text: 'I hid from all predators', emoji: '🦖😨', meaning: 'fearful behavior' },
+      { text: 'I dominated the Cretaceous period', emoji: '🦖👑', meaning: 'ruled the time period' },
+      { text: 'I was very small and helpless', emoji: '🦖🐁', meaning: 'weak and tiny' }
+    ],
+    
+    revealText: 'Magnificent! The Tyrannosaurus Rex stands before us—the most fearsome carnivore! It proclaims "I dominated the Cretaceous period!" This apex predator ruled 66 million years ago with powerful jaws and sharp teeth. Can you imagine seeing one? Scientists study fossils to understand these incredible creatures!',
+    
+    maxReplays: 5,
+    wordCount: 48,
+    duration: 42
   },
   {
-    id: 'first_fossil',
-    title: '💎 First Dino Fossil!',
-    text: 'Fantastic! ... WOW! ... We found our first dinosaur fossil! ... You are being such an amazing paleontologist! ... Fossils help us learn about ancient creatures—just like puzzle pieces from long ago! ... Two more fossils to discover! ... What dinosaur do you think we will find next?',
-    emoji: '💎',
-    character: 'Dina',
-    bgColor: 'from-yellow-100 to-amber-100 dark:from-yellow-900 dark:to-amber-900',
-    interactive: false,
-    fossilsNeeded: 3,
-    wordCount: 20,
-    duration: 25
-  },
-  {
-    id: 'herbivore_herd',
-    title: '🦕 Gentle Giants',
-    text: 'Look how tall this dinosaur is! ... The Brachiosaurus says "I can reach the highest leaves!" ... Can you say that while stretching up really tall? ... Let us stretch high! This dinosaur was as tall as a building!',
+    id: 'triceratops_defense',
+    title: '🦕 Triceratops Defense',
     emoji: '🦕',
     character: 'Dina',
     bgColor: 'from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900',
     interactive: true,
-    audioText: 'I can reach the highest leaves',
-    choices: ['I can reach the highest leaves', 'I cannot reach anything', 'I eat rocks not leaves'],
-    wordCount: 30,
-    duration: 38,
-    question: 'What special thing can the Brachiosaurus do?',
-    hint: 'Its long neck helps it reach very high'
+    listeningFirst: true,
+    
+    audioText: 'My three horns protect my family',
+    audioInstruction: 'Listen to how Triceratops describes its defense mechanism!',
+    
+    question: 'How does Triceratops protect itself and others?',
+    hint: 'Look at the name "tri" means three',
+    
+    choices: [
+      { text: 'My three horns protect my family', emoji: '🦕⚔️', meaning: 'defensive horns' },
+      { text: 'I run away from danger quickly', emoji: '🦕💨', meaning: 'fleeing predators' },
+      { text: 'I climb tall trees for safety', emoji: '🦕🌲', meaning: 'tree climbing' }
+    ],
+    
+    revealText: 'Excellent observation! Triceratops announces "My three horns protect my family!" These herbivores used their distinctive three-horned faces and bony frills as defensive weapons against predators. They traveled in herds for additional protection. Triceratops means "three-horned face" in Latin!',
+    
+    maxReplays: 5,
+    wordCount: 50,
+    duration: 43
   },
   {
-    id: 'triceratops',
-    title: '🦏 Three-Horned Friend!',
-    text: 'Here comes a Triceratops with three horns! ... The Triceratops says "My horns keep me safe!" ... Can you say that? ... Let us be strong together! Those horns are like a knight\'s shield!',
-    emoji: '🦏',
+    id: 'pterodactyl_flight',
+    title: '🦅 Pterodactyl Soaring',
+    emoji: '🦅',
     character: 'Dina',
-    bgColor: 'from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900',
+    bgColor: 'from-blue-100 to-sky-100 dark:from-blue-900 dark:to-sky-900',
     interactive: true,
-    audioText: 'My horns keep me safe',
-    choices: ['My horns keep me safe', 'I have no protection', 'I am always in danger'],
-    wordCount: 28,
-    duration: 36,
-    question: 'How does the Triceratops protect itself?',
-    hint: 'It uses the horns on its head'
+    listeningFirst: true,
+    
+    audioText: 'I soar above searching for fish',
+    audioInstruction: 'Listen to the flying reptile\'s hunting strategy!',
+    
+    question: 'What does the Pterodactyl do while flying?',
+    hint: 'Think about what it\'s looking for from the sky',
+    
+    choices: [
+      { text: 'I soar above searching for fish', emoji: '🦅🐟', meaning: 'hunting from above' },
+      { text: 'I burrow underground for safety', emoji: '🦅⬇️', meaning: 'digging holes' },
+      { text: 'I swim in deep ocean waters', emoji: '🦅🌊', meaning: 'swimming deep' }
+    ],
+    
+    revealText: 'Remarkable discovery! The Pterodactyl announces "I soar above searching for fish!" These flying reptiles weren\'t actually dinosaurs—they were pterosaurs! With massive wingspans, they glided over ancient seas and lakes, diving to catch fish. Imagine giant wings spanning up to 20 feet!',
+    
+    maxReplays: 5,
+    wordCount: 52,
+    duration: 44
+  },
+  {
+    id: 'first_fossil',
+    title: '💎 First Rare Fossil',
+    emoji: '💎',
+    character: 'Dina',
+    bgColor: 'from-yellow-100 to-amber-100 dark:from-yellow-900 dark:to-amber-900',
+    interactive: true,
+    listeningFirst: true,
+    questionType: 'true-false',
+    
+    audioText: 'Fossils preserve ancient life from millions of years ago',
+    audioInstruction: 'Listen to this paleontology fact!',
+    
+    question: 'True or False: Fossils preserve ancient life from millions of years ago?',
+    hint: 'Think about what fossils teach us',
+    
+    choices: [
+      { text: 'Fossils preserve ancient life from millions of years ago', emoji: '✅', meaning: 'true - fossils are ancient remains' },
+      { text: 'False - Fossils are recent discoveries', emoji: '❌', meaning: 'incorrect - fossils are very old' }
+    ],
+    
+    revealText: 'Outstanding! We\'ve uncovered our first precious fossil! You\'re demonstrating exceptional scientific thinking! It\'s absolutely TRUE—fossils preserve ancient life from millions of years ago! When organisms died, layers of sediment gradually turned their remains into stone. Two more fossils to discover!',
+    
+    maxReplays: 5,
+    starsNeeded: 3,
+    wordCount: 52,
+    duration: 38
+  },
+  {
+    id: 'stegosaurus_plates',
+    title: '🦕 Stegosaurus Plates',
+    emoji: '🦕',
+    character: 'Dina',
+    bgColor: 'from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900',
+    interactive: true,
+    listeningFirst: true,
+    
+    audioText: 'My back plates regulate my temperature',
+    audioInstruction: 'Listen to Stegosaurus explain its unique plates!',
+    
+    question: 'What purpose do Stegosaurus plates serve?',
+    hint: 'They help control body heat',
+    
+    choices: [
+      { text: 'My back plates store extra food', emoji: '🦕🍖', meaning: 'food storage' },
+      { text: 'My back plates regulate my temperature', emoji: '🦕🌡️', meaning: 'temperature control' },
+      { text: 'My back plates help me fly away', emoji: '🦕✈️', meaning: 'flight capability' }
+    ],
+    
+    revealText: 'Brilliant deduction! Stegosaurus states "My back plates regulate my temperature!" Scientists believe these distinctive plates helped control body heat—cooling or warming depending on blood flow. The tail spikes (called thagomizer) defended against predators. Nature\'s engineering is amazing!',
+    
+    maxReplays: 5,
+    wordCount: 50,
+    duration: 43
   },
   {
     id: 'second_fossil',
-    title: '✨ Second Ancient Fossil!',
-    text: 'Incredible! ... You are such a great dinosaur detective! ... Another fossil appeared near the volcano! ... These bones tell stories from millions of years ago—before you, me, or even your grandparents were born! ... One last fossil to find! ... We are almost done!',
+    title: '✨ Second Ancient Fossil',
     emoji: '✨',
     character: 'Dina',
-    bgColor: 'from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900',
+    bgColor: 'from-cyan-100 to-teal-100 dark:from-cyan-900 dark:to-teal-900',
+    interactive: true,
+    listeningFirst: true,
+    questionType: 'inference',
+    
+    audioText: 'Dinosaurs became extinct because of environmental catastrophe',
+    audioInstruction: 'Listen to the extinction theory!',
+    
+    question: 'According to the fossil, why did dinosaurs disappear?',
+    hint: 'A major disaster changed their world',
+    
+    choices: [
+      { text: 'They all decided to migrate elsewhere', emoji: '🦕✈️', meaning: 'voluntary relocation' },
+      { text: 'Dinosaurs became extinct because of environmental catastrophe', emoji: '🦕💥', meaning: 'natural disaster' },
+      { text: 'They transformed into modern birds overnight', emoji: '🦕🦅', meaning: 'instant evolution' }
+    ],
+    
+    revealText: 'Exceptional analysis! Another fossil reveals: "Dinosaurs became extinct because of environmental catastrophe!" Scientists theorize a massive asteroid impact 66 million years ago caused climate change, darkness, and food scarcity. Only birds—dinosaur descendants—survived. One final fossil awaits!',
+    
+    maxReplays: 5,
+    starsNeeded: 3,
+    wordCount: 48,
+    duration: 42
+  },
+  {
+    id: 'brachiosaurus_height',
+    title: '🦕 Brachiosaurus Giant',
+    emoji: '🦕',
+    character: 'Dina',
+    bgColor: 'from-green-200 to-lime-200 dark:from-green-800 dark:to-lime-800',
+    interactive: true,
+    listeningFirst: true,
+    
+    audioText: 'My long neck reaches the tallest trees',
+    audioInstruction: 'Listen to how Brachiosaurus feeds itself!',
+    
+    question: 'How does Brachiosaurus access its food?',
+    hint: 'It eats leaves from very high places',
+    
+    choices: [
+      { text: 'I dig deep underground for roots', emoji: '🦕⬇️', meaning: 'digging for food' },
+      { text: 'My long neck reaches the tallest trees', emoji: '🦕🌲', meaning: 'reaching high branches' },
+      { text: 'I hunt smaller dinosaurs for meals', emoji: '🦕🍖', meaning: 'carnivorous hunting' }
+    ],
+    
+    revealText: 'Magnificent observation! Brachiosaurus declares "My long neck reaches the tallest trees!" These gentle herbivorous giants stood 40 feet tall, accessing vegetation other dinosaurs couldn\'t reach. One Brachiosaurus weighed as much as 12 elephants! Imagine that enormous, peaceful creature!',
+    
+    maxReplays: 5,
+    wordCount: 48,
+    duration: 42
+  },
+  {
+    id: 'final_fossil',
+    title: '🏆 Third Precious Fossil',
+    text: 'Phenomenal achievement! ... INCREDIBLE! ... We\'ve collected all three rare fossils! ... (Your scientific expertise is extraordinary!) These fossils unlock millions of years of prehistoric secrets! ... The entire paleontology community celebrates your discovery! ... You are a BRILLIANT young scientist! ... Your curiosity and dedication are remarkable!',
+    emoji: '🏆',
+    character: 'Dina',
+    bgColor: 'from-amber-200 to-yellow-200 dark:from-amber-800 dark:to-yellow-800',
     interactive: false,
-    fossilsNeeded: 3,
-    wordCount: 21,
-    duration: 25
+    starsNeeded: 3,
+    wordCount: 48,
+    duration: 32
   },
   {
-    id: 'stegosaurus',
-    title: '🦎 Spiky Stegosaurus!',
-    text: 'Look at those amazing plates on its back! ... The Stegosaurus says "My plates are special and unique!" ... Can you say that? ... Let us be proud! Everyone is unique and special, just like you!',
-    emoji: '🦎',
-    character: 'Dina',
-    bgColor: 'from-pink-100 to-rose-100 dark:from-pink-900 dark:to-rose-900',
-    interactive: true,
-    audioText: 'My plates are special and unique',
-    choices: ['My plates are special and unique', 'I look like everyone else', 'I have nothing special'],
-    wordCount: 28,
-    duration: 36,
-    question: 'What makes the Stegosaurus unique?',
-    hint: 'The plates on its back make it special'
-  },
-  {
-    id: 'velociraptor',
-    title: '🐆 Speedy Raptor!',
-    text: 'Here come some fast Velociraptors! ... The Velociraptors say "We work together as a team!" ... Can you say that? ... Let us be a team! Working together makes us stronger!',
-    emoji: '🐆',
-    character: 'Dina',
-    bgColor: 'from-gray-100 to-slate-100 dark:from-gray-900 dark:to-slate-900',
-    interactive: true,
-    audioText: 'We work together as a team',
-    choices: ['We work together as a team', 'We always work alone', 'We never help each other'],
-    wordCount: 28,
-    duration: 36,
-    question: 'What do the Velociraptors do together?',
-    hint: 'They help and cooperate with each other'
-  },
-  {
-    id: 'third_fossil',
-    title: '🌟 Third Magic Fossil!',
-    text: 'We did it! ... YES! ... All three fossils are glowing brightly! ... (They are shining because YOU found them!) They will help scientists learn about dinosaur history forever. ... You are an AMAZING paleontologist! ... I am so proud of how much you have learned!',
-    emoji: '🌟',
-    character: 'Dina',
-    bgColor: 'from-yellow-200 to-orange-200 dark:from-yellow-800 dark:to-orange-800',
-    interactive: false,
-    fossilsNeeded: 3,
-    wordCount: 23,
-    duration: 30
-  },
-  {
-    id: 'flying_dino',
-    title: '🦅 Flying Reptile!',
-    text: 'Look up in the sky! ... The Pterodactyl calls "I fly high in the sky!" ... Can you say that? ... Let us fly! Pterodactyls were like the birds of dinosaur times!',
-    emoji: '🦅',
-    character: 'Dina',
-    bgColor: 'from-blue-200 to-cyan-200 dark:from-blue-800 dark:to-cyan-800',
-    interactive: true,
-    audioText: 'I fly high in the sky',
-    choices: ['I fly high in the sky', 'I stay on the ground', 'I cannot fly at all'],
-    wordCount: 28,
-    duration: 36,
-    question: 'Where does the Pterodactyl travel?',
-    hint: 'It moves through the air above us'
-  },
-  {
-    id: 'volcano',
-    title: '🌋 Ancient Volcano!',
-    text: 'Oh my! We see the volcano smoking! ... Let us say "We need to stay far away!" ... Can you say that? ... Let us be careful! Volcanoes are hot and powerful!',
-    emoji: '🌋',
-    character: 'Dina',
-    bgColor: 'from-red-200 to-orange-200 dark:from-red-800 dark:to-orange-800',
-    interactive: true,
-    audioText: 'We need to stay far away',
-    choices: ['We need to stay far away', 'Let us go very close', 'It is not dangerous'],
-    wordCount: 30,
-    duration: 38,
-    question: 'What should we do near the volcano?',
-    hint: 'We should keep a safe distance'
-  },
-  {
-    id: 'final_celebration',
-    title: '🎉 Dino Discovery Celebration!',
-    text: 'Congratulations, dinosaur expert! ... You helped Dina complete the prehistoric mission! ... All the dinosaurs are celebrating YOU, and we have learned so much about ancient times! ... You listened so carefully and spoke with such wonderful voices! ... You are a SUPERSTAR paleontologist! ... Give yourself a ROAR of celebration! 🦖',
+    id: 'celebration',
+    title: '🎉 Scientific Triumph!',
+    text: 'Congratulations, Master Paleontologist! ... You\'ve completed this extraordinary expedition! ... Museums worldwide will display your incredible fossil discoveries! ... You\'ve demonstrated exceptional listening skills, scientific reasoning, and intellectual curiosity! ... Your understanding of prehistoric life is impressive! ... Continue exploring and questioning the world around you! ... You\'re destined for great scientific adventures! 🦕✨',
     emoji: '🎉',
     character: 'Dina',
     bgColor: 'from-rainbow-100 to-sparkle-100 dark:from-rainbow-900 dark:to-sparkle-900',
     interactive: false,
-    wordCount: 24,
-    duration: 35
+    wordCount: 52,
+    duration: 42
   }
 ];
 
-const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
+const DinosaurDiscoveryAdventure = ({ onClose, onComplete }: Props) => {
+  const { user } = useAuth();
+  const userId = user?.id ? String(user.id) : 'local-user';
+  
   const [stepIndex, setStepIndex] = useState(0);
-  const [fossils, setFossils] = useState(0);
+  const [stars, setStars] = useState(0);
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [timeSpent, setTimeSpent] = useState(0);
   const [showHint, setShowHint] = useState(false);
-  const contentRef = useRef<HTMLDivElement>(null);
+  
+  const [listeningPhase, setListeningPhase] = useState<'listening' | 'question' | 'reveal'>('listening');
+  const [replaysUsed, setReplaysUsed] = useState(0);
+  const [hasListened, setHasListened] = useState(false);
+  const [audioWaveform, setAudioWaveform] = useState(false);
+  
+  const [showTranscript, setShowTranscript] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState<'normal' | 'slow' | 'slower'>('slow'); // Default to slow for better comprehension
+  const [captionsEnabled, setCaptionsEnabled] = useState(false);
+  const [retryMode, setRetryMode] = useState(false);
+  const [attemptCount, setAttemptCount] = useState(0);
+  const [ttsAvailable, setTtsAvailable] = useState(true);
+  const [currentCaption, setCurrentCaption] = useState('');
+  const [accessibilityMode, setAccessibilityMode] = useState(false);
+  
+  const [currentSession, setCurrentSession] = useState<StorySession | null>(null);
+  const [questionStartTime, setQuestionStartTime] = useState(0);
+  const [downloadStatus, setDownloadStatus] = useState<DownloadStatus | null>(null);
 
   const current = storySteps[stepIndex];
   const progress = Math.round(((stepIndex + 1) / storySteps.length) * 100);
@@ -194,34 +281,129 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
   const totalWords = storySteps.reduce((sum, step) => sum + step.wordCount, 0);
   const totalDuration = storySteps.reduce((sum, step) => sum + step.duration, 0);
 
-  // Smooth scroll to top on step change
+  const maxReplays = (current as any).maxReplays || 5;
+  const unlimitedReplays = true;
+
   useEffect(() => {
-    if (contentRef.current) {
-      contentRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    const initializeVoice = async () => {
+      await HybridVoiceService.initialize();
+      const available = HybridVoiceService.isAvailable();
+      setTtsAvailable(available);
+      if (!available) setShowTranscript(true);
+    };
+    initializeVoice();
+    
+    const unsubscribe = HybridVoiceService.onDownloadProgress((status) => {
+      setDownloadStatus(status);
+      if (!status.downloading && status.progress === 100) setTtsAvailable(true);
+    });
+    
+    const initSession = async () => {
+      await KidsListeningAnalytics.initialize(userId);
+      const session = KidsListeningAnalytics.startSession(userId, 'dinosaur-discovery', 'Dinosaur Discovery');
+      setCurrentSession(session);
+    };
+    initSession();
+    
+    return () => unsubscribe();
+  }, [userId]);
+
+  useEffect(() => {
+    if (current.listeningFirst) {
+      setListeningPhase('listening');
+      setReplaysUsed(0);
+      setHasListened(false);
+      setAttemptCount(0);
+      setRetryMode(false);
+    } else {
+      setListeningPhase('reveal');
     }
+    setSelectedChoice(null);
+    setShowFeedback(false);
+    setShowHint(false);
+    setCurrentCaption('');
   }, [stepIndex]);
 
-  // Timer for tracking session duration
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeSpent(prev => prev + 1);
-    }, 1000);
+    const timer = setInterval(() => setTimeSpent(prev => prev + 1), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  // Auto-play story narration with character voice
+  const stripEmojis = (text: string): string => {
+    return text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{FE00}-\u{FE0F}]|[\u{E0020}-\u{E007F}]/gu, '').trim();
+  };
+
+  const playAudioWithCaptions = async (text: string, showCaptions: boolean = false) => {
+    try {
+      const cleanText = stripEmojis(text);
+      const allowCaptions = showCaptions && captionsEnabled && 
+        (listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode);
+      
+      await HybridVoiceService.speak(cleanText, DINA_VOICE, {
+        speed: playbackSpeed,
+        showCaptions: allowCaptions,
+        onCaptionUpdate: allowCaptions ? setCurrentCaption : () => {}
+      });
+    } catch (error) {
+      setTtsAvailable(false);
+      if (listeningPhase === 'reveal' || !current.listeningFirst) setShowTranscript(true);
+      throw error;
+    }
+  };
+
   useEffect(() => {
-    if (current.text && SpeechService.isTTSSupported()) {
-      const playNarration = async () => {
+    if (listeningPhase === 'listening' && current.listeningFirst && (current as any).audioText) {
+      const playListeningAudio = async () => {
+        setIsPlaying(true);
+        setAudioWaveform(true);
         try {
-          await SpeechService.speakAsCharacter(current.text, current.character as any);
+          await playAudioWithCaptions((current as any).audioText, true);
+          setHasListened(true);
+        } catch (error) {
+          setHasListened(true);
+        }
+        setIsPlaying(false);
+        setAudioWaveform(false);
+      };
+      playListeningAudio();
+    }
+    
+    // Auto-play for reveal phase (after correct answer)
+    if (listeningPhase === 'reveal' && current.listeningFirst && (current as any).revealText && ttsAvailable) {
+      const playReveal = async () => {
+        setIsPlaying(true);
+        try {
+          await playAudioWithCaptions((current as any).revealText, true);
+        } catch (error) {
+          console.log('TTS not available');
+        }
+        setIsPlaying(false);
+      };
+      playReveal();
+    }
+    
+    if (!current.listeningFirst && current.text && ttsAvailable) {
+      const playNarration = async () => {
+        let textToRead = current.text;
+        
+        // Handle dynamic celebration text based on stars collected
+        if (current.id === 'grand_celebration') {
+          if (stars >= 3) {
+            textToRead = "Congratulations paleontologist! ... The prehistoric world celebrates your discoveries! ... Dinosaurs roar with joy, fossils glow brightly, and ancient magic fills the air! ... You made history with your excellent listening! You should feel incredibly proud! ... Give yourself a mighty roar!";
+          } else {
+            textToRead = `Great work, young scientist! ... You discovered ${Math.floor(stars)} fossil${Math.floor(stars) !== 1 ? 's' : ''}! ... The dinosaurs are impressed by your dedication! ... Dina is proud of your effort! ... Every expedition teaches us something new. Keep exploring and you'll find all the fossils next time! 🦕`;
+          }
+        }
+        
+        try {
+          await playAudioWithCaptions(textToRead, true);
         } catch (error) {
           console.log('TTS not available');
         }
       };
       playNarration();
     }
-  }, [current.text, current.character]);
+  }, [listeningPhase, stepIndex, playbackSpeed, stars]);
 
   const handleNext = () => {
     if (stepIndex < storySteps.length - 1) {
@@ -230,58 +412,104 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
       setShowFeedback(false);
       setShowHint(false);
     } else {
-      // Calculate score based on correct answers and time
       const accuracyScore = correctAnswers * 20;
-      const timeBonus = Math.max(0, 300 - timeSpent) * 0.1;
-      const fossilBonus = fossils * 10;
-      const score = Math.min(100, 40 + accuracyScore + timeBonus + fossilBonus);
+      const timeBonus = Math.max(0, 420 - timeSpent) * 0.1;
+      const starBonus = stars * 10;
+      const score = Math.min(100, 40 + accuracyScore + timeBonus + starBonus);
+      
+      if (currentSession) {
+        KidsListeningAnalytics.completeSession(userId, currentSession, score, stars);
+      }
       onComplete(score);
     }
   };
 
-  const handleChoice = async (choice: string) => {
-    setSelectedChoice(choice);
-    setIsPlaying(true);
+  const handleReplayAudio = async () => {
+    if (!unlimitedReplays && replaysUsed >= maxReplays) return;
+    if (!current.listeningFirst) return;
     
-    // Play the correct word with character voice
-    if (current.audioText && SpeechService.isTTSSupported()) {
-      try {
-        await SpeechService.speakAsCharacter(current.audioText, current.character as any);
-      } catch (error) {
-        console.log('TTS not available');
-      }
+    setReplaysUsed(prev => prev + 1);
+    setIsPlaying(true);
+    setAudioWaveform(true);
+    
+    try {
+      await playAudioWithCaptions((current as any).audioText, true);
+      setHasListened(true);
+    } catch (error) {
+      setHasListened(true);
     }
     
     setIsPlaying(false);
+    setAudioWaveform(false);
+  };
+  
+  const handleProceedToQuestion = () => {
+    if (!hasListened) return;
+    setListeningPhase('question');
+    setQuestionStartTime(Date.now());
+  };
+
+  const handleChoice = async (choiceObj: any) => {
+    const choice = typeof choiceObj === 'string' ? choiceObj : choiceObj.text;
+    setSelectedChoice(choice);
+    const currentAttempt = attemptCount + 1;
+    setAttemptCount(currentAttempt);
     
-    // Check if choice is correct
-    const isCorrect = choice === current.audioText;
+    const questionTime = Math.round((Date.now() - questionStartTime) / 1000);
+    const isCorrect = choice === (current as any).audioText;
+    
+    if (currentSession && current.listeningFirst) {
+      const updatedSession = KidsListeningAnalytics.recordAttempt(
+        currentSession,
+        current.id,
+        (current as any).question || '',
+        isCorrect,
+        currentAttempt,
+        replaysUsed,
+        questionTime
+      );
+      setCurrentSession(updatedSession);
+    }
+    
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
-      setFossils(prev => Math.min(3, prev + 1));
+      const starReward = currentAttempt === 1 ? 1 : 0.5;
+      setStars(prev => Math.min(3, prev + starReward));
+      setShowFeedback(true);
+      setRetryMode(false);
+      
+      setTimeout(() => setListeningPhase('reveal'), 2500);
+      setTimeout(() => handleNext(), 5000);
+    } else {
+      setShowFeedback(true);
+      setRetryMode(true);
+    }
+  };
+  
+  const handleRetry = () => {
+    setSelectedChoice(null);
+    setShowFeedback(false);
+    setRetryMode(false);
+    setListeningPhase('listening');
+    setReplaysUsed(0);
+  };
+
+  const playRevealText = async () => {
+    let textToSpeak = (current as any).revealText || current.text;
+    
+    // Handle dynamic celebration text based on stars collected
+    if (current.id === 'grand_celebration') {
+      if (stars >= 3) {
+        textToSpeak = "Congratulations paleontologist! ... The prehistoric world celebrates your discoveries! ... Dinosaurs roar with joy, fossils glow brightly, and ancient magic fills the air! ... You made history with your excellent listening! You should feel incredibly proud! ... Give yourself a mighty roar!";
+      } else {
+        textToSpeak = `Great work, young scientist! ... You discovered ${Math.floor(stars)} fossil${Math.floor(stars) !== 1 ? 's' : ''}! ... The dinosaurs are impressed by your dedication! ... Dina is proud of your effort! ... Every expedition teaches us something new. Keep exploring and you'll find all the fossils next time! 🦕`;
+      }
     }
     
-    setShowFeedback(true);
-    
-    // Auto-advance after showing feedback
-    setTimeout(() => {
-      handleNext();
-    }, 2500);
-  };
-
-  // Helper function to remove emojis from text before TTS
-  const stripEmojis = (text: string): string => {
-    // Remove all emoji characters to prevent TTS from reading "tree emoji" etc.
-    return text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{FE00}-\u{FE0F}]|[\u{E0020}-\u{E007F}]/gu, '').trim();
-  };
-
-  const playAudio = async () => {
-    if (current.audioText && SpeechService.isTTSSupported()) {
+    if (textToSpeak && ttsAvailable) {
       setIsPlaying(true);
       try {
-        // Strip emojis before speaking
-        const cleanText = stripEmojis(current.audioText);
-        await SpeechService.speakAsCharacter(cleanText, current.character as any);
+        await playAudioWithCaptions(textToSpeak, true);
       } catch (error) {
         console.log('TTS not available');
       }
@@ -289,444 +517,243 @@ const DinosaurAdventure = ({ onClose, onComplete }: Props) => {
     }
   };
 
-  const playStoryText = async () => {
-    if (current.text && SpeechService.isTTSSupported()) {
-      setIsPlaying(true);
-      try {
-        // Strip emojis before speaking
-        const cleanText = stripEmojis(current.text);
-        await SpeechService.speakAsCharacter(cleanText, current.character as any);
-      } catch (error) {
-        console.log('TTS not available');
-      }
-      setIsPlaying(false);
+  const getCorrectFeedback = () => {
+    const messages = [
+      "🦕 ROAR-SOME! You earned a fossil! 💎",
+      "💎 DINO-MITE! Excellent work!",
+      "✨ PREHISTORIC PERFECT! Amazing!",
+      "🎯 FOSSIL FOUND! Great scientist!",
+      "🏆 BRILLIANT DISCOVERY!"
+    ];
+    return messages[Math.floor(Math.random() * messages.length)];
+  };
+  
+  const getWrongFeedback = (attempt: number) => {
+    if (attempt === 1) {
+      return `💪 Not quite, young scientist! Listen carefully and investigate again! 🎧`;
+    } else {
+      return `🦕 Keep exploring! Listen one more time to discover the answer! 👂`;
     }
   };
-
-  const getCharacterAnimation = () => {
-    if (current.id.includes('fossil')) return 'animate-bounce';
-    return 'animate-float';
-  };
-
-  const getDinoIcon = () => {
-    switch (current.id) {
-      case 't_rex': return Footprints;
-      case 'herbivore_herd': return Mountain;
-      case 'triceratops': return Sun;
-      case 'stegosaurus': return Sparkles;
-      case 'velociraptor': return Footprints;
-      case 'flying_dino': return Cloud;
-      case 'volcano': return Sparkles;
-      default: return Sparkles;
-    }
-  };
-
-  const DinoIcon = getDinoIcon();
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <Card className={cn(
-        "w-full max-w-5xl h-[95vh] rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-500",
-        "bg-gradient-to-br", current.bgColor,
-        "flex flex-col"
-      )}>
-        {/* Always Visible Close Button */}
+      <Card className={cn("w-full max-w-5xl sm:max-w-6xl lg:max-w-7xl h-[95vh] rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-500 bg-gradient-to-br", current.bgColor, "flex flex-col")}>
         <div className="absolute top-4 right-4 z-10">
-          <Button 
-            variant="ghost" 
-            onClick={onClose} 
-            className="h-10 w-10 p-0 rounded-full bg-white/80 hover:bg-white backdrop-blur-sm border border-gray-200 hover:border-gray-300 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 z-50"
-          >
-            <X className="w-5 h-5 text-gray-700 hover:text-gray-900" />
+          <Button variant="ghost" onClick={onClose} className="h-10 w-10 p-0 rounded-full bg-white/80 hover:bg-white backdrop-blur-sm border shadow-lg z-50">
+            <X className="w-5 h-5 text-gray-700" />
           </Button>
         </div>
 
-        <CardContent className="p-2 sm:p-4 md:p-6 lg:p-8 flex-1 flex flex-col overflow-hidden" ref={contentRef}>
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 sm:mb-3 gap-2 flex-shrink-0">
-            <div className="flex items-center gap-3">
+        <CardContent className="p-2 sm:p-4 md:p-6 lg:p-8 flex-1 flex flex-col overflow-hidden">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 gap-2 flex-shrink-0">
+            <div className="flex items-center gap-2 sm:gap-3">
               <div className="relative">
                 <Footprints className="w-6 h-6 sm:w-8 sm:h-8 text-orange-600 animate-bounce" />
-                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 absolute -top-1 -right-1 animate-ping" />
+                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-amber-400 absolute -top-1 -right-1 animate-ping" />
               </div>
               <div>
-                <h2 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white">Dina's Dino Adventure</h2>
+                <h2 className="text-base sm:text-xl font-bold text-gray-800 dark:text-white">Dina's Dinosaur Discovery</h2>
                 <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
                   Step {stepIndex + 1} of {totalSteps} • {totalWords} words • {Math.round(totalDuration/60)}min
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3 self-end sm:self-auto">
-              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap bg-white/50 dark:bg-gray-800/50 px-3 py-1 rounded-full border border-white/20">
-                💎 {fossils}/3 Fossils
-              </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="text-xs bg-white/50 px-3 py-1 rounded-full">💎 {stars}/3 Fossils</div>
+              <Button variant="ghost" size="sm" onClick={async () => {
+                HybridVoiceService.stop();
+                const newSpeed = playbackSpeed === 'slow' ? 'slower' : playbackSpeed === 'slower' ? 'normal' : 'slow';
+                setPlaybackSpeed(newSpeed);
+                try {
+                  let textToPlay = '';
+                  if (listeningPhase === 'listening' && current.listeningFirst && (current as any).audioText) {
+                    textToPlay = (current as any).audioText;
+                  } else if (listeningPhase === 'reveal' && current.listeningFirst && (current as any).revealText) {
+                    textToPlay = (current as any).revealText;
+                  } else if (!current.listeningFirst && current.text) {
+                    if (current.id === 'grand_celebration') {
+                      textToPlay = stars >= 3 ? "Congratulations paleontologist! ... The prehistoric world celebrates your discoveries! ... Dinosaurs roar with joy, fossils glow brightly, and ancient magic fills the air! ... You made history with your excellent listening! You should feel incredibly proud! ... Give yourself a mighty roar!" : `Great work, young scientist! ... You discovered ${Math.floor(stars)} fossil${Math.floor(stars) !== 1 ? 's' : ''}! ... The dinosaurs are impressed by your dedication! ... Dina is proud of your effort! ... Every expedition teaches us something new. Keep exploring and you'll find all the fossils next time! 🦕`;
+                    } else {
+                      textToPlay = current.text;
+                    }
+                  }
+                  if (textToPlay && ttsAvailable) {
+                    await HybridVoiceService.speak(stripEmojis(textToPlay), DINA_VOICE, { speed: newSpeed, showCaptions: captionsEnabled, onCaptionUpdate: setCurrentCaption });
+                  }
+                } catch (error) {
+                  console.log('Could not replay at new speed');
+                }
+              }} className="h-7 px-2 rounded-full text-xs bg-orange-50 border" title={`Playback speed: ${playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow (Default)' : 'Very Slow'}`}>
+                <Gauge className="w-3.5 h-3.5 mr-1" />
+                {playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow' : 'Very Slow'}
+              </Button>
             </div>
           </div>
 
-          {/* Progress Bar */}
-          <Progress value={progress} className="h-2 mb-3 sm:mb-4 bg-white/30 flex-shrink-0">
-            <div className="h-full bg-gradient-to-r from-orange-400 to-red-400 rounded-full transition-all duration-500" />
+          <Progress value={progress} className="h-2 mb-3 bg-white/30 flex-shrink-0">
+            <div className="h-full bg-gradient-to-r from-orange-400 to-amber-400 rounded-full transition-all duration-500" />
           </Progress>
 
-          {/* Content Area */}
-          <div className="flex-1 overflow-hidden pb-2">
+          <div className="flex-1 overflow-y-auto pb-2">
             <div className="text-center h-full flex flex-col justify-center">
-              {/* Character and Scene */}
-              <div className="relative mb-1 sm:mb-2 md:mb-3">
-                <div className={cn(
-                  "text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-1 sm:mb-2", 
-                  getCharacterAnimation()
-                )}>
-                  <span className={cn(
-                    current.id === 'final_celebration' && 'animate-celebration-party'
-                  )}>
-                    {current.emoji}
-                  </span>
-                </div>
-                
-                {/* Fossil Collection Display - Show in all steps like other stories */}
-                <div className="flex items-center justify-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+              <div className="relative mb-2">
+                <div className="text-5xl mb-2 animate-float">{current.emoji}</div>
+                <div className="flex items-center justify-center gap-1.5 mb-2">
                   {Array.from({ length: 3 }).map((_, i) => (
-                    <div 
-                      key={i} 
-                      className={cn(
-                        "w-4 h-4 sm:w-6 sm:h-6 md:w-7 md:h-7 transition-all duration-500 transform hover:scale-125 flex items-center justify-center",
-                        i < fossils 
-                          ? 'text-amber-600 animate-pulse drop-shadow-lg' 
-                          : 'text-gray-300 opacity-50'
-                      )} 
-                    >
-                      💎
-                    </div>
+                    <Star key={i} className={cn("w-5 h-5 transition-all", i < stars ? 'text-amber-400 animate-pulse' : 'text-gray-300 opacity-50')} />
                   ))}
                 </div>
-
-                {/* Dino Icon */}
-                <div className="absolute top-1 right-1 sm:top-2 sm:right-2 animate-float-slow">
-                  <DinoIcon className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-orange-500 opacity-70" />
-                </div>
               </div>
 
-              {/* Story Text */}
-              <div className="bg-white/80 dark:bg-gray-800/80 rounded-lg sm:rounded-xl md:rounded-2xl p-2 sm:p-3 md:p-4 mb-2 sm:mb-3 backdrop-blur-sm border-2 border-white/20 shadow-lg sm:shadow-2xl max-w-4xl mx-auto">
-                <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold mb-1 sm:mb-2 text-gray-800 dark:text-white flex items-center justify-center gap-2">
-                  {current.title}
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={playStoryText}
-                    className="text-blue-500 hover:text-blue-600 h-6 w-6 sm:h-8 sm:w-8 p-0"
-                  >
-                    <Volume2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                  </Button>
-                </h3>
-                <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-700 dark:text-gray-200 leading-snug sm:leading-relaxed mx-auto max-w-3xl">
-                  {current.text}
-                </p>
-                
-                {/* Word Count and Duration */}
-                <div className="flex justify-center gap-2 mt-1 sm:mt-2 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-                  <span>📝 {current.wordCount} words</span>
-                  <span>⏱️ {current.duration}s</span>
+              {current.listeningFirst && listeningPhase === 'listening' && (
+                <div className="space-y-4 max-w-3xl mx-auto w-full">
+                  <div className="bg-orange-100/80 dark:bg-orange-900/40 rounded-2xl p-6 backdrop-blur-sm border-2 border-orange-300 shadow-2xl">
+                    <h3 className="text-lg font-bold mb-4 flex items-center justify-center gap-2">
+                      <Ear className="w-6 h-6 text-orange-600 animate-bounce" />
+                      {(current as any).audioInstruction}
+                    </h3>
+                    {audioWaveform && (
+                      <div className="flex items-center justify-center gap-2 mb-4">
+                        {[...Array(5)].map((_, i) => (
+                          <div key={i} className="w-2 bg-orange-500 rounded-full animate-waveform" style={{ height: '40px', animationDelay: `${i * 0.1}s` }} />
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex flex-col items-center gap-3 mt-4">
+                      <Button onClick={handleReplayAudio} disabled={isPlaying} className={cn("rounded-xl px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold", isPlaying && "animate-pulse")}>
+                        <Volume2 className="w-5 h-5 mr-2" />
+                        {isPlaying ? 'Playing...' : `Listen Again (${replaysUsed} plays)`}
+                      </Button>
+                      {hasListened && (
+                        <Button onClick={handleProceedToQuestion} className="bg-green-500 text-white rounded-xl px-6 py-3 font-bold animate-bounce">
+                          Ready to Answer! ✓
+                        </Button>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {/* Interactive Elements */}
-              {current.interactive && (
-                <div className="space-y-1.5 sm:space-y-2 md:space-y-3 max-w-4xl mx-auto w-full">
-                  {/* Question and Hint */}
-                  <div className="bg-orange-50 dark:bg-orange-900/20 rounded-md sm:rounded-lg md:rounded-xl p-1.5 sm:p-2 md:p-3 border border-orange-200 dark:border-orange-700">
-                    <h4 className="text-xs sm:text-sm md:text-base font-bold text-gray-800 dark:text-white mb-1">
-                      {current.question}
-                    </h4>
+              {current.listeningFirst && listeningPhase === 'question' && (
+                <div className="space-y-2 max-w-4xl mx-auto w-full">
+                  <div className="bg-yellow-50 rounded-lg p-2.5 border border-yellow-200">
+                    <h4 className="text-sm font-bold mb-1.5">{(current as any).question}</h4>
                     {showHint ? (
-                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
-                        💡 Dino Hint: {current.hint}
-                      </p>
+                      <p className="text-xs">💡 {(current as any).hint}</p>
                     ) : (
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => setShowHint(true)}
-                        className="text-orange-600 border-orange-300 hover:bg-orange-100 text-xs sm:text-sm"
-                      >
-                        Need a dino hint? 🦖
+                      <Button variant="outline" size="sm" onClick={() => setShowHint(true)} className="text-yellow-600 text-xs">
+                        Scientific Hint? 🦕
                       </Button>
                     )}
                   </div>
-
-                  {/* Audio Play Button */}
-                  {current.audioText && (
-                    <div className="flex justify-center mb-1.5 sm:mb-2">
-                      <Button 
-                        onClick={playAudio}
-                        disabled={isPlaying}
-                        className={cn(
-                          "rounded-lg sm:rounded-xl md:rounded-2xl px-3 sm:px-5 md:px-6 py-1.5 sm:py-2 md:py-2.5 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold transition-all duration-300 transform hover:scale-105 text-[10px] sm:text-xs md:text-sm",
-                          isPlaying && "animate-pulse"
-                        )}
-                      >
-                        {isPlaying ? (
-                          <>
-                            <Volume2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 animate-spin" />
-                            Listening...
-                          </>
-                        ) : (
-                          <>
-                            <Volume2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                            <span className="hidden sm:inline">Listen to the Dino Word</span>
-                            <span className="sm:hidden">🔊 Listen</span>
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  )}
-
-                  {/* Choice Buttons */}
-                  {current.choices && (
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 md:gap-3 justify-center">
-                      {current.choices.map((choice) => {
-                        const isSelected = selectedChoice === choice;
-                        const isCorrect = choice === current.audioText;
+                  <div className="flex justify-center mb-2">
+                    <Button onClick={handleReplayAudio} disabled={isPlaying} className={cn("rounded-xl px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold text-xs", isPlaying && "animate-pulse")}>
+                      <Volume2 className="w-4 h-4 mr-2" />
+                      🔊 Replay
+                    </Button>
+                  </div>
+                  {(current as any).choices && (
+                    <div className="grid grid-cols-1 gap-2.5">
+                      {(current as any).choices.map((choice: any, idx: number) => {
+                        const isSelected = selectedChoice === choice.text;
+                        const isCorrect = choice.text === (current as any).audioText;
                         const showResult = showFeedback && isSelected;
-                        
                         return (
-                          <Button
-                            key={choice}
-                            onClick={() => handleChoice(choice)}
-                            disabled={showFeedback}
-                            className={cn(
-                              "rounded-md sm:rounded-lg md:rounded-xl px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 text-[10px] sm:text-xs md:text-sm font-bold transition-all duration-300 transform hover:scale-105 h-auto min-h-[45px] sm:min-h-[50px] md:min-h-[55px]",
-                              showResult && isCorrect && "bg-green-500 hover:bg-green-600 text-white animate-bounce shadow-lg sm:shadow-2xl",
-                              showResult && !isCorrect && "bg-red-500 hover:bg-red-600 text-white shadow-md sm:shadow-xl",
-                              !showResult && "bg-white/90 hover:bg-white text-gray-700 border-2 border-gray-200 hover:border-orange-300 hover:shadow-lg"
-                            )}
-                          >
-                            <span className="flex flex-col items-center gap-0.5 sm:gap-1">
-                              <span className="text-base sm:text-lg md:text-xl mb-0.5">
-                                {choice === 'T-Rex' && '🦖'}
-                                {choice === 'Brachiosaurus' && '🦕'}
-                                {choice === 'Triceratops' && '🦏'}
-                                {choice === 'Stegosaurus' && '🦎'}
-                                {choice === 'Velociraptor' && '🐆'}
-                                {choice === 'Pterodactyl' && '🦅'}
-                                {choice === 'volcano' && '🌋'}
-                                {choice === 'Ankylosaurus' && '🛡️'}
-                                {choice === 'Dragon' && '🐉'}
-                                {choice === 'Eagle' && '🦅'}
-                                {choice === 'mountain' && '⛰️'}
-                                {choice === 'waterfall' && '🌊'}
-                              </span>
-                              {choice}
-                              {showResult && isCorrect && (
-                                <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-pink-300 animate-pulse" />
-                              )}
-                            </span>
+                          <Button key={idx} onClick={() => handleChoice(choice)} disabled={showFeedback} className={cn("rounded-lg px-3 py-2.5 text-xs font-bold h-auto min-h-[55px]", showResult && isCorrect && "bg-green-500 text-white animate-bounce", showResult && !isCorrect && "bg-red-500 text-white", !showResult && "bg-white/90 text-gray-700 border-2")}>
+                            <div className="flex items-center gap-2 w-full">
+                              <span className="text-lg">{choice.emoji}</span>
+                              <div className="flex-1 text-left">
+                                <p className="font-bold text-xs">{choice.text}</p>
+                                <p className="text-xs opacity-70">{choice.meaning}</p>
+                              </div>
+                            </div>
                           </Button>
                         );
                       })}
                     </div>
                   )}
-
-                  {/* Feedback */}
                   {showFeedback && (
-                    <div className="text-red-600 dark:text-red-400 text-xs sm:text-sm md:text-base font-bold bg-red-50 dark:bg-red-900/20 rounded-md sm:rounded-lg md:rounded-xl p-1.5 sm:p-2 md:p-3 border border-red-200 dark:border-red-700">
-                      💪 GREAT effort! You are trying so hard and that is wonderful! The dino word was "{current.audioText}" - Let us explore it together! You are doing SUPER!
+                    <div className="mt-2">
+                      {selectedChoice === (current as any).audioText ? (
+                        <div className="text-green-600 text-xs font-bold bg-green-50 rounded-lg p-2.5 border">
+                          {getCorrectFeedback()}
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          <div className="text-red-600 text-xs font-bold bg-red-50 rounded-lg p-2.5 border">
+                            {getWrongFeedback(attemptCount)}
+                          </div>
+                          {retryMode && (
+                            <div className="flex gap-2">
+                              <Button onClick={handleRetry} className="bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg px-4 py-2.5 text-sm font-bold">
+                                <RotateCcw className="w-4 h-4 mr-2" />
+                                Retry
+                              </Button>
+                              <Button onClick={handleNext} variant="outline" className="rounded-lg px-4 py-2.5 text-sm">Skip</Button>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
               )}
 
-              {/* Non-interactive steps */}
-              {!current.interactive && (
-                <div className="flex justify-center pt-1.5 sm:pt-2">
-                  <Button 
-                    onClick={handleNext} 
-                    className="rounded-lg sm:rounded-xl md:rounded-2xl px-4 sm:px-5 md:px-6 py-1.5 sm:py-2 md:py-2.5 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold transition-all duration-300 hover:scale-105 transform shadow-lg sm:shadow-2xl text-[10px] sm:text-xs md:text-sm"
-                  >
-                    {stepIndex === storySteps.length - 1 ? (
-                      <>
-                        <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 animate-pulse" />
-                        <span className="hidden sm:inline">Complete Dino Mission! ✨</span>
-                        <span className="sm:hidden">Finish! ✨</span>
-                      </>
-                    ) : (
-                      <>
-                        <Play className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                        <span className="hidden sm:inline">Continue Dino Adventure! 🦕</span>
-                        <span className="sm:hidden">Continue 🦕</span>
-                      </>
-                    )}
-                  </Button>
+              {current.listeningFirst && listeningPhase === 'reveal' && (
+                <div className="space-y-4 max-w-4xl mx-auto w-full">
+                  <div className="bg-green-100/80 rounded-2xl p-6 backdrop-blur-sm border-2 border-green-300">
+                    <h3 className="text-lg font-bold mb-3 flex items-center justify-center gap-2">
+                      {current.title}
+                      <Button variant="ghost" size="sm" onClick={playRevealText} className="text-orange-500 h-7 w-7 p-0">
+                        <Volume2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </h3>
+                    <p className="text-sm leading-relaxed">{(current as any).revealText}</p>
+                    <div className="mt-4 flex justify-center">
+                      <Button onClick={handleNext} className="bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold rounded-2xl px-8 py-3">
+                        Continue Expedition! 🦕
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               )}
-            </div>
-          </div>
 
-          {/* Floating Elements */}
-          <div className="hidden sm:block absolute top-4 left-4 animate-float-slow">
-            <Footprints className="w-6 h-6 text-orange-400" />
-          </div>
-          <div className="hidden sm:block absolute bottom-4 left-4 animate-float-medium">
-            <Sparkles className="w-6 h-6 text-yellow-400" />
-          </div>
-          <div className="hidden sm:block absolute bottom-4 right-4 animate-float-fast">
-            <Mountain className="w-6 h-6 text-gray-400" />
+              {!current.listeningFirst && (
+                <>
+                  <div className="bg-white/80 rounded-2xl p-6 mb-4 backdrop-blur-sm border-2 shadow-2xl max-w-4xl mx-auto">
+                    <h3 className="text-lg font-bold mb-3 flex items-center justify-center gap-2">
+                      {current.title}
+                      <Button variant="ghost" size="sm" onClick={playRevealText} className="text-orange-600">
+                        <Volume2 className="w-5 h-5" />
+                      </Button>
+                    </h3>
+                    <p className="text-base leading-relaxed">{current.text}</p>
+                    <div className="flex justify-center gap-3 mt-4 text-sm text-gray-500">
+                      <span>📝 {current.wordCount}</span>
+                      <span>⏱️ {current.duration}s</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-center">
+                    <Button onClick={handleNext} className="rounded-2xl px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold shadow-2xl">
+                      {stepIndex === storySteps.length - 1 ? <><Zap className="w-4 h-4 mr-2 animate-pulse" />Complete Discovery! ✨</> : <><Play className="w-4 h-4 mr-2" />Continue! 🦕</>}
+                    </Button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Enhanced Custom Animations */}
       <style>{`
-        .smooth-scroll {
-          scroll-behavior: smooth;
-          -webkit-overflow-scrolling: touch;
-        }
-        
-        .smooth-scroll::-webkit-scrollbar {
-          width: 6px;
-        }
-        
-        .smooth-scroll::-webkit-scrollbar-track {
-          background: rgba(255, 255, 255, 0.1);
-          border-radius: 10px;
-        }
-        
-        .smooth-scroll::-webkit-scrollbar-thumb {
-          background: rgba(249, 115, 22, 0.3);
-          border-radius: 10px;
-        }
-        
-        .smooth-scroll::-webkit-scrollbar-thumb:hover {
-          background: rgba(249, 115, 22, 0.5);
-        }
-        
-        @keyframes float-slow {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          33% { transform: translateY(-10px) rotate(5deg); }
-          66% { transform: translateY(-5px) rotate(-5deg); }
-        }
-        
-        @keyframes float-medium {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-15px); }
-        }
-        
-        @keyframes float-fast {
-          0%, 100% { transform: translateY(0px) scale(1); }
-          50% { transform: translateY(-8px) scale(1.1); }
-        }
-        
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-        
-        @keyframes fade-in {
-          from { opacity: 0; transform: scale(0.8); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        
-        @keyframes gentle-pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.8; }
-        }
-        
-        @keyframes celebration-party {
-          0% { 
-            transform: scale(1) rotate(0deg); 
-            filter: drop-shadow(0 0 5px gold);
-          }
-          25% { 
-            transform: scale(1.2) rotate(90deg); 
-            filter: drop-shadow(0 0 10px #ff6b6b);
-          }
-          50% { 
-            transform: scale(1.1) rotate(180deg); 
-            filter: drop-shadow(0 0 15px #4ecdc4);
-          }
-          75% { 
-            transform: scale(1.3) rotate(270deg); 
-            filter: drop-shadow(0 0 12px #45b7d1);
-          }
-          100% { 
-            transform: scale(1) rotate(360deg); 
-            filter: drop-shadow(0 0 5px gold);
-          }
-        }
-        
-        @keyframes celebration-sparkle {
-          0%, 100% { 
-            transform: scale(1);
-            text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
-          }
-          50% { 
-            transform: scale(1.15);
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8),
-                        0 0 30px rgba(255, 105, 180, 0.6),
-                        0 0 40px rgba(135, 206, 250, 0.4);
-          }
-        }
-        
-        .animate-float-slow {
-          animation: float-slow 4s ease-in-out infinite;
-        }
-        
-        .animate-float-medium {
-          animation: float-medium 3s ease-in-out infinite;
-        }
-        
-        .animate-float-fast {
-          animation: float-fast 2s ease-in-out infinite;
-        }
-        
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
-        
-        .animate-fade-in {
-          animation: fade-in 0.5s ease-out;
-        }
-        
-        .animate-gentle-pulse {
-          animation: gentle-pulse 2s ease-in-out infinite;
-        }
-        
-        .animate-celebration-party {
-          animation: celebration-party 2s ease-in-out infinite;
-          display: inline-block;
-          transform-origin: center;
-        }
-        
-        .animate-celebration-sparkle {
-          animation: celebration-sparkle 1.5s ease-in-out infinite;
-        }
-        
-        /* Mobile optimizations */
-        @media (max-width: 640px) {
-          .smooth-scroll {
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-          }
-          
-          .smooth-scroll::-webkit-scrollbar {
-            display: none;
-          }
-          
-          .animate-celebration-party {
-            animation-duration: 2.5s;
-          }
-        }
-        
-        /* Reduced motion for accessibility */
-        @media (prefers-reduced-motion: reduce) {
-          .animate-celebration-party {
-            animation: celebration-sparkle 2s ease-in-out infinite;
-          }
-        }
+        @keyframes waveform { 0%, 100% { height: 20px; } 50% { height: 50px; } }
+        .animate-waveform { animation: waveform 0.6s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+        .animate-float { animation: float 3s ease-in-out infinite; }
       `}</style>
     </div>
   );
 };
 
-export default DinosaurAdventure;
+export default DinosaurDiscoveryAdventure;

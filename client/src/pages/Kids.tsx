@@ -57,6 +57,9 @@ const KidsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [showFavoritesModal, setShowFavoritesModal] = useState(false);
+  const [pronunciationAttempts, setPronunciationAttempts] = useState(0);
+  const [vocabularyAttempts, setVocabularyAttempts] = useState(0);
   const storiesPerPage = 4;
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -171,12 +174,25 @@ const KidsPage = () => {
             setStreak(serverProgress.streak ?? 0);
             const fav = (serverProgress as any)?.details?.favorites ?? [];
             setFavorites(Array.isArray(fav) ? fav : []);
+            
+            // Load pronunciation and vocabulary attempts
+            const details = (serverProgress as any)?.details || {};
+            const pronCount = Object.keys(details.pronunciation || {}).length;
+            const vocabCount = Object.keys(details.vocabulary || {}).length;
+            setPronunciationAttempts(pronCount);
+            setVocabularyAttempts(vocabCount);
           } catch {
             const localProgress = await KidsProgressService.get(userId);
             setPoints(localProgress.points);
             setStreak(localProgress.streak);
             const fav = (localProgress as any).details?.favorites ?? [];
             setFavorites(Array.isArray(fav) ? fav : []);
+            
+            const details = (localProgress as any).details || {};
+            const pronCount = Object.keys(details.pronunciation || {}).length;
+            const vocabCount = Object.keys(details.vocabulary || {}).length;
+            setPronunciationAttempts(pronCount);
+            setVocabularyAttempts(vocabCount);
           }
         } else {
           const localProgress = await KidsProgressService.get(userId);
@@ -184,6 +200,12 @@ const KidsPage = () => {
           setStreak(localProgress.streak);
           const fav = (localProgress as any).details?.favorites ?? [];
           setFavorites(Array.isArray(fav) ? fav : []);
+          
+          const details = (localProgress as any).details || {};
+          const pronCount = Object.keys(details.pronunciation || {}).length;
+          const vocabCount = Object.keys(details.vocabulary || {}).length;
+          setPronunciationAttempts(pronCount);
+          setVocabularyAttempts(vocabCount);
         }
       } catch (error) {
         console.error('Error loading progress:', error);
@@ -200,6 +222,11 @@ const KidsPage = () => {
       y: Math.random() * 80 + 10,
     }));
     setFloatingIcons(newFloatingIcons);
+    
+    // Set up real-time polling for progress updates every 3 seconds
+    const progressInterval = setInterval(loadProgress, 3000);
+    
+    return () => clearInterval(progressInterval);
   }, [userId, isAuthenticated]);
 
   const categories = [
@@ -212,10 +239,10 @@ const KidsPage = () => {
   const allStories = [
     {
       title: "The Magic Forest",
-      description: "Listen to Luna the rabbit's adventure and answer questions to collect magic stars!",
+      description: "Join Luna the rabbit on a magical listening adventure!",
       difficulty: 'Easy',
-      duration: '6 min',
-      words: 265,
+      duration: '7 min',
+      words: 445,
       image: '🌳',
       character: Rabbit,
       gradient: 'from-green-400 to-emerald-400',
@@ -225,10 +252,10 @@ const KidsPage = () => {
     },
     {
       title: "Space Adventure",
-      description: "Listen to Cosmo's space journey and help him explore by answering questions!",
+      description: "Join Cosmo on a cosmic listening journey!",
       difficulty: 'Medium',
-      duration: '6 min',
-      words: 290,
+      duration: '7 min',
+      words: 533,
       image: '🚀',
       character: Rocket,
       gradient: 'from-purple-400 to-indigo-400',
@@ -238,10 +265,10 @@ const KidsPage = () => {
     },
     {
       title: "Underwater World",
-      description: "Listen carefully to Finn the fish and discover ocean secrets together!",
+      description: "Dive with Finn and discover ocean secrets!",
       difficulty: 'Easy',
       duration: '6 min',
-      words: 280,
+      words: 507,
       image: '🐠',
       character: Fish,
       gradient: 'from-blue-400 to-cyan-400',
@@ -251,10 +278,10 @@ const KidsPage = () => {
     },
     {
       title: "Dinosaur Discovery",
-      description: "Listen to Dina's prehistoric tales and answer her dino-mite questions!",
+      description: "Explore prehistoric times with Dina!",
       difficulty: 'Hard',
-      duration: '6 min',
-      words: 250,
+      duration: '7 min',
+      words: 518,
       image: '🦖',
       character: Footprints,
       gradient: 'from-orange-400 to-red-400',
@@ -264,10 +291,10 @@ const KidsPage = () => {
     },
     {
       title: "Unicorn Magic",
-      description: "Listen to Stardust's magical story and earn stars in the Sparkle Kingdom!",
+      description: "Join Stardust in a magical kingdom!",
       difficulty: 'Easy',
       duration: '5 min',
-      words: 225,
+      words: 391,
       image: '🦄',
       character: Sparkles,
       gradient: 'from-pink-400 to-purple-400',
@@ -277,10 +304,10 @@ const KidsPage = () => {
     },
     {
       title: "Pirate Treasure",
-      description: "Listen to Captain Finn's treasure hunt and help him find the hidden gold!",
+      description: "Sail with Captain Finn on a treasure hunt!",
       difficulty: 'Medium',
-      duration: '3 min',
-      words: 96,
+      duration: '5 min',
+      words: 428,
       image: '🏴‍☠️',
       character: Anchor,
       gradient: 'from-amber-400 to-yellow-400',
@@ -290,10 +317,10 @@ const KidsPage = () => {
     },
     {
       title: "Superhero School",
-      description: "Listen to Captain Courage's training and become a superhero together!",
+      description: "Train with Captain Courage to be a hero!",
       difficulty: 'Medium',
-      duration: '4 min',
-      words: 160,
+      duration: '6 min',
+      words: 419,
       image: '🦸',
       character: Shield,
       gradient: 'from-blue-400 to-indigo-400',
@@ -303,10 +330,10 @@ const KidsPage = () => {
     },
     {
       title: "Fairy Garden",
-      description: "Listen to Twinkle the fairy's magical tales and discover tiny wonders!",
+      description: "Discover tiny wonders with Twinkle the fairy!",
       difficulty: 'Easy',
-      duration: '3 min',
-      words: 145,
+      duration: '5 min',
+      words: 364,
       image: '🧚',
       character: Sparkles,
       gradient: 'from-green-400 to-teal-400',
@@ -317,51 +344,79 @@ const KidsPage = () => {
   ];
 
   // Calculate pagination
-  const totalPages = Math.ceil(allStories.length / storiesPerPage);
   const startIndex = (currentPage - 1) * storiesPerPage;
-  const currentStories = allStories.slice(startIndex, startIndex + storiesPerPage);
+  const paginatedStories = allStories.slice(startIndex, startIndex + storiesPerPage);
+  const totalPages = Math.ceil(allStories.length / storiesPerPage);
+  
+  // Get favorite stories for modal
+  const favoriteStories = allStories.filter((_, index) => favorites.includes(index));
 
+  // Dynamic achievements based on real-time progress
   const achievements = [
-    { name: 'First Words', icon: Star, progress: Math.min(100, Math.round((points / 1000) * 100)), emoji: '🌟' },
-    { name: 'Story Master', icon: BookOpen, progress: Math.min(100, favorites.length * 12.5), emoji: '📖' },
-    { name: 'Pronunciation Pro', icon: Mic, progress: 50, emoji: '🎤' },
-    { name: 'Vocabulary Builder', icon: Zap, progress: 25, emoji: '⚡' },
+    { 
+      name: 'First Words', 
+      icon: Star, 
+      progress: Math.min(100, Math.round((points / 1000) * 100)), 
+      emoji: '🌟',
+      description: `${points}/1000 points`
+    },
+    { 
+      name: 'Story Master', 
+      icon: BookOpen, 
+      progress: Math.min(100, favorites.length * 12.5), 
+      emoji: '📖',
+      description: `${favorites.length}/8 favorite stories`
+    },
+    { 
+      name: 'Pronunciation Pro', 
+      icon: Mic, 
+      progress: Math.min(100, pronunciationAttempts * 7.14), 
+      emoji: '🎤',
+      description: `${pronunciationAttempts}/14 practiced`
+    },
+    { 
+      name: 'Vocabulary Builder', 
+      icon: Zap, 
+      progress: Math.min(100, vocabularyAttempts * 7.14), 
+      emoji: '⚡',
+      description: `${vocabularyAttempts}/14 words learned`
+    },
   ];
   const completedAchievements = achievements.filter(a => a.progress === 100).length;
 
   // Offline kids lesson content for modules
   const vocabWords = [
-    { word: 'rabbit', hint: '/ˈræb.ɪt/' },
-    { word: 'forest', hint: '/ˈfɒr.ɪst/' },
-    { word: 'planet', hint: '/ˈplæn.ɪt/' },
-    { word: 'dinosaur', hint: '/ˈdaɪ.nə.sɔːr/' },
-    { word: 'unicorn', hint: '/ˈjuː.nɪ.kɔːrn/' },
-    { word: 'pirate', hint: '/ˈpaɪ.rət/' },
-    { word: 'treasure', hint: '/ˈtreʒ.ər/' },
-    { word: 'parrot', hint: '/ˈpær.ət/' },
-    { word: 'superhero', hint: '/ˈsuː.pə.hɪə.rəʊ/' },
-    { word: 'rescue', hint: '/ˈres.kjuː/' },
-    { word: 'fairy', hint: '/ˈfeə.ri/' },
-    { word: 'magic', hint: '/ˈmædʒ.ɪk/' },
-    { word: 'moonflower', hint: '/ˈmuːn.flaʊ.ər/' },
-    { word: 'sparkle', hint: '/ˈspɑː.kəl/' }
+    { word: 'rabbit', hint: '🐰 Say: RAB-it' },
+    { word: 'forest', hint: '🌲 Say: FOR-est' },
+    { word: 'planet', hint: '🪐 Say: PLAN-it' },
+    { word: 'dinosaur', hint: '🦖 Say: DY-no-sawr' },
+    { word: 'unicorn', hint: '🦄 Say: YOU-ni-corn' },
+    { word: 'pirate', hint: '🏴‍☠️ Say: PY-rate' },
+    { word: 'treasure', hint: '💎 Say: TREZH-er' },
+    { word: 'parrot', hint: '🦜 Say: PAIR-ut' },
+    { word: 'superhero', hint: '🦸 Say: SOO-per-hero' },
+    { word: 'rescue', hint: '🚁 Say: RES-kyoo' },
+    { word: 'fairy', hint: '🧚 Say: FAIR-ee' },
+    { word: 'magic', hint: '✨ Say: MAJ-ik' },
+    { word: 'moonflower', hint: '🌙🌸 Say: MOON-flow-er' },
+    { word: 'sparkle', hint: '⭐ Say: SPAR-kul' }
   ];
 
   const pronounceItems = [
-    { phrase: 'Hello Luna', phonemes: '/həˈləʊ ˈluː.nə/' },
-    { phrase: 'Magic forest', phonemes: '/ˈmædʒ.ɪk ˈfɒr.ɪst/' },
-    { phrase: 'Happy rabbit', phonemes: '/ˈhæp.i ˈræb.ɪt/' },
-    { phrase: 'Big dinosaur', phonemes: '/bɪɡ ˈdaɪ.nə.sɔːr/' },
-    { phrase: 'Rainbow unicorn', phonemes: '/ˈreɪn.bəʊ ˈjuː.nɪ.kɔːrn/' },
-    { phrase: 'Pirate treasure', phonemes: '/ˈpaɪ.rət ˈtreʒ.ər/' },
-    { phrase: 'Captain Finn', phonemes: '/ˈkæp.tɪn fɪn/' },
-    { phrase: 'Buried treasure', phonemes: '/ˈber.id ˈtreʒ.ər/' },
-    { phrase: 'Superhero training', phonemes: '/ˈsuː.pə.hɪə.rəʊ ˈtreɪ.nɪŋ/' },
-    { phrase: 'Rescue mission', phonemes: '/ˈres.kjuː ˈmɪʃ.ən/' },
-    { phrase: 'Fairy dust', phonemes: '/ˈfeə.ri dʌst/' },
-    { phrase: 'Magic sparkles', phonemes: '/ˈmædʒ.ɪk ˈspɑː.kəlz/' },
-    { phrase: 'Talking bunnies', phonemes: '/ˈtɔː.kɪŋ ˈbʌn.iz/' },
-    { phrase: 'Glowing moonflowers', phonemes: '/ˈɡləʊ.ɪŋ ˈmuːn.flaʊ.əz/' }
+    { phrase: 'Hello Luna', phonemes: '👋 Say: heh-LOW LOO-nah' },
+    { phrase: 'Magic forest', phonemes: '✨🌲 Say: MAJ-ik FOR-est' },
+    { phrase: 'Happy rabbit', phonemes: '😊🐰 Say: HAP-ee RAB-it' },
+    { phrase: 'Big dinosaur', phonemes: '🦖 Say: BIG DY-no-sawr' },
+    { phrase: 'Rainbow unicorn', phonemes: '🌈🦄 Say: RAIN-bow YOU-ni-corn' },
+    { phrase: 'Pirate treasure', phonemes: '🏴‍☠️💎 Say: PY-rate TREZH-er' },
+    { phrase: 'Captain Finn', phonemes: '⚓ Say: CAP-tin FIN' },
+    { phrase: 'Buried treasure', phonemes: '🏝️💰 Say: BER-eed TREZH-er' },
+    { phrase: 'Superhero training', phonemes: '🦸‍♂️💪 Say: SOO-per-hero TRAIN-ing' },
+    { phrase: 'Rescue mission', phonemes: '🚁🆘 Say: RES-kyoo MISH-un' },
+    { phrase: 'Fairy dust', phonemes: '🧚✨ Say: FAIR-ee DUST' },
+    { phrase: 'Magic sparkles', phonemes: '✨⭐ Say: MAJ-ik SPAR-kulz' },
+    { phrase: 'Talking bunnies', phonemes: '🐰💬 Say: TAWK-ing BUN-eez' },
+    { phrase: 'Glowing moonflowers', phonemes: '🌙🌸 Say: GLOW-ing MOON-flow-erz' }
   ];
 
   const handleStartLesson = async (storyIndex: number) => {
@@ -468,16 +523,15 @@ const KidsPage = () => {
     setIsPlaying(false);
   };
 
-  const toggleFavorite = async (index: number) => {
+  const toggleFavorite = async (storyIndex: number) => {
     if (!isAuthenticated) {
       setShowAuthModal(true);
       return;
     }
 
-    const actualIndex = startIndex + index;
-    const next = favorites.includes(actualIndex)
-      ? favorites.filter(i => i !== actualIndex)
-      : [...favorites, actualIndex];
+    const next = favorites.includes(storyIndex)
+      ? favorites.filter(i => i !== storyIndex)
+      : [...favorites, storyIndex];
     setFavorites(next);
     
     try {
@@ -868,9 +922,9 @@ const KidsPage = () => {
           <div className="mb-8 sm:mb-10 md:mb-12 px-2 sm:px-0">
             {/* Stories Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6 lg:gap-8 mb-6 sm:mb-8">
-              {currentStories.map((story, index) => {
+              {paginatedStories.map((story) => {
+                const actualIndex = allStories.findIndex(s => s.title === story.title);
                 const CharacterIcon = story.character;
-                const actualIndex = startIndex + index;
                 return (
                   <Card 
                     key={actualIndex} 
@@ -919,7 +973,7 @@ const KidsPage = () => {
                             variant="outline" 
                             onClick={(e) => {
                               e.stopPropagation();
-                              toggleFavorite(index);
+                              toggleFavorite(actualIndex);
                             }} 
                             className={cn(
                               "rounded-lg sm:rounded-xl text-base sm:text-lg bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors", 
@@ -937,7 +991,7 @@ const KidsPage = () => {
                             "w-full bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white font-bold py-3 sm:py-4 rounded-xl sm:rounded-2xl transition-all duration-300 group-hover:shadow-xl relative overflow-hidden text-sm sm:text-base",
                             bounceAnimation && currentStory === actualIndex && "animate-pulse"
                           )}
-                          onClick={() => handleStartLesson(index)}
+                          onClick={() => handleStartLesson(actualIndex)}
                           disabled={isPlaying}
                         >
                           <span className="relative z-10 flex items-center justify-center">
@@ -1009,14 +1063,26 @@ const KidsPage = () => {
         )}
 
         {activeCategory === 'vocabulary' && (
-          <div className="mb-8 sm:mb-10 md:mb-12 px-2 sm:px-0">
-            <Vocabulary words={vocabWords} />
+          <div className="mb-8 sm:mb-10 md:mb-12 px-2 sm:px-0 mx-auto w-full lg:max-w-7xl xl:max-w-[1400px]">
+            <Vocabulary 
+              words={vocabWords} 
+              onWordPracticed={() => {
+                // Track vocabulary attempts
+                setVocabularyAttempts(prev => prev + 1);
+              }}
+            />
           </div>
         )}
         
         {activeCategory === 'pronunciation' && (
           <div className="mb-8 sm:mb-10 md:mb-12 px-2 sm:px-0">
-            <Pronunciation items={pronounceItems} />
+            <Pronunciation 
+              items={pronounceItems}
+              onPhrasePracticed={() => {
+                // Track pronunciation attempts
+                setPronunciationAttempts(prev => prev + 1);
+              }}
+            />
           </div>
         )}
         
@@ -1027,7 +1093,7 @@ const KidsPage = () => {
         )}
 
         {/* Achievements Section */}
-        <Card className="bg-purple-100/50 dark:bg-purple-950/30 backdrop-blur-sm border-2 border-purple-300 dark:border-purple-600 rounded-xl sm:rounded-2xl lg:rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl mb-6 sm:mb-8 mx-2 sm:mx-0">
+        <Card className="bg-purple-100/50 dark:bg-purple-950/30 backdrop-blur-sm border-2 border-purple-300 dark:border-purple-600 rounded-xl sm:rounded-2xl lg:rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl mb-6 sm:mb-8 mx-2 sm:mx-auto w-full lg:max-w-7xl xl:max-w-[1400px]">
           <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-center mb-4 sm:mb-6 md:mb-8 text-gray-900 dark:text-white flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
             <Trophy className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-yellow-500 dark:text-yellow-400 animate-bounce flex-shrink-0" />
             <span>Your Super Achievements!</span>
@@ -1051,7 +1117,8 @@ const KidsPage = () => {
                       )}
                     </div>
                   </div>
-                  <p className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white mb-2 sm:mb-3 px-1">{achievement.name}</p>
+                  <p className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white mb-1 sm:mb-2 px-1">{achievement.name}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">{achievement.description}</p>
                   <Progress value={achievement.progress} className="h-2 sm:h-3 bg-purple-200/60 dark:bg-gray-600 rounded-full mb-1 sm:mb-2">
                     <div 
                       className={cn(
@@ -1060,7 +1127,7 @@ const KidsPage = () => {
                       )}
                     />
                   </Progress>
-                  <span className="text-xs font-semibold text-gray-700 dark:text-gray-400">{achievement.progress}%</span>
+                  <span className="text-xs font-semibold text-gray-700 dark:text-gray-400">{achievement.progress.toFixed(0)}%</span>
                 </div>
               );
             })}
@@ -1090,15 +1157,146 @@ const KidsPage = () => {
             <Button 
               variant="outline" 
               className="rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-3 sm:py-3 md:py-4 border-2 border-pink-300 dark:border-pink-600 hover:border-pink-400 dark:hover:border-pink-500 bg-pink-50/40 dark:bg-pink-900/10 hover:bg-pink-100/60 dark:hover:bg-pink-900/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 group text-sm sm:text-base w-full sm:w-auto sm:flex-1 sm:min-w-[160px]"
-              onClick={() => handleCategoryClick('stories')}
+              onClick={() => setShowFavoritesModal(true)}
             >
               <Heart className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-pink-600 dark:text-pink-400 group-hover:animate-pulse flex-shrink-0" />
-              <span className="font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap">Favorite Stories</span>
+              <span className="font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap">
+                Favorite Stories {favorites.length > 0 && `(${favorites.length})`}
+              </span>
             </Button>
           </div>
         </div>
       </div>
 
+
+      {/* Favorites Modal */}
+      {showFavoritesModal && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+          onClick={() => setShowFavoritesModal(false)}
+        >
+          <div 
+            className="relative w-full max-w-5xl max-h-[85vh] overflow-y-auto bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-3xl shadow-2xl border-4 border-pink-200 dark:border-pink-600"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="sticky top-0 z-10 bg-gradient-to-r from-pink-400 via-rose-400 to-pink-500 p-6 rounded-t-3xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Heart className="w-8 h-8 text-white animate-pulse" fill="white" />
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
+                    My Favorite Stories
+                  </h2>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowFavoritesModal(false)}
+                  className="text-white hover:bg-white/20 rounded-full w-10 h-10 p-0"
+                >
+                  ✕
+                </Button>
+              </div>
+              <p className="text-white/90 mt-2 text-sm sm:text-base">
+                {favoriteStories.length === 0 
+                  ? "You haven't added any favorites yet. Click the ❤️ button on stories you love!"
+                  : `You have ${favoriteStories.length} favorite ${favoriteStories.length === 1 ? 'story' : 'stories'}! 🎉`
+                }
+              </p>
+            </div>
+
+            {/* Content */}
+            <div className="p-6">
+              {favoriteStories.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="text-6xl mb-4">💔</div>
+                  <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
+                    No favorite stories yet. Start exploring and add some!
+                  </p>
+                  <Button
+                    onClick={() => {
+                      setShowFavoritesModal(false);
+                      setActiveCategory('stories');
+                      containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white font-bold py-3 px-8 rounded-xl"
+                  >
+                    Explore Stories
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                  {favoriteStories.map((story) => {
+                    const actualIndex = allStories.findIndex(s => s.title === story.title);
+                    const CharacterIcon = story.character;
+                    return (
+                      <Card 
+                        key={actualIndex}
+                        className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-pink-400 overflow-hidden"
+                      >
+                        <CardContent className="p-0">
+                          <div className={cn(
+                            "p-6 relative overflow-hidden bg-gradient-to-br",
+                            story.bgGradient
+                          )}>
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-white/20 dark:bg-black/20 rounded-full -mr-12 -mt-12"></div>
+                            <div className="relative z-10 text-center">
+                              <div className={cn("text-5xl mb-3 transform transition-transform duration-300 group-hover:scale-110", story.animation)}>
+                                {story.image}
+                              </div>
+                              <CharacterIcon className="w-10 h-10 mx-auto mb-2 text-gray-600 dark:text-gray-300 opacity-80" />
+                              <h3 className="text-xl font-bold mb-2 text-gray-800 dark:text-white">
+                                {story.title}
+                              </h3>
+                              <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                                {story.description}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="p-4 bg-white dark:bg-gray-800">
+                            <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-4">
+                              <span className="flex items-center gap-1">📚 {story.words}</span>
+                              <span className="flex items-center gap-1">⏱️ {story.duration}</span>
+                              <span className={cn(
+                                "font-semibold",
+                                story.difficulty === 'Easy' && "text-green-500 dark:text-green-400",
+                                story.difficulty === 'Medium' && "text-yellow-500 dark:text-yellow-400",
+                                story.difficulty === 'Hard' && "text-red-500 dark:text-red-400"
+                              )}>
+                                🎯 {story.difficulty}
+                              </span>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => toggleFavorite(actualIndex)}
+                                className="flex-shrink-0 border-pink-500 text-pink-600 hover:bg-pink-50 dark:hover:bg-pink-900/20"
+                              >
+                                ❤️
+                              </Button>
+                              <Button
+                                className="flex-1 bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white font-bold py-2 rounded-lg text-sm"
+                                onClick={() => {
+                                  setShowFavoritesModal(false);
+                                  handleStartLesson(actualIndex);
+                                }}
+                              >
+                                <Play className="w-4 h-4 mr-1" />
+                                Start Adventure
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Adventure Modals */}
       {showMagicForest && (

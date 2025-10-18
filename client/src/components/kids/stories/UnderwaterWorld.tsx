@@ -1,204 +1,280 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Sparkles, Fish, Volume2, Play, Heart, Zap, Waves, X } from 'lucide-react';
-import SpeechService from '@/services/SpeechService';
+import { Sparkles, Fish, Star, Volume2, Play, Heart, Zap, Waves, X, Ear, Award, Eye, Gauge, RotateCcw, FileText, Download } from 'lucide-react';
+import HybridVoiceService, { STORY_VOICES, type DownloadStatus } from '@/services/HybridVoiceService';
+import KidsListeningAnalytics, { type StorySession } from '@/services/KidsListeningAnalytics';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 
 type Props = {
   onClose: () => void;
   onComplete: (score: number) => void;
 };
 
+// Finn's unique voice profile
+const FINN_VOICE = STORY_VOICES.Finn;
+
 const storySteps = [
   {
     id: 'intro',
-    title: '🌊 Ocean Adventure Begins!',
-    text: 'Hello there, ocean explorer! ... I am Finn the friendly fish! ... Come dive with me into the magical underwater world where we\'ll meet amazing sea creatures and discover ocean secrets! ... Have you ever been swimming or seen fish in an aquarium? We\'re going even deeper!',
+    title: '🌊 Welcome to the Ocean!',
+    text: 'Hello little swimmer! I am Finn the friendly fish, and I\'m so happy to see you!... Today, we\'re diving deep into my beautiful underwater world!... You will meet colorful fish, singing whales, and discover amazing ocean treasures!... Your mission is to listen carefully and collect THREE shiny stars!... Ready to dive in? Let\'s splash into our ocean adventure!',
     emoji: '🐠',
     character: 'Finn',
-    bgColor: 'from-blue-100 to-teal-100 dark:from-blue-900 dark:to-teal-900',
+    bgColor: 'from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900',
     interactive: false,
-    wordCount: 25,
-    duration: 30
+    wordCount: 60,
+    duration: 35
+  },
+  {
+    id: 'swimming_fish',
+    title: '🐠 Swimming Together',
+    emoji: '🐠',
+    character: 'Finn',
+    bgColor: 'from-cyan-200 to-blue-200 dark:from-cyan-800 dark:to-blue-800',
+    interactive: true,
+    listeningFirst: true,
+    
+    audioText: 'Swimming is so much fun',
+    audioInstruction: 'Listen to what Finn loves to do!',
+    
+    question: 'What does Finn say about swimming?',
+    hint: 'Think about how Finn feels when swimming',
+    
+    choices: [
+      { text: 'Swimming makes me tired', emoji: '🐠😫', meaning: 'exhausting' },
+      { text: 'Swimming is so much fun', emoji: '🐠😊', meaning: 'joyful and fun' },
+      { text: 'I never swim at all', emoji: '🐠🚫', meaning: 'not swimming' }
+    ],
+    
+    revealText: 'Look at Finn swimming happily in the clear blue water! Finn says "Swimming is so much fun!" Can you swim with your arms? Swish swish! The ocean is Finn\'s home, and swimming makes every day an adventure!',
+    
+    maxReplays: 5,
+    wordCount: 38,
+    duration: 35
   },
   {
     id: 'coral_reef',
-    title: '🐚 Beautiful Coral Reef',
-    text: 'Wow! ... Look at all these beautiful colors! ... The coral reef says "Welcome to our colorful home!" ... Can you say that? ... Let\'s greet the reef! The coral looks like an underwater rainbow garden!',
-    emoji: '🐚',
+    title: '🪸 Colorful Coral',
+    emoji: '🪸',
     character: 'Finn',
     bgColor: 'from-pink-100 to-orange-100 dark:from-pink-900 dark:to-orange-900',
     interactive: true,
-    audioText: 'Welcome to our colorful home',
-    choices: ['Welcome to our colorful home', 'Go away from here', 'This place is boring'],
-    wordCount: 26,
-    duration: 36,
-    question: 'What does the coral reef say to us?',
-    hint: 'The reef is happy to see us'
+    listeningFirst: true,
+    
+    audioText: 'Come see my beautiful colors',
+    audioInstruction: 'Listen to what the coral reef says!',
+    
+    question: 'What does the coral want us to do?',
+    hint: 'The coral is showing something pretty',
+    
+    choices: [
+      { text: 'Come see my beautiful colors', emoji: '🪸🌈', meaning: 'showing pretty colors' },
+      { text: 'Go away from me now', emoji: '🪸❌', meaning: 'telling us to leave' },
+      { text: 'I am very plain', emoji: '🪸⚪', meaning: 'not colorful' }
+    ],
+    
+    revealText: 'WOW! Look at the amazing coral reef! It\'s pink, orange, yellow, and purple! The coral says "Come see my beautiful colors!" Can you name all the colors you see? Coral reefs are homes for many tiny fish friends!',
+    
+    maxReplays: 5,
+    wordCount: 40,
+    duration: 36
   },
   {
-    id: 'dolphin_friend',
-    title: '🐬 Playful Dolphin Friend!',
-    text: 'Amazing! ... Here comes a dolphin jumping through the waves! ... The dolphin says "Let\'s splash and play together!" ... Can you say that? ... Ready to play! Dolphins love to jump and splash just like you!',
+    id: 'friendly_dolphin',
+    title: '🐬 Playful Dolphin',
     emoji: '🐬',
     character: 'Finn',
-    bgColor: 'from-cyan-100 to-blue-100 dark:from-cyan-900 dark:to-blue-900',
+    bgColor: 'from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900',
     interactive: true,
-    audioText: 'Let us splash and play together',
-    choices: ['Let us splash and play together', 'I want to be alone', 'Playing is not fun'],
-    wordCount: 28,
-    duration: 36,
-    question: 'What does the dolphin want to do with us?',
-    hint: 'Dolphins love to have fun in the water'
+    listeningFirst: true,
+    
+    audioText: 'Let us play and jump high',
+    audioInstruction: 'Listen to what the dolphin wants to do!',
+    
+    question: 'What does the dolphin want us to do?',
+    hint: 'Dolphins love to jump out of the water',
+    
+    choices: [
+      { text: 'Let us sleep all day', emoji: '🐬😴', meaning: 'resting and sleeping' },
+      { text: 'Let us stay very still', emoji: '🐬🧊', meaning: 'not moving' },
+      { text: 'Let us play and jump high', emoji: '🐬🎉', meaning: 'playing and jumping' }
+    ],
+    
+    revealText: 'A friendly dolphin swims up to us, clicking happily! The dolphin says "Let us play and jump high!" Can you pretend to jump like a dolphin? SPLASH! Dolphins are very playful and smart ocean friends who love to have fun!',
+    
+    maxReplays: 5,
+    wordCount: 42,
+    duration: 36
   },
   {
-    id: 'first_pearl',
-    title: '💎 First Shining Pearl!',
-    text: "Fantastic! ... WOW! ... We found our first glowing ocean pearl! ... You're such a wonderful ocean explorer! ... Pearls help guide sea creatures and make the ocean sparkle—just like a shiny jewel! ... Three more pearls to collect! ... What do you think we'll find next in the ocean?",
-    emoji: '💎',
+    id: 'first_star',
+    title: '⭐ First Ocean Star',
+    emoji: '⭐',
     character: 'Finn',
     bgColor: 'from-yellow-100 to-amber-100 dark:from-yellow-900 dark:to-amber-900',
-    interactive: false,
-    pearlsNeeded: 4,
-    wordCount: 21,
-    duration: 25
-  },
-  {
-    id: 'octopus_hide',
-    title: '🐙 Clever Octopus Hideout!',
-    text: 'Look! ... The clever octopus can change colors! ... It says "I can hide anywhere I want!" ... Can you say that? ... Let\'s practice being sneaky! Have you ever played hide and seek?',
-    emoji: '🐙',
-    character: 'Finn',
-    bgColor: 'from-purple-100 to-indigo-100 dark:from-purple-900 dark:to-indigo-900',
     interactive: true,
-    audioText: 'I can hide anywhere I want',
-    choices: ['I can hide anywhere I want', 'Everyone can always see me', 'I never play hide and seek'],
-    wordCount: 28,
-    duration: 36,
-    question: 'What special skill does the octopus have?',
-    hint: 'It can change colors to hide'
+    listeningFirst: true,
+    questionType: 'true-false',
+    
+    audioText: 'Fish swim in the water',
+    audioInstruction: 'Listen to this ocean fact!',
+    
+    question: 'True or False: Fish swim in the water?',
+    hint: 'Where do fish live?',
+    
+    choices: [
+      { text: 'Fish swim in the water', emoji: '✅', meaning: 'true - fish live in water' },
+      { text: 'False - Fish fly in sky', emoji: '❌', meaning: 'incorrect - fish don\'t fly' }
+    ],
+    
+    revealText: 'Hooray! We found our first shiny star at the bottom of the ocean! You\'re listening so well! It\'s TRUE - fish DO swim in the water! That\'s their home! Have you ever seen fish in a pond or aquarium? Two more stars to find!',
+    
+    maxReplays: 5,
+    starsNeeded: 3,
+    wordCount: 45,
+    duration: 32
   },
   {
-    id: 'whale_song',
-    title: '🐋 Magical Whale Song!',
-    text: 'WOW! ... A giant whale! ... The whale sings "The ocean is my home so deep!" ... Can you sing that? ... Let\'s sing! Whales are the biggest animals in the ocean!',
+    id: 'singing_whale',
+    title: '🐋 Singing Whale',
     emoji: '🐋',
     character: 'Finn',
-    bgColor: 'from-gray-100 to-blue-100 dark:from-gray-900 dark:to-blue-900',
+    bgColor: 'from-blue-200 to-purple-200 dark:from-blue-800 dark:to-purple-800',
     interactive: true,
-    audioText: 'The ocean is my home so deep',
-    choices: ['The ocean is my home so deep', 'I live in the sky', 'I do not have a home'],
-    wordCount: 30,
-    duration: 38,
-    question: 'What does the whale sing about?',
-    hint: 'The whale loves living in the deep ocean'
+    listeningFirst: true,
+    
+    audioText: 'My song travels far and wide',
+    audioInstruction: 'Listen to what the whale says about singing!',
+    
+    question: 'What does the whale say about its song?',
+    hint: 'The whale\'s song goes a long way',
+    
+    choices: [
+      { text: 'My song is very quiet', emoji: '🐋🤫', meaning: 'soft and silent' },
+      { text: 'My song travels far and wide', emoji: '🐋🎵', meaning: 'goes long distances' },
+      { text: 'I never sing at all', emoji: '🐋🚫', meaning: 'no singing' }
+    ],
+    
+    revealText: 'Listen! Do you hear that beautiful sound? A big blue whale is singing! The whale says "My song travels far and wide!" Whale songs can travel through the whole ocean! Other whales can hear it from far away. How amazing!',
+    
+    maxReplays: 5,
+    wordCount: 45,
+    duration: 38
   },
   {
-    id: 'second_pearl',
-    title: '✨ Second Sparkling Pearl!',
-    text: 'Wonderful! ... You\'re such a great listener! ... Another pearl appeared near the whale! ... Pearls glow because they\'re happy to see brave explorers like us! ... (They\'re shining just for you!) Two more pearls to go! ... We\'re more than halfway there!',
+    id: 'second_star',
+    title: '✨ Second Shining Star',
     emoji: '✨',
     character: 'Finn',
-    bgColor: 'from-blue-200 to-cyan-200 dark:from-blue-800 dark:to-cyan-800',
-    interactive: false,
-    pearlsNeeded: 4,
-    wordCount: 20,
-    duration: 25
-  },
-  {
-    id: 'sea_turtle',
-    title: '🐢 Wise Sea Turtle!',
-    text: 'Here comes an old, wise turtle! ... The turtle says "Take your time and enjoy the journey!" ... Can you say that? ... Let\'s be calm and wise! Turtles move slowly and that\'s perfectly okay!',
-    emoji: '🐢',
-    character: 'Finn',
-    bgColor: 'from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900',
+    bgColor: 'from-cyan-100 to-teal-100 dark:from-cyan-900 dark:to-teal-900',
     interactive: true,
-    audioText: 'Take your time and enjoy the journey',
-    choices: ['Take your time and enjoy the journey', 'Always rush and hurry', 'Never stop to rest'],
-    wordCount: 28,
-    duration: 36,
-    question: 'What wise lesson does the turtle teach us?',
-    hint: 'It\'s about not hurrying too much'
-  },
-  {
-    id: 'seahorse_dance',
-    title: '🦋 Magical Seahorse Dance!',
-    text: 'Look at these tiny, graceful seahorses! ... The seahorses say "Dancing makes us happy!" ... Can you say that? ... Let\'s dance with them! Do you like to dance too?',
-    emoji: '🦋',
-    character: 'Finn',
-    bgColor: 'from-pink-100 to-purple-100 dark:from-pink-900 dark:to-purple-900',
-    interactive: true,
-    audioText: 'Dancing makes us happy',
-    choices: ['Dancing makes us happy', 'We never move around', 'Moving is very sad'],
-    wordCount: 26,
-    duration: 36,
-    question: 'How do the seahorses feel when they dance?',
-    hint: 'They feel good and joyful'
-  },
-  {
-    id: 'third_pearl',
-    title: '🌟 Third Glowing Pearl!',
-    text: 'Excellent! ... You\'re doing so well! ... We found our third pearl near the seahorses! ... It\'s shining extra bright to celebrate YOUR adventure! ... (You\'re such a smart ocean explorer!) Just one more pearl to find! ... We\'re almost finished!',
-    emoji: '🌟',
-    character: 'Finn',
-    bgColor: 'from-yellow-200 to-orange-200 dark:from-yellow-800 dark:to-orange-800',
-    interactive: false,
-    pearlsNeeded: 4,
-    wordCount: 19,
-    duration: 25
+    listeningFirst: true,
+    questionType: 'inference',
+    
+    audioText: 'The ocean is happy when we keep it clean',
+    audioInstruction: 'Listen to what makes the ocean happy!',
+    
+    question: 'What makes the ocean happy?',
+    hint: 'Think about taking care of the ocean',
+    
+    choices: [
+      { text: 'Throwing trash in the water', emoji: '🌊🗑️', meaning: 'making it dirty' },
+      { text: 'The ocean is happy when we keep it clean', emoji: '🌊✨', meaning: 'keeping it nice' },
+      { text: 'The ocean never feels happy', emoji: '🌊😢', meaning: 'always sad' }
+    ],
+    
+    revealText: 'Wonderful! Another star appeared near the coral! The ocean is happy when we keep it clean! That means no trash in the water! When we take care of the ocean, all the fish and animals can stay healthy and happy! Just one more star!',
+    
+    maxReplays: 5,
+    starsNeeded: 3,
+    wordCount: 48,
+    duration: 38
   },
   {
     id: 'treasure_chest',
-    title: '📦 Sunken Treasure!',
-    text: 'Oh my goodness! ... We found treasure! ... Let\'s shout "We discovered something amazing!" ... Can you say that? ... Let\'s celebrate! Have you ever found something special?',
-    emoji: '📦',
+    title: '💎 Ocean Treasure',
+    emoji: '💎',
     character: 'Finn',
     bgColor: 'from-amber-100 to-yellow-100 dark:from-amber-900 dark:to-yellow-900',
     interactive: true,
-    audioText: 'We discovered something amazing',
-    choices: ['We discovered something amazing', 'We found nothing special', 'This is very boring'],
-    wordCount: 28,
-    duration: 36,
-    question: 'How do we feel about finding the treasure?',
-    hint: 'We are excited and surprised'
+    listeningFirst: true,
+    
+    audioText: 'Friends are the best treasure',
+    audioInstruction: 'Listen to the treasure\'s secret message!',
+    
+    question: 'What is the best treasure?',
+    hint: 'It\'s not gold or jewels!',
+    
+    choices: [
+      { text: 'Gold coins are best', emoji: '💰', meaning: 'money and gold' },
+      { text: 'Friends are the best treasure', emoji: '👯💎', meaning: 'friendship is precious' },
+      { text: 'Nothing is a treasure', emoji: '❌', meaning: 'no treasures exist' }
+    ],
+    
+    revealText: 'Look! We found a sparkling treasure chest! Inside is a special message: "Friends are the best treasure!" Can you say that? It\'s true - having friends is more valuable than any gold! Friends make us happy every day!',
+    
+    maxReplays: 5,
+    wordCount: 42,
+    duration: 36
   },
   {
-    id: 'final_pearl',
-    title: '💫 Fourth Magic Pearl!',
-    text: 'Hooray! ... YES! YES! YES! ... We collected all four magic pearls! ... (YOU did it!) They\'re creating a beautiful pearl bridge across the ocean! ... You\'re an AMAZING ocean explorer! ... I\'m so proud of all your listening and speaking!',
-    emoji: '💫',
+    id: 'final_star',
+    title: '🌟 Third Ocean Star',
+    text: 'Amazing! ... YES! ... We collected all three shiny ocean stars! ... (You\'re such a wonderful listener!) The stars are making the whole ocean sparkle and glow! ... All the sea creatures are celebrating because of YOU! ... You are an INCREDIBLE ocean explorer! ... Finn is so proud of you!',
+    emoji: '🌟',
     character: 'Finn',
-    bgColor: 'from-purple-200 to-pink-200 dark:from-purple-800 dark:to-pink-800',
+    bgColor: 'from-blue-200 to-cyan-200 dark:from-blue-800 dark:to-cyan-800',
     interactive: false,
-    pearlsNeeded: 4,
-    wordCount: 19,
-    duration: 25
+    starsNeeded: 3,
+    wordCount: 42,
+    duration: 28
   },
   {
     id: 'celebration',
-    title: '🎉 Ocean Hero Celebration!',
-    text: 'Congratulations, ocean hero! ... You helped Finn complete the underwater mission! ... All the sea creatures are celebrating YOU, and the ocean is sparkling with joy! ... You listened so carefully and spoke so clearly! ... You\'re a SUPERSTAR! ... Give yourself a big splash and a cheer! 🌊',
+    title: '🎉 Ocean Party!',
+    text: 'Congratulations, ocean hero! ... The WHOLE ocean is celebrating YOU! ... Fish are swimming in happy circles, dolphins are jumping for joy, and whales are singing your victory song! ... You listened so carefully and learned so much! ... You\'re a SUPERSTAR swimmer! ... Give yourself a big splash of applause! 🌊✨',
     emoji: '🎉',
     character: 'Finn',
     bgColor: 'from-rainbow-100 to-sparkle-100 dark:from-rainbow-900 dark:to-sparkle-900',
     interactive: false,
-    wordCount: 20,
-    duration: 35
+    wordCount: 45,
+    duration: 38
   }
 ];
 
 const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
+  const { user } = useAuth();
+  const userId = user?.id ? String(user.id) : 'local-user';
+  
   const [stepIndex, setStepIndex] = useState(0);
-  const [pearls, setPearls] = useState(0);
+  const [stars, setStars] = useState(0);
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [timeSpent, setTimeSpent] = useState(0);
   const [showHint, setShowHint] = useState(false);
-  const contentRef = useRef<HTMLDivElement>(null);
+  
+  const [listeningPhase, setListeningPhase] = useState<'listening' | 'question' | 'reveal'>('listening');
+  const [replaysUsed, setReplaysUsed] = useState(0);
+  const [hasListened, setHasListened] = useState(false);
+  const [audioWaveform, setAudioWaveform] = useState(false);
+  
+  const [showTranscript, setShowTranscript] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState<'normal' | 'slow' | 'slower'>('slow'); // Default to slow for better comprehension
+  const [captionsEnabled, setCaptionsEnabled] = useState(false);
+  const [retryMode, setRetryMode] = useState(false);
+  const [attemptCount, setAttemptCount] = useState(0);
+  const [ttsAvailable, setTtsAvailable] = useState(true);
+  const [currentCaption, setCurrentCaption] = useState('');
+  const [accessibilityMode, setAccessibilityMode] = useState(false);
+  
+  const [currentSession, setCurrentSession] = useState<StorySession | null>(null);
+  const [questionStartTime, setQuestionStartTime] = useState(0);
+  const [downloadStatus, setDownloadStatus] = useState<DownloadStatus | null>(null);
 
   const current = storySteps[stepIndex];
   const progress = Math.round(((stepIndex + 1) / storySteps.length) * 100);
@@ -206,35 +282,129 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
   const totalWords = storySteps.reduce((sum, step) => sum + step.wordCount, 0);
   const totalDuration = storySteps.reduce((sum, step) => sum + step.duration, 0);
 
-  // Smooth scroll to top on step change
+  const maxReplays = (current as any).maxReplays || 5;
+  const unlimitedReplays = true;
+
   useEffect(() => {
-    if (contentRef.current) {
-      contentRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    const initializeVoice = async () => {
+      await HybridVoiceService.initialize();
+      const available = HybridVoiceService.isAvailable();
+      setTtsAvailable(available);
+      if (!available) setShowTranscript(true);
+    };
+    initializeVoice();
+    
+    const unsubscribe = HybridVoiceService.onDownloadProgress((status) => {
+      setDownloadStatus(status);
+      if (!status.downloading && status.progress === 100) setTtsAvailable(true);
+    });
+    
+    const initSession = async () => {
+      await KidsListeningAnalytics.initialize(userId);
+      const session = KidsListeningAnalytics.startSession(userId, 'underwater-world', 'Underwater World');
+      setCurrentSession(session);
+    };
+    initSession();
+    
+    return () => unsubscribe();
+  }, [userId]);
+
+  useEffect(() => {
+    if (current.listeningFirst) {
+      setListeningPhase('listening');
+      setReplaysUsed(0);
+      setHasListened(false);
+      setAttemptCount(0);
+      setRetryMode(false);
+    } else {
+      setListeningPhase('reveal');
     }
+    setSelectedChoice(null);
+    setShowFeedback(false);
+    setShowHint(false);
+    setCurrentCaption('');
   }, [stepIndex]);
 
-  // Timer for tracking session duration
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeSpent(prev => prev + 1);
-    }, 1000);
+    const timer = setInterval(() => setTimeSpent(prev => prev + 1), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  // Auto-play story narration with character voice
+  const stripEmojis = (text: string): string => {
+    return text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{FE00}-\u{FE0F}]|[\u{E0020}-\u{E007F}]/gu, '').trim();
+  };
+
+  const playAudioWithCaptions = async (text: string, showCaptions: boolean = false) => {
+    try {
+      const cleanText = stripEmojis(text);
+      const allowCaptions = showCaptions && captionsEnabled && 
+        (listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode);
+      
+      await HybridVoiceService.speak(cleanText, FINN_VOICE, {
+        speed: playbackSpeed,
+        showCaptions: allowCaptions,
+        onCaptionUpdate: allowCaptions ? setCurrentCaption : () => {}
+      });
+    } catch (error) {
+      setTtsAvailable(false);
+      if (listeningPhase === 'reveal' || !current.listeningFirst) setShowTranscript(true);
+      throw error;
+    }
+  };
+
   useEffect(() => {
-    if (current.text && SpeechService.isTTSSupported()) {
-      const playNarration = async () => {
+    if (listeningPhase === 'listening' && current.listeningFirst && (current as any).audioText) {
+      const playListeningAudio = async () => {
+        setIsPlaying(true);
+        setAudioWaveform(true);
         try {
-          // Use character-specific voice (Finn or other ocean characters)
-          await SpeechService.speakAsCharacter(current.text, current.character as any);
+          await playAudioWithCaptions((current as any).audioText, true);
+          setHasListened(true);
+        } catch (error) {
+          setHasListened(true);
+        }
+        setIsPlaying(false);
+        setAudioWaveform(false);
+      };
+      playListeningAudio();
+    }
+    
+    // Auto-play for reveal phase (after correct answer)
+    if (listeningPhase === 'reveal' && current.listeningFirst && (current as any).revealText && ttsAvailable) {
+      const playReveal = async () => {
+        setIsPlaying(true);
+        try {
+          await playAudioWithCaptions((current as any).revealText, true);
+        } catch (error) {
+          console.log('TTS not available');
+        }
+        setIsPlaying(false);
+      };
+      playReveal();
+    }
+    
+    if (!current.listeningFirst && current.text && ttsAvailable) {
+      const playNarration = async () => {
+        let textToRead = current.text;
+        
+        // Handle dynamic celebration text based on stars collected
+        if (current.id === 'grand_celebration') {
+          if (stars >= 3) {
+            textToRead = "Congratulations ocean explorer! ... The WHOLE underwater world is celebrating YOU! ... Sea creatures are dancing, bubbles are sparkling, and ocean magic surrounds us! ... You made the ocean proud with your wonderful listening! You should feel SO special! ... Give yourself a splashy cheer!";
+          } else {
+            textToRead = `Great diving, young explorer! ... You found ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The sea creatures are happy with your effort! ... Finn is proud of you! ... Every ocean adventure teaches us something. Keep swimming and you'll find all the stars next time! 🐠`;
+          }
+        }
+        
+        try {
+          await playAudioWithCaptions(textToRead, true);
         } catch (error) {
           console.log('TTS not available');
         }
       };
       playNarration();
     }
-  }, [current.text, current.character]);
+  }, [listeningPhase, stepIndex, playbackSpeed, stars]);
 
   const handleNext = () => {
     if (stepIndex < storySteps.length - 1) {
@@ -243,57 +413,104 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
       setShowFeedback(false);
       setShowHint(false);
     } else {
-      // Calculate score based on correct answers and time
-      const accuracyScore = correctAnswers * 15;
-      const timeBonus = Math.max(0, 480 - timeSpent) * 0.1;
-      const pearlBonus = pearls * 10;
-      const score = Math.min(100, 40 + accuracyScore + timeBonus + pearlBonus);
+      const accuracyScore = correctAnswers * 20;
+      const timeBonus = Math.max(0, 360 - timeSpent) * 0.1;
+      const starBonus = stars * 10;
+      const score = Math.min(100, 40 + accuracyScore + timeBonus + starBonus);
+      
+      if (currentSession) {
+        KidsListeningAnalytics.completeSession(userId, currentSession, score, stars);
+      }
       onComplete(score);
     }
   };
 
-  const handleChoice = async (choice: string) => {
-    setSelectedChoice(choice);
-    setIsPlaying(true);
+  const handleReplayAudio = async () => {
+    if (!unlimitedReplays && replaysUsed >= maxReplays) return;
+    if (!current.listeningFirst) return;
     
-    // Play the correct word with character voice
-    if (current.audioText && SpeechService.isTTSSupported()) {
-      try {
-        await SpeechService.speakAsCharacter(current.audioText, current.character as any);
-      } catch (error) {
-        console.log('TTS not available');
-      }
+    setReplaysUsed(prev => prev + 1);
+    setIsPlaying(true);
+    setAudioWaveform(true);
+    
+    try {
+      await playAudioWithCaptions((current as any).audioText, true);
+      setHasListened(true);
+    } catch (error) {
+      setHasListened(true);
     }
     
     setIsPlaying(false);
+    setAudioWaveform(false);
+  };
+  
+  const handleProceedToQuestion = () => {
+    if (!hasListened) return;
+    setListeningPhase('question');
+    setQuestionStartTime(Date.now());
+  };
+
+  const handleChoice = async (choiceObj: any) => {
+    const choice = typeof choiceObj === 'string' ? choiceObj : choiceObj.text;
+    setSelectedChoice(choice);
+    const currentAttempt = attemptCount + 1;
+    setAttemptCount(currentAttempt);
     
-    // Check if choice is correct
-    const isCorrect = choice === current.audioText;
+    const questionTime = Math.round((Date.now() - questionStartTime) / 1000);
+    const isCorrect = choice === (current as any).audioText;
+    
+    if (currentSession && current.listeningFirst) {
+      const updatedSession = KidsListeningAnalytics.recordAttempt(
+        currentSession,
+        current.id,
+        (current as any).question || '',
+        isCorrect,
+        currentAttempt,
+        replaysUsed,
+        questionTime
+      );
+      setCurrentSession(updatedSession);
+    }
+    
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
-      // Add pearl for every correct answer in interactive steps
-      setPearls(prev => Math.min(4, prev + 1));
+      const starReward = currentAttempt === 1 ? 1 : 0.5;
+      setStars(prev => Math.min(3, prev + starReward));
+      setShowFeedback(true);
+      setRetryMode(false);
+      
+      setTimeout(() => setListeningPhase('reveal'), 2500);
+      setTimeout(() => handleNext(), 5000);
+    } else {
+      setShowFeedback(true);
+      setRetryMode(true);
+    }
+  };
+  
+  const handleRetry = () => {
+    setSelectedChoice(null);
+    setShowFeedback(false);
+    setRetryMode(false);
+    setListeningPhase('listening');
+    setReplaysUsed(0);
+  };
+
+  const playRevealText = async () => {
+    let textToSpeak = (current as any).revealText || current.text;
+    
+    // Handle dynamic celebration text based on stars collected
+    if (current.id === 'grand_celebration') {
+      if (stars >= 3) {
+        textToSpeak = "Congratulations ocean explorer! ... The WHOLE underwater world is celebrating YOU! ... Sea creatures are dancing, bubbles are sparkling, and ocean magic surrounds us! ... You made the ocean proud with your wonderful listening! You should feel SO special! ... Give yourself a splashy cheer!";
+      } else {
+        textToSpeak = `Great diving, young explorer! ... You found ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The sea creatures are happy with your effort! ... Finn is proud of you! ... Every ocean adventure teaches us something. Keep swimming and you'll find all the stars next time! 🐠`;
+      }
     }
     
-    setShowFeedback(true);
-    
-    // Auto-advance after showing feedback
-    setTimeout(() => {
-      handleNext();
-    }, 2500);
-  };
-
-  // Helper function to remove emojis from text before TTS
-  const stripEmojis = (text: string): string => {
-    return text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{FE00}-\u{FE0F}]|[\u{E0020}-\u{E007F}]/gu, '').trim();
-  };
-
-  const playAudio = async () => {
-    if (current.audioText && SpeechService.isTTSSupported()) {
+    if (textToSpeak && ttsAvailable) {
       setIsPlaying(true);
       try {
-        const cleanText = stripEmojis(current.audioText);
-        await SpeechService.speakAsCharacter(cleanText, current.character as any);
+        await playAudioWithCaptions(textToSpeak, true);
       } catch (error) {
         console.log('TTS not available');
       }
@@ -301,261 +518,201 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
     }
   };
 
-  const playStoryText = async () => {
-    if (current.text && SpeechService.isTTSSupported()) {
-      setIsPlaying(true);
-      try {
-        const cleanText = stripEmojis(current.text);
-        await SpeechService.speakAsCharacter(cleanText, current.character as any);
-      } catch (error) {
-        console.log('TTS not available');
-      }
-      setIsPlaying(false);
+  const getCorrectFeedback = () => {
+    const messages = [
+      "🌊 SPLASH-TASTIC! You earned a star! 🌟",
+      "⭐ FIN-TASTIC! Perfect listening!",
+      "✨ BUBBLE-ICIOUS! Amazing!",
+      "🎯 PERFECT! Great ocean explorer!",
+      "💫 BRILLIANT! Star earned!"
+    ];
+    return messages[Math.floor(Math.random() * messages.length)];
+  };
+  
+  const getWrongFeedback = (attempt: number) => {
+    if (attempt === 1) {
+      return `💪 Not quite, swimmer! Listen carefully and try again! 🎧`;
+    } else {
+      return `🌊 Keep swimming! Listen one more time to find the answer! 👂`;
     }
   };
 
   const getCharacterAnimation = () => {
-    if (current.id.includes('pearl')) return 'animate-bounce';
+    if (current.id.includes('star')) return 'animate-bounce';
     return 'animate-float';
   };
-
-  const getOceanIcon = () => {
-    switch (current.id) {
-      case 'coral_reef': return Sparkles;
-      case 'dolphin_friend': return Waves;
-      case 'octopus_hide': return Sparkles;
-      case 'whale_song': return Waves;
-      case 'sea_turtle': return Sparkles;
-      case 'seahorse_dance': return Sparkles;
-      case 'treasure_chest': return Sparkles;
-      default: return Waves;
-    }
-  };
-
-  const OceanIcon = getOceanIcon();
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <Card className={cn(
-        "w-full max-w-5xl h-[95vh] rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-500",
+        "w-full max-w-5xl sm:max-w-6xl lg:max-w-7xl h-[95vh] rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-500",
         "bg-gradient-to-br", current.bgColor,
         "flex flex-col"
       )}>
-        {/* Always Visible Close Button */}
         <div className="absolute top-4 right-4 z-10">
           <Button 
             variant="ghost" 
             onClick={onClose} 
-            className="h-10 w-10 p-0 rounded-full bg-white/80 hover:bg-white backdrop-blur-sm border border-gray-200 hover:border-gray-300 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 z-50"
+            className="h-10 w-10 p-0 rounded-full bg-white/80 hover:bg-white backdrop-blur-sm border shadow-lg z-50"
           >
-            <X className="w-5 h-5 text-gray-700 hover:text-gray-900" />
+            <X className="w-5 h-5 text-gray-700" />
           </Button>
         </div>
 
-        <CardContent className="p-2 sm:p-4 md:p-6 lg:p-8 flex-1 flex flex-col overflow-hidden" ref={contentRef}>
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 sm:mb-3 gap-2 flex-shrink-0">
-            <div className="flex items-center gap-3">
+        <CardContent className="p-2 sm:p-4 md:p-6 lg:p-8 flex-1 flex flex-col overflow-hidden">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 gap-2 flex-shrink-0">
+            <div className="flex items-center gap-2 sm:gap-3">
               <div className="relative">
-                <Fish className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-600 animate-swim" />
-                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400 absolute -top-1 -right-1 animate-ping" />
+                <Fish className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 animate-bounce" />
+                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-cyan-400 absolute -top-1 -right-1 animate-ping" />
               </div>
               <div>
-                <h2 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white">Finn's Ocean Adventure</h2>
+                <h2 className="text-base sm:text-xl font-bold text-gray-800 dark:text-white">Finn's Underwater World</h2>
                 <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
                   Step {stepIndex + 1} of {totalSteps} • {totalWords} words • {Math.round(totalDuration/60)}min
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3 self-end sm:self-auto">
-              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap bg-white/50 dark:bg-gray-800/50 px-3 py-1 rounded-full border border-white/20">
-                💎 {pearls}/4 Pearls
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="text-xs bg-white/50 px-3 py-1 rounded-full">
+                ⭐ {stars}/3 Stars
+              </div>
+              <div className="flex gap-1">
+                <Button variant="ghost" size="sm" onClick={async () => {
+                  HybridVoiceService.stop();
+                  const newSpeed = playbackSpeed === 'slow' ? 'slower' : playbackSpeed === 'slower' ? 'normal' : 'slow';
+                  setPlaybackSpeed(newSpeed);
+                  try {
+                    let textToPlay = '';
+                    if (listeningPhase === 'listening' && current.listeningFirst && (current as any).audioText) {
+                      textToPlay = (current as any).audioText;
+                    } else if (listeningPhase === 'reveal' && current.listeningFirst && (current as any).revealText) {
+                      textToPlay = (current as any).revealText;
+                    } else if (!current.listeningFirst && current.text) {
+                      if (current.id === 'grand_celebration') {
+                        textToPlay = stars >= 3 ? "Congratulations ocean explorer! ... The WHOLE underwater world is celebrating YOU! ... Sea creatures are dancing, bubbles are sparkling, and ocean magic surrounds us! ... You made the ocean proud with your wonderful listening! You should feel SO special! ... Give yourself a splashy cheer!" : `Great diving, young explorer! ... You found ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The sea creatures are happy with your effort! ... Finn is proud of you! ... Every ocean adventure teaches us something. Keep swimming and you'll find all the stars next time! 🐠`;
+                      } else {
+                        textToPlay = current.text;
+                      }
+                    }
+                    if (textToPlay && ttsAvailable) {
+                      await HybridVoiceService.speak(stripEmojis(textToPlay), FINN_VOICE, { speed: newSpeed, showCaptions: captionsEnabled, onCaptionUpdate: setCurrentCaption });
+                    }
+                  } catch (error) {
+                    console.log('Could not replay at new speed');
+                  }
+                }} className="h-7 px-2 rounded-full text-xs bg-blue-50 border border-blue-200" title={`Playback speed: ${playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow (Default)' : 'Very Slow'}`}>
+                  <Gauge className="w-3.5 h-3.5 mr-1" />
+                  {playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow' : 'Very Slow'}
+                </Button>
               </div>
             </div>
           </div>
 
-          {/* Progress Bar */}
-          <Progress value={progress} className="h-2 mb-3 sm:mb-4 bg-white/30 flex-shrink-0">
-            <div className="h-full bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full transition-all duration-500" />
+          <Progress value={progress} className="h-2 mb-3 bg-white/30 flex-shrink-0">
+            <div className="h-full bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full transition-all duration-500" />
           </Progress>
 
-          {/* Content Area */}
-          <div className="flex-1 overflow-hidden pb-2">
+          <div className="flex-1 overflow-y-auto pb-2">
             <div className="text-center h-full flex flex-col justify-center">
-              {/* Character and Scene */}
-              <div className="relative mb-1 sm:mb-2 md:mb-3">
-                <div className={cn(
-                  "text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-1 sm:mb-2", 
-                  getCharacterAnimation()
-                )}>
-                  <span className={cn(
-                    current.id === 'celebration' && 'animate-celebration-party'
-                  )}>
-                    {current.emoji}
-                  </span>
+              <div className="relative mb-2">
+                <div className={cn("text-5xl mb-2", getCharacterAnimation())}>
+                  {current.emoji}
                 </div>
-                
-                {/* Pearl Collection Display - Show in all steps like other stories */}
-                <div className="flex items-center justify-center gap-1 sm:gap-2 mb-1 sm:mb-2">
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <div 
-                      key={i} 
-                      className={cn(
-                        "w-4 h-4 sm:w-6 sm:h-6 md:w-7 md:h-7 rounded-full transition-all duration-500 transform hover:scale-125 border-2 flex items-center justify-center",
-                        i < pearls 
-                          ? 'bg-white border-white shadow-lg animate-pulse drop-shadow-lg' 
-                          : 'bg-gray-300/50 border-gray-400 opacity-50'
-                      )} 
-                    >
-                      {i < pearls && <span className="text-yellow-400 text-lg">●</span>}
-                    </div>
+                <div className="flex items-center justify-center gap-1.5 mb-2">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <Star key={i} className={cn("w-5 h-5 transition-all", i < stars ? 'text-yellow-400 animate-pulse' : 'text-gray-300 opacity-50')} />
                   ))}
                 </div>
-
-                {/* Ocean Icon */}
-                <div className="absolute top-1 right-1 sm:top-2 sm:right-2 animate-float-slow">
-                  <OceanIcon className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-cyan-400 opacity-70" />
-                </div>
               </div>
 
-              {/* Story Text */}
-              <div className="bg-white/80 dark:bg-gray-800/80 rounded-lg sm:rounded-xl md:rounded-2xl p-2 sm:p-3 md:p-4 mb-2 sm:mb-3 backdrop-blur-sm border-2 border-white/20 shadow-lg sm:shadow-2xl max-w-4xl mx-auto">
-                <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold mb-1 sm:mb-2 text-gray-800 dark:text-white flex items-center justify-center gap-2">
-                  {current.title}
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={playStoryText}
-                    className="text-blue-500 hover:text-blue-600 h-6 w-6 sm:h-8 sm:w-8 p-0"
-                  >
-                    <Volume2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                  </Button>
-                </h3>
-                <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-700 dark:text-gray-200 leading-snug sm:leading-relaxed mx-auto max-w-3xl">
-                  {current.text}
-                </p>
-                
-                {/* Word Count and Duration */}
-                <div className="flex justify-center gap-2 mt-1 sm:mt-2 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-                  <span>📝 {current.wordCount} words</span>
-                  <span>⏱️ {current.duration}s</span>
+              {current.listeningFirst && listeningPhase === 'listening' && (
+                <div className="space-y-4 max-w-3xl mx-auto w-full">
+                  <div className="bg-blue-100/80 dark:bg-blue-900/40 rounded-2xl p-6 backdrop-blur-sm border-2 border-blue-300 shadow-2xl">
+                    <h3 className="text-lg font-bold mb-4 text-gray-800 dark:text-white flex items-center justify-center gap-2">
+                      <Ear className="w-6 h-6 text-blue-600 animate-bounce" />
+                      {(current as any).audioInstruction}
+                    </h3>
+                    {audioWaveform && (
+                      <div className="flex items-center justify-center gap-2 mb-4">
+                        {[...Array(5)].map((_, i) => (
+                          <div key={i} className="w-2 bg-blue-500 rounded-full animate-waveform" style={{ height: '40px', animationDelay: `${i * 0.1}s` }} />
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex flex-col items-center gap-3 mt-4">
+                      <Button onClick={handleReplayAudio} disabled={isPlaying} className={cn("rounded-xl px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold", isPlaying && "animate-pulse")}>
+                        <Volume2 className="w-5 h-5 mr-2" />
+                        {isPlaying ? 'Playing...' : `Listen Again (${replaysUsed} plays)`}
+                      </Button>
+                      {hasListened && (
+                        <Button onClick={handleProceedToQuestion} className="bg-green-500 text-white rounded-xl px-6 py-3 font-bold animate-bounce">
+                          I'm Ready! ✓
+                        </Button>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {/* Interactive Elements */}
-              {current.interactive && (
-                <div className="space-y-1.5 sm:space-y-2 md:space-y-3 max-w-4xl mx-auto w-full">
-                  {/* Question and Hint */}
-                  <div className="bg-cyan-50 dark:bg-cyan-900/20 rounded-md sm:rounded-lg md:rounded-xl p-1.5 sm:p-2 md:p-3 border border-cyan-200 dark:border-cyan-700">
-                    <h4 className="text-xs sm:text-sm md:text-base font-bold text-gray-800 dark:text-white mb-1">
-                      {current.question}
-                    </h4>
+              {current.listeningFirst && listeningPhase === 'question' && (
+                <div className="space-y-2 max-w-4xl mx-auto w-full">
+                  <div className="bg-yellow-50 rounded-lg p-2.5 border border-yellow-200">
+                    <h4 className="text-sm font-bold mb-1.5">{(current as any).question}</h4>
                     {showHint ? (
-                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
-                        💡 Ocean Hint: {current.hint}
-                      </p>
+                      <p className="text-xs">💡 {(current as any).hint}</p>
                     ) : (
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => setShowHint(true)}
-                        className="text-cyan-600 border-cyan-300 hover:bg-cyan-100 text-xs sm:text-sm"
-                      >
-                        Need an ocean hint? 🌊
+                      <Button variant="outline" size="sm" onClick={() => setShowHint(true)} className="text-yellow-600 text-xs">
+                        Need a hint? 🐠
                       </Button>
                     )}
                   </div>
-
-                  {/* Audio Play Button */}
-                  {current.audioText && (
-                    <div className="flex justify-center mb-1.5 sm:mb-2">
-                      <Button 
-                        onClick={playAudio}
-                        disabled={isPlaying}
-                        className={cn(
-                          "rounded-lg sm:rounded-xl md:rounded-2xl px-3 sm:px-5 md:px-6 py-1.5 sm:py-2 md:py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold transition-all duration-300 transform hover:scale-105 text-[10px] sm:text-xs md:text-sm",
-                          isPlaying && "animate-pulse"
-                        )}
-                      >
-                        {isPlaying ? (
-                          <>
-                            <Volume2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 animate-spin" />
-                            Listening...
-                          </>
-                        ) : (
-                          <>
-                            <Volume2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                            <span className="hidden sm:inline">Listen to the Ocean Word</span>
-                            <span className="sm:hidden">🔊 Listen</span>
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  )}
-
-                  {/* Choice Buttons */}
-                  {current.choices && (
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 md:gap-3 justify-center">
-                      {current.choices.map((choice) => {
-                        const isSelected = selectedChoice === choice;
-                        const isCorrect = choice === current.audioText;
+                  <div className="flex justify-center mb-2">
+                    <Button onClick={handleReplayAudio} disabled={isPlaying} className={cn("rounded-xl px-5 py-2.5 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold text-xs", isPlaying && "animate-pulse")}>
+                      <Volume2 className="w-4 h-4 mr-2" />
+                      🔊 Listen
+                    </Button>
+                  </div>
+                  {(current as any).choices && (
+                    <div className="grid grid-cols-1 gap-2.5">
+                      {(current as any).choices.map((choice: any, idx: number) => {
+                        const isSelected = selectedChoice === choice.text;
+                        const isCorrect = choice.text === (current as any).audioText;
                         const showResult = showFeedback && isSelected;
-                        
                         return (
-                          <Button
-                            key={choice}
-                            onClick={() => handleChoice(choice)}
-                            disabled={showFeedback}
-                            className={cn(
-                              "rounded-md sm:rounded-lg md:rounded-xl px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 text-[10px] sm:text-xs md:text-sm font-bold transition-all duration-300 transform hover:scale-105 h-auto min-h-[45px] sm:min-h-[50px] md:min-h-[55px]",
-                              showResult && isCorrect && "bg-green-500 hover:bg-green-600 text-white animate-bounce shadow-lg sm:shadow-2xl",
-                              showResult && !isCorrect && "bg-red-500 hover:bg-red-600 text-white shadow-md sm:shadow-xl",
-                              !showResult && "bg-white/90 hover:bg-white text-gray-700 border-2 border-gray-200 hover:border-cyan-300 hover:shadow-lg"
-                            )}
-                          >
-                            <span className="flex flex-col items-center gap-0.5 sm:gap-1">
-                              <span className="text-base sm:text-lg md:text-xl mb-0.5">
-                                {choice === 'coral' && '🐚'}
-                                {choice === 'dolphin' && '🐬'}
-                                {choice === 'octopus' && '🐙'}
-                                {choice === 'whale' && '🐋'}
-                                {choice === 'turtle' && '🐢'}
-                                {choice === 'seahorse' && '🦋'}
-                                {choice === 'treasure' && '📦'}
-                                {choice === 'shell' && '🐚'}
-                                {choice === 'rock' && '🪨'}
-                                {choice === 'whale' && '🐋'}
-                                {choice === 'shark' && '🦈'}
-                                {choice === 'squid' && '🦑'}
-                                {choice === 'jellyfish' && '🎐'}
-                                {choice === 'seal' && '🔹'}
-                                {choice === 'crab' && '🦀'}
-                                {choice === 'lobster' && '🦞'}
-                                {choice === 'starfish' && '⭐'}
-                                {choice === 'shells' && '🐚'}
-                                {choice === 'rocks' && '🪨'}
-                              </span>
-                              {choice}
-                              {showResult && isCorrect && (
-                                <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-pink-300 animate-pulse" />
-                              )}
-                            </span>
+                          <Button key={idx} onClick={() => handleChoice(choice)} disabled={showFeedback} className={cn("rounded-lg px-3 py-2.5 text-xs font-bold h-auto min-h-[55px]", showResult && isCorrect && "bg-green-500 text-white animate-bounce", showResult && !isCorrect && "bg-red-500 text-white", !showResult && "bg-white/90 text-gray-700 border-2")}>
+                            <div className="flex items-center gap-2 w-full">
+                              <span className="text-lg">{choice.emoji}</span>
+                              <div className="flex-1 text-left">
+                                <p className="font-bold text-xs">{choice.text}</p>
+                                <p className="text-xs opacity-70">{choice.meaning}</p>
+                              </div>
+                            </div>
                           </Button>
                         );
                       })}
                     </div>
                   )}
-
-                  {/* Feedback */}
                   {showFeedback && (
-                    <div className="mt-2 sm:mt-3 animate-fade-in">
-                      {selectedChoice === current.audioText ? (
-                        <div className="text-green-600 dark:text-green-400 text-xs sm:text-sm md:text-base font-bold animate-bounce bg-green-50 dark:bg-green-900/20 rounded-md sm:rounded-lg md:rounded-xl p-1.5 sm:p-2 md:p-3 border border-green-200 dark:border-green-700">
-                          🎉 SPLASH-TASTIC! You listened perfectly and spoke beautifully! You earned a pearl! 💎 You're an amazing ocean explorer!
+                    <div className="mt-2">
+                      {selectedChoice === (current as any).audioText ? (
+                        <div className="text-green-600 text-xs font-bold bg-green-50 rounded-lg p-2.5 border border-green-200">
+                          {getCorrectFeedback()}
                         </div>
                       ) : (
-                        <div className="text-red-600 dark:text-red-400 text-xs sm:text-sm md:text-base font-bold bg-red-50 dark:bg-red-900/20 rounded-md sm:rounded-lg md:rounded-xl p-1.5 sm:p-2 md:p-3 border border-red-200 dark:border-red-700">
-                          💪 WONDERFUL try! You're working so hard and I'm proud! The ocean word was "{current.audioText}" - Let's swim through it together! You're doing GREAT!
+                        <div className="space-y-3">
+                          <div className="text-red-600 text-xs font-bold bg-red-50 rounded-lg p-2.5 border border-red-200">
+                            {getWrongFeedback(attemptCount)}
+                          </div>
+                          {retryMode && (
+                            <div className="flex gap-2">
+                              <Button onClick={handleRetry} className="bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg px-4 py-2.5 text-sm font-bold">
+                                <RotateCcw className="w-4 h-4 mr-2" />
+                                Try Again
+                              </Button>
+                              <Button onClick={handleNext} variant="outline" className="rounded-lg px-4 py-2.5 text-sm">Skip</Button>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -563,203 +720,63 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
                 </div>
               )}
 
-              {/* Non-interactive steps */}
-              {!current.interactive && (
-                <div className="flex justify-center pt-1.5 sm:pt-2">
-                  <Button 
-                    onClick={handleNext} 
-                    className="rounded-lg sm:rounded-xl md:rounded-2xl px-4 sm:px-5 md:px-6 py-1.5 sm:py-2 md:py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold transition-all duration-300 hover:scale-105 transform shadow-lg sm:shadow-2xl text-[10px] sm:text-xs md:text-sm"
-                  >
-                    {stepIndex === storySteps.length - 1 ? (
-                      <>
-                        <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 animate-pulse" />
-                        <span className="hidden sm:inline">Complete Ocean Mission! ✨</span>
-                        <span className="sm:hidden">Finish! ✨</span>
-                      </>
-                    ) : (
-                      <>
-                        <Play className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                        <span className="hidden sm:inline">Continue Ocean Adventure! 🌊</span>
-                        <span className="sm:hidden">Continue 🌊</span>
-                      </>
-                    )}
-                  </Button>
+              {current.listeningFirst && listeningPhase === 'reveal' && (
+                <div className="space-y-4 max-w-4xl mx-auto w-full">
+                  <div className="bg-green-100/80 rounded-2xl p-6 backdrop-blur-sm border-2 border-green-300">
+                    <h3 className="text-lg font-bold mb-3 flex items-center justify-center gap-2">
+                      {current.title}
+                      <Button variant="ghost" size="sm" onClick={playRevealText} className="text-blue-500 h-7 w-7 p-0">
+                        <Volume2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </h3>
+                    <p className="text-sm leading-relaxed">{(current as any).revealText}</p>
+                    <div className="mt-4 flex justify-center">
+                      <Button onClick={handleNext} className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold rounded-2xl px-8 py-3">
+                        Continue! 🌊
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               )}
-            </div>
-          </div>
 
-          {/* Floating Elements */}
-          <div className="hidden sm:block absolute top-4 left-4 animate-float-slow">
-            <Waves className="w-6 h-6 text-cyan-400" />
-          </div>
-          <div className="hidden sm:block absolute bottom-4 left-4 animate-float-medium">
-            <Sparkles className="w-6 h-6 text-blue-400" />
-          </div>
-          <div className="hidden sm:block absolute bottom-4 right-4 animate-float-fast">
-            <Fish className="w-6 h-6 text-teal-400" />
+              {!current.listeningFirst && (
+                <>
+                  <div className="bg-white/80 rounded-2xl p-6 mb-4 backdrop-blur-sm border-2 shadow-2xl max-w-4xl mx-auto">
+                    <h3 className="text-lg font-bold mb-3 flex items-center justify-center gap-2">
+                      {current.title}
+                      <Button variant="ghost" size="sm" onClick={playRevealText} className="text-blue-600">
+                        <Volume2 className="w-5 h-5" />
+                      </Button>
+                    </h3>
+                    <p className="text-base leading-relaxed">{current.text}</p>
+                    <div className="flex justify-center gap-3 mt-4 text-sm text-gray-500">
+                      <span>📝 {current.wordCount}</span>
+                      <span>⏱️ {current.duration}s</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-center">
+                    <Button onClick={handleNext} className="rounded-2xl px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold shadow-2xl">
+                      {stepIndex === storySteps.length - 1 ? <><Zap className="w-4 h-4 mr-2 animate-pulse" />Complete! ✨</> : <><Play className="w-4 h-4 mr-2" />Continue 🌊</>}
+                    </Button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Enhanced Custom Animations */}
       <style>{`
-        .smooth-scroll {
-          scroll-behavior: smooth;
-          -webkit-overflow-scrolling: touch;
+        @keyframes waveform {
+          0%, 100% { height: 20px; }
+          50% { height: 50px; }
         }
-        
-        .smooth-scroll::-webkit-scrollbar {
-          width: 6px;
-        }
-        
-        .smooth-scroll::-webkit-scrollbar-track {
-          background: rgba(255, 255, 255, 0.1);
-          border-radius: 10px;
-        }
-        
-        .smooth-scroll::-webkit-scrollbar-thumb {
-          background: rgba(6, 182, 212, 0.3);
-          border-radius: 10px;
-        }
-        
-        .smooth-scroll::-webkit-scrollbar-thumb:hover {
-          background: rgba(6, 182, 212, 0.5);
-        }
-        
-        @keyframes float-slow {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          33% { transform: translateY(-10px) rotate(5deg); }
-          66% { transform: translateY(-5px) rotate(-5deg); }
-        }
-        
-        @keyframes float-medium {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-15px); }
-        }
-        
-        @keyframes float-fast {
-          0%, 100% { transform: translateY(0px) scale(1); }
-          50% { transform: translateY(-8px) scale(1.1); }
-        }
-        
+        .animate-waveform { animation: waveform 0.6s ease-in-out infinite; }
         @keyframes float {
           0%, 100% { transform: translateY(0px); }
           50% { transform: translateY(-20px); }
         }
-        
-        @keyframes fade-in {
-          from { opacity: 0; transform: scale(0.8); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        
-        @keyframes gentle-pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.8; }
-        }
-        
-        @keyframes swim {
-          0%, 100% { transform: translateX(0px) rotate(0deg); }
-          25% { transform: translateX(-2px) rotate(-5deg); }
-          75% { transform: translateX(2px) rotate(5deg); }
-        }
-        
-        @keyframes celebration-party {
-          0% { 
-            transform: scale(1) rotate(0deg); 
-            filter: drop-shadow(0 0 5px gold);
-          }
-          25% { 
-            transform: scale(1.2) rotate(90deg); 
-            filter: drop-shadow(0 0 10px #ff6b6b);
-          }
-          50% { 
-            transform: scale(1.1) rotate(180deg); 
-            filter: drop-shadow(0 0 15px #4ecdc4);
-          }
-          75% { 
-            transform: scale(1.3) rotate(270deg); 
-            filter: drop-shadow(0 0 12px #45b7d1);
-          }
-          100% { 
-            transform: scale(1) rotate(360deg); 
-            filter: drop-shadow(0 0 5px gold);
-          }
-        }
-        
-        @keyframes celebration-sparkle {
-          0%, 100% { 
-            transform: scale(1);
-            text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
-          }
-          50% { 
-            transform: scale(1.15);
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8),
-                        0 0 30px rgba(255, 105, 180, 0.6),
-                        0 0 40px rgba(135, 206, 250, 0.4);
-          }
-        }
-        
-        .animate-float-slow {
-          animation: float-slow 4s ease-in-out infinite;
-        }
-        
-        .animate-float-medium {
-          animation: float-medium 3s ease-in-out infinite;
-        }
-        
-        .animate-float-fast {
-          animation: float-fast 2s ease-in-out infinite;
-        }
-        
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
-        
-        .animate-fade-in {
-          animation: fade-in 0.5s ease-out;
-        }
-        
-        .animate-gentle-pulse {
-          animation: gentle-pulse 2s ease-in-out infinite;
-        }
-        
-        .animate-swim {
-          animation: swim 2s ease-in-out infinite;
-        }
-        
-        .animate-celebration-party {
-          animation: celebration-party 2s ease-in-out infinite;
-          display: inline-block;
-          transform-origin: center;
-        }
-        
-        .animate-celebration-sparkle {
-          animation: celebration-sparkle 1.5s ease-in-out infinite;
-        }
-        
-        /* Mobile optimizations */
-        @media (max-width: 640px) {
-          .smooth-scroll {
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-          }
-          
-          .smooth-scroll::-webkit-scrollbar {
-            display: none;
-          }
-          
-          .animate-celebration-party {
-            animation-duration: 2.5s;
-          }
-        }
-        
-        /* Reduced motion for accessibility */
-        @media (prefers-reduced-motion: reduce) {
-          .animate-celebration-party {
-            animation: celebration-sparkle 2s ease-in-out infinite;
-          }
-        }
+        .animate-float { animation: float 3s ease-in-out infinite; }
       `}</style>
     </div>
   );

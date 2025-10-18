@@ -1,22 +1,24 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Volume2, ChevronRight, ChevronLeft, Star, Trophy, Loader2 } from 'lucide-react';
+import { Volume2, ChevronRight, ChevronLeft, Star, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import EnhancedTTS from '@/services/EnhancedTTS';
-import { WhisperService } from '@/services/WhisperService';
-import { AdvancedPronunciationScorer } from '@/services/AdvancedPronunciationScorer';
-import VoiceRecorder from './VoiceRecorder';
+import KidsVoiceRecorder from './KidsVoiceRecorder';
 import HybridServiceManager from '@/services/HybridServiceManager';
 
 type WordCard = { word: string; hint?: string };
 
-export default function Vocabulary({ words }: { words: WordCard[] }) {
+interface VocabularyProps {
+  words: WordCard[];
+  onWordPracticed?: (word: string) => void;
+}
+
+export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) {
   const [current, setCurrent] = useState(0);
   const [masteredWords, setMasteredWords] = useState<Set<number>>(new Set());
   const [currentAttempts, setCurrentAttempts] = useState(0);
   const [lastScore, setLastScore] = useState<number | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
   const card = words[current];
@@ -48,63 +50,43 @@ export default function Vocabulary({ words }: { words: WordCard[] }) {
     }
   };
 
-  const handleRecordingComplete = async (blob: Blob) => {
-    setIsProcessing(true);
-    setShowSuccess(false);
+  const handleCorrectPronunciation = async (_blob: Blob, score: number) => {
+    // Mark as mastered immediately
+    setLastScore(score);
+    setCurrentAttempts(prev => prev + 1);
+    setMasteredWords(prev => new Set([...prev, current]));
+    setShowSuccess(true);
     
-    try {
-      // Transcribe with Whisper
-      let transcript = '';
-      try {
-        const result = await WhisperService.transcribe(blob);
-        transcript = result.transcript;
-      } catch (error) {
-        console.warn('Whisper failed:', error);
-        transcript = '';
-      }
-
-      // Score pronunciation
-      const score = await AdvancedPronunciationScorer.scoreDetailed(
-        card.word,
-        transcript,
-        blob
-      );
-
-      setLastScore(score.overall);
-      setCurrentAttempts(prev => prev + 1);
-
-      // Check if word is mastered (score >= 80)
-      if (score.overall >= 80) {
-        setMasteredWords(prev => new Set([...prev, current]));
-        setShowSuccess(true);
-        
-        // Save vocabulary word
-        await HybridServiceManager.saveVocabularyWord({
-          word: card.word,
-          definition: card.hint,
-          mastered: true
-        });
-
-        // Celebrate!
-        await EnhancedTTS.speak('Excellent! You mastered this word!', { 
-          rate: 0.9, 
-          emotion: 'happy' 
-        });
-
-        // Auto-advance after celebration
-        setTimeout(() => {
-          next();
-        }, 2000);
-      } else if (score.overall >= 60) {
-        await EnhancedTTS.speak('Good try! Practice a bit more.', { rate: 0.9 });
-      } else {
-        await EnhancedTTS.speak('Keep trying! Listen to the word again.', { rate: 0.9 });
-      }
-    } catch (error) {
-      console.error('Error processing vocabulary:', error);
-    } finally {
-      setIsProcessing(false);
+    // Notify parent component
+    if (onWordPracticed) {
+      onWordPracticed(card.word);
     }
+    
+    // Save vocabulary word
+    try {
+      await HybridServiceManager.saveVocabularyWord({
+        word: card.word,
+        definition: card.hint,
+        mastered: true
+      });
+    } catch (error) {
+      console.warn('Error saving vocabulary word:', error);
+    }
+
+    // Celebrate!
+    try {
+      await EnhancedTTS.speak('Excellent! You mastered this word!', { 
+        rate: 0.9, 
+        emotion: 'happy' 
+      });
+    } catch (error) {
+      console.warn('TTS celebration failed:', error);
+    }
+
+    // Auto-advance to next word after celebration (fresh start)
+    setTimeout(() => {
+      next();
+    }, 2000);
   };
 
   const next = () => {
@@ -134,7 +116,7 @@ export default function Vocabulary({ words }: { words: WordCard[] }) {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-4 sm:space-y-6 max-w-4xl lg:max-w-7xl xl:max-w-[1400px] mx-auto">
       {/* Progress Overview */}
       <Card className="border-2 border-purple-200 bg-purple-50 dark:bg-purple-900/20">
         <CardContent className="py-3 sm:py-4 px-3 sm:px-4">
@@ -164,12 +146,15 @@ export default function Vocabulary({ words }: { words: WordCard[] }) {
       </Card>
 
       {/* Word Card */}
-      <Card className={cn(
-        "border-2 transition-all duration-300",
-        masteredWords.has(current) 
-          ? "border-green-200 bg-green-50 dark:bg-green-900/20" 
-          : "border-blue-200"
-      )}>
+      <Card 
+        key={`word-card-${current}`}
+        className={cn(
+          "border-2 transition-all duration-300 animate-in fade-in slide-in-from-right-4",
+          masteredWords.has(current) 
+            ? "border-green-200 bg-green-50 dark:bg-green-900/20" 
+            : "border-blue-200"
+        )}
+      >
         <CardHeader className="px-3 sm:px-4 md:px-6 py-3 sm:py-4">
           <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <span className="text-sm sm:text-base text-gray-600 dark:text-gray-500">
@@ -187,12 +172,14 @@ export default function Vocabulary({ words }: { words: WordCard[] }) {
           {/* Word Display */}
           <div className="text-center space-y-3 sm:space-y-4">
             <div className={cn(
-              "text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold transition-all duration-300",
-              showSuccess && "animate-bounce"
+              "text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold transition-all duration-500",
+              showSuccess && "animate-bounce scale-110",
+              masteredWords.has(current) && "text-green-600 dark:text-green-400"
             )}>
-              {showSuccess && '🎉 '}
+
               {card.word}
               {showSuccess && ' 🎉'}
+              {masteredWords.has(current) && !showSuccess && ' ✨'}
             </div>
             
             {card.hint && (
@@ -212,32 +199,25 @@ export default function Vocabulary({ words }: { words: WordCard[] }) {
             </Button>
           </div>
 
-          {/* Voice Recorder */}
-          {!isProcessing && (
-            <div className="border-t-2 border-gray-200 dark:border-gray-700 pt-4 sm:pt-6">
-              <p className="text-center text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-3 sm:mb-4 font-semibold">
-                🎤 Now you say it!
-              </p>
-              <VoiceRecorder
-                onRecordingComplete={handleRecordingComplete}
-                maxDuration={10}
-                showPlayback={true}
-              />
-            </div>
-          )}
-
-          {/* Processing */}
-          {isProcessing && (
-            <div className="text-center space-y-3 sm:space-y-4 py-6 sm:py-8">
-              <Loader2 className="w-10 h-10 sm:w-12 sm:h-12 text-blue-500 animate-spin mx-auto" />
-              <p className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 dark:text-gray-100 px-4">
-                Checking your pronunciation...
-              </p>
-            </div>
-          )}
+          {/* Smart Voice Recorder - Auto-stops when correct */}
+          <div className="border-t-2 border-gray-200 dark:border-gray-700 pt-4 sm:pt-6">
+            <p className="text-center text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-3 sm:mb-4 font-semibold">
+              🎤 Now you say it!
+            </p>
+            <KidsVoiceRecorder
+              key={`recorder-${current}-${card.word}`}
+              targetWord={card.word}
+              onCorrectPronunciation={handleCorrectPronunciation}
+              maxDuration={10}
+              autoAnalyze={true}
+            />
+            <p className="text-xs sm:text-sm text-center text-gray-500 dark:text-gray-400 mt-3 px-4">
+              💡 Tip: The recorder will automatically stop when you pronounce it correctly!
+            </p>
+          </div>
 
           {/* Last Score */}
-          {lastScore !== null && !isProcessing && (
+          {lastScore !== null && (
             <div className={cn(
               "text-center p-4 sm:p-6 rounded-xl sm:rounded-2xl border-2",
               lastScore >= 80 && "bg-green-50 border-green-200 dark:bg-green-900/20",
@@ -298,7 +278,6 @@ export default function Vocabulary({ words }: { words: WordCard[] }) {
       {showSuccess && (
         <Card className="border-2 border-green-200 bg-green-50 dark:bg-green-900/20">
           <CardContent className="py-4 sm:py-6 text-center px-3 sm:px-4">
-            <div className="text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4 animate-bounce">🎉</div>
             <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
               Amazing! Word Mastered!
             </h3>

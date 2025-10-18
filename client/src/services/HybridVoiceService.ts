@@ -169,12 +169,36 @@ export class HybridVoiceService {
 
   /**
    * Get adjusted playback rate based on speed setting
+   * Updated with more pronounced speed differences for better kid comprehension
    */
   private static getAdjustedRate(baseRate: number, speed: 'normal' | 'slow' | 'slower'): number {
     switch (speed) {
-      case 'slow': return baseRate * 0.85;
-      case 'slower': return baseRate * 0.7;
-      default: return baseRate;
+      case 'slow': return baseRate * 0.7;    // 30% slower - noticeably slower
+      case 'slower': return baseRate * 0.5;  // 50% slower - very slow for maximum comprehension
+      default: return baseRate;               // Normal speed
+    }
+  }
+
+  /**
+   * Stop/cancel any currently playing speech
+   */
+  static stop(): void {
+    try {
+      // Stop Piper TTS if available and has stop method
+      if (this.piperAvailable && typeof (PiperTTS as any).stop === 'function') {
+        (PiperTTS as any).stop();
+      }
+      
+      // Stop Web Speech API if available
+      if (typeof (SpeechService as any).stopSpeaking === 'function') {
+        (SpeechService as any).stopSpeaking();
+      } else if (typeof window !== 'undefined' && window.speechSynthesis) {
+        // Fallback to direct speechSynthesis cancel
+        window.speechSynthesis.cancel();
+      }
+    } catch (error) {
+      // Silently handle errors - stopping speech is not critical
+      console.log('Could not stop speech:', error);
     }
   }
 

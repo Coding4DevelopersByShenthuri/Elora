@@ -19,14 +19,14 @@ const LUNA_VOICE = STORY_VOICES.Luna;
 const storySteps = [
   {
     id: 'intro',
-    title: '🌳 Magic Forest Adventure',
-    text: 'Hello little explorer! I am Luna the magical rabbit!.. Welcome to our enchanted forest where amazing adventures await us! Have you ever been to a forest or park? This one is extra magical!',
+    title: '🌳 Welcome to the Magic Forest!',
+    text: 'Hello little explorer! I am Luna the magical rabbit, and I\'m so happy you\'re here!... Today, we\'re going on a special listening adventure through my enchanted forest... You will meet talking trees, singing rivers, and wise animals... Your mission is to listen very carefully to what they say, and answer questions to collect THREE magic stars!... Are you ready? Let\'s begin our magical journey together!',
     emoji: '🐰',
     character: 'Luna',
     bgColor: 'from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900',
     interactive: false,
-    wordCount: 18,
-    duration: 25
+    wordCount: 60,
+    duration: 35
   },
   {
     id: 'whispering_trees',
@@ -45,11 +45,11 @@ const storySteps = [
     question: 'What greeting did the trees whisper to us?',
     hint: 'Listen for their friendly welcome',
     
-    // Choices are aurally DIFFERENT (not just word matching)
+    // Choices are aurally DIFFERENT (correct answer in position 2)
     choices: [
+      { text: 'The forest is sleeping', emoji: '🌲😴', meaning: 'quiet statement' },
       { text: 'Welcome to our forest', emoji: '🌲🤗', meaning: 'friendly greeting' },
-      { text: 'Leave our forest now', emoji: '🌲❌', meaning: 'unfriendly command' },
-      { text: 'The forest is sleeping', emoji: '🌲😴', meaning: 'quiet statement' }
+      { text: 'Leave our forest now', emoji: '🌲❌', meaning: 'unfriendly command' }
     ],
     
     // Full text revealed AFTER answering correctly
@@ -74,10 +74,11 @@ const storySteps = [
     question: 'How does the butterfly feel about today?',
     hint: 'Think about the butterfly\'s emotion and the weather',
     
+    // Choices aurally different (correct answer in position 3)
     choices: [
-      { text: 'I love this sunny day', emoji: '🦋☀️', meaning: 'happy and sunny' },
       { text: 'I hate this rainy day', emoji: '🦋🌧️', meaning: 'sad and rainy' },
-      { text: 'I fear this stormy day', emoji: '🦋⛈️', meaning: 'scared and stormy' }
+      { text: 'I fear this stormy day', emoji: '🦋⛈️', meaning: 'scared and stormy' },
+      { text: 'I love this sunny day', emoji: '🦋☀️', meaning: 'happy and sunny' }
     ],
     
     revealText: 'Oh wonderful! A rainbow butterfly is flying toward us! Its wings are so colorful - like a rainbow after rain! It says "I love this sunny day!" Can you repeat that with a happy voice?',
@@ -95,19 +96,20 @@ const storySteps = [
     interactive: true,
     listeningFirst: true,
     
-    audioText: 'Flow flow flow so free',
+    audioText: 'Flow, so free',
     audioInstruction: 'Listen to the river\'s happy song!',
     
     question: 'What is the river singing about doing?',
     hint: 'The river loves to move without stopping',
     
+    // Choices with rhythmic patterns (correct answer stays position 1 for variety)
     choices: [
-      { text: 'Flow flow flow so free', emoji: '💧🎵', meaning: 'moving freely' },
-      { text: 'Stop stop stop right here', emoji: '💧🛑', meaning: 'staying still' },
-      { text: 'Sleep sleep sleep all day', emoji: '💧😴', meaning: 'resting quietly' }
+      { text: 'Flow, so free', emoji: '💧🎵', meaning: 'moving freely' },
+      { text: 'Stop, right here', emoji: '💧🛑', meaning: 'staying still' },
+      { text: 'Sleep, all day', emoji: '💧😴', meaning: 'resting quietly' }
     ],
     
-    revealText: 'Listen to the happy river! Do you hear the water flowing? It\'s singing "Flow, flow, flow so free!" Can you sing that song with the river? Let\'s practice together!',
+    revealText: 'Listen to the happy river! Do you hear the water flowing? It\'s singing "flow, so free!" Can you sing that song with the river? Let\'s practice together!',
     
     maxReplays: 5,
     wordCount: 28,
@@ -128,10 +130,11 @@ const storySteps = [
     question: 'What do the flowers teach us about kindness?',
     hint: 'It\'s about how kindness affects others',
     
+    // Life lesson choices (correct answer in position 3)
     choices: [
-      { text: 'Being kind makes everyone smile', emoji: '🌸😊', meaning: 'kindness creates happiness' },
       { text: 'Being loud makes everyone listen', emoji: '🌸📢', meaning: 'volume gets attention' },
-      { text: 'Being first makes everyone follow', emoji: '🌸🏃', meaning: 'speed creates leaders' }
+      { text: 'Being first makes everyone follow', emoji: '🌸🏃', meaning: 'speed creates leaders' },
+      { text: 'Being kind makes everyone smile', emoji: '🌸😊', meaning: 'kindness creates happiness' }
     ],
     
     revealText: 'Amazing! These magical flowers can talk! They smell so sweet! They say "Being kind makes everyone smile!" Can you say that? Remember, being kind is like giving someone a warm hug with your words!',
@@ -148,25 +151,25 @@ const storySteps = [
     bgColor: 'from-yellow-100 to-amber-100 dark:from-yellow-900 dark:to-amber-900',
     interactive: true,
     listeningFirst: true,
-    questionType: 'true-false', // NEW: Different question type
+    questionType: 'true-false', // True/False question type
     
-    audioText: 'Stars help plants grow and animals sleep',
+    audioText: 'Stars shine brightly at night',
     audioInstruction: 'Listen to this interesting fact about stars!',
     
-    question: 'True or False: Stars help plants grow and animals sleep?',
-    hint: 'Think about what Luna said about stars',
+    question: 'True or False: Stars shine brightly at night?',
+    hint: 'Think about when you see stars - day or night?',
     
     choices: [
-      { text: 'True - Stars are helpful!', emoji: '✅', meaning: 'correct - stars do help' },
-      { text: 'False - Stars do nothing', emoji: '❌', meaning: 'incorrect - stars are important' }
+      { text: 'False - Stars do not shine', emoji: '❌', meaning: 'incorrect - stars do shine' },
+      { text: 'Stars shine brightly at night', emoji: '✅', meaning: 'true - we see stars at night' }
     ],
     
-    revealText: 'Hooray! WOW! We found our first glowing star! You\'re doing an amazing job listening! It fell from the night sky - just like when you see stars twinkling at bedtime! Stars help plants grow and animals sleep. Two more to find! Can you guess where they might be?',
+    revealText: 'Hooray! WOW! We found our first glowing star! You\'re doing an amazing job listening! It\'s TRUE - stars DO shine brightly at night, just like when you look up at bedtime and see them twinkling! Have you ever made a wish on a star? Two more stars to find! Can you guess where they might be?',
     
     maxReplays: 5,
     starsNeeded: 3,
-    wordCount: 28,
-    duration: 30
+    wordCount: 35,
+    duration: 32
   },
   {
     id: 'friendly_squirrel',
@@ -183,10 +186,11 @@ const storySteps = [
     question: 'Where does the squirrel invite us to play?',
     hint: 'Squirrels love to climb and jump in trees',
     
+    // Directional choices (correct answer in position 2)
     choices: [
+      { text: 'Come hide with me inside', emoji: '🐿️🏠', meaning: 'inside a hole' },
       { text: 'Come play with me up high', emoji: '🐿️⬆️', meaning: 'high in the trees' },
-      { text: 'Come rest with me down low', emoji: '🐿️⬇️', meaning: 'low on the ground' },
-      { text: 'Come hide with me inside', emoji: '🐿️🏠', meaning: 'inside a hole' }
+      { text: 'Come rest with me down low', emoji: '🐿️⬇️', meaning: 'low on the ground' }
     ],
     
     revealText: 'Look up there! Can you see the squirrel jumping on the branches? A friendly squirrel is calling "Come play with me up high!" Can you say that? Let\'s practice! Have you ever seen a squirrel climb a tree?',
@@ -205,16 +209,17 @@ const storySteps = [
     listeningFirst: true,
     questionType: 'inference', // NEW: Inference question
     
-    audioText: 'Stars twinkle because they are happy to see us exploring',
+    audioText: 'They are happy to see us',
     audioInstruction: 'Listen to why stars twinkle!',
     
     question: 'Why do stars twinkle according to Luna?',
     hint: 'Think about what makes the stars happy',
     
+    // Inference choices (correct answer in position 3)
     choices: [
-      { text: 'They are happy to see us', emoji: '✨😊', meaning: 'emotional connection' },
       { text: 'The wind makes them move', emoji: '✨💨', meaning: 'physical reason' },
-      { text: 'They want to go home', emoji: '✨🏠', meaning: 'different desire' }
+      { text: 'They want to go home', emoji: '✨🏠', meaning: 'different desire' },
+      { text: 'They are happy to see us', emoji: '✨😊', meaning: 'emotional connection' }
     ],
     
     revealText: 'Incredible! You\'re such a great listener! Another star appeared near the old oak tree! Stars twinkle because they are happy to see us exploring. (Just like your eyes sparkle when you\'re happy!) One last star to go! We\'re almost there!',
@@ -239,9 +244,10 @@ const storySteps = [
     question: 'What does the wise owl tell us to do?',
     hint: 'It\'s about learning by wondering and asking',
     
+    // Wisdom choices (correct answer in position 2)
     choices: [
-      { text: 'Always be curious and ask questions', emoji: '🦉❓', meaning: 'keep learning and wondering' },
       { text: 'Always be silent and never speak', emoji: '🦉🤐', meaning: 'stay quiet always' },
+      { text: 'Always be curious and ask questions', emoji: '🦉❓', meaning: 'keep learning and wondering' },
       { text: 'Always be busy and never stop', emoji: '🦉🏃', meaning: 'move constantly' }
     ],
     
@@ -297,12 +303,13 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
   
   // Accessibility & Enhanced Features
   const [showTranscript, setShowTranscript] = useState(false);
-  const [playbackSpeed, setPlaybackSpeed] = useState<'normal' | 'slow' | 'slower'>('normal');
+  const [playbackSpeed, setPlaybackSpeed] = useState<'normal' | 'slow' | 'slower'>('slow'); // Default to slow for better comprehension
   const [captionsEnabled, setCaptionsEnabled] = useState(false);
   const [retryMode, setRetryMode] = useState(false);
   const [attemptCount, setAttemptCount] = useState(0);
   const [ttsAvailable, setTtsAvailable] = useState(true);
   const [currentCaption, setCurrentCaption] = useState('');
+  const [accessibilityMode, setAccessibilityMode] = useState(false); // For hearing-impaired kids
   
   // Analytics tracking
   const [currentSession, setCurrentSession] = useState<StorySession | null>(null);
@@ -385,6 +392,7 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
     setShowFeedback(false);
     setShowHint(false);
     setCurrentCaption('');
+    // Don't reset accessibility mode - keep it persistent across steps if enabled
   }, [stepIndex]);
 
   // Timer for tracking session duration
@@ -407,19 +415,26 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
       // Strip emojis/stickers before speaking to prevent TTS from reading emoji names
       const cleanText = stripEmojis(text);
       
+      // Determine if captions should be shown based on phase and accessibility mode
+      const allowCaptions = showCaptions && captionsEnabled && 
+        (listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode);
+      
       await HybridVoiceService.speak(
         cleanText,
         LUNA_VOICE,
         {
           speed: playbackSpeed,
-          showCaptions: showCaptions && captionsEnabled,
-          onCaptionUpdate: setCurrentCaption
+          showCaptions: allowCaptions,
+          onCaptionUpdate: allowCaptions ? setCurrentCaption : () => {}
         }
       );
     } catch (error) {
       console.log('Voice synthesis failed, showing text instead');
       setTtsAvailable(false);
-      setShowTranscript(true); // Auto-enable transcript on failure
+      // Only auto-enable transcript in reveal phase or for non-interactive content
+      if (listeningPhase === 'reveal' || !current.listeningFirst) {
+        setShowTranscript(true);
+      }
       throw error;
     }
   };
@@ -443,18 +458,43 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
       playListeningAudio();
     }
     
-    // For non-interactive steps, play the full text
+    // Auto-play for reveal phase (after correct answer)
+    if (listeningPhase === 'reveal' && current.listeningFirst && (current as any).revealText && ttsAvailable) {
+      const playReveal = async () => {
+        setIsPlaying(true);
+        try {
+          await playAudioWithCaptions((current as any).revealText, true);
+        } catch (error) {
+          console.log('TTS not available');
+        }
+        setIsPlaying(false);
+      };
+      playReveal();
+    }
+    
+    // For non-interactive steps, play the full text automatically
     if (!current.listeningFirst && current.text && ttsAvailable) {
       const playNarration = async () => {
+        let textToRead = current.text;
+        
+        // Handle dynamic celebration text based on stars collected
+        if (current.id === 'grand_celebration') {
+          if (stars >= 3) {
+            textToRead = "Congratulations superstar! ... The WHOLE forest is celebrating YOU! ... Animals are dancing, flowers are singing, and magic sparkles everywhere!. You made the forest happy with your wonderful listening! You should feel SO proud! ... Give yourself a BIG clap!";
+          } else {
+            textToRead = `Great job, little explorer! ... You earned ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The forest friends are so happy you tried your best! ... Luna the rabbit is proud of you! ... Every adventure is a chance to learn and grow. Keep practicing and you'll collect all the stars next time! 🌟`;
+          }
+        }
+        
         try {
-          await playAudioWithCaptions(current.text, true);
+          await playAudioWithCaptions(textToRead, true);
         } catch (error) {
           console.log('TTS not available');
         }
       };
       playNarration();
     }
-  }, [listeningPhase, stepIndex, playbackSpeed]);
+  }, [listeningPhase, stepIndex, playbackSpeed, stars]);
 
   const handleNext = () => {
     if (stepIndex < storySteps.length - 1) {
@@ -576,7 +616,17 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
   };
 
   const playRevealText = async () => {
-    const textToSpeak = (current as any).revealText || current.text;
+    let textToSpeak = (current as any).revealText || current.text;
+    
+    // Handle dynamic celebration text based on stars collected
+    if (current.id === 'grand_celebration') {
+      if (stars >= 3) {
+        textToSpeak = "Congratulations superstar! ... The WHOLE forest is celebrating YOU! ... Animals are dancing, flowers are singing, and magic sparkles everywhere!. You made the forest happy with your wonderful listening! You should feel SO proud! ... Give yourself a BIG clap!";
+      } else {
+        textToSpeak = `Great job, little explorer! ... You earned ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The forest friends are so happy you tried your best! ... Luna the rabbit is proud of you! ... Every adventure is a chance to learn and grow. Keep practicing and you'll collect all the stars next time! 🌟`;
+      }
+    }
+    
     if (textToSpeak && ttsAvailable) {
       setIsPlaying(true);
       try {
@@ -602,9 +652,9 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
   
   const getWrongFeedback = (attempt: number) => {
     if (attempt === 1) {
-      return `💪 Good try! The answer was "${(current as any).audioText}". Try again?`;
+      return `💪 Not quite! Listen carefully and try again! 🎧`;
     } else {
-      return `🌟 Nice effort! It was "${(current as any).audioText}". One more time?`;
+      return `🌟 Keep trying! Listen one more time to find the answer! 👂`;
     }
   };
 
@@ -665,7 +715,80 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
               
               {/* Accessibility Controls */}
               <div className="flex gap-1">
-                {/* Transcript Toggle */}
+                {/* Speed Control - ALWAYS Available (works offline & online) */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={async () => {
+                    // Stop any currently playing audio
+                    HybridVoiceService.stop();
+                    
+                    // Cycle to next speed
+                    const newSpeed = playbackSpeed === 'slow' ? 'slower' : playbackSpeed === 'slower' ? 'normal' : 'slow';
+                    setPlaybackSpeed(newSpeed);
+                    
+                    // Immediately replay current content at new speed
+                    try {
+                      let textToPlay = '';
+                      
+                      if (listeningPhase === 'listening' && current.listeningFirst && (current as any).audioText) {
+                        textToPlay = (current as any).audioText;
+                      } else if (listeningPhase === 'reveal' && current.listeningFirst && (current as any).revealText) {
+                        textToPlay = (current as any).revealText;
+                      } else if (!current.listeningFirst && current.text) {
+                        // Handle celebration text
+                        if (current.id === 'grand_celebration') {
+                          textToPlay = stars >= 3 
+                            ? "Congratulations superstar! ... The WHOLE forest is celebrating YOU! ... Animals are dancing, flowers are singing, and magic sparkles everywhere!. You made the forest happy with your wonderful listening! You should feel SO proud! ... Give yourself a BIG clap!"
+                            : `Great job, little explorer! ... You earned ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The forest friends are so happy you tried your best! ... Luna the rabbit is proud of you! ... Every adventure is a chance to learn and grow. Keep practicing and you'll collect all the stars next time! 🌟`;
+                        } else {
+                          textToPlay = current.text;
+                        }
+                      }
+                      
+                      if (textToPlay && ttsAvailable) {
+                        const cleanText = stripEmojis(textToPlay);
+                        await HybridVoiceService.speak(cleanText, LUNA_VOICE, {
+                          speed: newSpeed,
+                          showCaptions: captionsEnabled,
+                          onCaptionUpdate: setCurrentCaption
+                        });
+                      }
+                    } catch (error) {
+                      console.log('Could not replay at new speed');
+                    }
+                  }}
+                  className="h-7 px-2 rounded-full text-xs bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700"
+                  title={`Playback speed (works offline & online): ${playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow (Default)' : 'Very Slow'}`}
+                >
+                  <Gauge className="w-3.5 h-3.5 mr-1" />
+                  {playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow' : 'Very Slow'}
+                </Button>
+                
+                {/* Accessibility Mode Toggle (for hearing-impaired) */}
+                {(listeningPhase === 'listening' || listeningPhase === 'question') && current.listeningFirst && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setAccessibilityMode(!accessibilityMode);
+                      if (!accessibilityMode) {
+                        setShowTranscript(true);
+                        setCaptionsEnabled(true);
+                      }
+                    }}
+                    className={cn(
+                      "h-7 px-2 rounded-full text-xs",
+                      accessibilityMode && "bg-orange-100 dark:bg-orange-900 border border-orange-300"
+                    )}
+                    title="Accessibility mode (for hearing difficulties)"
+                  >
+                    👂 {accessibilityMode ? 'ON' : 'Help'}
+                  </Button>
+                )}
+                
+                {/* Transcript Toggle - Only in reveal phase OR accessibility mode */}
+                {(listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode) && (
                 <Button
                   variant="ghost"
                   size="sm"
@@ -678,8 +801,10 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                 >
                   <FileText className="w-3.5 h-3.5" />
                 </Button>
+                )}
                 
-                {/* Captions Toggle */}
+                {/* Captions Toggle - Only in reveal phase OR accessibility mode */}
+                {(listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode) && (
                 <Button
                   variant="ghost"
                   size="sm"
@@ -692,22 +817,7 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                 >
                   <Eye className="w-3.5 h-3.5" />
                 </Button>
-                
-                {/* Speed Control */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setPlaybackSpeed(prev => 
-                      prev === 'normal' ? 'slow' : prev === 'slow' ? 'slower' : 'normal'
-                    );
-                  }}
-                  className="h-7 px-2 rounded-full text-xs"
-                  title={`Speed: ${playbackSpeed}`}
-                >
-                  <Gauge className="w-3.5 h-3.5 mr-1" />
-                  {playbackSpeed === 'normal' ? '1x' : playbackSpeed === 'slow' ? '0.8x' : '0.6x'}
-                </Button>
+                )}
               </div>
             </div>
           </div>
@@ -746,8 +856,21 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
             </div>
           )}
           
-          {/* Live Caption Display */}
-          {captionsEnabled && currentCaption && (
+          {/* Accessibility Mode Warning */}
+          {accessibilityMode && (listeningPhase === 'listening' || listeningPhase === 'question') && (
+            <div className="mb-2 bg-orange-100 dark:bg-orange-900/40 border-2 border-orange-400 text-orange-900 dark:text-orange-200 px-4 py-2.5 rounded-lg shadow-md">
+              <div className="flex items-center gap-2 justify-center">
+                <span className="text-lg">👂</span>
+                <div className="text-xs sm:text-sm">
+                  <strong>Accessibility Mode Active:</strong> Text shown for hearing support. 
+                  <span className="block sm:inline sm:ml-1">Challenge reduced - encourage listening when possible!</span>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Live Caption Display - Only in reveal phase or accessibility mode */}
+          {captionsEnabled && currentCaption && (listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode) && (
             <div className="mb-2 bg-black/80 text-white px-4 py-2 rounded-lg text-center text-sm sm:text-base font-semibold animate-fade-in">
               {currentCaption}
             </div>
@@ -805,20 +928,24 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                       {(current as any).audioInstruction}
                     </h3>
                     
-                    {/* Transcript (if enabled) */}
-                    {showTranscript && (
-                      <div className="mb-4 bg-white/90 dark:bg-gray-700/90 rounded-lg p-4 border-2 border-blue-200">
+                    {/* Transcript (only in accessibility mode during listening phase) */}
+                    {showTranscript && accessibilityMode && (
+                      <div className="mb-4 bg-orange-50/90 dark:bg-orange-900/30 rounded-lg p-4 border-2 border-orange-300">
                         <div className="flex items-center gap-2 mb-2">
-                          <FileText className="w-4 h-4 text-blue-600" />
-                          <span className="text-xs font-semibold text-gray-600 dark:text-gray-300">Transcript:</span>
+                          <FileText className="w-4 h-4 text-orange-600" />
+                          <span className="text-xs font-semibold text-orange-700 dark:text-orange-300">Accessibility Transcript:</span>
                         </div>
                         <p className="text-sm text-gray-700 dark:text-gray-200 font-medium">
                           "{(current as any).audioText}"
                         </p>
+                        <p className="text-xs text-orange-600 dark:text-orange-400 mt-2">
+                          ⚠️ Try to listen carefully instead of reading!
+                        </p>
                       </div>
                     )}
                     
-                    {audioWaveform && !showTranscript && (
+                    {/* Audio waveform - hide if accessibility transcript is shown */}
+                    {audioWaveform && !(showTranscript && accessibilityMode) && (
                       <div className="flex items-center justify-center gap-2 mb-4">
                         {[...Array(5)].map((_, i) => (
                           <div
@@ -850,11 +977,6 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                         👂 Listen carefully! {unlimitedReplays ? 'Unlimited plays' : `${maxReplays} plays available`}.
                       </p>
                       
-                      {!ttsAvailable && (
-                        <p className="text-xs text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 px-3 py-1 rounded-lg">
-                          ⚠️ Audio not available. Read the text above.
-                        </p>
-                      )}
                       
                       {hasListened && (
                         <Button
@@ -1139,20 +1261,24 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                       <span>{(current as any).audioInstruction}</span>
                     </h3>
                     
-                    {/* Transcript (if enabled) */}
-                    {showTranscript && (
-                      <div className="mb-3 bg-white/90 dark:bg-gray-700/90 rounded-lg p-3 border-2 border-blue-200">
+                    {/* Transcript (only in accessibility mode during listening phase) */}
+                    {showTranscript && accessibilityMode && (
+                      <div className="mb-3 bg-orange-50/90 dark:bg-orange-900/30 rounded-lg p-3 border-2 border-orange-300">
                         <div className="flex items-center gap-2 mb-1">
-                          <FileText className="w-4 h-4 text-blue-600" />
-                          <span className="text-xs font-semibold text-gray-600 dark:text-gray-300">Transcript:</span>
+                          <FileText className="w-4 h-4 text-orange-600" />
+                          <span className="text-xs font-semibold text-orange-700 dark:text-orange-300">Accessibility Transcript:</span>
                         </div>
                         <p className="text-sm md:text-base text-gray-700 dark:text-gray-200 font-medium">
                           "{(current as any).audioText}"
                         </p>
+                        <p className="text-xs text-orange-600 dark:text-orange-400 mt-1.5">
+                          ⚠️ Try to listen carefully instead of reading!
+                        </p>
                       </div>
                     )}
                     
-                    {audioWaveform && !showTranscript && (
+                    {/* Audio waveform - hide if accessibility transcript is shown */}
+                    {audioWaveform && !(showTranscript && accessibilityMode) && (
                       <div className="flex items-center justify-center gap-2 mb-4">
                         {[...Array(5)].map((_, i) => (
                           <div
@@ -1184,11 +1310,6 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                         👂 Listen carefully! {unlimitedReplays ? 'Unlimited plays' : `${maxReplays} plays available`}.
                       </p>
                       
-                      {!ttsAvailable && (
-                        <p className="text-xs text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 px-3 py-1.5 rounded-lg">
-                          ⚠️ Audio not available. Read the text above.
-                        </p>
-                      )}
                       
                       {hasListened && (
                         <Button
