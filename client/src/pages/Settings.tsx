@@ -7,10 +7,13 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from 'react';
 import { prefetchAppShell } from "@/services/OfflinePrefetch";
+import { useNavigate } from 'react-router-dom';
+import { Download, Lock, ChevronRight } from 'lucide-react';
 
 const Settings = () => {
   const showContent = useAnimateIn(false, 300);
   const [useLocalModel, setUseLocalModel] = useState<boolean>(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const stored = localStorage.getItem('speakbee_use_local_model');
@@ -106,6 +109,47 @@ const Settings = () => {
                     <Button variant="secondary" onClick={() => prefetchAppShell()}>
                       Prefetch
                     </Button>
+                  </div>
+
+                  <div className="h-px bg-border" />
+
+                  <div>
+                    <h3 className="text-base font-semibold mb-4">Kids Learning Settings</h3>
+                    <div className="space-y-3">
+                      <Button
+                        variant="outline"
+                        className="w-full justify-between h-auto py-4 px-4 border-2 border-blue-300 dark:border-blue-600 bg-blue-50/40 dark:bg-blue-900/10 hover:bg-blue-100/60 dark:hover:bg-blue-900/20 transition-colors"
+                        onClick={() => navigate('/model-manager')}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                            <Download className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                          </div>
+                          <div className="text-left">
+                            <div className="font-semibold text-gray-900 dark:text-white">Manage AI Models</div>
+                            <div className="text-sm text-gray-600 dark:text-gray-400">Download and manage offline AI models</div>
+                          </div>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                      </Button>
+
+                      <Button
+                        variant="outline"
+                        className="w-full justify-between h-auto py-4 px-4 border-2 border-purple-300 dark:border-purple-600 bg-purple-50/40 dark:bg-purple-900/10 hover:bg-purple-100/60 dark:hover:bg-purple-900/20 transition-colors"
+                        onClick={() => navigate('/parental-controls')}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30">
+                            <Lock className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                          </div>
+                          <div className="text-left">
+                            <div className="font-semibold text-gray-900 dark:text-white">Parental Controls</div>
+                            <div className="text-sm text-gray-600 dark:text-gray-400">Manage screen time and content filters</div>
+                          </div>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
