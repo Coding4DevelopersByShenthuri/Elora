@@ -93,144 +93,159 @@ const Index = () => {
   
   return (
     <div className="relative overflow-hidden min-h-screen">
-      {/* Background Elements */}
+      {/* Background Elements - NO CHANGES */}
       <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-primary/5 to-transparent -z-10"></div>
       <div className="absolute top-1/4 right-0 w-[400px] h-[400px] rounded-full bg-secondary/10 blur-3xl -z-10"></div>
       <div className="absolute bottom-1/4 left-0 w-[300px] h-[300px] rounded-full bg-accent/10 blur-3xl -z-10"></div>
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* Hero Section */}
-        <div className="py-20 md:py-32">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="pt-32 sm:pt-28 md:pt-32 lg:pt-36 pb-12 sm:pb-16 md:pb-20 lg:pb-24">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 xl:gap-16 items-center">
             {/* Left Content */}
-            <div className="space-y-8">
-              <div className="space-y-6">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary font-medium">
-                  <Sparkles className="w-4 h-4" />
-                  <span>AI-Powered English Learning</span>
+            <div className="space-y-6 md:space-y-8">
+              <div className="space-y-4 md:space-y-6">
+                <div className="inline-flex items-center gap-1.5 md:gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-primary/30 text-primary font-semibold text-xs md:text-base shadow-md border-2 border-primary/30">
+                  <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" />
+                  <span className="whitespace-nowrap">AI-Powered English Learning</span>
                 </div>
                 
-                <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight">
-                  Master English with Your
-                  <span className="relative">
-                    <span className="text-primary"> Personal AI Tutor</span>
-                    <svg className="absolute -bottom-2 left-0 w-full h-3 text-orange-400" viewBox="0 0 200 12" fill="none">
+                {/* Mobile View - Optimized layout */}
+                <h1 className="block md:hidden text-3xl sm:text-4xl font-bold leading-tight">
+                  <span className="block">Master English with Your</span>
+                  <span className="block mt-1">
+                    <span className="text-primary">Personal </span>
+                    <span className="relative inline-block">
+                      <span className="text-primary">AI Tutor</span>
+                      <svg className="absolute -bottom-0.5 left-0 w-full h-1.5 text-orange-400" viewBox="0 0 200 12" fill="none">
+                        <path d="M2 8C50 2 100 10 150 6C180 4 200 8 200 8" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+                      </svg>
+                    </span>
+                  </span>
+                </h1>
+
+                {/* Desktop View - No quotation marks */}
+                <h1 className="hidden md:block md:text-5xl lg:text-5xl xl:text-6xl font-bold leading-tight">
+                  Master English with Your <span className="text-primary md:inline-block">Personal</span>
+                  <span className="relative inline-block mt-2">
+                    <span className="text-primary">AI Tutor</span>
+                    <svg className="absolute -bottom-1 md:-bottom-2 left-0 w-full h-2 md:h-3 text-orange-400" viewBox="0 0 200 12" fill="none">
                       <path d="M2 8C50 2 100 10 150 6C180 4 200 8 200 8" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
                     </svg>
                   </span>
                 </h1>
                 
-                <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl">
+                <p className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed">
                   Practice speaking, listening, and conversation skills with our advanced AI technology. 
                   Works completely offline, respects your privacy, and adapts to your learning pace.
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-4 text-lg rounded-full">
-                  <Play className="w-5 h-5 mr-2" />
+              <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
+                <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-6 py-3 md:px-8 md:py-4 text-base md:text-lg rounded-full shadow-lg hover:shadow-xl transition-shadow">
+                  <Play className="w-4 h-4 md:w-5 md:h-5 mr-2" />
                   Start Learning Free
                 </Button>
-                <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white px-8 py-4 text-lg rounded-full">
-                  <Volume2 className="w-5 h-5 mr-2" />
+                <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white px-6 py-3 md:px-8 md:py-4 text-base md:text-lg rounded-full">
+                  <Volume2 className="w-4 h-4 md:w-5 md:h-5 mr-2" />
                   Watch Demo
                 </Button>
               </div>
 
-              <div className="flex items-center gap-8 text-sm text-muted-foreground">
+              <div className="flex flex-wrap items-center gap-4 md:gap-8 text-xs sm:text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <CheckCircle className="w-3 h-3 md:w-4 md:h-4 text-green-500" />
                   <span>100% Offline/Online</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <CheckCircle className="w-3 h-3 md:w-4 md:h-4 text-green-500" />
                   <span>Privacy First</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <CheckCircle className="w-3 h-3 md:w-4 md:h-4 text-green-500" />
                   <span>AI-Powered</span>
                 </div>
               </div>
             </div>
 
             {/* Right Content - Hero Image */}
-            <div className="relative">
-              <div className="relative bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl p-8 backdrop-blur-sm">
-                <div className="bg-white/80 rounded-2xl p-6 shadow-2xl">
-                  <div className="flex items-center justify-center mb-6">
-                    <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
-                      <Brain className="w-10 h-10 text-white" />
+            <div className="relative mt-8 lg:mt-0">
+              <div className="relative bg-gradient-to-br from-primary/20 to-secondary/20 rounded-2xl md:rounded-3xl p-6 md:p-8 backdrop-blur-sm">
+                <div className="bg-white/80 rounded-xl md:rounded-2xl p-4 md:p-6 shadow-2xl">
+                  <div className="flex items-center justify-center mb-4 md:mb-6">
+                    <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
+                      <Brain className="w-8 h-8 md:w-10 md:h-10 text-white" />
                     </div>
                   </div>
-                  <h3 className="text-2xl font-bold text-center mb-4">Your AI English Coach</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                      <Mic className="w-5 h-5 text-primary" />
-                      <span className="text-sm">Speaking Practice</span>
+                  <h3 className="text-xl md:text-2xl font-bold text-center mb-3 md:mb-4">Your AI English Coach</h3>
+                  <div className="space-y-2 md:space-y-3">
+                    <div className="flex items-center gap-3 p-2 md:p-3 bg-green-50 rounded-lg">
+                      <Mic className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                      <span className="text-xs md:text-sm">Speaking Practice</span>
                     </div>
-                    <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-                      <BookOpen className="w-5 h-5 text-primary" />
-                      <span className="text-sm">Interactive Lessons</span>
+                    <div className="flex items-center gap-3 p-2 md:p-3 bg-blue-50 rounded-lg">
+                      <BookOpen className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                      <span className="text-xs md:text-sm">Interactive Lessons</span>
                     </div>
-                    <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg">
-                      <Award className="w-5 h-5 text-primary" />
-                      <span className="text-sm">Progress Tracking</span>
+                    <div className="flex items-center gap-3 p-2 md:p-3 bg-purple-50 rounded-lg">
+                      <Award className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                      <span className="text-xs md:text-sm">Progress Tracking</span>
                     </div>
                   </div>
                 </div>
                 
                 {/* Floating Elements */}
-                <div className="absolute -top-4 -right-4 w-8 h-8 bg-orange-400 rounded-full flex items-center justify-center animate-bounce">
-                  <Star className="w-4 h-4 text-white" />
+                <div className="absolute -top-3 -right-3 md:-top-4 md:-right-4 w-6 h-6 md:w-8 md:h-8 bg-orange-400 rounded-full flex items-center justify-center animate-bounce">
+                  <Star className="w-3 h-3 md:w-4 md:h-4 text-white" />
                 </div>
-                <div className="absolute -bottom-4 -left-4 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center animate-pulse">
-                  <Heart className="w-3 h-3 text-white" />
+                <div className="absolute -bottom-3 -left-3 md:-bottom-4 md:-left-4 w-5 h-5 md:w-6 md:h-6 bg-yellow-400 rounded-full flex items-center justify-center animate-pulse">
+                  <Heart className="w-2 h-2 md:w-3 md:h-3 text-white" />
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Original Features Section */}
-        <div className="py-20">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
+        {/* Features Section */}
+        <div className="py-12 md:py-16 lg:py-20">
+          <div className="text-center mb-10 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
               Why Choose <span className="text-primary">Speak Bee</span>?
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto px-4">
               Experience the future of English learning with our cutting-edge AI technology designed for learners of all levels.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {features.map((feature, index) => (
               <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/80 backdrop-blur-sm">
-                <CardContent className="p-8 text-center">
-                  <div className={`w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300`}>
+                <CardContent className="p-6 md:p-8 text-center">
+                  <div className={`w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 md:mb-6 rounded-xl md:rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300`}>
                     {feature.icon}
                   </div>
-                  <h3 className="text-xl font-bold mb-4">{feature.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
+                  <h3 className="text-lg md:text-xl font-bold mb-3 md:mb-4">{feature.title}</h3>
+                  <p className="text-sm md:text-base text-muted-foreground leading-relaxed">{feature.description}</p>
                 </CardContent>
               </Card>
             ))}
           </div>
         </div>
 
-        {/* Model Image Style Features Section */}
-        <div className="py-20">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+        {/* Learning Benefits Section */}
+        <div className="py-12 md:py-16 lg:py-20">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center mb-10 md:mb-16">
             {/* Left Side - Title */}
             <div>
-              <h2 className="text-4xl sm:text-5xl font-bold mb-6">
-                An Easier Way to <span className="relative">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
+                An Easier Way to <span className="relative inline-block">
                   <span className="text-primary">Learn</span>
-                  <svg className="absolute -bottom-2 left-0 w-full h-3 text-orange-400" viewBox="0 0 200 12" fill="none">
+                  <svg className="absolute -bottom-1 md:-bottom-2 left-0 w-full h-2 md:h-3 text-orange-400" viewBox="0 0 200 12" fill="none">
                     <path d="M2 8C50 2 100 10 150 6C180 4 200 8 200 8" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
                   </svg>
-                </span> and <span className="relative">
+                </span> and <span className="relative inline-block">
                   <span className="text-primary">Speak</span>
-                  <svg className="absolute -bottom-2 left-0 w-full h-3 text-orange-400" viewBox="0 0 200 12" fill="none">
+                  <svg className="absolute -bottom-1 md:-bottom-2 left-0 w-full h-2 md:h-3 text-orange-400" viewBox="0 0 200 12" fill="none">
                     <path d="M2 8C50 2 100 10 150 6C180 4 200 8 200 8" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
                   </svg>
                 </span>
@@ -239,140 +254,134 @@ const Index = () => {
 
             {/* Right Side - Description */}
             <div className="relative">
-              <div className="absolute -top-4 -right-4 w-6 h-6 text-primary">
+              <div className="absolute -top-3 -right-3 md:-top-4 md:-right-4 w-5 h-5 md:w-6 md:h-6 text-primary hidden sm:block">
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                 </svg>
               </div>
-              <p className="text-lg text-muted-foreground leading-relaxed">
+              <p className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed">
                 When learners have reliable access to AI-powered English training and the freedom to choose what and when they learn, 
                 more skills are developed and language fluency stays on track.
               </p>
-              {/* Decorative arrow */}
-              <div className="absolute -bottom-8 -left-8 w-16 h-16 text-primary opacity-60">
-                <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
-                  <path d="M20 20C40 10 60 30 80 20C85 18 90 22 90 25C90 30 85 35 80 30C70 25 50 15 30 25C25 27 20 25 20 20Z" stroke="currentColor" strokeWidth="2" fill="currentColor"/>
-                </svg>
-              </div>
             </div>
           </div>
 
-          {/* Three Feature Cards - Model Image Style */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Three Feature Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {[
               {
-                icon: <Target className="w-8 h-8" />,
+                icon: <Target className="w-6 h-6 md:w-8 md:h-8" />,
                 title: "Learning disruptions <span className='text-orange-500 font-bold'>hinder</span> progress",
                 description: "When learners have reliable access to AI-powered training",
                 color: "from-primary to-primary/80"
               },
               {
-                icon: <Globe className="w-8 h-8" />,
+                icon: <Globe className="w-6 h-6 md:w-8 md:h-8" />,
                 title: "A better way to <span className='text-orange-500 font-bold'>connect</span> learners and AI",
                 description: "When learners have reliable access to AI-powered training",
                 color: "from-primary to-primary/80"
               },
               {
-                icon: <Award className="w-8 h-8" />,
+                icon: <Award className="w-6 h-6 md:w-8 md:h-8" />,
                 title: "Language skills stay <span className='text-orange-500 font-bold'>on track</span> to meet goals",
                 description: "When learners have reliable access to AI-powered training",
                 color: "from-primary to-primary/80"
               }
             ].map((feature, index) => (
               <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/90 backdrop-blur-sm relative">
-                <CardContent className="p-8">
-                  <div className="flex items-start justify-between mb-6">
-                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300`}>
+                <CardContent className="p-6 md:p-8">
+                  <div className="flex items-start justify-between mb-4 md:mb-6">
+                    <div className={`w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300`}>
                       {feature.icon}
                     </div>
-                    <div className="w-8 h-8 rounded-full bg-orange-400 flex items-center justify-center">
-                      <ArrowRight className="w-4 h-4 text-white" />
+                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-orange-400 flex items-center justify-center flex-shrink-0">
+                      <ArrowRight className="w-3 h-3 md:w-4 md:h-4 text-white" />
                     </div>
                   </div>
-                  <h3 className="text-xl font-bold mb-4 text-primary" dangerouslySetInnerHTML={{ __html: feature.title }} />
-                  <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
+                  <h3 className="text-base md:text-xl font-bold mb-3 md:mb-4 text-primary" dangerouslySetInnerHTML={{ __html: feature.title }} />
+                  <p className="text-sm md:text-base text-muted-foreground leading-relaxed">{feature.description}</p>
                 </CardContent>
               </Card>
             ))}
           </div>
         </div>
 
-        {/* Original Statistics Section */}
-        <div className="py-20">
-          <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-3xl p-12">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+        {/* Statistics Section */}
+        <div className="py-12 md:py-16 lg:py-20">
+          <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl md:rounded-3xl p-6 md:p-10 lg:p-12">
+            <div className="text-center mb-8 md:mb-12">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 md:mb-4">
                 Trusted by Learners Worldwide
               </h2>
-              <p className="text-xl text-muted-foreground">
+              <p className="text-base sm:text-lg md:text-xl text-muted-foreground px-4">
                 Join thousands of successful English learners who have improved their skills with Speak Bee
               </p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
               {stats.map((stat, index) => (
                 <div key={index} className="text-center">
-                  <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                  <div className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-3 md:mb-4 rounded-full bg-primary/20 flex items-center justify-center text-primary">
                     {stat.icon}
                   </div>
-                  <div className="text-3xl md:text-4xl font-bold text-primary mb-2">{stat.number}</div>
-                  <div className="text-muted-foreground font-medium">{stat.label}</div>
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-1 md:mb-2">{stat.number}</div>
+                  <div className="text-xs sm:text-sm md:text-base text-muted-foreground font-medium">{stat.label}</div>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Statistics Section - Model Image Style */}
-        <div className="py-20">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        {/* Why Choose Our Services Section */}
+        <div className="py-12 md:py-16 lg:py-20">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 xl:gap-16 items-center">
             {/* Left Side - Student Image Area */}
-            <div className="relative">
+            <div className="relative order-2 lg:order-1">
               <div className="relative">
                 {/* Student placeholder - using a gradient circle as placeholder */}
-                <div className="w-80 h-80 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                  <div className="w-60 h-60 rounded-full bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center">
-                    <Brain className="w-24 h-24 text-primary" />
+                <div className="w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                  <div className="w-48 h-48 sm:w-56 sm:h-56 md:w-60 md:h-60 rounded-full bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center">
+                    <Brain className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 text-primary" />
                   </div>
                 </div>
                 
                 {/* Background shapes */}
-                <div className="absolute -top-8 -left-8 w-32 h-32 bg-primary/10 rounded-2xl rotate-12"></div>
-                <div className="absolute -bottom-8 -right-8 w-24 h-24 bg-secondary/10 rounded-2xl -rotate-12"></div>
+                <div className="absolute -top-6 -left-6 md:-top-8 md:-left-8 w-24 h-24 md:w-32 md:h-32 bg-primary/10 rounded-xl md:rounded-2xl rotate-12 hidden sm:block"></div>
+                <div className="absolute -bottom-6 -right-6 md:-bottom-8 md:-right-8 w-20 h-20 md:w-24 md:h-24 bg-secondary/10 rounded-xl md:rounded-2xl -rotate-12 hidden sm:block"></div>
                 
                 {/* Decorative elements */}
-                <div className="absolute top-4 right-4 w-6 h-6 bg-orange-400 rounded-full animate-pulse"></div>
-                <div className="absolute bottom-4 left-4 w-4 h-4 bg-orange-400 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
+                <div className="absolute top-4 right-4 w-5 h-5 md:w-6 md:h-6 bg-orange-400 rounded-full animate-pulse"></div>
+                <div className="absolute bottom-4 left-4 w-3 h-3 md:w-4 md:h-4 bg-orange-400 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
               </div>
             </div>
 
             {/* Right Side - Statistics */}
-            <div className="space-y-8">
+            <div className="space-y-6 md:space-y-8 order-1 lg:order-2">
               <div>
-                <h2 className="text-4xl sm:text-5xl font-bold mb-6">
-                  Why Choose Our <span className="relative">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
+                  Why Choose Our <span className="relative inline-block">
                     <span className="text-primary">Services</span>?
-                    <svg className="absolute -bottom-2 left-0 w-full h-3 text-orange-400" viewBox="0 0 200 12" fill="none">
+                    <svg className="absolute -bottom-1 md:-bottom-2 left-0 w-full h-2 md:h-3 text-orange-400" viewBox="0 0 200 12" fill="none">
                       <path d="M2 8C50 2 100 10 150 6C180 4 200 8 200 8" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
                     </svg>
                   </span>
                 </h2>
-                <p className="text-lg text-muted-foreground leading-relaxed">
+                <p className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed">
                   Schools and districts save time and money, so they can focus on full-time staff and student outcomes. 
                   Learners work on their own terms while making a difference in their language skills.
                 </p>
               </div>
 
               {/* Statistics Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
                 {[
                   { number: "3k+", label: "Highly Trained AI Models", color: "bg-orange-400" },
                   { number: "300+", label: "Learning Centers Worldwide", color: "bg-orange-400" },
                   { number: "48+", label: "Countries We Serve", color: "bg-orange-400" }
                 ].map((stat, index) => (
-                  <div key={index} className={`${stat.color} rounded-2xl p-6 text-white text-center`}>
-                    <div className="text-3xl font-bold mb-2">{stat.number}</div>
-                    <div className="text-sm font-medium">{stat.label}</div>
+                  <div key={index} className={`${stat.color} rounded-xl md:rounded-2xl p-4 md:p-6 text-white text-center transform hover:scale-105 transition-transform duration-300`}>
+                    <div className="text-2xl md:text-3xl font-bold mb-1 md:mb-2">{stat.number}</div>
+                    <div className="text-xs md:text-sm font-medium leading-tight">{stat.label}</div>
                   </div>
                 ))}
               </div>
@@ -387,36 +396,36 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Original Testimonials Section */}
-        <div className="py-20">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+        {/* Testimonials Section */}
+        <div className="py-12 md:py-16 lg:py-20">
+          <div className="text-center mb-10 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 md:mb-6">
               What Our <span className="text-primary">Lovely Learners</span> Say
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto px-4">
               Real stories from real people who have transformed their English skills with Speak Bee.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {testimonials.map((testimonial, index) => (
               <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/90 backdrop-blur-sm">
-                <CardContent className="p-8">
-                  <div className="flex items-center mb-6">
-                    <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-2xl mr-4">
+                <CardContent className="p-6 md:p-8">
+                  <div className="flex items-center mb-4 md:mb-6">
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/20 flex items-center justify-center text-xl md:text-2xl mr-3 md:mr-4 flex-shrink-0">
                       {testimonial.image}
                     </div>
-                    <div>
-                      <h4 className="font-bold text-lg">{testimonial.name}</h4>
-                      <p className="text-muted-foreground text-sm">{testimonial.role} in {testimonial.location}</p>
+                    <div className="min-w-0">
+                      <h4 className="font-bold text-base md:text-lg truncate">{testimonial.name}</h4>
+                      <p className="text-muted-foreground text-xs md:text-sm truncate">{testimonial.role} in {testimonial.location}</p>
                       <div className="flex text-yellow-400 mt-1">
                         {[...Array(testimonial.rating)].map((_, i) => (
-                          <Star key={i} className="w-4 h-4 fill-current" />
+                          <Star key={i} className="w-3 h-3 md:w-4 md:h-4 fill-current" />
                         ))}
                       </div>
                     </div>
                   </div>
-                  <p className="text-muted-foreground leading-relaxed italic">
+                  <p className="text-sm md:text-base text-muted-foreground leading-relaxed italic">
                     "{testimonial.content}"
                   </p>
                 </CardContent>
@@ -425,15 +434,15 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Testimonials Section - Model Image Style */}
-        <div className="py-20">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start mb-16">
+        {/* Featured Testimonials Section */}
+        <div className="py-12 md:py-16 lg:py-20">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-start mb-10 md:mb-16">
             {/* Left Side - Title */}
             <div>
-              <h2 className="text-4xl sm:text-5xl font-bold mb-6">
-                What Our <span className="relative">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
+                What Our <span className="relative inline-block">
                   <span className="text-primary">Lovely</span>
-                  <svg className="absolute -bottom-2 left-0 w-full h-3 text-orange-400" viewBox="0 0 200 12" fill="none">
+                  <svg className="absolute -bottom-1 md:-bottom-2 left-0 w-full h-2 md:h-3 text-orange-400" viewBox="0 0 200 12" fill="none">
                     <path d="M2 8C50 2 100 10 150 6C180 4 200 8 200 8" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
                   </svg>
                 </span> Learners Say
@@ -442,23 +451,23 @@ const Index = () => {
 
             {/* Right Side - Description */}
             <div className="relative">
-              <div className="absolute -top-4 -right-4 w-6 h-6 text-primary">
+              <div className="absolute -top-3 -right-3 md:-top-4 md:-right-4 w-5 h-5 md:w-6 md:h-6 text-primary hidden sm:block">
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                 </svg>
               </div>
-              <p className="text-lg text-muted-foreground leading-relaxed">
+              <p className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed">
                 We recently heard from Sarah Johnson, who started learning with Speak Bee in the spring of 2024. 
                 Below, she shares her story of how she was able to improve her English skills quickly.
               </p>
               {/* Decorative lines */}
-              <div className="absolute -bottom-8 -right-8 w-12 h-1 bg-primary/60 rounded-full"></div>
-              <div className="absolute -bottom-6 -right-6 w-8 h-1 bg-primary/40 rounded-full"></div>
+              <div className="absolute -bottom-6 -right-6 md:-bottom-8 md:-right-8 w-10 md:w-12 h-1 bg-primary/60 rounded-full hidden sm:block"></div>
+              <div className="absolute -bottom-4 -right-4 md:-bottom-6 md:-right-6 w-6 md:w-8 h-1 bg-primary/40 rounded-full hidden sm:block"></div>
             </div>
           </div>
 
           {/* Testimonial Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {[
               {
                 name: "James Hown",
@@ -486,22 +495,22 @@ const Index = () => {
               }
             ].map((testimonial, index) => (
               <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/90 backdrop-blur-sm">
-                <CardContent className="p-8">
-                  <div className="flex items-center mb-6">
-                    <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-2xl mr-4">
+                <CardContent className="p-6 md:p-8">
+                  <div className="flex items-center mb-4 md:mb-6">
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/20 flex items-center justify-center text-xl md:text-2xl mr-3 md:mr-4 flex-shrink-0">
                       {testimonial.image}
                     </div>
-                    <div>
-                      <h4 className="font-bold text-lg text-primary">{testimonial.name}</h4>
-                      <p className="text-muted-foreground text-sm">{testimonial.role} in {testimonial.location}</p>
+                    <div className="min-w-0">
+                      <h4 className="font-bold text-base md:text-lg text-primary truncate">{testimonial.name}</h4>
+                      <p className="text-muted-foreground text-xs md:text-sm truncate">{testimonial.role} in {testimonial.location}</p>
                       <div className="flex text-yellow-400 mt-1">
                         {[...Array(testimonial.rating)].map((_, i) => (
-                          <Star key={i} className="w-4 h-4 fill-current" />
+                          <Star key={i} className="w-3 h-3 md:w-4 md:h-4 fill-current" />
                         ))}
                       </div>
                     </div>
                   </div>
-                  <p className="text-muted-foreground leading-relaxed italic">
+                  <p className="text-sm md:text-base text-muted-foreground leading-relaxed italic">
                     "{testimonial.content}"
                   </p>
                 </CardContent>
@@ -510,15 +519,15 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Content Section - Model Image Style */}
-        <div className="py-20">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start mb-16">
+        {/* Content Resources Section */}
+        <div className="py-12 md:py-16 lg:py-20">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-start mb-10 md:mb-16">
             {/* Left Side - Title */}
             <div>
-              <h2 className="text-4xl sm:text-5xl font-bold mb-6">
-                Useful Content For Your <span className="relative">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
+                Useful Content For Your <span className="relative inline-block">
                   <span className="text-primary">Check</span>
-                  <svg className="absolute -bottom-2 left-0 w-full h-3 text-orange-400" viewBox="0 0 200 12" fill="none">
+                  <svg className="absolute -bottom-1 md:-bottom-2 left-0 w-full h-2 md:h-3 text-orange-400" viewBox="0 0 200 12" fill="none">
                     <path d="M2 8C50 2 100 10 150 6C180 4 200 8 200 8" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
                   </svg>
                 </span>
@@ -527,12 +536,12 @@ const Index = () => {
 
             {/* Right Side - Description */}
             <div className="relative">
-              <div className="absolute -top-4 -right-4 w-6 h-6 text-primary">
+              <div className="absolute -top-3 -right-3 md:-top-4 md:-right-4 w-5 h-5 md:w-6 md:h-6 text-primary hidden sm:block">
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                 </svg>
               </div>
-              <p className="text-lg text-muted-foreground leading-relaxed">
+              <p className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed">
                 Looking to become fluent in English? Speak Bee is now servicing learners worldwide! 
                 English learning is a rewarding journey for aspiring speakers, part-time learners, and exam candidates.
               </p>
@@ -540,7 +549,7 @@ const Index = () => {
           </div>
 
           {/* Content Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {[
               {
                 title: "How Speak Bee helped me start speaking in 11 days",
@@ -558,17 +567,17 @@ const Index = () => {
                 color: "bg-accent/10"
               }
             ].map((item, index) => (
-              <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/90 backdrop-blur-sm">
+              <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/90 backdrop-blur-sm overflow-hidden">
                 <CardContent className="p-0">
                   {/* Image placeholder */}
-                  <div className={`w-full h-48 ${item.color} flex items-center justify-center text-6xl mb-6`}>
+                  <div className={`w-full h-36 md:h-48 ${item.color} flex items-center justify-center text-4xl md:text-6xl`}>
                     {item.image}
                   </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold mb-4 text-primary">{item.title}</h3>
+                  <div className="p-4 md:p-6">
+                    <h3 className="text-base md:text-xl font-bold mb-3 md:mb-4 text-primary leading-tight">{item.title}</h3>
                     <div className="flex justify-end">
-                      <div className="w-8 h-8 rounded-full bg-orange-400 flex items-center justify-center">
-                        <ArrowRight className="w-4 h-4 text-white" />
+                      <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-orange-400 flex items-center justify-center hover:scale-110 transition-transform">
+                        <ArrowRight className="w-3 h-3 md:w-4 md:h-4 text-white" />
                       </div>
                     </div>
                   </div>
@@ -580,7 +589,7 @@ const Index = () => {
       </div>
 
       {/* Additional Landing Components */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* Manage Section - Features with Interactive Illustrations */}
         <ManageSection show={showManage} />
 
@@ -591,23 +600,23 @@ const Index = () => {
         <DeploySection show={showDeploy} />
 
         {/* Call to Action */}
-        <div className="py-10">
-          <div className="bg-gradient-to-br from-primary to-secondary rounded-3xl p-12 text-center text-white">
-            <h2 className="text-3xl text-white sm:text-4xl font-bold mb-6">
+        <div className="py-8 md:py-10 lg:py-12">
+          <div className="bg-gradient-to-br from-primary to-secondary rounded-2xl md:rounded-3xl p-8 md:p-12 lg:p-16 text-center text-white">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white font-bold mb-4 md:mb-6">
               Ready to Master English?
             </h2>
-            <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto text-black">
+            <p className="text-base sm:text-lg md:text-xl mb-6 md:mb-8 opacity-90 max-w-2xl mx-auto text-white px-4">
               Join thousands of learners who are already improving their English skills with our AI-powered platform.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-white text-primary hover:bg-white/90 px-8 py-4 text-lg rounded-full">
-                <Play className="w-5 h-5 mr-2" />
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
+              <Button size="lg" className="bg-white text-primary hover:bg-white/90 px-6 py-3 md:px-8 md:py-4 text-base md:text-lg rounded-full shadow-lg hover:shadow-xl transition-all">
+                <Play className="w-4 h-4 md:w-5 md:h-5 mr-2" />
                 Start Your Journey
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary px-8 py-4 text-lg rounded-full">
+              <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-primary px-6 py-3 md:px-8 md:py-4 text-base md:text-lg rounded-full transition-all">
                 <Link to="/about" className="flex items-center">
                   Learn More
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                  <ArrowRight className="w-4 h-4 md:w-5 md:h-5 ml-2" />
                 </Link>
               </Button>
             </div>
