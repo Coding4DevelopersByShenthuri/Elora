@@ -207,3 +207,5 @@ WARNING 2025-10-18 17:30:16,352 log 14984 15664 Not Found: /api/vocabulary/
 WARNING 2025-10-18 17:30:16,363 basehttp 14984 15664 "POST /api/vocabulary/ HTTP/1.1" 404 6344
 WARNING 2025-10-18 17:31:30,301 log 14984 15664 Not Found: /api/vocabulary/
 WARNING 2025-10-18 17:31:30,304 basehttp 14984 15664 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+INFO 2025-10-18 20:53:51,966 autoreload 19180 22756 Watching for file changes with StatReloader
+INFO 2025-10-18 21:01:01,780 autoreload 16220 18936 Watching for file changes with StatReloader
