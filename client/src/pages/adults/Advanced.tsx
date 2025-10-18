@@ -245,7 +245,7 @@ const AdvancedPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-indigo-50/30 pb-20 pt-32">
+    <div className="min-h-screen pb-20 pt-32">
       <div className="container mx-auto px-4">
         {/* Header Section */}
         <div className="text-center mb-12">

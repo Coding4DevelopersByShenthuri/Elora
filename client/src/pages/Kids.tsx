@@ -653,7 +653,7 @@ const KidsPage = () => {
   // Show auth modal if not authenticated
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50/20 to-purple-50/20 px-3 sm:px-4 md:px-6">
+      <div className="min-h-screen flex items-center justify-center px-3 sm:px-4 md:px-6">
         <AuthModal 
           isOpen={showAuthModal} 
           onClose={handleAuthModalClose}
@@ -687,7 +687,7 @@ const KidsPage = () => {
   return (
     <div 
       ref={containerRef} 
-      className="min-h-screen pb-16 sm:pb-20 pt-24 sm:pt-32 md:pt-40 bg-gradient-to-br from-slate-50 via-blue-50/20 to-purple-50/20 relative overflow-hidden"
+      className="min-h-screen pb-16 sm:pb-20 pt-24 sm:pt-32 md:pt-40 relative overflow-hidden"
     >
       {/* Auth Modal */}
       <AuthModal 
