@@ -25,7 +25,9 @@ interface ModelDownloadManagerProps {
 const ModelDownloadManager = ({ onComplete, userLevel = 'beginner', hideHeader = false }: ModelDownloadManagerProps) => {
   const [models, setModels] = useState<ModelInfo[]>([]);
   const [downloadingModel, setDownloadingModel] = useState<string | null>(null);
-  const [downloadProgress, setDownloadProgress] = useState(0);
+  const [downloadProgress, setDownloadProgress] = useState<{ [key: string]: number }>({});
+  const [isDownloadingAll, setIsDownloadingAll] = useState(false);
+  const [overallProgress, setOverallProgress] = useState(0);
   const [storageInfo, setStorageInfo] = useState({ used: 0, available: 0 });
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
@@ -52,12 +54,21 @@ const ModelDownloadManager = ({ onComplete, userLevel = 'beginner', hideHeader =
       
       const modelList: ModelInfo[] = [
         {
+          id: 'piper-en-us-lessac-medium',
+          name: '🎤 Kid-Friendly Voices (Piper TTS)',
+          description: 'HIGH-QUALITY voices for stories - Natural & Fun! Works offline!',
+          size: '28 MB',
+          sizeBytes: 28 * 1024 * 1024,
+          category: 'essential',
+          cached: availableModels.find(m => m.id === 'piper-en-us-lessac-medium')?.cached || false
+        },
+        {
           id: 'whisper-tiny-en',
           name: 'Speech Recognition (Tiny)',
           description: 'Fast speech-to-text for kids',
           size: '75 MB',
           sizeBytes: 75 * 1024 * 1024,
-          category: 'essential',
+          category: 'recommended',
           cached: availableModels.find(m => m.id === 'whisper-tiny-en')?.cached || false
         },
         {
@@ -66,7 +77,7 @@ const ModelDownloadManager = ({ onComplete, userLevel = 'beginner', hideHeader =
           description: 'Smart feedback and conversations',
           size: '82 MB',
           sizeBytes: 82 * 1024 * 1024,
-          category: 'essential',
+          category: 'recommended',
           cached: availableModels.find(m => m.id === 'distilgpt2')?.cached || false
         },
         {
@@ -75,7 +86,7 @@ const ModelDownloadManager = ({ onComplete, userLevel = 'beginner', hideHeader =
           description: 'More accurate speech recognition',
           size: '142 MB',
           sizeBytes: 142 * 1024 * 1024,
-          category: 'recommended',
+          category: 'optional',
           cached: availableModels.find(m => m.id === 'whisper-base-en')?.cached || false
         },
         {
@@ -84,7 +95,7 @@ const ModelDownloadManager = ({ onComplete, userLevel = 'beginner', hideHeader =
           description: 'Better conversations and feedback',
           size: '124 MB',
           sizeBytes: 124 * 1024 * 1024,
-          category: userLevel === 'advanced' ? 'recommended' : 'optional',
+          category: 'optional',
           cached: availableModels.find(m => m.id === 'gpt2')?.cached || false
         }
       ];
@@ -107,39 +118,49 @@ const ModelDownloadManager = ({ onComplete, userLevel = 'beginner', hideHeader =
     }
   };
 
-  const downloadModel = async (modelId: string) => {
+  const downloadModel = async (modelId: string, skipRefresh = false) => {
     if (!isOnline) {
       alert('⚠️ No internet connection. Please connect to WiFi to download models.');
       return;
     }
 
     setDownloadingModel(modelId);
-    setDownloadProgress(0);
+    setDownloadProgress(prev => ({ ...prev, [modelId]: 0 }));
     
     try {
       await ModelManager.downloadModel(modelId, (progress: any) => {
-        setDownloadProgress(typeof progress === 'number' ? progress : progress.progress || 0);
+        const percentage = typeof progress === 'number' 
+          ? progress 
+          : Math.round(progress.percentage) || 0;
+        setDownloadProgress(prev => ({ ...prev, [modelId]: percentage }));
       });
       
-      // Refresh model list
-      await loadModels();
-      await loadStorageInfo();
+      // Set to 100% when complete
+      setDownloadProgress(prev => ({ ...prev, [modelId]: 100 }));
       
-      // Check if all essential models are downloaded
-      const updatedModels = await ModelManager.getAvailableModels();
-      const essentialDownloaded = models
-        .filter(m => m.category === 'essential')
-        .every(m => updatedModels.find(um => um.id === m.id)?.cached);
-      
-      if (essentialDownloaded && onComplete) {
-        onComplete();
+      // Refresh model list if not part of batch download
+      if (!skipRefresh) {
+        await loadModels();
+        await loadStorageInfo();
+        
+        // Check if all essential models are downloaded
+        const updatedModels = await ModelManager.getAvailableModels();
+        const essentialDownloaded = models
+          .filter(m => m.category === 'essential')
+          .every(m => updatedModels.find(um => um.id === m.id)?.cached);
+        
+        if (essentialDownloaded && onComplete) {
+          onComplete();
+        }
       }
     } catch (error) {
       console.error('Error downloading model:', error);
       alert('Failed to download model. Please try again.');
+      setDownloadProgress(prev => ({ ...prev, [modelId]: 0 }));
     } finally {
-      setDownloadingModel(null);
-      setDownloadProgress(0);
+      if (!skipRefresh) {
+        setDownloadingModel(null);
+      }
     }
   };
 
@@ -156,10 +177,70 @@ const ModelDownloadManager = ({ onComplete, userLevel = 'beginner', hideHeader =
   };
 
   const downloadAllEssential = async () => {
+    if (!isOnline) {
+      alert('⚠️ No internet connection. Please connect to WiFi to download models.');
+      return;
+    }
+
     const essentialModels = models.filter(m => m.category === 'essential' && !m.cached);
     
-    for (const model of essentialModels) {
-      await downloadModel(model.id);
+    if (essentialModels.length === 0) {
+      return;
+    }
+
+    setIsDownloadingAll(true);
+    setOverallProgress(0);
+    
+    try {
+      const totalSize = essentialModels.reduce((sum, m) => sum + m.sizeBytes, 0);
+      let completedSize = 0;
+      
+      for (let i = 0; i < essentialModels.length; i++) {
+        const model = essentialModels[i];
+        
+        setDownloadingModel(model.id);
+        setDownloadProgress(prev => ({ ...prev, [model.id]: 0 }));
+        
+        await ModelManager.downloadModel(model.id, (progress: any) => {
+          const percentage = typeof progress === 'number' 
+            ? progress 
+            : Math.round(progress.percentage) || 0;
+          
+          // Update individual model progress
+          setDownloadProgress(prev => ({ ...prev, [model.id]: percentage }));
+          
+          // Calculate overall progress
+          const currentModelProgress = (percentage / 100) * model.sizeBytes;
+          const overall = ((completedSize + currentModelProgress) / totalSize) * 100;
+          setOverallProgress(Math.round(overall));
+        });
+        
+        // Mark this model as complete
+        setDownloadProgress(prev => ({ ...prev, [model.id]: 100 }));
+        completedSize += model.sizeBytes;
+        setOverallProgress(Math.round((completedSize / totalSize) * 100));
+      }
+      
+      // Refresh everything at the end
+      await loadModels();
+      await loadStorageInfo();
+      
+      // Check if all essential models are downloaded
+      const updatedModels = await ModelManager.getAvailableModels();
+      const essentialDownloaded = models
+        .filter(m => m.category === 'essential')
+        .every(m => updatedModels.find(um => um.id === m.id)?.cached);
+      
+      if (essentialDownloaded && onComplete) {
+        onComplete();
+      }
+    } catch (error) {
+      console.error('Error downloading models:', error);
+      alert('Failed to download some models. Please try again.');
+    } finally {
+      setIsDownloadingAll(false);
+      setDownloadingModel(null);
+      setOverallProgress(0);
     }
   };
 
@@ -255,24 +336,44 @@ const ModelDownloadManager = ({ onComplete, userLevel = 'beginner', hideHeader =
       {!allEssentialDownloaded && (
         <Card className="border-2 border-yellow-400 dark:border-yellow-500 bg-yellow-50/50 dark:bg-yellow-900/30 shadow-sm">
           <CardContent className="py-3 sm:py-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div className="flex-1">
-                <p className="font-bold text-sm sm:text-base text-gray-900 dark:text-white mb-1">
-                  ⚡ Quick Start (Recommended)
-                </p>
-                <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Download all essential models at once ({formatBytes(totalEssentialSize)})
-                </p>
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex-1">
+                  <p className="font-bold text-sm sm:text-base text-gray-900 dark:text-white mb-1">
+                    ⚡ Quick Start (Recommended)
+                  </p>
+                  <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Download all essential models at once ({formatBytes(totalEssentialSize)})
+                  </p>
+                </div>
+                <Button
+                  onClick={downloadAllEssential}
+                  disabled={!isOnline || isDownloadingAll}
+                  className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] w-full sm:w-auto text-sm font-bold shadow-md"
+                  size="sm"
+                >
+                  {isDownloadingAll ? (
+                    <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 animate-spin" />
+                  ) : (
+                    <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  )}
+                  {isDownloadingAll ? 'Downloading...' : 'Download All'}
+                </Button>
               </div>
-              <Button
-                onClick={downloadAllEssential}
-                disabled={!isOnline || downloadingModel !== null}
-                className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] w-full sm:w-auto text-sm font-bold shadow-md"
-                size="sm"
-              >
-                <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                Download All
-              </Button>
+              
+              {isDownloadingAll && (
+                <div className="mt-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs sm:text-sm font-bold text-blue-700 dark:text-blue-400">
+                      Overall Progress
+                    </span>
+                    <span className="text-xs sm:text-sm font-mono font-bold text-blue-700 dark:text-blue-400">
+                      {overallProgress}%
+                    </span>
+                  </div>
+                  <Progress value={overallProgress} className="h-2 sm:h-2.5" />
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -290,7 +391,7 @@ const ModelDownloadManager = ({ onComplete, userLevel = 'beginner', hideHeader =
                 key={model.id}
                 model={model}
                 isDownloading={downloadingModel === model.id}
-                downloadProgress={downloadProgress}
+                downloadProgress={downloadProgress[model.id] || 0}
                 onDownload={downloadModel}
                 onDelete={deleteModel}
                 isOnline={isOnline}
@@ -312,7 +413,7 @@ const ModelDownloadManager = ({ onComplete, userLevel = 'beginner', hideHeader =
                 key={model.id}
                 model={model}
                 isDownloading={downloadingModel === model.id}
-                downloadProgress={downloadProgress}
+                downloadProgress={downloadProgress[model.id] || 0}
                 onDownload={downloadModel}
                 onDelete={deleteModel}
                 isOnline={isOnline}
@@ -334,7 +435,7 @@ const ModelDownloadManager = ({ onComplete, userLevel = 'beginner', hideHeader =
                 key={model.id}
                 model={model}
                 isDownloading={downloadingModel === model.id}
-                downloadProgress={downloadProgress}
+                downloadProgress={downloadProgress[model.id] || 0}
                 onDownload={downloadModel}
                 onDelete={deleteModel}
                 isOnline={isOnline}

@@ -34,6 +34,17 @@ class ModelManagerClass {
   // Available models configuration
   private availableModels: ModelInfo[] = [
     {
+      id: 'piper-en-us-lessac-medium',
+      name: 'Piper TTS - Kid Voices',
+      type: 'tts',
+      size: 28 * 1024 * 1024, // ~28MB
+      quantization: 'none',
+      url: 'https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/lessac/medium/en_US-lessac-medium.onnx',
+      version: '1.0.0',
+      cached: false,
+      description: 'High-quality kid-friendly voices for stories (works offline!)'
+    },
+    {
       id: 'whisper-tiny-en',
       name: 'Whisper Tiny English',
       type: 'stt',

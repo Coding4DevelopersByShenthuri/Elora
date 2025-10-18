@@ -106,17 +106,22 @@ const KidsPage = () => {
         const health = await HybridServiceManager.getSystemHealth();
         console.log('📊 System Health:', health);
 
-        // 3. Check if essential models are downloaded
+        // 3. Check if essential models are downloaded (prioritize Piper TTS for better voice)
+        const piperReady = await ModelManager.isModelCached('piper-en-us-lessac-medium');
         const whisperReady = await ModelManager.isModelCached('whisper-tiny-en');
         const llmReady = await ModelManager.isModelCached('distilgpt2');
 
-        setModelsReady(whisperReady || llmReady);
+        setModelsReady(piperReady || whisperReady || llmReady);
 
         // 4. If models aren't ready, user can click "Download AI Tutor" button
-        if (!whisperReady && !llmReady) {
+        if (!piperReady && !whisperReady && !llmReady) {
           console.log('📦 Models not found. User can download from Model Manager page.');
+          console.log('💡 Download Piper TTS for high-quality kid voices!');
         } else {
           console.log('✅ Models ready! Initializing services...');
+          if (piperReady) {
+            console.log('🎤 Piper TTS available - using high-quality kid voices!');
+          }
           
           // Initialize services in parallel
           await Promise.allSettled([
@@ -717,32 +722,38 @@ const KidsPage = () => {
           </div>
         </div>
 
-        {/* Sync Status & Settings Bar */}
-        <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 px-2 sm:px-0">
-          <SyncStatusIndicator showDetails={false} className="flex-shrink-0 w-full sm:w-auto" />
-          
-          <div className="flex gap-2 sm:gap-3 w-full sm:w-auto justify-stretch sm:justify-end flex-wrap">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate('/model-manager')}
-              className="rounded-xl flex-1 sm:flex-initial sm:w-auto sm:max-w-[160px] text-xs sm:text-sm border-2 border-blue-300 dark:border-blue-600 bg-blue-50/40 dark:bg-blue-900/10 hover:bg-blue-100/60 dark:hover:bg-blue-900/20 text-gray-800 dark:text-white font-semibold backdrop-blur-sm transition-colors whitespace-nowrap"
-            >
-              <Settings className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-blue-600 dark:text-blue-400 flex-shrink-0" />
-              <span className="hidden sm:inline">Manage Models</span>
-              <span className="sm:hidden">Models</span>
-            </Button>
+      
+        <div className="mb-4 sm:mb-6 w-full max-w-full px-2 sm:px-0">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 w-full">
+            {/* SyncStatusIndicator: Limited to 50% width on desktop to ensure buttons have space */}
+            <div className="flex-shrink w-full sm:w-auto sm:max-w-[50%] overflow-hidden">
+              <SyncStatusIndicator showDetails={false} className="w-full sm:w-auto" />
+            </div>
             
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate('/parental-controls')}
-              className="rounded-xl flex-1 sm:flex-initial sm:w-auto sm:max-w-[160px] text-xs sm:text-sm border-2 border-purple-300 dark:border-purple-600 bg-purple-50/40 dark:bg-purple-900/10 hover:bg-purple-100/60 dark:hover:bg-purple-900/20 text-gray-800 dark:text-white font-semibold backdrop-blur-sm transition-colors whitespace-nowrap"
-            >
-              <Lock className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-purple-600 dark:text-purple-400 flex-shrink-0" />
-              <span className="hidden sm:inline">Parent Controls</span>
-              <span className="sm:hidden">Parent</span>
-            </Button>
+            {/* Action Buttons: Always visible, never overflow on any screen size */}
+            <div className="flex gap-2 sm:gap-3 w-full sm:w-auto sm:flex-shrink-0 justify-stretch sm:justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/model-manager')}
+                className="rounded-xl flex-1 sm:flex-none text-xs sm:text-sm border-2 border-blue-300 dark:border-blue-600 bg-blue-50/40 dark:bg-blue-900/10 hover:bg-blue-100/60 dark:hover:bg-blue-900/20 text-gray-800 dark:text-white font-semibold backdrop-blur-sm transition-colors whitespace-nowrap px-3 sm:px-4"
+              >
+                <Settings className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                <span className="hidden sm:inline">Manage Models</span>
+                <span className="sm:hidden">Models</span>
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/parental-controls')}
+                className="rounded-xl flex-1 sm:flex-none text-xs sm:text-sm border-2 border-purple-300 dark:border-purple-600 bg-purple-50/40 dark:bg-purple-900/10 hover:bg-purple-100/60 dark:hover:bg-purple-900/20 text-gray-800 dark:text-white font-semibold backdrop-blur-sm transition-colors whitespace-nowrap px-3 sm:px-4"
+              >
+                <Lock className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-purple-600 dark:text-purple-400 flex-shrink-0" />
+                <span className="hidden sm:inline">Parent Controls</span>
+                <span className="sm:hidden">Parent</span>
+              </Button>
+            </div>
           </div>
         </div>
 

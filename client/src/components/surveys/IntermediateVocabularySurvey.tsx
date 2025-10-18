@@ -147,16 +147,16 @@ const IntermediateVocabularySurvey: React.FC<IntermediateVocabularySurveyProps> 
             </div>
 
             {/* Right content */}
-            <div className="w-1/2 bg-white p-8 lg:p-16 flex flex-col pt-16">
+            <div className="w-1/2 bg-white p-8 lg:p-16 flex flex-col pt-8">
               <div className="max-w-xl mx-auto w-full">
                 <SurveyProgress currentStep={currentStep!} totalSteps={totalSteps!} onBack={onBack} variant="desktop" />
 
                 <h1 className="text-2xl md:text-[40px] leading-snug md:leading-[1.2] font-bold text-blue-900 mb-2 text-center">
                   Select all the words you know:
                 </h1>
-                <p className="text-gray-500 text-center mb-8">B1-B2 Intermediate Level</p>
+                <p className="text-gray-500 text-center mb-6">B1-B2 Intermediate Level</p>
 
-                <div className="mt-2 max-h-[420px] overflow-y-auto pr-2">
+                <div className="mt-2 max-h-[360px] overflow-y-auto pr-2">
                   <div className="grid grid-cols-4 gap-2">
                     {firstTwelve.map((w) => {
                       const isSelected = selectedWords.has(w);
@@ -251,7 +251,7 @@ const IntermediateVocabularySurvey: React.FC<IntermediateVocabularySurveyProps> 
                   </div>
                 </div>
 
-                <div className="mt-6 flex justify-center">
+                <div className="mt-4 flex justify-center">
                   <button onClick={handleContinue} className="w-full max-w-sm rounded-xl px-5 py-3 bg-blue-600 text-white font-semibold shadow-sm">Continue</button>
                 </div>
               </div>
