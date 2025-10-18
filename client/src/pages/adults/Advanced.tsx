@@ -245,7 +245,7 @@ const AdvancedPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/30 to-slate-900 dark:from-slate-900 dark:via-purple-950/20 dark:to-slate-900 pb-20 pt-32">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-indigo-50/30 pb-20 pt-32">
       <div className="container mx-auto px-4">
         {/* Header Section */}
         <div className="text-center mb-12">
@@ -253,23 +253,23 @@ const AdvancedPage = () => {
             <div className="relative">
               <div className="absolute inset-0 bg-purple-500 rounded-xl blur-md opacity-30 animate-pulse"></div>
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-indigo-400 dark:from-purple-300 dark:to-indigo-300 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
               Expert English Mastery
             </h1>
           </div>
-          <p className="text-lg text-gray-300 dark:text-gray-400 max-w-3xl mx-auto mb-6 leading-relaxed">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6 leading-relaxed">
             Achieve professional excellence with near-native fluency, executive communication skills, and sophisticated cultural intelligence
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <Badge variant="secondary" className="bg-purple-500/20 dark:bg-purple-900/30 text-purple-300 dark:text-purple-400 border-purple-500/30 dark:border-purple-800 px-4 py-1">
+            <Badge variant="secondary" className="bg-purple-100/80 backdrop-blur-sm text-purple-700 border-purple-200 px-4 py-1">
               <Crown className="w-3 h-3 mr-2" />
               Expert Level
             </Badge>
-            <Badge variant="secondary" className="bg-blue-500/20 dark:bg-blue-900/30 text-blue-300 dark:text-blue-400 border-blue-500/30 dark:border-blue-800 px-4 py-1">
+            <Badge variant="secondary" className="bg-blue-100/80 backdrop-blur-sm text-blue-700 border-blue-200 px-4 py-1">
               <Lightbulb className="w-3 h-3 mr-2" />
               Executive Communication
             </Badge>
-            <Badge variant="secondary" className="bg-emerald-500/20 dark:bg-emerald-900/30 text-emerald-300 dark:text-emerald-400 border-emerald-500/30 dark:border-emerald-800 px-4 py-1">
+            <Badge variant="secondary" className="bg-emerald-100/80 backdrop-blur-sm text-emerald-700 border-emerald-200 px-4 py-1">
               <TargetIcon className="w-3 h-3 mr-2" />
               Professional Excellence
             </Badge>
@@ -279,36 +279,36 @@ const AdvancedPage = () => {
         {/* Elite Progress Dashboard */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
           {/* Mastery Progress */}
-          <Card className="lg:col-span-2 bg-slate-800/60 dark:bg-gray-800 border border-slate-700 dark:border-gray-700 shadow-xl">
+          <Card className="lg:col-span-2 bg-white/80 backdrop-blur-md border border-gray-200 shadow-lg">
             <CardContent className="p-8">
               <div className="flex items-center justify-between mb-8">
                 <div>
-                  <h3 className="text-2xl font-semibold text-white dark:text-white">Expert Progress Tracking</h3>
-                  <p className="text-gray-400 dark:text-gray-400">Your journey to professional English mastery</p>
+                  <h3 className="text-2xl font-semibold text-foreground">Expert Progress Tracking</h3>
+                  <p className="text-muted-foreground">Your journey to professional English mastery</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-3xl font-bold text-purple-400 dark:text-purple-400">{progress}%</div>
-                  <div className="text-gray-400 dark:text-gray-400">Mastery Achievement</div>
+                  <div className="text-3xl font-bold text-purple-600">{progress}%</div>
+                  <div className="text-muted-foreground">Mastery Achievement</div>
                 </div>
               </div>
 
-              <Progress value={progress} className="h-3 bg-slate-700 dark:bg-gray-700 mb-8">
+              <Progress value={progress} className="h-3 bg-gray-200/50 mb-8">
                 <div className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full transition-all duration-500" />
               </Progress>
               
               {/* Mastery Metrics */}
               <div className="space-y-6">
-                <h4 className="font-semibold text-white dark:text-white text-lg">Expert Skill Development</h4>
+                <h4 className="font-semibold text-foreground text-lg">Expert Skill Development</h4>
                 {masteryMetrics.map((metric, index) => (
                   <div key={index} className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-300 dark:text-gray-300">{metric.skill}</span>
+                      <span className="text-sm font-medium text-foreground">{metric.skill}</span>
                       <div className="flex items-center gap-3">
-                        <span className="text-xs text-gray-400 dark:text-gray-400">Target: {metric.target}%</span>
-                        <span className="text-sm font-medium text-white dark:text-white w-12 text-right">{metric.progress}%</span>
+                        <span className="text-xs text-muted-foreground">Target: {metric.target}%</span>
+                        <span className="text-sm font-medium text-foreground w-12 text-right">{metric.progress}%</span>
                       </div>
                     </div>
-                    <Progress value={metric.progress} className="w-full h-2 bg-slate-700 dark:bg-gray-700">
+                    <Progress value={metric.progress} className="w-full h-2 bg-gray-200/50">
                       <div className={cn(
                         "h-full rounded-full transition-all duration-500 bg-gradient-to-r",
                         metric.color,
@@ -322,9 +322,9 @@ const AdvancedPage = () => {
           </Card>
 
           {/* Elite Stats & Achievements */}
-          <Card className="bg-slate-800/60 dark:bg-gray-800 border border-slate-700 dark:border-gray-700 shadow-xl">
+          <Card className="bg-white/80 backdrop-blur-md border border-gray-200 shadow-lg">
             <CardContent className="p-8">
-              <h3 className="text-xl font-semibold text-white dark:text-white mb-6">Expert Performance</h3>
+              <h3 className="text-xl font-semibold text-foreground mb-6">Expert Performance</h3>
               
               {/* Stats */}
               <div className="space-y-6 mb-8">
@@ -332,15 +332,15 @@ const AdvancedPage = () => {
                   const Icon = stat.icon;
                   return (
                     <div key={index} className="flex items-center gap-4">
-                      <div className={cn("p-3 rounded-xl bg-slate-700/50 dark:bg-gray-700", stat.color)}>
+                      <div className={cn("p-3 rounded-xl bg-gray-100/50 backdrop-blur-sm", stat.color)}>
                         <Icon className="w-5 h-5" />
                       </div>
                       <div className="flex-1">
                         <div className="flex justify-between items-baseline">
-                          <span className="text-sm font-medium text-gray-300 dark:text-gray-300">{stat.label}</span>
-                          <span className="text-lg font-bold text-white dark:text-white">{stat.value}</span>
+                          <span className="text-sm font-medium text-foreground">{stat.label}</span>
+                          <span className="text-lg font-bold text-foreground">{stat.value}</span>
                         </div>
-                        <p className="text-xs text-gray-400 dark:text-gray-400">{stat.description}</p>
+                        <p className="text-xs text-muted-foreground">{stat.description}</p>
                       </div>
                     </div>
                   );
@@ -349,7 +349,7 @@ const AdvancedPage = () => {
 
               {/* Achievements */}
               <div>
-                <h4 className="text-lg font-semibold text-white dark:text-white mb-4">Expert Certifications</h4>
+                <h4 className="text-lg font-semibold text-foreground mb-4">Expert Certifications</h4>
                 <div className="grid grid-cols-2 gap-3">
                   {achievements.map((achievement, index) => {
                     const Icon = achievement.icon;
@@ -357,10 +357,10 @@ const AdvancedPage = () => {
 
                     return (
                       <div key={index} className={cn(
-                        "p-4 rounded-xl border transition-all duration-300 group cursor-pointer",
+                        "p-4 rounded-xl border transition-all duration-300 group cursor-pointer backdrop-blur-sm",
                         isEarned
-                          ? "bg-purple-500/10 border-purple-500/30 text-purple-300 dark:bg-purple-900/20 dark:border-purple-800 dark:text-purple-400 hover:bg-purple-500/20"
-                          : "bg-slate-700/30 border-slate-600 dark:bg-gray-700 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-slate-600/30"
+                          ? "bg-purple-100/70 border-purple-300 text-purple-700 hover:bg-purple-100"
+                          : "bg-gray-100/50 border-gray-300 text-muted-foreground hover:bg-gray-100"
                       )}>
                         <Icon className={cn(
                           "w-5 h-5 mb-2 transition-transform duration-300 group-hover:scale-110",
@@ -369,7 +369,7 @@ const AdvancedPage = () => {
                         )} />
                         <div className="text-sm font-medium mb-2">{achievement.name}</div>
                         {!isEarned && (
-                          <Progress value={achievement.progress} className="h-1 bg-slate-600 dark:bg-gray-600">
+                          <Progress value={achievement.progress} className="h-1 bg-gray-200/50">
                             <div className="h-full bg-purple-500 rounded-full" />
                           </Progress>
                         )}
@@ -386,8 +386,8 @@ const AdvancedPage = () => {
         <div className="mb-12">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-2xl font-bold text-white dark:text-white mb-2">Expert Challenge Labs</h2>
-              <p className="text-gray-400 dark:text-gray-400">High-stakes simulations for professional excellence</p>
+              <h2 className="text-2xl font-bold text-foreground mb-2">Expert Challenge Labs</h2>
+              <p className="text-muted-foreground">High-stakes simulations for professional excellence</p>
             </div>
           </div>
 
@@ -397,7 +397,7 @@ const AdvancedPage = () => {
               return (
                 <Card 
                   key={index} 
-                  className="group cursor-pointer bg-slate-800/40 dark:bg-gray-800 border border-slate-700 dark:border-gray-700 hover:border-purple-500/50 dark:hover:border-purple-600 transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-purple-500/10"
+                  className="group cursor-pointer bg-white/70 backdrop-blur-md border border-gray-200 hover:border-purple-400 transition-all duration-300 shadow-md hover:shadow-xl"
                   onMouseEnter={() => setIsHovered(index)}
                   onMouseLeave={() => setIsHovered(null)}
                 >
@@ -417,24 +417,24 @@ const AdvancedPage = () => {
                     </div>
                     
                     <div className="flex items-center gap-2 mb-3">
-                      <h4 className="font-semibold text-white dark:text-white text-lg">{activity.title}</h4>
+                      <h4 className="font-semibold text-foreground text-lg">{activity.title}</h4>
                       <Badge variant="outline" className={cn(
                         "text-xs border-0",
-                        activity.difficulty === "Expert" ? "bg-red-500/20 text-red-300" :
-                        activity.difficulty === "Very High" ? "bg-orange-500/20 text-orange-300" :
-                        "bg-yellow-500/20 text-yellow-300"
+                        activity.difficulty === "Expert" ? "bg-red-100/80 text-red-700" :
+                        activity.difficulty === "Very High" ? "bg-orange-100/80 text-orange-700" :
+                        "bg-yellow-100/80 text-yellow-700"
                       )}>
                         {activity.difficulty}
                       </Badge>
                     </div>
                     
-                    <p className="text-sm text-gray-400 dark:text-gray-400 mb-6 leading-relaxed">{activity.description}</p>
+                    <p className="text-sm text-muted-foreground mb-6 leading-relaxed">{activity.description}</p>
                     
                     <div className="flex items-center justify-between mb-4">
-                      <Badge variant="secondary" className="text-xs bg-slate-700/50 dark:bg-gray-700 text-gray-300">
+                      <Badge variant="secondary" className="text-xs bg-gray-100/80 text-foreground">
                         {activity.time}
                       </Badge>
-                      <Badge variant="outline" className="text-xs bg-purple-500/20 dark:bg-purple-900/20 text-purple-300 dark:text-purple-400">
+                      <Badge variant="outline" className="text-xs bg-purple-100/70 text-purple-700">
                         {activity.participants}
                       </Badge>
                     </div>
@@ -458,8 +458,8 @@ const AdvancedPage = () => {
         <div className="mb-12">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-2xl font-bold text-white dark:text-white">Expert Learning Modules</h2>
-              <p className="text-gray-400 dark:text-gray-400">Master sophisticated communication for professional leadership</p>
+              <h2 className="text-2xl font-bold text-foreground">Expert Learning Modules</h2>
+              <p className="text-muted-foreground">Master sophisticated communication for professional leadership</p>
             </div>
           </div>
 
@@ -472,10 +472,10 @@ const AdvancedPage = () => {
                   key={module.id}
                   variant={activeModule === module.id ? "default" : "outline"}
                   className={cn(
-                    "rounded-xl px-6 py-3 font-medium transition-all duration-300 border-2",
+                    "rounded-xl px-6 py-3 font-medium transition-all duration-300 border-2 backdrop-blur-sm",
                     activeModule === module.id 
                       ? "bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg border-transparent" 
-                      : "bg-slate-800/40 dark:bg-gray-800 border-slate-700 dark:border-gray-700 hover:border-purple-500/50 dark:hover:border-purple-600 text-gray-300 dark:text-gray-300 hover:shadow-md"
+                      : "bg-white/70 border-gray-300 hover:border-purple-400 text-foreground hover:shadow-md"
                   )}
                   onClick={() => setActiveModule(module.id)}
                 >
@@ -492,10 +492,10 @@ const AdvancedPage = () => {
               <Card 
                 key={index} 
                 className={cn(
-                  "group cursor-pointer border-2 transition-all duration-500 bg-slate-800/40 dark:bg-gray-800 hover:shadow-2xl hover:shadow-purple-500/10 overflow-hidden",
+                  "group cursor-pointer border-2 transition-all duration-500 bg-white/70 backdrop-blur-md hover:shadow-xl overflow-hidden",
                   lesson.completed 
-                    ? "border-emerald-500/30 dark:border-emerald-800 hover:border-emerald-400/50 dark:hover:border-emerald-600" 
-                    : "border-slate-700 dark:border-gray-700 hover:border-purple-500/50 dark:hover:border-purple-600"
+                    ? "border-emerald-300 hover:border-emerald-400" 
+                    : "border-gray-200 hover:border-purple-400"
                 )}
                 onMouseEnter={() => setIsHovered(index + 10)}
                 onMouseLeave={() => setIsHovered(null)}
@@ -538,7 +538,7 @@ const AdvancedPage = () => {
                   
                   {/* Content */}
                   <div className="p-6">
-                    <div className="flex justify-between text-sm text-gray-400 dark:text-gray-400 mb-4">
+                    <div className="flex justify-between text-sm text-muted-foreground mb-4">
                       <span className="flex items-center gap-2 font-medium">
                         <Clock className="w-4 h-4" />
                         {lesson.duration}
@@ -547,7 +547,7 @@ const AdvancedPage = () => {
                         <Target className="w-4 h-4" />
                         {lesson.focus}
                       </span>
-                      <Badge variant="secondary" className="bg-purple-500/20 text-purple-300 dark:text-purple-400 border-0 text-xs">
+                      <Badge variant="secondary" className="bg-purple-100/80 text-purple-700 border-0 text-xs">
                         {lesson.level}
                       </Badge>
                     </div>
@@ -555,10 +555,10 @@ const AdvancedPage = () => {
                     {/* Progress */}
                     <div className="space-y-2 mb-6">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-400 dark:text-gray-400">Module Progress</span>
-                        <span className="font-medium text-white dark:text-white">{lesson.progress}%</span>
+                        <span className="text-muted-foreground">Module Progress</span>
+                        <span className="font-medium text-foreground">{lesson.progress}%</span>
                       </div>
-                      <Progress value={lesson.progress} className="h-2 bg-slate-700 dark:bg-gray-700">
+                      <Progress value={lesson.progress} className="h-2 bg-gray-200/50">
                         <div className={cn("h-full rounded-full bg-gradient-to-r", lesson.color)} />
                       </Progress>
                     </div>

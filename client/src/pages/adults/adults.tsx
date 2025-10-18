@@ -205,7 +205,7 @@ const AdultsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-purple-50/20 dark:from-slate-900 dark:via-blue-950/10 dark:to-purple-950/10 pb-20 pt-32">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-purple-50/20 pb-20 pt-32">
       <div className="container mx-auto px-4">
         {/* Header Section */}
         <div className="text-center mb-12">

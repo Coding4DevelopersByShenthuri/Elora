@@ -5,7 +5,7 @@ import {
   Rabbit, Fish, Rocket, Cloud,
   Sun, CloudRain, CloudSnow, Footprints,
   ChevronLeft, ChevronRight, Anchor,
-  Shield, Download, Settings, Loader2, Lock
+  Shield, Download, Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -653,7 +653,7 @@ const KidsPage = () => {
   // Show auth modal if not authenticated
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50/20 to-purple-50/20 dark:from-slate-900 dark:via-blue-950/10 dark:to-purple-950/10 px-3 sm:px-4 md:px-6">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50/20 to-purple-50/20 px-3 sm:px-4 md:px-6">
         <AuthModal 
           isOpen={showAuthModal} 
           onClose={handleAuthModalClose}
@@ -687,7 +687,7 @@ const KidsPage = () => {
   return (
     <div 
       ref={containerRef} 
-      className="min-h-screen pb-16 sm:pb-20 pt-24 sm:pt-32 md:pt-40 bg-gradient-to-br from-slate-50 via-blue-50/20 to-purple-50/20 dark:from-slate-900 dark:via-blue-950/10 dark:to-purple-950/10 relative overflow-hidden"
+      className="min-h-screen pb-16 sm:pb-20 pt-24 sm:pt-32 md:pt-40 bg-gradient-to-br from-slate-50 via-blue-50/20 to-purple-50/20 relative overflow-hidden"
     >
       {/* Auth Modal */}
       <AuthModal 
@@ -778,37 +778,7 @@ const KidsPage = () => {
 
       
         <div className="mb-4 sm:mb-6 w-full max-w-full px-2 sm:px-0">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 w-full">
-            {/* SyncStatusIndicator: Limited to 50% width on desktop to ensure buttons have space */}
-            <div className="flex-shrink w-full sm:w-auto sm:max-w-[50%] overflow-hidden">
-              <SyncStatusIndicator showDetails={false} className="w-full sm:w-auto" />
-            </div>
-            
-            {/* Action Buttons: Always visible, never overflow on any screen size */}
-            <div className="flex gap-2 sm:gap-3 w-full sm:w-auto sm:flex-shrink-0 justify-stretch sm:justify-end">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate('/model-manager')}
-                className="rounded-xl flex-1 sm:flex-none text-xs sm:text-sm border-2 border-blue-300 dark:border-blue-600 bg-blue-50/40 dark:bg-blue-900/10 hover:bg-blue-100/60 dark:hover:bg-blue-900/20 text-gray-800 dark:text-white font-semibold backdrop-blur-sm transition-colors whitespace-nowrap px-3 sm:px-4"
-              >
-                <Settings className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-blue-600 dark:text-blue-400 flex-shrink-0" />
-                <span className="hidden sm:inline">Manage Models</span>
-                <span className="sm:hidden">Models</span>
-              </Button>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate('/parental-controls')}
-                className="rounded-xl flex-1 sm:flex-none text-xs sm:text-sm border-2 border-purple-300 dark:border-purple-600 bg-purple-50/40 dark:bg-purple-900/10 hover:bg-purple-100/60 dark:hover:bg-purple-900/20 text-gray-800 dark:text-white font-semibold backdrop-blur-sm transition-colors whitespace-nowrap px-3 sm:px-4"
-              >
-                <Lock className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-purple-600 dark:text-purple-400 flex-shrink-0" />
-                <span className="hidden sm:inline">Parent Controls</span>
-                <span className="sm:hidden">Parent</span>
-              </Button>
-            </div>
-          </div>
+          <SyncStatusIndicator showDetails={false} className="w-full sm:w-auto" />
         </div>
 
         {/* Stats Bar */}
@@ -1136,7 +1106,7 @@ const KidsPage = () => {
 
         {/* Quick Actions */}
         <div className="text-center px-4 sm:px-6">
-          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 dark:text-gray-300 mb-4 sm:mb-6 font-semibold">Ready for more fun? Let's play! 🎯</p>
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-900 dark:text-gray-300 mb-4 sm:mb-6 font-semibold">Ready for more fun? Let's play! 🎯</p>
           <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 max-w-4xl mx-auto">
             <Button 
               variant="outline" 

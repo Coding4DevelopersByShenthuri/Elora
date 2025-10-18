@@ -16,7 +16,7 @@ const ParentalControlsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-purple-50/20 dark:from-slate-900 dark:via-blue-950/10 dark:to-purple-950/10 pt-16 sm:pt-20">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-purple-50/20 pt-16 sm:pt-20">
       <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8 lg:p-10 pb-20">
         {/* Header with Back Button and Title */}
         <div className="flex items-center justify-between mb-3 sm:mb-4">
