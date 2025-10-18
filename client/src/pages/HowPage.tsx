@@ -22,9 +22,11 @@ import {
   Chrome,
   Sparkles,
   Zap,
-  Target
+  Target,
+  ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
 import { WaitlistModal } from '@/components/waitlist/WaitlistModal';
 
@@ -50,29 +52,6 @@ const FeatureCard = ({
   );
 };
 
-const WorkflowStep = ({
-  number,
-  title,
-  description,
-  color = "primary"
-}: {
-  number: number,
-  title: string,
-  description: string,
-  color?: string
-}) => {
-  return (
-    <div className="relative">
-      <div className={`absolute top-0 left-0 w-10 h-10 rounded-full bg-${color} dark:text-black text-white flex items-center justify-center font-bold text-lg z-10`}>
-        {number}
-      </div>
-      <div className="pl-16">
-        <h3 className="text-xl font-bold mb-2">{title}</h3>
-        <p className="text-foreground/80">{description}</p>
-      </div>
-    </div>
-  );
-};
 
 const FeatureShowcase = ({
   title,
@@ -167,57 +146,138 @@ const HowPage = () => {
       <div className="absolute bottom-1/3 left-0 w-[250px] h-[250px] rounded-full bg-accent/5 blur-3xl -z-10"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-36 pb-24">
-        {/* Hero Section */}
-        <div className="flex flex-col items-center text-center mb-24">
-          <div ref={heroRef} className="relative w-full max-w-3xl mx-auto">
-            <div className="absolute -z-10 w-[300px] h-[300px] rounded-full bg-gradient-to-r from-primary/30 to-accent/30 blur-3xl left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
-            <div className="glass-panel rounded-full py-5 px-8 inline-block mx-auto mb-12">
-              <h1 className="text-2xl md:text-3xl font-bold text-primary">How does Speak Bee work?</h1>
+        {/* Hero Section - Model Image Style */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
+          {/* Left Side - Student Image */}
+          <div className="relative">
+            <div className="relative">
+              {/* Student placeholder - using a gradient circle as placeholder */}
+              <div className="w-80 h-80 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                <div className="w-60 h-60 rounded-full bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center">
+                  <Brain className="w-24 h-24 text-primary" />
+                </div>
+              </div>
+              
+              {/* Background shapes */}
+              <div className="absolute -top-8 -left-8 w-32 h-32 bg-primary/10 rounded-2xl rotate-12"></div>
+              <div className="absolute -bottom-8 -right-8 w-24 h-24 bg-secondary/10 rounded-2xl -rotate-12"></div>
+              
+              {/* Decorative elements */}
+              <div className="absolute top-4 right-4 w-6 h-6 bg-orange-400 rounded-full animate-pulse"></div>
+              <div className="absolute bottom-4 left-4 w-4 h-4 bg-orange-400 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
             </div>
+          </div>
 
-            <p className="text-xl text-center text-foreground/80 max-w-2xl mx-auto mb-12">
-              There's powerful AI and advanced speech technology behind our English Trainer, but we've made it simple and intuitive to use for learners of all ages.
+          {/* Right Side - Content */}
+          <div className="space-y-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary font-medium mb-6">
+              <Sparkles className="w-4 h-4" />
+              <span>How It Works</span>
+            </div>
+            
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
+              How <span className="text-primary">Speak Bee</span> Works
+            </h1>
+            
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              There's powerful AI and advanced speech technology behind our English Trainer, 
+              but we've made it simple and intuitive to use for learners of all ages.
             </p>
 
-            <div className="flex justify-center">
-              <Button size="lg" className="rounded-full" asChild>
-                <Link to="/">
-                  Start exploring
-                </Link>
-              </Button>
+            {/* Decorative elements */}
+            <div className="flex space-x-2">
+              <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
+              <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
+              <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
             </div>
           </div>
         </div>
 
-        {/* Workflow Section */}
+        {/* Workflow Section - Model Image Style */}
         <div className="mb-24">
-          <h2 className="text-3xl font-bold text-center mb-12">How the App Works</h2>
-
-          <div className="relative">
-            <div className="absolute left-5 top-6 w-0.5 h-[calc(100%-60px)] bg-gradient-to-b from-primary via-accent to-primary/30"></div>
-
-            <div className="space-y-16 pl-4">
-              <WorkflowStep
-                number={1}
-                title="Choose Your Module"
-                description="Select the category that fits your learning needs: Kids, Adults (Beginner → Advanced), or IELTS/PTE exam practice."
-              />
-              <WorkflowStep
-                number={2}
-                title="Learn & Practice"
-                description="Engage in interactive lessons offline with AI-powered conversation simulations, pronunciation feedback, and grammar/vocabulary exercises."
-              />
-              <WorkflowStep
-                number={3}
-                title="Track Progress"
-                description="Monitor your improvements with offline progress tracking, achievement badges, scores, and streaks to stay motivated."
-              />
-              <WorkflowStep
-                number={4}
-                title="Master English"
-                description="Apply your skills in real conversations and exam-like scenarios. Our offline Small Language Model provides personalized feedback to enhance fluency, pronunciation, and confidence."
-              />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+            {/* Left Side - Title */}
+            <div>
+              <h2 className="text-4xl sm:text-5xl font-bold mb-6">
+                How the App <span className="relative">
+                  <span className="text-primary">Works</span>
+                  <svg className="absolute -bottom-2 left-0 w-full h-3 text-orange-400" viewBox="0 0 200 12" fill="none">
+                    <path d="M2 8C50 2 100 10 150 6C180 4 200 8 200 8" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+                  </svg>
+                </span>
+              </h2>
             </div>
+
+            {/* Right Side - Description */}
+            <div className="relative">
+              <div className="absolute -top-4 -right-4 w-6 h-6 text-primary">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              </div>
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                Simple steps to start your English learning journey with AI-powered guidance. 
+                Our platform makes it easy for learners to improve their language skills effectively.
+              </p>
+              {/* Decorative arrow */}
+              <div className="absolute -bottom-8 -left-8 w-16 h-16 text-primary opacity-60">
+                <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+                  <path d="M20 20C40 10 60 30 80 20C85 18 90 22 90 25C90 30 85 35 80 30C70 25 50 15 30 25C25 27 20 25 20 20Z" stroke="currentColor" strokeWidth="2" fill="currentColor"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          {/* Four Step Cards - Model Image Style */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              {
+                number: 1,
+                title: "Choose Your Module",
+                description: "Select the category that fits your learning needs: Kids, Adults, or IELTS/PTE exam practice.",
+                icon: <Target className="w-8 h-8" />,
+                color: "from-primary to-primary/80"
+              },
+              {
+                number: 2,
+                title: "Learn & Practice",
+                description: "Engage in interactive lessons offline with AI-powered conversation simulations and pronunciation feedback.",
+                icon: <BookOpen className="w-8 h-8" />,
+                color: "from-primary to-primary/80"
+              },
+              {
+                number: 3,
+                title: "Track Progress",
+                description: "Monitor your improvements with offline progress tracking, achievement badges, and scores.",
+                icon: <BarChart className="w-8 h-8" />,
+                color: "from-primary to-primary/80"
+              },
+              {
+                number: 4,
+                title: "Master English",
+                description: "Apply your skills in real conversations. Our AI provides personalized feedback to enhance fluency.",
+                icon: <Award className="w-8 h-8" />,
+                color: "from-primary to-primary/80"
+              }
+            ].map((step, index) => (
+              <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/90 backdrop-blur-sm relative">
+                <CardContent className="p-8">
+                  <div className="flex items-start justify-between mb-6">
+                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${step.color} flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300`}>
+                      {step.icon}
+                    </div>
+                    <div className="w-8 h-8 rounded-full bg-orange-400 flex items-center justify-center">
+                      <ArrowRight className="w-4 h-4 text-white" />
+                    </div>
+                  </div>
+                  <div className="w-8 h-8 mb-4 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg">
+                    {step.number}
+                  </div>
+                  <h3 className="text-xl font-bold mb-4 text-primary">{step.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed">{step.description}</p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
 

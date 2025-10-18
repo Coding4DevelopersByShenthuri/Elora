@@ -1,340 +1,190 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Heart, Lightbulb, RefreshCw, Stars, Zap, ShieldCheck, Lock, Award, Users as UsersIcon, CheckCircle, Globe, Star, TrendingUp } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Heart, Lightbulb, Zap, ShieldCheck, Award, Globe, ArrowRight, Sparkles, Target, Brain, Play } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const WhySection = ({
-  title,
-  content,
-  icon,
-  id
-}: {
-  title: string,
-  content: React.ReactNode,
-  icon: React.ReactNode,
-  id: string
-}) => {
-  return (
-    <div id={id} className="mb-20 max-w-4xl mx-auto">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 flex items-center justify-center rounded-full bg-primary/10">
-          {icon}
-        </div>
-        <h2 className="text-2xl md:text-3xl font-bold text-primary">{title}</h2>
-      </div>
-      <div className="text-foreground/80 space-y-4">
-        {content}
-      </div>
-    </div>
-  );
-};
 
 const WhyPage = () => {
   const [, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading
     const timer = setTimeout(() => {
-      //@ts-ignore
       setLoading(false);
     }, 1000);
-
     return () => clearTimeout(timer);
   }, []);
 
+
+  const values = [
+    {
+      icon: <ShieldCheck className="w-6 h-6" />,
+      title: "Privacy First",
+      description: "Your data never leaves your device. Complete offline functionality with zero data collection."
+    },
+    {
+      icon: <Brain className="w-6 h-6" />,
+      title: "AI-Powered Learning",
+      description: "Advanced AI technology provides personalized feedback and adapts to your learning pace."
+    },
+    {
+      icon: <Globe className="w-6 h-6" />,
+      title: "Accessible Everywhere",
+      description: "Learn English anywhere, anytime, without requiring an internet connection."
+    },
+    {
+      icon: <Award className="w-6 h-6" />,
+      title: "Proven Results",
+      description: "Thousands of learners have improved their English skills using our platform."
+    }
+  ];
+
   return (
-    <div className="relative overflow-hidden">
-      {/* Background elements */}
-      <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-primary/5 to-transparent -z-10"></div>
-      <div className="absolute top-1/3 right-0 w-[300px] h-[300px] rounded-full bg-primary/5 blur-3xl -z-10"></div>
-      <div className="absolute bottom-1/3 left-0 w-[250px] h-[250px] rounded-full bg-accent/5 blur-3xl -z-10"></div>
+    <div className="relative overflow-hidden min-h-screen">
+      {/* Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-primary/5 to-transparent -z-10"></div>
+      <div className="absolute top-1/4 right-0 w-[400px] h-[400px] rounded-full bg-secondary/10 blur-3xl -z-10"></div>
+      <div className="absolute bottom-1/4 left-0 w-[300px] h-[300px] rounded-full bg-accent/10 blur-3xl -z-10"></div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-36 pb-24">
-        <div className="flex flex-col items-center text-center mb-16">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-foreground bg-clip-text">
-            Why?
-          </h1>
-
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Everything we do starts with this question.
-          </p>
-
-          <div className="mt-10 glass-panel p-8 md:p-10 rounded-lg max-w-3xl mx-auto shadow-lg border-2 border-primary/20">
-            <p className="text-xl md:text-2xl text-foreground/90">
-              Why should this app exist? Why should anyone care to use it? Why is privacy so important to us?
-            </p>
-            <p className="text-xl md:text-2xl text-foreground/90 mt-6">
-              Eventually, the "why" led us here.
-            </p>
-          </div>
-        </div>
-
-        <WhySection
-          id="why-1"
-          icon={<Lightbulb className="w-6 h-6 text-primary" />}
-          //@ts-ignore
-          title={
-            <span className="text-teal-600">
-              Because why not make learning English truly accessible?
-            </span>
-          }
-          content={
-            <>
-              <p>
-                We've always approached language learning this way. We looked at the current tools and asked ourselves: why must learning spoken English rely on internet connectivity? Why are expensive cloud subscriptions required? Why do many apps collect user data unnecessarily? Are these features helping learners—or just creating clutter? What if we did it differently?
-              </p>
-              <p>
-                With Speak Bee, we asked ourselves: why not? Why not build a fully offline, AI-powered trainer that runs entirely on your device? Why not make it private, fast, and available anytime, anywhere? Why not create tailored lessons for kids, adults, and exam aspirants that actually help them speak English confidently? Forget how it’s usually done—let’s make learning better, simpler, and more engaging.
-              </p>
-              <div className="mt-6">
-                <Button variant="outline" className="gap-2" asChild>
-                  <Link to="/how">
-                    MORE ON HOW WE THINK
-                    <ExternalLink size={16} />
-                  </Link>
-                </Button>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24">
+        {/* Hero Section - Model Image Style */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
+          {/* Left Side - Student Image */}
+          <div className="relative">
+            <div className="relative">
+              {/* Student placeholder - using a gradient circle as placeholder */}
+              <div className="w-80 h-80 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                <div className="w-60 h-60 rounded-full bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center">
+                  <Heart className="w-24 h-24 text-primary" />
+                </div>
               </div>
-              <div className="mt-4 text-sm text-muted-foreground">
-                <p className="font-medium">The beginning — How did we end up creating Speak Bee?</p>
-                <p className="mt-2 font-medium">A letter — How can we help you speak confidently, anywhere, anytime, without relying on the internet?</p>
-              </div>
-            </>
-          }
-        />
-
-        <WhySection
-          id="why-2"
-          icon={<Heart className="w-6 h-6 text-primary" />}
-          //@ts-ignore
-          title={
-            <span className="text-teal-600">
-              Because we need better relationships with technology.
-            </span>
-          }
-          content={
-            <>
-              <p>
-                Once, learning English was simple. You had a book, a lesson, a tutor, and the joy of speaking each word correctly. You practiced, learned, and then moved on, knowing exactly what you had accomplished.
-              </p>
-              <p>
-                Today, language apps are different. They demand constant attention, endless scrolling, and internet connectivity. They track your data, push notifications, and often distract you from real learning. Instead of helping you, they make you adapt to them.
-              </p>
-              <p>
-                We asked ourselves—what if it could be different? What if technology could truly serve you? That’s why we built our Spoken English Training App. Fully offline, AI-powered, and designed to guide you step by step. Lessons tailored to your level, instant feedback on pronunciation, fluency, and grammar, and interactive practice that builds confidence naturally. Learning English, simplified, personal, and always at your fingertips.
-              </p>
-              <p>
-                We decided we could.
-              </p>
-              <div className="mt-6">
-                <Button variant="outline" className="gap-2" asChild>
-                  <Link to="/how">
-                    HOW WE MAKE OUR DECISIONS
-                    <ExternalLink size={16} />
-                  </Link>
-                </Button>
-              </div>
-              <div className="mt-4 text-sm text-muted-foreground">
-                <p className="font-medium">Our promise from us to you</p>
-                <p className="mt-2 font-medium">Our commitment to your English learning journey</p>
-                <p className="mt-2 font-medium">Focused on improving your spoken English, without distractions</p>
-                <p className="mt-2 font-medium">A tool that adapts to your pace, fully offline and private</p>
-              </div>
-            </>
-          }
-        />
-
-        <WhySection
-          id="why-3"
-          icon={<RefreshCw className="w-6 h-6 text-primary" />}
-          //@ts-ignore
-          title={
-            <span className="text-teal-600">
-              Because new beginnings are beautiful.
-            </span>
-          }
-          content={
-            <>
-              <p>
-                Our app starts you on a clean slate—no complicated setups, no constant internet required. Whether you're a beginner or looking to improve your fluency, you can focus entirely on learning and practicing spoken English.
-              </p>
-              <p>
-                By keeping your learning offline and personalized, we remove distractions and digital clutter. Each lesson, conversation, and exercise is designed to help you build confidence, track progress, and speak naturally.
-              </p>
-            </>
-          }
-        />
-
-        <WhySection
-          id="why-4"
-          icon={<Zap className="w-6 h-6 text-primary" />}
-          //@ts-ignore
-          title={
-            <span className="text-teal-600">
-              Because learning English should empower you, not distract you.
-            </span>
-          }
-          content={
-            <>
-              <p>
-                We built this app for learners of all ages who want to improve their spoken English without relying on constant internet access. It’s designed to help you focus on speaking, listening, and practicing naturally.
-              </p>
-              <p>
-                The app works silently in the background, offering feedback, pronunciation guidance, and conversation practice. It doesn’t demand attention, notifications, or unnecessary interaction—it’s here to serve your learning.
-              </p>
-              <p>
-                At its core, it’s a tool to help you gain confidence, fluency, and mastery of English. Whether you’re a child learning basics, an adult improving your skills, or an exam aspirant preparing for IELTS/PTE, this app supports you to practice, progress, and succeed.
-              </p>
-            </>
-          }
-        />
-
-
-        {/* Trust & Security Section */}
-        <div className="mt-24 mb-16">
-          <h2 className="text-3xl font-bold text-center mb-12 text-teal-600">
-            Built on Trust, Security, and Privacy
-          </h2>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            <div className="glass-panel rounded-xl p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-600/20 to-teal-600/10 flex items-center justify-center mx-auto mb-4 text-teal-600">
-                <ShieldCheck className="w-8 h-8" />
-              </div>
-              <h3 className="font-bold text-lg mb-2">Privacy Certified</h3>
-              <p className="text-muted-foreground text-sm">Your data never leaves your device. 100% offline processing.</p>
-            </div>
-
-            <div className="glass-panel rounded-xl p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-600/20 to-teal-600/10 flex items-center justify-center mx-auto mb-4 text-teal-600">
-                <Lock className="w-8 h-8" />
-              </div>
-              <h3 className="font-bold text-lg mb-2">Secure by Design</h3>
-              <p className="text-muted-foreground text-sm">Built with security best practices. No data collection or tracking.</p>
-            </div>
-
-            <div className="glass-panel rounded-xl p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-600/20 to-teal-600/10 flex items-center justify-center mx-auto mb-4 text-teal-600">
-                <Award className="w-8 h-8" />
-              </div>
-              <h3 className="font-bold text-lg mb-2">Quality Assured</h3>
-              <p className="text-muted-foreground text-sm">Developed by certified language educators and AI experts.</p>
-            </div>
-
-            <div className="glass-panel rounded-xl p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-600/20 to-teal-600/10 flex items-center justify-center mx-auto mb-4 text-teal-600">
-                <UsersIcon className="w-8 h-8" />
-              </div>
-              <h3 className="font-bold text-lg mb-2">Community Trusted</h3>
-              <p className="text-muted-foreground text-sm">Thousands of learners worldwide improving their English daily.</p>
+              
+              {/* Background shapes */}
+              <div className="absolute -top-8 -left-8 w-32 h-32 bg-primary/10 rounded-2xl rotate-12"></div>
+              <div className="absolute -bottom-8 -right-8 w-24 h-24 bg-secondary/10 rounded-2xl -rotate-12"></div>
+              
+              {/* Decorative elements */}
+              <div className="absolute top-4 right-4 w-6 h-6 bg-orange-400 rounded-full animate-pulse"></div>
+              <div className="absolute bottom-4 left-4 w-4 h-4 bg-orange-400 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
             </div>
           </div>
 
-          {/* Statistics */}
-          <div className="glass-panel rounded-2xl p-8 md:p-12 mb-12 bg-gradient-to-br from-teal-600/5 to-transparent">
-            <h3 className="text-2xl md:text-3xl font-bold mb-8 text-center text-teal-600">
-              Trusted by Learners Worldwide
-            </h3>
+          {/* Right Side - Content */}
+          <div className="space-y-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary font-medium mb-6">
+              <Sparkles className="w-4 h-4" />
+              <span>Our Philosophy</span>
+            </div>
             
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-              <div className="text-center">
-                <div className="w-12 h-12 rounded-full bg-teal-600/20 flex items-center justify-center mx-auto mb-3 text-teal-600">
-                  <UsersIcon className="w-6 h-6" />
-                </div>
-                <div className="text-3xl md:text-4xl font-bold text-teal-600 mb-1">10,000+</div>
-                <div className="text-sm text-muted-foreground">Active Learners</div>
-              </div>
-
-              <div className="text-center">
-                <div className="w-12 h-12 rounded-full bg-teal-600/20 flex items-center justify-center mx-auto mb-3 text-teal-600">
-                  <Globe className="w-6 h-6" />
-                </div>
-                <div className="text-3xl md:text-4xl font-bold text-teal-600 mb-1">50+</div>
-                <div className="text-sm text-muted-foreground">Countries</div>
-              </div>
-
-              <div className="text-center">
-                <div className="w-12 h-12 rounded-full bg-teal-600/20 flex items-center justify-center mx-auto mb-3 text-teal-600">
-                  <Star className="w-6 h-6" />
-                </div>
-                <div className="text-3xl md:text-4xl font-bold text-teal-600 mb-1">4.8/5</div>
-                <div className="text-sm text-muted-foreground">User Rating</div>
-              </div>
-
-              <div className="text-center">
-                <div className="w-12 h-12 rounded-full bg-teal-600/20 flex items-center justify-center mx-auto mb-3 text-teal-600">
-                  <TrendingUp className="w-6 h-6" />
-                </div>
-                <div className="text-3xl md:text-4xl font-bold text-teal-600 mb-1">95%</div>
-                <div className="text-sm text-muted-foreground">Success Rate</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Privacy & Security Guarantees */}
-          <div className="glass-panel rounded-2xl p-8 md:p-12 bg-gradient-to-br from-teal-600/5 to-transparent">
-            <h3 className="text-2xl md:text-3xl font-bold mb-8 text-center text-teal-600">
-              Your Privacy & Security Guaranteed
-            </h3>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
+              Why <span className="text-primary">Speak Bee</span>?
+            </h1>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-5xl mx-auto">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full bg-teal-600/20 flex items-center justify-center flex-shrink-0 mt-1 text-teal-600">
-                  <Lock className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-lg mb-2">No Data Collection</h4>
-                  <p className="text-muted-foreground">
-                    We don't collect, store, or transmit your personal data. Everything happens on your device.
-                  </p>
-                </div>
-              </div>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Everything we do starts with a simple question: How can we make English learning 
+              more accessible, effective, and private for everyone?
+            </p>
 
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full bg-teal-600/20 flex items-center justify-center flex-shrink-0 mt-1 text-teal-600">
-                  <ShieldCheck className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-lg mb-2">Offline-First Architecture</h4>
-                  <p className="text-muted-foreground">
-                    All AI processing happens locally. Your voice recordings and progress stay on your device.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full bg-teal-600/20 flex items-center justify-center flex-shrink-0 mt-1 text-teal-600">
-                  <UsersIcon className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-lg mb-2">Parental Controls</h4>
-                  <p className="text-muted-foreground">
-                    Safe environment for kids with age-appropriate content and full parental oversight.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full bg-teal-600/20 flex items-center justify-center flex-shrink-0 mt-1 text-teal-600">
-                  <CheckCircle className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-lg mb-2">No Third-Party Trackers</h4>
-                  <p className="text-muted-foreground">
-                    Zero analytics, no ad networks, no tracking pixels. Your privacy is absolute.
-                  </p>
-                </div>
-              </div>
+            {/* Decorative elements */}
+            <div className="flex space-x-2">
+              <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
+              <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
+              <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
             </div>
           </div>
         </div>
 
-        <div className="mt-16 text-center">
-          <Button size="lg" className="gap-2" asChild>
-            <Link to="/">
-              Start Your Journey
-              <Stars size={18} />
-            </Link>
-          </Button>
+        {/* Main Reasons Section - Model Image Style */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
+          {[
+            {
+              icon: <Lightbulb className="w-8 h-8" />,
+              title: "Because learning should be <span className='text-orange-500 font-bold'>accessible</span> to everyone",
+              description: "We believe that quality English education shouldn't be limited by internet connectivity, expensive subscriptions, or privacy concerns. Our offline-first approach ensures that anyone, anywhere can learn English effectively.",
+              color: "from-primary to-primary/80"
+            },
+            {
+              icon: <Heart className="w-8 h-8" />,
+              title: "Because we care about your <span className='text-orange-500 font-bold'>privacy</span> and data",
+              description: "Your learning journey is personal. That's why all your data stays on your device. No cloud storage, no data collection, no tracking. Just pure, private learning.",
+              color: "from-primary to-primary/80"
+            },
+            {
+              icon: <Zap className="w-8 h-8" />,
+              title: "Because AI should <span className='text-orange-500 font-bold'>empower</span>, not replace human learning",
+              description: "Our AI technology enhances your learning experience by providing instant feedback and personalized guidance, while keeping you in control of your educational journey.",
+              color: "from-primary to-primary/80"
+            },
+            {
+              icon: <Target className="w-8 h-8" />,
+              title: "Because every learner deserves <span className='text-orange-500 font-bold'>personalized</span> attention",
+              description: "Whether you're a child starting out, an adult improving your skills, or preparing for exams, our AI adapts to your pace and learning style for maximum effectiveness.",
+              color: "from-primary to-primary/80"
+            }
+          ].map((reason, index) => (
+            <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/90 backdrop-blur-sm">
+              <CardContent className="p-8">
+                <div className="flex items-start justify-between mb-6">
+                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${reason.color} flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300`}>
+                    {reason.icon}
+                  </div>
+                  <div className="w-8 h-8 rounded-full bg-orange-400 flex items-center justify-center">
+                    <ArrowRight className="w-4 h-4 text-white" />
+                  </div>
+                </div>
+                <h3 className="text-2xl font-bold mb-4 text-primary" dangerouslySetInnerHTML={{ __html: reason.title }} />
+                <p className="text-muted-foreground leading-relaxed text-lg">{reason.description}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Values Section */}
+        <div className="mb-20">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+              Our Core <span className="text-primary">Values</span>
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              These principles guide everything we do and every decision we make.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {values.map((value, index) => (
+              <div key={index} className="text-center group">
+                <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-300">
+                  {value.icon}
+                </div>
+                <h3 className="text-xl font-bold mb-4">{value.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">{value.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Call to Action */}
+        <div className="text-center">
+          <div className="bg-gradient-to-br from-primary to-secondary rounded-3xl p-12 text-white">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+              Ready to Start Your English Journey?
+            </h2>
+            <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
+              Join thousands of learners who are already improving their English skills with our AI-powered platform.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" className="bg-white text-primary hover:bg-white/90 px-8 py-4 text-lg rounded-full">
+                <Play className="w-5 h-5 mr-2" />
+                Start Learning Now
+              </Button>
+              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary px-8 py-4 text-lg rounded-full">
+                <Link to="/how" className="flex items-center">
+                  Learn How It Works
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Link>
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

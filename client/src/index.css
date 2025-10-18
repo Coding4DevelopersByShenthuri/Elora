@@ -44,79 +44,83 @@
  
 @layer base {
   :root {
-    /* Light Mode - Consistent Warm Golden Background */
-    --background: 52 43% 55%;
-    --foreground: 222.2 84% 4.9%;
+    /* Light Mode - Exact Green Color Palette */
+    --background: 120 20% 95%; /* --nyanza: #d8f3dcff */
+    --foreground: 120 60% 8%; /* --dark-green: #081c15ff */
 
     --card: 0 0% 100% / 0.9;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 120 60% 8%;
  
     --popover: 0 0% 100% / 0.95;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 120 60% 8%;
  
-    /* Warm Golden Primary Colors */
-    --primary: 45 93% 47%;
+    /* Exact Green Primary Colors */
+    --primary: 120 30% 45%; /* --sea-green: #40916cff */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 45 93% 57%;
-    --primary-deep: 45 93% 37%;
-    --primary-light: 45 93% 67%;
-    --primary-vibrant: 45 100% 52%;
+    --primary-glow: 120 30% 55%;
+    --primary-deep: 120 30% 35%;
+    --primary-light: 120 30% 65%;
+    --primary-vibrant: 120 35% 50%;
  
-    /* Complementary Secondary Palette */
-    --secondary: 35 85% 55%;
+    /* Exact Secondary Palette */
+    --secondary: 120 25% 60%; /* --mint-2: #52b788ff */
     --secondary-foreground: 0 0% 100%;
-    --secondary-deep: 35 85% 45%;
-    --secondary-light: 35 85% 65%;
-    --secondary-vibrant: 35 95% 60%;
+    --secondary-deep: 120 25% 50%;
+    --secondary-light: 120 25% 70%;
+    --secondary-vibrant: 120 30% 65%;
  
-    /* Warm Muted Colors */
-    --muted: 50 30% 90%;
-    --muted-foreground: 50 30% 35%;
-    --muted-deep: 50 30% 85%;
-    --muted-interactive: 50 40% 88%;
+    /* Exact Muted Colors */
+    --muted: 120 15% 90%; /* --celadon-2: #95d5b2ff */
+    --muted-foreground: 120 30% 25%;
+    --muted-deep: 120 15% 85%;
+    --muted-interactive: 120 20% 88%;
  
-    /* Warm Accent Colors */
-    --accent: 40 80% 50%;
+    /* Exact Accent Colors */
+    --accent: 120 35% 50%; /* --mint: #74c69dff */
     --accent-foreground: 0 0% 100%;
-    --accent-deep: 40 80% 40%;
-    --accent-light: 40 80% 60%;
-    --accent-vibrant: 40 90% 55%;
+    --accent-deep: 120 35% 40%;
+    --accent-light: 120 35% 60%;
+    --accent-vibrant: 120 40% 55%;
 
-    /* Additional Warm Colors */
-    --tertiary: 52 43% 55%;
-    --tertiary-foreground: 0 0% 100%;
-    --tertiary-deep: 52 43% 45%;
-    --tertiary-light: 52 43% 65%;
+    /* Additional Exact Green Colors */
+    --tertiary: 120 20% 85%; /* --celadon: #b7e4c7ff */
+    --tertiary-foreground: 120 60% 8%;
+    --tertiary-deep: 120 20% 75%;
+    --tertiary-light: 120 20% 95%;
 
-    --quaternary: 51 33% 75%;
-    --quaternary-foreground: 222.2 84% 4.9%;
-    --quaternary-deep: 51 33% 65%;
-    --quaternary-light: 51 33% 85%;
+    --quaternary: 120 15% 92%; /* --nyanza: #d8f3dcff */
+    --quaternary-foreground: 120 60% 8%;
+    --quaternary-deep: 120 15% 87%;
+    --quaternary-light: 120 15% 97%;
+
+    /* Additional palette colors */
+    --brunswick-green: 120 40% 15%; /* --brunswick-green: #1b4332ff */
+    --dartmouth-green: 120 35% 25%; /* --dartmouth-green: #2d6a4fff */
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Warm Golden Borders */
-    --border: 45 30% 75%;
-    --input: 45 30% 92%;
-    --ring: 45 93% 47%;
+    /* Green Borders */
+    --border: 120 20% 80%;
+    --input: 120 20% 92%;
+    --ring: 120 30% 45%;
  
     --radius: 0.75rem;
 
-    /* Warm Gradient System */
-    --gradient-primary: linear-gradient(135deg, hsl(45 93% 47%), hsl(45 100% 57%), hsl(45 93% 67%));
-    --gradient-secondary: linear-gradient(135deg, hsl(35 85% 55%), hsl(35 95% 65%), hsl(35 85% 75%));
-    --gradient-accent: linear-gradient(135deg, hsl(40 80% 50%), hsl(40 90% 60%), hsl(40 80% 70%));
-    --gradient-tertiary: linear-gradient(135deg, hsl(52 43% 55%), hsl(52 53% 65%), hsl(52 43% 75%));
-    --gradient-quaternary: linear-gradient(135deg, hsl(51 33% 75%), hsl(51 43% 85%), hsl(51 33% 95%));
-    --gradient-rainbow: linear-gradient(135deg, hsl(45 93% 47%), hsl(35 85% 55%), hsl(40 80% 50%), hsl(52 43% 55%), hsl(51 33% 75%));
+    /* Green Gradient System */
+    --gradient-primary: linear-gradient(135deg, hsl(120 30% 45%), hsl(120 35% 55%), hsl(120 30% 65%));
+    --gradient-secondary: linear-gradient(135deg, hsl(120 25% 60%), hsl(120 30% 70%), hsl(120 25% 80%));
+    --gradient-accent: linear-gradient(135deg, hsl(120 35% 50%), hsl(120 40% 60%), hsl(120 35% 70%));
+    --gradient-tertiary: linear-gradient(135deg, hsl(120 20% 85%), hsl(120 25% 90%), hsl(120 20% 95%));
+    --gradient-quaternary: linear-gradient(135deg, hsl(120 15% 92%), hsl(120 20% 95%), hsl(120 15% 98%));
+    --gradient-rainbow: linear-gradient(135deg, hsl(120 30% 45%), hsl(120 25% 60%), hsl(120 35% 50%), hsl(120 20% 85%), hsl(120 15% 92%));
     
-    /* Warm Golden Shadows */
-    --shadow-colorful: 0 10px 30px -10px hsl(45 93% 47% / 0.3);
-    --shadow-glow: 0 0 40px hsl(45 93% 57% / 0.4);
-    --shadow-soft: 0 4px 20px -4px hsl(45 30% 75% / 0.6);
-    --shadow-interactive: 0 8px 25px -8px hsl(45 93% 47% / 0.2);
-    --shadow-floating: 0 15px 35px -15px hsl(45 93% 57% / 0.3);
+    /* Green Shadows */
+    --shadow-colorful: 0 10px 30px -10px hsl(120 30% 45% / 0.3);
+    --shadow-glow: 0 0 40px hsl(120 30% 55% / 0.4);
+    --shadow-soft: 0 4px 20px -4px hsl(120 20% 80% / 0.6);
+    --shadow-interactive: 0 8px 25px -8px hsl(120 30% 45% / 0.2);
+    --shadow-floating: 0 15px 35px -15px hsl(120 30% 55% / 0.3);
     
     /* Enhanced Transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -125,10 +129,10 @@
     --transition-interactive: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
     /* Floating Icons Colors */
-    --floating-icon-primary: 45 93% 47% / 0.15;
-    --floating-icon-secondary: 35 85% 55% / 0.12;
-    --floating-icon-accent: 40 80% 50% / 0.1;
-    --floating-icon-glow: 45 93% 57% / 0.08;
+    --floating-icon-primary: 120 30% 45% / 0.15;
+    --floating-icon-secondary: 120 25% 60% / 0.12;
+    --floating-icon-accent: 120 35% 50% / 0.1;
+    --floating-icon-glow: 120 30% 55% / 0.08;
   }
  
   .dark {
@@ -275,8 +279,8 @@
     animation: pulseGlow 2s infinite ease-in-out;
   }
   
-  .light .golden-gradient-text {
-    background: linear-gradient(135deg, hsl(45 93% 47%), hsl(45 100% 57%));
+  .light .green-gradient-text {
+    background: linear-gradient(135deg, hsl(120 30% 45%), hsl(120 35% 55%));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -332,26 +336,26 @@
   /* Floating Icons Styles */
   .light .floating-icon-primary {
     background: hsl(var(--floating-icon-primary));
-    border: 1px solid hsl(45 93% 47% / 0.2);
-    box-shadow: 0 8px 32px hsl(45 93% 47% / 0.15);
+    border: 1px solid hsl(120 30% 45% / 0.2);
+    box-shadow: 0 8px 32px hsl(120 30% 45% / 0.15);
   }
   
   .light .floating-icon-secondary {
     background: hsl(var(--floating-icon-secondary));
-    border: 1px solid hsl(35 85% 55% / 0.2);
-    box-shadow: 0 8px 32px hsl(35 85% 55% / 0.12);
+    border: 1px solid hsl(120 25% 60% / 0.2);
+    box-shadow: 0 8px 32px hsl(120 25% 60% / 0.12);
   }
   
   .light .floating-icon-accent {
     background: hsl(var(--floating-icon-accent));
-    border: 1px solid hsl(40 80% 50% / 0.2);
-    box-shadow: 0 8px 32px hsl(40 80% 50% / 0.1);
+    border: 1px solid hsl(120 35% 50% / 0.2);
+    box-shadow: 0 8px 32px hsl(120 35% 50% / 0.1);
   }
   
   .light .floating-icon-glow {
     background: hsl(var(--floating-icon-glow));
-    border: 1px solid hsl(45 93% 57% / 0.15);
-    box-shadow: 0 8px 32px hsl(45 93% 57% / 0.08);
+    border: 1px solid hsl(120 30% 55% / 0.15);
+    box-shadow: 0 8px 32px hsl(120 30% 55% / 0.08);
   }
 
   .dark .floating-icon-primary {
@@ -391,13 +395,60 @@
     min-height: 100vh;
   }
   
-  /* Consistent Warm Golden Background for ALL Light Mode Pages */
+  /* Consistent Green Background for ALL Light Mode Pages */
   .light body {
-    background: hsla(52, 43%, 55%, 1);
-    background: linear-gradient(90deg, hsla(52, 43%, 55%, 1) 0%, hsla(51, 33%, 75%, 1) 100%);
-    background: -moz-linear-gradient(90deg, hsla(52, 43%, 55%, 1) 0%, hsla(51, 33%, 75%, 1) 100%);
-    background: -webkit-linear-gradient(90deg, hsla(52, 43%, 55%, 1) 0%, hsla(51, 33%, 75%, 1) 100%);
-    filter: progid: DXImageTransform.Microsoft.gradient( startColorstr="#BEB15B", endColorstr="#D5CFAC", GradientType=1 );
+    background: #d8f3dcff; /* --nyanza exact color */
+    background: linear-gradient(90deg, #d8f3dcff 0%, #b7e4c7ff 100%);
+    background: -moz-linear-gradient(90deg, #d8f3dcff 0%, #b7e4c7ff 100%);
+    background: -webkit-linear-gradient(90deg, #d8f3dcff 0%, #b7e4c7ff 100%);
+    filter: progid: DXImageTransform.Microsoft.gradient( startColorstr="#d8f3dc", endColorstr="#b7e4c7", GradientType=1 );
+  }
+
+  /* Ensure proper contrast in light mode */
+  .light .text-primary {
+    color: #40916cff; /* --sea-green for better contrast */
+  }
+
+  .light .text-muted-foreground {
+    color: #2d6a4fff; /* --dartmouth-green for better contrast */
+  }
+
+  /* Ensure proper contrast in dark mode */
+  .dark .text-primary {
+    color: #74c69dff; /* --mint for better contrast in dark mode */
+  }
+
+  .dark .text-muted-foreground {
+    color: #b7e4c7ff; /* --celadon for better contrast in dark mode */
+  }
+
+  /* Responsive improvements */
+  @media (max-width: 768px) {
+    .light body {
+      background: #d8f3dcff; /* Solid color on mobile for better performance */
+    }
+    
+    .dark body {
+      background: hsl(222.2 84% 4.9%); /* Solid color on mobile for better performance */
+    }
+  }
+
+  /* Ensure all text is readable */
+  .light h1, .light h2, .light h3, .light h4, .light h5, .light h6 {
+    color: #1b4332ff; /* --brunswick-green for strong contrast */
+  }
+
+  .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+    color: #d8f3dcff; /* --nyanza for strong contrast in dark mode */
+  }
+
+  /* Ensure buttons have good contrast */
+  .light .bg-primary {
+    background-color: #40916cff !important; /* --sea-green */
+  }
+
+  .dark .bg-primary {
+    background-color: #74c69dff !important; /* --mint for dark mode */
   }
   
   /* Consistent Dark Background for ALL Dark Mode Pages */

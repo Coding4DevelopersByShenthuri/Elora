@@ -22,7 +22,7 @@ const UseCasesSection = ({ show }: UseCasesSectionProps) => {
 
   return (
     <AnimatedTransition show={show} animation="slide-up" duration={600}>
-      <div className="py-12 md:py-24 lg:py-32 px-4 sm:px-6">
+      <div className="pt-12 pb-6 md:pt-24 md:pb-8 lg:pt-32 lg:pb-10 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto mb-12 md:mb-16">
           {/* Updated Title - Responsive */}
           <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl text-center mb-8 md:mb-12 tracking-tight text-teal-600 font-bold leading-tight">
