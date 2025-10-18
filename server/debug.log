@@ -209,3 +209,7 @@ WARNING 2025-10-18 17:31:30,301 log 14984 15664 Not Found: /api/vocabulary/
 WARNING 2025-10-18 17:31:30,304 basehttp 14984 15664 "POST /api/vocabulary/ HTTP/1.1" 404 6344
 INFO 2025-10-18 20:53:51,966 autoreload 19180 22756 Watching for file changes with StatReloader
 INFO 2025-10-18 21:01:01,780 autoreload 16220 18936 Watching for file changes with StatReloader
+WARNING 2025-10-18 21:01:07,592 log 16220 2464 Not Found: /
+WARNING 2025-10-18 21:01:07,593 basehttp 16220 2464 "GET / HTTP/1.1" 404 6280
+WARNING 2025-10-18 21:01:08,671 log 16220 2464 Not Found: /favicon.ico
+WARNING 2025-10-18 21:01:08,672 basehttp 16220 2464 "GET /favicon.ico HTTP/1.1" 404 6331
