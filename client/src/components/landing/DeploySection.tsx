@@ -34,8 +34,17 @@ export const DeploySection = ({ show }: DeploySectionProps) => {
       <div className="py-16 md:py-24">
         {/* Section Header */}
         <div className="flex flex-col items-center text-center gap-2 mb-12">
-          <h2 className="text-4xl font-bold text-teal-600 md:text-8xl">Learn & Improve</h2>
-          <p className="text-foreground max-w-3xl text-xl md:text-2xl mt-2">
+          <h2 className="text-3xl font-bold md:text-6xl">
+            <span className="text-orange-500">Learn</span>
+            <span className="text-foreground"> & </span>
+            <span className="relative inline-block">
+              <span className="text-[#529641]">Improve</span>
+              <svg className="absolute -bottom-1 md:-bottom-2 left-0 w-full h-2 md:h-3 text-orange-400" viewBox="0 0 200 12" fill="none">
+                <path d="M2 8C50 2 100 10 150 6C180 4 200 8 200 8" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+              </svg>
+            </span>
+          </h2>
+          <p className="text-foreground max-w-3xl text-xl md:text-xl mt-2">
             Experience offline AI-powered English training designed to enhance your speaking and comprehension skills.
           </p>
         </div>

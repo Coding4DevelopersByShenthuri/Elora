@@ -37,9 +37,9 @@ export const ManageSection = ({ show }: ManageSectionProps) => {
     <AnimatedTransition show={show} animation="slide-up" duration={600}>
       <div className="py-16 md:py-24">
         <div className="flex flex-col items-center text-center gap-2 mb-12">
-          <h2 className="text-4xl font-bold text-teal-600 md:text-8xl">Features</h2>
-          <p className="text-foreground max-w-3xl text-xl md:text-2xl mt-2">
-            Your first and only personal AI English coach.
+          <h2 className="text-2xl font-bold text-[#529641] md:text-6xl">Features</h2>
+          <p className="text-foreground max-w-3xl text-xl md:text-xl mt-2">
+            Your first and only personal AI English coach works Offline/Online.
           </p>
         </div>
 

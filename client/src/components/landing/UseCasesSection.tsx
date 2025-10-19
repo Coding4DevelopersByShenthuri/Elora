@@ -25,8 +25,16 @@ const UseCasesSection = ({ show }: UseCasesSectionProps) => {
       <div className="pt-12 pb-6 md:pt-24 md:pb-8 lg:pt-32 lg:pb-10 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto mb-12 md:mb-16">
           {/* Updated Title - Responsive */}
-          <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl text-center mb-8 md:mb-12 tracking-tight text-teal-600 font-bold leading-tight">
-            Interactive Spoken English Training for Everyone
+          <h2 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl xl:text-6xl text-center mb-8 md:mb-12 tracking-tight font-bold leading-tight">
+            <span className="text-foreground">Interactive </span>
+            <span className="text-orange-500">Spoken English </span>
+            <span className="text-foreground">Training for </span>
+            <span className="relative inline-block">
+              <span className="text-[#529641]">Everyone</span>
+              <svg className="absolute -bottom-1 md:-bottom-2 left-0 w-full h-2 md:h-3 text-orange-400" viewBox="0 0 200 12" fill="none">
+                <path d="M2 8C50 2 100 10 150 6C180 4 200 8 200 8" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+              </svg>
+            </span>
           </h2>
           
           {/* User Type Tabs - Responsive */}
