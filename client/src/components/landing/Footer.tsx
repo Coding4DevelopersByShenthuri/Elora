@@ -111,19 +111,44 @@ const Footer = () => {
       </div>
 
       {/* Bottom Bar */}
-      <div className="w-full border-t border-gray-200 dark:border-white/20 py-3 text-xs text-black dark:text-white flex flex-col lg:flex-row justify-between items-center gap-2 text-center lg:text-left">
-        <div className="flex flex-col sm:flex-row items-center gap-2">
-          <p>© {new Date().getFullYear()} Speak Bee. All rights reserved.</p>
-          <div className="flex items-center gap-3 flex-wrap justify-center">
+      <div className="w-full border-t border-gray-200 dark:border-white/20 py-3 text-xs text-black dark:text-white">
+        {/* Mobile Layout */}
+        <div className="flex flex-col lg:hidden items-center gap-2 text-center">
+          <div className="flex flex-col sm:flex-row items-center gap-2">
+            <p>© {new Date().getFullYear()} Speak Bee. All rights reserved.</p>
+            <div className="flex items-center gap-3 flex-wrap justify-center">
+              <Link to="/privacy" className="hover:text-primary transition">Privacy Policy</Link>
+              <Link to="/terms" className="hover:text-primary transition">Terms</Link>
+              <Link to="/cookies" className="hover:text-primary transition">Cookies</Link>
+            </div>
+          </div>
+          <div className="flex items-center gap-1 justify-center">
+            <span>Crafted with</span>
+            <span className="text-red-500 dark:text-red-400">♡</span>
+            <span>by Shenthuri Maran</span>
+          </div>
+        </div>
+        
+        {/* Desktop Layout */}
+        <div className="hidden lg:grid lg:grid-cols-3 items-center gap-4 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Left: Privacy Links */}
+          <div className="flex items-center gap-3 justify-start">
             <Link to="/privacy" className="hover:text-primary transition">Privacy Policy</Link>
             <Link to="/terms" className="hover:text-primary transition">Terms</Link>
             <Link to="/cookies" className="hover:text-primary transition">Cookies</Link>
           </div>
-        </div>
-        <div className="flex items-center gap-1 justify-center">
-          <span>Crafted with</span>
-          <span className="text-red-500 dark:text-red-400">♡</span>
-          <span>by Shenthuri Maran</span>
+          
+          {/* Center: Copyright */}
+          <div className="flex justify-center">
+            <p>© {new Date().getFullYear()} Speak Bee. All rights reserved.</p>
+          </div>
+          
+          {/* Right: Crafted by */}
+          <div className="flex items-center gap-1 justify-end">
+            <span>Crafted with</span>
+            <span className="text-red-500 dark:text-red-400">♡</span>
+            <span>by Shenthuri Maran</span>
+          </div>
         </div>
       </div>
     </footer>

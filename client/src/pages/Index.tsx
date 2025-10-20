@@ -178,10 +178,10 @@ const Index = () => {
                       <div className="absolute inset-0 bg-gradient-to-tr from-transparent to-white/20 rounded-full"></div>
                     </div>
                   </div>
-                  <h3 className="text-xl md:text-2xl font-bold text-center mb-3 md:mb-4 bg-gradient-to-r from-[#2d6a4f] to-[#40916c] bg-clip-text text-transparent">
+                  <h3 className="text-xl md:text-2xl font-bold text-center mb-3 md:mb-4 bg-gradient-to-r from-[#1b4332] to-[#1b4332] bg-clip-text text-transparent">
                     Your AI <span className="relative inline-block text-teal-500 bg-clip-text" style={{ WebkitTextFillColor: 'currentColor' }}>
                       English
-                      <svg className="absolute -bottom-0.5 left-0 w-full h-1 text-orange-400" viewBox="0 0 200 12" fill="none">
+                      <svg className="absolute -bottom-0.5 left-0 w-full h-1 text-orange-500" viewBox="0 0 200 12" fill="none">
                         <path d="M2 8C50 2 100 10 150 6C180 4 200 8 200 8" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
                       </svg>
                     </span> Coach

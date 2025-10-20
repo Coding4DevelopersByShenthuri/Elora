@@ -2,7 +2,7 @@ import beeImage from '@/assets/bee.png';
 
 export const LoadingScreen = () => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-muted/30">
+    <div className="min-h-screen flex flex-col items-center justify-center light:bg-gradient-to-b light:from-[#d8f3dc] light:via-[#e8f8ea] light:to-white dark:bg-gradient-to-b dark:from-background dark:to-muted/30">
       <div className="relative">
         <img 
           src={beeImage} 

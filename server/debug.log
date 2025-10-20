@@ -232,3 +232,5 @@ WARNING 2025-10-19 00:44:01,857 basehttp 16220 19696 "POST /api/vocabulary/ HTTP
 INFO 2025-10-19 14:26:21,843 autoreload 21972 10636 Watching for file changes with StatReloader
 INFO 2025-10-19 14:29:00,588 autoreload 20836 22304 Watching for file changes with StatReloader
 INFO 2025-10-19 14:47:28,176 autoreload 3644 25140 Watching for file changes with StatReloader
+INFO 2025-10-19 21:12:24,156 autoreload 20348 7472 Watching for file changes with StatReloader
+INFO 2025-10-20 12:24:01,523 autoreload 14964 7924 Watching for file changes with StatReloader
