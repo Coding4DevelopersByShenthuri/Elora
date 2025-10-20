@@ -1,4 +1,4 @@
-# 🐝 Speak Bee - Offline SLM Setup Guide
+# 🐝 Elora - Offline SLM Setup Guide
 
 Complete guide for setting up and running the Offline Spoken English Training App with Small Language Models.
 
@@ -20,7 +20,7 @@ Complete guide for setting up and running the Offline Spoken English Training Ap
 
 ## 🎯 Overview
 
-Speak Bee uses **Small Language Models (SLMs)** that run entirely offline in your browser. The app includes:
+Elora uses **Small Language Models (SLMs)** that run entirely offline in your browser. The app includes:
 
 - **Whisper.cpp** for offline speech-to-text (STT)
 - **Transformers.js** with DistilGPT-2/GPT-2 for conversation and feedback
@@ -32,7 +32,7 @@ Speak Bee uses **Small Language Models (SLMs)** that run entirely offline in you
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    Speak Bee Frontend                   │
+│                    Elora Frontend                   │
 │  ┌─────────────┐  ┌──────────────┐  ┌───────────────┐ │
 │  │   React UI  │  │  Service      │  │  Web Workers  │ │
 │  │   Components│─▶│  Layer        │─▶│  (Inference)  │ │

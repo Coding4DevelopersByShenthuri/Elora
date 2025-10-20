@@ -77,7 +77,7 @@ const WhyPage = () => {
             </div>
             
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
-              Why <span className="text-primary">Speak Bee</span>?
+              Why <span className="text-primary">Elora</span>?
             </h1>
             
             <p className="text-lg text-muted-foreground leading-relaxed">

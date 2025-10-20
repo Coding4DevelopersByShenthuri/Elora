@@ -1,4 +1,4 @@
-# 🐝 Speak Bee - Quick Reference Card
+# 🐝 Elora - Quick Reference Card
 
 ## ❓ **Quick Answers**
 
@@ -64,7 +64,7 @@ cd client && npm run dev
 ## 🔍 **File Locations**
 
 ```
-Speak Bee/
+Elora/
 ├── client/src/services/        ⭐ ALL SLM CODE HERE
 │   ├── LocalLLM.ts             🤖 Rule-based SLM
 │   ├── TransformersService.ts  🤖 DistilGPT-2

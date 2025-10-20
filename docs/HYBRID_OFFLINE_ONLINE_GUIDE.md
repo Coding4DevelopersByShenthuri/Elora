@@ -1,14 +1,14 @@
-# 🐝 Speak Bee - Complete Hybrid Offline + Online Guide
+# 🐝 Elora - Complete Hybrid Offline + Online Guide
 
 ## 🎯 **Project Overview**
 
-Speak Bee is a **hybrid offline-first spoken English training application** that works both **completely offline** and with **optional cloud features**.
+Elora is a **hybrid offline-first spoken English training application** that works both **completely offline** and with **optional cloud features**.
 
 ### **Unique Architecture:**
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    SPEAK BEE                            │
+│                    Elora                            │
 │                                                         │
 │  ┌──────────────────┐         ┌──────────────────┐   │
 │  │   CLIENT (React)  │         │  SERVER (Django) │   │
@@ -121,7 +121,7 @@ npm run dev
 ## 📂 **Project Structure**
 
 ```
-Speak Bee/
+Elora/
 │
 ├── client/                           🎨 REACT FRONTEND (Offline + Online)
 │   ├── src/
@@ -633,7 +633,7 @@ python manage.py runserver
 
 ## 🎉 **Summary**
 
-Your **Speak Bee** application is a **sophisticated hybrid system**:
+Your **Elora** application is a **sophisticated hybrid system**:
 
 ### **✅ What You Have:**
 

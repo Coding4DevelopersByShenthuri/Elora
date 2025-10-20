@@ -1,6 +1,6 @@
-# Speak Bee - Server
+# Elora - Server
 
-Django REST API backend for Speak Bee application.
+Django REST API backend for Elora application.
 
 ## Setup
 

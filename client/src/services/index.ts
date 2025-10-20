@@ -1,5 +1,5 @@
 /*
-  Speak Bee - Offline SLM Services Index
+  Elora - Offline SLM Services Index
   Central export point for all offline AI services
 */
 
@@ -100,7 +100,7 @@ export async function initializeOfflineServices(
   userLevel: 'kids' | 'beginner' | 'intermediate' | 'advanced' = 'beginner'
 ): Promise<void> {
   try {
-    console.log('🐝 Initializing Speak Bee offline services...');
+    console.log('🐝 Initializing Elora offline services...');
 
     // Download recommended models
     console.log('📦 Downloading models...');

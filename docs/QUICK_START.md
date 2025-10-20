@@ -1,4 +1,4 @@
-# 🚀 Speak Bee - Quick Start Guide
+# 🚀 Elora - Quick Start Guide
 
 Get your offline English learning app running in 5 minutes!
 
@@ -391,7 +391,7 @@ await WhisperService.initialize();
 await TransformersService.initialize();
 await SLMInference.initialize();
 
-console.log('🐝 Speak Bee is ready for offline learning!');
+console.log('🐝 Elora is ready for offline learning!');
 ```
 
 ---

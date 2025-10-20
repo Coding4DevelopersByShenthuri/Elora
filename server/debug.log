@@ -1,13 +1,13 @@
 INFO 2025-09-26 14:40:39,895 autoreload 8528 16808 Watching for file changes with StatReloader
-INFO 2025-09-26 14:41:20,116 autoreload 8528 16808 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\crud\urls.py changed, reloading.
+INFO 2025-09-26 14:41:20,116 autoreload 8528 16808 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\urls.py changed, reloading.
 INFO 2025-09-26 14:41:21,011 autoreload 10208 19772 Watching for file changes with StatReloader
 WARNING 2025-09-26 14:42:38,098 log 10208 1904 Not Found: /
 WARNING 2025-09-26 14:42:38,111 basehttp 10208 1904 "GET / HTTP/1.1" 404 2610
 WARNING 2025-09-26 14:49:16,081 log 10208 15572 Not Found: /
 WARNING 2025-09-26 14:49:16,090 basehttp 10208 15572 "GET / HTTP/1.1" 404 2610
-INFO 2025-09-26 14:51:00,649 autoreload 10208 19772 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\crud\settings.py changed, reloading.
+INFO 2025-09-26 14:51:00,649 autoreload 10208 19772 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
 INFO 2025-09-26 14:51:03,957 autoreload 5412 21584 Watching for file changes with StatReloader
-INFO 2025-09-26 14:54:08,531 autoreload 5412 21584 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\crud\settings.py changed, reloading.
+INFO 2025-09-26 14:54:08,531 autoreload 5412 21584 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
 INFO 2025-09-26 14:54:12,296 autoreload 21144 9032 Watching for file changes with StatReloader
 INFO 2025-09-26 14:54:35,166 autoreload 21176 5940 Watching for file changes with StatReloader
 WARNING 2025-09-26 14:54:39,512 log 21176 3364 Not Found: /
@@ -142,23 +142,23 @@ INFO 2025-10-10 09:44:51,175 autoreload 17948 2168 Watching for file changes wit
 WARNING 2025-10-10 10:25:09,064 log 17948 8744 Unauthorized: /api/auth/login
 WARNING 2025-10-10 10:25:09,075 basehttp 17948 8744 "POST /api/auth/login HTTP/1.1" 401 39
 INFO 2025-10-10 12:17:35,557 autoreload 10980 10832 Watching for file changes with StatReloader
-INFO 2025-10-10 16:43:32,883 autoreload 10980 10832 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\models.py changed, reloading.
+INFO 2025-10-10 16:43:32,883 autoreload 10980 10832 C:\Users\shent\OneDrive\Desktop\Elora\server\api\models.py changed, reloading.
 INFO 2025-10-10 16:43:45,219 autoreload 12012 7192 Watching for file changes with StatReloader
-INFO 2025-10-10 16:43:55,795 autoreload 12012 7192 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\views.py changed, reloading.
+INFO 2025-10-10 16:43:55,795 autoreload 12012 7192 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
 INFO 2025-10-10 16:43:57,428 autoreload 4488 2652 Watching for file changes with StatReloader
-INFO 2025-10-10 16:44:01,540 autoreload 4488 2652 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\urls.py changed, reloading.
+INFO 2025-10-10 16:44:01,540 autoreload 4488 2652 C:\Users\shent\OneDrive\Desktop\Elora\server\api\urls.py changed, reloading.
 INFO 2025-10-10 16:44:02,986 autoreload 20408 11232 Watching for file changes with StatReloader
-INFO 2025-10-10 16:44:35,064 autoreload 20408 11232 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\serializers.py changed, reloading.
+INFO 2025-10-10 16:44:35,064 autoreload 20408 11232 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
 INFO 2025-10-10 16:44:35,927 autoreload 16364 4892 Watching for file changes with StatReloader
-INFO 2025-10-10 16:44:41,146 autoreload 16364 4892 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\models.py changed, reloading.
+INFO 2025-10-10 16:44:41,146 autoreload 16364 4892 C:\Users\shent\OneDrive\Desktop\Elora\server\api\models.py changed, reloading.
 INFO 2025-10-10 16:44:42,491 autoreload 388 1456 Watching for file changes with StatReloader
-INFO 2025-10-10 16:44:44,492 autoreload 388 1456 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\serializers.py changed, reloading.
+INFO 2025-10-10 16:44:44,492 autoreload 388 1456 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
 INFO 2025-10-10 16:44:46,040 autoreload 4424 14180 Watching for file changes with StatReloader
-INFO 2025-10-10 16:44:49,361 autoreload 4424 14180 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\urls.py changed, reloading.
+INFO 2025-10-10 16:44:49,361 autoreload 4424 14180 C:\Users\shent\OneDrive\Desktop\Elora\server\api\urls.py changed, reloading.
 INFO 2025-10-10 16:44:50,864 autoreload 20408 3780 Watching for file changes with StatReloader
 INFO 2025-10-10 20:55:04,915 autoreload 11828 7896 Watching for file changes with StatReloader
 INFO 2025-10-10 21:36:10,909 autoreload 4308 13104 Watching for file changes with StatReloader
-INFO 2025-10-11 01:15:47,009 autoreload 4308 13104 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\serializers.py changed, reloading.
+INFO 2025-10-11 01:15:47,009 autoreload 4308 13104 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
 INFO 2025-10-11 01:15:56,018 autoreload 14376 17544 Watching for file changes with StatReloader
 INFO 2025-10-11 12:17:21,528 autoreload 5348 5216 Watching for file changes with StatReloader
 INFO 2025-10-11 16:19:32,952 autoreload 9756 16168 Watching for file changes with StatReloader
@@ -170,21 +170,21 @@ INFO 2025-10-13 22:00:29,415 autoreload 12252 16624 Watching for file changes wi
 INFO 2025-10-14 09:46:59,796 autoreload 9664 14716 Watching for file changes with StatReloader
 INFO 2025-10-14 16:23:40,252 autoreload 1148 16248 Watching for file changes with StatReloader
 INFO 2025-10-15 14:30:08,171 autoreload 11404 18096 Watching for file changes with StatReloader
-INFO 2025-10-15 17:06:37,140 autoreload 11404 18096 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\models.py changed, reloading.
+INFO 2025-10-15 17:06:37,140 autoreload 11404 18096 C:\Users\shent\OneDrive\Desktop\Elora\server\api\models.py changed, reloading.
 INFO 2025-10-15 17:06:42,584 autoreload 21432 3488 Watching for file changes with StatReloader
-INFO 2025-10-15 17:07:11,986 autoreload 21432 3488 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\serializers.py changed, reloading.
+INFO 2025-10-15 17:07:11,986 autoreload 21432 3488 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
 INFO 2025-10-15 17:07:13,987 autoreload 15908 5396 Watching for file changes with StatReloader
-INFO 2025-10-15 17:08:25,289 autoreload 15908 5396 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\views.py changed, reloading.
+INFO 2025-10-15 17:08:25,289 autoreload 15908 5396 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
 INFO 2025-10-15 17:08:27,214 autoreload 20584 21416 Watching for file changes with StatReloader
-INFO 2025-10-15 17:08:59,032 autoreload 20584 21416 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\urls.py changed, reloading.
+INFO 2025-10-15 17:08:59,032 autoreload 20584 21416 C:\Users\shent\OneDrive\Desktop\Elora\server\api\urls.py changed, reloading.
 INFO 2025-10-15 17:09:01,321 autoreload 19480 18204 Watching for file changes with StatReloader
-INFO 2025-10-15 17:09:10,474 autoreload 19480 18204 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\models.py changed, reloading.
+INFO 2025-10-15 17:09:10,474 autoreload 19480 18204 C:\Users\shent\OneDrive\Desktop\Elora\server\api\models.py changed, reloading.
 INFO 2025-10-15 17:09:12,647 autoreload 20376 15264 Watching for file changes with StatReloader
-INFO 2025-10-15 17:09:15,103 autoreload 20376 15264 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\serializers.py changed, reloading.
+INFO 2025-10-15 17:09:15,103 autoreload 20376 15264 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
 INFO 2025-10-15 17:09:18,508 autoreload 8540 10044 Watching for file changes with StatReloader
-INFO 2025-10-15 17:09:23,722 autoreload 8540 10044 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\urls.py changed, reloading.
+INFO 2025-10-15 17:09:23,722 autoreload 8540 10044 C:\Users\shent\OneDrive\Desktop\Elora\server\api\urls.py changed, reloading.
 INFO 2025-10-15 17:09:24,890 autoreload 21336 11048 Watching for file changes with StatReloader
-INFO 2025-10-15 17:12:10,213 autoreload 21336 11048 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\admin.py changed, reloading.
+INFO 2025-10-15 17:12:10,213 autoreload 21336 11048 C:\Users\shent\OneDrive\Desktop\Elora\server\api\admin.py changed, reloading.
 INFO 2025-10-15 17:12:13,312 autoreload 10548 228 Watching for file changes with StatReloader
 INFO 2025-10-15 17:25:34,897 autoreload 20248 13000 Watching for file changes with StatReloader
 INFO 2025-10-15 22:56:34,454 autoreload 22028 4268 Watching for file changes with StatReloader
@@ -234,3 +234,5 @@ INFO 2025-10-19 14:29:00,588 autoreload 20836 22304 Watching for file changes wi
 INFO 2025-10-19 14:47:28,176 autoreload 3644 25140 Watching for file changes with StatReloader
 INFO 2025-10-19 21:12:24,156 autoreload 20348 7472 Watching for file changes with StatReloader
 INFO 2025-10-20 12:24:01,523 autoreload 14964 7924 Watching for file changes with StatReloader
+INFO 2025-10-20 18:45:57,518 autoreload 14964 7924 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\views.py changed, reloading.
+INFO 2025-10-20 18:46:18,450 autoreload 15976 16924 Watching for file changes with StatReloader

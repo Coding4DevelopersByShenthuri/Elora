@@ -803,7 +803,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
       'Our Intellectual Property', 'Your Content', 'License Grant', 'Technical Requirements', 
       'Offline Capabilities', 'Service Models', 'Payment Terms', 'Free Trial Offers',
       'Permitted Uses', 'Prohibited Activities', 'Data Processing Architecture', 'Data Collection',
-      'Data Security', 'By You', 'By Speak Bee', 'Effect of Termination',
+      'Data Security', 'By You', 'By Elora', 'Effect of Termination',
       'For Parents/Guardians (Kids Module)', 'For Educational Institutions', 'For Examination Candidates',
       'Governing Law', 'Dispute Resolution', 'Class Action Waiver'];
 
@@ -915,7 +915,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
             </button>
             <div className="flex-1">
               <p className="text-white text-xs md:text-sm leading-relaxed">
-                <strong>I have read, understood, and agree to be bound by the Terms and Conditions Agreement.</strong> I acknowledge that this is a legal contract between me and Speak Bee, and I understand my rights and responsibilities as outlined in this document.
+                <strong>I have read, understood, and agree to be bound by the Terms and Conditions Agreement.</strong> I acknowledge that this is a legal contract between me and Elora, and I understand my rights and responsibilities as outlined in this document.
               </p>
             </div>
           </div>
@@ -980,7 +980,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
             <div className="auth-form-container auth-register-container">
               <form onSubmit={handleAuth} className="h-full bg-[#143C3D] p-3 md:p-4 flex flex-col auth-register-content">
                 <div className="text-center mb-2">
-                  <h1 className="text-lg md:text-xl font-bold text-white mb-1">Speak Bee</h1>
+                  <h1 className="text-lg md:text-xl font-bold text-white mb-1">Elora</h1>
                   <p className="text-[#4BB6B7] text-xs">Create Your Account</p>
                 </div>
 
@@ -1148,7 +1148,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
                         >
                           Terms and Conditions
                         </button>
-                        {' '}and acknowledge that this is a legal agreement between me and Speak Bee.
+                        {' '}and acknowledge that this is a legal agreement between me and Elora.
                       </span>
                     </div>
 
@@ -1180,7 +1180,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
             <div className="auth-form-container auth-login-container">
               <form onSubmit={handleAuth} className="h-full bg-[#143C3D] p-4 md:p-8 flex flex-col justify-center">
                 <div className="text-center mb-4 md:mb-6">
-                  <h1 className="text-2xl md:text-3xl font-bold text-white mb-1 md:mb-2">Speak Bee</h1>
+                  <h1 className="text-2xl md:text-3xl font-bold text-white mb-1 md:mb-2">Elora</h1>
                   <p className="text-[#4BB6B7] text-sm md:text-base">Welcome back to your English learning journey</p>
                 </div>
 
@@ -1316,7 +1316,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
                 </div>
 
                 <div className="text-center mb-4 md:mb-6">
-                  <h1 className="text-2xl md:text-3xl font-bold text-white mb-1 md:mb-1">Speak Bee</h1>
+                  <h1 className="text-2xl md:text-3xl font-bold text-white mb-1 md:mb-1">Elora</h1>
                   <p className="text-[#4BB6B7] text-sm md:text-base">Reset Your Password</p>
                 </div>
 

@@ -27,8 +27,8 @@ const Footer = () => {
           <Link to="/" className="flex items-center gap-3 mb-4 group">
             <img
               src="/logo01.png"
-              alt="Speak Bee Logo"
-              className="h-16 sm:h-20 md:h-24 lg:h-28 w-auto transition-transform duration-300 group-hover:scale-110"
+              alt="Elora Logo"
+              className="h-16 sm:h-20 md:h-20 lg:h-20 w-auto transition-transform duration-300 group-hover:scale-110"
             />
             <p className="text-sm hidden sm:block">
               Spoken English Platform
@@ -68,7 +68,7 @@ const Footer = () => {
           <h3 className="font-semibold text-base mb-4 text-black dark:text-white">Quick Links</h3>
           <ul className="space-y-2 text-sm">
             <li><Link to="/" className="hover:text-primary transition">Home</Link></li>
-            <li><Link to="/why" className="hover:text-primary transition">Why Speak Bee</Link></li>
+            <li><Link to="/why" className="hover:text-primary transition">Why Elora</Link></li>
             <li><Link to="/how" className="hover:text-primary transition">How It Works</Link></li>
             <li><Link to="/about" className="hover:text-primary transition">About Us</Link></li>
             <li><Link to="/help" className="hover:text-primary transition">Help Center</Link></li>
@@ -115,7 +115,7 @@ const Footer = () => {
         {/* Mobile Layout */}
         <div className="flex flex-col lg:hidden items-center gap-2 text-center">
           <div className="flex flex-col sm:flex-row items-center gap-2">
-            <p>© {new Date().getFullYear()} Speak Bee. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} Elora. All rights reserved.</p>
             <div className="flex items-center gap-3 flex-wrap justify-center">
               <Link to="/privacy" className="hover:text-primary transition">Privacy Policy</Link>
               <Link to="/terms" className="hover:text-primary transition">Terms</Link>
@@ -140,7 +140,7 @@ const Footer = () => {
           
           {/* Center: Copyright */}
           <div className="flex justify-center">
-            <p>© {new Date().getFullYear()} Speak Bee. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} Elora. All rights reserved.</p>
           </div>
           
           {/* Right: Crafted by */}

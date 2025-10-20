@@ -34,7 +34,7 @@ export const AboutUsSection = ({ show }: AboutUsSectionProps) => {
   const milestones = [
     {
       year: "2024",
-      title: "Speak Bee Launch",
+      title: "Elora Launch",
       description: "Released the world's first fully offline AI-powered English trainer for all platforms."
     },
     {
@@ -45,7 +45,7 @@ export const AboutUsSection = ({ show }: AboutUsSectionProps) => {
     {
       year: "2025",
       title: "Growing Community",
-      description: "Thousands of learners worldwide improving their English skills with Speak Bee."
+      description: "Thousands of learners worldwide improving their English skills with Elora."
     },
     {
       year: "Future",
@@ -129,7 +129,7 @@ export const AboutUsSection = ({ show }: AboutUsSectionProps) => {
           
           <div className="max-w-4xl mx-auto space-y-4 text-muted-foreground text-lg leading-relaxed">
             <p>
-              Speak Bee was born from a simple observation: millions of people worldwide want to learn English, 
+              Elora was born from a simple observation: millions of people worldwide want to learn English, 
               but traditional methods and apps create unnecessary barriers. Expensive subscriptions, mandatory internet connections, 
               privacy concerns, and one-size-fits-all approaches leave many learners behind.
             </p>
@@ -146,13 +146,13 @@ export const AboutUsSection = ({ show }: AboutUsSectionProps) => {
             </p>
             
             <p>
-              But most importantly, we built Speak Bee with <strong className="text-teal-600">privacy, accessibility, and effectiveness</strong> at its core. 
+              But most importantly, we built Elora with <strong className="text-teal-600">privacy, accessibility, and effectiveness</strong> at its core. 
               Your data never leaves your device. You can learn anywhere—on a plane, in remote areas, during your commute. 
               And our AI provides real-time feedback that actually helps you improve.
             </p>
             
             <p className="font-semibold text-teal-600">
-              Today, Speak Bee is helping thousands of learners around the world speak English with confidence. And we're just getting started.
+              Today, Elora is helping thousands of learners around the world speak English with confidence. And we're just getting started.
             </p>
           </div>
         </div>

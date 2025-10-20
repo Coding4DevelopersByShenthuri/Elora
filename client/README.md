@@ -1,4 +1,4 @@
-# Speak Bee (Offline-First PWA)
+# Elora (Offline-First PWA)
 
 Professional offline English learning platform built with React, TypeScript, and Vite.
 

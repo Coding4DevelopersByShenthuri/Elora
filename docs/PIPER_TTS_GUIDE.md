@@ -161,7 +161,7 @@ import { PiperTTS } from './services/PiperTTS';
 await PiperTTS.initialize('en-us-amy-medium');
 
 // Speak text
-await PiperTTS.speak('Hello! Welcome to Speak Bee.', {
+await PiperTTS.speak('Hello! Welcome to Elora.', {
   speakingRate: 0.9,  // Slightly slower
   pitch: 0,           // Normal pitch
   volumeGainDb: 0     // Normal volume

@@ -1,4 +1,4 @@
-// Service Worker for Speak Bee - Offline Support
+// Service Worker for Elora - Offline Support
 // Version 1.0.0 - Production Ready
 const VERSION = '1.0.0';
 const CACHE_NAME = `speakbee-static-v${VERSION}`;

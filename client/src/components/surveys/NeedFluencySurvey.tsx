@@ -39,7 +39,7 @@ const NeedFluencySurvey: React.FC<NeedFluencySurveyProps> = ({
           <div className="md:hidden w-full h-full flex flex-col">
             <div className="bg-blue-50 p-6 pb-0 flex flex-col relative">
               <div className='flex items-center w-full mb-4 relative'>
-                <img src="/logo01.png" alt="Speak Bee Logo" className="w-20 h-20 object-contain ml-2" />
+                <img src="/logo01.png" alt="Elora Logo" className="w-20 h-20 object-contain ml-2" />
                 {/* Center illustration */}
                 <div className="absolute left-1/2 transform -translate-x-1/2 top-[-6px]">
                   <img src="/point.png" alt="Pointing character" className={`w-32 h-32 object-contain ${animate ? 'nf-bounce-once' : ''}`} />
@@ -80,7 +80,7 @@ const NeedFluencySurvey: React.FC<NeedFluencySurveyProps> = ({
             <div className="w-1/2 bg-blue-50 flex items-center justify-center p-8 relative">
               <img src="/point.png" alt="Pointing character" className={`w-[520px] h-auto object-contain drop-shadow-sm ${animate ? 'nf-bounce-once' : ''}`} />
               <div className="absolute bottom-6 left-6">
-                <img src="/logo01.png" alt="Speak Bee Logo" className="w-32 h-32 object-contain" />
+                <img src="/logo01.png" alt="Elora Logo" className="w-32 h-32 object-contain" />
               </div>
             </div>
 

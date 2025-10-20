@@ -53,7 +53,7 @@ const LanguageSurvey: React.FC<LanguageSurveyProps> = ({ isOpen, onComplete, onB
             <div className="bg-blue-50 p-6 pb-0 flex flex-col relative">
               <div className='flex items-center w-full mb-4 relative'>
                 {/* Logo - Positioned on the left */}
-                <img src="/logo01.png" alt="Speak Bee Logo" className="w-20 h-20 object-contain ml-2" />
+                <img src="/logo01.png" alt="Elora Logo" className="w-20 h-20 object-contain ml-2" />
                 
                 {/* Globe - Centered */}
                 <img 
@@ -113,7 +113,7 @@ const LanguageSurvey: React.FC<LanguageSurveyProps> = ({ isOpen, onComplete, onB
               
               {/* Logo in bottom left corner */}
               <div className="absolute bottom-6 left-6">
-                <img src="/logo01.png" alt="Speak Bee Logo" className="w-32 h-32 object-contain" />
+                <img src="/logo01.png" alt="Elora Logo" className="w-32 h-32 object-contain" />
               </div>
             </div>
 

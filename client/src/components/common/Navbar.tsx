@@ -193,13 +193,13 @@ export const Navbar = () => {
               <div className="relative">
                 <Link
                   to="/"
-                  className="absolute -top-8 -left-2 z-50 flex items-center transition-all duration-300 hover:scale-105"
+                  className="absolute -top-8 -left-2 lg:-top-6 lg:left-2 z-50 flex items-center transition-all duration-300 hover:scale-105"
                   onClick={() => handleNavItemClick('what')}
                 >
                   <img
                     src="/logo01.png"
                     alt="Logo"
-                    className="h-28 w-auto sm:h-32 md:h-36 lg:h-40"
+                    className="h-28 w-auto sm:h-32 md:h-32 lg:h-32"
                   />
                 </Link>
                 
@@ -563,7 +563,7 @@ export const Navbar = () => {
                     {/* Clean Footer */}
                     <div className="p-3 border-t bg-muted/30 transition-all duration-300 ease-out delay-300">
                       <div className="text-center text-xs text-muted-foreground">
-                        <p>© 2025 Speak Bee</p>
+                        <p>© 2025 Elora</p>
                         <p className="text-[10px] mt-1">Spoken English Learning Platform</p>
                       </div>
                     </div>

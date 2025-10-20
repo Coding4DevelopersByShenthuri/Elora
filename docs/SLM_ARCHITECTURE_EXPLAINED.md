@@ -6,7 +6,7 @@
 
 An SLM is a **lightweight AI language model** (typically <500M parameters) that can run **locally on your device** without needing cloud servers or internet connectivity.
 
-### **In Your Speak Bee Project:**
+### **In Your Elora Project:**
 
 Your SLM implementation uses **THREE layers** of intelligence:
 
@@ -583,7 +583,7 @@ VITE_PREFER_OFFLINE=false
 
 ## 🎉 **SUMMARY**
 
-Your **Speak Bee** project has a **sophisticated hybrid architecture**:
+Your **Elora** project has a **sophisticated hybrid architecture**:
 
 1. **🤖 SLM (Offline AI)** - Located in `client/src/services/`
    - Runs 100% in browser

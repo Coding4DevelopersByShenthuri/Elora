@@ -7,23 +7,23 @@ Last Updated: ${new Date().toLocaleDateString()}
 
 The Agreement
 
-This Service Agreement ("Contract") is made and entered into as of the date of your acceptance, by and between Speak Bee ("Service Provider") and You ("User" or "Client"). By accessing, registering for, or using the services of Speak Bee, you acknowledge that you have read, understood, and agree to be bound by the terms and conditions outlined in this Agreement.
+This Service Agreement ("Contract") is made and entered into as of the date of your acceptance, by and between Elora ("Service Provider") and You ("User" or "Client"). By accessing, registering for, or using the services of Elora, you acknowledge that you have read, understood, and agree to be bound by the terms and conditions outlined in this Agreement.
 
 Introduction
 
-Welcome to Speak Bee! By using our application and/or using the services that are provided, you acknowledge that you have read, understood, and agree to be bound by our Terms and Conditions. These Terms and Conditions unconditionally extend and apply to all related applications, services, and updates. If you do not agree with all of these Terms and Conditions, you are prohibited from using this Application, and you may discontinue use immediately. Speak Bee recommends that you save or print a copy of these Terms and Conditions for future reference.
+Welcome to Elora! By using our application and/or using the services that are provided, you acknowledge that you have read, understood, and agree to be bound by our Terms and Conditions. These Terms and Conditions unconditionally extend and apply to all related applications, services, and updates. If you do not agree with all of these Terms and Conditions, you are prohibited from using this Application, and you may discontinue use immediately. Elora recommends that you save or print a copy of these Terms and Conditions for future reference.
 
 Definitions/Terminology
 
 The following definitions apply to these Terms and Conditions, Privacy Policy, and all related Agreements:
 
 - "User", "Visitor," "Client," "Customer," "You" and "Your" refers to you, the person(s) that use this Application.
-- "Speak Bee", "We", "Our" and "Us" refers to our Application/Company.
+- "Elora", "We", "Our" and "Us" refers to our Application/Company.
 - "Party," "Parties," or "Us" refers to both you and us.
-- "Application" refers to the Speak Bee Spoken English Training software and all related services.
+- "Application" refers to the Elora Spoken English Training software and all related services.
 - "Content" refers to all materials, information, documents, services, or other entities available through the Application.
 
-All terms refer to all considerations of Speak Bee necessary to undertake support to you for the express purpose of meeting your User needs in respect of our services, under and subject to, prevailing law of the jurisdiction in which Speak Bee operates.
+All terms refer to all considerations of Elora necessary to undertake support to you for the express purpose of meeting your User needs in respect of our services, under and subject to, prevailing law of the jurisdiction in which Elora operates.
 
 User Obligations
 
@@ -34,14 +34,14 @@ Compliance with Laws
 You must comply with all applicable laws, regulations, and third-party agreements in your use of the Application.
 
 Lawful Use
-You will use Speak Bee's services only for lawful purposes and as outlined in this Agreement. Any unauthorized or prohibited use may result in immediate termination of your account.
+You will use Elora's services only for lawful purposes and as outlined in this Agreement. Any unauthorized or prohibited use may result in immediate termination of your account.
 
 Account Security
 You are responsible for maintaining the confidentiality of your login credentials and for all activities that occur under your account.
 
 Product/Service Details
 
-Speak Bee offers the following services through its offline-first English language learning application:
+Elora offers the following services through its offline-first English language learning application:
 
 - Speech Recognition & Pronunciation Feedback: Real-time speech analysis and corrective feedback
 - Interactive Learning Modules: Structured lessons for different proficiency levels
@@ -57,7 +57,7 @@ Speak Bee offers the following services through its offline-first English langua
 Intellectual Property Rights
 
 Our Intellectual Property
-Other than the content you own and opt to include on this Application, under these Terms, Speak Bee and/or its licensors own and reserve all intellectual property rights of this Application. You are granted a limited license, subject to the restrictions entailed in these Terms and Conditions, for purposes of using this Application's content and services.
+Other than the content you own and opt to include on this Application, under these Terms, Elora and/or its licensors own and reserve all intellectual property rights of this Application. You are granted a limited license, subject to the restrictions entailed in these Terms and Conditions, for purposes of using this Application's content and services.
 
 Protected intellectual property includes:
 - AI models, algorithms, and machine learning systems
@@ -73,7 +73,7 @@ You retain ownership of:
 - User-generated content where applicable
 
 License Grant
-By using the Application, you grant Speak Bee a worldwide, non-exclusive, royalty-free license to use, reproduce, and process your data solely for the purpose of providing and improving our services, in accordance with our Privacy Policy.
+By using the Application, you grant Elora a worldwide, non-exclusive, royalty-free license to use, reproduce, and process your data solely for the purpose of providing and improving our services, in accordance with our Privacy Policy.
 
 Service Specifications
 
@@ -94,7 +94,7 @@ Offline Capabilities
 Payment and Financial Terms
 
 Service Models
-Speak Bee may utilize the following revenue models:
+Elora may utilize the following revenue models:
 - One-time application purchase
 - Subscription-based premium features
 - Institutional bulk licensing
@@ -128,7 +128,7 @@ You may not:
 - Share account access or create multiple fraudulent accounts
 - Use the Application to harass, abuse, or harm others
 - Distribute viruses or malicious code through our services
-- Violate intellectual property rights of Speak Bee or third parties
+- Violate intellectual property rights of Elora or third parties
 
 Privacy and Data Protection
 
@@ -154,7 +154,7 @@ Data Security
 
 Disclaimer of Warranties
 
-THE APPLICATION AND SERVICES ARE PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED. TO THE FULLEST EXTENT PERMISSIBLE PURSUANT TO APPLICABLE LAW, SPEAK BEE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO:
+THE APPLICATION AND SERVICES ARE PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED. TO THE FULLEST EXTENT PERMISSIBLE PURSUANT TO APPLICABLE LAW, Elora DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO:
 
 - Perfect speech recognition accuracy or performance
 - Uninterrupted or error-free service availability
@@ -165,14 +165,14 @@ THE APPLICATION AND SERVICES ARE PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WAR
 
 Limitation of Liability
 
-TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL SPEAK BEE, ITS DIRECTORS, EMPLOYEES, PARTNERS, AGENTS, SUPPLIERS, OR AFFILIATES BE LIABLE FOR:
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL Elora, ITS DIRECTORS, EMPLOYEES, PARTNERS, AGENTS, SUPPLIERS, OR AFFILIATES BE LIABLE FOR:
 
 - Technical issues related to user device hardware or software
 - Internet connectivity requirements for certain features
 - User's ability to achieve specific learning goals or outcomes
 - Third-party services, applications, or integrations
 - Indirect, incidental, special, consequential, or punitive damages
-- Any damages exceeding the amount paid by you to Speak Bee in the past six months
+- Any damages exceeding the amount paid by you to Elora in the past six months
 
 Modifications to Terms
 
@@ -189,7 +189,7 @@ Termination and Suspension
 By You
 You may terminate your account at any time through application settings or by contacting customer support.
 
-By Speak Bee
+By Elora
 We may suspend or terminate accounts for:
 - Violation of these Terms and Conditions
 - Prolonged account inactivity (typically 12 months)
@@ -250,7 +250,7 @@ We typically respond to inquiries within 2 business days.
 
 Entire Agreement
 
-These Terms and Conditions, together with our Privacy Policy and any additional agreements you may enter with Speak Bee, constitute the entire agreement between you and Speak Bee regarding the Application and supersede all prior agreements, understandings, and representations.
+These Terms and Conditions, together with our Privacy Policy and any additional agreements you may enter with Elora, constitute the entire agreement between you and Elora regarding the Application and supersede all prior agreements, understandings, and representations.
 
 Severability
 
@@ -262,9 +262,9 @@ Our failure to enforce any right or provision of these Terms will not be conside
 
 Assignment
 
-You may not assign or transfer these Terms, by operation of law or otherwise, without Speak Bee's prior written consent. Any attempt by you to assign or transfer these Terms without such consent will be null and of no effect. Speak Bee may assign or transfer these Terms, at its sole discretion, without restriction.
+You may not assign or transfer these Terms, by operation of law or otherwise, without Elora's prior written consent. Any attempt by you to assign or transfer these Terms without such consent will be null and of no effect. Elora may assign or transfer these Terms, at its sole discretion, without restriction.
 
-By using Speak Bee, you acknowledge that you have read, understood, and expressly agree to be bound by these Terms and Conditions.
+By using Elora, you acknowledge that you have read, understood, and expressly agree to be bound by these Terms and Conditions.
 `;
 
 // Security questions for user registration

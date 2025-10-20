@@ -176,7 +176,7 @@ const HowPage = () => {
             </div>
             
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
-              How <span className="text-primary">Speak Bee</span> Works
+              How <span className="text-primary">Elora</span> Works
             </h1>
             
             <p className="text-lg text-muted-foreground leading-relaxed">
@@ -293,7 +293,7 @@ const HowPage = () => {
               Interactive Learning Modules
             </span>
           }
-            description="Speak Bee offers category-based modules for Kids, Adults, and IELTS/PTE learners, tailored to your skill level and learning goals."
+            description="Elora offers category-based modules for Kids, Adults, and IELTS/PTE learners, tailored to your skill level and learning goals."
             image="./image6.png"
             features={[
               { icon: <CheckCircle size={24} />, text: "Kids: Vocabulary games, story listening, pronunciation practice" },
@@ -329,7 +329,7 @@ const HowPage = () => {
                 Access Lessons & Feedback Instantly.
               </span>
             }
-            description="Quickly find the lessons, exercises, and practice sessions you need. Speak Bee helps you navigate your learning path efficiently and stay on track."
+            description="Quickly find the lessons, exercises, and practice sessions you need. Elora helps you navigate your learning path efficiently and stay on track."
             image="./image7.png"
             features={[
               { icon: <CheckCircle size={24} />, text: "Instant access to Kids, Adults, and IELTS/PTE modules" },
@@ -347,7 +347,7 @@ const HowPage = () => {
                 AI-Powered Learning Insights.
               </span>
             }
-            description="Speak Bee's AI helps you discover patterns in your learning, providing personalized guidance and suggestions to improve your English skills efficiently."
+            description="Elora's AI helps you discover patterns in your learning, providing personalized guidance and suggestions to improve your English skills efficiently."
             image="./image8.png"
             features={[
               { icon: <CheckCircle size={24} />, text: "AI analyzes your progress to suggest next lessons and exercises" },
@@ -365,7 +365,7 @@ const HowPage = () => {
                 Your Private Learning Hub.
               </span>
             }
-            description="Speak Bee keeps your learning progress and data completely private. All exercises, lessons, and feedback are stored locally, giving you full control and offline access."
+            description="Elora keeps your learning progress and data completely private. All exercises, lessons, and feedback are stored locally, giving you full control and offline access."
             image="./image9.png"
             features={[
               { icon: <CheckCircle size={24} />, text: "All learning data stored locally on your device" },
@@ -383,7 +383,7 @@ const HowPage = () => {
                 Your Personal English Coach.
               </span>
             }
-            description="Speak Bee acts as an extension of your learning journey, guiding you through interactive lessons, practice exercises, and real-time feedback across all your devices."
+            description="Elora acts as an extension of your learning journey, guiding you through interactive lessons, practice exercises, and real-time feedback across all your devices."
             image="./image10.png"
             features={[
               { icon: <CheckCircle size={24} />, text: "Works offline on all your devices: Android, iOS, Windows, and macOS" },
@@ -398,14 +398,14 @@ const HowPage = () => {
         <div className="py-16 px-4 rounded-lg glass-panel my-24">
           <h2 className="text-3xl font-bold text-center mb-3">We believe learning should be effortless</h2>
           <p className="text-xl text-center text-foreground/80 max-w-3xl mx-auto mb-16">
-            Focus on improving your English skills while Speak Bee handles the rest — practice, feedback, and progress tracking.
+            Focus on improving your English skills while Elora handles the rest — practice, feedback, and progress tracking.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <ValueProp
               icon={<Brain className="w-8 h-8 text-primary" />}
               title="Learn with AI"
-              description="Speak Bee uses offline AI to provide real-time conversation practice, pronunciation scoring, and personalized feedback."
+              description="Elora uses offline AI to provide real-time conversation practice, pronunciation scoring, and personalized feedback."
             />
             <ValueProp
               icon={<Shield className="w-8 h-8 text-primary" />}
@@ -559,7 +559,7 @@ const HowPage = () => {
                 AI & Speech Technology
               </h3>
               <p className="text-foreground/80 mb-4">
-                Speak Bee leverages cutting-edge AI and offline speech models to provide pronunciation feedback, interactive conversations, and personalized learning paths.
+                Elora leverages cutting-edge AI and offline speech models to provide pronunciation feedback, interactive conversations, and personalized learning paths.
               </p>
 
               <h3 className="flex items-center text-xl font-bold mb-3 gap-2">
@@ -594,7 +594,7 @@ const HowPage = () => {
             </div>
             
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 text-teal-600">
-              Download Speak Bee
+              Download Elora
             </h2>
             
             <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">

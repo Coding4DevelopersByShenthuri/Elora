@@ -25,7 +25,7 @@ const SpeakOutSurvey: React.FC<SpeakOutSurveyProps> = ({
           <div className="md:hidden w-full h-full flex flex-col">
             <div className="bg-blue-50 p-6 pb-0 flex flex-col relative">
               <div className='flex items-center w-full mb-4 relative'>
-                <img src="/logo01.png" alt="Speak Bee Logo" className="w-20 h-20 object-contain ml-2" />
+                <img src="/logo01.png" alt="Elora Logo" className="w-20 h-20 object-contain ml-2" />
                 {/* Mobile illustration - centered and lifted into the blue header */}
                 <div className="absolute left-1/2 -translate-x-1/2 top-[-10px]">
                   <div className="relative w-36 h-36">
@@ -43,7 +43,7 @@ const SpeakOutSurvey: React.FC<SpeakOutSurveyProps> = ({
 
                 <h1 className="text-3xl sm:text-4xl font-bold text-blue-900 mb-4 leading-snug">
                   Speak out loud to learn English.<br />
-                  With <span className="text-teal-600">Speak Bee</span>,<br />
+                  With <span className="text-teal-600">Elora</span>,<br />
                   it’s simple and fun.
                 </h1>
               </div>
@@ -73,7 +73,7 @@ const SpeakOutSurvey: React.FC<SpeakOutSurveyProps> = ({
 
               {/* Logo in bottom-left */}
               <div className="absolute bottom-6 left-6">
-                <img src="/logo01.png" alt="Speak Bee Logo" className="w-32 h-32 object-contain" />
+                <img src="/logo01.png" alt="Elora Logo" className="w-32 h-32 object-contain" />
               </div>
             </div>
 
@@ -83,7 +83,7 @@ const SpeakOutSurvey: React.FC<SpeakOutSurveyProps> = ({
                 <SurveyProgress currentStep={currentStep} totalSteps={totalSteps} onBack={onBack} variant="desktop" />
 
                 <h1 className="text-2xl md:text-[40px] leading-snug md:leading-[1.2] font-bold text-blue-900 mb-10 md:mb-24 text-center">
-                  Speak out loud to learn English. With <span className="text-yellow-600">Speak Bee</span>, it's simple and fun.
+                  Speak out loud to learn English. With <span className="text-yellow-600">Elora</span>, it's simple and fun.
                 </h1>
 
                 <div className="flex justify-center">

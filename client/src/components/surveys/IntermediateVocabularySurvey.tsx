@@ -81,7 +81,7 @@ const IntermediateVocabularySurvey: React.FC<IntermediateVocabularySurveyProps> 
           <div className="md:hidden w-full h-full flex flex-col">
             <div className="bg-blue-50 p-6 pb-0 flex flex-col relative">
               <div className='flex items-center w-full mb-4 relative'>
-                <img src="/logo01.png" alt="Speak Bee Logo" className="w-20 h-20 object-contain ml-2" />
+                <img src="/logo01.png" alt="Elora Logo" className="w-20 h-20 object-contain ml-2" />
                 {/* Inter image */}
                 <div className="absolute left-1/2 transform -translate-x-1/2 top-[-10px]">
                   <img src="/Inter.png" alt="B1-B2 Level" className={`w-36 h-36 object-contain drop-shadow-sm ${animate ? 'iv-bounce-in' : ''}`} />
@@ -142,7 +142,7 @@ const IntermediateVocabularySurvey: React.FC<IntermediateVocabularySurveyProps> 
                 <img src="/Inter.png" alt="B1-B2 Level" className={`w-[520px] h-auto object-contain drop-shadow-sm ${animate ? 'iv-bounce-in' : ''}`} />
               </div>
               <div className="absolute bottom-6 left-6">
-                <img src="/logo01.png" alt="Speak Bee Logo" className="w-32 h-32 object-contain" />
+                <img src="/logo01.png" alt="Elora Logo" className="w-32 h-32 object-contain" />
               </div>
             </div>
 

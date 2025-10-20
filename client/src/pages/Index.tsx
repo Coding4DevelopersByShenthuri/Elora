@@ -61,7 +61,7 @@ const Index = () => {
       name: "Sarah Johnson",
       role: "English Teacher",
       location: "New York",
-      content: "Speak Bee has revolutionized how my students learn English. The offline AI features work perfectly even in areas with poor internet connectivity.",
+      content: "Elora has revolutionized how my students learn English. The offline AI features work perfectly even in areas with poor internet connectivity.",
       rating: 5,
       image: "👩‍🏫"
     },
@@ -225,7 +225,7 @@ const Index = () => {
           <div className="text-center mb-10 md:mb-16">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
               Why Choose <span className="relative inline-block">
-                <span className="text-[#529641]">Speak Bee</span>
+                <span className="text-[#529641]">Elora</span>
                 <svg className="absolute -bottom-1 md:-bottom-2 left-0 w-full h-2 md:h-3 text-orange-400" viewBox="0 0 200 12" fill="none">
                   <path d="M2 8C50 2 100 10 150 6C180 4 200 8 200 8" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
                 </svg>
@@ -375,7 +375,7 @@ const Index = () => {
                 </svg>
               </div>
               <p className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed">
-                We recently heard from Sarah Johnson, who started learning with Speak Bee in the spring of 2024. 
+                We recently heard from Sarah Johnson, who started learning with Elora in the spring of 2024. 
                 Below, she shares her story of how she was able to improve her English skills quickly.
               </p>
               {/* Decorative lines */}
@@ -391,7 +391,7 @@ const Index = () => {
                 name: "James Hown",
                 role: "English Teacher",
                 location: "Texas",
-                content: "Speak Bee has revolutionized how my students learn English. The offline AI features work perfectly even in areas with poor internet connectivity.",
+                content: "Elora has revolutionized how my students learn English. The offline AI features work perfectly even in areas with poor internet connectivity.",
                 rating: 5,
                 image: "👨‍🏫"
               },

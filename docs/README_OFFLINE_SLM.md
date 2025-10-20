@@ -1,4 +1,4 @@
-# 🐝 Speak Bee - Offline SLM Implementation
+# 🐝 Elora - Offline SLM Implementation
 
 **Complete offline Spoken English Training App using Small Language Models**
 

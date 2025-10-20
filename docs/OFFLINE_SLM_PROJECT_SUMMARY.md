@@ -1,6 +1,6 @@
-# 🐝 Speak Bee - Offline SLM Project Summary
+# 🐝 Elora - Offline SLM Project Summary
 
-Complete overview of the offline Small Language Model implementation for Speak Bee English Training App.
+Complete overview of the offline Small Language Model implementation for Elora English Training App.
 
 ---
 
@@ -493,7 +493,7 @@ async function runVoiceLesson() {
 
 ## ✨ Conclusion
 
-The **Speak Bee Offline SLM Project** is now **complete and ready for testing**. 
+The **Elora Offline SLM Project** is now **complete and ready for testing**. 
 
 All core services have been implemented with:
 - ✅ Full offline functionality

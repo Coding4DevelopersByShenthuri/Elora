@@ -56,7 +56,7 @@ const HelpPage = () => {
                                 Whether you're stuck, curious, or just getting started—this page is for you.
                             </p>
                             <p className="text-xl md:text-2xl text-foreground/90 mt-4">
-                                Find answers, connect with support, and get the most out of Speak Bee.
+                                Find answers, connect with support, and get the most out of Elora.
                             </p>
                         </div>
                     </div>
@@ -69,7 +69,7 @@ const HelpPage = () => {
                         content={
                             <>
                                 <p><strong>Q: Do I need the internet to use this app?</strong></p>
-                                <p>A: No! Speak Bee works fully offline. You can learn, practice, and improve anywhere, anytime.</p>
+                                <p>A: No! Elora works fully offline. You can learn, practice, and improve anywhere, anytime.</p>
 
                                 <p className="mt-6"><strong>Q: Is my data being tracked?</strong></p>
                                 <p>A: Absolutely not. We value your privacy. Everything stays on your device—nothing is sent to the cloud.</p>

@@ -85,7 +85,7 @@ const UserSurvey: React.FC<UserSurveyProps> = ({ isOpen, onComplete, currentStep
                 {/* Logo - Positioned on the left */}
                 <img
                   src="/logo01.png"
-                  alt="Speak Bee Logo"
+                  alt="Elora Logo"
                   className="w-20 h-20 object-contain ml-2"
                 />
                 
@@ -189,7 +189,7 @@ const UserSurvey: React.FC<UserSurveyProps> = ({ isOpen, onComplete, currentStep
               <div className="absolute bottom-6 left-6">
                 <img
                   src="/logo01.png"
-                  alt="Speak Bee Logo"
+                  alt="Elora Logo"
                   className="w-32 h-32 object-contain"
                 />
               </div>

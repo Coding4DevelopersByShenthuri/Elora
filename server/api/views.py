@@ -740,6 +740,6 @@ def health_check(request):
     """API health check"""
     return Response({
         "status": "healthy",
-        "message": "Speak Bee API is running",
+        "message": "Elora API is running",
         "version": "1.0.0"
     })

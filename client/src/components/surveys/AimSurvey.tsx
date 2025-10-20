@@ -46,7 +46,7 @@ const AimSurvey: React.FC<AimSurveyProps> = ({
           <div className="md:hidden w-full h-full flex flex-col">
             <div className="bg-blue-50 p-6 pb-0 flex flex-col relative">
               <div className='flex items-center w-full mb-4 relative'>
-                <img src="/logo01.png" alt="Speak Bee Logo" className="w-20 h-20 object-contain ml-2" />
+                <img src="/logo01.png" alt="Elora Logo" className="w-20 h-20 object-contain ml-2" />
                 {/* Mobile illustration - centered */}
                 <img src="/aim.png" alt="Aim" className={`w-38 h-38 object-contain absolute left-1/2 transform -translate-x-1/2 ${shouldAnimate ? 'aim-bounce-once' : ''}`} />
               </div>
@@ -86,7 +86,7 @@ const AimSurvey: React.FC<AimSurveyProps> = ({
                 <img src="/aim.png" alt="Aim" className={`w-[420px] h-auto object-contain drop-shadow-sm ${shouldAnimate ? 'aim-bounce-once' : ''}`} />
               </div>
               <div className="absolute bottom-6 left-6">
-                <img src="/logo01.png" alt="Speak Bee Logo" className="w-32 h-32 object-contain" />
+                <img src="/logo01.png" alt="Elora Logo" className="w-32 h-32 object-contain" />
               </div>
             </div>
 

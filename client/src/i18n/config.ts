@@ -12,7 +12,7 @@ const resources = {
   en: {
     translation: {
       // Common
-      welcome: 'Welcome to Speak Bee',
+      welcome: 'Welcome to Elora',
       continue: 'Continue',
       back: 'Back',
       next: 'Next',

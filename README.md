@@ -1,4 +1,4 @@
-# 🐝 Speak Bee - Your Personal AI English Trainer
+# 🐝 Elora - Your Personal AI English Trainer
 
 **Offline-First English Learning Platform with AI-Powered Features**
 
@@ -10,7 +10,7 @@
 
 ## 🌟 Overview
 
-Speak Bee is a comprehensive English learning platform that works 100% offline while optionally syncing to the cloud. Built with privacy-first principles, it offers personalized learning experiences for Kids, Adults (Beginner to Advanced), and IELTS/PTE exam candidates.
+Elora is a comprehensive English learning platform that works 100% offline while optionally syncing to the cloud. Built with privacy-first principles, it offers personalized learning experiences for Kids, Adults (Beginner to Advanced), and IELTS/PTE exam candidates.
 
 ### Key Features
 
@@ -299,5 +299,5 @@ Built by passionate educators and engineers dedicated to making English learning
 **Version:** 2.0  
 **Last Updated:** October 15, 2025
 
-**Start learning English today with Speak Bee! 🐝📚**
+**Start learning English today with Elora! 🐝📚**
 
