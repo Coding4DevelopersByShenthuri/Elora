@@ -17,22 +17,22 @@ const AboutPage = () => {
 
   const values = [
     {
-      icon: <Lightbulb className="w-6 h-6" />,
+      icon: <Lightbulb className="w-6 h-6 text-teal-800" />,
       title: "Innovation",
       description: "Pioneering offline AI technology to make language learning accessible everywhere."
     },
     {
-      icon: <Heart className="w-6 h-6" />,
+      icon: <Heart className="w-6 h-6 text-teal-800" />,
       title: "Empathy",
       description: "Understanding the challenges learners face and building solutions that truly help."
     },
     {
-      icon: <Users className="w-6 h-6" />,
+      icon: <Users className="w-6 h-6 text-teal-800" />,
       title: "Inclusivity",
       description: "Creating tools for everyone—kids, adults, and exam candidates—regardless of background."
     },
     {
-      icon: <Award className="w-6 h-6" />,
+      icon: <Award className="w-6 h-6 text-teal-800" />,
       title: "Excellence",
       description: "Delivering high-quality learning experiences with proven results and effectiveness."
     }
@@ -77,7 +77,7 @@ const AboutPage = () => {
               {/* Student image */}
               <div className="w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 mx-auto rounded-full overflow-hidden border-4 border-primary/20 shadow-2xl">
                 <img 
-                  src="/About.png" 
+                  src="/board.png" 
                   alt="Happy English learner" 
                   className="w-full h-full object-cover"
                 />
@@ -101,7 +101,12 @@ const AboutPage = () => {
             </div>
             
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold">
-              Get in <span className="text-orange-400">Touch</span>
+              Get in <span className="relative inline-block">
+                <span className="text-orange-400">Touch</span>
+                <svg className="absolute -bottom-1 md:-bottom-2 left-0 w-full h-2 md:h-3 text-green-500" viewBox="0 0 200 12" fill="none">
+                  <path d="M2 8C50 2 100 10 150 6C180 4 200 8 200 8" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+                </svg>
+              </span>
             </h1>
             
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary">
@@ -127,12 +132,11 @@ const AboutPage = () => {
           <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/90 backdrop-blur-sm">
             <CardContent className="p-6 md:p-8 lg:p-10">
               <div className="flex flex-col sm:flex-row items-start sm:items-center mb-4 md:mb-6">
-                <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-300 mb-4 sm:mb-0 sm:mr-4 flex-shrink-0">
-                  <Target className="w-6 h-6 md:w-8 md:h-8" />
+                <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-gradient-to-br from-primary/50 to-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-300 mb-4 sm:mb-0 sm:mr-4 flex-shrink-0">
+                  <Target className="w-6 h-6 md:w-8 md:h-8 text-teal-800" />
                 </div>
                 <div>
-                  <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-primary mb-1">Best Certified AI Worldwide</h2>
-                  <div className="text-2xl md:text-3xl font-bold text-primary">210+</div>
+                  <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-teal-800 mb-1">Best Certified AI Worldwide</h2>
                   <div className="text-xs md:text-sm text-muted-foreground">Expert models already join us</div>
                 </div>
               </div>
@@ -146,11 +150,11 @@ const AboutPage = () => {
           <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/90 backdrop-blur-sm">
             <CardContent className="p-6 md:p-8 lg:p-10">
               <div className="flex flex-col sm:flex-row items-start sm:items-center mb-4 md:mb-6">
-                <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-gradient-to-br from-secondary/20 to-secondary/10 flex items-center justify-center text-secondary group-hover:scale-110 transition-transform duration-300 mb-4 sm:mb-0 sm:mr-4 flex-shrink-0">
-                  <Lightbulb className="w-6 h-6 md:w-8 md:h-8" />
+                <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-gradient-to-br from-secondary/50 to-secondary/20 flex items-center justify-center text-secondary group-hover:scale-110 transition-transform duration-300 mb-4 sm:mb-0 sm:mr-4 flex-shrink-0">
+                  <Lightbulb className="w-6 h-6 md:w-8 md:h-8 text-teal-800" />
                 </div>
                 <div>
-                  <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-primary mb-1">Transforming learners and AI technology</h2>
+                  <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-teal-800 mb-1">Transforming learners and AI technology</h2>
                   <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-orange-400 flex items-center justify-center mt-2">
                     <ArrowRight className="w-3 h-3 md:w-4 md:h-4 text-white" />
                   </div>
@@ -182,7 +186,7 @@ const AboutPage = () => {
                   <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-primary/20 flex items-center justify-center mx-auto mb-4 md:mb-6 text-primary group-hover:scale-110 transition-transform duration-300">
                     {value.icon}
                   </div>
-                  <h3 className="text-lg md:text-xl font-bold mb-3 md:mb-4">{value.title}</h3>
+                  <h3 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-teal-800">{value.title}</h3>
                   <p className="text-sm md:text-base text-muted-foreground leading-relaxed">{value.description}</p>
                 </CardContent>
               </Card>
@@ -250,10 +254,10 @@ const AboutPage = () => {
                   <div className={`flex-1 ${idx % 2 === 0 ? 'lg:text-right' : 'lg:text-left'}`}>
                     <Card className="hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/80 backdrop-blur-sm">
                       <CardContent className="p-4 md:p-6">
-                        <div className="inline-block px-2 py-1 md:px-3 md:py-1 rounded-full bg-primary/20 text-primary font-bold text-xs md:text-sm mb-2 md:mb-3">
+                        <div className="inline-block px-2 py-1 md:px-3 md:py-1 rounded-full bg-teal-100 text-teal-800 font-bold text-xs md:text-sm mb-2 md:mb-3">
                           {milestone.year}
                         </div>
-                        <h3 className="text-lg md:text-xl font-bold mb-1 md:mb-2 text-primary">{milestone.title}</h3>
+                        <h3 className="text-lg md:text-xl font-bold mb-1 md:mb-2 text-teal-800">{milestone.title}</h3>
                         <p className="text-sm md:text-base text-muted-foreground leading-relaxed">{milestone.description}</p>
                       </CardContent>
                     </Card>
@@ -308,15 +312,15 @@ const AboutPage = () => {
               <div className="flex flex-wrap gap-3 md:gap-6 mb-6 md:mb-8">
                 <div className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-white/20 text-white text-xs md:text-base">
                   <Users className="w-3 h-3 md:w-4 md:h-4" />
-                  <span className="font-medium">10+ Team Members</span>
+                  <span className="font-medium">2+ Team Members</span>
                 </div>
                 <div className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-white/20 text-white text-xs md:text-base">
                   <Globe2 className="w-3 h-3 md:w-4 md:h-4" />
-                  <span className="font-medium">5+ Countries</span>
+                  <span className="font-medium">2+ Countries</span>
                 </div>
                 <div className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-white/20 text-white text-xs md:text-base">
                   <Award className="w-3 h-3 md:w-4 md:h-4" />
-                  <span className="font-medium">20+ Years Experience</span>
+                  <span className="font-medium">2+ Years Experience</span>
                 </div>
               </div>
 
@@ -325,7 +329,7 @@ const AboutPage = () => {
                 <Button size="lg" className="bg-[#F7B500] hover:bg-[#F7B500]/90 text-white px-6 py-3 md:px-8 md:py-4 text-base md:text-lg rounded-full" asChild>
                   <Link to="/contact">Get in Touch</Link>
                 </Button>
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-[#2F786E] px-6 py-3 md:px-8 md:py-4 text-base md:text-lg rounded-full" asChild>
+                <Button size="lg" variant="outline" className="border-white text-teal-500 hover:bg-white hover:text-[#2F786E] px-6 py-3 md:px-8 md:py-4 text-base md:text-lg rounded-full" asChild>
                   <Link to="/why">Learn Our Philosophy</Link>
                 </Button>
               </div>

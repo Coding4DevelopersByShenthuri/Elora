@@ -18,22 +18,22 @@ const WhyPage = () => {
 
   const values = [
     {
-      icon: <ShieldCheck className="w-6 h-6" />,
+      icon: <ShieldCheck className="w-6 h-6 text-teal-700" />,
       title: "Privacy First",
       description: "Your data never leaves your device. Complete offline functionality with zero data collection."
     },
     {
-      icon: <Brain className="w-6 h-6" />,
+      icon: <Brain className="w-6 h-6 text-teal-700" />,
       title: "AI-Powered Learning",
       description: "Advanced AI technology provides personalized feedback and adapts to your learning pace."
     },
     {
-      icon: <Globe className="w-6 h-6" />,
+      icon: <Globe className="w-6 h-6 text-teal-700" />,
       title: "Accessible Everywhere",
       description: "Learn English anywhere, anytime, without requiring an internet connection."
     },
     {
-      icon: <Award className="w-6 h-6" />,
+      icon: <Award className="w-6 h-6 text-teal-700" />,
       title: "Proven Results",
       description: "Thousands of learners have improved their English skills using our platform."
     }
@@ -100,25 +100,25 @@ const WhyPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
           {[
             {
-              icon: <Lightbulb className="w-8 h-8" />,
+              icon: <Lightbulb className="w-8 h-8 text-teal-800" />,
               title: "Because learning should be <span className='text-orange-500 font-bold'>accessible</span> to everyone",
               description: "We believe that quality English education shouldn't be limited by internet connectivity, expensive subscriptions, or privacy concerns. Our offline-first approach ensures that anyone, anywhere can learn English effectively.",
               color: "from-primary to-primary/80"
             },
             {
-              icon: <Heart className="w-8 h-8" />,
+              icon: <Heart className="w-8 h-8 text-teal-800" />,
               title: "Because we care about your <span className='text-orange-500 font-bold'>privacy</span> and data",
               description: "Your learning journey is personal. That's why all your data stays on your device. No cloud storage, no data collection, no tracking. Just pure, private learning.",
               color: "from-primary to-primary/80"
             },
             {
-              icon: <Zap className="w-8 h-8" />,
+              icon: <Zap className="w-8 h-8 text-teal-800" />,
               title: "Because AI should <span className='text-orange-500 font-bold'>empower</span>, not replace human learning",
               description: "Our AI technology enhances your learning experience by providing instant feedback and personalized guidance, while keeping you in control of your educational journey.",
               color: "from-primary to-primary/80"
             },
             {
-              icon: <Target className="w-8 h-8" />,
+              icon: <Target className="w-8 h-8 text-teal-800" />,
               title: "Because every learner deserves <span className='text-orange-500 font-bold'>personalized</span> attention",
               description: "Whether you're a child starting out, an adult improving your skills, or preparing for exams, our AI adapts to your pace and learning style for maximum effectiveness.",
               color: "from-primary to-primary/80"
@@ -134,7 +134,7 @@ const WhyPage = () => {
                     <ArrowRight className="w-4 h-4 text-white" />
                   </div>
                 </div>
-                <h3 className="text-2xl font-bold mb-4 text-primary" dangerouslySetInnerHTML={{ __html: reason.title }} />
+                <h3 className="text-2xl font-bold mb-4 text-teal-600" dangerouslySetInnerHTML={{ __html: reason.title }} />
                 <p className="text-muted-foreground leading-relaxed text-lg">{reason.description}</p>
               </CardContent>
             </Card>
@@ -162,30 +162,6 @@ const WhyPage = () => {
                 <p className="text-muted-foreground leading-relaxed">{value.description}</p>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* Call to Action */}
-        <div className="text-center">
-          <div className="bg-gradient-to-br from-primary to-secondary rounded-3xl p-12 text-white">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-6">
-              Ready to Start Your English Journey?
-            </h2>
-            <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-              Join thousands of learners who are already improving their English skills with our AI-powered platform.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-white text-primary hover:bg-white/90 px-8 py-4 text-lg rounded-full">
-                <Play className="w-5 h-5 mr-2" />
-                Start Learning Now
-              </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary px-8 py-4 text-lg rounded-full">
-                <Link to="/how" className="flex items-center">
-                  Learn How It Works
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Link>
-              </Button>
-            </div>
           </div>
         </div>
       </div>
