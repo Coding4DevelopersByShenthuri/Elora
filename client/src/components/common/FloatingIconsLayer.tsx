@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useTheme } from '@/contexts/ThemeContext';
 
 // Material Design
@@ -54,19 +55,26 @@ function randomBetween(min: number, max: number) {
 
 export const FloatingIconsLayer: React.FC = () => {
   const { theme } = useTheme();
+  const location = useLocation();
+  
+  // Don't render floating icons on the Kids page
+  if (location.pathname === '/kids') {
+    return null;
+  }
+  
   // Precompute randomized positions and animation timing for a stable render per mount
   const items = useMemo(() => {
-    const viewCount = 18; // render a few extras for density
+    const viewCount = 12; // Reduced for minimalistic effect
     return Array.from({ length: viewCount }).map((_, idx) => {
       const Icon = icons[idx % icons.length];
       const top = randomBetween(5, 85); // percent
       const left = randomBetween(2, 98); // percent
-      const delay = randomBetween(0, 6); // seconds
-      const duration = randomBetween(12, 28); // seconds
-      const size = randomBetween(14, 22); // px small
-      const rotate = randomBetween(-15, 15); // deg
+      const delay = randomBetween(0, 8); // seconds - increased for less density
+      const duration = randomBetween(18, 35); // seconds - slower for subtlety
+      const size = randomBetween(12, 18); // px - smaller icons
+      const rotate = randomBetween(-8, 8); // deg - less rotation
       const color = tealPalette[idx % tealPalette.length];
-      const floatDistance = randomBetween(12, 28); // px
+      const floatDistance = randomBetween(8, 15); // px - reduced movement
       return { Icon, top, left, delay, duration, size, rotate, color, floatDistance };
     });
   }, []);
@@ -87,7 +95,7 @@ export const FloatingIconsLayer: React.FC = () => {
             animation: `floatingDrift ${item.duration}s ease-in-out ${item.delay}s infinite`,
             willChange: 'transform, opacity',
             transform: `rotate(${item.rotate}deg)`,
-            opacity: theme === 'dark' ? 0.2 : 0.35,
+            opacity: theme === 'dark' ? 0.12 : 0.18,
           }}
         >
           <item.Icon size={item.size} color={item.color} />
@@ -96,11 +104,11 @@ export const FloatingIconsLayer: React.FC = () => {
 
       <style>{`
         @keyframes floatingDrift {
-          0% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0.25; }
-          25% { transform: translate3d(8px, -${Math.round(items[0]?.floatDistance ?? 20)}px, 0) rotate(2deg); opacity: 0.4; }
-          50% { transform: translate3d(-6px, -${Math.round((items[0]?.floatDistance ?? 20) / 2)}px, 0) rotate(-1.5deg); opacity: 0.32; }
-          75% { transform: translate3d(10px, -${Math.round(items[0]?.floatDistance ?? 20)}px, 0) rotate(1deg); opacity: 0.42; }
-          100% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0.25; }
+          0% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0.15; }
+          25% { transform: translate3d(4px, -${Math.round(items[0]?.floatDistance ?? 12)}px, 0) rotate(1deg); opacity: 0.22; }
+          50% { transform: translate3d(-3px, -${Math.round((items[0]?.floatDistance ?? 12) / 2)}px, 0) rotate(-0.8deg); opacity: 0.18; }
+          75% { transform: translate3d(5px, -${Math.round(items[0]?.floatDistance ?? 12)}px, 0) rotate(0.5deg); opacity: 0.20; }
+          100% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0.15; }
         }
       `}</style>
     </div>

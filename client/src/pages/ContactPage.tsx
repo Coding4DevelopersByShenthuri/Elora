@@ -81,6 +81,28 @@ const ContactPage = () => {
       <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-primary/5 to-transparent -z-10"></div>
       <div className="absolute top-1/3 right-0 w-[300px] h-[300px] rounded-full bg-primary/5 blur-3xl -z-10"></div>
       <div className="absolute bottom-1/3 left-0 w-[250px] h-[250px] rounded-full bg-accent/5 blur-3xl -z-10"></div>
+      
+      {/* Decorative SVG elements - Green and Orange */}
+      <div className="absolute top-20 left-10 w-16 h-16 text-green-500 opacity-40 hidden lg:block">
+        <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+          <path d="M20 20C40 10 60 30 80 20C85 18 90 22 90 25C90 30 85 35 80 30C70 25 50 15 30 25C25 27 20 25 20 20Z" stroke="currentColor" strokeWidth="2" fill="currentColor"/>
+        </svg>
+      </div>
+      <div className="absolute top-40 right-20 w-20 h-20 text-orange-500 opacity-30 hidden lg:block">
+        <svg viewBox="0 0 100 100" fill="currentColor" className="w-full h-full">
+          <path d="M50 10L60 40L90 50L60 60L50 90L40 60L10 50L40 40Z"/>
+        </svg>
+      </div>
+      <div className="absolute bottom-20 left-20 w-24 h-24 text-green-500 opacity-30 hidden lg:block">
+        <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+          <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="3" strokeDasharray="10,5"/>
+        </svg>
+      </div>
+      <div className="absolute bottom-40 right-10 w-18 h-18 text-orange-500 opacity-40 hidden lg:block">
+        <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+          <path d="M10 50Q30 20 50 50T90 50" stroke="currentColor" strokeWidth="2" fill="none"/>
+        </svg>
+      </div>
 
       {/* Toast */}
       {toast.visible && (

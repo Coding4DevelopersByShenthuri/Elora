@@ -100,13 +100,19 @@ const AboutPage = () => {
               <span>About Us</span>
             </div>
             
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold relative">
               Get in <span className="relative inline-block">
                 <span className="text-orange-400">Touch</span>
                 <svg className="absolute -bottom-1 md:-bottom-2 left-0 w-full h-2 md:h-3 text-green-500" viewBox="0 0 200 12" fill="none">
                   <path d="M2 8C50 2 100 10 150 6C180 4 200 8 200 8" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
                 </svg>
               </span>
+              {/* Decorative stars - Orange */}
+              <div className="absolute -top-6 -right-6 w-10 h-10 text-orange-500 opacity-60 hidden md:block">
+                <svg viewBox="0 0 100 100" fill="currentColor" className="w-full h-full">
+                  <path d="M50 10L60 40L90 50L60 60L50 90L40 60L10 50L40 40Z"/>
+                </svg>
+              </div>
             </h1>
             
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary">
@@ -128,8 +134,20 @@ const AboutPage = () => {
         </div>
 
         {/* Mission & Vision */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 mb-12 md:mb-16 lg:mb-20">
-          <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/90 backdrop-blur-sm">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 mb-12 md:mb-16 lg:mb-20 relative">
+          {/* Decorative wavy line - Green */}
+          <div className="absolute -top-10 left-1/2 w-32 h-8 text-green-500 opacity-40 hidden lg:block">
+            <svg viewBox="0 0 200 50" fill="none" className="w-full h-full">
+              <path d="M0 25Q50 0 100 25T200 25" stroke="currentColor" strokeWidth="3" fill="none"/>
+            </svg>
+          </div>
+          <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/90 backdrop-blur-sm relative">
+            {/* Decorative circle - Orange */}
+            <div className="absolute top-4 right-4 w-8 h-8 text-orange-500 opacity-50">
+              <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+                <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="2"/>
+              </svg>
+            </div>
             <CardContent className="p-6 md:p-8 lg:p-10">
               <div className="flex flex-col sm:flex-row items-start sm:items-center mb-4 md:mb-6">
                 <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-gradient-to-br from-primary/50 to-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-300 mb-4 sm:mb-0 sm:mr-4 flex-shrink-0">
@@ -147,7 +165,13 @@ const AboutPage = () => {
             </CardContent>
           </Card>
 
-          <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/90 backdrop-blur-sm">
+          <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/90 backdrop-blur-sm relative">
+            {/* Decorative arrow - Green */}
+            <div className="absolute -bottom-4 -right-4 w-12 h-12 text-green-500 opacity-60 hidden sm:block">
+              <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+                <path d="M20 20C40 10 60 30 80 20C85 18 90 22 90 25C90 30 85 35 80 30C70 25 50 15 30 25C25 27 20 25 20 20Z" stroke="currentColor" strokeWidth="2" fill="currentColor"/>
+              </svg>
+            </div>
             <CardContent className="p-6 md:p-8 lg:p-10">
               <div className="flex flex-col sm:flex-row items-start sm:items-center mb-4 md:mb-6">
                 <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-gradient-to-br from-secondary/50 to-secondary/20 flex items-center justify-center text-secondary group-hover:scale-110 transition-transform duration-300 mb-4 sm:mb-0 sm:mr-4 flex-shrink-0">
@@ -169,10 +193,22 @@ const AboutPage = () => {
         </div>
 
         {/* Core Values */}
-        <div className="mb-12 md:mb-16 lg:mb-20">
+        <div className="mb-12 md:mb-16 lg:mb-20 relative">
+          {/* Decorative zigzag - Orange */}
+          <div className="absolute top-0 left-10 w-20 h-20 text-orange-500 opacity-30 hidden lg:block">
+            <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+              <path d="M10 10L30 30L10 50L30 70L10 90" stroke="currentColor" strokeWidth="3" fill="none"/>
+            </svg>
+          </div>
           <div className="text-center mb-10 md:mb-16">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 md:mb-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 md:mb-6 relative">
               Our Core <span className="text-primary">Values</span>
+              {/* Decorative dots - Green */}
+              <div className="absolute -top-4 right-1/4 flex gap-2 hidden md:flex">
+                <div className="w-2 h-2 rounded-full bg-green-500 opacity-60"></div>
+                <div className="w-2 h-2 rounded-full bg-green-500 opacity-40"></div>
+                <div className="w-2 h-2 rounded-full bg-green-500 opacity-20"></div>
+              </div>
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto px-4">
               These principles guide everything we do and every decision we make.
@@ -181,7 +217,21 @@ const AboutPage = () => {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             {values.map((value, idx) => (
-              <Card key={idx} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/80 backdrop-blur-sm">
+              <Card key={idx} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/80 backdrop-blur-sm relative">
+                {/* Alternating decorative elements */}
+                {idx % 2 === 0 ? (
+                  <div className="absolute -top-2 -right-2 w-6 h-6 text-orange-500 opacity-60">
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+                      <circle cx="12" cy="12" r="10"/>
+                    </svg>
+                  </div>
+                ) : (
+                  <div className="absolute -bottom-2 -left-2 w-6 h-6 text-green-500 opacity-60">
+                    <svg viewBox="0 0 100 100" fill="currentColor" className="w-full h-full">
+                      <path d="M50 10L60 40L90 50L60 60L50 90L40 60L10 50L40 40Z"/>
+                    </svg>
+                  </div>
+                )}
                 <CardContent className="p-5 md:p-6 text-center">
                   <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-primary/20 flex items-center justify-center mx-auto mb-4 md:mb-6 text-primary group-hover:scale-110 transition-transform duration-300">
                     {value.icon}

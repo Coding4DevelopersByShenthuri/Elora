@@ -3,7 +3,7 @@ import {
   Volume2, Star, Trophy, Play, BookOpen, 
   Mic, Award, Zap, Heart, Sparkles,
   Rabbit, Fish, Rocket, Cloud,
-  Sun, CloudRain, CloudSnow, Footprints,
+  Sun, CloudRain, Footprints,
   ChevronLeft, ChevronRight, Anchor,
   Shield, Download, Loader2
 } from 'lucide-react';
@@ -246,7 +246,7 @@ const KidsPage = () => {
       image: '🌳',
       character: Rabbit,
       gradient: 'from-green-400 to-emerald-400',
-      bgGradient: 'from-green-50 to-emerald-50 dark:from-green-900 dark:to-emerald-900',
+      bgGradient: 'from-green-200 to-emerald-300 dark:from-green-900 dark:to-emerald-900',
       animation: 'animate-float-slow',
       type: 'forest'
     },
@@ -259,7 +259,7 @@ const KidsPage = () => {
       image: '🚀',
       character: Rocket,
       gradient: 'from-purple-400 to-indigo-400',
-      bgGradient: 'from-purple-50 to-indigo-50 dark:from-purple-900 dark:to-indigo-900',
+      bgGradient: 'from-purple-200 to-indigo-300 dark:from-purple-900 dark:to-indigo-900',
       animation: 'animate-bounce',
       type: 'space'
     },
@@ -272,7 +272,7 @@ const KidsPage = () => {
       image: '🐠',
       character: Fish,
       gradient: 'from-blue-400 to-cyan-400',
-      bgGradient: 'from-blue-50 to-cyan-50 dark:from-blue-900 dark:to-cyan-900',
+      bgGradient: 'from-blue-200 to-cyan-300 dark:from-blue-900 dark:to-cyan-900',
       animation: 'animate-float-medium',
       type: 'ocean'
     },
@@ -285,7 +285,7 @@ const KidsPage = () => {
       image: '🦖',
       character: Footprints,
       gradient: 'from-orange-400 to-red-400',
-      bgGradient: 'from-orange-50 to-red-50 dark:from-orange-900 dark:to-red-900',
+      bgGradient: 'from-orange-200 to-red-300 dark:from-orange-900 dark:to-red-900',
       animation: 'animate-float-slow',
       type: 'dinosaur'
     },
@@ -298,7 +298,7 @@ const KidsPage = () => {
       image: '🦄',
       character: Sparkles,
       gradient: 'from-pink-400 to-purple-400',
-      bgGradient: 'from-pink-50 to-purple-50 dark:from-pink-900 dark:to-purple-900',
+      bgGradient: 'from-pink-200 to-purple-300 dark:from-pink-900 dark:to-purple-900',
       animation: 'animate-float-medium',
       type: 'unicorn'
     },
@@ -311,7 +311,7 @@ const KidsPage = () => {
       image: '🏴‍☠️',
       character: Anchor,
       gradient: 'from-amber-400 to-yellow-400',
-      bgGradient: 'from-amber-50 to-yellow-50 dark:from-amber-900 dark:to-yellow-900',
+      bgGradient: 'from-amber-200 to-yellow-300 dark:from-amber-900 dark:to-yellow-900',
       animation: 'animate-bounce',
       type: 'pirate'
     },
@@ -323,8 +323,8 @@ const KidsPage = () => {
       words: 419,
       image: '🦸',
       character: Shield,
-      gradient: 'from-blue-400 to-indigo-400',
-      bgGradient: 'from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900',
+      gradient: 'from-red-400 to-blue-500',
+      bgGradient: 'from-red-200 to-blue-300 dark:from-red-900 dark:to-blue-900',
       animation: 'animate-float-fast',
       type: 'superhero'
     },
@@ -336,8 +336,8 @@ const KidsPage = () => {
       words: 364,
       image: '🧚',
       character: Sparkles,
-      gradient: 'from-green-400 to-teal-400',
-      bgGradient: 'from-green-50 to-teal-50 dark:from-green-900 dark:to-teal-900',
+      gradient: 'from-violet-400 to-cyan-400',
+      bgGradient: 'from-violet-200 to-cyan-300 dark:from-violet-900 dark:to-cyan-900',
       animation: 'animate-float-slow',
       type: 'fairy'
     }
@@ -709,9 +709,6 @@ const KidsPage = () => {
         <div className="absolute bottom-20 left-4 sm:left-20 animate-float-fast">
           <CloudRain className="w-10 h-10 sm:w-14 sm:h-14 text-blue-300/60 dark:text-blue-600/60" />
         </div>
-        <div className="absolute bottom-10 right-4 sm:right-10 animate-bounce">
-          <CloudSnow className="w-8 h-8 sm:w-12 sm:h-12 text-cyan-200/60 dark:text-cyan-700/60" />
-        </div>
       </div>
 
       {/* Floating Icons */}
@@ -735,7 +732,18 @@ const KidsPage = () => {
 
       <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative z-10">
         {/* Header Section */}
-        <div className="text-center mb-6 sm:mb-8">
+        <div className="text-center mb-6 sm:mb-8 relative">
+          {/* Decorative stars - Green and Orange */}
+          <div className="absolute -top-4 left-1/4 w-8 h-8 text-green-500 opacity-60 hidden md:block animate-pulse">
+            <svg viewBox="0 0 100 100" fill="currentColor" className="w-full h-full">
+              <path d="M50 10L60 40L90 50L60 60L50 90L40 60L10 50L40 40Z"/>
+            </svg>
+          </div>
+          <div className="absolute -top-2 right-1/4 w-10 h-10 text-orange-500 opacity-70 hidden md:block animate-bounce">
+            <svg viewBox="0 0 100 100" fill="currentColor" className="w-full h-full">
+              <path d="M50 10L60 40L90 50L60 60L50 90L40 60L10 50L40 40Z"/>
+            </svg>
+          </div>
           <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4 px-2">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] rounded-full blur-md opacity-60 animate-pulse"></div>
@@ -782,8 +790,26 @@ const KidsPage = () => {
         </div>
 
         {/* Stats Bar */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-5 lg:gap-6 mb-6 sm:mb-8 px-2 sm:px-0">
-          <Card className="bg-yellow-50/30 dark:bg-yellow-900/10 backdrop-blur-sm border-2 border-yellow-200 dark:border-yellow-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-5 lg:gap-6 mb-6 sm:mb-8 px-2 sm:px-0 relative">
+          {/* Decorative circles - Green */}
+          <div className="absolute -top-4 -left-4 w-12 h-12 text-green-500 opacity-30 hidden lg:block">
+            <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+              <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="3" strokeDasharray="10,5"/>
+            </svg>
+          </div>
+          {/* Decorative arrow - Orange */}
+          <div className="absolute -bottom-6 -right-6 w-16 h-16 text-orange-500 opacity-40 hidden lg:block">
+            <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+              <path d="M20 20C40 10 60 30 80 20C85 18 90 22 90 25C90 30 85 35 80 30C70 25 50 15 30 25C25 27 20 25 20 20Z" stroke="currentColor" strokeWidth="2" fill="currentColor"/>
+            </svg>
+          </div>
+          <Card className="bg-yellow-50/30 dark:bg-yellow-900/10 backdrop-blur-sm border-2 border-yellow-200 dark:border-yellow-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative">
+            {/* Decorative dot - Orange */}
+            <div className="absolute -top-2 -right-2 w-6 h-6 text-orange-500 opacity-70">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+                <circle cx="12" cy="12" r="10"/>
+              </svg>
+            </div>
             <CardContent className="p-4 sm:p-5 md:p-6 text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
                 <Trophy className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-yellow-500 dark:text-yellow-400 flex-shrink-0" />
@@ -793,7 +819,13 @@ const KidsPage = () => {
             </CardContent>
           </Card>
           
-          <Card className="bg-green-50/30 dark:bg-green-900/10 backdrop-blur-sm border-2 border-green-200 dark:border-green-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+          <Card className="bg-green-50/30 dark:bg-green-900/10 backdrop-blur-sm border-2 border-green-200 dark:border-green-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative">
+            {/* Decorative star - Green */}
+            <div className="absolute -top-2 -right-2 w-6 h-6 text-green-500 opacity-70">
+              <svg viewBox="0 0 100 100" fill="currentColor" className="w-full h-full">
+                <path d="M50 10L60 40L90 50L60 60L50 90L40 60L10 50L40 40Z"/>
+              </svg>
+            </div>
             <CardContent className="p-4 sm:p-5 md:p-6 text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
                 <Zap className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-green-500 dark:text-green-400 animate-pulse flex-shrink-0" />
@@ -803,7 +835,13 @@ const KidsPage = () => {
             </CardContent>
           </Card>
           
-          <Card className="bg-blue-50/30 dark:bg-blue-900/10 backdrop-blur-sm border-2 border-blue-200 dark:border-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+          <Card className="bg-blue-50/30 dark:bg-blue-900/10 backdrop-blur-sm border-2 border-blue-200 dark:border-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative">
+            {/* Decorative squiggle - Orange */}
+            <div className="absolute top-2 right-2 w-8 h-8 text-orange-500 opacity-60">
+              <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+                <path d="M10 50Q30 20 50 50T90 50" stroke="currentColor" strokeWidth="2" fill="none"/>
+              </svg>
+            </div>
             <CardContent className="p-4 sm:p-5 md:p-6 text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
                 <Award className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-blue-500 dark:text-blue-400 flex-shrink-0" />
@@ -985,9 +1023,9 @@ const KidsPage = () => {
                   size="sm"
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="rounded-lg sm:rounded-xl px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-xs sm:text-sm font-semibold disabled:opacity-50 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300"
+                  className="rounded-lg sm:rounded-xl px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-xs sm:text-sm font-semibold disabled:opacity-50 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border-gray-300 dark:border-gray-600 text-teal-800 dark:text-teal-800"
                 >
-                  <ChevronLeft className="w-4 h-4 sm:w-4 sm:h-4 sm:mr-1 md:mr-2" />
+                  <ChevronLeft className="w-4 h-4 sm:w-4 sm:h-4 sm:mr-1 md:mr-2 text-teal-800" />
                   <span className="hidden md:inline">Previous</span>
                 </Button>
                 
@@ -1002,7 +1040,7 @@ const KidsPage = () => {
                         "w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl text-xs sm:text-sm md:text-base font-bold",
                         currentPage === page 
                           ? "bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white shadow-lg" 
-                          : "bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300"
+                          : "bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border-gray-300 dark:border-gray-600 text-teal-800 dark:text-teal-800"
                       )}
                     >
                       {page}
@@ -1015,10 +1053,10 @@ const KidsPage = () => {
                   size="sm"
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="rounded-lg sm:rounded-xl px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-xs sm:text-sm font-semibold disabled:opacity-50 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300"
+                  className="rounded-lg sm:rounded-xl px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-xs sm:text-sm font-semibold disabled:opacity-50 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border-gray-300 dark:border-gray-600 text-teal-800 dark:text-teal-800"
                 >
                   <span className="hidden md:inline">Next</span>
-                  <ChevronRight className="w-4 h-4 sm:w-4 sm:h-4 sm:ml-1 md:ml-2" />
+                  <ChevronRight className="w-4 h-4 sm:w-4 sm:h-4 sm:ml-1 md:ml-2 text-teal-800" />
                 </Button>
               </div>
             )}
@@ -1063,9 +1101,24 @@ const KidsPage = () => {
         )}
 
         {/* Achievements Section */}
-        <Card className="bg-purple-100/50 dark:bg-purple-950/30 backdrop-blur-sm border-2 border-purple-300 dark:border-purple-600 rounded-xl sm:rounded-2xl lg:rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl mb-6 sm:mb-8 mx-2 sm:mx-auto w-full lg:max-w-7xl xl:max-w-[1400px]">
+        <Card className="bg-purple-100/50 dark:bg-purple-950/30 backdrop-blur-sm border-2 border-purple-300 dark:border-purple-600 rounded-xl sm:rounded-2xl lg:rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl mb-6 sm:mb-8 mx-2 sm:mx-auto w-full lg:max-w-7xl xl:max-w-[1400px] relative">
+          {/* Decorative elements - Green and Orange */}
+          <div className="absolute -top-4 -left-4 w-12 h-12 text-green-500 opacity-60 hidden md:block animate-bounce">
+            <svg viewBox="0 0 100 100" fill="currentColor" className="w-full h-full">
+              <path d="M50 10L60 40L90 50L60 60L50 90L40 60L10 50L40 40Z"/>
+            </svg>
+          </div>
+          <div className="absolute -top-4 -right-4 w-10 h-10 text-orange-500 opacity-70 hidden md:block animate-pulse">
+            <svg viewBox="0 0 100 100" fill="currentColor" className="w-full h-full">
+              <circle cx="50" cy="50" r="40"/>
+            </svg>
+          </div>
+          <div className="absolute -bottom-4 left-1/2 w-14 h-14 text-green-500 opacity-50 hidden md:block">
+            <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+              <path d="M10 50Q30 20 50 50T90 50" stroke="currentColor" strokeWidth="2" fill="none"/>
+            </svg>
+          </div>
           <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-center mb-4 sm:mb-6 md:mb-8 text-gray-900 dark:text-white flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
-            <Trophy className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-yellow-500 dark:text-yellow-400 animate-bounce flex-shrink-0" />
             <span>Your Super Achievements!</span>
           </h2>
           
@@ -1088,7 +1141,7 @@ const KidsPage = () => {
                     </div>
                   </div>
                   <p className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white mb-1 sm:mb-2 px-1">{achievement.name}</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">{achievement.description}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-500 mb-2 font-semibold">{achievement.description}</p>
                   <Progress value={achievement.progress} className="h-2 sm:h-3 bg-purple-200/60 dark:bg-gray-600 rounded-full mb-1 sm:mb-2">
                     <div 
                       className={cn(
@@ -1097,7 +1150,7 @@ const KidsPage = () => {
                       )}
                     />
                   </Progress>
-                  <span className="text-xs font-semibold text-gray-700 dark:text-gray-400">{achievement.progress.toFixed(0)}%</span>
+                  <span className="text-s font-bold text-teal-700">{achievement.progress.toFixed(0)}%</span>
                 </div>
               );
             })}
@@ -1106,7 +1159,7 @@ const KidsPage = () => {
 
         {/* Quick Actions */}
         <div className="text-center px-4 sm:px-6">
-          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-900 dark:text-gray-300 mb-4 sm:mb-6 font-semibold">Ready for more fun? Let's play! 🎯</p>
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-900 dark:text-gray-500 mb-4 sm:mb-6 font-semibold">Ready for more fun? Let's play! 🎯</p>
           <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 max-w-4xl mx-auto">
             <Button 
               variant="outline" 
@@ -1114,7 +1167,7 @@ const KidsPage = () => {
               onClick={() => handleCategoryClick('pronunciation')}
             >
               <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-green-600 dark:text-green-400 group-hover:animate-bounce flex-shrink-0" />
-              <span className="font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap">Listen & Repeat</span>
+              <span className="font-semibold text-gray-800 dark:text-gray-500 whitespace-nowrap">Listen & Repeat</span>
             </Button>
             <Button 
               variant="outline" 
@@ -1122,7 +1175,7 @@ const KidsPage = () => {
               onClick={() => handleCategoryClick('pronunciation')}
             >
               <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-blue-600 dark:text-blue-400 group-hover:animate-pulse flex-shrink-0" />
-              <span className="font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap">Speak Now</span>
+              <span className="font-semibold text-gray-800 dark:text-gray-500 whitespace-nowrap">Speak Now</span>
             </Button>
             <Button 
               variant="outline" 
@@ -1130,7 +1183,7 @@ const KidsPage = () => {
               onClick={() => setShowFavoritesModal(true)}
             >
               <Heart className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-pink-600 dark:text-pink-400 group-hover:animate-pulse flex-shrink-0" />
-              <span className="font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap">
+              <span className="font-semibold text-gray-800 dark:text-gray-500 whitespace-nowrap">
                 Favorite Stories {favorites.length > 0 && `(${favorites.length})`}
               </span>
             </Button>

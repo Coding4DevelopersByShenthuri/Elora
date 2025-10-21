@@ -72,14 +72,26 @@ const WhyPage = () => {
           </div>
 
           {/* Right Side - Content */}
-          <div className="space-y-8">
+          <div className="space-y-8 relative">
+            {/* Decorative curved line - Green */}
+            <div className="absolute -top-8 -left-8 w-20 h-20 text-green-500 opacity-40 hidden md:block">
+              <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+                <path d="M10 90Q10 10 90 10" stroke="currentColor" strokeWidth="3" fill="none"/>
+              </svg>
+            </div>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary font-medium mb-6">
               <Sparkles className="w-4 h-4" />
               <span>Our Philosophy</span>
             </div>
             
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 relative">
               Why <span className="text-primary">Elora</span>?
+              {/* Decorative star - Orange */}
+              <div className="absolute -top-4 -right-8 w-8 h-8 text-orange-500 opacity-70 hidden sm:block">
+                <svg viewBox="0 0 100 100" fill="currentColor" className="w-full h-full">
+                  <path d="M50 10L60 40L90 50L60 60L50 90L40 60L10 50L40 40Z"/>
+                </svg>
+              </div>
             </h1>
             
             <p className="text-lg text-muted-foreground leading-relaxed">
@@ -97,7 +109,13 @@ const WhyPage = () => {
         </div>
 
         {/* Main Reasons Section - Model Image Style */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20 relative">
+          {/* Decorative wavy arrow - Orange */}
+          <div className="absolute top-10 -left-12 w-24 h-24 text-orange-500 opacity-40 hidden xl:block">
+            <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+              <path d="M20 20C40 10 60 30 80 20C85 18 90 22 90 25C90 30 85 35 80 30C70 25 50 15 30 25C25 27 20 25 20 20Z" stroke="currentColor" strokeWidth="2" fill="currentColor"/>
+            </svg>
+          </div>
           {[
             {
               icon: <Lightbulb className="w-8 h-8 text-teal-800" />,
@@ -124,7 +142,29 @@ const WhyPage = () => {
               color: "from-primary to-primary/80"
             }
           ].map((reason, index) => (
-            <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/90 backdrop-blur-sm">
+            <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/90 backdrop-blur-sm relative">
+              {/* Alternating decorative elements */}
+              {index === 0 && (
+                <div className="absolute -top-3 -right-3 w-10 h-10 text-green-500 opacity-60">
+                  <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+                    <circle cx="50" cy="50" r="35" stroke="currentColor" strokeWidth="3" strokeDasharray="10,5"/>
+                  </svg>
+                </div>
+              )}
+              {index === 1 && (
+                <div className="absolute -bottom-3 -left-3 w-8 h-8 text-orange-500 opacity-70">
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+                    <circle cx="12" cy="12" r="10"/>
+                  </svg>
+                </div>
+              )}
+              {index === 2 && (
+                <div className="absolute top-4 right-4 w-10 h-10 text-green-500 opacity-50">
+                  <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+                    <path d="M10 50Q30 20 50 50T90 50" stroke="currentColor" strokeWidth="2" fill="none"/>
+                  </svg>
+                </div>
+              )}
               <CardContent className="p-8">
                 <div className="flex items-start justify-between mb-6">
                   <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${reason.color} flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300`}>
@@ -142,7 +182,18 @@ const WhyPage = () => {
         </div>
 
         {/* Values Section */}
-        <div className="mb-20">
+        <div className="mb-20 relative">
+          {/* Decorative circles - Green and Orange */}
+          <div className="absolute -top-6 right-20 w-12 h-12 text-orange-500 opacity-30 hidden lg:block">
+            <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+              <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="3"/>
+            </svg>
+          </div>
+          <div className="absolute top-1/2 -left-10 w-16 h-16 text-green-500 opacity-30 hidden xl:block">
+            <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+              <path d="M50 10L60 40L90 50L60 60L50 90L40 60L10 50L40 40Z" stroke="currentColor" strokeWidth="2" fill="none"/>
+            </svg>
+          </div>
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold mb-6">
               Our Core <span className="text-primary">Values</span>

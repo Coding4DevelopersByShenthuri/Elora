@@ -190,10 +190,22 @@ const HowPage = () => {
         </div>
 
         {/* Workflow Section - Model Image Style */}
-        <div className="mb-24">
+        <div className="mb-24 relative">
+          {/* Decorative spiral - Green */}
+          <div className="absolute -top-10 -right-10 w-24 h-24 text-green-500 opacity-30 hidden xl:block">
+            <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+              <path d="M50 10C30 10 10 30 10 50C10 70 30 90 50 90C70 90 90 70 90 50C90 35 80 25 65 25C55 25 45 35 45 45C45 55 55 60 60 60" stroke="currentColor" strokeWidth="2" fill="none"/>
+            </svg>
+          </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
             {/* Left Side - Title */}
-            <div>
+            <div className="relative">
+              {/* Decorative dots - Orange */}
+              <div className="absolute -top-8 left-0 flex gap-2">
+                <div className="w-3 h-3 rounded-full bg-orange-500 opacity-60"></div>
+                <div className="w-3 h-3 rounded-full bg-orange-500 opacity-40"></div>
+                <div className="w-3 h-3 rounded-full bg-orange-500 opacity-20"></div>
+              </div>
               <h2 className="text-4xl sm:text-5xl font-bold mb-6">
                 How the App <span className="relative">
                   <span className="text-primary">Works</span>
@@ -211,12 +223,18 @@ const HowPage = () => {
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                 </svg>
               </div>
+              {/* Decorative wavy line - Green */}
+              <div className="absolute top-1/2 -right-12 w-20 h-20 text-green-500 opacity-40 hidden lg:block">
+                <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+                  <path d="M10 50Q30 20 50 50T90 50" stroke="currentColor" strokeWidth="2" fill="none"/>
+                </svg>
+              </div>
               <p className="text-lg text-muted-foreground leading-relaxed">
                 Simple steps to start your English learning journey with AI-powered guidance. 
                 Our platform makes it easy for learners to improve their language skills effectively.
               </p>
               {/* Decorative arrow */}
-              <div className="absolute -bottom-8 -left-8 w-16 h-16 text-primary opacity-60">
+              <div className="absolute -bottom-8 -left-8 w-16 h-16 text-orange-500 opacity-60 hidden sm:block">
                 <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
                   <path d="M20 20C40 10 60 30 80 20C85 18 90 22 90 25C90 30 85 35 80 30C70 25 50 15 30 25C25 27 20 25 20 20Z" stroke="currentColor" strokeWidth="2" fill="currentColor"/>
                 </svg>
@@ -225,7 +243,9 @@ const HowPage = () => {
           </div>
 
           {/* Four Step Cards - Model Image Style */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative">
+            {/* Decorative connecting line - Orange */}
+            <div className="absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-orange-300 to-transparent opacity-30 hidden lg:block"></div>
             {[
               {
                 number: 1,
@@ -256,7 +276,22 @@ const HowPage = () => {
                 color: "from-primary to-primary/80"
               }
             ].map((step, index) => (
-              <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/90 backdrop-blur-sm relative">
+              <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/90 backdrop-blur-sm relative z-10">
+                {/* Random decorative elements on cards */}
+                {index === 0 && (
+                  <div className="absolute -bottom-3 -right-3 w-10 h-10 text-green-500 opacity-60">
+                    <svg viewBox="0 0 100 100" fill="currentColor" className="w-full h-full">
+                      <path d="M50 10L60 40L90 50L60 60L50 90L40 60L10 50L40 40Z"/>
+                    </svg>
+                  </div>
+                )}
+                {index === 2 && (
+                  <div className="absolute top-4 right-4 w-8 h-8 text-orange-500 opacity-50">
+                    <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+                      <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="2"/>
+                    </svg>
+                  </div>
+                )}
                 <CardContent className="p-8">
                   <div className="flex items-start justify-between mb-6">
                     <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${step.color} flex items-center justify-center text-teal-400 group-hover:scale-110 transition-transform duration-300`}>

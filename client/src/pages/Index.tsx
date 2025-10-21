@@ -221,7 +221,13 @@ const Index = () => {
         </div>
 
         {/* Features Section */}
-        <div className="py-12 md:py-16 lg:py-20">
+        <div className="py-12 md:py-16 lg:py-20 relative">
+          {/* Decorative circle - Green */}
+          <div className="absolute top-10 right-10 w-20 h-20 text-green-500 opacity-30 hidden lg:block">
+            <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+              <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="3" strokeDasharray="5,5"/>
+            </svg>
+          </div>
           <div className="text-center mb-10 md:mb-16">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
               Why Choose <span className="relative inline-block">
@@ -236,10 +242,31 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 relative">
+            {/* Decorative squiggle - Orange */}
+            <div className="absolute -left-12 top-1/2 w-24 h-24 text-orange-500 opacity-40 hidden xl:block">
+              <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+                <path d="M10 50Q30 20 50 50T90 50" stroke="currentColor" strokeWidth="2" fill="none"/>
+              </svg>
+            </div>
             {features.map((feature, index) => (
-              <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/80 backdrop-blur-sm">
+              <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/80 backdrop-blur-sm relative">
                 <CardContent className="p-6 md:p-8 text-center">
+                  {/* Random decorative dots */}
+                  {index === 0 && (
+                    <div className="absolute -top-3 -right-3 w-6 h-6 text-green-500 opacity-70">
+                      <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+                        <circle cx="12" cy="12" r="10"/>
+                      </svg>
+                    </div>
+                  )}
+                  {index === 1 && (
+                    <div className="absolute -bottom-2 -left-2 w-8 h-8 text-orange-500 opacity-60">
+                      <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+                        <path d="M50 10L60 40L90 50L60 60L50 90L40 60L10 50L40 40Z" fill="currentColor"/>
+                      </svg>
+                    </div>
+                  )}
                   <div className={`w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 md:mb-6 rounded-xl md:rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300`}>
                     {feature.icon}
                   </div>
@@ -276,6 +303,12 @@ const Index = () => {
               <div className="absolute -top-3 -right-3 md:-top-4 md:-right-4 w-5 h-5 md:w-6 md:h-6 text-primary hidden sm:block">
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              </div>
+              {/* Decorative wavy arrow - Orange */}
+              <div className="absolute -bottom-8 -left-8 w-16 h-16 text-orange-500 opacity-60 hidden sm:block">
+                <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+                  <path d="M20 20C40 10 60 30 80 20C85 18 90 22 90 25C90 30 85 35 80 30C70 25 50 15 30 25C25 27 20 25 20 20Z" stroke="currentColor" strokeWidth="2" fill="currentColor"/>
                 </svg>
               </div>
               <p className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed">
@@ -372,6 +405,12 @@ const Index = () => {
               <div className="absolute -top-3 -right-3 md:-top-4 md:-right-4 w-5 h-5 md:w-6 md:h-6 text-primary hidden sm:block">
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              </div>
+              {/* Decorative spiral - Green */}
+              <div className="absolute top-1/2 -left-10 w-16 h-16 text-green-500 opacity-50 hidden md:block">
+                <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+                  <path d="M50 10C30 10 10 30 10 50C10 70 30 90 50 90C70 90 90 70 90 50C90 35 80 25 65 25C55 25 45 35 45 45C45 55 55 60 60 60" stroke="currentColor" strokeWidth="2" fill="none"/>
                 </svg>
               </div>
               <p className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed">
