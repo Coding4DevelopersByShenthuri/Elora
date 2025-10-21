@@ -46,17 +46,19 @@ const WhyPage = () => {
       <div className="absolute top-1/4 right-0 w-[400px] h-[400px] rounded-full bg-secondary/10 blur-3xl -z-10"></div>
       <div className="absolute bottom-1/4 left-0 w-[300px] h-[300px] rounded-full bg-accent/10 blur-3xl -z-10"></div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-36 pb-24">
         {/* Hero Section - Model Image Style */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
           {/* Left Side - Student Image */}
           <div className="relative">
             <div className="relative">
-              {/* Student placeholder - using a gradient circle as placeholder */}
-              <div className="w-80 h-80 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                <div className="w-60 h-60 rounded-full bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center">
-                  <Heart className="w-24 h-24 text-primary" />
-                </div>
+              {/* Student Image */}
+              <div className="w-80 h-80 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20 shadow-2xl">
+                <img 
+                  src="/boy.jpg" 
+                  alt="Student learning English" 
+                  className="w-full h-full object-cover"
+                />
               </div>
               
               {/* Background shapes */}

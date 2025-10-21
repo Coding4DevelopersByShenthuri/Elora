@@ -74,11 +74,13 @@ const AboutPage = () => {
           {/* Left Side - Student Image */}
           <div className="relative order-2 lg:order-1">
             <div className="relative">
-              {/* Student placeholder - using a gradient circle as placeholder */}
-              <div className="w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                <div className="w-48 h-48 sm:w-56 sm:h-56 md:w-60 md:h-60 rounded-full bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center">
-                  <Users className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 text-primary" />
-                </div>
+              {/* Student image */}
+              <div className="w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 mx-auto rounded-full overflow-hidden border-4 border-primary/20 shadow-2xl">
+                <img 
+                  src="/About.png" 
+                  alt="Happy English learner" 
+                  className="w-full h-full object-cover"
+                />
               </div>
               
               {/* Background shapes */}
@@ -268,42 +270,91 @@ const AboutPage = () => {
           </div>
         </div>
 
-        {/* Team Section */}
-        <Card className="border-0 bg-gradient-to-br from-primary/5 to-secondary/5">
-          <CardContent className="p-6 md:p-10 lg:p-12 text-center">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 md:mb-6 text-primary">
-              Built by Passionate Educators & Engineers
-            </h2>
-            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-6 md:mb-8 leading-relaxed px-4">
-              Our diverse team combines expertise in language education, artificial intelligence, software engineering, and user experience design. 
-              We're united by a common goal: making English learning accessible, effective, and enjoyable for everyone.
-            </p>
-            
-            <div className="flex flex-wrap justify-center gap-3 md:gap-6 mb-6 md:mb-8">
-              <div className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-primary/10 text-primary text-xs md:text-base">
-                <Users className="w-3 h-3 md:w-4 md:h-4" />
-                <span className="font-medium">10+ Team Members</span>
-              </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-primary/10 text-primary text-xs md:text-base">
-                <Globe2 className="w-3 h-3 md:w-4 md:h-4" />
-                <span className="font-medium">5+ Countries</span>
-              </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-primary/10 text-primary text-xs md:text-base">
-                <Award className="w-3 h-3 md:w-4 md:h-4" />
-                <span className="font-medium">20+ Years Experience</span>
+        {/* Team Section - Redesigned like the image */}
+        <div className="relative mb-12 md:mb-16 lg:mb-20">
+          {/* Main Teal Block */}
+          <div className="relative bg-[#2F786E] rounded-3xl p-8 md:p-12 lg:p-16 overflow-hidden">
+            {/* Student Image Peeking from Left */}
+            <div className="absolute -left-8 md:-left-12 lg:-left-16 top-1/2 transform -translate-y-1/2 z-10">
+              <div className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 rounded-full overflow-hidden border-4 border-white/20 shadow-2xl">
+                <img 
+                  src="/board.jpg" 
+                  alt="Happy student" 
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 md:gap-4">
-              <Button size="lg" className="bg-primary hover:bg-primary/90 px-6 py-3 md:px-8 md:py-4 text-base md:text-lg rounded-full" asChild>
-                <Link to="/contact">Get in Touch</Link>
-              </Button>
-              <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white px-6 py-3 md:px-8 md:py-4 text-base md:text-lg rounded-full" asChild>
-                <Link to="/why">Learn Our Philosophy</Link>
-              </Button>
+            {/* Content */}
+            <div className="relative z-20 ml-16 md:ml-20 lg:ml-24 max-w-4xl">
+              {/* Orange "Get in Touch" subtitle */}
+              <div className="text-[#F7B500] font-semibold text-sm md:text-base lg:text-lg mb-2">
+                Get in Touch
+              </div>
+              
+              {/* Main heading */}
+              <h2 className="text-white text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4 md:mb-6 leading-tight">
+                Built by Passionate<br className="hidden sm:block" />
+                Educators & Engineers
+              </h2>
+              
+              {/* Description */}
+              <p className="text-white text-sm md:text-base lg:text-lg leading-relaxed mb-6 md:mb-8 max-w-2xl">
+                Our diverse team combines expertise in language education, artificial intelligence, software engineering, and user experience design. 
+                We're united by a common goal: making English learning accessible, effective, and enjoyable for everyone.
+              </p>
+
+              {/* Stats */}
+              <div className="flex flex-wrap gap-3 md:gap-6 mb-6 md:mb-8">
+                <div className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-white/20 text-white text-xs md:text-base">
+                  <Users className="w-3 h-3 md:w-4 md:h-4" />
+                  <span className="font-medium">10+ Team Members</span>
+                </div>
+                <div className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-white/20 text-white text-xs md:text-base">
+                  <Globe2 className="w-3 h-3 md:w-4 md:h-4" />
+                  <span className="font-medium">5+ Countries</span>
+                </div>
+                <div className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-white/20 text-white text-xs md:text-base">
+                  <Award className="w-3 h-3 md:w-4 md:h-4" />
+                  <span className="font-medium">20+ Years Experience</span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
+                <Button size="lg" className="bg-[#F7B500] hover:bg-[#F7B500]/90 text-white px-6 py-3 md:px-8 md:py-4 text-base md:text-lg rounded-full" asChild>
+                  <Link to="/contact">Get in Touch</Link>
+                </Button>
+                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-[#2F786E] px-6 py-3 md:px-8 md:py-4 text-base md:text-lg rounded-full" asChild>
+                  <Link to="/why">Learn Our Philosophy</Link>
+                </Button>
+              </div>
             </div>
-          </CardContent>
-        </Card>
+
+            {/* Orange Arrow Icon - Top Right */}
+            <div className="absolute top-6 md:top-8 right-6 md:right-8 w-8 h-8 md:w-10 md:h-10 bg-[#2F786E] rounded-lg flex items-center justify-center">
+              <ArrowRight className="w-4 h-4 md:w-5 md:h-5 text-[#F7B500] rotate-45" />
+            </div>
+
+
+
+            {/* Hand-drawn Underline - Under main heading */}
+            <div className="absolute top-32 md:top-40 left-16 md:left-20 lg:left-24 w-32 md:w-48 lg:w-64">
+              <svg 
+                viewBox="0 0 200 20" 
+                className="w-full h-full"
+              >
+                <path
+                  d="M5 15 Q50 5 100 12 Q150 18 195 8"
+                  fill="none"
+                  stroke="#F7B500"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

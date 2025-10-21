@@ -151,11 +151,13 @@ const HowPage = () => {
           {/* Left Side - Student Image */}
           <div className="relative">
             <div className="relative">
-              {/* Student placeholder - using a gradient circle as placeholder */}
-              <div className="w-80 h-80 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                <div className="w-60 h-60 rounded-full bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center">
-                  <Brain className="w-24 h-24 text-primary" />
-                </div>
+              {/* Student Image */}
+              <div className="w-80 h-80 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 overflow-hidden flex items-center justify-center">
+                <img 
+                  src="/How.png" 
+                  alt="How Elora Works" 
+                  className="w-full h-full object-cover"
+                />
               </div>
               
               {/* Background shapes */}
