@@ -236,3 +236,4 @@ INFO 2025-10-19 21:12:24,156 autoreload 20348 7472 Watching for file changes wit
 INFO 2025-10-20 12:24:01,523 autoreload 14964 7924 Watching for file changes with StatReloader
 INFO 2025-10-20 18:45:57,518 autoreload 14964 7924 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\views.py changed, reloading.
 INFO 2025-10-20 18:46:18,450 autoreload 15976 16924 Watching for file changes with StatReloader
+INFO 2025-10-21 09:33:23,676 autoreload 19808 9144 Watching for file changes with StatReloader
