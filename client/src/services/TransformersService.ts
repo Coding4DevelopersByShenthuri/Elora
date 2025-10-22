@@ -66,20 +66,27 @@ class TransformersServiceClass {
           try {
             const ort = await import('onnxruntime-web');
             
-            // Wait for ONNX Runtime to fully initialize
-            if (ort && ort.env && ort.env.wasm) {
-              // Configure ONNX Runtime to use WASM backend only (most compatible)
-              ort.env.wasm.numThreads = 1;
-              ort.env.wasm.simd = true;
-              ort.env.wasm.proxy = false;
-              
-              // Set WASM file paths to CDN
-              ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.17.3/dist/';
-              
-              console.log('✅ ONNX Runtime configured successfully');
-            } else {
-              throw new Error('ONNX Runtime env.wasm not available');
+            // Wait for module to fully load
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // Ensure ONNX Runtime environment is properly initialized
+            if (!ort || !ort.env) {
+              throw new Error('ONNX Runtime module not properly loaded');
             }
+            
+            // Configure ONNX Runtime to use WASM backend only (most compatible)
+            // Only set numThreads if the WASM environment exists (wasm is readonly)
+            if (ort.env.wasm) {
+              ort.env.wasm.numThreads = 1;
+            }
+            ort.env.wasm.simd = true;
+            ort.env.wasm.proxy = false;
+            
+            // Set WASM file paths - use relative paths for local files
+            // The WASM files are bundled with the app in dist folder
+            ort.env.wasm.wasmPaths = '/';
+            
+            console.log('✅ ONNX Runtime configured successfully');
           } catch (ortError) {
             console.warn('⚠️ ONNX Runtime configuration failed:', ortError);
             // Don't continue if ONNX Runtime fails - transformers needs it

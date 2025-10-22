@@ -20,10 +20,6 @@ export default defineConfig({
     ],
     // Force dependency re-optimization on config change
     force: false,
-    // Configure esbuild to properly handle ONNX Runtime
-    esbuildOptions: {
-      target: 'esnext',
-    },
   },
   resolve: {
     alias: {
@@ -70,6 +66,13 @@ export default defineConfig({
             }
           }
         },
+        // Ensure WASM files are in the correct location
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name && assetInfo.name.endsWith('.wasm')) {
+            return '[name][extname]'; // Keep WASM files in root
+          }
+          return 'assets/[name]-[hash][extname]';
+        },
       },
       // External WASM files to prevent bundling issues
       external: [],
@@ -84,7 +87,7 @@ export default defineConfig({
     target: 'esnext',
     // Minification
     minify: 'terser',
-    // Copy WASM files for ONNX Runtime
+    // Copy WASM files for ONNX Runtime - ensure they're not inlined
     assetsInlineLimit: 0,
   },
   // PWA and offline support
