@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Sparkles, Anchor, Star, Volume2, Play, Zap, X, Ear, Gauge, RotateCcw } from 'lucide-react';
+import { Sparkles, Anchor, Star, Volume2, Play, Zap, X, Ear, Gauge, RotateCcw, FileText, Eye, Award, Heart } from 'lucide-react';
 import HybridVoiceService, { STORY_VOICES } from '@/services/HybridVoiceService';
 import KidsListeningAnalytics, { type StorySession } from '@/services/KidsListeningAnalytics';
 import { cn } from '@/lib/utils';
@@ -239,6 +239,9 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
   const [retryMode, setRetryMode] = useState(false);
   const [attemptCount, setAttemptCount] = useState(0);
   const [ttsAvailable, setTtsAvailable] = useState(true);
+  const [showTranscript, setShowTranscript] = useState(false);
+  const [captionsEnabled, setCaptionsEnabled] = useState(false);
+  const [accessibilityMode, setAccessibilityMode] = useState(false);
   
   const [currentSession, setCurrentSession] = useState<StorySession | null>(null);
   const [questionStartTime, setQuestionStartTime] = useState(0);
@@ -512,35 +515,115 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="text-xs bg-white/50 px-3 py-1 rounded-full">🗺️ {stars}/3 Maps</div>
-              <Button variant="ghost" size="sm" onClick={async () => {
-                HybridVoiceService.stop();
-                const newSpeed = playbackSpeed === 'slow' ? 'slower' : playbackSpeed === 'slower' ? 'normal' : 'slow';
-                setPlaybackSpeed(newSpeed);
-                try {
-                  let textToPlay = '';
-                  if (listeningPhase === 'listening' && current.listeningFirst && (current as any).audioText) {
-                    textToPlay = (current as any).audioText;
-                  } else if (listeningPhase === 'reveal' && current.listeningFirst && (current as any).revealText) {
-                    textToPlay = (current as any).revealText;
-                  } else if (!current.listeningFirst && current.text) {
-                    if (current.id === 'grand_celebration') {
-                      textToPlay = stars >= 3 ? "Congratulations brave pirate! ... The WHOLE crew is celebrating YOU! ... Pirates are cheering, treasure is glowing, and adventure magic fills the ship! ... You made the seven seas proud with your amazing listening! You should feel SO brave! ... Give yourself a hearty ARRR!" : `Great adventure, young pirate! ... You found ${Math.floor(stars)} treasure map${Math.floor(stars) !== 1 ? 's' : ''}! ... The crew is impressed by your courage! ... Captain Finn is proud of you! ... Every voyage teaches us something. Keep sailing and you'll find all the treasure next time! 🏴‍☠️`;
-                    } else {
-                      textToPlay = current.text;
+            <div className="flex items-center gap-2 sm:gap-3 self-end sm:self-auto flex-wrap">
+              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap bg-white/50 dark:bg-gray-800/50 px-3 py-1 rounded-full border border-white/20">🗺️ {stars}/3 Maps</div>
+              
+              {/* Accessibility Controls */}
+              <div className="flex gap-1">
+                {/* Speed Control - ALWAYS visible with proper dark mode */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={async () => {
+                    HybridVoiceService.stop();
+                    const newSpeed = playbackSpeed === 'slow' ? 'slower' : playbackSpeed === 'slower' ? 'normal' : 'slow';
+                    setPlaybackSpeed(newSpeed);
+                    try {
+                      let textToPlay = '';
+                      if (listeningPhase === 'listening' && current.listeningFirst && (current as any).audioText) {
+                        textToPlay = (current as any).audioText;
+                      } else if (listeningPhase === 'reveal' && current.listeningFirst && (current as any).revealText) {
+                        textToPlay = (current as any).revealText;
+                      } else if (!current.listeningFirst && current.text) {
+                        if (current.id === 'celebration') {
+                          textToPlay = stars >= 3 ? "Congratulations brave pirate! ... The WHOLE crew is celebrating YOU! ... Pirates are cheering, treasure is glowing, and adventure magic fills the ship! ... You made the seven seas proud with your amazing listening! You should feel SO brave! ... Give yourself a hearty ARRR!" : `Great adventure, young pirate! ... You found ${Math.floor(stars)} treasure map${Math.floor(stars) !== 1 ? 's' : ''}! ... The crew is impressed by your courage! ... Captain Finn is proud of you! ... Every voyage teaches us something. Keep sailing and you'll find all the treasure next time! 🏴‍☠️`;
+                        } else {
+                          textToPlay = current.text;
+                        }
+                      }
+                      if (textToPlay && ttsAvailable) {
+                        const cleanText = stripEmojis(textToPlay);
+                        await HybridVoiceService.speak(cleanText, CAPTAIN_VOICE, { speed: newSpeed });
+                      }
+                    } catch (error) {
+                      console.log('Could not replay at new speed');
                     }
-                  }
-                  if (textToPlay && ttsAvailable) {
-                    await HybridVoiceService.speak(textToPlay, CAPTAIN_VOICE, { speed: newSpeed });
-                  }
-                } catch (error) {
-                  console.log('Could not replay at new speed');
-                }
-              }} className="h-7 px-2 rounded-full text-xs bg-amber-50 border" title={`Playback speed: ${playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow (Default)' : 'Very Slow'}`}>
-                <Gauge className="w-3.5 h-3.5 mr-1" />
-                {playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow' : 'Very Slow'}
-              </Button>
+                  }}
+                  className="h-7 px-2 rounded-full text-xs bg-amber-50 dark:bg-amber-800 hover:bg-amber-100 dark:hover:bg-amber-700 border border-amber-200 dark:border-amber-600 text-amber-800 dark:text-amber-100 font-semibold shadow-sm"
+                  title={`Playback speed: ${playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow (Default)' : 'Very Slow'}`}
+                >
+                  <Gauge className="w-3.5 h-3.5 mr-1 text-amber-600 dark:text-amber-200" />
+                  {playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow' : 'Very Slow'}
+                </Button>
+                
+                {/* Accessibility Mode Toggle */}
+                {(listeningPhase === 'listening' || listeningPhase === 'question') && current.listeningFirst && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setAccessibilityMode(!accessibilityMode);
+                      if (!accessibilityMode) {
+                        setShowTranscript(true);
+                        setCaptionsEnabled(true);
+                      }
+                    }}
+                    className={cn(
+                      "h-7 px-2 rounded-full text-xs",
+                      accessibilityMode && "bg-orange-100 dark:bg-orange-900 border border-orange-300"
+                    )}
+                    title="Accessibility mode (for hearing difficulties)"
+                  >
+                    👂 {accessibilityMode ? 'ON' : 'Help'}
+                  </Button>
+                )}
+                
+                {/* Transcript Toggle - Only in reveal phase OR accessibility mode */}
+                {(listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowTranscript(!showTranscript)}
+                    className={cn(
+                      "h-7 w-7 p-0 rounded-full border shadow-sm",
+                      showTranscript 
+                        ? "bg-blue-100 dark:bg-blue-800 border-blue-300 dark:border-blue-600 hover:bg-blue-200 dark:hover:bg-blue-700" 
+                        : "bg-white/80 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600"
+                    )}
+                    title="Toggle text transcript"
+                  >
+                    <FileText className={cn(
+                      "w-3.5 h-3.5",
+                      showTranscript 
+                        ? "text-blue-700 dark:text-blue-200" 
+                        : "text-gray-700 dark:text-gray-200"
+                    )} />
+                  </Button>
+                )}
+                
+                {/* Captions Toggle - Only in reveal phase OR accessibility mode */}
+                {(listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setCaptionsEnabled(!captionsEnabled)}
+                    className={cn(
+                      "h-7 w-7 p-0 rounded-full border shadow-sm",
+                      captionsEnabled 
+                        ? "bg-purple-100 dark:bg-purple-800 border-purple-300 dark:border-purple-600 hover:bg-purple-200 dark:hover:bg-purple-700" 
+                        : "bg-white/80 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600"
+                    )}
+                    title="Toggle captions"
+                  >
+                    <Eye className={cn(
+                      "w-3.5 h-3.5",
+                      captionsEnabled 
+                        ? "text-purple-700 dark:text-purple-200" 
+                        : "text-gray-700 dark:text-gray-200"
+                    )} />
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -549,7 +632,8 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
           </Progress>
 
           <div className="flex-1 overflow-y-auto overflow-x-hidden sm:overflow-hidden pb-2 sm:pb-4 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent">
-            <div className="text-center h-full flex flex-col justify-center">
+            {/* MOBILE: Original Single Column Layout */}
+            <div className="sm:hidden text-center h-full flex flex-col justify-center">
               {/* Character and Scene */}
               <div className="relative mb-2 sm:mb-2 md:mb-3">
                 <div className={cn(
@@ -579,28 +663,69 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
                 </div>
               </div>
 
+              {/* Mobile: PHASE 1 - LISTENING */}
               {current.listeningFirst && listeningPhase === 'listening' && (
                 <div className="space-y-4 max-w-3xl mx-auto w-full">
-                  <div className="bg-amber-100/80 rounded-2xl p-6 backdrop-blur-sm border-2 border-amber-300 shadow-2xl">
-                    <h3 className="text-lg font-bold mb-4 flex items-center justify-center gap-2">
+                  <div className="bg-amber-100/80 dark:bg-amber-900/40 rounded-2xl p-6 backdrop-blur-sm border-2 border-amber-300 shadow-2xl">
+                    <h3 className="text-lg font-bold mb-4 text-gray-800 dark:text-white flex items-center justify-center gap-2">
                       <Ear className="w-6 h-6 text-amber-600 animate-bounce" />
                       {(current as any).audioInstruction}
                     </h3>
-                    {audioWaveform && (
+                    
+                    {/* Transcript (only in accessibility mode during listening phase) */}
+                    {showTranscript && accessibilityMode && (
+                      <div className="mb-4 bg-orange-50/90 dark:bg-orange-900/30 rounded-lg p-4 border-2 border-orange-300">
+                        <div className="flex items-center gap-2 mb-2">
+                          <FileText className="w-4 h-4 text-orange-600" />
+                          <span className="text-xs font-semibold text-orange-700 dark:text-orange-300">Accessibility Transcript:</span>
+                        </div>
+                        <p className="text-sm text-gray-700 dark:text-gray-200 font-medium">
+                          "{(current as any).audioText}"
+                        </p>
+                        <p className="text-xs text-orange-600 dark:text-orange-400 mt-2">
+                          ⚠️ Try to listen carefully instead of reading!
+                        </p>
+                      </div>
+                    )}
+                    
+                    {/* Audio waveform - hide if accessibility transcript is shown */}
+                    {audioWaveform && !(showTranscript && accessibilityMode) && (
                       <div className="flex items-center justify-center gap-2 mb-4">
                         {[...Array(5)].map((_, i) => (
-                          <div key={i} className="w-2 bg-amber-500 rounded-full animate-waveform" style={{ height: '40px', animationDelay: `${i * 0.1}s` }} />
+                          <div
+                            key={i}
+                            className="w-2 bg-amber-500 rounded-full animate-waveform"
+                            style={{
+                              height: '40px',
+                              animationDelay: `${i * 0.1}s`
+                            }}
+                          />
                         ))}
                       </div>
                     )}
                     <div className="flex flex-col items-center gap-3 mt-4">
-                      <Button onClick={handleReplayAudio} disabled={isPlaying} className={cn("rounded-xl px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold", isPlaying && "animate-pulse")}>
+                      <Button
+                        onClick={handleReplayAudio}
+                        disabled={!unlimitedReplays && replaysUsed >= maxReplays || isPlaying}
+                        className={cn(
+                          "rounded-xl px-6 py-3 text-base bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold transition-all",
+                          isPlaying && "animate-pulse"
+                        )}
+                      >
                         <Volume2 className="w-5 h-5 mr-2" />
-                        {isPlaying ? 'Playing...' : `Listen Again (${replaysUsed} plays)`}
+                        {isPlaying ? 'Playing...' : unlimitedReplays ? `Listen Again (${replaysUsed} plays)` : `Listen Again (${maxReplays - replaysUsed} left)`}
                       </Button>
+                      
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                        👂 Listen carefully! {unlimitedReplays ? 'Unlimited plays' : `${maxReplays} plays available`}.
+                      </p>
+                      
                       {hasListened && (
-                        <Button onClick={handleProceedToQuestion} className="bg-green-500 text-white rounded-xl px-6 py-3 font-bold animate-bounce">
-                          Ready! ✓
+                        <Button
+                          onClick={handleProceedToQuestion}
+                          className="mt-2 bg-green-500 hover:bg-green-600 text-white rounded-xl px-6 py-3 font-bold animate-bounce"
+                        >
+                          I'm Ready! ✓
                         </Button>
                       )}
                     </div>
@@ -608,62 +733,125 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
                 </div>
               )}
 
+              {/* Mobile: PHASE 2 - QUESTION */}
               {current.listeningFirst && listeningPhase === 'question' && (
-                <div className="space-y-2 max-w-4xl mx-auto w-full">
-                  <div className="bg-yellow-50 rounded-lg p-2.5 border border-yellow-200">
-                    <h4 className="text-sm font-bold mb-1.5">{(current as any).question}</h4>
+                <div className="space-y-2 sm:space-y-2 md:space-y-3 max-w-4xl mx-auto w-full">
+                  {/* Question and Hint */}
+                  <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg sm:rounded-lg md:rounded-xl p-2.5 sm:p-2 md:p-3 border border-yellow-200 dark:border-yellow-700">
+                    <h4 className="text-sm sm:text-sm md:text-base font-bold text-gray-800 dark:text-white mb-1.5 sm:mb-1">
+                      {(current as any).question}
+                    </h4>
                     {showHint ? (
-                      <p className="text-xs">💡 {(current as any).hint}</p>
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
+                        💡 Hint: {(current as any).hint}
+                      </p>
                     ) : (
-                      <Button variant="outline" size="sm" onClick={() => setShowHint(true)} className="text-yellow-600 text-xs">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setShowHint(true)}
+                        className="text-yellow-600 border-yellow-300 hover:bg-yellow-100 text-xs sm:text-sm"
+                      >
                         Pirate Hint? 🏴‍☠️
                       </Button>
                     )}
                   </div>
-                  <div className="flex justify-center mb-2">
-                    <Button onClick={handleReplayAudio} disabled={isPlaying} className={cn("rounded-xl px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold text-xs", isPlaying && "animate-pulse")}>
-                      <Volume2 className="w-4 h-4 mr-2" />
-                      🔊 Listen
+
+                  {/* Replay Button */}
+                  <div className="flex justify-center mb-2 sm:mb-2">
+                    <Button 
+                      onClick={handleReplayAudio}
+                      disabled={replaysUsed >= maxReplays || isPlaying}
+                      className={cn(
+                        "rounded-lg sm:rounded-xl md:rounded-2xl px-4 sm:px-5 md:px-6 py-2.5 sm:py-2 md:py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold transition-all duration-300 transform hover:scale-105 text-xs sm:text-xs md:text-sm",
+                        isPlaying && "animate-pulse"
+                      )}
+                    >
+                      {isPlaying ? (
+                        <>
+                          <Volume2 className="w-4 h-4 sm:w-4 sm:h-4 mr-2 sm:mr-2 animate-spin" />
+                          Listening...
+                        </>
+                      ) : (
+                        <>
+                          <Volume2 className="w-4 h-4 sm:w-4 sm:h-4 mr-2 sm:mr-2" />
+                          <span className="hidden sm:inline">Listen to the Command</span>
+                          <span className="sm:hidden">🔊 Listen</span>
+                        </>
+                      )}
                     </Button>
                   </div>
+                  {/* Choice Buttons */}
                   {(current as any).choices && (
-                    <div className="grid grid-cols-1 gap-2.5">
+                    <div className="grid grid-cols-1 gap-2.5 sm:gap-2 md:gap-3 justify-center">
                       {(current as any).choices.map((choice: any, idx: number) => {
                         const isSelected = selectedChoice === choice.text;
                         const isCorrect = choice.text === (current as any).audioText;
                         const showResult = showFeedback && isSelected;
+                        
                         return (
-                          <Button key={idx} onClick={() => handleChoice(choice)} disabled={showFeedback} className={cn("rounded-lg px-3 py-2.5 text-xs font-bold h-auto min-h-[55px]", showResult && isCorrect && "bg-green-500 text-white animate-bounce", showResult && !isCorrect && "bg-red-500 text-white", !showResult && "bg-white/90 text-gray-700 border-2")}>
-                            <div className="flex items-center gap-2 w-full">
-                              <span className="text-lg">{choice.emoji}</span>
+                          <Button
+                            key={idx}
+                            onClick={() => handleChoice(choice)}
+                            disabled={showFeedback}
+                            className={cn(
+                              "rounded-lg sm:rounded-lg md:rounded-xl px-3 sm:px-3 md:px-4 py-2.5 sm:py-2 md:py-2.5 text-xs sm:text-xs md:text-sm font-bold transition-all duration-300 transform hover:scale-105 h-auto min-h-[55px] sm:min-h-[50px] md:min-h-[55px]",
+                              showResult && isCorrect && "bg-green-500 hover:bg-green-600 text-white animate-bounce shadow-lg sm:shadow-2xl",
+                              showResult && !isCorrect && "bg-red-500 hover:bg-red-600 text-white shadow-md sm:shadow-xl",
+                              !showResult && "bg-white/90 hover:bg-white text-gray-700 border-2 border-gray-200 hover:border-amber-300 hover:shadow-lg"
+                            )}
+                          >
+                            <div className="flex items-center gap-2 sm:gap-3 md:gap-4 w-full">
+                              <span className="text-lg sm:text-lg md:text-xl">{choice.emoji}</span>
                               <div className="flex-1 text-left">
-                                <p className="font-bold text-xs">{choice.text}</p>
+                                <p className="font-bold text-xs sm:text-sm md:text-base">{choice.text}</p>
                                 <p className="text-xs opacity-70">{choice.meaning}</p>
                               </div>
+                              {showResult && isCorrect && (
+                                <Award className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-300 animate-spin absolute top-1 right-1" />
+                              )}
                             </div>
                           </Button>
                         );
                       })}
                     </div>
                   )}
+
+                  {/* Feedback */}
                   {showFeedback && (
-                    <div className="mt-2">
+                    <div className="mt-2 sm:mt-3 animate-fade-in">
                       {selectedChoice === (current as any).audioText ? (
-                        <div className="text-green-600 text-xs font-bold bg-green-50 rounded-lg p-2.5 border">
+                        <div className="text-green-600 dark:text-green-400 text-xs sm:text-sm md:text-base font-bold animate-bounce bg-green-50 dark:bg-green-900/20 rounded-lg sm:rounded-lg md:rounded-xl p-2.5 sm:p-2 md:p-3 border border-green-200 dark:border-green-700">
                           {getCorrectFeedback()}
+                          {attemptCount === 0 && (
+                            <div className="mt-2 text-xs">
+                              🏆 Perfect! First try bonus!
+                            </div>
+                          )}
                         </div>
                       ) : (
                         <div className="space-y-3">
-                          <div className="text-red-600 text-xs font-bold bg-red-50 rounded-lg p-2.5 border">
+                          <div className="text-red-600 dark:text-red-400 text-xs sm:text-sm md:text-base font-bold bg-red-50 dark:bg-red-900/20 rounded-lg sm:rounded-lg md:rounded-xl p-2.5 sm:p-2 md:p-3 border border-red-200 dark:border-red-700">
                             {getWrongFeedback(attemptCount)}
                           </div>
+                          
+                          {/* Retry Button - Mobile */}
                           {retryMode && (
-                            <div className="flex gap-2">
-                              <Button onClick={handleRetry} className="bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg px-4 py-2.5 text-sm font-bold">
+                            <div className="flex justify-center gap-2">
+                              <Button
+                                onClick={handleRetry}
+                                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-lg px-4 py-2.5 text-sm font-bold shadow-md hover:shadow-lg transition-all"
+                              >
                                 <RotateCcw className="w-4 h-4 mr-2" />
                                 Try Again
                               </Button>
-                              <Button onClick={handleNext} variant="outline" className="rounded-lg px-4 py-2.5 text-sm">Skip</Button>
+                              <Button
+                                onClick={handleNext}
+                                variant="outline"
+                                className="rounded-lg px-4 py-2.5 text-sm font-semibold border-2 border-gray-400 dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 shadow-sm hover:shadow-md transition-all"
+                              >
+                                Skip
+                              </Button>
                             </div>
                           )}
                         </div>
@@ -673,57 +861,448 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
                 </div>
               )}
 
+              {/* Mobile: PHASE 3 - REVEAL */}
               {current.listeningFirst && listeningPhase === 'reveal' && (
                 <div className="space-y-4 max-w-4xl mx-auto w-full">
-                  <div className="bg-green-100/80 rounded-2xl p-6 backdrop-blur-sm border-2 border-green-300">
-                    <h3 className="text-lg font-bold mb-3 flex items-center justify-center gap-2">
+                  <div className="bg-green-100/80 dark:bg-green-900/40 rounded-2xl p-6 backdrop-blur-sm border-2 border-green-300 shadow-2xl">
+                    <h3 className="text-lg sm:text-xl font-bold mb-3 text-gray-800 dark:text-white flex items-center justify-center gap-2 sm:gap-2">
                       {current.title}
-                      <Button variant="ghost" size="sm" onClick={playRevealText} className="text-amber-500 h-7 w-7 p-0">
-                        <Volume2 className="w-3.5 h-3.5" />
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={playRevealText}
+                        className="text-blue-500 hover:text-blue-600 h-7 w-7 sm:h-8 sm:w-8 p-0"
+                      >
+                        <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </Button>
                     </h3>
-                    <p className="text-sm leading-relaxed">{(current as any).revealText}</p>
+                    <p className="text-sm sm:text-sm md:text-base lg:text-lg text-gray-700 dark:text-gray-200 leading-relaxed sm:leading-relaxed mx-auto max-w-3xl">
+                      {(current as any).revealText}
+                    </p>
+                    
                     <div className="mt-4 flex justify-center">
-                      <Button onClick={handleNext} className="bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-2xl px-8 py-3">
-                        Continue! ⚓
+                      <Button 
+                        onClick={handleNext} 
+                        className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold rounded-2xl px-8 py-3"
+                      >
+                        Continue Adventure! ⚓
                       </Button>
                     </div>
                   </div>
                 </div>
               )}
 
+              {/* Mobile: Non-interactive steps */}
               {!current.listeningFirst && (
                 <>
-                  <div className="bg-white/80 rounded-2xl p-6 mb-4 backdrop-blur-sm border-2 shadow-2xl max-w-4xl mx-auto">
-                    <h3 className="text-lg font-bold mb-3 flex items-center justify-center gap-2">
+                  <div className="bg-white/80 dark:bg-gray-800/80 rounded-2xl p-6 mb-4 backdrop-blur-sm border-2 border-white/20 shadow-2xl max-w-4xl mx-auto">
+                    <h3 className="text-lg sm:text-xl font-bold mb-3 text-gray-800 dark:text-white flex items-center justify-center gap-2 sm:gap-2">
                       {current.title}
-                      <Button variant="ghost" size="sm" onClick={playRevealText} className="text-amber-600">
+                      <Button variant="ghost" size="sm" onClick={playRevealText} className="text-blue-600 hover:text-blue-700">
                         <Volume2 className="w-5 h-5" />
                       </Button>
                     </h3>
-                    <p className="text-base leading-relaxed">{current.text}</p>
-                    <div className="flex justify-center gap-3 mt-4 text-sm text-gray-500">
-                      <span>📝 {current.wordCount}</span>
+                    <p className="text-base text-gray-700 dark:text-gray-200 leading-relaxed">
+                      {current.id === 'celebration' ? (
+                        stars >= 3 ? (
+                          "Congratulations brave pirate! ... The WHOLE crew is celebrating YOU! ... Pirates are cheering, treasure is glowing, and adventure magic fills the ship! ... You made the seven seas proud with your amazing listening! You should feel SO brave! ... Give yourself a hearty ARRR!"
+                        ) : (
+                          `Great adventure, young pirate! ... You found ${Math.floor(stars)} treasure map${Math.floor(stars) !== 1 ? 's' : ''}! ... The crew is impressed by your courage! ... Captain Finn is proud of you! ... Every voyage teaches us something. Keep sailing and you'll find all the treasure next time! 🏴‍☠️`
+                        )
+                      ) : (
+                        current.text
+                      )}
+                    </p>
+                    <div className="flex justify-center gap-3 mt-4 text-sm text-gray-500 dark:text-gray-400">
+                      <span>📝 {current.wordCount} words</span>
                       <span>⏱️ {current.duration}s</span>
                     </div>
                   </div>
-                  <div className="flex justify-center">
-                    <Button onClick={handleNext} className="rounded-2xl px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold shadow-2xl">
-                      {stepIndex === storySteps.length - 1 ? <><Zap className="w-4 h-4 mr-2 animate-pulse" />Complete! ✨</> : <><Play className="w-4 h-4 mr-2" />Continue ⚓</>}
+                  
+                  <div className="flex justify-center pt-2 sm:pt-3">
+                    <Button onClick={handleNext} className="rounded-lg sm:rounded-2xl md:rounded-3xl px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold transition-all duration-300 hover:scale-105 transform shadow-lg sm:shadow-2xl text-xs sm:text-sm md:text-base">
+                      {stepIndex === storySteps.length - 1 ? (
+                        <>
+                          <Zap className="w-4 h-4 sm:w-4 sm:h-4 mr-2 sm:mr-2 animate-pulse" />
+                          <span className="hidden sm:inline">Complete Treasure Hunt! ✨</span>
+                          <span className="sm:hidden">Done! ✨</span>
+                        </>
+                      ) : (
+                        <>
+                          <Play className="w-4 h-4 sm:w-4 sm:h-4 mr-2 sm:mr-2" />
+                          <span className="hidden sm:inline">Continue Adventure! ⚓</span>
+                          <span className="sm:hidden">Next ⚓</span>
+                        </>
+                      )}
                     </Button>
                   </div>
                 </>
               )}
             </div>
+
+            {/* Desktop: Two Column Layout */}
+            <div className="hidden sm:flex sm:flex-row h-full gap-4 lg:gap-6">
+              {/* LEFT SIDE: Visual Elements (Desktop Only) */}
+              <div className="sm:flex sm:flex-col sm:items-center sm:justify-center sm:w-1/4 lg:w-1/3 sm:pr-2 lg:pr-4">
+                <div className="relative">
+                  <div className={cn(
+                    "text-7xl md:text-8xl lg:text-9xl mb-4 lg:mb-6", 
+                    "animate-float"
+                  )}>
+                    <span className={cn(
+                      current.id === 'celebration' && 'animate-celebration-party'
+                    )}>
+                      {current.emoji}
+                    </span>
+                  </div>
+
+                  {/* Star Collection Display */}
+                  <div className="flex items-center justify-center gap-2 md:gap-3 mb-4">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <Star 
+                        key={i} 
+                        className={cn(
+                          "w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 transition-all duration-500 transform hover:scale-125",
+                          i < stars 
+                            ? 'text-amber-400 animate-pulse drop-shadow-lg' 
+                            : 'text-gray-300 opacity-50'
+                        )} 
+                      />
+                    ))}
+                  </div>
+
+                  {/* Environment Icon */}
+                  <div className="absolute -top-6 -right-6 lg:-top-8 lg:-right-8 animate-float-slow">
+                    <Anchor className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 text-amber-500 opacity-70" />
+                  </div>
+                </div>
+              </div>
+
+              {/* RIGHT SIDE: Content (Desktop) */}
+              <div className="flex-1 flex flex-col justify-center sm:pr-4 overflow-hidden max-h-full">
+
+              {/* Desktop: PHASE 1 - LISTENING */}
+              {current.listeningFirst && listeningPhase === 'listening' && (
+                <div className="w-full">
+                  <div className="bg-amber-100/80 dark:bg-amber-900/40 rounded-xl p-4 lg:p-5 backdrop-blur-sm border-2 border-amber-300 shadow-xl">
+                    <h3 className="text-base md:text-lg font-bold mb-3 text-gray-800 dark:text-white flex items-center justify-center gap-2">
+                      <Ear className="w-5 h-5 md:w-6 md:h-6 text-amber-600 animate-bounce" />
+                      <span>{(current as any).audioInstruction}</span>
+                    </h3>
+                    
+                    {/* Transcript (only in accessibility mode during listening phase) */}
+                    {showTranscript && accessibilityMode && (
+                      <div className="mb-3 bg-orange-50/90 dark:bg-orange-900/30 rounded-lg p-3 border-2 border-orange-300">
+                        <div className="flex items-center gap-2 mb-1">
+                          <FileText className="w-4 h-4 text-orange-600" />
+                          <span className="text-xs font-semibold text-orange-700 dark:text-orange-300">Accessibility Transcript:</span>
+                        </div>
+                        <p className="text-sm md:text-base text-gray-700 dark:text-gray-200 font-medium">
+                          "{(current as any).audioText}"
+                        </p>
+                        <p className="text-xs text-orange-600 dark:text-orange-400 mt-1.5">
+                          ⚠️ Try to listen carefully instead of reading!
+                        </p>
+                      </div>
+                    )}
+                    
+                    {/* Audio waveform - hide if accessibility transcript is shown */}
+                    {audioWaveform && !(showTranscript && accessibilityMode) && (
+                      <div className="flex items-center justify-center gap-2 mb-4">
+                        {[...Array(5)].map((_, i) => (
+                          <div
+                            key={i}
+                            className="w-2 bg-amber-500 rounded-full animate-waveform"
+                            style={{
+                              height: '40px',
+                              animationDelay: `${i * 0.1}s`
+                            }}
+                          />
+                        ))}
+                      </div>
+                    )}
+                    
+                    <div className="flex flex-col items-center gap-2 mt-3">
+                      <Button
+                        onClick={handleReplayAudio}
+                        disabled={!unlimitedReplays && replaysUsed >= maxReplays || isPlaying}
+                        className={cn(
+                          "rounded-xl px-5 md:px-6 py-2 md:py-2.5 text-sm md:text-base bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold transition-all",
+                          isPlaying && "animate-pulse"
+                        )}
+                      >
+                        <Volume2 className="w-4 h-4 mr-2" />
+                        {isPlaying ? 'Playing...' : unlimitedReplays ? `Listen Again (${replaysUsed} plays)` : `Listen Again (${maxReplays - replaysUsed})`}
+                      </Button>
+                      
+                      <p className="text-xs md:text-sm text-gray-600 dark:text-gray-300">
+                        👂 Listen carefully! {unlimitedReplays ? 'Unlimited plays' : `${maxReplays} plays available`}.
+                      </p>
+                      
+                      {hasListened && (
+                        <Button
+                          onClick={handleProceedToQuestion}
+                          className="mt-1 bg-green-500 hover:bg-green-600 text-white rounded-xl px-5 md:px-6 py-2 md:py-2.5 text-sm md:text-base font-bold animate-bounce"
+                        >
+                          I'm Ready! ✓
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Desktop: PHASE 2 - QUESTION */}
+              {current.listeningFirst && listeningPhase === 'question' && (
+                <div className="w-full space-y-2">
+                  <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-2.5 lg:p-3 border-2 border-yellow-300">
+                    <h4 className="text-sm md:text-base font-bold text-gray-800 dark:text-white mb-1.5">
+                      {(current as any).question}
+                    </h4>
+                    {showHint ? (
+                      <p className="text-xs md:text-sm text-gray-600 dark:text-gray-300">
+                        💡 Hint: {(current as any).hint}
+                      </p>
+                    ) : (
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setShowHint(true)}
+                        className="text-yellow-600 border-yellow-300 hover:bg-yellow-100 text-xs h-7 px-3"
+                      >
+                        Pirate Hint? 🏴‍☠️
+                      </Button>
+                    )}
+                  </div>
+
+                  <div className="flex justify-center">
+                    <Button 
+                      onClick={handleReplayAudio}
+                      disabled={!unlimitedReplays && replaysUsed >= maxReplays || isPlaying}
+                      className="bg-amber-500 hover:bg-amber-600 text-white rounded-lg px-4 md:px-5 py-1.5 md:py-2 text-xs md:text-sm"
+                    >
+                      <Volume2 className="w-3 h-3 mr-1.5" />
+                      {unlimitedReplays ? `Replay (${replaysUsed})` : `Replay (${maxReplays - replaysUsed})`}
+                    </Button>
+                  </div>
+
+                  {(current as any).choices && (
+                    <div className="grid grid-cols-1 gap-1.5">
+                      {(current as any).choices.map((choice: any, idx: number) => {
+                        const isSelected = selectedChoice === choice.text;
+                        const isCorrect = choice.text === (current as any).audioText;
+                        const showResult = showFeedback && isSelected;
+                        
+                        return (
+                          <Button
+                            key={idx}
+                            onClick={() => handleChoice(choice)}
+                            disabled={showFeedback}
+                            className={cn(
+                              "rounded-lg px-2.5 py-2 text-xs md:text-sm font-bold transition-all duration-300 transform hover:scale-105 h-auto min-h-[42px] relative",
+                              showResult && isCorrect && "bg-green-500 hover:bg-green-600 text-white animate-bounce shadow-xl",
+                              showResult && !isCorrect && "bg-red-500 hover:bg-red-600 text-white shadow-lg",
+                              !showResult && "bg-white/90 hover:bg-white text-gray-700 border-2 border-gray-300 hover:border-amber-400 hover:shadow-md"
+                            )}
+                          >
+                            <div className="flex items-center gap-2 w-full">
+                              <span className="text-lg md:text-xl">{choice.emoji}</span>
+                              <div className="flex-1 text-left">
+                                <p className="font-bold text-xs md:text-sm">{choice.text}</p>
+                                <p className="text-xs opacity-70">{choice.meaning}</p>
+                              </div>
+                              {showResult && isCorrect && (
+                                <Award className="w-3.5 h-3.5 md:w-4 md:h-4 text-yellow-300 animate-spin absolute top-1 right-1" />
+                              )}
+                            </div>
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {showFeedback && (
+                    <div className="mt-1.5 animate-fade-in relative z-10">
+                      {selectedChoice === (current as any).audioText ? (
+                        <div className="text-green-600 dark:text-green-400 text-xs md:text-sm font-bold bg-green-50 dark:bg-green-900/20 rounded-lg p-2 border-2 border-green-400 shadow-sm">
+                          {getCorrectFeedback()}
+                          {attemptCount === 0 && (
+                            <div className="mt-1 text-xs">
+                              🏆 First try bonus!
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <div className="text-orange-700 dark:text-orange-300 text-xs md:text-sm font-bold bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/30 dark:to-red-900/30 rounded-lg p-2 border-2 border-orange-400 shadow-sm">
+                            {getWrongFeedback(attemptCount)}
+                          </div>
+                          
+                          {/* Retry Button - Desktop */}
+                          {retryMode && (
+                            <div className="flex flex-col sm:flex-row justify-center items-stretch gap-2 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-lg p-2.5 border-2 border-gray-300 dark:border-gray-600 shadow-md">
+                              <Button
+                                onClick={handleRetry}
+                                className="flex-1 sm:flex-none bg-gradient-to-r from-orange-500 via-orange-600 to-red-500 hover:from-orange-600 hover:via-orange-700 hover:to-red-600 text-white rounded-lg px-5 py-2 text-sm font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-2 border-orange-300 animate-pulse-slow relative overflow-hidden"
+                              >
+                                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 animate-shimmer"></div>
+                                <RotateCcw className="w-4 h-4 mr-1.5 relative z-10" />
+                                <span className="relative z-10">Try Again</span>
+                              </Button>
+                              <Button
+                                onClick={handleNext}
+                                variant="outline"
+                                className="flex-1 sm:flex-none rounded-lg px-5 py-2 text-sm font-bold border-2 border-gray-600 dark:border-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105"
+                              >
+                                <span>Skip</span>
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Desktop: PHASE 3 - REVEAL */}
+              {current.listeningFirst && listeningPhase === 'reveal' && (
+                <div className="w-full">
+                  <div className="bg-green-100/80 dark:bg-green-900/40 rounded-xl p-4 lg:p-5 backdrop-blur-sm border-2 border-green-300 shadow-xl">
+                    <h3 className="text-sm md:text-base font-bold mb-2 text-gray-800 dark:text-white flex items-center justify-center gap-2">
+                      {current.title}
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={playRevealText}
+                        className="text-blue-600 hover:text-blue-700 h-7 w-7 p-0"
+                      >
+                        <Volume2 className="w-4 h-4" />
+                      </Button>
+                    </h3>
+                    <p className="text-xs md:text-sm text-gray-700 dark:text-gray-200 leading-relaxed px-2">
+                      {(current as any).revealText}
+                    </p>
+                    
+                    <div className="mt-3 flex justify-center">
+                      <Button 
+                        onClick={handleNext} 
+                        className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold rounded-xl px-5 md:px-6 py-2 md:py-2.5 text-sm md:text-base"
+                      >
+                        Continue Adventure! ⚓
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Desktop: Non-interactive steps */}
+              {!current.listeningFirst && (
+                <div className="w-full">
+                  <div className="bg-white/80 dark:bg-gray-800/80 rounded-xl p-4 lg:p-5 mb-3 backdrop-blur-sm border-2 border-white/20 shadow-xl">
+                    <h3 className="text-base md:text-lg font-bold mb-2 text-gray-800 dark:text-white flex items-center justify-center gap-2">
+                      {current.title}
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={playRevealText}
+                        className="text-blue-600 hover:text-blue-700 h-7 w-7 p-0"
+                      >
+                        <Volume2 className="w-4 h-4" />
+                      </Button>
+                    </h3>
+                    <p className="text-sm md:text-base text-gray-700 dark:text-gray-200 leading-relaxed px-2">
+                      {current.id === 'celebration' ? (
+                        stars >= 3 ? (
+                          "Congratulations brave pirate! ... The WHOLE crew is celebrating YOU! ... Pirates are cheering, treasure is glowing, and adventure magic fills the ship! ... You made the seven seas proud with your amazing listening! You should feel SO brave! ... Give yourself a hearty ARRR!"
+                        ) : (
+                          `Great adventure, young pirate! ... You found ${Math.floor(stars)} treasure map${Math.floor(stars) !== 1 ? 's' : ''}! ... The crew is impressed by your courage! ... Captain Finn is proud of you! ... Every voyage teaches us something. Keep sailing and you'll find all the treasure next time! 🏴‍☠️`
+                        )
+                      ) : (
+                        current.text
+                      )}
+                    </p>
+                    
+                    <div className="flex justify-center gap-2 mt-2 text-xs text-gray-500 dark:text-gray-400">
+                      <span>📝 {current.wordCount}</span>
+                      <span>⏱️ {current.duration}s</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-center">
+                    <Button 
+                      onClick={handleNext} 
+                      className="rounded-xl px-5 md:px-6 py-2 md:py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold transition-all duration-300 hover:scale-105 shadow-lg text-sm md:text-base"
+                    >
+                      {stepIndex === storySteps.length - 1 ? (
+                        <>
+                          <Zap className="w-4 h-4 mr-2 animate-pulse" />
+                          Complete Treasure Hunt! ✨
+                        </>
+                      ) : (
+                        <>
+                          <Play className="w-4 h-4 mr-2" />
+                          Continue Adventure! ⚓
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              )}
+              </div>
+            </div>
+          </div>
+
+          {/* Floating Elements - Positioned around left visual area on desktop */}
+          <div className="hidden lg:block absolute top-20 left-8 animate-float-slow">
+            <Sparkles className="w-8 h-8 text-amber-400" />
+          </div>
+          <div className="hidden lg:block absolute bottom-20 left-12 animate-float-medium">
+            <Heart className="w-8 h-8 text-orange-400" />
+          </div>
+          <div className="hidden lg:block absolute top-1/2 left-4 animate-float-fast">
+            <Anchor className="w-7 h-7 text-amber-500" />
           </div>
         </CardContent>
       </Card>
 
+      {/* Enhanced Custom Animations */}
       <style>{`
-        @keyframes waveform { 0%, 100% { height: 20px; } 50% { height: 50px; } }
-        .animate-waveform { animation: waveform 0.6s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
-        .animate-float { animation: float 3s ease-in-out infinite; }
+        @keyframes float-slow {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          33% { transform: translateY(-10px) rotate(5deg); }
+          66% { transform: translateY(-5px) rotate(-5deg); }
+        }
+        
+        @keyframes float-medium {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-15px); }
+        }
+        
+        @keyframes float-fast {
+          0%, 100% { transform: translateY(0px) scale(1); }
+          50% { transform: translateY(-8px) scale(1.1); }
+        }
+        
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes fade-in {
+          from { opacity: 0; transform: scale(0.8); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        
+        @keyframes gentle-pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.8; }
+        }
+        
+        @keyframes waveform {
+          0%, 100% { height: 20px; }
+          50% { height: 50px; }
+        }
         
         @keyframes celebration-party {
           0% { 
@@ -748,10 +1327,93 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
           }
         }
         
+        @keyframes celebration-sparkle {
+          0%, 100% { 
+            transform: scale(1);
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+          }
+          50% { 
+            transform: scale(1.15);
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8),
+                        0 0 30px rgba(255, 105, 180, 0.6),
+                        0 0 40px rgba(135, 206, 250, 0.4);
+          }
+        }
+        
+        @keyframes pulse-slow {
+          0%, 100% { 
+            transform: scale(1);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+          }
+          50% { 
+            transform: scale(1.05);
+            box-shadow: 0 20px 50px -12px rgba(251, 146, 60, 0.5), 0 10px 10px -5px rgba(239, 68, 68, 0.3);
+          }
+        }
+        
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+        
+        .animate-float-slow {
+          animation: float-slow 4s ease-in-out infinite;
+        }
+        
+        .animate-pulse-slow {
+          animation: pulse-slow 2s ease-in-out infinite;
+        }
+        
+        .animate-shimmer {
+          animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        .animate-float-medium {
+          animation: float-medium 3s ease-in-out infinite;
+        }
+        
+        .animate-float-fast {
+          animation: float-fast 2s ease-in-out infinite;
+        }
+        
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
+        }
+        
+        .animate-fade-in {
+          animation: fade-in 0.5s ease-out;
+        }
+        
+        .animate-gentle-pulse {
+          animation: gentle-pulse 2s ease-in-out infinite;
+        }
+        
+        .animate-waveform {
+          animation: waveform 0.6s ease-in-out infinite;
+        }
+        
         .animate-celebration-party {
           animation: celebration-party 2s ease-in-out infinite;
           display: inline-block;
           transform-origin: center;
+        }
+        
+        .animate-celebration-sparkle {
+          animation: celebration-sparkle 1.5s ease-in-out infinite;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 640px) {
+          .animate-celebration-party {
+            animation-duration: 2.5s;
+          }
+        }
+        
+        /* Reduced motion for accessibility */
+        @media (prefers-reduced-motion: reduce) {
+          .animate-celebration-party {
+            animation: celebration-sparkle 2s ease-in-out infinite;
+          }
         }
         
         /* Custom scrollbar styles */
@@ -770,6 +1432,12 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
         
         .scrollbar-thin::-webkit-scrollbar-thumb:hover {
           background: rgba(107, 114, 128, 0.7);
+        }
+        
+        /* Firefox scrollbar */
+        .scrollbar-thin {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
         }
       `}</style>
     </div>
