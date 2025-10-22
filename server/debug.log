@@ -269,3 +269,14 @@ WARNING 2025-10-22 11:48:16,087 log 3816 16028 Not Found: /api/vocabulary/
 WARNING 2025-10-22 11:48:16,091 basehttp 3816 16028 "POST /api/vocabulary/ HTTP/1.1" 404 6344
 WARNING 2025-10-22 11:57:46,444 log 3816 20676 Not Found: /api/vocabulary/
 WARNING 2025-10-22 11:57:46,445 basehttp 3816 20676 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+INFO 2025-10-22 21:39:39,615 autoreload 12724 2444 Watching for file changes with StatReloader
+INFO 2025-10-22 22:12:26,750 basehttp 12724 11892 "OPTIONS /api/vocabulary/ HTTP/1.1" 200 0
+WARNING 2025-10-22 22:12:31,822 log 12724 11892 Not Found: /api/vocabulary/
+INFO 2025-10-22 22:12:31,841 basehttp 12724 11892 - Broken pipe from ('127.0.0.1', 49851)
+WARNING 2025-10-22 22:12:56,907 log 12724 18196 Not Found: /api/vocabulary/
+WARNING 2025-10-22 22:12:56,914 basehttp 12724 18196 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+WARNING 2025-10-22 22:16:15,041 log 12724 21932 Not Found: /api/vocabulary/
+WARNING 2025-10-22 22:16:15,057 basehttp 12724 21932 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+WARNING 2025-10-22 22:16:38,766 log 12724 21932 Not Found: /api/vocabulary/
+WARNING 2025-10-22 22:16:38,837 basehttp 12724 21932 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+INFO 2025-10-22 22:33:19,642 autoreload 11252 9180 Watching for file changes with StatReloader
