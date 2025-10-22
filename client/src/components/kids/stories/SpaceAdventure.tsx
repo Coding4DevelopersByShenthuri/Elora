@@ -637,10 +637,10 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
                       console.log('Could not replay at new speed');
                     }
                   }}
-                  className="h-7 px-2 rounded-full text-xs bg-purple-50 dark:bg-purple-900/30 border border-purple-200"
-                  title={`Playback speed: ${playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow (Default)' : 'Very Slow'}`}
+                  className="h-7 px-2 rounded-full text-xs bg-purple-50 dark:bg-purple-800 hover:bg-purple-100 dark:hover:bg-purple-700 border border-purple-200 dark:border-purple-600 text-purple-800 dark:text-purple-100 font-semibold shadow-sm"
+                  title={`Playback speed (works offline & online): ${playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow (Default)' : 'Very Slow'}`}
                 >
-                  <Gauge className="w-3.5 h-3.5 mr-1" />
+                  <Gauge className="w-3.5 h-3.5 mr-1 text-purple-600 dark:text-purple-200" />
                   {playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow' : 'Very Slow'}
                 </Button>
                 
@@ -659,66 +659,111 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
                       "h-7 px-2 rounded-full text-xs",
                       accessibilityMode && "bg-orange-100 dark:bg-orange-900 border border-orange-300"
                     )}
+                    title="Accessibility mode (for hearing difficulties)"
                   >
                     👂 {accessibilityMode ? 'ON' : 'Help'}
                   </Button>
                 )}
                 
+                {/* Transcript Toggle - Only in reveal phase OR accessibility mode */}
                 {(listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode) && (
-                  <>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowTranscript(!showTranscript)}
-                      className={cn(
-                        "h-7 w-7 p-0 rounded-full",
-                        showTranscript && "bg-blue-100 dark:bg-blue-900"
-                      )}
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setCaptionsEnabled(!captionsEnabled)}
-                      className={cn(
-                        "h-7 w-7 p-0 rounded-full",
-                        captionsEnabled && "bg-purple-100 dark:bg-purple-900"
-                      )}
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                    </Button>
-                  </>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowTranscript(!showTranscript)}
+                  className={cn(
+                    "h-7 w-7 p-0 rounded-full border shadow-sm",
+                    showTranscript 
+                      ? "bg-blue-100 dark:bg-blue-800 border-blue-300 dark:border-blue-600 hover:bg-blue-200 dark:hover:bg-blue-700" 
+                      : "bg-white/80 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600"
+                  )}
+                  title="Toggle text transcript"
+                >
+                  <FileText className={cn(
+                    "w-3.5 h-3.5",
+                    showTranscript 
+                      ? "text-blue-700 dark:text-blue-200" 
+                      : "text-gray-700 dark:text-gray-200"
+                  )} />
+                </Button>
+                )}
+                
+                {/* Captions Toggle - Only in reveal phase OR accessibility mode */}
+                {(listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setCaptionsEnabled(!captionsEnabled)}
+                  className={cn(
+                    "h-7 w-7 p-0 rounded-full border shadow-sm",
+                    captionsEnabled 
+                      ? "bg-purple-100 dark:bg-purple-800 border-purple-300 dark:border-purple-600 hover:bg-purple-200 dark:hover:bg-purple-700" 
+                      : "bg-white/80 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600"
+                  )}
+                  title="Toggle captions"
+                >
+                  <Eye className={cn(
+                    "w-3.5 h-3.5",
+                    captionsEnabled 
+                      ? "text-purple-700 dark:text-purple-200" 
+                      : "text-gray-700 dark:text-gray-200"
+                  )} />
+                </Button>
                 )}
               </div>
             </div>
           </div>
           
+          {/* Download Progress Banner (Online Users) */}
           {downloadStatus?.downloading && (
-            <div className="mb-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-2.5 rounded-lg shadow-lg">
+            <div className="mb-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-2.5 rounded-lg shadow-lg animate-fade-in">
               <div className="flex items-center gap-3 mb-1.5">
                 <Download className="w-4 h-4 animate-bounce" />
                 <span className="text-xs sm:text-sm font-bold">
-                  Downloading Space Voices... {Math.round(downloadStatus.progress)}%
+                  Downloading High-Quality Space Voices... {Math.round(downloadStatus.progress)}%
                 </span>
               </div>
-              <Progress value={downloadStatus.progress} className="h-1.5 bg-white/30" />
+              <Progress 
+                value={downloadStatus.progress} 
+                className="h-1.5 bg-white/30"
+              >
+                <div className="h-full bg-white rounded-full transition-all duration-500" />
+              </Progress>
+              <p className="text-xs opacity-90 mt-1">
+                ✨ Your app will work offline after this download!
+              </p>
             </div>
           )}
           
+          {/* Download Complete Notification */}
+          {downloadStatus && !downloadStatus.downloading && downloadStatus.progress === 100 && stepIndex < 2 && (
+            <div className="mb-2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg animate-bounce">
+              <div className="flex items-center gap-2 justify-center">
+                <span className="text-xl">🎉</span>
+                <span className="text-xs sm:text-sm font-bold">
+                  Space voices ready! Now works offline too!
+                </span>
+                <span className="text-xl">✨</span>
+              </div>
+            </div>
+          )}
+          
+          {/* Accessibility Mode Warning */}
           {accessibilityMode && (listeningPhase === 'listening' || listeningPhase === 'question') && (
-            <div className="mb-2 bg-orange-100 dark:bg-orange-900/40 border-2 border-orange-400 text-orange-900 dark:text-orange-200 px-4 py-2.5 rounded-lg">
+            <div className="mb-2 bg-orange-100 dark:bg-orange-900/40 border-2 border-orange-400 text-orange-900 dark:text-orange-200 px-4 py-2.5 rounded-lg shadow-md">
               <div className="flex items-center gap-2 justify-center">
                 <span className="text-lg">👂</span>
                 <div className="text-xs sm:text-sm">
-                  <strong>Accessibility Mode:</strong> Text shown. Try listening when possible!
+                  <strong>Accessibility Mode Active:</strong> Text shown for hearing support. 
+                  <span className="block sm:inline sm:ml-1">Challenge reduced - encourage listening when possible!</span>
                 </div>
               </div>
             </div>
           )}
           
+          {/* Live Caption Display - Only in reveal phase or accessibility mode */}
           {captionsEnabled && currentCaption && (listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode) && (
-            <div className="mb-2 bg-black/80 text-white px-4 py-2 rounded-lg text-center text-sm sm:text-base font-semibold">
+            <div className="mb-2 bg-black/80 text-white px-4 py-2 rounded-lg text-center text-sm sm:text-base font-semibold animate-fade-in">
               {currentCaption}
             </div>
           )}
@@ -727,7 +772,8 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
             <div className="h-full bg-gradient-to-r from-purple-400 to-blue-400 rounded-full transition-all duration-500" />
           </Progress>
 
-          <div className="flex-1 overflow-y-auto pb-2 sm:pb-4">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden sm:overflow-hidden pb-2 sm:pb-4 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent">
+            {/* MOBILE: Original Single Column Layout */}
             <div className="sm:hidden text-center h-full flex flex-col justify-center">
               <div className="relative mb-2">
                 <div className={cn("text-5xl sm:text-6xl mb-2", getCharacterAnimation())}>
@@ -747,6 +793,7 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
                 </div>
               </div>
 
+              {/* Mobile: PHASE 1 - LISTENING */}
               {current.listeningFirst && listeningPhase === 'listening' && (
                 <div className="space-y-4 max-w-3xl mx-auto w-full">
                   <div className="bg-purple-100/80 dark:bg-purple-900/40 rounded-2xl p-6 backdrop-blur-sm border-2 border-purple-300 shadow-2xl">
@@ -755,43 +802,60 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
                       {(current as any).audioInstruction}
                     </h3>
                     
+                    {/* Transcript (only in accessibility mode during listening phase) */}
                     {showTranscript && accessibilityMode && (
                       <div className="mb-4 bg-orange-50/90 dark:bg-orange-900/30 rounded-lg p-4 border-2 border-orange-300">
+                        <div className="flex items-center gap-2 mb-2">
+                          <FileText className="w-4 h-4 text-orange-600" />
+                          <span className="text-xs font-semibold text-orange-700 dark:text-orange-300">Accessibility Transcript:</span>
+                        </div>
                         <p className="text-sm text-gray-700 dark:text-gray-200 font-medium">
                           "{(current as any).audioText}"
+                        </p>
+                        <p className="text-xs text-orange-600 dark:text-orange-400 mt-2">
+                          ⚠️ Try to listen carefully instead of reading!
                         </p>
                       </div>
                     )}
                     
+                    {/* Audio waveform - hide if accessibility transcript is shown */}
                     {audioWaveform && !(showTranscript && accessibilityMode) && (
                       <div className="flex items-center justify-center gap-2 mb-4">
                         {[...Array(5)].map((_, i) => (
                           <div
                             key={i}
                             className="w-2 bg-purple-500 rounded-full animate-waveform"
-                            style={{ height: '40px', animationDelay: `${i * 0.1}s` }}
+                            style={{
+                              height: '40px',
+                              animationDelay: `${i * 0.1}s`
+                            }}
                           />
                         ))}
                       </div>
                     )}
                     
                     <div className="flex flex-col items-center gap-3 mt-4">
-                      <Button 
+                  <Button 
                         onClick={handleReplayAudio}
                         disabled={!unlimitedReplays && replaysUsed >= maxReplays || isPlaying}
                         className={cn(
-                          "rounded-xl px-6 py-3 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-bold",
+                          "rounded-xl px-6 py-3 text-base bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-bold transition-all",
                           isPlaying && "animate-pulse"
                         )}
                       >
                         <Volume2 className="w-5 h-5 mr-2" />
-                        {isPlaying ? 'Playing...' : `Listen Again (${replaysUsed} plays)`}
-                      </Button>
+                        {isPlaying ? 'Playing...' : unlimitedReplays ? `Listen Again (${replaysUsed} plays)` : `Listen Again (${maxReplays - replaysUsed} left)`}
+                  </Button>
+                      
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                        👂 Listen carefully! {unlimitedReplays ? 'Unlimited plays' : `${maxReplays} plays available`}.
+                      </p>
+                      
                       
                       {hasListened && (
                         <Button
                           onClick={handleProceedToQuestion}
-                          className="bg-green-500 hover:bg-green-600 text-white rounded-xl px-6 py-3 font-bold animate-bounce"
+                          className="mt-2 bg-green-500 hover:bg-green-600 text-white rounded-xl px-6 py-3 font-bold animate-bounce"
                         >
                           I'm Ready! ✓
                         </Button>
@@ -801,44 +865,58 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
                 </div>
               )}
 
+              {/* Mobile: PHASE 2 - QUESTION */}
               {current.listeningFirst && listeningPhase === 'question' && (
-                <div className="space-y-2 max-w-4xl mx-auto w-full">
-                  <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-2.5 border border-yellow-200">
-                    <h4 className="text-sm font-bold text-gray-800 dark:text-white mb-1.5">
+                <div className="space-y-2 sm:space-y-2 md:space-y-3 max-w-4xl mx-auto w-full">
+                  {/* Question and Hint */}
+                  <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg sm:rounded-lg md:rounded-xl p-2.5 sm:p-2 md:p-3 border border-yellow-200 dark:border-yellow-700">
+                    <h4 className="text-sm sm:text-sm md:text-base font-bold text-gray-800 dark:text-white mb-1.5 sm:mb-1">
                       {(current as any).question}
                     </h4>
                     {showHint ? (
-                      <p className="text-xs text-gray-600 dark:text-gray-300">
-                        💡 {(current as any).hint}
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
+                        💡 Hint: {(current as any).hint}
                       </p>
                     ) : (
                       <Button 
                         variant="outline" 
                         size="sm" 
                         onClick={() => setShowHint(true)}
-                        className="text-yellow-600 border-yellow-300 hover:bg-yellow-100 text-xs"
+                        className="text-yellow-600 border-yellow-300 hover:bg-yellow-100 text-xs sm:text-sm"
                       >
                         Need a hint? 🚀
                       </Button>
                     )}
                   </div>
 
-                  <div className="flex justify-center mb-2">
-                    <Button 
+                  {/* Replay Button */}
+                    <div className="flex justify-center mb-2 sm:mb-2">
+                      <Button 
                       onClick={handleReplayAudio}
                       disabled={replaysUsed >= maxReplays || isPlaying}
-                      className={cn(
-                        "rounded-xl px-5 py-2.5 bg-gradient-to-r from-purple-500 to-blue-500 text-white font-bold text-xs",
-                        isPlaying && "animate-pulse"
-                      )}
-                    >
-                      <Volume2 className="w-4 h-4 mr-2" />
-                      {isPlaying ? 'Listening...' : '🔊 Listen'}
-                    </Button>
-                  </div>
+                        className={cn(
+                          "rounded-lg sm:rounded-xl md:rounded-2xl px-4 sm:px-5 md:px-6 py-2.5 sm:py-2 md:py-2.5 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-bold transition-all duration-300 transform hover:scale-105 text-xs sm:text-xs md:text-sm",
+                          isPlaying && "animate-pulse"
+                        )}
+                      >
+                        {isPlaying ? (
+                          <>
+                            <Volume2 className="w-4 h-4 sm:w-4 sm:h-4 mr-2 sm:mr-2 animate-spin" />
+                            Listening...
+                          </>
+                        ) : (
+                          <>
+                            <Volume2 className="w-4 h-4 sm:w-4 sm:h-4 mr-2 sm:mr-2" />
+                            <span className="hidden sm:inline">Listen to the Magic Word</span>
+                            <span className="sm:hidden">🔊 Listen</span>
+                          </>
+                        )}
+                      </Button>
+                    </div>
 
+                  {/* Choice Buttons */}
                   {(current as any).choices && (
-                    <div className="grid grid-cols-1 gap-2.5">
+                    <div className="grid grid-cols-1 gap-2.5 sm:gap-2 md:gap-3 justify-center">
                       {(current as any).choices.map((choice: any, idx: number) => {
                         const isSelected = selectedChoice === choice.text;
                         const isCorrect = choice.text === (current as any).audioText;
@@ -850,20 +928,20 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
                             onClick={() => handleChoice(choice)}
                             disabled={showFeedback}
                             className={cn(
-                              "rounded-lg px-3 py-2.5 text-xs font-bold h-auto min-h-[55px]",
-                              showResult && isCorrect && "bg-green-500 text-white animate-bounce",
-                              showResult && !isCorrect && "bg-red-500 text-white",
-                              !showResult && "bg-white/90 text-gray-700 border-2 border-gray-200"
+                              "rounded-lg sm:rounded-lg md:rounded-xl px-3 sm:px-3 md:px-4 py-2.5 sm:py-2 md:py-2.5 text-xs sm:text-xs md:text-sm font-bold transition-all duration-300 transform hover:scale-105 h-auto min-h-[55px] sm:min-h-[50px] md:min-h-[55px]",
+                              showResult && isCorrect && "bg-green-500 hover:bg-green-600 text-white animate-bounce shadow-lg sm:shadow-2xl",
+                              showResult && !isCorrect && "bg-red-500 hover:bg-red-600 text-white shadow-md sm:shadow-xl",
+                              !showResult && "bg-white/90 hover:bg-white text-gray-700 border-2 border-gray-200 hover:border-purple-300 hover:shadow-lg"
                             )}
                           >
-                            <div className="flex items-center gap-2 w-full">
-                              <span className="text-lg">{choice.emoji}</span>
+                            <div className="flex items-center gap-2 sm:gap-3 md:gap-4 w-full">
+                              <span className="text-lg sm:text-lg md:text-xl">{choice.emoji}</span>
                               <div className="flex-1 text-left">
-                                <p className="font-bold text-xs">{choice.text}</p>
+                                <p className="font-bold text-xs sm:text-sm md:text-base">{choice.text}</p>
                                 <p className="text-xs opacity-70">{choice.meaning}</p>
                               </div>
                               {showResult && isCorrect && (
-                                <Award className="w-4 h-4 text-yellow-300 animate-spin" />
+                                <Award className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-300 animate-spin absolute top-1 right-1" />
                               )}
                             </div>
                           </Button>
@@ -872,22 +950,30 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
                     </div>
                   )}
 
+                  {/* Feedback */}
                   {showFeedback && (
-                    <div className="mt-2 animate-fade-in">
+                    <div className="mt-2 sm:mt-3 animate-fade-in">
                       {selectedChoice === (current as any).audioText ? (
-                        <div className="text-green-600 text-xs font-bold bg-green-50 rounded-lg p-2.5 border border-green-200">
+                        <div className="text-green-600 dark:text-green-400 text-xs sm:text-sm md:text-base font-bold animate-bounce bg-green-50 dark:bg-green-900/20 rounded-lg sm:rounded-lg md:rounded-xl p-2.5 sm:p-2 md:p-3 border border-green-200 dark:border-green-700">
                           {getCorrectFeedback()}
+                          {attemptCount === 0 && (
+                            <div className="mt-2 text-xs">
+                              🏆 Perfect! First try bonus!
+                            </div>
+                          )}
                         </div>
                       ) : (
                         <div className="space-y-3">
-                          <div className="text-red-600 text-xs font-bold bg-red-50 rounded-lg p-2.5 border border-red-200">
+                        <div className="text-red-600 dark:text-red-400 text-xs sm:text-sm md:text-base font-bold bg-red-50 dark:bg-red-900/20 rounded-lg sm:rounded-lg md:rounded-xl p-2.5 sm:p-2 md:p-3 border border-red-200 dark:border-red-700">
                             {getWrongFeedback(attemptCount)}
                           </div>
+                          
+                          {/* Retry Button - Mobile */}
                           {retryMode && (
-                            <div className="flex gap-2">
+                            <div className="flex justify-center gap-2">
                               <Button
                                 onClick={handleRetry}
-                                className="bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg px-4 py-2.5 text-sm font-bold"
+                                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-lg px-4 py-2.5 text-sm font-bold shadow-md hover:shadow-lg transition-all"
                               >
                                 <RotateCcw className="w-4 h-4 mr-2" />
                                 Try Again
@@ -895,7 +981,7 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
                               <Button
                                 onClick={handleNext}
                                 variant="outline"
-                                className="rounded-lg px-4 py-2.5 text-sm"
+                                className="rounded-lg px-4 py-2.5 text-sm font-semibold border-2 border-gray-400 dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 shadow-sm hover:shadow-md transition-all"
                               >
                                 Skip
                               </Button>
@@ -908,22 +994,346 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
                 </div>
               )}
 
+              {/* Mobile: PHASE 3 - REVEAL */}
               {current.listeningFirst && listeningPhase === 'reveal' && (
                 <div className="space-y-4 max-w-4xl mx-auto w-full">
-                  <div className="bg-green-100/80 dark:bg-green-900/40 rounded-2xl p-6 backdrop-blur-sm border-2 border-green-300">
-                    <h3 className="text-lg font-bold mb-3 text-gray-800 dark:text-white flex items-center justify-center gap-2">
+                  <div className="bg-green-100/80 dark:bg-green-900/40 rounded-2xl p-6 backdrop-blur-sm border-2 border-green-300 shadow-2xl">
+                    <h3 className="text-lg sm:text-xl font-bold mb-3 text-gray-800 dark:text-white flex items-center justify-center gap-2 sm:gap-2">
                       {current.title}
-                      <Button variant="ghost" size="sm" onClick={playRevealText} className="text-blue-500 h-7 w-7 p-0">
-                        <Volume2 className="w-3.5 h-3.5" />
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={playRevealText}
+                        className="text-blue-500 hover:text-blue-600 h-7 w-7 sm:h-8 sm:w-8 p-0"
+                      >
+                        <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </Button>
                     </h3>
-                    <p className="text-sm text-gray-700 dark:text-gray-200 leading-relaxed">
+                    <p className="text-sm sm:text-sm md:text-base lg:text-lg text-gray-700 dark:text-gray-200 leading-relaxed sm:leading-relaxed mx-auto max-w-3xl">
                       {(current as any).revealText}
                     </p>
+                    
                     <div className="mt-4 flex justify-center">
                       <Button 
                         onClick={handleNext} 
-                        className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-2xl px-8 py-3"
+                        className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold rounded-2xl px-8 py-3"
+                      >
+                        Continue Adventure! 🚀
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Mobile: Non-interactive steps */}
+              {!current.listeningFirst && (
+                <>
+                  <div className="bg-white/80 dark:bg-gray-800/80 rounded-2xl p-6 mb-4 backdrop-blur-sm border-2 border-white/20 shadow-2xl max-w-4xl mx-auto">
+                    <h3 className="text-lg sm:text-xl font-bold mb-3 text-gray-800 dark:text-white flex items-center justify-center gap-2 sm:gap-2">
+                      {current.title}
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={playRevealText}
+                        className="text-blue-600 hover:text-blue-700"
+                      >
+                        <Volume2 className="w-5 h-5" />
+                      </Button>
+                    </h3>
+                    <p className="text-base text-gray-700 dark:text-gray-200 leading-relaxed">
+                      {/* Dynamic message based on stars collected */}
+                      {current.id === 'celebration' ? (
+                        stars >= 3 ? (
+                          // 3 stars - Full celebration
+                          "Congratulations SPACE HERO! ... You helped Cosmo complete the mission! ... All the stars are shining brightly, and the WHOLE galaxy is celebrating YOUR amazing adventure! ... Aliens are dancing, planets are spinning with joy, and rockets are doing loop-de-loops! ... You listened so well! ... You're a SUPERSTAR! ... Give yourself the biggest space high-five! 🙌✨"
+                        ) : (
+                          // 1-2 stars - Encouraging message
+                          `Great mission, young astronaut! ... You collected ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The galaxy is impressed by your bravery! ... Cosmo is proud of you! ... Every space journey teaches us something. Keep exploring and you'll collect all the stars next time! 🚀`
+                        )
+                      ) : (
+                        current.text
+                      )}
+                    </p>
+                    
+                    <div className="flex justify-center gap-3 mt-4 text-sm text-gray-500 dark:text-gray-400">
+                      <span>📝 {current.wordCount} words</span>
+                      <span>⏱️ {current.duration}s</span>
+                    </div>
+                  </div>
+                  
+                <div className="flex justify-center pt-2 sm:pt-3">
+                  <Button 
+                    onClick={handleNext} 
+                    className="rounded-lg sm:rounded-2xl md:rounded-3xl px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-3.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold transition-all duration-300 hover:scale-105 transform shadow-lg sm:shadow-2xl text-xs sm:text-sm md:text-base"
+                  >
+                    {stepIndex === storySteps.length - 1 ? (
+                      <>
+                        <Zap className="w-4 h-4 sm:w-4 sm:h-4 mr-2 sm:mr-2 animate-pulse" />
+                        <span className="hidden sm:inline">Complete Space Journey! ✨</span>
+                        <span className="sm:hidden">Done! ✨</span>
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-4 h-4 sm:w-4 sm:h-4 mr-2 sm:mr-2" />
+                        <span className="hidden sm:inline">Continue Adventure! 🚀</span>
+                        <span className="sm:hidden">Next 🚀</span>
+                      </>
+                    )}
+                  </Button>
+                </div>
+                </>
+              )}
+            </div>
+
+            {/* Desktop: Two Column Layout */}
+            <div className="hidden sm:flex sm:flex-row h-full gap-4 lg:gap-6">
+              {/* LEFT SIDE: Visual Elements (Desktop Only) */}
+              <div className="sm:flex sm:flex-col sm:items-center sm:justify-center sm:w-1/4 lg:w-1/3 sm:pr-2 lg:pr-4">
+                <div className="relative">
+                  <div className={cn(
+                    "text-7xl md:text-8xl lg:text-9xl mb-4 lg:mb-6", 
+                    getCharacterAnimation()
+                  )}>
+                    <span className={cn(
+                      current.id === 'celebration' && 'animate-celebration-party'
+                    )}>
+                      {current.emoji}
+                    </span>
+                  </div>
+
+                  {/* Star Collection Display */}
+                  <div className="flex items-center justify-center gap-2 md:gap-3 mb-4">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <Star 
+                        key={i} 
+                        className={cn(
+                          "w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 transition-all duration-500 transform hover:scale-125",
+                          i < stars 
+                            ? 'text-yellow-400 animate-pulse drop-shadow-lg' 
+                            : 'text-gray-300 opacity-50'
+                        )} 
+                      />
+                    ))}
+                  </div>
+
+                  {/* Environment Icon */}
+                  <div className="absolute -top-6 -right-6 lg:-top-8 lg:-right-8 animate-float-slow">
+                    <Sparkles className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 text-purple-500 opacity-70" />
+                  </div>
+                </div>
+              </div>
+
+              {/* RIGHT SIDE: Content (Desktop) */}
+              <div className="flex-1 flex flex-col justify-center sm:pr-4 overflow-hidden max-h-full">
+
+              {/* Desktop: PHASE 1 - LISTENING */}
+              {current.listeningFirst && listeningPhase === 'listening' && (
+                <div className="w-full">
+                  <div className="bg-purple-100/80 dark:bg-purple-900/40 rounded-xl p-4 lg:p-5 backdrop-blur-sm border-2 border-purple-300 shadow-xl">
+                    <h3 className="text-base md:text-lg font-bold mb-3 text-gray-800 dark:text-white flex items-center justify-center gap-2">
+                      <Ear className="w-5 h-5 md:w-6 md:h-6 text-purple-600 animate-bounce" />
+                      <span>{(current as any).audioInstruction}</span>
+                    </h3>
+                    
+                    {/* Transcript (only in accessibility mode during listening phase) */}
+                    {showTranscript && accessibilityMode && (
+                      <div className="mb-3 bg-orange-50/90 dark:bg-orange-900/30 rounded-lg p-3 border-2 border-orange-300">
+                        <div className="flex items-center gap-2 mb-1">
+                          <FileText className="w-4 h-4 text-orange-600" />
+                          <span className="text-xs font-semibold text-orange-700 dark:text-orange-300">Accessibility Transcript:</span>
+                        </div>
+                        <p className="text-sm md:text-base text-gray-700 dark:text-gray-200 font-medium">
+                          "{(current as any).audioText}"
+                        </p>
+                        <p className="text-xs text-orange-600 dark:text-orange-400 mt-1.5">
+                          ⚠️ Try to listen carefully instead of reading!
+                        </p>
+                      </div>
+                    )}
+                    
+                    {/* Audio waveform - hide if accessibility transcript is shown */}
+                    {audioWaveform && !(showTranscript && accessibilityMode) && (
+                      <div className="flex items-center justify-center gap-2 mb-4">
+                        {[...Array(5)].map((_, i) => (
+                          <div
+                            key={i}
+                            className="w-2 bg-purple-500 rounded-full animate-waveform"
+                            style={{
+                              height: '40px',
+                              animationDelay: `${i * 0.1}s`
+                            }}
+                          />
+                        ))}
+                      </div>
+                    )}
+                    
+                    <div className="flex flex-col items-center gap-2 mt-3">
+                      <Button
+                        onClick={handleReplayAudio}
+                        disabled={!unlimitedReplays && replaysUsed >= maxReplays || isPlaying}
+                        className={cn(
+                          "rounded-xl px-5 md:px-6 py-2 md:py-2.5 text-sm md:text-base bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-bold transition-all",
+                          isPlaying && "animate-pulse"
+                        )}
+                      >
+                        <Volume2 className="w-4 h-4 mr-2" />
+                        {isPlaying ? 'Playing...' : unlimitedReplays ? `Listen Again (${replaysUsed} plays)` : `Listen Again (${maxReplays - replaysUsed})`}
+                      </Button>
+                      
+                      <p className="text-xs md:text-sm text-gray-600 dark:text-gray-300">
+                        👂 Listen carefully! {unlimitedReplays ? 'Unlimited plays' : `${maxReplays} plays available`}.
+                      </p>
+                      
+                      
+                      {hasListened && (
+                        <Button
+                          onClick={handleProceedToQuestion}
+                          className="mt-1 bg-green-500 hover:bg-green-600 text-white rounded-xl px-5 md:px-6 py-2 md:py-2.5 text-sm md:text-base font-bold animate-bounce"
+                        >
+                          I'm Ready! ✓
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Desktop: PHASE 2 - QUESTION */}
+              {current.listeningFirst && listeningPhase === 'question' && (
+                <div className="w-full space-y-2">
+                  <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-2.5 lg:p-3 border-2 border-yellow-300">
+                    <h4 className="text-sm md:text-base font-bold text-gray-800 dark:text-white mb-1.5">
+                      {(current as any).question}
+                    </h4>
+                    {showHint ? (
+                      <p className="text-xs md:text-sm text-gray-600 dark:text-gray-300">
+                        💡 Hint: {(current as any).hint}
+                      </p>
+                    ) : (
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setShowHint(true)}
+                        className="text-yellow-600 border-yellow-300 hover:bg-yellow-100 text-xs h-7 px-3"
+                      >
+                        Need a hint? 🚀
+                      </Button>
+                    )}
+                  </div>
+
+                  <div className="flex justify-center">
+                    <Button 
+                      onClick={handleReplayAudio}
+                      disabled={!unlimitedReplays && replaysUsed >= maxReplays || isPlaying}
+                      className="bg-purple-500 hover:bg-purple-600 text-white rounded-lg px-4 md:px-5 py-1.5 md:py-2 text-xs md:text-sm"
+                    >
+                      <Volume2 className="w-3 h-3 mr-1.5" />
+                      {unlimitedReplays ? `Replay (${replaysUsed})` : `Replay (${maxReplays - replaysUsed})`}
+                    </Button>
+                  </div>
+
+                  {(current as any).choices && (
+                    <div className="grid grid-cols-1 gap-1.5">
+                      {(current as any).choices.map((choice: any, idx: number) => {
+                        const isSelected = selectedChoice === choice.text;
+                        const isCorrect = choice.text === (current as any).audioText;
+                        const showResult = showFeedback && isSelected;
+                        
+                        return (
+                          <Button
+                            key={idx}
+                            onClick={() => handleChoice(choice)}
+                            disabled={showFeedback}
+                            className={cn(
+                              "rounded-lg px-2.5 py-2 text-xs md:text-sm font-bold transition-all duration-300 transform hover:scale-105 h-auto min-h-[42px] relative",
+                              showResult && isCorrect && "bg-green-500 hover:bg-green-600 text-white animate-bounce shadow-xl",
+                              showResult && !isCorrect && "bg-red-500 hover:bg-red-600 text-white shadow-lg",
+                              !showResult && "bg-white/90 hover:bg-white text-gray-700 border-2 border-gray-300 hover:border-purple-400 hover:shadow-md"
+                            )}
+                          >
+                            <div className="flex items-center gap-2 w-full">
+                              <span className="text-lg md:text-xl">{choice.emoji}</span>
+                              <div className="flex-1 text-left">
+                                <p className="font-bold text-xs md:text-sm">{choice.text}</p>
+                                <p className="text-xs opacity-70">{choice.meaning}</p>
+                              </div>
+                              {showResult && isCorrect && (
+                                <Award className="w-3.5 h-3.5 md:w-4 md:h-4 text-yellow-300 animate-spin absolute top-1 right-1" />
+                              )}
+                            </div>
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {showFeedback && (
+                    <div className="mt-1.5 animate-fade-in relative z-10">
+                      {selectedChoice === (current as any).audioText ? (
+                        <div className="text-green-600 dark:text-green-400 text-xs md:text-sm font-bold bg-green-50 dark:bg-green-900/20 rounded-lg p-2 border-2 border-green-400 shadow-sm">
+                          {getCorrectFeedback()}
+                          {attemptCount === 0 && (
+                            <div className="mt-1 text-xs">
+                              🏆 First try bonus!
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <div className="text-orange-700 dark:text-orange-300 text-xs md:text-sm font-bold bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/30 dark:to-red-900/30 rounded-lg p-2 border-2 border-orange-400 shadow-sm">
+                            {getWrongFeedback(attemptCount)}
+                          </div>
+                          
+                          {/* Retry Button - Desktop - COMPACT & VISIBLE */}
+                          {retryMode && (
+                            <div className="flex flex-col sm:flex-row justify-center items-stretch gap-2 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-lg p-2.5 border-2 border-gray-300 dark:border-gray-600 shadow-md">
+                              <Button
+                                onClick={handleRetry}
+                                className="flex-1 sm:flex-none bg-gradient-to-r from-orange-500 via-orange-600 to-red-500 hover:from-orange-600 hover:via-orange-700 hover:to-red-600 text-white rounded-lg px-5 py-2 text-sm font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-2 border-orange-300 animate-pulse-slow relative overflow-hidden"
+                              >
+                                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 animate-shimmer"></div>
+                                <RotateCcw className="w-4 h-4 mr-1.5 relative z-10" />
+                                <span className="relative z-10">Try Again</span>
+                              </Button>
+                              <Button
+                                onClick={handleNext}
+                                variant="outline"
+                                className="flex-1 sm:flex-none rounded-lg px-5 py-2 text-sm font-bold border-2 border-gray-600 dark:border-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105"
+                              >
+                                <span>Skip</span>
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Desktop: PHASE 3 - REVEAL */}
+              {current.listeningFirst && listeningPhase === 'reveal' && (
+                <div className="w-full">
+                  <div className="bg-green-100/80 dark:bg-green-900/40 rounded-xl p-4 lg:p-5 backdrop-blur-sm border-2 border-green-300 shadow-xl">
+                    <h3 className="text-sm md:text-base font-bold mb-2 text-gray-800 dark:text-white flex items-center justify-center gap-2">
+                      {current.title}
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={playRevealText}
+                        className="text-blue-600 hover:text-blue-700 h-7 w-7 p-0"
+                      >
+                        <Volume2 className="w-4 h-4" />
+                      </Button>
+                    </h3>
+                    <p className="text-xs md:text-sm text-gray-700 dark:text-gray-200 leading-relaxed px-2">
+                      {(current as any).revealText}
+                    </p>
+                    
+                    <div className="mt-3 flex justify-center">
+                      <Button 
+                        onClick={handleNext} 
+                        className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold rounded-xl px-5 md:px-6 py-2 md:py-2.5 text-sm md:text-base"
                       >
                         Continue! 🚀
                       </Button>
@@ -932,27 +1342,46 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
                 </div>
               )}
 
+              {/* Desktop: Non-interactive steps */}
               {!current.listeningFirst && (
-                <>
-                  <div className="bg-white/80 dark:bg-gray-800/80 rounded-2xl p-6 mb-4 backdrop-blur-sm border-2 border-white/20 shadow-2xl max-w-4xl mx-auto">
-                    <h3 className="text-lg font-bold mb-3 text-gray-800 dark:text-white flex items-center justify-center gap-2">
+                <div className="w-full">
+                  <div className="bg-white/80 dark:bg-gray-800/80 rounded-xl p-4 lg:p-5 mb-3 backdrop-blur-sm border-2 border-white/20 shadow-xl">
+                    <h3 className="text-base md:text-lg font-bold mb-2 text-gray-800 dark:text-white flex items-center justify-center gap-2">
                       {current.title}
-                      <Button variant="ghost" size="sm" onClick={playRevealText} className="text-blue-600">
-                        <Volume2 className="w-5 h-5" />
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={playRevealText}
+                        className="text-blue-600 hover:text-blue-700 h-7 w-7 p-0"
+                      >
+                        <Volume2 className="w-4 h-4" />
                       </Button>
                     </h3>
-                    <p className="text-base text-gray-700 dark:text-gray-200 leading-relaxed">
-                      {current.text}
+                    <p className="text-sm md:text-base text-gray-700 dark:text-gray-200 leading-relaxed px-2">
+                      {/* Dynamic message based on stars collected */}
+                      {current.id === 'celebration' ? (
+                        stars >= 3 ? (
+                          // 3 stars - Full celebration
+                          "Congratulations SPACE HERO! ... You helped Cosmo complete the mission! ... All the stars are shining brightly, and the WHOLE galaxy is celebrating YOUR amazing adventure! ... Aliens are dancing, planets are spinning with joy, and rockets are doing loop-de-loops! ... You listened so well! ... You're a SUPERSTAR! ... Give yourself the biggest space high-five! 🙌✨"
+                        ) : (
+                          // 1-2 stars - Encouraging message
+                          `Great mission, young astronaut! ... You collected ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The galaxy is impressed by your bravery! ... Cosmo is proud of you! ... Every space journey teaches us something. Keep exploring and you'll collect all the stars next time! 🚀`
+                        )
+                      ) : (
+                        current.text
+                      )}
                     </p>
-                    <div className="flex justify-center gap-3 mt-4 text-sm text-gray-500">
+                    
+                    <div className="flex justify-center gap-2 mt-2 text-xs text-gray-500 dark:text-gray-400">
                       <span>📝 {current.wordCount}</span>
                       <span>⏱️ {current.duration}s</span>
                     </div>
                   </div>
+                  
                   <div className="flex justify-center">
                     <Button 
                       onClick={handleNext} 
-                      className="rounded-2xl px-6 py-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white font-bold shadow-2xl"
+                      className="rounded-xl px-5 md:px-6 py-2 md:py-2.5 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-bold transition-all duration-300 hover:scale-105 shadow-lg text-sm md:text-base"
                     >
                       {stepIndex === storySteps.length - 1 ? (
                         <>
@@ -962,39 +1391,132 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
                       ) : (
                         <>
                           <Play className="w-4 h-4 mr-2" />
-                          Continue 🚀
+                          Continue! 🚀
                         </>
                       )}
                     </Button>
                   </div>
-                </>
+                </div>
               )}
+              </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
       <style>{`
-        @keyframes waveform {
-          0%, 100% { height: 20px; }
-          50% { height: 50px; }
+        @keyframes float-slow {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          33% { transform: translateY(-10px) rotate(5deg); }
+          66% { transform: translateY(-5px) rotate(-5deg); }
         }
-        .animate-waveform {
-          animation: waveform 0.6s ease-in-out infinite;
-        }
+        
         @keyframes float {
           0%, 100% { transform: translateY(0px); }
           50% { transform: translateY(-20px); }
         }
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
-        .animate-fade-in {
-          animation: fade-in 0.5s ease-out;
-        }
+        
         @keyframes fade-in {
           from { opacity: 0; transform: scale(0.8); }
           to { opacity: 1; transform: scale(1); }
+        }
+        
+        @keyframes waveform {
+          0%, 100% { height: 20px; }
+          50% { height: 50px; }
+        }
+        
+        @keyframes celebration-party {
+          0% { 
+            transform: scale(1) rotate(0deg); 
+            filter: drop-shadow(0 0 5px gold);
+          }
+          25% { 
+            transform: scale(1.2) rotate(90deg); 
+            filter: drop-shadow(0 0 10px #ff6b6b);
+          }
+          50% { 
+            transform: scale(1.1) rotate(180deg); 
+            filter: drop-shadow(0 0 15px #4ecdc4);
+          }
+          75% { 
+            transform: scale(1.3) rotate(270deg); 
+            filter: drop-shadow(0 0 12px #45b7d1);
+          }
+          100% { 
+            transform: scale(1) rotate(360deg); 
+            filter: drop-shadow(0 0 5px gold);
+          }
+        }
+        
+        @keyframes pulse-slow {
+          0%, 100% { 
+            transform: scale(1);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+          }
+          50% { 
+            transform: scale(1.05);
+            box-shadow: 0 20px 50px -12px rgba(251, 146, 60, 0.5), 0 10px 10px -5px rgba(239, 68, 68, 0.3);
+          }
+        }
+        
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+        
+        .animate-float-slow {
+          animation: float-slow 4s ease-in-out infinite;
+        }
+        
+        .animate-pulse-slow {
+          animation: pulse-slow 2s ease-in-out infinite;
+        }
+        
+        .animate-shimmer {
+          animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
+        }
+        
+        .animate-fade-in {
+          animation: fade-in 0.5s ease-out;
+        }
+        
+        .animate-waveform {
+          animation: waveform 0.6s ease-in-out infinite;
+        }
+        
+        .animate-celebration-party {
+          animation: celebration-party 2s ease-in-out infinite;
+          display: inline-block;
+          transform-origin: center;
+        }
+        
+        /* Custom scrollbar styles */
+        .scrollbar-thin::-webkit-scrollbar {
+          width: 8px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+          background: rgba(156, 163, 175, 0.5);
+          border-radius: 4px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+          background: rgba(107, 114, 128, 0.7);
+        }
+        
+        /* Firefox scrollbar */
+        .scrollbar-thin {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
         }
       `}</style>
     </div>

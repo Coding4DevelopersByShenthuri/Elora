@@ -55,7 +55,7 @@ const ModelDownloadManager = ({ onComplete, userLevel = 'beginner', hideHeader =
       const modelList: ModelInfo[] = [
         {
           id: 'piper-en-us-lessac-medium',
-          name: '🎤 Kid-Friendly Voices',
+          name: 'Kid-Friendly Voices',
           description: 'HIGH-QUALITY voices for stories - Natural & Fun! Works offline!',
           size: '28 MB',
           sizeBytes: 28 * 1024 * 1024,
