@@ -758,10 +758,10 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                       console.log('Could not replay at new speed');
                     }
                   }}
-                  className="h-7 px-2 rounded-full text-xs bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700"
+                  className="h-7 px-2 rounded-full text-xs bg-green-50 dark:bg-green-800 hover:bg-green-100 dark:hover:bg-green-700 border border-green-200 dark:border-green-600 text-green-800 dark:text-green-100 font-semibold shadow-sm"
                   title={`Playback speed (works offline & online): ${playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow (Default)' : 'Very Slow'}`}
                 >
-                  <Gauge className="w-3.5 h-3.5 mr-1" />
+                  <Gauge className="w-3.5 h-3.5 mr-1 text-green-600 dark:text-green-200" />
                   {playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow' : 'Very Slow'}
                 </Button>
                 
@@ -794,12 +794,19 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                   size="sm"
                   onClick={() => setShowTranscript(!showTranscript)}
                   className={cn(
-                    "h-7 w-7 p-0 rounded-full",
-                    showTranscript && "bg-blue-100 dark:bg-blue-900"
+                    "h-7 w-7 p-0 rounded-full border shadow-sm",
+                    showTranscript 
+                      ? "bg-blue-100 dark:bg-blue-800 border-blue-300 dark:border-blue-600 hover:bg-blue-200 dark:hover:bg-blue-700" 
+                      : "bg-white/80 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600"
                   )}
                   title="Toggle text transcript"
                 >
-                  <FileText className="w-3.5 h-3.5" />
+                  <FileText className={cn(
+                    "w-3.5 h-3.5",
+                    showTranscript 
+                      ? "text-blue-700 dark:text-blue-200" 
+                      : "text-gray-700 dark:text-gray-200"
+                  )} />
                 </Button>
                 )}
                 
@@ -810,12 +817,19 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                   size="sm"
                   onClick={() => setCaptionsEnabled(!captionsEnabled)}
                   className={cn(
-                    "h-7 w-7 p-0 rounded-full",
-                    captionsEnabled && "bg-purple-100 dark:bg-purple-900"
+                    "h-7 w-7 p-0 rounded-full border shadow-sm",
+                    captionsEnabled 
+                      ? "bg-purple-100 dark:bg-purple-800 border-purple-300 dark:border-purple-600 hover:bg-purple-200 dark:hover:bg-purple-700" 
+                      : "bg-white/80 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600"
                   )}
                   title="Toggle captions"
                 >
-                  <Eye className="w-3.5 h-3.5" />
+                  <Eye className={cn(
+                    "w-3.5 h-3.5",
+                    captionsEnabled 
+                      ? "text-purple-700 dark:text-purple-200" 
+                      : "text-gray-700 dark:text-gray-200"
+                  )} />
                 </Button>
                 )}
               </div>
