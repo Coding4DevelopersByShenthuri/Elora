@@ -5,8 +5,6 @@
   Supports DistilGPT-2, GPT-2, and BERT models for various tasks
 */
 
-import { ModelManager } from './ModelManager';
-
 export interface GrammarCorrectionResult {
   correctedText: string;
   corrections: Array<{
@@ -39,7 +37,6 @@ export interface ConversationContext {
 }
 
 class TransformersServiceClass {
-  private pipeline: any = null;
   private textGenPipeline: any = null;
   private grammarPipeline: any = null;
   private modelLoaded = false;
@@ -64,13 +61,54 @@ class TransformersServiceClass {
       // Check if Transformers.js is available
       if (typeof window !== 'undefined') {
         try {
-          // Dynamically import Transformers.js
+          // CRITICAL: Configure ONNX Runtime FIRST before importing transformers
+          // This prevents the "Cannot read properties of undefined (reading 'registerBackend')" error
+          try {
+            const ort = await import('onnxruntime-web');
+            
+            // Wait for ONNX Runtime to fully initialize
+            if (ort && ort.env && ort.env.wasm) {
+              // Configure ONNX Runtime to use WASM backend only (most compatible)
+              ort.env.wasm.numThreads = 1;
+              ort.env.wasm.simd = true;
+              ort.env.wasm.proxy = false;
+              
+              // Set WASM file paths to CDN
+              ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.17.3/dist/';
+              
+              console.log('✅ ONNX Runtime configured successfully');
+            } else {
+              throw new Error('ONNX Runtime env.wasm not available');
+            }
+          } catch (ortError) {
+            console.warn('⚠️ ONNX Runtime configuration failed:', ortError);
+            // Don't continue if ONNX Runtime fails - transformers needs it
+            throw new Error('ONNX Runtime initialization failed');
+          }
+          
+          // NOW import and configure Transformers.js
           const transformers = await import('@xenova/transformers');
+          
+          if (!transformers || !transformers.pipeline) {
+            throw new Error('Transformers.js module loaded but pipeline not available');
+          }
           
           // Configure to use local models when available
           transformers.env.allowLocalModels = true;
           transformers.env.allowRemoteModels = true;
           transformers.env.useBrowserCache = true;
+          
+          // Use WASM backend only - ensure backends object exists
+          if (!transformers.env.backends) {
+            transformers.env.backends = { onnx: { wasm: {} } } as any;
+          }
+          if (!transformers.env.backends.onnx) {
+            transformers.env.backends.onnx = { wasm: {} } as any;
+          }
+          if (!transformers.env.backends.onnx.wasm) {
+            transformers.env.backends.onnx.wasm = {} as any;
+          }
+          transformers.env.backends.onnx.wasm.numThreads = 1;
           
           // Load text generation pipeline
           console.log('Loading text generation pipeline...');
@@ -84,7 +122,9 @@ class TransformersServiceClass {
             this.grammarPipeline = await transformers.pipeline(
               'text2text-generation',
               'Xenova/flan-t5-small',
-              { quantized: true }
+              { 
+                quantized: true
+              }
             );
           } catch (grammarError) {
             console.warn('Grammar pipeline not available, using rule-based fallback');
@@ -95,7 +135,7 @@ class TransformersServiceClass {
           console.log('✅ Transformers model loaded successfully');
         } catch (importError) {
           console.warn('⚠️ Transformers.js not available, using fallback mode');
-          console.warn('Install with: npm install @xenova/transformers');
+          console.warn('Error details:', importError);
           // Set flag to use fallback methods
           this.modelLoaded = false;
         }
@@ -374,7 +414,7 @@ class TransformersServiceClass {
   /**
    * Generate fallback response when AI model unavailable
    */
-  private generateFallbackResponse(prompt: string): string {
+  private generateFallbackResponse(_prompt: string): string {
     const templates = [
       "That's interesting. Can you tell me more about that?",
       "I see. What else would you like to discuss?",
@@ -390,7 +430,7 @@ class TransformersServiceClass {
    * Generate fallback conversation response
    */
   private generateFallbackConversation(
-    userMessage: string,
+    _userMessage: string,
     context: ConversationContext
   ): string {
     const { userLevel } = context;
@@ -431,7 +471,8 @@ class TransformersServiceClass {
    * Cleanup resources
    */
   destroy(): void {
-    this.pipeline = null;
+    this.textGenPipeline = null;
+    this.grammarPipeline = null;
     this.modelLoaded = false;
     this.loadingPromise = null;
   }

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Volume2, TrendingUp, TrendingDown, Minus, CheckCircle, AlertCircle, Lightbulb, Star } from 'lucide-react';
+import { useState } from 'react';
+import { Volume2, CheckCircle, AlertCircle, Lightbulb, Star } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
@@ -66,11 +66,6 @@ const PronunciationFeedbackDisplay = ({
     return "Don't give up! Practice makes perfect!";
   };
 
-  const getTrendIcon = (score: number) => {
-    if (score >= 80) return <TrendingUp className="w-5 h-5 text-green-500" />;
-    if (score >= 60) return <Minus className="w-5 h-5 text-yellow-500" />;
-    return <TrendingDown className="w-5 h-5 text-red-500" />;
-  };
 
   const speakFeedback = async () => {
     if (speakingFeedback) return;

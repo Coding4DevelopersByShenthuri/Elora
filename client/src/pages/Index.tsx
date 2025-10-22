@@ -7,12 +7,9 @@ import {
   Mic, 
   BookOpen, 
   Award, 
-  Users,
-  Globe, 
   Star,
   ArrowRight,
   CheckCircle,
-  Target,
   Brain,
   Shield,
   Heart,
@@ -53,42 +50,6 @@ const Index = () => {
       description: "All your learning data stays on your device. No internet required, complete privacy guaranteed.",
       color: "from-blue-500 to-indigo-600"
     }
-  ];
-
-  // Original testimonials array
-  const testimonials = [
-    {
-      name: "Sarah Johnson",
-      role: "English Teacher",
-      location: "New York",
-      content: "Elora has revolutionized how my students learn English. The offline AI features work perfectly even in areas with poor internet connectivity.",
-      rating: 5,
-      image: "👩‍🏫"
-    },
-    {
-      name: "Ahmed Hassan",
-      role: "IELTS Candidate",
-      location: "Dubai",
-      content: "The speaking practice modules helped me improve my IELTS score from 6.0 to 8.5. The AI feedback is incredibly accurate and helpful.",
-      rating: 5,
-      image: "👨‍💼"
-    },
-    {
-      name: "Maria Rodriguez",
-      role: "Parent",
-      location: "Mexico City",
-      content: "My 8-year-old daughter loves the interactive stories and games. It's amazing how much her English has improved in just 3 months.",
-      rating: 5,
-      image: "👩‍👧"
-    }
-  ];
-
-  // Original stats array
-  const stats = [
-    { number: "10,000+", label: "Active Learners", icon: <Users className="w-6 h-6" /> },
-    { number: "50+", label: "Countries", icon: <Globe className="w-6 h-6" /> },
-    { number: "4.9/5", label: "User Rating", icon: <Star className="w-6 h-6" /> },
-    { number: "95%", label: "Success Rate", icon: <Target className="w-6 h-6" /> }
   ];
   
   return (

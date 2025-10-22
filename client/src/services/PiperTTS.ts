@@ -374,7 +374,7 @@ class PiperTTSClass {
    */
   async downloadVoice(
     voiceId: string,
-    onProgress?: (progress: number) => void
+    _onProgress?: (progress: number) => void
   ): Promise<void> {
     const voice = this.availableVoices.find(v => v.id === voiceId);
     if (!voice) {

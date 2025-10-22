@@ -253,7 +253,7 @@ class SLMInferenceClass {
   /**
    * Parse generated feedback into structured response
    */
-  private parseFeedback(feedbackText: string, request: FeedbackRequest): FeedbackResponse {
+  private parseFeedback(feedbackText: string, _request: FeedbackRequest): FeedbackResponse {
     const lines = feedbackText.trim().split('\n').filter(l => l.trim());
     
     // Extract score if present
@@ -283,7 +283,7 @@ class SLMInferenceClass {
    * Generate rule-based feedback as fallback
    */
   private generateRuleBasedFeedback(request: FeedbackRequest): FeedbackResponse {
-    const { userText, expectedText, exerciseType, userLevel } = request;
+    const { userText, expectedText, exerciseType } = request;
     const wordCount = userText.trim().split(/\s+/).length;
 
     let feedback = '';

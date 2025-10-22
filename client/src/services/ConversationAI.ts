@@ -3,7 +3,6 @@
   Generates contextual responses and provides feedback
 */
 
-import { TransformersService } from './TransformersService';
 import { SLMEvaluator } from './SLMEvaluator';
 
 export interface ConversationMessage {
@@ -265,7 +264,7 @@ class ConversationAIClass {
   /**
    * Generate follow-up questions
    */
-  private generateFollowUpQuestions(userInput: string): string[] {
+  private generateFollowUpQuestions(_userInput: string): string[] {
     const questions = [
       'Can you tell me more about that?',
       'That\'s interesting. What else can you share?',
@@ -330,7 +329,13 @@ class ConversationAIClass {
    * End conversation and get final feedback
    */
   endConversation(): {
-    summary: ReturnType<typeof this.getSummary>;
+    summary: {
+      messageCount: number;
+      averageGrammar: number;
+      averageVocabulary: number;
+      averageFluency: number;
+      duration: number;
+    };
     overallFeedback: string;
     recommendations: string[];
   } {

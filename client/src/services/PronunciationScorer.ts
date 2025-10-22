@@ -126,7 +126,7 @@ class PronunciationScorerClass {
   /**
    * Calculate fluency score based on speech characteristics
    */
-  private calculateFluency(words: string[], audioData?: Blob): number {
+  private calculateFluency(words: string[], _audioData?: Blob): number {
     // Basic fluency calculation
     const wordCount = words.length;
 

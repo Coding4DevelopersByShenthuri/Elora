@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Heart, Lightbulb, Zap, ShieldCheck, Award, Globe, ArrowRight, Sparkles, Target, Brain, Play } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Heart, Lightbulb, Zap, ShieldCheck, Award, Globe, ArrowRight, Sparkles, Target, Brain } from 'lucide-react';
 
 
 const WhyPage = () => {

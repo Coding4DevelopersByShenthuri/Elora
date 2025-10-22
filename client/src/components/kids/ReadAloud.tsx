@@ -21,7 +21,6 @@ export default function ReadAloud({ lesson }: { lesson: ReadAloudLesson }) {
   const [step, setStep] = useState<'intro' | 'listen' | 'record' | 'feedback'>('intro');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [feedback, setFeedback] = useState<any>(null);
   const [currentWordIndex, setCurrentWordIndex] = useState(-1);
 
@@ -85,7 +84,6 @@ export default function ReadAloud({ lesson }: { lesson: ReadAloudLesson }) {
   };
 
   const handleRecordingComplete = async (blob: Blob) => {
-    setAudioBlob(blob);
     setIsProcessing(true);
     
     try {
@@ -136,7 +134,7 @@ export default function ReadAloud({ lesson }: { lesson: ReadAloudLesson }) {
         overall: pronScore.overall,
         accuracy: pronScore.accuracy,
         fluency: pronScore.fluency,
-        completeness: pronScore.completeness,
+        completeness: pronScore.overall, // Use overall as completeness fallback
         wordScores: pronScore.wordScores,
         recommendations: [
           aiFeedback.feedback,
@@ -161,13 +159,11 @@ export default function ReadAloud({ lesson }: { lesson: ReadAloudLesson }) {
 
   const handleTryAgain = () => {
     setFeedback(null);
-    setAudioBlob(null);
     setStep('record');
   };
 
   const handleReset = () => {
     setFeedback(null);
-    setAudioBlob(null);
     setStep('intro');
   };
 

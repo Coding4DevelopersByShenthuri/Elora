@@ -1,29 +1,20 @@
 import { useState, useEffect, useRef } from 'react';
 import {
-  Brain,
-  Lightbulb,
   Smile,
   Mic,
   BarChart,
-  Star,
   CheckCircle,
-  Award,
-  PenTool,
   BookOpen,
-  Shield,
-  Clock,
-  Cpu,
-  Database,
-  Sliders,
   Sparkles,
-  Zap,
   Target,
-  ArrowRight
+  ArrowRight,
+  Award
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Link } from 'react-router-dom';
 import { WaitlistModal } from '@/components/waitlist/WaitlistModal';
 
+// Kept for potential future use
+/*
 const FeatureCard = ({
   icon,
   title,
@@ -45,6 +36,7 @@ const FeatureCard = ({
     </div>
   );
 };
+*/
 
 
 const FeatureShowcase = ({
@@ -85,6 +77,7 @@ const FeatureShowcase = ({
   );
 };
 
+/*
 const ValueProp = ({
   icon,
   title,
@@ -104,6 +97,7 @@ const ValueProp = ({
     </div>
   );
 };
+*/
 
 const HowPage = () => {
   const [, setLoading] = useState(true);

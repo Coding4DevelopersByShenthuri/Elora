@@ -138,7 +138,7 @@ class AdvancedPronunciationScorerClass {
     expectedText: string,
     spokenText: string,
     audioData?: Blob,
-    referenceAudio?: Blob
+    _referenceAudio?: Blob
   ): Promise<DetailedPronunciationScore> {
     // Tokenize texts
     const expectedWords = this.tokenize(expectedText);
@@ -202,7 +202,7 @@ class AdvancedPronunciationScorerClass {
   private async alignWords(
     expectedWords: string[],
     spokenWords: string[],
-    acousticFeatures: AcousticFeatures | null
+    _acousticFeatures: AcousticFeatures | null
   ): Promise<WordAlignment[]> {
     const alignments: WordAlignment[] = [];
     let currentTime = 0;
@@ -553,7 +553,7 @@ class AdvancedPronunciationScorerClass {
   private calculateSpeechMetrics(
     text: string,
     audioData: Blob | undefined,
-    acousticFeatures: AcousticFeatures | null
+    _acousticFeatures: AcousticFeatures | null
   ): DetailedPronunciationScore['metrics'] {
     const words = this.tokenize(text);
     const wordCount = words.length;
@@ -582,7 +582,7 @@ class AdvancedPronunciationScorerClass {
   /**
    * Extract acoustic features from audio (placeholder)
    */
-  private async extractAcousticFeatures(audioData: Blob): Promise<AcousticFeatures> {
+  private async extractAcousticFeatures(_audioData: Blob): Promise<AcousticFeatures> {
     try {
       // In production, this would use Web Audio API for feature extraction
       // For now, generate placeholder features

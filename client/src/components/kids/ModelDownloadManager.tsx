@@ -22,7 +22,7 @@ interface ModelDownloadManagerProps {
   hideHeader?: boolean;
 }
 
-const ModelDownloadManager = ({ onComplete, userLevel = 'beginner', hideHeader = false }: ModelDownloadManagerProps) => {
+const ModelDownloadManager = ({ onComplete, hideHeader = false }: ModelDownloadManagerProps) => {
   const [models, setModels] = useState<ModelInfo[]>([]);
   const [downloadingModel, setDownloadingModel] = useState<string | null>(null);
   const [downloadProgress, setDownloadProgress] = useState<{ [key: string]: number }>({});

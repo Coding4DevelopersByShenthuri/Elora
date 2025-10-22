@@ -6,12 +6,33 @@ import path from 'node:path'
 export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
-    include: ['tslib'],
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      'lucide-react',
+      'recharts',
+      'tslib'
+    ],
+    exclude: [
+      '@xenova/transformers',
+      'onnxruntime-web'
+    ],
+    // Force dependency re-optimization on config change
+    force: false,
+    // Configure esbuild to properly handle ONNX Runtime
+    esbuildOptions: {
+      target: 'esnext',
+    },
   },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+  },
+  worker: {
+    format: 'es',
+    plugins: () => [],
   },
   server: {
     port: 5173,
@@ -40,9 +61,18 @@ export default defineConfig({
             if (id.includes('recharts')) {
               return 'chart-vendor';
             }
+            // Keep transformers and onnxruntime separate to avoid bundling issues
+            if (id.includes('@xenova/transformers')) {
+              return 'transformers-vendor';
+            }
+            if (id.includes('onnxruntime-web')) {
+              return 'onnxruntime-vendor';
+            }
           }
         },
       },
+      // External WASM files to prevent bundling issues
+      external: [],
     },
     // Enable source maps for debugging (can be disabled in production)
     sourcemap: false,
@@ -54,6 +84,8 @@ export default defineConfig({
     target: 'esnext',
     // Minification
     minify: 'terser',
+    // Copy WASM files for ONNX Runtime
+    assetsInlineLimit: 0,
   },
   // PWA and offline support
   publicDir: 'public',

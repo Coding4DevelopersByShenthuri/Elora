@@ -88,11 +88,11 @@ class ProgressTrackerClass {
     // Record practice session
     data.practiceSessions.push({
       id: `session-${Date.now()}`,
-      lessonId,
       score,
       duration: timeSpent,
       date: new Date().toISOString(),
-      type: 'lesson'
+      type: 'pronunciation',
+      details: { lessonId }
     });
 
     // Check achievements
@@ -227,7 +227,7 @@ class ProgressTrackerClass {
       weekEnd: now.toISOString().split('T')[0],
       totalLessons: weekSessions.length,
       totalTime: weekSessions.reduce((sum, s) => sum + s.duration, 0),
-      totalPoints: weekSessions.reduce((sum, s) => this.calculatePoints(s.score, s.duration), 0),
+      totalPoints: weekSessions.reduce((_sum, s) => this.calculatePoints(s.score, s.duration), 0),
       averageScore,
       streak: data.currentStreak,
       daysActive: uniqueDays.size

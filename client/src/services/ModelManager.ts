@@ -38,7 +38,7 @@ class ModelManagerClass {
       name: 'Piper TTS - Kid Voices',
       type: 'tts',
       size: 28 * 1024 * 1024, // ~28MB
-      quantization: 'none',
+      quantization: 'fp32',
       url: 'https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/lessac/medium/en_US-lessac-medium.onnx',
       version: '1.0.0',
       cached: false,

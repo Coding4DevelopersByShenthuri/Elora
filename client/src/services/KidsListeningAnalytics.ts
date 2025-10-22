@@ -81,7 +81,7 @@ export class KidsListeningAnalytics {
   /**
    * Start a new story session
    */
-  static startSession(userId: string, storyId: string, storyTitle: string): StorySession {
+  static startSession(_userId: string, storyId: string, storyTitle: string): StorySession {
     return {
       storyId,
       storyTitle,

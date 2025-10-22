@@ -421,13 +421,13 @@ const KidsPage = () => {
       return;
     }
 
-    const actualIndex = startIndex + storyIndex;
-    setCurrentStory(actualIndex);
+    // storyIndex is already the correct index in allStories array
+    setCurrentStory(storyIndex);
     setIsPlaying(true);
     setBounceAnimation(true);
     
     // Open appropriate adventure module
-    const storyType = allStories[actualIndex].type;
+    const storyType = allStories[storyIndex].type;
     if (storyType === 'forest') {
       setShowMagicForest(true);
     } else if (storyType === 'space') {
@@ -457,7 +457,7 @@ const KidsPage = () => {
       const token = localStorage.getItem('speakbee_auth_token');
       const updateDetails = (details: any) => {
         details.readAloud = details.readAloud || {};
-        const key = `story-${actualIndex}`;
+        const key = `story-${storyIndex}`;
         const prev = details.readAloud[key] || { bestScore: 0, attempts: 0 };
         details.readAloud[key] = { 
           bestScore: Math.max(prev.bestScore, 80), 
@@ -508,7 +508,7 @@ const KidsPage = () => {
 
     // Speak story intro (offline TTS baseline)
     try {
-      const story = allStories[actualIndex];
+      const story = allStories[storyIndex];
       if (SpeechService.isTTSSupported()) {
         await SpeechService.speak(`${story.title}. ${story.description}`, { rate: 0.95 });
       }

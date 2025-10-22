@@ -109,7 +109,7 @@ class WhisperServiceClass {
    * Fallback to browser's Web Speech API
    */
   private async fallbackToWebSpeech(
-    audioBlob: Blob,
+    _audioBlob: Blob,
     options: { language?: string }
   ): Promise<WhisperResult> {
     // Import existing SpeechService
@@ -203,10 +203,16 @@ class WhisperServiceClass {
    */
   async clearModel(): Promise<void> {
     const db = await this.openDB();
-    const tx = db.transaction('models', 'readwrite');
-    await tx.objectStore('models').delete('whisper-tiny-en');
-    await tx.done;
-    this.modelLoaded = false;
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('models', 'readwrite');
+      const request = tx.objectStore('models').delete('whisper-tiny-en');
+      
+      request.onsuccess = () => {
+        this.modelLoaded = false;
+        resolve();
+      };
+      request.onerror = () => reject(request.error);
+    });
   }
 
   // IndexedDB helpers
@@ -228,18 +234,27 @@ class WhisperServiceClass {
 
   private async cacheModel(data: Uint8Array): Promise<void> {
     const db = await this.openDB();
-    const tx = db.transaction('models', 'readwrite');
-    await tx.objectStore('models').put(data, 'whisper-tiny-en');
-    await tx.done;
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('models', 'readwrite');
+      const request = tx.objectStore('models').put(data, 'whisper-tiny-en');
+      
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
   }
 
   private async getCachedModel(): Promise<Uint8Array | null> {
     try {
       const db = await this.openDB();
-      const tx = db.transaction('models', 'readonly');
-      const data = await tx.objectStore('models').get('whisper-tiny-en');
-      await tx.done;
-      return data || null;
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('models', 'readonly');
+        const request = tx.objectStore('models').get('whisper-tiny-en');
+        
+        request.onsuccess = () => {
+          resolve(request.result || null);
+        };
+        request.onerror = () => reject(request.error);
+      });
     } catch {
       return null;
     }

@@ -548,13 +548,33 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
             <div className="h-full bg-gradient-to-r from-amber-400 to-orange-400 rounded-full transition-all duration-500" />
           </Progress>
 
-          <div className="flex-1 overflow-y-auto pb-2">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden sm:overflow-hidden pb-2 sm:pb-4 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent">
             <div className="text-center h-full flex flex-col justify-center">
-              <div className="relative mb-2">
-                <div className="text-5xl mb-2 animate-float">{current.emoji}</div>
-                <div className="flex items-center justify-center gap-1.5 mb-2">
+              {/* Character and Scene */}
+              <div className="relative mb-2 sm:mb-2 md:mb-3">
+                <div className={cn(
+                  "text-5xl sm:text-5xl md:text-6xl lg:text-7xl mb-2 sm:mb-2", 
+                  "animate-float"
+                )}>
+                  <span className={cn(
+                    current.id === 'celebration' && 'animate-celebration-party'
+                  )}>
+                    {current.emoji}
+                  </span>
+                </div>
+                
+                {/* Star Collection Display */}
+                <div className="flex items-center justify-center gap-1.5 sm:gap-2 mb-2 sm:mb-2">
                   {Array.from({ length: 3 }).map((_, i) => (
-                    <Star key={i} className={cn("w-5 h-5 transition-all", i < stars ? 'text-amber-400 animate-pulse' : 'text-gray-300 opacity-50')} />
+                    <Star 
+                      key={i} 
+                      className={cn(
+                        "w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 transition-all duration-500 transform hover:scale-125",
+                        i < stars 
+                          ? 'text-amber-400 animate-pulse drop-shadow-lg' 
+                          : 'text-gray-300 opacity-50'
+                      )} 
+                    />
                   ))}
                 </div>
               </div>
@@ -704,6 +724,53 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
         .animate-waveform { animation: waveform 0.6s ease-in-out infinite; }
         @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
         .animate-float { animation: float 3s ease-in-out infinite; }
+        
+        @keyframes celebration-party {
+          0% { 
+            transform: scale(1) rotate(0deg); 
+            filter: drop-shadow(0 0 5px gold);
+          }
+          25% { 
+            transform: scale(1.2) rotate(90deg); 
+            filter: drop-shadow(0 0 10px #ff6b6b);
+          }
+          50% { 
+            transform: scale(1.1) rotate(180deg); 
+            filter: drop-shadow(0 0 15px #4ecdc4);
+          }
+          75% { 
+            transform: scale(1.3) rotate(270deg); 
+            filter: drop-shadow(0 0 12px #45b7d1);
+          }
+          100% { 
+            transform: scale(1) rotate(360deg); 
+            filter: drop-shadow(0 0 5px gold);
+          }
+        }
+        
+        .animate-celebration-party {
+          animation: celebration-party 2s ease-in-out infinite;
+          display: inline-block;
+          transform-origin: center;
+        }
+        
+        /* Custom scrollbar styles */
+        .scrollbar-thin::-webkit-scrollbar {
+          width: 8px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+          background: rgba(156, 163, 175, 0.5);
+          border-radius: 4px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+          background: rgba(107, 114, 128, 0.7);
+        }
       `}</style>
     </div>
   );

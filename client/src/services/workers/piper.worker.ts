@@ -262,7 +262,8 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
 // Handle worker errors
 self.onerror = (error) => {
   console.error('Piper worker error:', error);
-  self.postMessage({ error: error.message });
+  const errorMessage = typeof error === 'string' ? error : error instanceof ErrorEvent ? error.message : 'Unknown error';
+  self.postMessage({ error: errorMessage });
 };
 
 // Export for TypeScript

@@ -13,12 +13,7 @@
 */
 
 import API from './ApiService';
-import { WhisperService } from './WhisperService';
-import { TransformersService } from './TransformersService';
-import { SLMInference } from './SLMInference';
-import { AdvancedPronunciationScorer } from './AdvancedPronunciationScorer';
 import { ModelManager } from './ModelManager';
-import { PerformanceBenchmark } from './PerformanceBenchmark';
 
 export type OperationMode = 'offline' | 'online' | 'hybrid';
 
@@ -234,7 +229,7 @@ class HybridServiceManagerClass {
     if (this.isOnline() && !this.config.preferOffline) {
       try {
         const result = await API.progress.getMyProgress(type);
-        if (result.success) {
+        if (result.success && 'data' in result) {
           // Cache locally
           localStorage.setItem('cached_progress', JSON.stringify(result.data));
           return result.data;
@@ -257,7 +252,7 @@ class HybridServiceManagerClass {
     if (this.isOnline() && !this.config.preferOffline) {
       try {
         const result = await API.stats.getUserStats();
-        if (result.success) {
+        if (result.success && 'data' in result) {
           return result.data;
         }
       } catch (error) {

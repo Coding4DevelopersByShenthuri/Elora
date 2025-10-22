@@ -309,7 +309,7 @@ class AchievementSystemClass {
     this.achievements.forEach(achievement => {
       if (achievement.unlocked) return;
 
-      const { type, target, metric } = achievement.requirement;
+      const { target, metric } = achievement.requirement;
       let currentValue = 0;
 
       // Get current value based on metric

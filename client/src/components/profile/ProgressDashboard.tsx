@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Trophy, TrendingUp, Flame, Clock, Target, Award, 
-  BookOpen, BarChart3, Calendar, Star 
+  BookOpen, BarChart3, Calendar
 } from 'lucide-react';
 import { ProgressTracker } from '@/services/ProgressTracker';
 import { AchievementSystem, type Achievement } from '@/services/AchievementSystem';
-import { VocabularyBuilder } from '@/services/VocabularyBuilder';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function ProgressDashboard() {

@@ -256,3 +256,16 @@ ERROR 2025-10-21 23:33:05,384 basehttp 8288 15220 You're accessing the developme
 WARNING 2025-10-21 23:36:40,041 log 8288 19868 Not Found: /cancel
 WARNING 2025-10-21 23:36:40,043 basehttp 8288 19868 "GET /cancel HTTP/1.1" 404 6316
 INFO 2025-10-22 09:35:01,850 autoreload 3816 4688 Watching for file changes with StatReloader
+INFO 2025-10-22 11:44:44,092 basehttp 3816 16028 "OPTIONS /api/vocabulary/ HTTP/1.1" 200 0
+WARNING 2025-10-22 11:44:46,047 log 3816 16028 Not Found: /api/vocabulary/
+WARNING 2025-10-22 11:44:46,054 basehttp 3816 16028 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+WARNING 2025-10-22 11:45:06,110 log 3816 16028 Not Found: /api/vocabulary/
+WARNING 2025-10-22 11:45:06,111 basehttp 3816 16028 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+WARNING 2025-10-22 11:45:33,861 log 3816 16028 Not Found: /api/vocabulary/
+WARNING 2025-10-22 11:45:33,899 basehttp 3816 16028 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+WARNING 2025-10-22 11:45:58,747 log 3816 16028 Not Found: /api/vocabulary/
+WARNING 2025-10-22 11:45:58,758 basehttp 3816 16028 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+WARNING 2025-10-22 11:48:16,087 log 3816 16028 Not Found: /api/vocabulary/
+WARNING 2025-10-22 11:48:16,091 basehttp 3816 16028 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+WARNING 2025-10-22 11:57:46,444 log 3816 20676 Not Found: /api/vocabulary/
+WARNING 2025-10-22 11:57:46,445 basehttp 3816 20676 "POST /api/vocabulary/ HTTP/1.1" 404 6344
