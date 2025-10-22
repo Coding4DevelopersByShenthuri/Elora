@@ -30,6 +30,7 @@ import Settings from "@/pages/Settings";
 import HelpPage from "@/pages/HelpPage";
 import ContactPage from "@/pages/ContactPage";
 import KidsPage from "@/pages/Kids";
+import FavoritesPage from "@/pages/Favorites";
 import ModelManagerPage from "@/pages/ModelManager";
 import ParentalControlsPage from "@/pages/ParentalControlsPage";
 import Adults from "@/pages/adults/adults";
@@ -164,6 +165,7 @@ const AppRoutes = () => {
         <Route path="/help" element={<PageTransition><HelpPage /></PageTransition>} />
         <Route path="/contact" element={<PageTransition><ContactPage /></PageTransition>} />
         <Route path="/kids" element={<PageTransition><KidsPage /></PageTransition>} />
+        <Route path="/favorites" element={<PageTransition><FavoritesPage /></PageTransition>} />
         <Route path="/model-manager" element={<PageTransition><ModelManagerPage /></PageTransition>} />
         <Route path="/parental-controls" element={<PageTransition><ParentalControlsPage /></PageTransition>} />
         <Route path="/adults" element={<PageTransition><Adults /></PageTransition>} />

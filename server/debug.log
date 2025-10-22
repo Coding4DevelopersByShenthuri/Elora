@@ -237,3 +237,22 @@ INFO 2025-10-20 12:24:01,523 autoreload 14964 7924 Watching for file changes wit
 INFO 2025-10-20 18:45:57,518 autoreload 14964 7924 C:\Users\shent\OneDrive\Desktop\Speak Bee\server\api\views.py changed, reloading.
 INFO 2025-10-20 18:46:18,450 autoreload 15976 16924 Watching for file changes with StatReloader
 INFO 2025-10-21 09:33:23,676 autoreload 19808 9144 Watching for file changes with StatReloader
+INFO 2025-10-21 21:52:20,542 autoreload 8288 17484 Watching for file changes with StatReloader
+INFO 2025-10-21 22:23:33,312 basehttp 8288 8296 "OPTIONS /api/vocabulary/ HTTP/1.1" 200 0
+WARNING 2025-10-21 22:23:34,500 log 8288 8296 Not Found: /api/vocabulary/
+WARNING 2025-10-21 22:23:34,501 basehttp 8288 8296 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+INFO 2025-10-21 23:25:29,798 basehttp 8288 20344 code 400, message Bad request version ('ºº\x13\x01\x13\x02\x13\x03À+À/À,À0Ì©Ì¨À\x13À\x14\x00\x9c\x00\x9d\x00/\x005\x01\x00\x06\x93\x9a\x9a\x00\x00\x00\x1b\x00\x03\x02\x00\x02\x00')
+ERROR 2025-10-21 23:25:29,804 basehttp 8288 20344 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-10-21 23:25:29,813 basehttp 8288 9600 code 400, message Bad request version ('\x02h2\x08http/1.1\x00\x17\x00\x00\x00\x12\x00\x00\x00\x05\x00\x05\x01\x00\x00\x00\x00\x00')
+ERROR 2025-10-21 23:25:29,814 basehttp 8288 9600 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-10-21 23:33:05,365 basehttp 8288 13940 code 400, message Bad request version ('\x0f')
+INFO 2025-10-21 23:33:05,366 basehttp 8288 12152 code 400, message Bad request version ('\\\x03\x99²7ý÷<h\x87\x96S\x01§1yC\x1ar%ã\x7f½\x07}\x00°-\x86Ï\x8c\x08\x88')
+ERROR 2025-10-21 23:33:05,367 basehttp 8288 13940 You're accessing the development server over HTTPS, but it only supports HTTP.
+ERROR 2025-10-21 23:33:05,369 basehttp 8288 12152 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-10-21 23:33:05,379 basehttp 8288 21260 code 400, message Bad request version ('\x06\x9aY]\x01§¥RHFª\x10¨hý')
+ERROR 2025-10-21 23:33:05,382 basehttp 8288 21260 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-10-21 23:33:05,382 basehttp 8288 15220 code 400, message Bad request version ('ÂÖÌ\x84\x16\x97bKl\x87õéÏ,Úý\x8c\\Ïç®L~X©\x9cM\x07ûÉ3\x88\x00')
+ERROR 2025-10-21 23:33:05,384 basehttp 8288 15220 You're accessing the development server over HTTPS, but it only supports HTTP.
+WARNING 2025-10-21 23:36:40,041 log 8288 19868 Not Found: /cancel
+WARNING 2025-10-21 23:36:40,043 basehttp 8288 19868 "GET /cancel HTTP/1.1" 404 6316
+INFO 2025-10-22 09:35:01,850 autoreload 3816 4688 Watching for file changes with StatReloader

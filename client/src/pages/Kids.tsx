@@ -57,7 +57,6 @@ const KidsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
-  const [showFavoritesModal, setShowFavoritesModal] = useState(false);
   const [pronunciationAttempts, setPronunciationAttempts] = useState(0);
   const [vocabularyAttempts, setVocabularyAttempts] = useState(0);
   const storiesPerPage = 4;
@@ -347,9 +346,6 @@ const KidsPage = () => {
   const startIndex = (currentPage - 1) * storiesPerPage;
   const paginatedStories = allStories.slice(startIndex, startIndex + storiesPerPage);
   const totalPages = Math.ceil(allStories.length / storiesPerPage);
-  
-  // Get favorite stories for modal
-  const favoriteStories = allStories.filter((_, index) => favorites.includes(index));
 
   // Dynamic achievements based on real-time progress
   const achievements = [
@@ -752,8 +748,8 @@ const KidsPage = () => {
               Kids Learning Zone
             </h1>
           </div>
-          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-3 sm:mb-4 px-4">
-            Fun stories, exciting games, and magical adventures to learn English! 🎉
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-500 dark:text-gray-300 max-w-2xl mx-auto mb-3 sm:mb-4 px-4">
+            Fun stories, exciting games, and magical adventures to learn English!
           </p>
           
           {/* AI Status Badge */}
@@ -812,10 +808,10 @@ const KidsPage = () => {
             </div>
             <CardContent className="p-4 sm:p-5 md:p-6 text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-                <Trophy className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-yellow-500 dark:text-yellow-400 flex-shrink-0" />
+                <Trophy className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-yellow-600 dark:text-yellow-500 flex-shrink-0" />
                 <span className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">{points}</span>
               </div>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Sparkle Points ✨</p>
+              <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-300 font-bold">Sparkle Points ✨</p>
             </CardContent>
           </Card>
           
@@ -828,10 +824,10 @@ const KidsPage = () => {
             </div>
             <CardContent className="p-4 sm:p-5 md:p-6 text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-                <Zap className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-green-500 dark:text-green-400 animate-pulse flex-shrink-0" />
+                <Zap className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-green-600 dark:text-green-500 animate-pulse flex-shrink-0" />
                 <span className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">{streak} days</span>
               </div>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Learning Streak 🔥</p>
+              <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-300 font-bold">Learning Streak 🔥</p>
             </CardContent>
           </Card>
           
@@ -844,10 +840,10 @@ const KidsPage = () => {
             </div>
             <CardContent className="p-4 sm:p-5 md:p-6 text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-                <Award className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-blue-500 dark:text-blue-400 flex-shrink-0" />
+                <Award className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-blue-600 dark:text-blue-500 flex-shrink-0" />
                 <span className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">{completedAchievements}/{achievements.length}</span>
               </div>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Super Achievements 🏆</p>
+              <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-300 font-bold">Super Achievements 🏆</p>
             </CardContent>
           </Card>
         </div>
@@ -1159,7 +1155,7 @@ const KidsPage = () => {
 
         {/* Quick Actions */}
         <div className="text-center px-4 sm:px-6">
-          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-900 dark:text-gray-500 mb-4 sm:mb-6 font-semibold">Ready for more fun? Let's play! 🎯</p>
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-500 dark:text-gray-500 mb-4 sm:mb-6 font-semibold">Ready for more fun? Let's play! 🎯</p>
           <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 max-w-4xl mx-auto">
             <Button 
               variant="outline" 
@@ -1180,7 +1176,7 @@ const KidsPage = () => {
             <Button 
               variant="outline" 
               className="rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-3 sm:py-3 md:py-4 border-2 border-pink-300 dark:border-pink-600 hover:border-pink-400 dark:hover:border-pink-500 bg-pink-50/40 dark:bg-pink-900/10 hover:bg-pink-100/60 dark:hover:bg-pink-900/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 group text-sm sm:text-base w-full sm:w-auto sm:flex-1 sm:min-w-[160px]"
-              onClick={() => setShowFavoritesModal(true)}
+              onClick={() => navigate('/favorites')}
             >
               <Heart className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-pink-600 dark:text-pink-400 group-hover:animate-pulse flex-shrink-0" />
               <span className="font-semibold text-gray-800 dark:text-gray-500 whitespace-nowrap">
@@ -1190,136 +1186,6 @@ const KidsPage = () => {
           </div>
         </div>
       </div>
-
-
-      {/* Favorites Modal */}
-      {showFavoritesModal && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
-          onClick={() => setShowFavoritesModal(false)}
-        >
-          <div 
-            className="relative w-full max-w-5xl max-h-[85vh] overflow-y-auto bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-3xl shadow-2xl border-4 border-pink-200 dark:border-pink-600"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div className="sticky top-0 z-10 bg-gradient-to-r from-pink-400 via-rose-400 to-pink-500 p-6 rounded-t-3xl">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Heart className="w-8 h-8 text-white animate-pulse" fill="white" />
-                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
-                    My Favorite Stories
-                  </h2>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowFavoritesModal(false)}
-                  className="text-white hover:bg-white/20 rounded-full w-10 h-10 p-0"
-                >
-                  ✕
-                </Button>
-              </div>
-              <p className="text-white/90 mt-2 text-sm sm:text-base">
-                {favoriteStories.length === 0 
-                  ? "You haven't added any favorites yet. Click the ❤️ button on stories you love!"
-                  : `You have ${favoriteStories.length} favorite ${favoriteStories.length === 1 ? 'story' : 'stories'}! 🎉`
-                }
-              </p>
-            </div>
-
-            {/* Content */}
-            <div className="p-6">
-              {favoriteStories.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="text-6xl mb-4">💔</div>
-                  <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
-                    No favorite stories yet. Start exploring and add some!
-                  </p>
-                  <Button
-                    onClick={() => {
-                      setShowFavoritesModal(false);
-                      setActiveCategory('stories');
-                      containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
-                    className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white font-bold py-3 px-8 rounded-xl"
-                  >
-                    Explore Stories
-                  </Button>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                  {favoriteStories.map((story) => {
-                    const actualIndex = allStories.findIndex(s => s.title === story.title);
-                    const CharacterIcon = story.character;
-                    return (
-                      <Card 
-                        key={actualIndex}
-                        className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-pink-400 overflow-hidden"
-                      >
-                        <CardContent className="p-0">
-                          <div className={cn(
-                            "p-6 relative overflow-hidden bg-gradient-to-br",
-                            story.bgGradient
-                          )}>
-                            <div className="absolute top-0 right-0 w-24 h-24 bg-white/20 dark:bg-black/20 rounded-full -mr-12 -mt-12"></div>
-                            <div className="relative z-10 text-center">
-                              <div className={cn("text-5xl mb-3 transform transition-transform duration-300 group-hover:scale-110", story.animation)}>
-                                {story.image}
-                              </div>
-                              <CharacterIcon className="w-10 h-10 mx-auto mb-2 text-gray-600 dark:text-gray-300 opacity-80" />
-                              <h3 className="text-xl font-bold mb-2 text-gray-800 dark:text-white">
-                                {story.title}
-                              </h3>
-                              <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-                                {story.description}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="p-4 bg-white dark:bg-gray-800">
-                            <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-4">
-                              <span className="flex items-center gap-1">📚 {story.words}</span>
-                              <span className="flex items-center gap-1">⏱️ {story.duration}</span>
-                              <span className={cn(
-                                "font-semibold",
-                                story.difficulty === 'Easy' && "text-green-500 dark:text-green-400",
-                                story.difficulty === 'Medium' && "text-yellow-500 dark:text-yellow-400",
-                                story.difficulty === 'Hard' && "text-red-500 dark:text-red-400"
-                              )}>
-                                🎯 {story.difficulty}
-                              </span>
-                            </div>
-                            <div className="flex gap-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => toggleFavorite(actualIndex)}
-                                className="flex-shrink-0 border-pink-500 text-pink-600 hover:bg-pink-50 dark:hover:bg-pink-900/20"
-                              >
-                                ❤️
-                              </Button>
-                              <Button
-                                className="flex-1 bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white font-bold py-2 rounded-lg text-sm"
-                                onClick={() => {
-                                  setShowFavoritesModal(false);
-                                  handleStartLesson(actualIndex);
-                                }}
-                              >
-                                <Play className="w-4 h-4 mr-1" />
-                                Start Adventure
-                              </Button>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Adventure Modals */}
       {showMagicForest && (
