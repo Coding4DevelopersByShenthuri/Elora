@@ -280,3 +280,4 @@ WARNING 2025-10-22 22:16:15,057 basehttp 12724 21932 "POST /api/vocabulary/ HTTP
 WARNING 2025-10-22 22:16:38,766 log 12724 21932 Not Found: /api/vocabulary/
 WARNING 2025-10-22 22:16:38,837 basehttp 12724 21932 "POST /api/vocabulary/ HTTP/1.1" 404 6344
 INFO 2025-10-22 22:33:19,642 autoreload 11252 9180 Watching for file changes with StatReloader
+INFO 2025-10-23 11:46:13,653 autoreload 12764 11836 Watching for file changes with StatReloader
