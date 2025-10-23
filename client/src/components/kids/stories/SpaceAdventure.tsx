@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Sparkles, Rocket, Star, Volume2, Play, Zap, X, Ear, Award, Eye, Gauge, RotateCcw, FileText } from 'lucide-react';
+import { Sparkles, Rocket, Star, Volume2, Play, Zap, X, Ear, Award, Gauge, RotateCcw, FileText } from 'lucide-react';
 import OnlineTTS, { STORY_VOICES } from '@/services/OnlineTTS';
 import KidsListeningAnalytics, { type StorySession } from '@/services/KidsListeningAnalytics';
 import { cn } from '@/lib/utils';
@@ -265,7 +265,7 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
   
   const [showTranscript, setShowTranscript] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState<'normal' | 'slow' | 'slower'>('slow'); // Default to slow for better comprehension
-  const [captionsEnabled, setCaptionsEnabled] = useState(false);
+  const [captionsEnabled, setCaptionsEnabled] = useState(true);
   const [retryMode, setRetryMode] = useState(false);
   const [attemptCount, setAttemptCount] = useState(0);
   const [ttsAvailable, setTtsAvailable] = useState(true);
@@ -295,12 +295,12 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
         
         if (!available) {
           console.warn('No voice synthesis available');
-          setShowTranscript(true);
+          // Transcript remains off by default - users can toggle if needed
         }
       } catch (error) {
         console.error('Failed to initialize TTS:', error);
         setTtsAvailable(false);
-        setShowTranscript(true);
+        // Transcript remains off by default - users can toggle if needed
       }
     };
     initializeVoice();
@@ -367,9 +367,7 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
     } catch (error) {
       console.log('Voice synthesis failed');
       setTtsAvailable(false);
-      if (listeningPhase === 'reveal' || !current.listeningFirst) {
-        setShowTranscript(true);
-      }
+      // Transcript remains off by default - users can toggle if needed
       throw error;
     }
   };
@@ -653,7 +651,7 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
                     onClick={() => {
                       setAccessibilityMode(!accessibilityMode);
                       if (!accessibilityMode) {
-                        setShowTranscript(true);
+                        // Transcript remains off by default - users can toggle if needed
                         setCaptionsEnabled(true);
                       }
                     }}
@@ -690,28 +688,6 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
                 </Button>
                 )}
                 
-                {/* Captions Toggle - Only in reveal phase OR accessibility mode */}
-                {(listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode) && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setCaptionsEnabled(!captionsEnabled)}
-                  className={cn(
-                    "h-7 w-7 p-0 rounded-full border shadow-sm",
-                    captionsEnabled 
-                      ? "bg-purple-100 dark:bg-purple-800 border-purple-300 dark:border-purple-600 hover:bg-purple-200 dark:hover:bg-purple-700" 
-                      : "bg-white/80 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600"
-                  )}
-                  title="Toggle captions"
-                >
-                  <Eye className={cn(
-                    "w-3.5 h-3.5",
-                    captionsEnabled 
-                      ? "text-purple-700 dark:text-purple-200" 
-                      : "text-gray-700 dark:text-gray-200"
-                  )} />
-                </Button>
-                )}
               </div>
             </div>
           </div>

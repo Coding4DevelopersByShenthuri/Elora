@@ -82,6 +82,30 @@ export class OnlineTTS {
   }
 
   /**
+   * Get list of available voices for debugging
+   */
+  static getAvailableVoices(): SpeechSynthesisVoice[] {
+    return [...this.voices];
+  }
+
+  /**
+   * Log available voices for debugging
+   */
+  static logAvailableVoices(): void {
+    console.log('📢 Available voices:');
+    this.voices.forEach((voice, index) => {
+      console.log(`${index + 1}. ${voice.name} (${voice.lang}) - ${(voice as any).gender || 'unknown'} - ${voice.localService ? 'local' : 'remote'}`);
+    });
+  }
+
+  /**
+   * Get current voice mode
+   */
+  static getVoiceMode(): string {
+    return 'Online (Web Speech API)';
+  }
+
+  /**
    * Stop/cancel any currently playing speech
    */
   static stop(): void {
@@ -116,12 +140,48 @@ export class OnlineTTS {
 
       const utterance = new SpeechSynthesisUtterance(text);
       
-      // Set voice if specified
+      // Set voice if specified - with fallback logic
       if (voiceProfile.voiceName) {
-        const voice = this.voices.find(v => v.name === voiceProfile.voiceName);
+        console.log(`🎤 Voice selection for ${voiceProfile.name}:`, {
+          targetVoice: voiceProfile.voiceName,
+          availableVoices: this.voices.length,
+          voiceProfile: voiceProfile
+        });
+        
+        // Try exact match first
+        let voice = this.voices.find(v => v.name === voiceProfile.voiceName);
+        
+        // If exact match not found, try partial match
+        if (!voice) {
+          voice = this.voices.find(v => 
+            v.name.toLowerCase().includes(voiceProfile.voiceName!.toLowerCase()) ||
+            voiceProfile.voiceName!.toLowerCase().includes(v.name.toLowerCase())
+          );
+        }
+        
+        // If still not found, try to find a similar voice by gender/age
+        if (!voice) {
+          const targetName = voiceProfile.voiceName.toLowerCase();
+          if (targetName.includes('female') || targetName.includes('woman')) {
+            voice = this.voices.find(v => v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('woman'));
+          } else if (targetName.includes('male') || targetName.includes('man')) {
+            voice = this.voices.find(v => v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('man'));
+          }
+        }
+        
         if (voice) {
           utterance.voice = voice;
+          console.log(`✅ Voice selected: ${voice.name} for ${voiceProfile.name}`, {
+            voiceName: voice.name,
+            voiceLang: voice.lang,
+            voiceLocalService: voice.localService
+          });
+        } else {
+          console.warn(`⚠️ Voice "${voiceProfile.voiceName}" not found, using default voice for ${voiceProfile.name}`);
+          console.log('Available voices:', this.voices.map(v => v.name));
         }
+      } else {
+        console.log(`🎤 No specific voice requested for ${voiceProfile.name}, using default`);
       }
 
       // Set voice parameters
@@ -147,83 +207,70 @@ export class OnlineTTS {
     });
   }
 
-  /**
-   * Get available browser voices
-   */
-  static getAvailableVoices(): SpeechSynthesisVoice[] {
-    return [...this.voices];
-  }
-
-  /**
-   * Get voice mode (always 'online' for this service)
-   */
-  static getVoiceMode(): 'online' {
-    return 'online';
-  }
 }
 
 /**
  * Story Character Voice Profiles
- * Each of the 8 stories has a unique voice character
+ * Each of the 8 stories uses actual Google/Microsoft voices
  */
 export const STORY_VOICES: Record<string, VoiceProfile> = {
   // 1. Magic Forest Adventure - Luna (cheerful 6-year-old girl)
   Luna: {
     name: 'Luna',
-    pitch: 1.4,
-    rate: 0.9,
-    volume: 0.95,
-    voiceName: undefined, // Let browser choose best female voice
+    pitch: 1.0,
+    rate: 1.0,
+    volume: 1.0,
+    voiceName: 'Google UK English Female', // Google's young female voice
     description: 'Sweet, gentle rabbit voice with magical wonder'
   },
   
   // 2. Space Adventure - Cosmo (excited 7-year-old boy)
   Cosmo: {
     name: 'Cosmo',
-    pitch: 1.1,
+    pitch: 1.0,
     rate: 1.0,
-    volume: 0.98,
-    voiceName: undefined, // Let browser choose best male voice
+    volume: 1.0,
+    voiceName: 'Google UK English Male', // Google's young male voice
     description: 'Confident, adventurous astronaut voice'
   },
   
   // 3. Underwater World - Finn (gentle 6-year-old boy)
   Finn: {
     name: 'Finn',
-    pitch: 1.2,
-    rate: 0.85,
-    volume: 0.9,
-    voiceName: undefined,
+    pitch: 1.0,
+    rate: 1.0,
+    volume: 1.0,
+    voiceName: 'Microsoft David Desktop - English (United States)', // Microsoft's young male voice
     description: 'Bubbly, cheerful fish voice with underwater flow'
   },
   
   // 4. Dinosaur Discovery - Dina (bold 8-year-old girl)
   Dina: {
     name: 'Dina',
-    pitch: 1.15,
-    rate: 0.88,
-    volume: 0.93,
-    voiceName: undefined,
+    pitch: 1.0,
+    rate: 1.0,
+    volume: 1.0,
+    voiceName: 'Microsoft Zira Desktop - English (United States)', // Microsoft's young female voice
     description: 'Curious, enthusiastic explorer voice with scientific wonder'
   },
   
   // 5. Unicorn Magic - Stardust (sweet 5-year-old girl)
   Stardust: {
     name: 'Stardust',
-    pitch: 1.5,
-    rate: 0.87,
-    volume: 0.92,
-    voiceName: undefined,
+    pitch: 1.0,
+    rate: 1.0,
+    volume: 1.0,
+    voiceName: 'Google US English Female', // Google's young female voice
     description: 'Enchanting, graceful unicorn voice with dreamy magical quality'
   },
   
   // 6. Pirate Treasure - Captain Finn (brave 8-year-old boy)
   CaptainFinn: {
     name: 'Captain Finn',
-    pitch: 0.9,
-    rate: 0.85,
+    pitch: 1.0,
+    rate: 1.0,
     volume: 1.0,
-    voiceName: undefined,
+    voiceName: 'Microsoft Mark Desktop - English (United States)', // Microsoft's male voice
     description: 'Bold, adventurous pirate captain voice'
   },
   
@@ -231,19 +278,19 @@ export const STORY_VOICES: Record<string, VoiceProfile> = {
   CaptainCourage: {
     name: 'Captain Courage',
     pitch: 1.0,
-    rate: 0.92,
-    volume: 0.98,
-    voiceName: undefined,
+    rate: 1.0,
+    volume: 1.0,
+    voiceName: 'Google US English Male', // Google's male voice
     description: 'Heroic, confident superhero voice with powerful determination'
   },
   
   // 8. Fairy Garden - Twinkle (whimsical 6-year-old girl)
   Twinkle: {
     name: 'Twinkle',
-    pitch: 1.6,
-    rate: 0.93,
-    volume: 0.88,
-    voiceName: undefined,
+    pitch: 1.0,
+    rate: 1.0,
+    volume: 1.0,
+    voiceName: 'Microsoft Susan Desktop - English (United States)', // Microsoft's young female voice
     description: 'Delicate, twinkling fairy voice with sweet magical tone'
   }
 };

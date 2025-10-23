@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Sparkles, Rabbit, Star, Volume2, Play, Heart, Zap, Flower, Trees, CloudRain, X, Ear, Award, Eye, Gauge, RotateCcw, FileText } from 'lucide-react';
+import { Sparkles, Rabbit, Star, Volume2, Play, Heart, Zap, Flower, Trees, CloudRain, X, Ear, Award, Gauge, RotateCcw, FileText } from 'lucide-react';
 import OnlineTTS, { STORY_VOICES } from '@/services/OnlineTTS';
 import KidsListeningAnalytics, { type StorySession } from '@/services/KidsListeningAnalytics';
 import { cn } from '@/lib/utils';
@@ -304,11 +304,9 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
   // Accessibility & Enhanced Features
   const [showTranscript, setShowTranscript] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState<'normal' | 'slow' | 'slower'>('slow'); // Default to slow for better comprehension
-  const [captionsEnabled, setCaptionsEnabled] = useState(false);
   const [retryMode, setRetryMode] = useState(false);
   const [attemptCount, setAttemptCount] = useState(0);
   const [ttsAvailable, setTtsAvailable] = useState(true);
-  const [currentCaption, setCurrentCaption] = useState('');
   const [accessibilityMode, setAccessibilityMode] = useState(false); // For hearing-impaired kids
   
   // Analytics tracking
@@ -317,6 +315,7 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
   
   // TTS availability status
   const [ttsInitialized, setTtsInitialized] = useState(false);
+  const [isRevealTextPlaying, setIsRevealTextPlaying] = useState(false);
 
   const current = storySteps[stepIndex];
   const progress = Math.round(((stepIndex + 1) / storySteps.length) * 100);
@@ -342,15 +341,18 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
         
         if (!available) {
           console.warn('No voice synthesis available, falling back to text-only mode');
-          setShowTranscript(true); // Auto-enable transcript if no voice
+          // Transcript remains off by default - users can toggle if needed
         } else {
           const mode = OnlineTTS.getVoiceMode();
           console.log(`🎤 Voice mode: ${mode}`);
+          
+          // Log available voices for debugging
+          OnlineTTS.logAvailableVoices();
         }
       } catch (error) {
         console.error('Failed to initialize TTS:', error);
         setTtsAvailable(false);
-        setShowTranscript(true);
+        // Transcript remains off by default - users can toggle if needed
       }
     };
     initializeVoice();
@@ -384,7 +386,6 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
     setSelectedChoice(null);
     setShowFeedback(false);
     setShowHint(false);
-    setCurrentCaption('');
     // Don't reset accessibility mode - keep it persistent across steps if enabled
   }, [stepIndex]);
 
@@ -402,32 +403,49 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
     return text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{FE00}-\u{FE0F}]|[\u{E0020}-\u{E007F}]/gu, '').trim();
   };
 
-  // Enhanced audio playback with captions (OnlineTTS: Web Speech API only)
-  const playAudioWithCaptions = async (text: string, showCaptions: boolean = false) => {
+  // Enhanced audio playback (OnlineTTS: Web Speech API only)
+  const playAudioWithCaptions = async (text: string) => {
     try {
       // Strip emojis/stickers before speaking to prevent TTS from reading emoji names
       const cleanText = stripEmojis(text);
       
-      // Determine if captions should be shown based on phase and accessibility mode
-      const allowCaptions = showCaptions && captionsEnabled && 
-        (listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode);
+      console.log(`🎤 Playing audio with Luna's voice:`, {
+        text: cleanText.substring(0, 50) + '...',
+        voice: LUNA_VOICE,
+        step: current.id,
+        phase: listeningPhase,
+        speed: playbackSpeed,
+        isRevealText: !!(current as any).revealText && text === (current as any).revealText
+      });
+      
+      // Ensure TTS is available before speaking
+      if (!OnlineTTS.isAvailable()) {
+        throw new Error('TTS not available');
+      }
       
       await OnlineTTS.speak(
         cleanText,
         LUNA_VOICE,
         {
           speed: playbackSpeed,
-          showCaptions: allowCaptions,
-          onCaptionUpdate: allowCaptions ? setCurrentCaption : () => {}
+          showCaptions: false,
+          onCaptionUpdate: () => {}
         }
       );
+      
+      console.log(`✅ Audio playback completed for step: ${current.id}`);
     } catch (error) {
-      console.log('Voice synthesis failed, showing text instead');
+      console.error('❌ Voice synthesis failed:', error);
+      console.error('❌ Error details:', {
+        step: current.id,
+        phase: listeningPhase,
+        ttsAvailable,
+        isRevealText: !!(current as any).revealText && text === (current as any).revealText,
+        textLength: text.length
+      });
+      
       setTtsAvailable(false);
-      // Only auto-enable transcript in reveal phase or for non-interactive content
-      if (listeningPhase === 'reveal' || !current.listeningFirst) {
-        setShowTranscript(true);
-      }
+      // Transcript remains off by default - users can toggle if needed
       throw error;
     }
   };
@@ -439,7 +457,7 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
         setIsPlaying(true);
         setAudioWaveform(true);
         try {
-          await playAudioWithCaptions((current as any).audioText, true);
+          await playAudioWithCaptions((current as any).audioText);
           setHasListened(true);
         } catch (error) {
           console.log('TTS not available, text mode enabled');
@@ -453,14 +471,28 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
     
     // Auto-play for reveal phase (after correct answer)
     if (listeningPhase === 'reveal' && current.listeningFirst && (current as any).revealText && ttsAvailable) {
+      console.log('🎭 Auto-playing reveal text:', {
+        stepId: current.id,
+        revealText: (current as any).revealText.substring(0, 50) + '...',
+        voice: LUNA_VOICE,
+        speed: playbackSpeed
+      });
+      
       const playReveal = async () => {
         setIsPlaying(true);
+        setIsRevealTextPlaying(true);
         try {
-          await playAudioWithCaptions((current as any).revealText, true);
+          await playAudioWithCaptions((current as any).revealText);
+          console.log('✅ Auto reveal text playback completed');
+          
+          // Wait a bit more after TTS completes to ensure full reading
+          await new Promise(resolve => setTimeout(resolve, 1000));
         } catch (error) {
-          console.log('TTS not available');
+          console.error('❌ Auto reveal text playback failed:', error);
+        } finally {
+          setIsPlaying(false);
+          setIsRevealTextPlaying(false);
         }
-        setIsPlaying(false);
       };
       playReveal();
     }
@@ -472,17 +504,19 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
         
         // Handle dynamic celebration text based on stars collected
         if (current.id === 'grand_celebration') {
+          console.log(`🎉 Forest Celebration step - Stars collected: ${stars}`);
           if (stars >= 3) {
             textToRead = "Congratulations superstar! ... The WHOLE forest is celebrating YOU! ... Animals are dancing, flowers are singing, and magic sparkles everywhere!. You made the forest happy with your wonderful listening! You should feel SO proud! ... Give yourself a BIG clap!";
           } else {
             textToRead = `Great job, little explorer! ... You earned ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The forest friends are so happy you tried your best! ... Luna the rabbit is proud of you! ... Every adventure is a chance to learn and grow. Keep practicing and you'll collect all the stars next time! 🌟`;
           }
+          console.log(`🎉 Celebration text selected:`, textToRead.substring(0, 100) + '...');
         }
         
         try {
-          await playAudioWithCaptions(textToRead, true);
+          await playAudioWithCaptions(textToRead);
         } catch (error) {
-          console.log('TTS not available');
+          console.error('❌ TTS not available for non-interactive step:', error);
         }
       };
       playNarration();
@@ -527,7 +561,7 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
     setAudioWaveform(true);
     
       try {
-      await playAudioWithCaptions((current as any).audioText, true);
+      await playAudioWithCaptions((current as any).audioText);
       setHasListened(true);
       } catch (error) {
       console.log('TTS not available, text mode enabled');
@@ -587,10 +621,33 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
         setListeningPhase('reveal');
     }, 2500);
       
-      // Then move to next step
+      // Calculate dynamic timing based on reveal text length
+      const revealText = (current as any).revealText || '';
+      const textLength = revealText.length;
+      const wordsPerMinute = playbackSpeed === 'slow' ? 120 : playbackSpeed === 'slower' ? 80 : 160;
+      const estimatedDuration = Math.max(10000, (textLength / 5) * (60000 / wordsPerMinute) + 2000); // At least 10 seconds + 2 second buffer
+      
+      console.log('⏱️ Dynamic timing calculation:', {
+        textLength,
+        wordsPerMinute,
+        estimatedDuration: Math.round(estimatedDuration),
+        playbackSpeed,
+        revealText: revealText.substring(0, 50) + '...'
+      });
+      
+      // Move to next step after reveal text has time to complete
       setTimeout(() => {
-        handleNext();
-      }, 5000);
+        // Double-check that reveal text is not still playing
+        if (!isRevealTextPlaying) {
+          handleNext();
+        } else {
+          console.log('⏳ Reveal text still playing, waiting a bit more...');
+          // Wait a bit more if still playing
+          setTimeout(() => {
+            handleNext();
+          }, 2000);
+        }
+      }, estimatedDuration);
     } else {
       // Wrong answer - offer retry
       setShowFeedback(true);
@@ -611,24 +668,154 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
   const playRevealText = async () => {
     let textToSpeak = (current as any).revealText || current.text;
     
+    console.log('🎭 playRevealText called:', {
+      stepId: current.id,
+      hasRevealText: !!(current as any).revealText,
+      hasText: !!current.text,
+      ttsAvailable,
+      textPreview: textToSpeak ? textToSpeak.substring(0, 50) + '...' : 'No text'
+    });
+    
     // Handle dynamic celebration text based on stars collected
     if (current.id === 'grand_celebration') {
+      console.log(`🎉 Manual playRevealText - Forest Celebration - Stars: ${stars}`);
       if (stars >= 3) {
         textToSpeak = "Congratulations superstar! ... The WHOLE forest is celebrating YOU! ... Animals are dancing, flowers are singing, and magic sparkles everywhere!. You made the forest happy with your wonderful listening! You should feel SO proud! ... Give yourself a BIG clap!";
       } else {
         textToSpeak = `Great job, little explorer! ... You earned ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The forest friends are so happy you tried your best! ... Luna the rabbit is proud of you! ... Every adventure is a chance to learn and grow. Keep practicing and you'll collect all the stars next time! 🌟`;
       }
+      console.log(`🎉 Manual celebration text:`, textToSpeak.substring(0, 100) + '...');
     }
     
-    if (textToSpeak && ttsAvailable) {
-      setIsPlaying(true);
-      try {
-        await playAudioWithCaptions(textToSpeak, true);
-      } catch (error) {
-        console.log('TTS not available');
-      }
-      setIsPlaying(false);
+    if (!textToSpeak) {
+      console.log('❌ No text to speak in playRevealText');
+      return;
     }
+    
+    if (!ttsAvailable) {
+      console.log('❌ TTS not available in playRevealText');
+      return;
+    }
+    
+    console.log('🎤 Starting reveal text playback with Luna voice:', {
+      text: textToSpeak.substring(0, 100) + '...',
+      voice: LUNA_VOICE,
+      speed: playbackSpeed
+    });
+    
+    setIsPlaying(true);
+    setIsRevealTextPlaying(true);
+    try {
+      // Force stop any current speech first
+      OnlineTTS.stop();
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Use playAudioWithCaptions which ensures Luna's voice
+      await playAudioWithCaptions(textToSpeak);
+      console.log('✅ Reveal text playback completed successfully');
+      
+      // Wait a bit more to ensure full completion
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } catch (error) {
+      console.error('❌ TTS error in playRevealText:', error);
+      
+      // Try to reinitialize TTS and retry once
+      try {
+        console.log('🔄 Attempting TTS reinitialization...');
+        await OnlineTTS.initialize();
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        if (OnlineTTS.isAvailable()) {
+          console.log('🔄 Retrying reveal text with reinitialized TTS...');
+          await playAudioWithCaptions(textToSpeak);
+          console.log('✅ Retry successful');
+          
+          // Wait after retry too
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      } catch (retryError) {
+        console.error('❌ Retry failed:', retryError);
+      }
+    } finally {
+      setIsPlaying(false);
+      setIsRevealTextPlaying(false);
+    }
+  };
+
+  // Instant speed change function - no delays, immediate response
+  const handleSpeedChange = (newSpeed: 'normal' | 'slow' | 'slower') => {
+    console.log('🔄 INSTANT speed change - Current step:', current.id, 'New speed:', newSpeed);
+    
+    // Update speed state immediately
+    setPlaybackSpeed(newSpeed);
+    
+    // Force stop any currently playing audio immediately
+    OnlineTTS.stop();
+    
+    // Determine what text to replay
+    let textToPlay = '';
+    
+    if (current.listeningFirst) {
+      // Interactive steps with listening phases
+      if (listeningPhase === 'listening' && (current as any).audioText) {
+        textToPlay = (current as any).audioText;
+        console.log('🎧 INSTANT replay listening audio:', textToPlay.substring(0, 50) + '...');
+      } else if (listeningPhase === 'reveal' && (current as any).revealText) {
+        textToPlay = (current as any).revealText;
+        console.log('🎭 INSTANT replay reveal text:', textToPlay.substring(0, 50) + '...');
+      }
+    } else {
+      // Non-interactive steps (like intro, celebration, etc.)
+      if (current.text) {
+        if (current.id === 'grand_celebration') {
+          textToPlay = stars >= 3 
+            ? "Congratulations superstar! ... The WHOLE forest is celebrating YOU! ... Animals are dancing, flowers are singing, and magic sparkles everywhere!. You made the forest happy with your wonderful listening! You should feel SO proud! ... Give yourself a BIG clap!"
+            : `Great job, little explorer! ... You earned ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The forest friends are so happy you tried your best! ... Luna the rabbit is proud of you! ... Every adventure is a chance to learn and grow. Keep practicing and you'll collect all the stars next time! 🌟`;
+          console.log('🎉 INSTANT replay celebration text:', textToPlay.substring(0, 50) + '...');
+        } else {
+          textToPlay = current.text;
+          console.log('📖 INSTANT replay intro/narration text:', textToPlay.substring(0, 50) + '...');
+        }
+      }
+    }
+    
+    if (!textToPlay) {
+      console.log('❌ No text found to replay');
+      return;
+    }
+    
+    if (!ttsAvailable) {
+      console.log('❌ TTS not available');
+      return;
+    }
+    
+    // Start playing immediately with new speed
+    const playWithNewSpeed = async () => {
+      try {
+        const cleanText = stripEmojis(textToPlay);
+        console.log('🎤 INSTANT speaking at new speed:', newSpeed, 'Text length:', cleanText.length);
+        
+        setIsPlaying(true);
+        setIsRevealTextPlaying(listeningPhase === 'reveal');
+        
+        await OnlineTTS.speak(cleanText, LUNA_VOICE, {
+          speed: newSpeed,
+          showCaptions: false,
+          onCaptionUpdate: () => {}
+        });
+        
+        console.log('✅ INSTANT speed change completed successfully');
+        
+      } catch (error) {
+        console.error('❌ INSTANT speed change error:', error);
+      } finally {
+        setIsPlaying(false);
+        setIsRevealTextPlaying(false);
+      }
+    };
+    
+    // Start playing immediately (no await to make it instant)
+    playWithNewSpeed();
   };
 
   // Get varied feedback messages
@@ -712,46 +899,15 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={async () => {
-                    // Stop any currently playing audio
-                    OnlineTTS.stop();
-                    
+                  onClick={() => {
                     // Cycle to next speed
                     const newSpeed = playbackSpeed === 'slow' ? 'slower' : playbackSpeed === 'slower' ? 'normal' : 'slow';
-                    setPlaybackSpeed(newSpeed);
+                    console.log('🔄 Speed button clicked - changing from', playbackSpeed, 'to', newSpeed);
                     
-                    // Immediately replay current content at new speed
-                    try {
-                      let textToPlay = '';
-                      
-                      if (listeningPhase === 'listening' && current.listeningFirst && (current as any).audioText) {
-                        textToPlay = (current as any).audioText;
-                      } else if (listeningPhase === 'reveal' && current.listeningFirst && (current as any).revealText) {
-                        textToPlay = (current as any).revealText;
-                      } else if (!current.listeningFirst && current.text) {
-                        // Handle celebration text
-                        if (current.id === 'grand_celebration') {
-                          textToPlay = stars >= 3 
-                            ? "Congratulations superstar! ... The WHOLE forest is celebrating YOU! ... Animals are dancing, flowers are singing, and magic sparkles everywhere!. You made the forest happy with your wonderful listening! You should feel SO proud! ... Give yourself a BIG clap!"
-                            : `Great job, little explorer! ... You earned ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The forest friends are so happy you tried your best! ... Luna the rabbit is proud of you! ... Every adventure is a chance to learn and grow. Keep practicing and you'll collect all the stars next time! 🌟`;
-                        } else {
-                          textToPlay = current.text;
-                        }
-                      }
-                      
-                      if (textToPlay && ttsAvailable) {
-                        const cleanText = stripEmojis(textToPlay);
-                        await OnlineTTS.speak(cleanText, LUNA_VOICE, {
-                          speed: newSpeed,
-                          showCaptions: captionsEnabled,
-                          onCaptionUpdate: setCurrentCaption
-                        });
-                      }
-                    } catch (error) {
-                      console.log('Could not replay at new speed');
-                    }
+                    // Use the instant speed change function
+                    handleSpeedChange(newSpeed);
                   }}
-                  className="h-7 px-2 rounded-full text-xs bg-green-50 dark:bg-green-800 hover:bg-green-100 dark:hover:bg-green-700 border border-green-200 dark:border-green-600 text-green-800 dark:text-green-100 font-semibold shadow-sm"
+                  className="h-7 px-2 rounded-full text-xs font-semibold shadow-sm transition-all duration-200 bg-green-50 dark:bg-green-800 hover:bg-green-100 dark:hover:bg-green-700 border border-green-200 dark:border-green-600 text-green-800 dark:text-green-100"
                   title={`Playback speed (works offline & online): ${playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow (Default)' : 'Very Slow'}`}
                 >
                   <Gauge className="w-3.5 h-3.5 mr-1 text-green-600 dark:text-green-200" />
@@ -765,10 +921,6 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                     size="sm"
                     onClick={() => {
                       setAccessibilityMode(!accessibilityMode);
-                      if (!accessibilityMode) {
-                        setShowTranscript(true);
-                        setCaptionsEnabled(true);
-                      }
                     }}
                     className={cn(
                       "h-7 px-2 rounded-full text-xs",
@@ -779,6 +931,7 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                     👂 {accessibilityMode ? 'ON' : 'Help'}
                   </Button>
                 )}
+                
                 
                 {/* Transcript Toggle - Only in reveal phase OR accessibility mode */}
                 {(listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode) && (
@@ -803,28 +956,6 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                 </Button>
                 )}
                 
-                {/* Captions Toggle - Only in reveal phase OR accessibility mode */}
-                {(listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode) && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setCaptionsEnabled(!captionsEnabled)}
-                  className={cn(
-                    "h-7 w-7 p-0 rounded-full border shadow-sm",
-                    captionsEnabled 
-                      ? "bg-purple-100 dark:bg-purple-800 border-purple-300 dark:border-purple-600 hover:bg-purple-200 dark:hover:bg-purple-700" 
-                      : "bg-white/80 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600"
-                  )}
-                  title="Toggle captions"
-                >
-                  <Eye className={cn(
-                    "w-3.5 h-3.5",
-                    captionsEnabled 
-                      ? "text-purple-700 dark:text-purple-200" 
-                      : "text-gray-700 dark:text-gray-200"
-                  )} />
-                </Button>
-                )}
               </div>
             </div>
           </div>
@@ -835,7 +966,7 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
               <div className="flex items-center gap-2 justify-center">
                 <Volume2 className="w-4 h-4" />
                 <span className="text-xs sm:text-sm font-bold">
-                  🎤 Luna's voice is ready! Listen carefully to her magical words!
+                  Luna's voice is ready! Listen carefully to her magical words!
                 </span>
               </div>
             </div>
@@ -854,12 +985,6 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
             </div>
           )}
           
-          {/* Live Caption Display - Only in reveal phase or accessibility mode */}
-          {captionsEnabled && currentCaption && (listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode) && (
-            <div className="mb-2 bg-black/80 text-white px-4 py-2 rounded-lg text-center text-sm sm:text-base font-semibold animate-fade-in">
-              {currentCaption}
-            </div>
-          )}
 
           {/* Progress Bar */}
           <Progress value={progress} className="h-2 sm:h-2 mb-3 sm:mb-4 bg-white/30 flex-shrink-0">
@@ -1116,6 +1241,7 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                         size="sm" 
                         onClick={playRevealText}
                         className="text-blue-500 hover:text-blue-600 h-7 w-7 sm:h-8 sm:w-8 p-0"
+                        title="Replay this text with Luna's voice"
                       >
                         <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </Button>
@@ -1147,10 +1273,12 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                         size="sm" 
                         onClick={playRevealText}
                         className="text-blue-600 hover:text-blue-700"
+                        title="Replay this text with Luna's voice"
                       >
                         <Volume2 className="w-5 h-5" />
                       </Button>
                     </h3>
+                    
                     <p className="text-base text-gray-700 dark:text-gray-200 leading-relaxed">
                       {/* Dynamic message based on stars collected */}
                       {current.id === 'grand_celebration' ? (
@@ -1433,6 +1561,7 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                         size="sm" 
                         onClick={playRevealText}
                         className="text-blue-600 hover:text-blue-700 h-7 w-7 p-0"
+                        title="Replay this text with Luna's voice"
                       >
                         <Volume2 className="w-4 h-4" />
                       </Button>
@@ -1464,10 +1593,12 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                         size="sm" 
                         onClick={playRevealText}
                         className="text-blue-600 hover:text-blue-700 h-7 w-7 p-0"
+                        title="Replay this text with Luna's voice"
                       >
                         <Volume2 className="w-4 h-4" />
                       </Button>
                     </h3>
+                    
                     <p className="text-sm md:text-base text-gray-700 dark:text-gray-200 leading-relaxed px-2">
                       {/* Dynamic message based on stars collected */}
                       {current.id === 'grand_celebration' ? (

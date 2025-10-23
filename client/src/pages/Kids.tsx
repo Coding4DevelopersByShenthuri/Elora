@@ -14,7 +14,6 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import KidsProgressService from '@/services/KidsProgressService';
 import KidsApi from '@/services/KidsApi';
-import SpeechService from '@/services/SpeechService';
 import Vocabulary from '@/components/kids/Vocabulary';
 import Pronunciation from '@/components/kids/Pronunciation';
 import InteractiveGames from '@/components/kids/InteractiveGames';
@@ -506,15 +505,8 @@ const KidsPage = () => {
       setFloatingIcons(prev => prev.filter(icon => !newParticles.find(p => p.id === icon.id)));
     }, 2000);
 
-    // Speak story intro (offline TTS baseline)
-    try {
-      const story = allStories[storyIndex];
-      if (SpeechService.isTTSSupported()) {
-        await SpeechService.speak(`${story.title}. ${story.description}`, { rate: 0.95 });
-      }
-    } catch (error) {
-      console.error('Error speaking story intro:', error);
-    }
+    // Story intro voice disabled - only story content should be read by unique voices
+    // The story title and description are now silent to avoid confusion with character voices
     
     setIsPlaying(false);
   };
