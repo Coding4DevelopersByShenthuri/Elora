@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Sparkles, Flower, Star, Volume2, Play, Zap, X, Ear, Gauge, RotateCcw, FileText, Eye, Award } from 'lucide-react';
-import HybridVoiceService, { STORY_VOICES } from '@/services/HybridVoiceService';
+import OnlineTTS, { STORY_VOICES } from '@/services/OnlineTTS';
 import KidsListeningAnalytics, { type StorySession } from '@/services/KidsListeningAnalytics';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -260,8 +260,8 @@ const FairyGardenAdventure = ({ onClose, onComplete }: Props) => {
 
   useEffect(() => {
     const initializeVoice = async () => {
-      await HybridVoiceService.initialize();
-      const available = HybridVoiceService.isAvailable();
+      await OnlineTTS.initialize();
+      const available = OnlineTTS.isAvailable();
       setTtsAvailable(available);
     };
     initializeVoice();
@@ -308,7 +308,7 @@ const FairyGardenAdventure = ({ onClose, onComplete }: Props) => {
       const allowCaptions = showCaptions && captionsEnabled && 
         (listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode);
       
-      await HybridVoiceService.speak(
+      await OnlineTTS.speak(
         cleanText,
         TWINKLE_VOICE,
         {
@@ -552,7 +552,7 @@ const FairyGardenAdventure = ({ onClose, onComplete }: Props) => {
                   size="sm"
                   onClick={async () => {
                     // Stop any currently playing audio
-                    HybridVoiceService.stop();
+                    OnlineTTS.stop();
                     
                     // Cycle to next speed
                     const newSpeed = playbackSpeed === 'slow' ? 'slower' : playbackSpeed === 'slower' ? 'normal' : 'slow';
@@ -579,7 +579,7 @@ const FairyGardenAdventure = ({ onClose, onComplete }: Props) => {
                       
                       if (textToPlay && ttsAvailable) {
                         const cleanText = stripEmojis(textToPlay);
-                        await HybridVoiceService.speak(cleanText, TWINKLE_VOICE, {
+                        await OnlineTTS.speak(cleanText, TWINKLE_VOICE, {
                           speed: newSpeed,
                           showCaptions: captionsEnabled,
                           onCaptionUpdate: setCurrentCaption

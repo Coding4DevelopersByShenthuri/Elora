@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Sparkles, Anchor, Star, Volume2, Play, Zap, X, Ear, Gauge, RotateCcw, FileText, Eye, Award, Heart } from 'lucide-react';
-import HybridVoiceService, { STORY_VOICES } from '@/services/HybridVoiceService';
+import OnlineTTS, { STORY_VOICES } from '@/services/OnlineTTS';
 import KidsListeningAnalytics, { type StorySession } from '@/services/KidsListeningAnalytics';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -257,8 +257,8 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
 
   useEffect(() => {
     const initializeVoice = async () => {
-      await HybridVoiceService.initialize();
-      const available = HybridVoiceService.isAvailable();
+      await OnlineTTS.initialize();
+      const available = OnlineTTS.isAvailable();
       setTtsAvailable(available);
     };
     initializeVoice();
@@ -298,7 +298,7 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
   const playAudioWithCaptions = async (text: string) => {
     try {
       const cleanText = stripEmojis(text);
-      await HybridVoiceService.speak(cleanText, CAPTAIN_VOICE, {
+      await OnlineTTS.speak(cleanText, CAPTAIN_VOICE, {
         speed: playbackSpeed
       });
     } catch (error) {
@@ -525,7 +525,7 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
                   variant="ghost"
                   size="sm"
                   onClick={async () => {
-                    HybridVoiceService.stop();
+                    OnlineTTS.stop();
                     const newSpeed = playbackSpeed === 'slow' ? 'slower' : playbackSpeed === 'slower' ? 'normal' : 'slow';
                     setPlaybackSpeed(newSpeed);
                     try {
@@ -543,7 +543,7 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
                       }
                       if (textToPlay && ttsAvailable) {
                         const cleanText = stripEmojis(textToPlay);
-                        await HybridVoiceService.speak(cleanText, CAPTAIN_VOICE, { speed: newSpeed });
+                        await OnlineTTS.speak(cleanText, CAPTAIN_VOICE, { speed: newSpeed });
                       }
                     } catch (error) {
                       console.log('Could not replay at new speed');

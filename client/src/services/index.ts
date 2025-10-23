@@ -6,7 +6,7 @@
 // Import services for internal use
 import WhisperService from './WhisperService';
 import EnhancedTTS from './EnhancedTTS';
-import PiperTTS from './PiperTTS';
+import OnlineTTS from './OnlineTTS';
 import LocalLLM from './LocalLLM';
 import TransformersService from './TransformersService';
 import SLMInference from './SLMInference';
@@ -19,7 +19,7 @@ import PerformanceBenchmark from './PerformanceBenchmark';
 // Speech Services
 export { WhisperService, type WhisperConfig, type WhisperResult } from './WhisperService';
 export { EnhancedTTS, type Voice, type TTSOptions } from './EnhancedTTS';
-export { PiperTTS, type PiperVoice, type PiperTTSOptions } from './PiperTTS';
+export { OnlineTTS, type VoiceProfile, type PlaybackOptions } from './OnlineTTS';
 export { SpeechService } from './SpeechService';
 
 // Language Model Services
@@ -161,7 +161,7 @@ export async function checkOfflineStatus(): Promise<{
 export async function getRecommendedConfig(): Promise<{
   sttModel: string;
   llmModel: string;
-  ttsSystem: 'web-speech' | 'piper';
+  ttsSystem: 'web-speech';
   threads: number;
   contextSize: number;
 }> {
@@ -189,7 +189,7 @@ export async function getRecommendedConfig(): Promise<{
     return {
       sttModel: 'whisper-base-en',
       llmModel: 'gpt2',
-      ttsSystem: 'piper',
+      ttsSystem: 'web-speech',
       threads: metrics.cpuCores || 4,
       contextSize: 4096
     };
@@ -210,7 +210,7 @@ export default {
   // Services
   WhisperService,
   EnhancedTTS,
-  PiperTTS,
+  OnlineTTS,
   LocalLLM,
   TransformersService,
   SLMInference,

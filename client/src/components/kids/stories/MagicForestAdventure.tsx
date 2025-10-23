@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Sparkles, Rabbit, Star, Volume2, Play, Heart, Zap, Flower, Trees, CloudRain, X, Ear, Award, Eye, Gauge, RotateCcw, FileText, Download } from 'lucide-react';
-import HybridVoiceService, { STORY_VOICES, type DownloadStatus } from '@/services/HybridVoiceService';
+import { Sparkles, Rabbit, Star, Volume2, Play, Heart, Zap, Flower, Trees, CloudRain, X, Ear, Award, Eye, Gauge, RotateCcw, FileText } from 'lucide-react';
+import OnlineTTS, { STORY_VOICES } from '@/services/OnlineTTS';
 import KidsListeningAnalytics, { type StorySession } from '@/services/KidsListeningAnalytics';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -315,8 +315,8 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
   const [currentSession, setCurrentSession] = useState<StorySession | null>(null);
   const [questionStartTime, setQuestionStartTime] = useState(0);
   
-  // Download status for online users
-  const [downloadStatus, setDownloadStatus] = useState<DownloadStatus | null>(null);
+  // TTS availability status
+  const [ttsInitialized, setTtsInitialized] = useState(false);
 
   const current = storySteps[stepIndex];
   const progress = Math.round(((stepIndex + 1) / storySteps.length) * 100);
@@ -328,36 +328,32 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
   const maxReplays = (current as any).maxReplays || 5; // Increased from 3 to 5
   const unlimitedReplays = true; // Allow unlimited for accessibility
 
-  // Check TTS availability and initialize hybrid voice on mount
+  // Initialize online TTS on mount
   useEffect(() => {
     const initializeVoice = async () => {
-      // Initialize Piper TTS (offline)
-      await HybridVoiceService.initialize();
-      
-      // Check if any voice system is available
-      const available = HybridVoiceService.isAvailable();
-      setTtsAvailable(available);
-      
-      if (!available) {
-        console.warn('No voice synthesis available, falling back to text-only mode');
-        setShowTranscript(true); // Auto-enable transcript if no voice
-      } else {
-        const mode = HybridVoiceService.getVoiceMode();
-        console.log(`🎤 Voice mode: ${mode}`);
+      try {
+        // Initialize OnlineTTS (Web Speech API only)
+        await OnlineTTS.initialize();
+        
+        // Check if TTS is available
+        const available = OnlineTTS.isAvailable();
+        setTtsAvailable(available);
+        setTtsInitialized(true);
+        
+        if (!available) {
+          console.warn('No voice synthesis available, falling back to text-only mode');
+          setShowTranscript(true); // Auto-enable transcript if no voice
+        } else {
+          const mode = OnlineTTS.getVoiceMode();
+          console.log(`🎤 Voice mode: ${mode}`);
+        }
+      } catch (error) {
+        console.error('Failed to initialize TTS:', error);
+        setTtsAvailable(false);
+        setShowTranscript(true);
       }
     };
     initializeVoice();
-    
-    // Subscribe to download progress
-    const unsubscribe = HybridVoiceService.onDownloadProgress((status) => {
-      setDownloadStatus(status);
-      
-      // Update TTS availability when download completes
-      if (!status.downloading && status.progress === 100) {
-        setTtsAvailable(true);
-        console.log('🎉 High-quality kid voices now available!');
-      }
-    });
     
     // Initialize analytics session
     const initSession = async () => {
@@ -370,9 +366,6 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
       setCurrentSession(session);
     };
     initSession();
-    
-    // Cleanup subscription
-    return () => unsubscribe();
   }, [userId]);
 
   // Reset state on step change
@@ -409,7 +402,7 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
     return text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{FE00}-\u{FE0F}]|[\u{E0020}-\u{E007F}]/gu, '').trim();
   };
 
-  // Enhanced audio playback with captions (Hybrid: Piper offline or Web Speech online)
+  // Enhanced audio playback with captions (OnlineTTS: Web Speech API only)
   const playAudioWithCaptions = async (text: string, showCaptions: boolean = false) => {
     try {
       // Strip emojis/stickers before speaking to prevent TTS from reading emoji names
@@ -419,7 +412,7 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
       const allowCaptions = showCaptions && captionsEnabled && 
         (listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode);
       
-      await HybridVoiceService.speak(
+      await OnlineTTS.speak(
         cleanText,
         LUNA_VOICE,
         {
@@ -721,7 +714,7 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                   size="sm"
                   onClick={async () => {
                     // Stop any currently playing audio
-                    HybridVoiceService.stop();
+                    OnlineTTS.stop();
                     
                     // Cycle to next speed
                     const newSpeed = playbackSpeed === 'slow' ? 'slower' : playbackSpeed === 'slower' ? 'normal' : 'slow';
@@ -748,7 +741,7 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
                       
                       if (textToPlay && ttsAvailable) {
                         const cleanText = stripEmojis(textToPlay);
-                        await HybridVoiceService.speak(cleanText, LUNA_VOICE, {
+                        await OnlineTTS.speak(cleanText, LUNA_VOICE, {
                           speed: newSpeed,
                           showCaptions: captionsEnabled,
                           onCaptionUpdate: setCurrentCaption
@@ -836,36 +829,14 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
             </div>
           </div>
           
-          {/* Download Progress Banner (Online Users) */}
-          {downloadStatus?.downloading && (
-            <div className="mb-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2.5 rounded-lg shadow-lg animate-fade-in">
-              <div className="flex items-center gap-3 mb-1.5">
-                <Download className="w-4 h-4 animate-bounce" />
-                <span className="text-xs sm:text-sm font-bold">
-                  Downloading High-Quality Kid Voices... {Math.round(downloadStatus.progress)}%
-                </span>
-              </div>
-              <Progress 
-                value={downloadStatus.progress} 
-                className="h-1.5 bg-white/30"
-              >
-                <div className="h-full bg-white rounded-full transition-all duration-500" />
-              </Progress>
-              <p className="text-xs opacity-90 mt-1">
-                ✨ Your app will work offline after this download!
-              </p>
-            </div>
-          )}
-          
-          {/* Download Complete Notification */}
-          {downloadStatus && !downloadStatus.downloading && downloadStatus.progress === 100 && stepIndex < 2 && (
-            <div className="mb-2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg animate-bounce">
+          {/* TTS Status Banner */}
+          {ttsInitialized && ttsAvailable && (
+            <div className="mb-2 bg-gradient-to-r from-green-500 to-blue-500 text-white px-4 py-2.5 rounded-lg shadow-lg animate-fade-in">
               <div className="flex items-center gap-2 justify-center">
-                <span className="text-xl">🎉</span>
+                <Volume2 className="w-4 h-4" />
                 <span className="text-xs sm:text-sm font-bold">
-                  Kid voices ready! Now works offline too!
+                  🎤 Luna's voice is ready! Listen carefully to her magical words!
                 </span>
-                <span className="text-xl">✨</span>
               </div>
             </div>
           )}

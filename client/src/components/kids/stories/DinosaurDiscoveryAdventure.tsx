@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Sparkles, Star, Volume2, Play, Zap, X, Ear, Award, Eye, Gauge, RotateCcw, FileText, Footprints } from 'lucide-react';
-import HybridVoiceService, { STORY_VOICES } from '@/services/HybridVoiceService';
+import OnlineTTS, { STORY_VOICES } from '@/services/OnlineTTS';
 import KidsListeningAnalytics, { type StorySession } from '@/services/KidsListeningAnalytics';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -273,6 +273,7 @@ const DinosaurDiscoveryAdventure = ({ onClose, onComplete }: Props) => {
   
   const [currentSession, setCurrentSession] = useState<StorySession | null>(null);
   const [questionStartTime, setQuestionStartTime] = useState(0);
+  const [ttsInitialized, setTtsInitialized] = useState(false);
 
   const current = storySteps[stepIndex];
   const progress = Math.round(((stepIndex + 1) / storySteps.length) * 100);
@@ -285,16 +286,23 @@ const DinosaurDiscoveryAdventure = ({ onClose, onComplete }: Props) => {
 
   useEffect(() => {
     const initializeVoice = async () => {
-      await HybridVoiceService.initialize();
-      const available = HybridVoiceService.isAvailable();
-      setTtsAvailable(available);
-      if (!available) setShowTranscript(true);
+      try {
+        await OnlineTTS.initialize();
+        const available = OnlineTTS.isAvailable();
+        setTtsAvailable(available);
+        setTtsInitialized(true);
+        
+        if (!available) {
+          console.warn('No voice synthesis available');
+          setShowTranscript(true);
+        }
+      } catch (error) {
+        console.error('Failed to initialize TTS:', error);
+        setTtsAvailable(false);
+        setShowTranscript(true);
+      }
     };
     initializeVoice();
-    
-    const unsubscribe = HybridVoiceService.onDownloadProgress((status) => {
-      if (!status.downloading && status.progress === 100) setTtsAvailable(true);
-    });
     
     const initSession = async () => {
       await KidsListeningAnalytics.initialize(userId);
@@ -303,7 +311,7 @@ const DinosaurDiscoveryAdventure = ({ onClose, onComplete }: Props) => {
     };
     initSession();
     
-    return () => unsubscribe();
+    // No cleanup needed for online TTS
   }, [userId]);
 
   useEffect(() => {
@@ -337,7 +345,7 @@ const DinosaurDiscoveryAdventure = ({ onClose, onComplete }: Props) => {
       const allowCaptions = showCaptions && captionsEnabled && 
         (listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode);
       
-      await HybridVoiceService.speak(cleanText, DINA_VOICE, {
+      await OnlineTTS.speak(cleanText, DINA_VOICE, {
         speed: playbackSpeed,
         showCaptions: allowCaptions,
         onCaptionUpdate: allowCaptions ? setCurrentCaption : () => {}
@@ -536,14 +544,14 @@ const DinosaurDiscoveryAdventure = ({ onClose, onComplete }: Props) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <Card className={cn("w-full max-w-5xl sm:max-w-6xl lg:max-w-7xl h-[95vh] rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-500 bg-gradient-to-br", current.bgColor, "flex flex-col")}>
+      <Card className={cn("w-full max-w-5xl sm:max-w-6xl lg:max-w-7xl h-[95vh] rounded-2xl sm:rounded-3xl transition-all duration-500 bg-gradient-to-br", current.bgColor, "flex flex-col")}>
         <div className="absolute top-4 right-4 z-10">
           <Button variant="ghost" onClick={onClose} className="h-10 w-10 p-0 rounded-full bg-white/80 hover:bg-white backdrop-blur-sm border shadow-lg z-50">
             <X className="w-5 h-5 text-gray-700" />
           </Button>
         </div>
 
-        <CardContent className="p-2 sm:p-4 md:p-6 lg:p-8 flex-1 flex flex-col overflow-hidden">
+        <CardContent className="p-2 sm:p-4 md:p-6 lg:p-8 flex-1 flex flex-col">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 gap-2 flex-shrink-0">
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="relative">
@@ -570,7 +578,7 @@ const DinosaurDiscoveryAdventure = ({ onClose, onComplete }: Props) => {
                   size="sm"
                   onClick={async () => {
                     // Stop any currently playing audio
-                    HybridVoiceService.stop();
+                    OnlineTTS.stop();
                     
                     // Cycle to next speed
                     const newSpeed = playbackSpeed === 'slow' ? 'slower' : playbackSpeed === 'slower' ? 'normal' : 'slow';
@@ -597,7 +605,7 @@ const DinosaurDiscoveryAdventure = ({ onClose, onComplete }: Props) => {
                       
                       if (textToPlay && ttsAvailable) {
                         const cleanText = stripEmojis(textToPlay);
-                        await HybridVoiceService.speak(cleanText, DINA_VOICE, {
+                        await OnlineTTS.speak(cleanText, DINA_VOICE, {
                           speed: newSpeed,
                           showCaptions: captionsEnabled,
                           onCaptionUpdate: setCurrentCaption
@@ -691,6 +699,18 @@ const DinosaurDiscoveryAdventure = ({ onClose, onComplete }: Props) => {
             <div className="h-full bg-gradient-to-r from-orange-400 to-amber-400 rounded-full transition-all duration-500" />
           </Progress>
           
+          {/* TTS Status Banner */}
+          {ttsInitialized && ttsAvailable && (
+            <div className="mb-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white px-4 py-2.5 rounded-lg shadow-lg animate-fade-in">
+              <div className="flex items-center gap-2 justify-center">
+                <Volume2 className="w-4 h-4" />
+                <span className="text-xs sm:text-sm font-bold">
+                  🦕 Dina's voice is ready! Listen carefully to her scientific discoveries!
+                </span>
+              </div>
+            </div>
+          )}
+          
           {/* Accessibility Mode Warning */}
           {accessibilityMode && (listeningPhase === 'listening' || listeningPhase === 'question') && (
             <div className="mb-2 bg-orange-100 dark:bg-orange-900/40 border-2 border-orange-400 text-orange-900 dark:text-orange-200 px-4 py-2.5 rounded-lg shadow-md">
@@ -711,7 +731,7 @@ const DinosaurDiscoveryAdventure = ({ onClose, onComplete }: Props) => {
             </div>
           )}
 
-          <div className="flex-1 overflow-y-auto overflow-x-hidden sm:overflow-hidden pb-2 sm:pb-4 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent">
+          <div className="flex-1 overflow-y-auto pb-2 sm:pb-4 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent">
             {/* MOBILE: Original Single Column Layout */}
             <div className="sm:hidden text-center h-full flex flex-col justify-center">
               {/* Character and Scene */}

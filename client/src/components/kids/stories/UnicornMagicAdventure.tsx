@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Sparkles, Star, Volume2, Play, Zap, X, Ear, Award, Eye, Gauge, RotateCcw, FileText, Heart } from 'lucide-react';
-import HybridVoiceService, { STORY_VOICES } from '@/services/HybridVoiceService';
+import OnlineTTS, { STORY_VOICES } from '@/services/OnlineTTS';
 import KidsListeningAnalytics, { type StorySession } from '@/services/KidsListeningAnalytics';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -258,8 +258,8 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
 
   useEffect(() => {
     const initializeVoice = async () => {
-      await HybridVoiceService.initialize();
-      const available = HybridVoiceService.isAvailable();
+      await OnlineTTS.initialize();
+      const available = OnlineTTS.isAvailable();
       setTtsAvailable(available);
       if (!available) setShowTranscript(true);
     };
@@ -304,7 +304,7 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
       const allowCaptions = showCaptions && captionsEnabled && 
         (listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode);
       
-      await HybridVoiceService.speak(cleanText, STARDUST_VOICE, {
+      await OnlineTTS.speak(cleanText, STARDUST_VOICE, {
         speed: playbackSpeed,
         showCaptions: allowCaptions,
         onCaptionUpdate: allowCaptions ? setCurrentCaption : () => {}
@@ -536,7 +536,7 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
                   variant="ghost"
                   size="sm"
                   onClick={async () => {
-                    HybridVoiceService.stop();
+                    OnlineTTS.stop();
                     const newSpeed = playbackSpeed === 'slow' ? 'slower' : playbackSpeed === 'slower' ? 'normal' : 'slow';
                     setPlaybackSpeed(newSpeed);
                     try {
@@ -554,7 +554,7 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
                       }
                       if (textToPlay && ttsAvailable) {
                         const cleanText = stripEmojis(textToPlay);
-                        await HybridVoiceService.speak(cleanText, STARDUST_VOICE, {
+                        await OnlineTTS.speak(cleanText, STARDUST_VOICE, {
                           speed: newSpeed,
                           showCaptions: captionsEnabled,
                           onCaptionUpdate: setCurrentCaption

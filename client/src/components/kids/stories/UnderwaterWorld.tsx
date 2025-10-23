@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Sparkles, Fish, Star, Volume2, Play, Zap, Waves, X, Ear, Award, Eye, Gauge, RotateCcw, FileText } from 'lucide-react';
-import HybridVoiceService, { STORY_VOICES } from '@/services/HybridVoiceService';
+import OnlineTTS, { STORY_VOICES } from '@/services/OnlineTTS';
 import KidsListeningAnalytics, { type StorySession } from '@/services/KidsListeningAnalytics';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -286,8 +286,8 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
 
   useEffect(() => {
     const initializeVoice = async () => {
-      await HybridVoiceService.initialize();
-      const available = HybridVoiceService.isAvailable();
+      await OnlineTTS.initialize();
+      const available = OnlineTTS.isAvailable();
       setTtsAvailable(available);
       if (!available) setShowTranscript(true);
     };
@@ -332,7 +332,7 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
       const allowCaptions = showCaptions && captionsEnabled && 
         (listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode);
       
-      await HybridVoiceService.speak(cleanText, FINN_VOICE, {
+      await OnlineTTS.speak(cleanText, FINN_VOICE, {
         speed: playbackSpeed,
         showCaptions: allowCaptions,
         onCaptionUpdate: allowCaptions ? setCurrentCaption : () => {}
@@ -575,7 +575,7 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
                   variant="ghost"
                   size="sm"
                   onClick={async () => {
-                    HybridVoiceService.stop();
+                    OnlineTTS.stop();
                     const newSpeed = playbackSpeed === 'slow' ? 'slower' : playbackSpeed === 'slower' ? 'normal' : 'slow';
                     setPlaybackSpeed(newSpeed);
                     try {
@@ -593,7 +593,7 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
                       }
                       if (textToPlay && ttsAvailable) {
                         const cleanText = stripEmojis(textToPlay);
-                        await HybridVoiceService.speak(cleanText, FINN_VOICE, {
+                        await OnlineTTS.speak(cleanText, FINN_VOICE, {
                           speed: newSpeed,
                           showCaptions: captionsEnabled,
                           onCaptionUpdate: setCurrentCaption

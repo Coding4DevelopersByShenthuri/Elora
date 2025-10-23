@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Sparkles, Rocket, Star, Volume2, Play, Zap, X, Ear, Award, Eye, Gauge, RotateCcw, FileText, Download } from 'lucide-react';
-import HybridVoiceService, { STORY_VOICES, type DownloadStatus } from '@/services/HybridVoiceService';
+import { Sparkles, Rocket, Star, Volume2, Play, Zap, X, Ear, Award, Eye, Gauge, RotateCcw, FileText } from 'lucide-react';
+import OnlineTTS, { STORY_VOICES } from '@/services/OnlineTTS';
 import KidsListeningAnalytics, { type StorySession } from '@/services/KidsListeningAnalytics';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -274,7 +274,7 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
   
   const [currentSession, setCurrentSession] = useState<StorySession | null>(null);
   const [questionStartTime, setQuestionStartTime] = useState(0);
-  const [downloadStatus, setDownloadStatus] = useState<DownloadStatus | null>(null);
+  const [ttsInitialized, setTtsInitialized] = useState(false);
 
   const current = storySteps[stepIndex];
   const progress = Math.round(((stepIndex + 1) / storySteps.length) * 100);
@@ -287,23 +287,25 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
 
   useEffect(() => {
     const initializeVoice = async () => {
-      await HybridVoiceService.initialize();
-      const available = HybridVoiceService.isAvailable();
-      setTtsAvailable(available);
-      
-      if (!available) {
-        console.warn('No voice synthesis available');
+      try {
+        await OnlineTTS.initialize();
+        const available = OnlineTTS.isAvailable();
+        setTtsAvailable(available);
+        setTtsInitialized(true);
+        
+        if (!available) {
+          console.warn('No voice synthesis available');
+          setShowTranscript(true);
+        }
+      } catch (error) {
+        console.error('Failed to initialize TTS:', error);
+        setTtsAvailable(false);
         setShowTranscript(true);
       }
     };
     initializeVoice();
     
-    const unsubscribe = HybridVoiceService.onDownloadProgress((status) => {
-      setDownloadStatus(status);
-      if (!status.downloading && status.progress === 100) {
-        setTtsAvailable(true);
-      }
-    });
+    // TTS is now always available (online only)
     
     const initSession = async () => {
       await KidsListeningAnalytics.initialize(userId);
@@ -316,7 +318,7 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
     };
     initSession();
     
-    return () => unsubscribe();
+    // No cleanup needed for online TTS
   }, [userId]);
 
   useEffect(() => {
@@ -353,7 +355,7 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
       const allowCaptions = showCaptions && captionsEnabled && 
         (listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode);
       
-      await HybridVoiceService.speak(
+      await OnlineTTS.speak(
         cleanText,
         COSMO_VOICE,
         {
@@ -614,7 +616,7 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
                   variant="ghost"
                   size="sm"
                   onClick={async () => {
-                    HybridVoiceService.stop();
+                    OnlineTTS.stop();
                     const newSpeed = playbackSpeed === 'slow' ? 'slower' : playbackSpeed === 'slower' ? 'normal' : 'slow';
                     setPlaybackSpeed(newSpeed);
                     try {
@@ -631,7 +633,7 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
                         }
                       }
                       if (textToPlay && ttsAvailable) {
-                        await HybridVoiceService.speak(stripEmojis(textToPlay), COSMO_VOICE, { speed: newSpeed, showCaptions: captionsEnabled, onCaptionUpdate: setCurrentCaption });
+                        await OnlineTTS.speak(stripEmojis(textToPlay), COSMO_VOICE, { speed: newSpeed, showCaptions: captionsEnabled, onCaptionUpdate: setCurrentCaption });
                       }
                     } catch (error) {
                       console.log('Could not replay at new speed');
@@ -714,36 +716,14 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
             </div>
           </div>
           
-          {/* Download Progress Banner (Online Users) */}
-          {downloadStatus?.downloading && (
+          {/* TTS Status Banner */}
+          {ttsInitialized && ttsAvailable && (
             <div className="mb-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-2.5 rounded-lg shadow-lg animate-fade-in">
-              <div className="flex items-center gap-3 mb-1.5">
-                <Download className="w-4 h-4 animate-bounce" />
-                <span className="text-xs sm:text-sm font-bold">
-                  Downloading High-Quality Space Voices... {Math.round(downloadStatus.progress)}%
-                </span>
-              </div>
-              <Progress 
-                value={downloadStatus.progress} 
-                className="h-1.5 bg-white/30"
-              >
-                <div className="h-full bg-white rounded-full transition-all duration-500" />
-              </Progress>
-              <p className="text-xs opacity-90 mt-1">
-                ✨ Your app will work offline after this download!
-              </p>
-            </div>
-          )}
-          
-          {/* Download Complete Notification */}
-          {downloadStatus && !downloadStatus.downloading && downloadStatus.progress === 100 && stepIndex < 2 && (
-            <div className="mb-2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg animate-bounce">
               <div className="flex items-center gap-2 justify-center">
-                <span className="text-xl">🎉</span>
+                <Volume2 className="w-4 h-4" />
                 <span className="text-xs sm:text-sm font-bold">
-                  Space voices ready! Now works offline too!
+                  🚀 Cosmo's voice is ready! Listen carefully to his space adventures!
                 </span>
-                <span className="text-xl">✨</span>
               </div>
             </div>
           )}
