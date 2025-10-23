@@ -222,7 +222,7 @@ const storySteps = [
       { text: 'They are happy to see us', emoji: '✨😊', meaning: 'emotional connection' }
     ],
     
-    revealText: 'Incredible! You\'re such a great listener! Another star appeared near the old oak tree! Stars twinkle because they are happy to see us exploring. (Just like your eyes sparkle when you\'re happy!) One last star to go! We\'re almost there!',
+    revealText: 'Incredible! You\'re such a great listener! Another star appeared near the old oak tree! Stars twinkle because they are happy to see us exploring. One last star to go! We\'re almost there!',
     
     maxReplays: 5,
     starsNeeded: 3,

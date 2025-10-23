@@ -238,9 +238,6 @@ const Favorites = () => {
             <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-800 dark:text-white mb-1.5 sm:mb-2">
               No Favorites Yet
             </h2>
-            <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-600 dark:text-gray-400 mb-3 sm:mb-4 md:mb-5 max-w-xs sm:max-w-sm md:max-w-md mx-auto leading-relaxed px-2">
-              Discover amazing stories and save your favorites by clicking the ❤️ button!
-            </p>
             <Button
               onClick={() => navigate('/kids')}
               className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#118AB2] text-white font-bold py-2.5 sm:py-3 md:py-4 px-5 sm:px-6 md:px-8 lg:px-10 rounded-lg sm:rounded-xl md:rounded-2xl text-xs sm:text-sm md:text-base lg:text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 w-full sm:w-auto"
