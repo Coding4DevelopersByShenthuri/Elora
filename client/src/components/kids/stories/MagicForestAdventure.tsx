@@ -368,6 +368,12 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
       setCurrentSession(session);
     };
     initSession();
+
+    // Cleanup function to stop TTS when component unmounts
+    return () => {
+      console.log('🛑 Story component unmounting - stopping TTS immediately');
+      OnlineTTS.stop();
+    };
   }, [userId]);
 
   // Reset state on step change
@@ -560,6 +566,10 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
         console.log('📊 Session analytics saved');
       }
       
+      // Stop TTS when story completes
+      console.log('🛑 Story completed - stopping TTS');
+      OnlineTTS.stop();
+      
       onComplete(score);
     }
   };
@@ -622,9 +632,22 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
     
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
-      // Add star for correct answer (bonus for first attempt)
-      const starReward = currentAttempt === 1 ? 1 : 0.5; // Full star for first try, half for retry
-      setStars(prev => Math.min(3, prev + starReward));
+      
+      // Award stars based on specific story steps
+      if (current.id === 'star_discovery') {
+        // First star - after completing star discovery step
+        setStars(1);
+        console.log('⭐ First star awarded! (1/3)');
+      } else if (current.id === 'second_star') {
+        // Second star - after completing second star step
+        setStars(2);
+        console.log('⭐ Second star awarded! (2/3)');
+      } else if (current.id === 'final_star') {
+        // Third star - after completing final star step
+        setStars(3);
+        console.log('⭐ Third star awarded! (3/3)');
+      }
+      // Note: Other interactive steps don't award stars, only the specific star steps do
     
     setShowFeedback(true);
       setRetryMode(false);
@@ -891,7 +914,11 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
         <div className="absolute top-4 right-4 z-10">
           <Button 
             variant="ghost" 
-            onClick={onClose} 
+            onClick={() => {
+              console.log('🛑 Close button clicked - stopping TTS immediately');
+              OnlineTTS.stop();
+              onClose();
+            }} 
             className="h-10 w-10 p-0 rounded-full bg-white/80 hover:bg-white backdrop-blur-sm border border-gray-200 hover:border-gray-300 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 z-50"
           >
             <X className="w-5 h-5 text-gray-700 hover:text-gray-900" />
