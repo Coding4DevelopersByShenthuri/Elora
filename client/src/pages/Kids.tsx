@@ -5,7 +5,7 @@ import {
   Rabbit, Fish, Rocket, Cloud,
   Sun, CloudRain, Footprints,
   ChevronLeft, ChevronRight, Anchor,
-  Shield, Download, Loader2
+  Shield, Download, Loader2, Crown, Compass
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -26,6 +26,8 @@ import UnicornMagicAdventure from '@/components/kids/stories/UnicornMagicAdventu
 import PirateTreasureAdventure from '@/components/kids/stories/PirateTreasureAdventure';
 import SuperheroAdventure from '@/components/kids/stories/SuperheroSchoolAdventure';
 import FairyGardenAdventure from '@/components/kids/stories/FairyGardenAdventure';
+import RainbowCastleAdventure from '@/components/kids/stories/RainbowCastleAdventure';
+import JungleExplorerAdventure from '@/components/kids/stories/JungleExplorerAdventure';
 import AuthModal from '@/components/auth/AuthModal';
 import { useNavigate } from 'react-router-dom';
 import HybridServiceManager from '@/services/HybridServiceManager';
@@ -53,6 +55,8 @@ const KidsPage = () => {
   const [showPirateAdventure, setShowPirateAdventure] = useState(false);
   const [showSuperheroAdventure, setShowSuperheroAdventure] = useState(false);
   const [showFairyGardenAdventure, setShowFairyGardenAdventure] = useState(false);
+  const [showRainbowCastleAdventure, setShowRainbowCastleAdventure] = useState(false);
+  const [showJungleExplorerAdventure, setShowJungleExplorerAdventure] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
@@ -338,6 +342,32 @@ const KidsPage = () => {
       bgGradient: 'from-violet-200 to-cyan-300 dark:from-violet-900 dark:to-cyan-900',
       animation: 'animate-float-slow',
       type: 'fairy'
+    },
+    {
+      title: "Rainbow Castle",
+      description: "Join Princess Aurora on a magical rainbow adventure!",
+      difficulty: 'Easy',
+      duration: '6 min',
+      words: 420,
+      image: '🌈',
+      character: Crown,
+      gradient: 'from-pink-400 to-purple-400',
+      bgGradient: 'from-pink-200 to-purple-300 dark:from-pink-900 dark:to-purple-900',
+      animation: 'animate-float-slow',
+      type: 'rainbow'
+    },
+    {
+      title: "Jungle Explorer",
+      description: "Join Captain Leo on an exciting jungle expedition!",
+      difficulty: 'Medium',
+      duration: '8 min',
+      words: 520,
+      image: '🦁',
+      character: Compass,
+      gradient: 'from-orange-400 to-yellow-400',
+      bgGradient: 'from-orange-200 to-yellow-300 dark:from-orange-900 dark:to-yellow-900',
+      animation: 'animate-float-slow',
+      type: 'jungle'
     }
   ];
 
@@ -443,6 +473,10 @@ const KidsPage = () => {
       setShowSuperheroAdventure(true);
     } else if (storyType === 'fairy') {
       setShowFairyGardenAdventure(true);
+    } else if (storyType === 'rainbow') {
+      setShowRainbowCastleAdventure(true);
+    } else if (storyType === 'jungle') {
+      setShowJungleExplorerAdventure(true);
     }
     
     // Add celebration effects
@@ -1252,10 +1286,30 @@ const KidsPage = () => {
 
       {showFairyGardenAdventure && (
         <FairyGardenAdventure 
-          onClose={() => setShowFairyGardenAdventure(false)} 
+          onClose={() => setShowFairyGardenAdventure(false)}
           onComplete={(score) => {
             setShowFairyGardenAdventure(false);
             handleAdventureComplete(7, score);
+          }}
+        />
+      )}
+
+      {showRainbowCastleAdventure && (
+        <RainbowCastleAdventure 
+          onClose={() => setShowRainbowCastleAdventure(false)}
+          onComplete={(score) => {
+            setShowRainbowCastleAdventure(false);
+            handleAdventureComplete(8, score);
+          }}
+        />
+      )}
+
+      {showJungleExplorerAdventure && (
+        <JungleExplorerAdventure 
+          onClose={() => setShowJungleExplorerAdventure(false)}
+          onComplete={(score) => {
+            setShowJungleExplorerAdventure(false);
+            handleAdventureComplete(9, score);
           }}
         />
       )}

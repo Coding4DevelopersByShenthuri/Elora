@@ -366,6 +366,26 @@ export const STORY_VOICES: Record<string, VoiceProfile> = {
     volume: 1.0,
     voiceName: 'Microsoft Zira - English (United States)', // Microsoft's young female voice
     description: 'Delicate, twinkling fairy voice with sweet magical tone'
+  },
+  
+  // 9. Rainbow Castle - Aurora (elegant 7-year-old princess)
+  Aurora: {
+    name: 'Aurora',
+    pitch: 1.0,
+    rate: 0.95,
+    volume: 1.0,
+    voiceName: 'Microsoft Zira - English (United States)', // Microsoft's young female voice
+    description: 'Graceful, royal princess voice with magical elegance'
+  },
+  
+  // 10. Jungle Explorer - Leo (adventurous 8-year-old captain)
+  Leo: {
+    name: 'Leo',
+    pitch: 1.0,
+    rate: 1.0,
+    volume: 1.0,
+    voiceName: 'Microsoft Mark - English (United States)', // Microsoft's young male voice
+    description: 'Bold, adventurous explorer voice with jungle wisdom'
   }
 };
 
