@@ -13,6 +13,7 @@ type Props = {
   onComplete: (score: number) => void;
 };
 
+// Captain Courage's unique voice profile (uses hybrid voice system)
 const CAPTAIN_COURAGE_VOICE = STORY_VOICES.CaptainCourage;
 
 const storySteps = [
@@ -240,12 +241,13 @@ const SuperheroSchoolAdventure = ({ onClose, onComplete }: Props) => {
   const [attemptCount, setAttemptCount] = useState(0);
   const [ttsAvailable, setTtsAvailable] = useState(true);
   const [showTranscript, setShowTranscript] = useState(false);
-  const [captionsEnabled, setCaptionsEnabled] = useState(true);
-  const [currentCaption, setCurrentCaption] = useState('');
   const [accessibilityMode, setAccessibilityMode] = useState(false);
   
   const [currentSession, setCurrentSession] = useState<StorySession | null>(null);
   const [questionStartTime, setQuestionStartTime] = useState(0);
+  
+  // TTS availability status
+  const [ttsInitialized, setTtsInitialized] = useState(false);
 
   const current = storySteps[stepIndex];
   const progress = Math.round(((stepIndex + 1) / storySteps.length) * 100);
@@ -256,20 +258,53 @@ const SuperheroSchoolAdventure = ({ onClose, onComplete }: Props) => {
   const maxReplays = (current as any).maxReplays || 5;
   const unlimitedReplays = true;
 
+  // Initialize online TTS on mount
   useEffect(() => {
     const initializeVoice = async () => {
-      await OnlineTTS.initialize();
-      const available = OnlineTTS.isAvailable();
-      setTtsAvailable(available);
+      try {
+        // Initialize OnlineTTS (Web Speech API only)
+        await OnlineTTS.initialize();
+        
+        // Check if TTS is available
+        const available = OnlineTTS.isAvailable();
+        setTtsAvailable(available);
+        setTtsInitialized(true);
+        
+        if (!available) {
+          console.warn('No voice synthesis available, falling back to text-only mode');
+          // Transcript remains off by default - users can toggle if needed
+        } else {
+          const mode = OnlineTTS.getVoiceMode();
+          console.log(`🎤 Voice mode: ${mode}`);
+          
+          // Log available voices for debugging
+          OnlineTTS.logAvailableVoices();
+        }
+      } catch (error) {
+        console.error('Failed to initialize TTS:', error);
+        setTtsAvailable(false);
+        // Transcript remains off by default - users can toggle if needed
+      }
     };
     initializeVoice();
     
+    // Initialize analytics session
     const initSession = async () => {
       await KidsListeningAnalytics.initialize(userId);
-      const session = KidsListeningAnalytics.startSession(userId, 'superhero-school', 'Superhero School');
+      const session = KidsListeningAnalytics.startSession(
+        userId,
+        'superhero-school',
+        'Superhero School'
+      );
       setCurrentSession(session);
     };
     initSession();
+
+    // Cleanup function to stop TTS when component unmounts
+    return () => {
+      console.log('🛑 Story component unmounting - stopping TTS immediately');
+      OnlineTTS.stop();
+    };
   }, [userId]);
 
   useEffect(() => {
@@ -296,21 +331,67 @@ const SuperheroSchoolAdventure = ({ onClose, onComplete }: Props) => {
     return text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{FE00}-\u{FE0F}]|[\u{E0020}-\u{E007F}]/gu, '').trim();
   };
 
+  // Enhanced audio playback (OnlineTTS: Web Speech API only)
   const playAudioWithCaptions = async (text: string) => {
     try {
+      // Strip emojis/stickers before speaking to prevent TTS from reading emoji names
       const cleanText = stripEmojis(text);
       
-      await OnlineTTS.speak(cleanText, CAPTAIN_COURAGE_VOICE, {
+      console.log(`🎤 Playing audio with Captain Courage's voice:`, {
+        text: cleanText.substring(0, 50) + '...',
+        voice: CAPTAIN_COURAGE_VOICE,
+        step: current.id,
+        phase: listeningPhase,
         speed: playbackSpeed,
-        showCaptions: captionsEnabled,
-        onCaptionUpdate: setCurrentCaption
+        isRevealText: !!(current as any).revealText && text === (current as any).revealText
       });
-    } catch (error) {
-      setTtsAvailable(false);
-      throw error;
-    }
+      
+      // Ensure TTS is available before speaking
+      if (!OnlineTTS.isAvailable()) {
+        throw new Error('TTS not available');
+      }
+      
+      await OnlineTTS.speak(
+        cleanText,
+        CAPTAIN_COURAGE_VOICE,
+        {
+          speed: playbackSpeed,
+          showCaptions: false,
+          onCaptionUpdate: () => {}
+        }
+      );
+      
+      console.log(`✅ Audio playback completed for step: ${current.id}`);
+      } catch (error) {
+        console.error('❌ Voice synthesis failed:', error);
+        console.error('❌ Error details:', {
+          step: current.id,
+          phase: listeningPhase,
+          ttsAvailable,
+          isRevealText: !!(current as any).revealText && text === (current as any).revealText,
+          textLength: text.length
+        });
+        
+        // Don't mark TTS as unavailable immediately - try to recover
+        console.log('🔄 Attempting to recover TTS...');
+        try {
+          await OnlineTTS.initialize();
+          if (OnlineTTS.isAvailable()) {
+            console.log('✅ TTS recovered successfully');
+            // Don't throw error, just log it
+            return;
+          }
+        } catch (recoveryError) {
+          console.error('❌ TTS recovery failed:', recoveryError);
+        }
+        
+        setTtsAvailable(false);
+        // Transcript remains off by default - users can toggle if needed
+        throw error;
+      }
   };
 
+  // Auto-play for listening phase ONLY (no text shown)
   useEffect(() => {
     if (listeningPhase === 'listening' && current.listeningFirst && (current as any).audioText) {
       const playListeningAudio = async () => {
@@ -320,7 +401,8 @@ const SuperheroSchoolAdventure = ({ onClose, onComplete }: Props) => {
           await playAudioWithCaptions((current as any).audioText);
           setHasListened(true);
         } catch (error) {
-          setHasListened(true);
+          console.log('TTS not available, text mode enabled');
+          setHasListened(true); // Allow progression even without TTS
         }
         setIsPlaying(false);
         setAudioWaveform(false);
@@ -330,35 +412,50 @@ const SuperheroSchoolAdventure = ({ onClose, onComplete }: Props) => {
     
     // Auto-play for reveal phase (after correct answer)
     if (listeningPhase === 'reveal' && current.listeningFirst && (current as any).revealText && ttsAvailable) {
+      console.log('🎭 Auto-playing reveal text:', {
+        stepId: current.id,
+        revealText: (current as any).revealText.substring(0, 50) + '...',
+        voice: CAPTAIN_COURAGE_VOICE,
+        speed: playbackSpeed
+      });
+      
       const playReveal = async () => {
         setIsPlaying(true);
         try {
           await playAudioWithCaptions((current as any).revealText);
+          console.log('✅ Auto reveal text playback completed');
+          
+          // Wait a bit more after TTS completes to ensure full reading
+          await new Promise(resolve => setTimeout(resolve, 1000));
         } catch (error) {
-          console.log('TTS not available');
+          console.error('❌ Auto reveal text playback failed:', error);
+        } finally {
+          setIsPlaying(false);
         }
-        setIsPlaying(false);
       };
       playReveal();
     }
     
+    // For non-interactive steps, play the full text automatically
     if (!current.listeningFirst && current.text && ttsAvailable) {
       const playNarration = async () => {
         let textToRead = current.text;
         
         // Handle dynamic celebration text based on stars collected
-        if (current.id === 'grand_celebration') {
+        if (current.id === 'celebration') {
+          console.log(`🎉 Hero Celebration step - Stars collected: ${stars}`);
           if (stars >= 3) {
             textToRead = "Congratulations superhero! ... The WHOLE academy is celebrating YOU! ... Heroes are cheering, badges are shining, and courage fills the air! ... You made the hero world proud with your super listening! You should feel SO powerful! ... Give yourself a hero salute!";
           } else {
             textToRead = `Great training, young hero! ... You earned ${Math.floor(stars)} badge${Math.floor(stars) !== 1 ? 's' : ''}! ... The academy is inspired by your effort! ... Captain Courage is proud of you! ... Every hero learns through practice. Keep training and you'll earn all the badges next time! 🦸`;
           }
+          console.log(`🎉 Celebration text selected:`, textToRead.substring(0, 100) + '...');
         }
         
         try {
           await playAudioWithCaptions(textToRead);
         } catch (error) {
-          console.log('TTS not available');
+          console.error('❌ TTS not available for non-interactive step:', error);
         }
       };
       playNarration();
@@ -372,19 +469,33 @@ const SuperheroSchoolAdventure = ({ onClose, onComplete }: Props) => {
       setShowFeedback(false);
       setShowHint(false);
     } else {
+      // Calculate score based on correct answers and time
       const accuracyScore = correctAnswers * 20;
-      const timeBonus = Math.max(0, 360 - timeSpent) * 0.1;
+      const timeBonus = Math.max(0, 300 - timeSpent) * 0.1; // Bonus for faster completion
       const starBonus = stars * 10;
       const score = Math.min(100, 40 + accuracyScore + timeBonus + starBonus);
       
+      // Complete analytics session
       if (currentSession) {
-        KidsListeningAnalytics.completeSession(userId, currentSession, score, stars);
+        KidsListeningAnalytics.completeSession(
+          userId,
+          currentSession,
+          score,
+          stars
+        );
+        console.log('📊 Session analytics saved');
       }
+      
+      // Stop TTS when story completes
+      console.log('🛑 Story completed - stopping TTS');
+      OnlineTTS.stop();
+      
       onComplete(score);
     }
   };
 
   const handleReplayAudio = async () => {
+    // Allow unlimited replays for accessibility
     if (!unlimitedReplays && replaysUsed >= maxReplays) return;
     if (!current.listeningFirst) return;
     
@@ -392,11 +503,12 @@ const SuperheroSchoolAdventure = ({ onClose, onComplete }: Props) => {
     setIsPlaying(true);
     setAudioWaveform(true);
     
-    try {
+      try {
       await playAudioWithCaptions((current as any).audioText);
       setHasListened(true);
-    } catch (error) {
-      setHasListened(true);
+      } catch (error) {
+      console.log('TTS not available, text mode enabled');
+      setHasListened(true); // Still allow progression
     }
     
     setIsPlaying(false);
@@ -433,16 +545,79 @@ const SuperheroSchoolAdventure = ({ onClose, onComplete }: Props) => {
     
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
-      const starReward = currentAttempt === 1 ? 1 : 0.5;
-      setStars(prev => Math.min(3, prev + starReward));
-      setShowFeedback(true);
-      setRetryMode(false);
       
-      setTimeout(() => setListeningPhase('reveal'), 2500);
-      setTimeout(() => handleNext(), 5000);
+      // Award stars based on specific story steps
+      if (current.id === 'first_badge') {
+        // First badge - after completing first badge step
+        setStars(1);
+        console.log('🏅 First badge awarded! (1/3)');
+      } else if (current.id === 'second_badge') {
+        // Second badge - after completing second badge step
+        setStars(2);
+        console.log('🏅 Second badge awarded! (2/3)');
+      } else if (current.id === 'final_badge') {
+        // Third badge - after completing final badge step
+        setStars(3);
+        console.log('🏅 Third badge awarded! (3/3)');
+      }
+      // Note: Other interactive steps don't award badges, only the specific badge steps do
+    
+    setShowFeedback(true);
+      setRetryMode(false);
+    
+      // Auto-advance after showing feedback to reveal phase
+    setTimeout(() => {
+        setListeningPhase('reveal');
+    }, 2500);
+      
+      // Calculate dynamic timing based on reveal text length and voice characteristics
+      const revealText = (current as any).revealText || '';
+      const textLength = revealText.length;
+      
+      // More accurate timing calculation based on Captain Courage's voice profile
+      let wordsPerMinute;
+      switch (playbackSpeed) {
+        case 'slower': wordsPerMinute = 80; break;   // Very slow for better comprehension
+        case 'slow': wordsPerMinute = 120; break;    // Slow (default)
+        case 'normal': wordsPerMinute = 160; break;  // Normal speed
+        default: wordsPerMinute = 120;
+      }
+      
+      // Calculate estimated duration with more generous buffer for Captain Courage's voice
+      const wordCount = textLength / 5; // Approximate word count
+      const baseDuration = (wordCount / wordsPerMinute) * 60000; // Convert to milliseconds
+      const estimatedDuration = Math.max(12000, baseDuration + 3000); // At least 12 seconds + 3 second buffer
+      
+      console.log('⏱️ Dynamic timing calculation for Captain Courage:', {
+        textLength,
+        wordCount: Math.round(wordCount),
+        wordsPerMinute,
+        baseDuration: Math.round(baseDuration),
+        estimatedDuration: Math.round(estimatedDuration),
+        playbackSpeed,
+        revealText: revealText.substring(0, 50) + '...',
+        voiceProfile: 'Captain Courage (Microsoft Mark)'
+      });
+      
+      // Move to next step after reveal text has time to complete
+      setTimeout(() => {
+        // Double-check that reveal text is not still playing
+        if (!isPlaying) {
+          handleNext();
+        } else {
+          console.log('⏳ Reveal text still playing, waiting a bit more...');
+          // Wait a bit more if still playing
+          setTimeout(() => {
+            handleNext();
+          }, 2000);
+        }
+      }, estimatedDuration);
     } else {
+      // Wrong answer - offer retry
       setShowFeedback(true);
       setRetryMode(true);
+      
+      // Don't auto-advance on wrong answer - let them retry
     }
   };
   
@@ -457,22 +632,86 @@ const SuperheroSchoolAdventure = ({ onClose, onComplete }: Props) => {
   const playRevealText = async () => {
     let textToSpeak = (current as any).revealText || current.text;
     
+    console.log('🎭 playRevealText called:', {
+      stepId: current.id,
+      hasRevealText: !!(current as any).revealText,
+      hasText: !!current.text,
+      ttsAvailable,
+      textPreview: textToSpeak ? textToSpeak.substring(0, 50) + '...' : 'No text'
+    });
+    
     // Handle dynamic celebration text based on stars collected
-    if (current.id === 'grand_celebration') {
+    if (current.id === 'celebration') {
+      console.log(`🎉 Manual playRevealText - Hero Celebration - Stars: ${stars}`);
       if (stars >= 3) {
         textToSpeak = "Congratulations superhero! ... The WHOLE academy is celebrating YOU! ... Heroes are cheering, badges are shining, and courage fills the air! ... You made the hero world proud with your super listening! You should feel SO powerful! ... Give yourself a hero salute!";
       } else {
         textToSpeak = `Great training, young hero! ... You earned ${Math.floor(stars)} badge${Math.floor(stars) !== 1 ? 's' : ''}! ... The academy is inspired by your effort! ... Captain Courage is proud of you! ... Every hero learns through practice. Keep training and you'll earn all the badges next time! 🦸`;
       }
+      console.log(`🎉 Manual celebration text:`, textToSpeak.substring(0, 100) + '...');
     }
     
-    if (textToSpeak && ttsAvailable) {
-      setIsPlaying(true);
+    if (!textToSpeak) {
+      console.log('❌ No text to speak in playRevealText');
+      return;
+    }
+    
+    if (!ttsAvailable) {
+      console.log('❌ TTS not available in playRevealText, attempting to reinitialize...');
       try {
-        await playAudioWithCaptions(textToSpeak);
+        await OnlineTTS.initialize();
+        if (OnlineTTS.isAvailable()) {
+          console.log('✅ TTS reinitialized successfully');
+          setTtsAvailable(true);
+        } else {
+          console.log('❌ TTS still not available after reinitialization');
+          return;
+        }
       } catch (error) {
-        console.log('TTS not available');
+        console.error('❌ TTS reinitialization failed:', error);
+        return;
       }
+    }
+    
+    console.log('🎤 Starting reveal text playback with Captain Courage voice:', {
+      text: textToSpeak.substring(0, 100) + '...',
+      voice: CAPTAIN_COURAGE_VOICE,
+      speed: playbackSpeed
+    });
+    
+    setIsPlaying(true);
+    try {
+      // Force stop any current speech first
+      OnlineTTS.stop();
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Use playAudioWithCaptions which ensures Captain Courage's voice
+      await playAudioWithCaptions(textToSpeak);
+      console.log('✅ Reveal text playback completed successfully');
+      
+      // Wait a bit more to ensure full completion - longer wait for reveal text
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    } catch (error) {
+      console.error('❌ TTS error in playRevealText:', error);
+      
+      // Try to reinitialize TTS and retry once
+      try {
+        console.log('🔄 Attempting TTS reinitialization...');
+        await OnlineTTS.initialize();
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        if (OnlineTTS.isAvailable()) {
+          console.log('🔄 Retrying reveal text with reinitialized TTS...');
+          await playAudioWithCaptions(textToSpeak);
+          console.log('✅ Retry successful');
+          
+          // Wait after retry too - longer wait for reveal text
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      } catch (retryError) {
+        console.error('❌ Retry failed:', retryError);
+      }
+    } finally {
       setIsPlaying(false);
     }
   };
@@ -496,12 +735,95 @@ const SuperheroSchoolAdventure = ({ onClose, onComplete }: Props) => {
     }
   };
 
+  // Instant speed change function - no delays, immediate response
+  const handleSpeedChange = (newSpeed: 'normal' | 'slow' | 'slower') => {
+    console.log('🔄 INSTANT speed change - Current step:', current.id, 'New speed:', newSpeed);
+    
+    // Update speed state immediately
+    setPlaybackSpeed(newSpeed);
+    
+    // Force stop any currently playing audio immediately
+    OnlineTTS.stop();
+    
+    // Determine what text to replay
+    let textToPlay = '';
+    
+    if (current.listeningFirst) {
+      // Interactive steps with listening phases
+      if (listeningPhase === 'listening' && (current as any).audioText) {
+        textToPlay = (current as any).audioText;
+        console.log('🎧 INSTANT replay listening audio:', textToPlay.substring(0, 50) + '...');
+      } else if (listeningPhase === 'reveal' && (current as any).revealText) {
+        textToPlay = (current as any).revealText;
+        console.log('🎭 INSTANT replay reveal text:', textToPlay.substring(0, 50) + '...');
+      }
+    } else {
+      // Non-interactive steps (like intro, celebration, etc.)
+      if (current.text) {
+        if (current.id === 'celebration') {
+          textToPlay = stars >= 3 
+            ? "Congratulations superhero! ... The WHOLE academy is celebrating YOU! ... Heroes are cheering, badges are shining, and courage fills the air! ... You made the hero world proud with your super listening! You should feel SO powerful! ... Give yourself a hero salute!"
+            : `Great training, young hero! ... You earned ${Math.floor(stars)} badge${Math.floor(stars) !== 1 ? 's' : ''}! ... The academy is inspired by your effort! ... Captain Courage is proud of you! ... Every hero learns through practice. Keep training and you'll earn all the badges next time! 🦸`;
+          console.log('🎉 INSTANT replay celebration text:', textToPlay.substring(0, 50) + '...');
+        } else {
+          textToPlay = current.text;
+          console.log('📖 INSTANT replay intro/narration text:', textToPlay.substring(0, 50) + '...');
+        }
+      }
+    }
+    
+    if (!textToPlay) {
+      console.log('❌ No text found to replay');
+      return;
+    }
+    
+    if (!ttsAvailable) {
+      console.log('❌ TTS not available');
+      return;
+    }
+    
+    // Start playing immediately with new speed
+    const playWithNewSpeed = async () => {
+      try {
+        const cleanText = stripEmojis(textToPlay);
+        console.log('🎤 INSTANT speaking at new speed:', newSpeed, 'Text length:', cleanText.length);
+        
+        setIsPlaying(true);
+        
+        await OnlineTTS.speak(cleanText, CAPTAIN_COURAGE_VOICE, {
+          speed: newSpeed,
+          showCaptions: false,
+          onCaptionUpdate: () => {}
+        });
+        
+        console.log('✅ INSTANT speed change completed successfully');
+        
+      } catch (error) {
+        console.error('❌ INSTANT speed change error:', error);
+      } finally {
+        setIsPlaying(false);
+      }
+    };
+    
+    // Start playing immediately (no await to make it instant)
+    playWithNewSpeed();
+  };
+
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <Card className={cn("w-full max-w-5xl sm:max-w-6xl lg:max-w-7xl h-[95vh] rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-500 bg-gradient-to-br", current.bgColor, "flex flex-col")}>
+        {/* Always Visible Close Button */}
         <div className="absolute top-4 right-4 z-10">
-          <Button variant="ghost" onClick={onClose} className="h-10 w-10 p-0 rounded-full bg-white/80 hover:bg-white backdrop-blur-sm border shadow-lg z-50">
-            <X className="w-5 h-5 text-gray-700" />
+          <Button 
+            variant="ghost" 
+            onClick={() => {
+              console.log('🛑 Close button clicked - stopping TTS immediately');
+              OnlineTTS.stop();
+              onClose();
+            }} 
+            className="h-10 w-10 p-0 rounded-full bg-white/80 hover:bg-white backdrop-blur-sm border border-gray-200 hover:border-gray-300 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 z-50"
+          >
+            <X className="w-5 h-5 text-gray-700 hover:text-gray-900" />
           </Button>
         </div>
 
@@ -524,57 +846,32 @@ const SuperheroSchoolAdventure = ({ onClose, onComplete }: Props) => {
               
               {/* Accessibility Controls */}
               <div className="flex gap-1">
-                {/* Speed Control - ALWAYS visible with proper dark mode */}
+                {/* Speed Control - ALWAYS Available (works offline & online) */}
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={async () => {
-                    OnlineTTS.stop();
+                  onClick={() => {
+                    // Cycle to next speed
                     const newSpeed = playbackSpeed === 'slow' ? 'slower' : playbackSpeed === 'slower' ? 'normal' : 'slow';
-                    setPlaybackSpeed(newSpeed);
-                    try {
-                      let textToPlay = '';
-                      if (listeningPhase === 'listening' && current.listeningFirst && (current as any).audioText) {
-                        textToPlay = (current as any).audioText;
-                      } else if (listeningPhase === 'reveal' && current.listeningFirst && (current as any).revealText) {
-                        textToPlay = (current as any).revealText;
-                      } else if (!current.listeningFirst && current.text) {
-                        if (current.id === 'celebration') {
-                          textToPlay = stars >= 3 ? "Congratulations superhero! ... The WHOLE academy is celebrating YOU! ... Heroes are cheering, badges are shining, and courage fills the air! ... You made the hero world proud with your super listening! You should feel SO powerful! ... Give yourself a hero salute!" : `Great training, young hero! ... You earned ${Math.floor(stars)} badge${Math.floor(stars) !== 1 ? 's' : ''}! ... The academy is inspired by your effort! ... Captain Courage is proud of you! ... Every hero learns through practice. Keep training and you'll earn all the badges next time! 🦸`;
-                        } else {
-                          textToPlay = current.text;
-                        }
-                      }
-                      if (textToPlay && ttsAvailable) {
-                        const cleanText = stripEmojis(textToPlay);
-                        await OnlineTTS.speak(cleanText, CAPTAIN_COURAGE_VOICE, { 
-                          speed: newSpeed,
-                          showCaptions: captionsEnabled,
-                          onCaptionUpdate: setCurrentCaption
-                        });
-                      }
-                    } catch (error) {
-                      console.log('Could not replay at new speed');
-                    }
+                    console.log('🔄 Speed button clicked - changing from', playbackSpeed, 'to', newSpeed);
+                    
+                    // Use the instant speed change function
+                    handleSpeedChange(newSpeed);
                   }}
-                  className="h-7 px-2 rounded-full text-xs bg-blue-50 dark:bg-blue-800 hover:bg-blue-100 dark:hover:bg-blue-700 border border-blue-200 dark:border-blue-600 text-blue-800 dark:text-blue-100 font-semibold shadow-sm"
-                  title={`Playback speed: ${playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow (Default)' : 'Very Slow'}`}
+                  className="h-7 px-2 rounded-full text-xs font-semibold shadow-sm transition-all duration-200 bg-blue-50 dark:bg-blue-800 hover:bg-blue-100 dark:hover:bg-blue-700 border border-blue-200 dark:border-blue-600 text-blue-800 dark:text-blue-100"
+                  title={`Playback speed (works offline & online): ${playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow (Default)' : 'Very Slow'}`}
                 >
                   <Gauge className="w-3.5 h-3.5 mr-1 text-blue-600 dark:text-blue-200" />
                   {playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow' : 'Very Slow'}
                 </Button>
                 
-                {/* Accessibility Mode Toggle */}
+                {/* Accessibility Mode Toggle (for hearing-impaired) */}
                 {(listeningPhase === 'listening' || listeningPhase === 'question') && current.listeningFirst && (
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => {
                       setAccessibilityMode(!accessibilityMode);
-                      if (!accessibilityMode) {
-                        // Transcript remains off by default - users can toggle if needed
-                        setCaptionsEnabled(true);
-                      }
                     }}
                     className={cn(
                       "h-7 px-2 rounded-full text-xs",
@@ -586,37 +883,56 @@ const SuperheroSchoolAdventure = ({ onClose, onComplete }: Props) => {
                   </Button>
                 )}
                 
+                
                 {/* Transcript Toggle - Only in reveal phase OR accessibility mode */}
                 {(listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode) && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowTranscript(!showTranscript)}
-                    className={cn(
-                      "h-7 w-7 p-0 rounded-full border shadow-sm",
-                      showTranscript 
-                        ? "bg-blue-100 dark:bg-blue-800 border-blue-300 dark:border-blue-600 hover:bg-blue-200 dark:hover:bg-blue-700" 
-                        : "bg-white/80 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600"
-                    )}
-                    title="Toggle text transcript"
-                  >
-                    <FileText className={cn(
-                      "w-3.5 h-3.5",
-                      showTranscript 
-                        ? "text-blue-700 dark:text-blue-200" 
-                        : "text-gray-700 dark:text-gray-200"
-                    )} />
-                  </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowTranscript(!showTranscript)}
+                  className={cn(
+                    "h-7 w-7 p-0 rounded-full border shadow-sm",
+                    showTranscript 
+                      ? "bg-blue-100 dark:bg-blue-800 border-blue-300 dark:border-blue-600 hover:bg-blue-200 dark:hover:bg-blue-700" 
+                      : "bg-white/80 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600"
+                  )}
+                  title="Toggle text transcript"
+                >
+                  <FileText className={cn(
+                    "w-3.5 h-3.5",
+                    showTranscript 
+                      ? "text-blue-700 dark:text-blue-200" 
+                      : "text-gray-700 dark:text-gray-200"
+                  )} />
+                </Button>
                 )}
                 
               </div>
             </div>
           </div>
           
-          {/* Live Caption Display - Only in reveal phase or accessibility mode */}
-          {captionsEnabled && currentCaption && (listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode) && (
-            <div className="mb-2 bg-black/80 text-white px-4 py-2 rounded-lg text-center text-sm sm:text-base font-semibold animate-fade-in">
-              {currentCaption}
+          {/* TTS Status Banner */}
+          {ttsInitialized && ttsAvailable && (
+            <div className="mb-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2.5 rounded-lg shadow-lg animate-fade-in">
+              <div className="flex items-center gap-2 justify-center">
+                <Volume2 className="w-4 h-4" />
+                <span className="text-xs sm:text-sm font-bold">
+                  Captain Courage's voice is ready! Listen carefully to his heroic words!
+                </span>
+              </div>
+            </div>
+          )}
+          
+          {/* Accessibility Mode Warning */}
+          {accessibilityMode && (listeningPhase === 'listening' || listeningPhase === 'question') && (
+            <div className="mb-2 bg-orange-100 dark:bg-orange-900/40 border-2 border-orange-400 text-orange-900 dark:text-orange-200 px-4 py-2.5 rounded-lg shadow-md">
+              <div className="flex items-center gap-2 justify-center">
+                <span className="text-lg">👂</span>
+                <div className="text-xs sm:text-sm">
+                  <strong>Accessibility Mode Active:</strong> Text shown for hearing support. 
+                  <span className="block sm:inline sm:ml-1">Challenge reduced - encourage listening when possible!</span>
+                </div>
+              </div>
             </div>
           )}
 
