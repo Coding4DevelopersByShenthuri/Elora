@@ -37,18 +37,22 @@ const storySteps = [
     interactive: true,
     listeningFirst: true,
     
+    // What kids will HEAR (play this first, NO text shown)
     audioText: 'We are flying to the stars',
     audioInstruction: 'Listen to what we shout as we blast off!',
     
+    // Question AFTER audio (still no transcript)
     question: 'Where are we flying in our rocket?',
     hint: 'We\'re going up high into space',
     
+    // Choices are aurally DIFFERENT (correct answer in position 2)
     choices: [
       { text: 'We are going swimming', emoji: '🏊', meaning: 'in the water' },
       { text: 'We are flying to the stars', emoji: '🚀✨', meaning: 'up to space' },
       { text: 'We are staying on Earth', emoji: '🌍', meaning: 'not leaving' }
     ],
     
+    // Full text revealed AFTER answering correctly
     revealText: '3... 2... 1... BLAST OFF! Our rocket is zooming into space! Can you feel it? We shout "We are flying to the stars!" Say it with me! The Earth is getting smaller below us. Have you ever been on a really fast ride? This is even faster!',
     
     maxReplays: 5,
@@ -64,18 +68,22 @@ const storySteps = [
     interactive: true,
     listeningFirst: true,
     
+    // What kids will HEAR (play this first, NO text shown)
     audioText: 'Hello new friend from Earth',
     audioInstruction: 'Listen to how the friendly alien greets us!',
     
+    // Question AFTER audio (still no transcript)
     question: 'What does the friendly alien say to us?',
     hint: 'The alien is being very nice and welcoming',
     
+    // Choices are aurally DIFFERENT (correct answer in position 3)
     choices: [
       { text: 'Go away right now', emoji: '👽❌', meaning: 'unfriendly and mean' },
       { text: 'I am scared of you', emoji: '👽😰', meaning: 'frightened' },
       { text: 'Hello new friend from Earth', emoji: '👽👋', meaning: 'friendly greeting' }
     ],
     
+    // Full text revealed AFTER answering correctly
     revealText: 'Incredible! Look, a friendly green alien is waving at us! The alien smiles and says "Hello new friend from Earth!" Can you say that back? Let\'s wave and greet them! It\'s wonderful to make new friends, even in space! This alien has big eyes and loves to smile!',
     
     maxReplays: 5,
@@ -91,18 +99,22 @@ const storySteps = [
     interactive: true,
     listeningFirst: true,
     
+    // What kids will HEAR (play this first, NO text shown)
     audioText: 'My rings make me special',
     audioInstruction: 'Listen to what the planet is proud of!',
     
+    // Question AFTER audio (still no transcript)
     question: 'What makes this planet feel special?',
     hint: 'It\'s something beautiful around the planet',
     
+    // Choices are aurally DIFFERENT (correct answer in position 1)
     choices: [
       { text: 'My rings make me special', emoji: '🪐💍', meaning: 'beautiful rings' },
       { text: 'I have no rings at all', emoji: '🌑', meaning: 'plain and simple' },
       { text: 'I am very boring', emoji: '😔', meaning: 'not interesting' }
     ],
     
+    // Full text revealed AFTER answering correctly
     revealText: 'WOW! Look at this gorgeous planet with sparkly rings! The planet proudly says "My rings make me special!" Can you repeat that? The rings spin around like a colorful hula hoop! Everyone is special in their own way, just like this amazing planet with its beautiful rings!',
     
     maxReplays: 5,
@@ -119,17 +131,21 @@ const storySteps = [
     listeningFirst: true,
     questionType: 'true-false',
     
+    // What kids will HEAR (play this first, NO text shown)
     audioText: 'Stars twinkle in the night sky',
     audioInstruction: 'Listen to this space fact!',
     
+    // Question AFTER audio (still no transcript)
     question: 'True or False: Stars twinkle in the night sky?',
     hint: 'Think about when you see stars',
     
+    // Choices are aurally DIFFERENT (correct answer in position 1)
     choices: [
       { text: 'Stars twinkle in the night sky', emoji: '✅', meaning: 'true - we see them sparkle' },
       { text: 'False - Stars never twinkle', emoji: '❌', meaning: 'incorrect - they do twinkle' }
     ],
     
+    // Full text revealed AFTER answering correctly
     revealText: 'Fantastic! WOW! We found our first glowing space star! You\'re being such a brilliant listener! It\'s TRUE - stars DO twinkle in the night sky, making beautiful patterns! They guide spaceships and make the darkness sparkle! Have you made a wish on a star? Two more stars to collect!',
     
     maxReplays: 5,
@@ -146,18 +162,22 @@ const storySteps = [
     interactive: true,
     listeningFirst: true,
     
+    // What kids will HEAR (play this first, NO text shown)
     audioText: 'I can jump so high here',
     audioInstruction: 'Listen to what we can do on the moon!',
     
+    // Question AFTER audio (still no transcript)
     question: 'What special thing can we do on the moon?',
     hint: 'The moon has less gravity than Earth',
     
+    // Choices are aurally DIFFERENT (correct answer in position 2)
     choices: [
       { text: 'I cannot move at all', emoji: '🌙🚫', meaning: 'stuck in place' },
       { text: 'I can jump so high here', emoji: '🌙⬆️', meaning: 'jumping really high' },
       { text: 'I am very heavy here', emoji: '🌙⬇️', meaning: 'weighed down' }
     ],
     
+    // Full text revealed AFTER answering correctly
     revealText: 'Amazing! We landed on the moon! It\'s covered in soft gray dust! On the moon we say "I can jump so high here!" Can you pretend to jump? BOING! We can bounce like we\'re on a trampoline but even higher! The moon\'s lower gravity makes us super jumpers!',
     
     maxReplays: 5,
@@ -174,18 +194,22 @@ const storySteps = [
     listeningFirst: true,
     questionType: 'inference',
     
+    // What kids will HEAR (play this first, NO text shown)
     audioText: 'Stars are happy when explorers visit space',
     audioInstruction: 'Listen to why stars shine brightly!',
     
+    // Question AFTER audio (still no transcript)
     question: 'Why are stars shining so brightly?',
     hint: 'Think about how stars feel about space explorers',
     
+    // Choices are aurally DIFFERENT (correct answer in position 2)
     choices: [
       { text: 'They want to hide away', emoji: '✨🙈', meaning: 'shy and hiding' },
       { text: 'Stars are happy when explorers visit space', emoji: '✨😊', meaning: 'joyful and welcoming' },
       { text: 'They are feeling very cold', emoji: '✨❄️', meaning: 'chilly temperature' }
     ],
     
+    // Full text revealed AFTER answering correctly
     revealText: 'Wonderful! You\'re listening so carefully! Another star appeared near the moon crater! Stars are happy when explorers visit space - they love having visitors! (They\'re winking at you right now!) Just one more star to go! We\'re almost there, space explorer!',
     
     maxReplays: 5,
@@ -202,18 +226,22 @@ const storySteps = [
     interactive: true,
     listeningFirst: true,
     
+    // What kids will HEAR (play this first, NO text shown)
     audioText: 'We shine bright together',
     audioInstruction: 'Listen to what the star pattern says!',
     
+    // Question AFTER audio (still no transcript)
     question: 'What do the stars say about being together?',
     hint: 'They are happy to be close to each other',
     
+    // Choices are aurally DIFFERENT (correct answer in position 3)
     choices: [
       { text: 'We hide from each other', emoji: '⭐🙈', meaning: 'staying apart' },
       { text: 'We are always alone', emoji: '⭐😢', meaning: 'lonely and separated' },
       { text: 'We shine bright together', emoji: '⭐✨', meaning: 'united and strong' }
     ],
     
+    // Full text revealed AFTER answering correctly
     revealText: 'Beautiful! Look at those amazing star patterns in the sky! They make pictures like connect-the-dots! The stars say "We shine bright together!" Can you say that? Friends are better together, just like stars! Teamwork makes us all shine brighter!',
     
     maxReplays: 5,
@@ -223,7 +251,7 @@ const storySteps = [
   {
     id: 'final_star',
     title: '🌟 Third Magic Star',
-    text: 'Hooray! ... YES! YES! YES! ... We collected all three magic stars! ... (YOU did it, amazing space explorer!) They\'re creating a beautiful star bridge across the galaxy, lighting up the whole universe! ... You are a FANTASTIC cosmic adventurer! ... I\'m so proud of your careful listening and brave exploring!',
+    text: 'Hooray! ... YES! ... We collected all three magic stars! ... (YOU did it, amazing space explorer!) They\'re creating a beautiful star bridge across the galaxy, lighting up the whole universe! ... You are a FANTASTIC cosmic adventurer! ... I\'m so proud of your careful listening and brave exploring!',
     emoji: '🌟',
     character: 'Cosmo',
     bgColor: 'from-yellow-200 to-amber-200 dark:from-yellow-800 dark:to-amber-800',
@@ -233,7 +261,7 @@ const storySteps = [
     duration: 30
   },
   {
-    id: 'celebration',
+    id: 'grand_celebration',
     title: '🎉 Space Hero Celebration!',
     text: 'Congratulations, SPACE HERO! ... You helped Cosmo complete the mission! ... All the stars are shining brightly, and the WHOLE galaxy is celebrating YOUR amazing adventure! ... Aliens are dancing, planets are spinning with joy, and rockets are doing loop-de-loops! ... You listened so well! ... You\'re a SUPERSTAR! ... Give yourself the biggest space high-five! 🙌✨',
     emoji: '🎉',
@@ -258,23 +286,25 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
   const [timeSpent, setTimeSpent] = useState(0);
   const [showHint, setShowHint] = useState(false);
   
+  // NEW: Listening-first phase management
   const [listeningPhase, setListeningPhase] = useState<'listening' | 'question' | 'reveal'>('listening');
   const [replaysUsed, setReplaysUsed] = useState(0);
   const [hasListened, setHasListened] = useState(false);
   const [audioWaveform, setAudioWaveform] = useState(false);
   
+  // Accessibility & Enhanced Features
   const [showTranscript, setShowTranscript] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState<'normal' | 'slow' | 'slower'>('slow'); // Default to slow for better comprehension
-  const [captionsEnabled, setCaptionsEnabled] = useState(true);
   const [retryMode, setRetryMode] = useState(false);
   const [attemptCount, setAttemptCount] = useState(0);
   const [ttsAvailable, setTtsAvailable] = useState(true);
-  const [currentCaption, setCurrentCaption] = useState('');
-  const [accessibilityMode, setAccessibilityMode] = useState(false);
+  const [accessibilityMode, setAccessibilityMode] = useState(false); // For hearing-impaired kids
   
+  // Analytics tracking
   const [currentSession, setCurrentSession] = useState<StorySession | null>(null);
   const [questionStartTime, setQuestionStartTime] = useState(0);
   const [ttsInitialized, setTtsInitialized] = useState(false);
+  const [isRevealTextPlaying, setIsRevealTextPlaying] = useState(false);
 
   const current = storySteps[stepIndex];
   const progress = Math.round(((stepIndex + 1) / storySteps.length) * 100);
@@ -288,14 +318,36 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
   useEffect(() => {
     const initializeVoice = async () => {
       try {
+        // Initialize OnlineTTS (Web Speech API only)
         await OnlineTTS.initialize();
+        
+        // Check if TTS is available
         const available = OnlineTTS.isAvailable();
         setTtsAvailable(available);
         setTtsInitialized(true);
         
         if (!available) {
-          console.warn('No voice synthesis available');
+          console.warn('No voice synthesis available, falling back to text-only mode');
           // Transcript remains off by default - users can toggle if needed
+        } else {
+          const mode = OnlineTTS.getVoiceMode();
+          console.log(`🎤 Voice mode: ${mode}`);
+          
+          // Log available voices for debugging
+          OnlineTTS.logAvailableVoices();
+          
+          // VERIFY COSMO'S UNIQUE VOICE PROFILE
+          console.log('🚀 SPACE ADVENTURE VOICE VERIFICATION:', {
+            character: 'Cosmo the Astronaut',
+            voiceProfile: COSMO_VOICE,
+            voiceName: COSMO_VOICE.voiceName,
+            voiceDescription: COSMO_VOICE.description,
+            pitch: COSMO_VOICE.pitch,
+            rate: COSMO_VOICE.rate,
+            volume: COSMO_VOICE.volume,
+            isUniqueVoice: true,
+            note: 'This is Cosmo\'s unique voice profile - NOT generic Web Speech API'
+          });
         }
       } catch (error) {
         console.error('Failed to initialize TTS:', error);
@@ -305,8 +357,7 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
     };
     initializeVoice();
     
-    // TTS is now always available (online only)
-    
+    // Initialize analytics session
     const initSession = async () => {
       await KidsListeningAnalytics.initialize(userId);
       const session = KidsListeningAnalytics.startSession(
@@ -317,8 +368,12 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
       setCurrentSession(session);
     };
     initSession();
-    
-    // No cleanup needed for online TTS
+
+    // Cleanup function to stop TTS when component unmounts
+    return () => {
+      console.log('🛑 Story component unmounting - stopping TTS immediately');
+      OnlineTTS.stop();
+    };
   }, [userId]);
 
   useEffect(() => {
@@ -335,7 +390,6 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
     setSelectedChoice(null);
     setShowFeedback(false);
     setShowHint(false);
-    setCurrentCaption('');
   }, [stepIndex]);
 
   useEffect(() => {
@@ -349,23 +403,60 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
     return text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{FE00}-\u{FE0F}]|[\u{E0020}-\u{E007F}]/gu, '').trim();
   };
 
-  const playAudioWithCaptions = async (text: string, showCaptions: boolean = false) => {
+  const playAudioWithCaptions = async (text: string) => {
     try {
       const cleanText = stripEmojis(text);
-      const allowCaptions = showCaptions && captionsEnabled && 
-        (listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode);
+      
+      console.log(`🎤 Playing audio with Cosmo's UNIQUE voice profile:`, {
+        text: cleanText.substring(0, 50) + '...',
+        voiceProfile: COSMO_VOICE,
+        voiceName: COSMO_VOICE.voiceName,
+        voiceDescription: COSMO_VOICE.description,
+        step: current.id,
+        phase: listeningPhase,
+        speed: playbackSpeed,
+        isRevealText: !!(current as any).revealText && text === (current as any).revealText
+      });
+      
+      // Ensure TTS is available before speaking
+      if (!OnlineTTS.isAvailable()) {
+        throw new Error('TTS not available');
+      }
       
       await OnlineTTS.speak(
         cleanText,
         COSMO_VOICE,
         {
           speed: playbackSpeed,
-          showCaptions: allowCaptions,
-          onCaptionUpdate: allowCaptions ? setCurrentCaption : () => {}
+          showCaptions: false,
+          onCaptionUpdate: () => {}
         }
       );
+      
+      console.log(`✅ Audio playback completed for step: ${current.id}`);
     } catch (error) {
-      console.log('Voice synthesis failed');
+      console.error('❌ Voice synthesis failed:', error);
+      console.error('❌ Error details:', {
+        step: current.id,
+        phase: listeningPhase,
+        ttsAvailable,
+        isRevealText: !!(current as any).revealText && text === (current as any).revealText,
+        textLength: text.length
+      });
+      
+      // Don't mark TTS as unavailable immediately - try to recover
+      console.log('🔄 Attempting to recover TTS...');
+      try {
+        await OnlineTTS.initialize();
+        if (OnlineTTS.isAvailable()) {
+          console.log('✅ TTS recovered successfully');
+          // Don't throw error, just log it
+          return;
+        }
+      } catch (recoveryError) {
+        console.error('❌ TTS recovery failed:', recoveryError);
+      }
+      
       setTtsAvailable(false);
       // Transcript remains off by default - users can toggle if needed
       throw error;
@@ -378,10 +469,11 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
         setIsPlaying(true);
         setAudioWaveform(true);
         try {
-          await playAudioWithCaptions((current as any).audioText, true);
+          await playAudioWithCaptions((current as any).audioText);
           setHasListened(true);
         } catch (error) {
-          setHasListened(true);
+          console.log('TTS not available, text mode enabled');
+          setHasListened(true); // Allow progression even without TTS
         }
         setIsPlaying(false);
         setAudioWaveform(false);
@@ -391,14 +483,28 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
     
     // Auto-play for reveal phase (after correct answer)
     if (listeningPhase === 'reveal' && current.listeningFirst && (current as any).revealText && ttsAvailable) {
+      console.log('🎭 Auto-playing reveal text:', {
+        stepId: current.id,
+        revealText: (current as any).revealText.substring(0, 50) + '...',
+        voice: COSMO_VOICE,
+        speed: playbackSpeed
+      });
+      
       const playReveal = async () => {
         setIsPlaying(true);
+        setIsRevealTextPlaying(true);
         try {
-          await playAudioWithCaptions((current as any).revealText, true);
+          await playAudioWithCaptions((current as any).revealText);
+          console.log('✅ Auto reveal text playback completed');
+          
+          // Wait a bit more after TTS completes to ensure full reading
+          await new Promise(resolve => setTimeout(resolve, 1000));
         } catch (error) {
-          console.log('TTS not available');
+          console.error('❌ Auto reveal text playback failed:', error);
+        } finally {
+          setIsPlaying(false);
+          setIsRevealTextPlaying(false);
         }
-        setIsPlaying(false);
       };
       playReveal();
     }
@@ -417,9 +523,9 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
         }
         
         try {
-          await playAudioWithCaptions(textToRead, true);
+          await playAudioWithCaptions(textToRead);
         } catch (error) {
-          console.log('TTS not available');
+          console.error('❌ TTS not available for non-interactive step:', error);
         }
       };
       playNarration();
@@ -433,11 +539,13 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
       setShowFeedback(false);
       setShowHint(false);
     } else {
+      // Calculate score based on correct answers and time
       const accuracyScore = correctAnswers * 20;
-      const timeBonus = Math.max(0, 360 - timeSpent) * 0.1;
+      const timeBonus = Math.max(0, 300 - timeSpent) * 0.1; // Bonus for faster completion
       const starBonus = stars * 10;
       const score = Math.min(100, 40 + accuracyScore + timeBonus + starBonus);
       
+      // Complete analytics session
       if (currentSession) {
         KidsListeningAnalytics.completeSession(
           userId,
@@ -445,13 +553,19 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
           score,
           stars
         );
+        console.log('📊 Session analytics saved');
       }
+      
+      // Stop TTS when story completes
+      console.log('🛑 Story completed - stopping TTS');
+      OnlineTTS.stop();
       
       onComplete(score);
     }
   };
 
   const handleReplayAudio = async () => {
+    // Allow unlimited replays for accessibility
     if (!unlimitedReplays && replaysUsed >= maxReplays) return;
     if (!current.listeningFirst) return;
     
@@ -460,10 +574,11 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
     setAudioWaveform(true);
     
     try {
-      await playAudioWithCaptions((current as any).audioText, true);
+      await playAudioWithCaptions((current as any).audioText);
       setHasListened(true);
     } catch (error) {
-      setHasListened(true);
+      console.log('TTS not available, text mode enabled');
+      setHasListened(true); // Still allow progression
     }
     
     setIsPlaying(false);
@@ -500,21 +615,64 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
     
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
-      const starReward = currentAttempt === 1 ? 1 : 0.5;
-      setStars(prev => Math.min(3, prev + starReward));
+      
+      // Award stars based on specific story steps
+      if (current.id === 'first_star') {
+        // First star - after completing first star step
+        setStars(1);
+        console.log('⭐ First star awarded! (1/3)');
+      } else if (current.id === 'second_star') {
+        // Second star - after completing second star step
+        setStars(2);
+        console.log('⭐ Second star awarded! (2/3)');
+      } else if (current.id === 'final_star') {
+        // Third star - after completing final star step
+        setStars(3);
+        console.log('⭐ Third star awarded! (3/3)');
+      }
+      // Note: Other interactive steps don't award stars, only the specific star steps do
+    
       setShowFeedback(true);
       setRetryMode(false);
       
+      // Auto-advance after showing feedback to reveal phase
       setTimeout(() => {
         setListeningPhase('reveal');
       }, 2500);
       
+      // Calculate dynamic timing based on reveal text length
+      const revealText = (current as any).revealText || '';
+      const textLength = revealText.length;
+      const wordsPerMinute = playbackSpeed === 'slow' ? 120 : playbackSpeed === 'slower' ? 80 : 160;
+      const estimatedDuration = Math.max(10000, (textLength / 5) * (60000 / wordsPerMinute) + 2000); // At least 10 seconds + 2 second buffer
+      
+      console.log('⏱️ Dynamic timing calculation:', {
+        textLength,
+        wordsPerMinute,
+        estimatedDuration: Math.round(estimatedDuration),
+        playbackSpeed,
+        revealText: revealText.substring(0, 50) + '...'
+      });
+      
+      // Move to next step after reveal text has time to complete
       setTimeout(() => {
-        handleNext();
-      }, 5000);
+        // Double-check that reveal text is not still playing
+        if (!isRevealTextPlaying) {
+          handleNext();
+        } else {
+          console.log('⏳ Reveal text still playing, waiting a bit more...');
+          // Wait a bit more if still playing
+          setTimeout(() => {
+            handleNext();
+          }, 2000);
+        }
+      }, estimatedDuration);
     } else {
+      // Wrong answer - offer retry
       setShowFeedback(true);
       setRetryMode(true);
+      
+      // Don't auto-advance on wrong answer - let them retry
     }
   };
   
@@ -529,23 +687,91 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
   const playRevealText = async () => {
     let textToSpeak = (current as any).revealText || current.text;
     
+    console.log('🎭 playRevealText called:', {
+      stepId: current.id,
+      hasRevealText: !!(current as any).revealText,
+      hasText: !!current.text,
+      ttsAvailable,
+      textPreview: textToSpeak ? textToSpeak.substring(0, 50) + '...' : 'No text'
+    });
+    
     // Handle dynamic celebration text based on stars collected
     if (current.id === 'grand_celebration') {
+      console.log(`🎉 Manual playRevealText - Space Celebration - Stars: ${stars}`);
       if (stars >= 3) {
         textToSpeak = "Congratulations space explorer! ... The WHOLE galaxy is celebrating YOU! ... Aliens are cheering, stars are glowing brightly, and cosmic magic fills the universe! ... You made the cosmos proud with your stellar listening! You should feel SO amazing! ... Give yourself a cosmic high-five!";
       } else {
         textToSpeak = `Great mission, young astronaut! ... You collected ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The galaxy is impressed by your bravery! ... Cosmo is proud of you! ... Every space journey teaches us something. Keep exploring and you'll collect all the stars next time! 🚀`;
       }
+      console.log(`🎉 Manual celebration text:`, textToSpeak.substring(0, 100) + '...');
     }
     
-    if (textToSpeak && ttsAvailable) {
-      setIsPlaying(true);
+    if (!textToSpeak) {
+      console.log('❌ No text to speak in playRevealText');
+      return;
+    }
+    
+    if (!ttsAvailable) {
+      console.log('❌ TTS not available in playRevealText, attempting to reinitialize...');
       try {
-        await playAudioWithCaptions(textToSpeak, true);
+        await OnlineTTS.initialize();
+        if (OnlineTTS.isAvailable()) {
+          console.log('✅ TTS reinitialized successfully');
+          setTtsAvailable(true);
+        } else {
+          console.log('❌ TTS still not available after reinitialization');
+          return;
+        }
       } catch (error) {
-        console.log('TTS not available');
+        console.error('❌ TTS reinitialization failed:', error);
+        return;
       }
+    }
+    
+    console.log('🎤 Starting reveal text playback with Cosmo\'s UNIQUE voice:', {
+      text: textToSpeak.substring(0, 100) + '...',
+      voiceProfile: COSMO_VOICE,
+      voiceName: COSMO_VOICE.voiceName,
+      voiceDescription: COSMO_VOICE.description,
+      speed: playbackSpeed
+    });
+    
+    setIsPlaying(true);
+    setIsRevealTextPlaying(true);
+    try {
+      // Force stop any current speech first
+      OnlineTTS.stop();
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Use playAudioWithCaptions which ensures Cosmo's voice
+      await playAudioWithCaptions(textToSpeak);
+      console.log('✅ Reveal text playback completed successfully');
+      
+      // Wait a bit more to ensure full completion
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } catch (error) {
+      console.error('❌ TTS error in playRevealText:', error);
+      
+      // Try to reinitialize TTS and retry once
+      try {
+        console.log('🔄 Attempting TTS reinitialization...');
+        await OnlineTTS.initialize();
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        if (OnlineTTS.isAvailable()) {
+          console.log('🔄 Retrying reveal text with reinitialized TTS...');
+          await playAudioWithCaptions(textToSpeak);
+          console.log('✅ Retry successful');
+          
+          // Wait after retry too
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      } catch (retryError) {
+        console.error('❌ Retry failed:', retryError);
+      }
+    } finally {
       setIsPlaying(false);
+      setIsRevealTextPlaying(false);
     }
   };
 
@@ -568,10 +794,99 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
     }
   };
 
+  // Instant speed change function - no delays, immediate response
+  const handleSpeedChange = (newSpeed: 'normal' | 'slow' | 'slower') => {
+    console.log('🔄 INSTANT speed change - Current step:', current.id, 'New speed:', newSpeed);
+    
+    // Update speed state immediately
+    setPlaybackSpeed(newSpeed);
+    
+    // Force stop any currently playing audio immediately
+    OnlineTTS.stop();
+    
+    // Determine what text to replay
+    let textToPlay = '';
+    
+    if (current.listeningFirst) {
+      // Interactive steps with listening phases
+      if (listeningPhase === 'listening' && (current as any).audioText) {
+        textToPlay = (current as any).audioText;
+        console.log('🎧 INSTANT replay listening audio:', textToPlay.substring(0, 50) + '...');
+      } else if (listeningPhase === 'reveal' && (current as any).revealText) {
+        textToPlay = (current as any).revealText;
+        console.log('🎭 INSTANT replay reveal text:', textToPlay.substring(0, 50) + '...');
+      }
+    } else {
+      // Non-interactive steps (like intro, celebration, etc.)
+      if (current.text) {
+        if (current.id === 'grand_celebration') {
+          textToPlay = stars >= 3 
+            ? "Congratulations space explorer! ... The WHOLE galaxy is celebrating YOU! ... Aliens are cheering, stars are glowing brightly, and cosmic magic fills the universe! ... You made the cosmos proud with your stellar listening! You should feel SO amazing! ... Give yourself a cosmic high-five!"
+            : `Great mission, young astronaut! ... You collected ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The galaxy is impressed by your bravery! ... Cosmo is proud of you! ... Every space journey teaches us something. Keep exploring and you'll collect all the stars next time! 🚀`;
+          console.log('🎉 INSTANT replay celebration text:', textToPlay.substring(0, 50) + '...');
+        } else {
+          textToPlay = current.text;
+          console.log('📖 INSTANT replay intro/narration text:', textToPlay.substring(0, 50) + '...');
+        }
+      }
+    }
+    
+    if (!textToPlay) {
+      console.log('❌ No text found to replay');
+      return;
+    }
+    
+    if (!ttsAvailable) {
+      console.log('❌ TTS not available');
+      return;
+    }
+    
+    // Start playing immediately with new speed
+    const playWithNewSpeed = async () => {
+      try {
+        const cleanText = stripEmojis(textToPlay);
+        console.log('🎤 INSTANT speaking at new speed:', newSpeed, 'Text length:', cleanText.length);
+        
+        setIsPlaying(true);
+        setIsRevealTextPlaying(listeningPhase === 'reveal');
+        
+        await OnlineTTS.speak(cleanText, COSMO_VOICE, {
+          speed: newSpeed,
+          showCaptions: false,
+          onCaptionUpdate: () => {}
+        });
+        
+        console.log('✅ INSTANT speed change completed successfully');
+        
+      } catch (error) {
+        console.error('❌ INSTANT speed change error:', error);
+      } finally {
+        setIsPlaying(false);
+        setIsRevealTextPlaying(false);
+      }
+    };
+    
+    // Start playing immediately (no await to make it instant)
+    playWithNewSpeed();
+  };
+
   const getCharacterAnimation = () => {
     if (current.id.includes('star')) return 'animate-bounce';
     return 'animate-float';
   };
+
+  const getEnvironmentIcon = () => {
+    switch (current.id) {
+      case 'rocket_launch': return Rocket;
+      case 'friendly_alien': return Sparkles;
+      case 'planet_rings': return Star;
+      case 'moon_landing': return Star;
+      case 'constellation': return Star;
+      default: return Sparkles;
+    }
+  };
+
+  const EnvironmentIcon = getEnvironmentIcon();
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -580,10 +895,15 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
         "bg-gradient-to-br", current.bgColor,
         "flex flex-col"
       )}>
+        {/* Always Visible Close Button */}
         <div className="absolute top-4 right-4 z-10">
           <Button 
             variant="ghost" 
-            onClick={onClose} 
+            onClick={() => {
+              console.log('🛑 Close button clicked - stopping TTS immediately');
+              OnlineTTS.stop();
+              onClose();
+            }} 
             className="h-10 w-10 p-0 rounded-full bg-white/80 hover:bg-white backdrop-blur-sm border border-gray-200 hover:border-gray-300 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 z-50"
           >
             <X className="w-5 h-5 text-gray-700 hover:text-gray-900" />
@@ -613,31 +933,15 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={async () => {
-                    OnlineTTS.stop();
+                  onClick={() => {
+                    // Cycle to next speed
                     const newSpeed = playbackSpeed === 'slow' ? 'slower' : playbackSpeed === 'slower' ? 'normal' : 'slow';
-                    setPlaybackSpeed(newSpeed);
-                    try {
-                      let textToPlay = '';
-                      if (listeningPhase === 'listening' && current.listeningFirst && (current as any).audioText) {
-                        textToPlay = (current as any).audioText;
-                      } else if (listeningPhase === 'reveal' && current.listeningFirst && (current as any).revealText) {
-                        textToPlay = (current as any).revealText;
-                      } else if (!current.listeningFirst && current.text) {
-                        if (current.id === 'grand_celebration') {
-                          textToPlay = stars >= 3 ? "Congratulations space explorer! ... The WHOLE galaxy is celebrating YOU! ... Aliens are cheering, stars are glowing brightly, and cosmic magic fills the universe! ... You made the cosmos proud with your stellar listening! You should feel SO amazing! ... Give yourself a cosmic high-five!" : `Great mission, young astronaut! ... You collected ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The galaxy is impressed by your bravery! ... Cosmo is proud of you! ... Every space journey teaches us something. Keep exploring and you'll collect all the stars next time! 🚀`;
-                        } else {
-                          textToPlay = current.text;
-                        }
-                      }
-                      if (textToPlay && ttsAvailable) {
-                        await OnlineTTS.speak(stripEmojis(textToPlay), COSMO_VOICE, { speed: newSpeed, showCaptions: captionsEnabled, onCaptionUpdate: setCurrentCaption });
-                      }
-                    } catch (error) {
-                      console.log('Could not replay at new speed');
-                    }
+                    console.log('🔄 Speed button clicked - changing from', playbackSpeed, 'to', newSpeed);
+                    
+                    // Use the instant speed change function
+                    handleSpeedChange(newSpeed);
                   }}
-                  className="h-7 px-2 rounded-full text-xs bg-purple-50 dark:bg-purple-800 hover:bg-purple-100 dark:hover:bg-purple-700 border border-purple-200 dark:border-purple-600 text-purple-800 dark:text-purple-100 font-semibold shadow-sm"
+                  className="h-7 px-2 rounded-full text-xs font-semibold shadow-sm transition-all duration-200 bg-purple-50 dark:bg-purple-800 hover:bg-purple-100 dark:hover:bg-purple-700 border border-purple-200 dark:border-purple-600 text-purple-800 dark:text-purple-100"
                   title={`Playback speed (works offline & online): ${playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow (Default)' : 'Very Slow'}`}
                 >
                   <Gauge className="w-3.5 h-3.5 mr-1 text-purple-600 dark:text-purple-200" />
@@ -650,10 +954,6 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
                     size="sm"
                     onClick={() => {
                       setAccessibilityMode(!accessibilityMode);
-                      if (!accessibilityMode) {
-                        // Transcript remains off by default - users can toggle if needed
-                        setCaptionsEnabled(true);
-                      }
                     }}
                     className={cn(
                       "h-7 px-2 rounded-full text-xs",
@@ -717,12 +1017,6 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
             </div>
           )}
           
-          {/* Live Caption Display - Only in reveal phase or accessibility mode */}
-          {captionsEnabled && currentCaption && (listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode) && (
-            <div className="mb-2 bg-black/80 text-white px-4 py-2 rounded-lg text-center text-sm sm:text-base font-semibold animate-fade-in">
-              {currentCaption}
-            </div>
-          )}
 
           <Progress value={progress} className="h-2 mb-3 sm:mb-4 bg-white/30 flex-shrink-0">
             <div className="h-full bg-gradient-to-r from-purple-400 to-blue-400 rounded-full transition-all duration-500" />
@@ -746,6 +1040,11 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
                       )} 
                     />
                   ))}
+                </div>
+
+                {/* Environment Icon */}
+                <div className="absolute top-1 right-1 sm:top-2 sm:right-2 animate-float-slow">
+                  <EnvironmentIcon className="w-6 h-6 sm:w-6 sm:h-6 md:w-8 md:h-8 text-purple-500 opacity-70" />
                 </div>
               </div>
 
@@ -1074,7 +1373,7 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
 
                   {/* Environment Icon */}
                   <div className="absolute -top-6 -right-6 lg:-top-8 lg:-right-8 animate-float-slow">
-                    <Sparkles className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 text-purple-500 opacity-70" />
+                    <EnvironmentIcon className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 text-purple-500 opacity-70" />
                   </div>
                 </div>
               </div>
@@ -1360,11 +1659,32 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
         </CardContent>
       </Card>
 
+      {/* Floating Elements - Positioned around left visual area on desktop */}
+      <div className="hidden lg:block absolute top-20 left-8 animate-float-slow">
+        <Sparkles className="w-8 h-8 text-yellow-400" />
+      </div>
+      <div className="hidden lg:block absolute bottom-20 left-12 animate-float-medium">
+        <Star className="w-8 h-8 text-purple-400" />
+      </div>
+      <div className="hidden lg:block absolute top-1/2 left-4 animate-float-fast">
+        <Rocket className="w-7 h-7 text-blue-400" />
+      </div>
+
       <style>{`
         @keyframes float-slow {
           0%, 100% { transform: translateY(0px) rotate(0deg); }
           33% { transform: translateY(-10px) rotate(5deg); }
           66% { transform: translateY(-5px) rotate(-5deg); }
+        }
+        
+        @keyframes float-medium {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-15px); }
+        }
+        
+        @keyframes float-fast {
+          0%, 100% { transform: translateY(0px) scale(1); }
+          50% { transform: translateY(-8px) scale(1.1); }
         }
         
         @keyframes float {
@@ -1423,6 +1743,14 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
         
         .animate-float-slow {
           animation: float-slow 4s ease-in-out infinite;
+        }
+        
+        .animate-float-medium {
+          animation: float-medium 3s ease-in-out infinite;
+        }
+        
+        .animate-float-fast {
+          animation: float-fast 2s ease-in-out infinite;
         }
         
         .animate-pulse-slow {

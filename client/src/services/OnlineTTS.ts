@@ -31,6 +31,7 @@ export class OnlineTTS {
   private static synth: SpeechSynthesis | null = null;
   private static voices: SpeechSynthesisVoice[] = [];
   private static isInitialized = false;
+  private static isStopping = false; // Track if we're intentionally stopping
 
   /**
    * Initialize the TTS service
@@ -96,6 +97,22 @@ export class OnlineTTS {
     this.voices.forEach((voice, index) => {
       console.log(`${index + 1}. ${voice.name} (${voice.lang}) - ${(voice as any).gender || 'unknown'} - ${voice.localService ? 'local' : 'remote'}`);
     });
+    
+    // Check for specific voices we need
+    const microsoftVoices = this.voices.filter(v => v.name.toLowerCase().includes('microsoft'));
+    const markVoices = this.voices.filter(v => v.name.toLowerCase().includes('mark'));
+    const ziraVoices = this.voices.filter(v => v.name.toLowerCase().includes('zira'));
+    const davidVoices = this.voices.filter(v => v.name.toLowerCase().includes('david'));
+    
+    console.log('🎯 Voice availability check:');
+    console.log(`   Microsoft voices: ${microsoftVoices.length} (${microsoftVoices.map(v => v.name).join(', ')})`);
+    console.log(`   Mark voices: ${markVoices.length} (${markVoices.map(v => v.name).join(', ')})`);
+    console.log(`   Zira voices: ${ziraVoices.length} (${ziraVoices.map(v => v.name).join(', ')})`);
+    console.log(`   David voices: ${davidVoices.length} (${davidVoices.map(v => v.name).join(', ')})`);
+    
+    if (microsoftVoices.length === 0) {
+      console.warn('⚠️ No Microsoft voices found! Stories will use generic Web Speech API voices.');
+    }
   }
 
   /**
@@ -110,7 +127,12 @@ export class OnlineTTS {
    */
   static stop(): void {
     if (this.synth) {
+      this.isStopping = true; // Mark that we're intentionally stopping
       this.synth.cancel();
+      // Reset the flag after a short delay to allow error handlers to see it
+      setTimeout(() => {
+        this.isStopping = false;
+      }, 100);
     }
   }
 
@@ -135,8 +157,13 @@ export class OnlineTTS {
     }
 
     return new Promise((resolve, reject) => {
-      // Cancel any ongoing speech
+      // Cancel any ongoing speech gracefully
+      this.isStopping = true;
       this.synth!.cancel();
+      // Reset the flag after a short delay
+      setTimeout(() => {
+        this.isStopping = false;
+      }, 50);
 
       const utterance = new SpeechSynthesisUtterance(text);
       
@@ -169,10 +196,25 @@ export class OnlineTTS {
           }
         }
         
-        // If still not found, use the first available voice as fallback
+        // If still not found, try to find ANY Microsoft voice as fallback
         if (!voice && this.voices.length > 0) {
-          voice = this.voices[0];
-          console.log(`🔄 Using fallback voice: ${voice.name} for ${voiceProfile.name}`);
+          // Try to find any Microsoft voice first
+          voice = this.voices.find(v => v.name.toLowerCase().includes('microsoft'));
+          
+          // If no Microsoft voice, try to find any English voice
+          if (!voice) {
+            voice = this.voices.find(v => v.lang.startsWith('en'));
+          }
+          
+          // Last resort: use first available voice
+          if (!voice) {
+            voice = this.voices[0];
+          }
+          
+          console.log(`🔄 Using fallback voice: ${voice.name} for ${voiceProfile.name}`, {
+            reason: voice.name.toLowerCase().includes('microsoft') ? 'Microsoft voice found' : 
+                   voice.lang.startsWith('en') ? 'English voice found' : 'First available voice'
+          });
         }
         
         if (voice) {
@@ -205,12 +247,20 @@ export class OnlineTTS {
       };
 
       utterance.onerror = (error) => {
+        // Check if this is an expected interruption from our stop() call
+        if (this.isStopping && (error.error === 'interrupted' || error.error === 'canceled')) {
+          // This is an expected interruption, don't log as error
+          console.log('🔄 TTS intentionally stopped');
+          resolve(); // Don't reject, just resolve
+          return;
+        }
+        
+        // Log genuine errors
         console.error('TTS error:', error);
         console.error('TTS error details:', {
           error: error.error,
           type: error.type,
           charIndex: error.charIndex,
-          charCode: error.charCode,
           utterance: utterance.text.substring(0, 100) + '...'
         });
         
@@ -240,18 +290,18 @@ export const STORY_VOICES: Record<string, VoiceProfile> = {
     pitch: 1.0,
     rate: 1.0,
     volume: 1.0,
-    voiceName: 'Microsoft Zira Desktop - English (United States)', // Microsoft's young female voice
+    voiceName: 'Microsoft Zira - English (United States)', // Microsoft's young female voice
     description: 'Sweet, gentle rabbit voice with magical wonder'
   },
   
   // 2. Space Adventure - Cosmo (excited 7-year-old boy)
   Cosmo: {
     name: 'Cosmo',
-    pitch: 1.0,
-    rate: 1.0,
+    pitch: 1.1,
+    rate: 0.95,
     volume: 1.0,
-    voiceName: 'Microsoft Mark Desktop - English (United States)', // Microsoft's young male voice
-    description: 'Confident, adventurous astronaut voice'
+    voiceName: 'Microsoft Mark - English (United States)', // Microsoft's young male voice
+    description: 'Confident, adventurous astronaut voice with cosmic enthusiasm'
   },
   
   // 3. Underwater World - Finn (gentle 6-year-old boy)
@@ -260,7 +310,7 @@ export const STORY_VOICES: Record<string, VoiceProfile> = {
     pitch: 1.0,
     rate: 1.0,
     volume: 1.0,
-    voiceName: 'Microsoft David Desktop - English (United States)', // Microsoft's young male voice
+    voiceName: 'Microsoft David - English (United States)', // Microsoft's young male voice
     description: 'Bubbly, cheerful fish voice with underwater flow'
   },
   
@@ -270,7 +320,7 @@ export const STORY_VOICES: Record<string, VoiceProfile> = {
     pitch: 1.0,
     rate: 1.0,
     volume: 1.0,
-    voiceName: 'Microsoft Zira Desktop - English (United States)', // Microsoft's young female voice
+    voiceName: 'Microsoft Zira - English (United States)', // Microsoft's young female voice
     description: 'Curious, enthusiastic explorer voice with scientific wonder'
   },
   
@@ -280,7 +330,7 @@ export const STORY_VOICES: Record<string, VoiceProfile> = {
     pitch: 1.0,
     rate: 1.0,
     volume: 1.0,
-    voiceName: 'Microsoft Zira Desktop - English (United States)', // Microsoft's young female voice
+    voiceName: 'Microsoft Zira - English (United States)', // Microsoft's young female voice
     description: 'Enchanting, graceful unicorn voice with dreamy magical quality'
   },
   
@@ -290,7 +340,7 @@ export const STORY_VOICES: Record<string, VoiceProfile> = {
     pitch: 1.0,
     rate: 1.0,
     volume: 1.0,
-    voiceName: 'Microsoft Mark Desktop - English (United States)', // Microsoft's male voice
+    voiceName: 'Microsoft Mark - English (United States)', // Microsoft's male voice
     description: 'Bold, adventurous pirate captain voice'
   },
   
@@ -300,7 +350,7 @@ export const STORY_VOICES: Record<string, VoiceProfile> = {
     pitch: 1.0,
     rate: 1.0,
     volume: 1.0,
-    voiceName: 'Microsoft Mark Desktop - English (United States)', // Microsoft's male voice
+    voiceName: 'Microsoft Mark - English (United States)', // Microsoft's male voice
     description: 'Heroic, confident superhero voice with powerful determination'
   },
   
@@ -310,7 +360,7 @@ export const STORY_VOICES: Record<string, VoiceProfile> = {
     pitch: 1.0,
     rate: 1.0,
     volume: 1.0,
-    voiceName: 'Microsoft Zira Desktop - English (United States)', // Microsoft's young female voice
+    voiceName: 'Microsoft Zira - English (United States)', // Microsoft's young female voice
     description: 'Delicate, twinkling fairy voice with sweet magical tone'
   }
 };
