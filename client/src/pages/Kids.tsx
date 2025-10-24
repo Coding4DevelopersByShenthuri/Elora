@@ -607,9 +607,23 @@ const KidsPage = () => {
     setPoints(newPoints);
     setStreak(newStreak);
     
+    // Get story information for enrollment
+    const story = allStories[storyIndex];
+    const storyId = story.type;
+    const storyTitle = story.title;
+    
     try {
       const token = localStorage.getItem('speakbee_auth_token');
       const key = `story-${storyIndex}`;
+      
+      // Record story completion and enrollment
+      await KidsProgressService.recordStoryCompletion(
+        userId, 
+        storyId, 
+        storyTitle, 
+        story.type, 
+        score
+      );
       
       if (token && token !== 'local-token') {
         const current = await KidsApi.getProgress(token);

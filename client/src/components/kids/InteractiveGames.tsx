@@ -1,40 +1,72 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Trophy, Volume2, RefreshCw, Loader2 } from 'lucide-react';
+import { Trophy, Volume2, RefreshCw, Loader2, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import EnhancedTTS from '@/services/EnhancedTTS';
 import { WhisperService } from '@/services/WhisperService';
 import VoiceRecorder from './VoiceRecorder';
 import HybridServiceManager from '@/services/HybridServiceManager';
+import StoryWordsService, { type StoryWord } from '@/services/StoryWordsService';
+import { useAuth } from '@/contexts/AuthContext';
 
 type GameType = 'rhyme' | 'sentence' | 'echo' | 'menu';
 
 const InteractiveGames = () => {
   const [currentGame, setCurrentGame] = useState<GameType>('menu');
   const [score, setScore] = useState(0);
+  const { user } = useAuth();
+  const userId = user?.id ? String(user.id) : 'local-user';
+  const [enrolledStories, setEnrolledStories] = useState<string[]>([]);
+  const [storyWords, setStoryWords] = useState<StoryWord[]>([]);
+
+  // Load enrolled stories and words when component mounts
+  useEffect(() => {
+    const loadStoryData = () => {
+      const enrollments = StoryWordsService.getEnrolledStories(userId);
+      const completedStoryIds = enrollments
+        .filter(e => e.completed && e.wordsExtracted)
+        .map(e => e.storyId);
+      
+      setEnrolledStories(completedStoryIds);
+      
+      // Load words for all games
+      const allWords = StoryWordsService.getWordsFromEnrolledStories(userId);
+      setStoryWords(allWords);
+    };
+
+    loadStoryData();
+  }, [userId]);
 
   return (
     <div className="space-y-6">
       {currentGame === 'menu' && (
-        <GameMenu onSelectGame={setCurrentGame} totalScore={score} />
+        <GameMenu 
+          onSelectGame={setCurrentGame} 
+          totalScore={score} 
+          enrolledStories={enrolledStories}
+          storyWords={storyWords}
+        />
       )}
       {currentGame === 'rhyme' && (
         <RhymeTime 
           onBack={() => setCurrentGame('menu')} 
           onScoreUpdate={(points) => setScore(prev => prev + points)}
+          storyWords={storyWords}
         />
       )}
       {currentGame === 'sentence' && (
         <SentenceBuilder 
           onBack={() => setCurrentGame('menu')} 
           onScoreUpdate={(points) => setScore(prev => prev + points)}
+          storyWords={storyWords}
         />
       )}
       {currentGame === 'echo' && (
         <EchoChallenge 
           onBack={() => setCurrentGame('menu')} 
           onScoreUpdate={(points) => setScore(prev => prev + points)}
+          storyWords={storyWords}
         />
       )}
     </div>
@@ -42,7 +74,17 @@ const InteractiveGames = () => {
 };
 
 // Game Menu
-const GameMenu = ({ onSelectGame, totalScore }: { onSelectGame: (game: GameType) => void; totalScore: number }) => {
+const GameMenu = ({ 
+  onSelectGame, 
+  totalScore, 
+  enrolledStories, 
+  storyWords 
+}: { 
+  onSelectGame: (game: GameType) => void; 
+  totalScore: number;
+  enrolledStories: string[];
+  storyWords: StoryWord[];
+}) => {
   const games = [
     {
       id: 'rhyme' as GameType,
@@ -69,6 +111,24 @@ const GameMenu = ({ onSelectGame, totalScore }: { onSelectGame: (game: GameType)
 
   return (
     <div className="space-y-4 sm:space-y-6 max-w-6xl mx-auto">
+      {/* Story Enrollment Status */}
+      <Card className="border-2 border-blue-200 bg-blue-50 dark:bg-blue-900/20">
+        <CardContent className="py-4 sm:py-6 text-center px-3 sm:px-4">
+          <BookOpen className="w-10 h-10 sm:w-12 sm:h-12 text-blue-500 mx-auto mb-2 sm:mb-3" />
+          <div className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-500 mb-2">
+            {enrolledStories.length} Story{enrolledStories.length !== 1 ? 's' : ''} Completed
+          </div>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 font-semibold mb-2">
+            {storyWords.length} words available for games
+          </p>
+          {enrolledStories.length === 0 && (
+            <p className="text-xs sm:text-sm text-orange-600 dark:text-orange-400 font-medium">
+              Complete stories to unlock more words for games! 📚
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Score Display */}
       <Card className="border-2 border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20">
         <CardContent className="py-4 sm:py-6 text-center px-3 sm:px-4">
@@ -138,16 +198,102 @@ const GameMenu = ({ onSelectGame, totalScore }: { onSelectGame: (game: GameType)
 };
 
 // Rhyme Time Game
-const RhymeTime = ({ onBack, onScoreUpdate }: { onBack: () => void; onScoreUpdate: (points: number) => void }) => {
+const RhymeTime = ({ 
+  onBack, 
+  onScoreUpdate, 
+  storyWords 
+}: { 
+  onBack: () => void; 
+  onScoreUpdate: (points: number) => void;
+  storyWords: StoryWord[];
+}) => {
   const [currentPair, setCurrentPair] = useState(0);
   const [result, setResult] = useState<{ correct: boolean; message: string } | null>(null);
 
-  const rhymePairs = [
-    { word: 'cat', rhymes: ['hat', 'bat', 'mat', 'sat'], incorrect: ['dog', 'sun', 'car'] },
-    { word: 'tree', rhymes: ['bee', 'sea', 'key', 'free'], incorrect: ['bird', 'house', 'ball'] },
-    { word: 'sun', rhymes: ['run', 'fun', 'one', 'bun'], incorrect: ['moon', 'star', 'sky'] },
-    { word: 'night', rhymes: ['light', 'right', 'bright', 'sight'], incorrect: ['dark', 'day', 'time'] }
-  ];
+  // Generate rhyme pairs from story words
+  const generateRhymePairs = (words: StoryWord[]) => {
+    if (words.length === 0) {
+      // Fallback to default words
+      return [
+        { word: 'cat', emoji: '🐱', hint: '🐱 Say: KAT', rhymes: ['hat', 'bat', 'mat', 'sat'], incorrect: ['dog', 'sun', 'car'] },
+        { word: 'tree', emoji: '🌳', hint: '🌳 Say: TREE', rhymes: ['bee', 'sea', 'key', 'free'], incorrect: ['bird', 'house', 'ball'] },
+        { word: 'sun', emoji: '☀️', hint: '☀️ Say: SUN', rhymes: ['run', 'fun', 'one', 'bun'], incorrect: ['moon', 'star', 'sky'] },
+        { word: 'night', emoji: '🌙', hint: '🌙 Say: NITE', rhymes: ['light', 'right', 'bright', 'sight'], incorrect: ['dark', 'day', 'time'] }
+      ];
+    }
+
+    // Use story words for rhyming (simplified rhyming logic)
+    const rhymePairs = words.slice(0, 8).map((storyWord) => {
+      const word = storyWord.word.toLowerCase();
+      const rhymes = generateRhymes(word);
+      const incorrect = generateIncorrectOptions(word);
+      
+      return {
+        word: storyWord.word,
+        emoji: storyWord.emoji,
+        hint: storyWord.hint,
+        rhymes: rhymes.slice(0, 3),
+        incorrect: incorrect.slice(0, 1)
+      };
+    });
+
+    return rhymePairs;
+  };
+
+  const generateRhymes = (word: string): string[] => {
+    // Simple rhyming logic - in a real app, you'd use a proper rhyming dictionary
+    const rhymes: Record<string, string[]> = {
+      'cat': ['hat', 'bat', 'mat', 'sat', 'rat'],
+      'dog': ['log', 'fog', 'bog', 'jog'],
+      'sun': ['run', 'fun', 'bun', 'gun'],
+      'tree': ['bee', 'see', 'free', 'key'],
+      'fish': ['wish', 'dish', 'swish'],
+      'bird': ['word', 'heard', 'herd'],
+      'star': ['car', 'far', 'bar'],
+      'moon': ['soon', 'tune', 'spoon'],
+      'rabbit': ['habit', 'cabinet'],
+      'forest': ['chorus', 'focus'],
+      'magic': ['tragic', 'logic'],
+      'planet': ['banquet', 'blanket'],
+      'dinosaur': ['more', 'door', 'floor'],
+      'unicorn': ['corn', 'born', 'thorn'],
+      'pirate': ['pirate', 'irate'],
+      'treasure': ['pleasure', 'measure'],
+      'superhero': ['zero', 'hero'],
+      'fairy': ['hairy', 'scary'],
+      'sparkle': ['darkle', 'markle']
+    };
+    
+    return rhymes[word] || ['hat', 'bat', 'mat'];
+  };
+
+  const generateIncorrectOptions = (word: string): string[] => {
+    const incorrect: Record<string, string[]> = {
+      'cat': ['dog', 'sun', 'car'],
+      'dog': ['cat', 'bird', 'fish'],
+      'sun': ['moon', 'star', 'sky'],
+      'tree': ['bird', 'house', 'ball'],
+      'fish': ['bird', 'cat', 'dog'],
+      'bird': ['fish', 'cat', 'dog'],
+      'star': ['moon', 'sun', 'sky'],
+      'moon': ['sun', 'star', 'sky'],
+      'rabbit': ['fish', 'bird', 'cat'],
+      'forest': ['ocean', 'desert', 'mountain'],
+      'magic': ['normal', 'real', 'ordinary'],
+      'planet': ['star', 'moon', 'sky'],
+      'dinosaur': ['bird', 'fish', 'cat'],
+      'unicorn': ['horse', 'donkey', 'zebra'],
+      'pirate': ['sailor', 'captain', 'soldier'],
+      'treasure': ['trash', 'garbage', 'waste'],
+      'superhero': ['villain', 'enemy', 'bad guy'],
+      'fairy': ['witch', 'wizard', 'monster'],
+      'sparkle': ['dull', 'dark', 'dim']
+    };
+    
+    return incorrect[word] || ['dog', 'sun', 'car'];
+  };
+
+  const rhymePairs = generateRhymePairs(storyWords);
 
   const current = rhymePairs[currentPair];
   const allOptions = [...current.rhymes.slice(0, 3), ...current.incorrect.slice(0, 1)].sort(() => Math.random() - 0.5);
@@ -198,9 +344,15 @@ const RhymeTime = ({ onBack, onScoreUpdate }: { onBack: () => void; onScoreUpdat
           <p className="text-lg text-gray-600 dark:text-gray-300">
             Find a word that rhymes with:
           </p>
-          <div className="text-6xl font-extrabold text-pink-600 bg-pink-50 dark:bg-pink-900/20 rounded-2xl p-8">
-            {current.word}
+          <div className="text-6xl font-extrabold text-pink-600 bg-pink-50 dark:bg-pink-900/20 rounded-2xl p-8 flex items-center justify-center gap-3">
+            {current.emoji && <span className="text-7xl">{current.emoji}</span>}
+            <span>{current.word}</span>
           </div>
+          {current.hint && (
+            <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+              {current.hint}
+            </p>
+          )}
           <Button
             variant="outline"
             onClick={speakWord}
@@ -247,30 +399,94 @@ const RhymeTime = ({ onBack, onScoreUpdate }: { onBack: () => void; onScoreUpdat
 };
 
 // Sentence Builder Game
-const SentenceBuilder = ({ onBack, onScoreUpdate }: { onBack: () => void; onScoreUpdate: (points: number) => void }) => {
+const SentenceBuilder = ({ 
+  onBack, 
+  onScoreUpdate, 
+  storyWords 
+}: { 
+  onBack: () => void; 
+  onScoreUpdate: (points: number) => void;
+  storyWords: StoryWord[];
+}) => {
   const [currentLevel, setCurrentLevel] = useState(0);
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState('');
 
-  const levels = [
-    {
-      correct: ['The', 'cat', 'is', 'happy'],
-      words: ['The', 'cat', 'is', 'happy', 'sad', 'dog'],
-      image: '😺'
-    },
-    {
-      correct: ['I', 'like', 'to', 'play'],
-      words: ['I', 'like', 'to', 'play', 'swim', 'run'],
-      image: '🎮'
-    },
-    {
-      correct: ['The', 'sun', 'is', 'bright'],
-      words: ['The', 'sun', 'is', 'bright', 'dark', 'moon'],
-      image: '☀️'
+  // Generate sentence levels from story words
+  const generateSentenceLevels = (words: StoryWord[]) => {
+    if (words.length === 0) {
+      // Fallback to default levels
+      return [
+        {
+          correct: ['The', 'cat', 'is', 'happy'],
+          words: ['The', 'cat', 'is', 'happy', 'sad', 'dog'],
+          image: '😺',
+          storyTitle: 'Basic Words',
+          category: 'animals'
+        },
+        {
+          correct: ['I', 'like', 'to', 'play'],
+          words: ['I', 'like', 'to', 'play', 'swim', 'run'],
+          image: '🎮',
+          storyTitle: 'Basic Words',
+          category: 'actions'
+        },
+        {
+          correct: ['The', 'sun', 'is', 'bright'],
+          words: ['The', 'sun', 'is', 'bright', 'dark', 'moon'],
+          image: '☀️',
+          storyTitle: 'Basic Words',
+          category: 'nature'
+        }
+      ];
     }
-  ];
+
+    // Create sentence levels using story words
+    const levels = [];
+    const storyWordsByCategory = words.reduce((acc, word) => {
+      if (!acc[word.category]) acc[word.category] = [];
+      acc[word.category].push(word);
+      return acc;
+    }, {} as Record<string, StoryWord[]>);
+
+    // Generate 3 levels using different story themes
+    const categories = Object.keys(storyWordsByCategory);
+    for (let i = 0; i < Math.min(3, categories.length); i++) {
+      const category = categories[i];
+      const categoryWords = storyWordsByCategory[category];
+      
+      if (categoryWords.length >= 4) {
+        const selectedWords = categoryWords.slice(0, 4);
+        const correct = selectedWords.map(w => w.word);
+        const incorrect = categoryWords.slice(4, 6).map(w => w.word);
+        
+        levels.push({
+          correct,
+          words: [...correct, ...incorrect],
+          image: selectedWords[0].emoji,
+          storyTitle: selectedWords[0].storyTitle,
+          category: category
+        });
+      }
+    }
+
+    // Fill remaining levels with default if needed
+    while (levels.length < 3) {
+      levels.push({
+        correct: ['The', 'cat', 'is', 'happy'],
+        words: ['The', 'cat', 'is', 'happy', 'sad', 'dog'],
+        image: '😺',
+        storyTitle: 'Basic Words',
+        category: 'animals'
+      });
+    }
+
+    return levels;
+  };
+
+  const levels = generateSentenceLevels(storyWords);
 
   const current = levels[currentLevel];
 
@@ -361,9 +577,21 @@ const SentenceBuilder = ({ onBack, onScoreUpdate }: { onBack: () => void; onScor
             Level {currentLevel + 1} of {levels.length}
           </p>
           <div className="text-8xl mb-4">{current.image}</div>
-          <p className="text-sm text-gray-500 dark:text-gray-200">
+          <p className="text-sm text-gray-500 dark:text-gray-200 mb-2">
             Build the sentence by tapping the words below
           </p>
+          {current.storyTitle && current.storyTitle !== 'Basic Words' && (
+            <div className="bg-blue-100 dark:bg-blue-900/20 rounded-lg p-2 mb-2">
+              <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                Words from: {current.storyTitle}
+              </p>
+              {current.category && (
+                <p className="text-xs text-blue-500 dark:text-blue-500">
+                  Category: {current.category}
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Selected Words (Sentence Area) */}
@@ -465,19 +693,71 @@ const SentenceBuilder = ({ onBack, onScoreUpdate }: { onBack: () => void; onScor
 };
 
 // Echo Challenge Game
-const EchoChallenge = ({ onBack, onScoreUpdate }: { onBack: () => void; onScoreUpdate: (points: number) => void }) => {
+const EchoChallenge = ({ 
+  onBack, 
+  onScoreUpdate, 
+  storyWords 
+}: { 
+  onBack: () => void; 
+  onScoreUpdate: (points: number) => void;
+  storyWords: StoryWord[];
+}) => {
   const [level, setLevel] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
 
-  const challenges = [
-    { phrase: 'Hello friend', speed: 0.9, points: 10 },
-    { phrase: 'I love English', speed: 1.0, points: 15 },
-    { phrase: 'Learning is fun', speed: 1.1, points: 20 },
-    { phrase: 'Practice makes perfect', speed: 1.2, points: 25 },
-    { phrase: 'I can speak English well', speed: 1.3, points: 30 }
-  ];
+  // Generate challenges from story words
+  const generateChallenges = (words: StoryWord[]) => {
+    if (words.length === 0) {
+      // Fallback to default challenges
+      return [
+        { phrase: 'Hello friend', speed: 0.9, points: 10, storyTitle: 'Basic Words' },
+        { phrase: 'I love English', speed: 1.0, points: 15, storyTitle: 'Basic Words' },
+        { phrase: 'Learning is fun', speed: 1.1, points: 20, storyTitle: 'Basic Words' },
+        { phrase: 'Practice makes perfect', speed: 1.2, points: 25, storyTitle: 'Basic Words' },
+        { phrase: 'I can speak English well', speed: 1.3, points: 30, storyTitle: 'Basic Words' }
+      ];
+    }
+
+    // Create challenges using story words
+    const challenges = [];
+    const shortWords = words.filter(w => w.word.length <= 6).slice(0, 15);
+    
+    if (shortWords.length >= 5) {
+      // Create 5 challenges with increasing difficulty
+      const phrases = [
+        `${shortWords[0].word} ${shortWords[1].word}`,
+        `The ${shortWords[2].word} is ${shortWords[3].word}`,
+        `I see a ${shortWords[4].word}`,
+        `${shortWords[5].word} and ${shortWords[6].word} are friends`,
+        `The ${shortWords[7].word} loves to ${shortWords[8].word}`
+      ];
+
+      phrases.forEach((phrase, index) => {
+        challenges.push({
+          phrase,
+          speed: 0.9 + (index * 0.1),
+          points: 10 + (index * 5),
+          storyTitle: shortWords[index]?.storyTitle || 'Story Words'
+        });
+      });
+    }
+
+    // Fill remaining challenges with default if needed
+    while (challenges.length < 5) {
+      challenges.push({
+        phrase: 'Hello friend',
+        speed: 0.9 + (challenges.length * 0.1),
+        points: 10 + (challenges.length * 5),
+        storyTitle: 'Basic Words'
+      });
+    }
+
+    return challenges;
+  };
+
+  const challenges = generateChallenges(storyWords);
 
   const current = challenges[level];
 
@@ -567,6 +847,14 @@ const EchoChallenge = ({ onBack, onScoreUpdate }: { onBack: () => void; onScoreU
           <div className="text-4xl font-extrabold text-gray-800 dark:text-white bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl p-8">
             {current.phrase}
           </div>
+          
+          {current.storyTitle && current.storyTitle !== 'Basic Words' && (
+            <div className="bg-purple-100 dark:bg-purple-900/20 rounded-lg p-2 mb-2">
+              <p className="text-xs text-purple-600 dark:text-purple-400 font-medium">
+                Words from: {current.storyTitle}
+              </p>
+            </div>
+          )}
           
           <p className="text-sm text-gray-500 dark:text-gray-300">
             Listen and repeat as fast as you can! ⚡
