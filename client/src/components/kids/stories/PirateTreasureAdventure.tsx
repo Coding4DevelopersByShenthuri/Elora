@@ -157,7 +157,7 @@ const storySteps = [
       { text: 'Jump overboard quickly', emoji: '⛈️🏊', meaning: 'abandoning ship' }
     ],
     
-    revealText: 'Ahoy! ... Success! ... We found all three treasure maps! ... (You\'re a true pirate legend!) Captain Finn encourages "Stay brave through the storm!" The waves are big and the rain is heavy, but we hold on tight and stay strong together! ... You are an AMAZING adventurer! ... Captain Finn is proud to have you as crew!',
+    revealText: 'Ahoy! ... Success! ... We found our second treasure map! ... Captain Finn encourages "Stay brave through the storm!" The waves are big and the rain is heavy, but we hold on tight and stay strong together! ... You are a BRAVE adventurer! ... One more map to go!',
     
     maxReplays: 5,
     wordCount: 45,
@@ -192,20 +192,9 @@ const storySteps = [
     duration: 38
   },
   {
-    id: 'final_map',
-    title: '🏆 Treasure Found',
-    text: 'The seas are filled with so much adventure! All the maps and treasures are happy because you listened so carefully to their secrets. You have learned so much about bravery, friendship, and teamwork!',
-    emoji: '🏆',
-    character: 'Captain',
-    bgColor: 'from-yellow-200 to-orange-200 dark:from-yellow-800 dark:to-orange-800',
-    interactive: false,
-    wordCount: 45,
-    duration: 30
-  },
-  {
     id: 'celebration',
     title: '🎉 Treasure Found!',
-    text: 'Congratulations, brave pirate! ... You helped find the legendary treasure! ... The whole crew is celebrating with singing, dancing, and cheering! ... You listened well, stayed brave, and worked as a team! ... You earned your place as a TRUE PIRATE! ... Set sail for more adventures! ... Yo ho ho! 🏴‍☠️⚓',
+    text: 'Congratulations, brave pirate! ... You helped find the legendary treasure! ... The whole crew is celebrating with singing, dancing, and cheering! ... You listened well, stayed brave, and worked as a team! ... You earned your place as a TRUE PIRATE! ... Set sail for more adventures! 🏴‍☠️⚓',
     emoji: '🎉',
     character: 'Captain',
     bgColor: 'from-rainbow-100 to-sparkle-100 dark:from-rainbow-900 dark:to-sparkle-900',
@@ -466,7 +455,7 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
       };
       playNarration();
     }
-  }, [listeningPhase, stepIndex, playbackSpeed, stars]);
+  }, [listeningPhase, stepIndex, stars]); // Removed playbackSpeed from dependencies to prevent re-triggering
 
   const handleNext = () => {
     if (stepIndex < storySteps.length - 1) {
@@ -509,10 +498,11 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
     setIsPlaying(true);
     setAudioWaveform(true);
     
-      try {
+    try {
+      console.log('🔄 Manual replay - using current speed:', playbackSpeed);
       await playAudioWithCaptions((current as any).audioText);
       setHasListened(true);
-      } catch (error) {
+    } catch (error) {
       console.log('TTS not available, text mode enabled');
       setHasListened(true); // Still allow progression
     }
@@ -559,21 +549,20 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
       
-      // Award stars based on specific story steps (steps 4, 7, and 6)
+      // Award stars based on specific story steps
       if (current.id === 'parrot_friend') {
-        // First star - after completing step 4 (parrot friend)
+        // First star - after completing step 3 (parrot friend)
         setStars(1);
-        console.log('⭐ First star awarded! (1/3) - Step 4: Parrot Friend');
-      } else if (current.id === 'second_map') {
-        // Second star - after completing step 7 (second map)
-        setStars(2);
-        console.log('⭐ Second star awarded! (2/3) - Step 7: Second Map');
+        console.log('⭐ First star awarded! (1/3) - Step 3: Parrot Friend');
       } else if (current.id === 'stormy_seas') {
-        // Third star - after completing step 6 (stormy seas)
+        // Second star - after completing step 5 (stormy seas)
+        setStars(2);
+        console.log('⭐ Second star awarded! (2/3) - Step 5: Stormy Seas');
+      } else if (current.id === 'second_map') {
+        // Third star - after completing step 6 (second map)
         setStars(3);
-        console.log('⭐ Third star awarded! (3/3) - Step 6: Stormy Seas');
+        console.log('⭐ Third star awarded! (3/3) - Step 6: Second Map');
       }
-      // Note: Stars are awarded at steps 4, 7, and 6 for better progression
     
     setShowFeedback(true);
       setRetryMode(false);
@@ -674,7 +663,9 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
     console.log('🎤 Starting reveal text playback with Captain Finn voice:', {
       text: textToSpeak.substring(0, 100) + '...',
       voice: CAPTAIN_VOICE,
-      speed: playbackSpeed
+      speed: playbackSpeed,
+      step: current.id,
+      phase: listeningPhase
     });
     
     setIsPlaying(true);
@@ -735,9 +726,9 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
     }
   };
 
-  // Instant speed change function - no delays, immediate response
+  // Enhanced speed change function - handles all scenarios perfectly
   const handleSpeedChange = (newSpeed: 'normal' | 'slow' | 'slower') => {
-    console.log('🔄 INSTANT speed change - Current step:', current.id, 'New speed:', newSpeed);
+    console.log('🔄 SPEED CHANGE - Current step:', current.id, 'Phase:', listeningPhase, 'New speed:', newSpeed);
     
     // Update speed state immediately
     setPlaybackSpeed(newSpeed);
@@ -745,70 +736,88 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
     // Force stop any currently playing audio immediately
     OnlineTTS.stop();
     
-    // Determine what text to replay
-    let textToPlay = '';
+    // Reset playing states
+    setIsPlaying(false);
+    setIsRevealTextPlaying(false);
+    setAudioWaveform(false);
     
-    if (current.listeningFirst) {
-      // Interactive steps with listening phases
-      if (listeningPhase === 'listening' && (current as any).audioText) {
-        textToPlay = (current as any).audioText;
-        console.log('🎧 INSTANT replay listening audio:', textToPlay.substring(0, 50) + '...');
-      } else if (listeningPhase === 'reveal' && (current as any).revealText) {
-        textToPlay = (current as any).revealText;
-        console.log('🎭 INSTANT replay reveal text:', textToPlay.substring(0, 50) + '...');
-      }
-    } else {
-      // Non-interactive steps (like intro, celebration, etc.)
-      if (current.text) {
-        if (current.id === 'celebration') {
-          textToPlay = stars >= 3 
-            ? "Congratulations brave pirate! ... The WHOLE crew is celebrating YOU! ... Pirates are cheering, treasure is glowing, and adventure magic fills the ship! ... You made the seven seas proud with your amazing listening! You should feel SO brave! ... Give yourself a hearty ARRR!"
-            : `Great adventure, young pirate! ... You found ${Math.floor(stars)} treasure map${Math.floor(stars) !== 1 ? 's' : ''}! ... The crew is impressed by your courage! ... Captain Finn is proud of you! ... Every voyage teaches us something. Keep sailing and you'll find all the treasure next time! 🏴‍☠️`;
-          console.log('🎉 INSTANT replay celebration text:', textToPlay.substring(0, 50) + '...');
-        } else {
-          textToPlay = current.text;
-          console.log('📖 INSTANT replay intro/narration text:', textToPlay.substring(0, 50) + '...');
+    // Small delay to ensure TTS is fully stopped
+    setTimeout(() => {
+      // Determine what text to replay based on current context
+      let textToPlay = '';
+      let shouldReplay = false;
+      
+      if (current.listeningFirst) {
+        // Interactive steps with listening phases
+        if (listeningPhase === 'listening' && (current as any).audioText) {
+          textToPlay = (current as any).audioText;
+          shouldReplay = true;
+          console.log('🎧 Speed change - replaying listening audio:', textToPlay.substring(0, 50) + '...');
+        } else if (listeningPhase === 'reveal' && (current as any).revealText) {
+          textToPlay = (current as any).revealText;
+          shouldReplay = true;
+          console.log('🎭 Speed change - replaying reveal text:', textToPlay.substring(0, 50) + '...');
+        }
+      } else {
+        // Non-interactive steps (like intro, celebration, etc.)
+        if (current.text) {
+          if (current.id === 'celebration') {
+            textToPlay = stars >= 3 
+              ? "Congratulations brave pirate! ... The WHOLE crew is celebrating YOU! ... Pirates are cheering, treasure is glowing, and adventure magic fills the ship! ... You made the seven seas proud with your amazing listening! You should feel SO brave! ... Give yourself a hearty ARRR!"
+              : `Great adventure, young pirate! ... You found ${Math.floor(stars)} treasure map${Math.floor(stars) !== 1 ? 's' : ''}! ... The crew is impressed by your courage! ... Captain Finn is proud of you! ... Every voyage teaches us something. Keep sailing and you'll find all the treasure next time! 🏴‍☠️`;
+            console.log('🎉 Speed change - replaying celebration text:', textToPlay.substring(0, 50) + '...');
+          } else {
+            textToPlay = current.text;
+            console.log('📖 Speed change - replaying intro/narration text:', textToPlay.substring(0, 50) + '...');
+          }
+          shouldReplay = true;
         }
       }
-    }
-    
-    if (!textToPlay) {
-      console.log('❌ No text found to replay');
-      return;
-    }
-    
-    if (!ttsAvailable) {
-      console.log('❌ TTS not available');
-      return;
-    }
-    
-    // Start playing immediately with new speed
-    const playWithNewSpeed = async () => {
-      try {
-        const cleanText = stripEmojis(textToPlay);
-        console.log('🎤 INSTANT speaking at new speed:', newSpeed, 'Text length:', cleanText.length);
-        
-        setIsPlaying(true);
-        setIsRevealTextPlaying(listeningPhase === 'reveal');
-        
-        await OnlineTTS.speak(cleanText, CAPTAIN_VOICE, {
-          speed: newSpeed,
-          showCaptions: false,
-          onCaptionUpdate: () => {}
-        });
-        
-        console.log('✅ INSTANT speed change completed successfully');
-        
-      } catch (error) {
-        console.error('❌ INSTANT speed change error:', error);
-      } finally {
-        setIsPlaying(false);
-        setIsRevealTextPlaying(false);
+      
+      if (!shouldReplay || !textToPlay) {
+        console.log('ℹ️ Speed changed but no replay needed - no active audio context');
+        return;
       }
-    };
-    
-    // Start playing immediately (no await to make it instant)
-    playWithNewSpeed();
+      
+      if (!ttsAvailable) {
+        console.log('❌ TTS not available for speed change replay');
+        return;
+      }
+      
+      // Start playing with new speed
+      const playWithNewSpeed = async () => {
+        try {
+          const cleanText = stripEmojis(textToPlay);
+          console.log('🎤 Playing with new speed:', newSpeed, 'Text length:', cleanText.length);
+          
+          setIsPlaying(true);
+          setIsRevealTextPlaying(listeningPhase === 'reveal');
+          
+          // Set audio waveform for listening phase
+          if (listeningPhase === 'listening') {
+            setAudioWaveform(true);
+          }
+          
+          await OnlineTTS.speak(cleanText, CAPTAIN_VOICE, {
+            speed: newSpeed,
+            showCaptions: false,
+            onCaptionUpdate: () => {}
+          });
+          
+          console.log('✅ Speed change replay completed successfully');
+          
+        } catch (error) {
+          console.error('❌ Speed change replay error:', error);
+        } finally {
+          setIsPlaying(false);
+          setIsRevealTextPlaying(false);
+          setAudioWaveform(false);
+        }
+      };
+      
+      // Start playing with new speed
+      playWithNewSpeed();
+    }, 150); // Small delay to ensure clean stop
   };
 
   const getCharacterAnimation = () => {
