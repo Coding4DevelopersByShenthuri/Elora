@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Sparkles, Fish, Star, Volume2, Play, Zap, Waves, X, Ear, Award, Gauge, RotateCcw, FileText } from 'lucide-react';
-import { HybridVoiceService, STORY_VOICES } from '@/services/HybridVoiceService';
+import OnlineTTS, { STORY_VOICES } from '@/services/OnlineTTS';
 import KidsListeningAnalytics, { type StorySession } from '@/services/KidsListeningAnalytics';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -287,22 +287,23 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
   const maxReplays = (current as any).maxReplays || 5;
   const unlimitedReplays = true;
 
-  // Initialize hybrid voice service on mount
+  // Initialize online TTS on mount
   useEffect(() => {
     const initializeVoice = async () => {
       try {
-        // Initialize HybridVoiceService (handles both online and offline TTS)
-        await HybridVoiceService.initialize();
+        // Initialize OnlineTTS (Web Speech API only)
+        await OnlineTTS.initialize();
         
         // Check if TTS is available
-        const available = HybridVoiceService.isAvailable();
+        const available = OnlineTTS.isAvailable();
         setTtsAvailable(available);
         
         if (!available) {
           console.warn('No voice synthesis available, falling back to text-only mode');
           // Transcript remains off by default - users can toggle if needed
         } else {
-          console.log(`🎤 HybridVoiceService initialized successfully`);
+          const mode = OnlineTTS.getVoiceMode();
+          console.log(`🎤 Voice mode: ${mode}`);
           
           // VERIFY FINN'S UNIQUE VOICE PROFILE
           console.log('🐠 UNDERWATER WORLD VOICE VERIFICATION:', {
@@ -314,52 +315,15 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
             rate: FINN_VOICE.rate,
             volume: FINN_VOICE.volume,
             isUniqueVoice: true,
-            note: 'This is Finn\'s unique voice profile using HybridVoiceService',
-            expectedCharacteristics: 'Microsoft David voice for bubbly fish character with character-specific optimizations'
+            note: 'This is Finn\'s unique voice profile using OnlineTTS',
+            expectedCharacteristics: 'Microsoft David voice for bubbly fish character'
           });
           
-          // ENHANCED VOICE DEBUGGING - Check what voice will actually be used
-          console.log('🔍 ENHANCED VOICE DEBUGGING - Checking actual voice selection:');
-          const availableVoices = HybridVoiceService.getAvailableVoices();
-          console.log('Available voices count:', availableVoices.length);
-          console.log('Available voices:', availableVoices.map(v => ({
-            name: v.name,
-            lang: v.lang,
-            localService: v.localService,
-            gender: (v as any).gender || 'unknown'
-          })));
-          
-          // Check if Finn's specific voice is available
-          const finnVoice = availableVoices.find(v => v.name === FINN_VOICE.voiceName);
-          console.log('Finn\'s target voice found:', finnVoice ? finnVoice.name : 'NOT FOUND');
-          
-          // Check for Microsoft David specifically
-          const davidVoice = availableVoices.find(v => v.name.toLowerCase().includes('david'));
-          console.log('Microsoft David voice found:', davidVoice ? davidVoice.name : 'NOT FOUND');
-          
-          // Check for any Microsoft voices
-          const microsoftVoices = availableVoices.filter(v => v.name.toLowerCase().includes('microsoft'));
-          console.log('All Microsoft voices:', microsoftVoices.map(v => v.name));
-          
-          // Test voice selection logic by simulating the selection process
-          console.log('🎯 Testing voice selection logic...');
-          let selectedVoice = 'Unknown';
-          if (finnVoice) {
-            selectedVoice = finnVoice.name;
-            console.log('✅ Using exact match:', selectedVoice);
-          } else if (davidVoice) {
-            selectedVoice = davidVoice.name;
-            console.log('✅ Using David fallback:', selectedVoice);
-          } else if (microsoftVoices.length > 0) {
-            selectedVoice = microsoftVoices[0].name;
-            console.log('✅ Using Microsoft fallback:', selectedVoice);
-          } else {
-            console.log('❌ No suitable voice found');
-          }
-          console.log('Selected voice for Finn:', selectedVoice);
+          // Log available voices for debugging
+          OnlineTTS.logAvailableVoices();
         }
       } catch (error) {
-        console.error('Failed to initialize HybridVoiceService:', error);
+        console.error('Failed to initialize TTS:', error);
         setTtsAvailable(false);
         // Transcript remains off by default - users can toggle if needed
       }
@@ -381,7 +345,7 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
     // Cleanup function to stop TTS when component unmounts
     return () => {
       console.log('🛑 Story component unmounting - stopping TTS immediately');
-      HybridVoiceService.stop();
+      OnlineTTS.stop();
     };
   }, [userId]);
 
@@ -410,13 +374,13 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
     return text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{FE00}-\u{FE0F}]|[\u{E0020}-\u{E007F}]/gu, '').trim();
   };
 
-  // Enhanced audio playback (HybridVoiceService: Online + Offline TTS)
+  // Enhanced audio playback (OnlineTTS: Web Speech API only)
   const playAudioWithCaptions = async (text: string) => {
     try {
       // Strip emojis/stickers before speaking to prevent TTS from reading emoji names
       const cleanText = stripEmojis(text);
       
-      console.log(`🎤 Playing audio with Finn's voice via HybridVoiceService:`, {
+      console.log(`🎤 Playing audio with Finn's voice:`, {
         text: cleanText.substring(0, 50) + '...',
         voice: FINN_VOICE,
         step: current.id,
@@ -432,24 +396,12 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
         }
       });
       
-      // REAL-TIME VOICE VERIFICATION - Check what voice is actually being used
-      console.log('🔍 REAL-TIME VOICE VERIFICATION:');
-      const currentVoices = HybridVoiceService.getAvailableVoices();
-      const currentFinnVoice = currentVoices.find(v => v.name === FINN_VOICE.voiceName);
-      const currentDavidVoice = currentVoices.find(v => v.name.toLowerCase().includes('david'));
-      console.log('Current available voices for Finn:', {
-        targetVoice: FINN_VOICE.voiceName,
-        exactMatch: currentFinnVoice ? currentFinnVoice.name : 'NOT FOUND',
-        davidMatch: currentDavidVoice ? currentDavidVoice.name : 'NOT FOUND',
-        totalVoices: currentVoices.length
-      });
-      
       // Ensure TTS is available before speaking
-      if (!HybridVoiceService.isAvailable()) {
+      if (!OnlineTTS.isAvailable()) {
         throw new Error('TTS not available');
       }
       
-      await HybridVoiceService.speak(
+      await OnlineTTS.speak(
         cleanText,
         FINN_VOICE,
         {
@@ -473,8 +425,8 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
         // Don't mark TTS as unavailable immediately - try to recover
         console.log('🔄 Attempting to recover TTS...');
         try {
-          await HybridVoiceService.initialize();
-          if (HybridVoiceService.isAvailable()) {
+          await OnlineTTS.initialize();
+          if (OnlineTTS.isAvailable()) {
             console.log('✅ TTS recovered successfully');
             // Don't throw error, just log it
             return;
@@ -588,7 +540,7 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
       
       // Stop TTS when story completes
       console.log('🛑 Story completed - stopping TTS');
-      HybridVoiceService.stop();
+      OnlineTTS.stop();
       
       onComplete(score);
     }
@@ -748,8 +700,8 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
     if (!ttsAvailable) {
       console.log('❌ TTS not available in playRevealText, attempting to reinitialize...');
       try {
-        await HybridVoiceService.initialize();
-        if (HybridVoiceService.isAvailable()) {
+        await OnlineTTS.initialize();
+        if (OnlineTTS.isAvailable()) {
           console.log('✅ TTS reinitialized successfully');
           setTtsAvailable(true);
         } else {
@@ -772,7 +724,7 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
     setIsRevealTextPlaying(true);
     try {
       // Force stop any current speech first
-      HybridVoiceService.stop();
+      OnlineTTS.stop();
       await new Promise(resolve => setTimeout(resolve, 100));
       
       // Use playAudioWithCaptions which ensures Finn's voice
@@ -787,10 +739,10 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
       // Try to reinitialize TTS and retry once
       try {
         console.log('🔄 Attempting TTS reinitialization...');
-        await HybridVoiceService.initialize();
+        await OnlineTTS.initialize();
         await new Promise(resolve => setTimeout(resolve, 200));
         
-        if (HybridVoiceService.isAvailable()) {
+        if (OnlineTTS.isAvailable()) {
           console.log('🔄 Retrying reveal text with reinitialized TTS...');
           await playAudioWithCaptions(textToSpeak);
           console.log('✅ Retry successful');
@@ -815,7 +767,7 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
     setPlaybackSpeed(newSpeed);
     
     // Force stop any currently playing audio immediately
-    HybridVoiceService.stop();
+    OnlineTTS.stop();
     
     // Determine what text to replay
     let textToPlay = '';
@@ -863,7 +815,7 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
         setIsPlaying(true);
         setIsRevealTextPlaying(listeningPhase === 'reveal');
         
-        await HybridVoiceService.speak(cleanText, FINN_VOICE, {
+        await OnlineTTS.speak(cleanText, FINN_VOICE, {
           speed: newSpeed,
           showCaptions: false,
           onCaptionUpdate: () => {}
@@ -917,7 +869,11 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
         <div className="absolute top-4 right-4 z-10">
           <Button 
             variant="ghost" 
-            onClick={onClose} 
+            onClick={() => {
+              console.log('🛑 Close button clicked - stopping TTS immediately');
+              OnlineTTS.stop();
+              onClose();
+            }}
             className="h-10 w-10 p-0 rounded-full bg-white/80 hover:bg-white backdrop-blur-sm border shadow-lg z-50"
           >
             <X className="w-5 h-5 text-gray-700" />
