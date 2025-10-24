@@ -156,7 +156,7 @@ const storySteps = [
       { text: 'Dancing is too tiring', emoji: '🦋😓', meaning: 'too hard' }
     ],
     
-    revealText: 'Wonderful! ... You found all three flower petals! ... (They\'re making a beautiful crown for you!) The butterfly twirls and says "Dancing makes my heart happy!" When we move to music or spin around, it fills us with happiness! ... You are a MAGICAL friend! ... Twinkle is so happy you visited!',
+    revealText: 'Wonderful! You earned your second petal! The butterfly twirls and says "Dancing makes my heart happy!" When we move to music or spin around, it fills us with happiness! One more petal to complete your magical crown!',
     
     maxReplays: 5,
     wordCount: 38,
@@ -184,7 +184,7 @@ const storySteps = [
       { text: 'Nothing is ever special', emoji: '✨😞', meaning: 'nothing matters' }
     ],
     
-    revealText: 'Wise! "Small things can be very special!" A tiny seed becomes a flower, small acts of kindness change the world, and little fairies make big magic!',
+    revealText: 'Incredible! ... YES! ... You found all three flower petals! ... (They\'re making a beautiful crown for you!) "Small things can be very special!" A tiny seed becomes a flower, small acts of kindness change the world, and little fairies make big magic! ... You are a MAGICAL friend! ... Twinkle is so happy you visited!',
     
     maxReplays: 5,
     wordCount: 40,
@@ -539,21 +539,21 @@ const FairyGardenAdventure = ({ onClose, onComplete }: Props) => {
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
       
-      // Award stars based on specific story steps (steps 4, 7, and 6)
+      // Award stars based on specific story steps (steps 4, 6, and 7)
       if (current.id === 'blooming_flower') {
         // First star - after completing step 4 (blooming flower)
         setStars(1);
         console.log('⭐ First star awarded! (1/3) - Step 4: Blooming Flower');
-      } else if (current.id === 'second_petal') {
-        // Second star - after completing step 7 (second petal)
-        setStars(2);
-        console.log('⭐ Second star awarded! (2/3) - Step 7: Second Petal');
       } else if (current.id === 'butterfly_dance') {
-        // Third star - after completing step 6 (butterfly dance)
+        // Second star - after completing step 6 (butterfly dance)
+        setStars(2);
+        console.log('⭐ Second star awarded! (2/3) - Step 6: Butterfly Dance');
+      } else if (current.id === 'second_petal') {
+        // Third star - after completing step 7 (second petal)
         setStars(3);
-        console.log('⭐ Third star awarded! (3/3) - Step 6: Butterfly Dance');
+        console.log('⭐ Third star awarded! (3/3) - Step 7: Second Petal');
       }
-      // Note: Stars are awarded at steps 4, 7, and 6 for better progression
+      // Note: Stars are awarded at steps 4, 6, and 7 for proper progression
       
       setShowFeedback(true);
       setRetryMode(false);
