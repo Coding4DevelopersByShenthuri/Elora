@@ -13,7 +13,7 @@ type Props = {
   onComplete: (score: number) => void;
 };
 
-// Cosmo's unique voice profile
+// Cosmo's unique voice profile (uses OnlineTTS for unique Microsoft Mark voice)
 const COSMO_VOICE = STORY_VOICES.Cosmo;
 
 const storySteps = [
@@ -318,7 +318,7 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
   useEffect(() => {
     const initializeVoice = async () => {
       try {
-        // Initialize OnlineTTS (Web Speech API only)
+        // Initialize OnlineTTS (Web Speech API with unique Microsoft voices)
         await OnlineTTS.initialize();
         
         // Check if TTS is available
@@ -333,9 +333,6 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
           const mode = OnlineTTS.getVoiceMode();
           console.log(`🎤 Voice mode: ${mode}`);
           
-          // Log available voices for debugging
-          OnlineTTS.logAvailableVoices();
-          
           // VERIFY COSMO'S UNIQUE VOICE PROFILE
           console.log('🚀 SPACE ADVENTURE VOICE VERIFICATION:', {
             character: 'Cosmo the Astronaut',
@@ -346,7 +343,7 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
             rate: COSMO_VOICE.rate,
             volume: COSMO_VOICE.volume,
             isUniqueVoice: true,
-            note: 'This is Cosmo\'s unique voice profile - NOT generic Web Speech API'
+            note: 'This is Cosmo\'s unique voice profile using Microsoft Mark voice'
           });
         }
       } catch (error) {
@@ -444,18 +441,18 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
         textLength: text.length
       });
       
-      // Don't mark TTS as unavailable immediately - try to recover
-      console.log('🔄 Attempting to recover TTS...');
-      try {
-        await OnlineTTS.initialize();
-        if (OnlineTTS.isAvailable()) {
-          console.log('✅ TTS recovered successfully');
-          // Don't throw error, just log it
-          return;
+        // Don't mark TTS as unavailable immediately - try to recover
+        console.log('🔄 Attempting to recover TTS...');
+        try {
+          await OnlineTTS.initialize();
+          if (OnlineTTS.isAvailable()) {
+            console.log('✅ TTS recovered successfully');
+            // Don't throw error, just log it
+            return;
+          }
+        } catch (recoveryError) {
+          console.error('❌ TTS recovery failed:', recoveryError);
         }
-      } catch (recoveryError) {
-        console.error('❌ TTS recovery failed:', recoveryError);
-      }
       
       setTtsAvailable(false);
       // Transcript remains off by default - users can toggle if needed

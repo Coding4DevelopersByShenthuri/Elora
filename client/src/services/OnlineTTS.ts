@@ -222,7 +222,11 @@ export class OnlineTTS {
           console.log(`✅ Voice selected: ${voice.name} for ${voiceProfile.name}`, {
             voiceName: voice.name,
             voiceLang: voice.lang,
-            voiceLocalService: voice.localService
+            voiceLocalService: voice.localService,
+            targetVoice: voiceProfile.voiceName,
+            isExactMatch: voice.name === voiceProfile.voiceName,
+            isMicrosoftVoice: voice.name.toLowerCase().includes('microsoft'),
+            isGoogleVoice: voice.name.toLowerCase().includes('google')
           });
         } else {
           console.warn(`⚠️ Voice "${voiceProfile.voiceName}" not found, using default voice for ${voiceProfile.name}`);

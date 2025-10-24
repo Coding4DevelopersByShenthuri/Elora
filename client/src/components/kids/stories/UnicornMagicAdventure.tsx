@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Sparkles, Star, Volume2, Play, Zap, X, Ear, Award, Gauge, RotateCcw, FileText, Heart } from 'lucide-react';
+import { Sparkles, Star, Volume2, Play, Zap, X, Ear, Award, Gauge, RotateCcw, FileText, Heart, Flower, Trees, CloudRain } from 'lucide-react';
 import OnlineTTS, { STORY_VOICES } from '@/services/OnlineTTS';
 import KidsListeningAnalytics, { type StorySession } from '@/services/KidsListeningAnalytics';
 import { cn } from '@/lib/utils';
@@ -13,6 +13,7 @@ type Props = {
   onComplete: (score: number) => void;
 };
 
+// Stardust's unique voice profile (uses hybrid voice system)
 const STARDUST_VOICE = STORY_VOICES.Stardust;
 
 const storySteps = [
@@ -246,6 +247,10 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
   
   const [currentSession, setCurrentSession] = useState<StorySession | null>(null);
   const [questionStartTime, setQuestionStartTime] = useState(0);
+  
+  // TTS availability status
+  const [ttsInitialized, setTtsInitialized] = useState(false);
+  const [isRevealTextPlaying, setIsRevealTextPlaying] = useState(false);
 
   const current = storySteps[stepIndex];
   const progress = Math.round(((stepIndex + 1) / storySteps.length) * 100);
@@ -256,21 +261,53 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
   const maxReplays = (current as any).maxReplays || 5;
   const unlimitedReplays = true;
 
+  // Initialize online TTS on mount
   useEffect(() => {
     const initializeVoice = async () => {
-      await OnlineTTS.initialize();
-      const available = OnlineTTS.isAvailable();
-      setTtsAvailable(available);
-      // Transcript remains off by default - users can toggle if needed
+      try {
+        // Initialize OnlineTTS (Web Speech API only)
+        await OnlineTTS.initialize();
+        
+        // Check if TTS is available
+        const available = OnlineTTS.isAvailable();
+        setTtsAvailable(available);
+        setTtsInitialized(true);
+        
+        if (!available) {
+          console.warn('No voice synthesis available, falling back to text-only mode');
+          // Transcript remains off by default - users can toggle if needed
+        } else {
+          const mode = OnlineTTS.getVoiceMode();
+          console.log(`🎤 Voice mode: ${mode}`);
+          
+          // Log available voices for debugging
+          OnlineTTS.logAvailableVoices();
+        }
+      } catch (error) {
+        console.error('Failed to initialize TTS:', error);
+        setTtsAvailable(false);
+        // Transcript remains off by default - users can toggle if needed
+      }
     };
     initializeVoice();
     
+    // Initialize analytics session
     const initSession = async () => {
       await KidsListeningAnalytics.initialize(userId);
-      const session = KidsListeningAnalytics.startSession(userId, 'unicorn-magic', 'Unicorn Magic');
+      const session = KidsListeningAnalytics.startSession(
+        userId,
+        'unicorn-magic',
+        'Unicorn Magic'
+      );
       setCurrentSession(session);
     };
     initSession();
+
+    // Cleanup function to stop TTS when component unmounts
+    return () => {
+      console.log('🛑 Story component unmounting - stopping TTS immediately');
+      OnlineTTS.stop();
+    };
   }, [userId]);
 
   useEffect(() => {
@@ -298,34 +335,78 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
     return text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{FE00}-\u{FE0F}]|[\u{E0020}-\u{E007F}]/gu, '').trim();
   };
 
-  const playAudioWithCaptions = async (text: string, showCaptions: boolean = false) => {
+  // Enhanced audio playback (OnlineTTS: Web Speech API only)
+  const playAudioWithCaptions = async (text: string) => {
     try {
+      // Strip emojis/stickers before speaking to prevent TTS from reading emoji names
       const cleanText = stripEmojis(text);
-      const allowCaptions = showCaptions && captionsEnabled && 
-        (listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode);
       
-      await OnlineTTS.speak(cleanText, STARDUST_VOICE, {
+      console.log(`🎤 Playing audio with Stardust's voice:`, {
+        text: cleanText.substring(0, 50) + '...',
+        voice: STARDUST_VOICE,
+        step: current.id,
+        phase: listeningPhase,
         speed: playbackSpeed,
-        showCaptions: allowCaptions,
-        onCaptionUpdate: allowCaptions ? setCurrentCaption : () => {}
+        isRevealText: !!(current as any).revealText && text === (current as any).revealText
       });
-    } catch (error) {
-      setTtsAvailable(false);
-      // Transcript remains off by default - users can toggle if needed
-      throw error;
-    }
+      
+      // Ensure TTS is available before speaking
+      if (!OnlineTTS.isAvailable()) {
+        throw new Error('TTS not available');
+      }
+      
+      await OnlineTTS.speak(
+        cleanText,
+        STARDUST_VOICE,
+        {
+          speed: playbackSpeed,
+          showCaptions: false,
+          onCaptionUpdate: () => {}
+        }
+      );
+      
+      console.log(`✅ Audio playback completed for step: ${current.id}`);
+      } catch (error) {
+        console.error('❌ Voice synthesis failed:', error);
+        console.error('❌ Error details:', {
+          step: current.id,
+          phase: listeningPhase,
+          ttsAvailable,
+          isRevealText: !!(current as any).revealText && text === (current as any).revealText,
+          textLength: text.length
+        });
+        
+        // Don't mark TTS as unavailable immediately - try to recover
+        console.log('🔄 Attempting to recover TTS...');
+        try {
+          await OnlineTTS.initialize();
+          if (OnlineTTS.isAvailable()) {
+            console.log('✅ TTS recovered successfully');
+            // Don't throw error, just log it
+            return;
+          }
+        } catch (recoveryError) {
+          console.error('❌ TTS recovery failed:', recoveryError);
+        }
+        
+        setTtsAvailable(false);
+        // Transcript remains off by default - users can toggle if needed
+        throw error;
+      }
   };
 
+  // Auto-play for listening phase ONLY (no text shown)
   useEffect(() => {
     if (listeningPhase === 'listening' && current.listeningFirst && (current as any).audioText) {
       const playListeningAudio = async () => {
         setIsPlaying(true);
         setAudioWaveform(true);
         try {
-          await playAudioWithCaptions((current as any).audioText, true);
+          await playAudioWithCaptions((current as any).audioText);
           setHasListened(true);
         } catch (error) {
-          setHasListened(true);
+          console.log('TTS not available, text mode enabled');
+          setHasListened(true); // Allow progression even without TTS
         }
         setIsPlaying(false);
         setAudioWaveform(false);
@@ -335,35 +416,52 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
     
     // Auto-play for reveal phase (after correct answer)
     if (listeningPhase === 'reveal' && current.listeningFirst && (current as any).revealText && ttsAvailable) {
+      console.log('🎭 Auto-playing reveal text:', {
+        stepId: current.id,
+        revealText: (current as any).revealText.substring(0, 50) + '...',
+        voice: STARDUST_VOICE,
+        speed: playbackSpeed
+      });
+      
       const playReveal = async () => {
         setIsPlaying(true);
+        setIsRevealTextPlaying(true);
         try {
-          await playAudioWithCaptions((current as any).revealText, true);
+          await playAudioWithCaptions((current as any).revealText);
+          console.log('✅ Auto reveal text playback completed');
+          
+          // Wait a bit more after TTS completes to ensure full reading
+          await new Promise(resolve => setTimeout(resolve, 1000));
         } catch (error) {
-          console.log('TTS not available');
+          console.error('❌ Auto reveal text playback failed:', error);
+        } finally {
+          setIsPlaying(false);
+          setIsRevealTextPlaying(false);
         }
-        setIsPlaying(false);
       };
       playReveal();
     }
     
+    // For non-interactive steps, play the full text automatically
     if (!current.listeningFirst && current.text && ttsAvailable) {
       const playNarration = async () => {
         let textToRead = current.text;
         
         // Handle dynamic celebration text based on stars collected
-        if (current.id === 'grand_celebration') {
+        if (current.id === 'celebration') {
+          console.log(`🎉 Unicorn Celebration step - Stars collected: ${stars}`);
           if (stars >= 3) {
             textToRead = "Congratulations magical friend! ... The WHOLE enchanted kingdom is celebrating YOU! ... Unicorns are dancing, rainbows are glowing, and pure magic fills the sky! ... You made the magical world so proud with your wonderful listening! You should feel SO special! ... Give yourself a magical twirl!";
           } else {
             textToRead = `Beautiful work, little dreamer! ... You collected ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The unicorns are happy you tried your best! ... Rainbow is proud of you! ... Every magical journey helps us learn. Keep believing and you'll collect all the stars next time! 🦄`;
           }
+          console.log(`🎉 Celebration text selected:`, textToRead.substring(0, 100) + '...');
         }
         
         try {
-          await playAudioWithCaptions(textToRead, true);
+          await playAudioWithCaptions(textToRead);
         } catch (error) {
-          console.log('TTS not available');
+          console.error('❌ TTS not available for non-interactive step:', error);
         }
       };
       playNarration();
@@ -377,19 +475,33 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
       setShowFeedback(false);
       setShowHint(false);
     } else {
+      // Calculate score based on correct answers and time
       const accuracyScore = correctAnswers * 20;
-      const timeBonus = Math.max(0, 300 - timeSpent) * 0.1;
+      const timeBonus = Math.max(0, 300 - timeSpent) * 0.1; // Bonus for faster completion
       const starBonus = stars * 10;
       const score = Math.min(100, 40 + accuracyScore + timeBonus + starBonus);
       
+      // Complete analytics session
       if (currentSession) {
-        KidsListeningAnalytics.completeSession(userId, currentSession, score, stars);
+        KidsListeningAnalytics.completeSession(
+          userId,
+          currentSession,
+          score,
+          stars
+        );
+        console.log('📊 Session analytics saved');
       }
+      
+      // Stop TTS when story completes
+      console.log('🛑 Story completed - stopping TTS');
+      OnlineTTS.stop();
+      
       onComplete(score);
     }
   };
 
   const handleReplayAudio = async () => {
+    // Allow unlimited replays for accessibility
     if (!unlimitedReplays && replaysUsed >= maxReplays) return;
     if (!current.listeningFirst) return;
     
@@ -397,11 +509,12 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
     setIsPlaying(true);
     setAudioWaveform(true);
     
-    try {
-      await playAudioWithCaptions((current as any).audioText, true);
+      try {
+      await playAudioWithCaptions((current as any).audioText);
       setHasListened(true);
-    } catch (error) {
-      setHasListened(true);
+      } catch (error) {
+      console.log('TTS not available, text mode enabled');
+      setHasListened(true); // Still allow progression
     }
     
     setIsPlaying(false);
@@ -420,9 +533,13 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
     const currentAttempt = attemptCount + 1;
     setAttemptCount(currentAttempt);
     
+    // Calculate time spent on this question
     const questionTime = Math.round((Date.now() - questionStartTime) / 1000);
+    
+    // Check if choice is correct
     const isCorrect = choice === (current as any).audioText;
     
+    // Record attempt in analytics
     if (currentSession && current.listeningFirst) {
       const updatedSession = KidsListeningAnalytics.recordAttempt(
         currentSession,
@@ -438,16 +555,64 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
     
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
-      const starReward = currentAttempt === 1 ? 1 : 0.5;
-      setStars(prev => Math.min(3, prev + starReward));
-      setShowFeedback(true);
-      setRetryMode(false);
       
-      setTimeout(() => setListeningPhase('reveal'), 2500);
-      setTimeout(() => handleNext(), 5000);
+      // Award stars based on specific story steps
+      if (current.id === 'first_star') {
+        // First star - after completing first star step
+        setStars(1);
+        console.log('⭐ First star awarded! (1/3)');
+      } else if (current.id === 'second_star') {
+        // Second star - after completing second star step
+        setStars(2);
+        console.log('⭐ Second star awarded! (2/3)');
+      } else if (current.id === 'final_star') {
+        // Third star - after completing final star step
+        setStars(3);
+        console.log('⭐ Third star awarded! (3/3)');
+      }
+      // Note: Other interactive steps don't award stars, only the specific star steps do
+    
+    setShowFeedback(true);
+      setRetryMode(false);
+    
+      // Auto-advance after showing feedback to reveal phase
+    setTimeout(() => {
+        setListeningPhase('reveal');
+    }, 2500);
+      
+      // Calculate dynamic timing based on reveal text length
+      const revealText = (current as any).revealText || '';
+      const textLength = revealText.length;
+      const wordsPerMinute = playbackSpeed === 'slow' ? 120 : playbackSpeed === 'slower' ? 80 : 160;
+      const estimatedDuration = Math.max(10000, (textLength / 5) * (60000 / wordsPerMinute) + 2000); // At least 10 seconds + 2 second buffer
+      
+      console.log('⏱️ Dynamic timing calculation:', {
+        textLength,
+        wordsPerMinute,
+        estimatedDuration: Math.round(estimatedDuration),
+        playbackSpeed,
+        revealText: revealText.substring(0, 50) + '...'
+      });
+      
+      // Move to next step after reveal text has time to complete
+      setTimeout(() => {
+        // Double-check that reveal text is not still playing
+        if (!isRevealTextPlaying) {
+          handleNext();
+        } else {
+          console.log('⏳ Reveal text still playing, waiting a bit more...');
+          // Wait a bit more if still playing
+          setTimeout(() => {
+            handleNext();
+          }, 2000);
+        }
+      }, estimatedDuration);
     } else {
+      // Wrong answer - offer retry
       setShowFeedback(true);
       setRetryMode(true);
+      
+      // Don't auto-advance on wrong answer - let them retry
     }
   };
   
@@ -462,24 +627,166 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
   const playRevealText = async () => {
     let textToSpeak = (current as any).revealText || current.text;
     
+    console.log('🎭 playRevealText called:', {
+      stepId: current.id,
+      hasRevealText: !!(current as any).revealText,
+      hasText: !!current.text,
+      ttsAvailable,
+      textPreview: textToSpeak ? textToSpeak.substring(0, 50) + '...' : 'No text'
+    });
+    
     // Handle dynamic celebration text based on stars collected
-    if (current.id === 'grand_celebration') {
+    if (current.id === 'celebration') {
+      console.log(`🎉 Manual playRevealText - Unicorn Celebration - Stars: ${stars}`);
       if (stars >= 3) {
         textToSpeak = "Congratulations magical friend! ... The WHOLE enchanted kingdom is celebrating YOU! ... Unicorns are dancing, rainbows are glowing, and pure magic fills the sky! ... You made the magical world so proud with your wonderful listening! You should feel SO special! ... Give yourself a magical twirl!";
       } else {
         textToSpeak = `Beautiful work, little dreamer! ... You collected ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The unicorns are happy you tried your best! ... Rainbow is proud of you! ... Every magical journey helps us learn. Keep believing and you'll collect all the stars next time! 🦄`;
       }
+      console.log(`🎉 Manual celebration text:`, textToSpeak.substring(0, 100) + '...');
     }
     
-    if (textToSpeak && ttsAvailable) {
-      setIsPlaying(true);
-      try {
-        await playAudioWithCaptions(textToSpeak, true);
-      } catch (error) {
-        console.log('TTS not available');
-      }
-      setIsPlaying(false);
+    if (!textToSpeak) {
+      console.log('❌ No text to speak in playRevealText');
+      return;
     }
+    
+    if (!ttsAvailable) {
+      console.log('❌ TTS not available in playRevealText, attempting to reinitialize...');
+      try {
+        await OnlineTTS.initialize();
+        if (OnlineTTS.isAvailable()) {
+          console.log('✅ TTS reinitialized successfully');
+          setTtsAvailable(true);
+        } else {
+          console.log('❌ TTS still not available after reinitialization');
+          return;
+        }
+      } catch (error) {
+        console.error('❌ TTS reinitialization failed:', error);
+        return;
+      }
+    }
+    
+    console.log('🎤 Starting reveal text playback with Stardust voice:', {
+      text: textToSpeak.substring(0, 100) + '...',
+      voice: STARDUST_VOICE,
+      speed: playbackSpeed
+    });
+    
+    setIsPlaying(true);
+    setIsRevealTextPlaying(true);
+    try {
+      // Force stop any current speech first
+      OnlineTTS.stop();
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Use playAudioWithCaptions which ensures Stardust's voice
+      await playAudioWithCaptions(textToSpeak);
+      console.log('✅ Reveal text playback completed successfully');
+      
+      // Wait a bit more to ensure full completion
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } catch (error) {
+      console.error('❌ TTS error in playRevealText:', error);
+      
+      // Try to reinitialize TTS and retry once
+      try {
+        console.log('🔄 Attempting TTS reinitialization...');
+        await OnlineTTS.initialize();
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        if (OnlineTTS.isAvailable()) {
+          console.log('🔄 Retrying reveal text with reinitialized TTS...');
+          await playAudioWithCaptions(textToSpeak);
+          console.log('✅ Retry successful');
+          
+          // Wait after retry too
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      } catch (retryError) {
+        console.error('❌ Retry failed:', retryError);
+      }
+    } finally {
+      setIsPlaying(false);
+      setIsRevealTextPlaying(false);
+    }
+  };
+
+  // Instant speed change function - no delays, immediate response
+  const handleSpeedChange = (newSpeed: 'normal' | 'slow' | 'slower') => {
+    console.log('🔄 INSTANT speed change - Current step:', current.id, 'New speed:', newSpeed);
+    
+    // Update speed state immediately
+    setPlaybackSpeed(newSpeed);
+    
+    // Force stop any currently playing audio immediately
+    OnlineTTS.stop();
+    
+    // Determine what text to replay
+    let textToPlay = '';
+    
+    if (current.listeningFirst) {
+      // Interactive steps with listening phases
+      if (listeningPhase === 'listening' && (current as any).audioText) {
+        textToPlay = (current as any).audioText;
+        console.log('🎧 INSTANT replay listening audio:', textToPlay.substring(0, 50) + '...');
+      } else if (listeningPhase === 'reveal' && (current as any).revealText) {
+        textToPlay = (current as any).revealText;
+        console.log('🎭 INSTANT replay reveal text:', textToPlay.substring(0, 50) + '...');
+      }
+    } else {
+      // Non-interactive steps (like intro, celebration, etc.)
+      if (current.text) {
+        if (current.id === 'celebration') {
+          textToPlay = stars >= 3 
+            ? "Congratulations magical friend! ... The WHOLE enchanted kingdom is celebrating YOU! ... Unicorns are dancing, rainbows are glowing, and pure magic fills the sky! ... You made the magical world so proud with your wonderful listening! You should feel SO special! ... Give yourself a magical twirl!"
+            : `Beautiful work, little dreamer! ... You collected ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The unicorns are happy you tried your best! ... Rainbow is proud of you! ... Every magical journey helps us learn. Keep believing and you'll collect all the stars next time! 🦄`;
+          console.log('🎉 INSTANT replay celebration text:', textToPlay.substring(0, 50) + '...');
+        } else {
+          textToPlay = current.text;
+          console.log('📖 INSTANT replay intro/narration text:', textToPlay.substring(0, 50) + '...');
+        }
+      }
+    }
+    
+    if (!textToPlay) {
+      console.log('❌ No text found to replay');
+      return;
+    }
+    
+    if (!ttsAvailable) {
+      console.log('❌ TTS not available');
+      return;
+    }
+    
+    // Start playing immediately with new speed
+    const playWithNewSpeed = async () => {
+      try {
+        const cleanText = stripEmojis(textToPlay);
+        console.log('🎤 INSTANT speaking at new speed:', newSpeed, 'Text length:', cleanText.length);
+        
+        setIsPlaying(true);
+        setIsRevealTextPlaying(listeningPhase === 'reveal');
+        
+        await OnlineTTS.speak(cleanText, STARDUST_VOICE, {
+          speed: newSpeed,
+          showCaptions: false,
+          onCaptionUpdate: () => {}
+        });
+        
+        console.log('✅ INSTANT speed change completed successfully');
+        
+      } catch (error) {
+        console.error('❌ INSTANT speed change error:', error);
+      } finally {
+        setIsPlaying(false);
+        setIsRevealTextPlaying(false);
+      }
+    };
+    
+    // Start playing immediately (no await to make it instant)
+    playWithNewSpeed();
   };
 
   const getCorrectFeedback = () => {
@@ -501,17 +808,44 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
     }
   };
 
+  const getCharacterAnimation = () => {
+    if (current.id.includes('star')) return 'animate-bounce';
+    return 'animate-float';
+  };
+
+  const getEnvironmentIcon = () => {
+    switch (current.id) {
+      case 'rainbow_waterfall': return CloudRain;
+      case 'fairy_friends': return Sparkles;
+      case 'magic_flowers': return Flower;
+      case 'crystal_cave': return Trees;
+      default: return Sparkles;
+    }
+  };
+
+  const EnvironmentIcon = getEnvironmentIcon();
+
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <Card className={cn("w-full max-w-5xl sm:max-w-6xl lg:max-w-7xl h-[95vh] rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-500 bg-gradient-to-br", current.bgColor, "flex flex-col")}>
+        {/* Always Visible Close Button */}
         <div className="absolute top-4 right-4 z-10">
-          <Button variant="ghost" onClick={onClose} className="h-10 w-10 p-0 rounded-full bg-white/80 hover:bg-white backdrop-blur-sm border shadow-lg z-50">
-            <X className="w-5 h-5 text-gray-700" />
+          <Button 
+            variant="ghost" 
+            onClick={() => {
+              console.log('🛑 Close button clicked - stopping TTS immediately');
+              OnlineTTS.stop();
+              onClose();
+            }} 
+            className="h-10 w-10 p-0 rounded-full bg-white/80 hover:bg-white backdrop-blur-sm border border-gray-200 hover:border-gray-300 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 z-50"
+          >
+            <X className="w-5 h-5 text-gray-700 hover:text-gray-900" />
           </Button>
         </div>
 
         <CardContent className="p-2 sm:p-4 md:p-6 lg:p-8 flex-1 flex flex-col overflow-hidden">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 gap-2 flex-shrink-0">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 sm:mb-3 gap-2 sm:gap-2 flex-shrink-0">
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="relative">
                 <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-pink-600 animate-bounce" />
@@ -535,42 +869,19 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={async () => {
-                    OnlineTTS.stop();
+                  onClick={() => {
+                    // Cycle to next speed
                     const newSpeed = playbackSpeed === 'slow' ? 'slower' : playbackSpeed === 'slower' ? 'normal' : 'slow';
-                    setPlaybackSpeed(newSpeed);
-                    try {
-                      let textToPlay = '';
-                      if (listeningPhase === 'listening' && current.listeningFirst && (current as any).audioText) {
-                        textToPlay = (current as any).audioText;
-                      } else if (listeningPhase === 'reveal' && current.listeningFirst && (current as any).revealText) {
-                        textToPlay = (current as any).revealText;
-                      } else if (!current.listeningFirst && current.text) {
-                        if (current.id === 'grand_celebration') {
-                          textToPlay = stars >= 3 ? "Congratulations magical friend! ... The WHOLE enchanted kingdom is celebrating YOU! ... Unicorns are dancing, rainbows are glowing, and pure magic fills the sky! ... You made the magical world so proud with your wonderful listening! You should feel SO special! ... Give yourself a magical twirl!" : `Beautiful work, little dreamer! ... You collected ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The unicorns are happy you tried your best! ... Rainbow is proud of you! ... Every magical journey helps us learn. Keep believing and you'll collect all the stars next time! 🦄`;
-                        } else {
-                          textToPlay = current.text;
-                        }
-                      }
-                      if (textToPlay && ttsAvailable) {
-                        const cleanText = stripEmojis(textToPlay);
-                        await OnlineTTS.speak(cleanText, STARDUST_VOICE, {
-                          speed: newSpeed,
-                          showCaptions: captionsEnabled,
-                          onCaptionUpdate: setCurrentCaption
-                        });
-                      }
-                    } catch (error) {
-                      console.log('Could not replay at new speed');
-                    }
+                    console.log('🔄 Speed button clicked - changing from', playbackSpeed, 'to', newSpeed);
+                    
+                    // Use the instant speed change function
+                    handleSpeedChange(newSpeed);
                   }}
-                  className="h-7 px-2 rounded-full text-xs bg-pink-100 dark:bg-pink-800 hover:bg-pink-200 dark:hover:bg-pink-700 border border-pink-300 dark:border-pink-600 text-pink-900 dark:text-pink-50 font-semibold shadow-sm transition-all"
+                  className="h-7 px-2 rounded-full text-xs font-semibold shadow-sm transition-all duration-200 bg-pink-50 dark:bg-pink-800 hover:bg-pink-100 dark:hover:bg-pink-700 border border-pink-200 dark:border-pink-600 text-pink-800 dark:text-pink-100"
                   title={`Playback speed (works offline & online): ${playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow (Default)' : 'Very Slow'}`}
                 >
-                  <Gauge className="w-3.5 h-3.5 mr-1 text-pink-700 dark:text-pink-100" />
-                  <span className="text-pink-900 dark:text-pink-50">
-                    {playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow' : 'Very Slow'}
-                  </span>
+                  <Gauge className="w-3.5 h-3.5 mr-1 text-pink-600 dark:text-pink-200" />
+                  {playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow' : 'Very Slow'}
                 </Button>
                 
                 {/* Accessibility Mode Toggle (for hearing-impaired) */}
@@ -621,10 +932,18 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
               </div>
             </div>
           </div>
-
-          <Progress value={progress} className="h-2 sm:h-2 mb-3 sm:mb-4 bg-white/30 flex-shrink-0">
-            <div className="h-full bg-gradient-to-r from-pink-400 to-purple-400 rounded-full transition-all duration-500" />
-          </Progress>
+          
+          {/* TTS Status Banner */}
+          {ttsInitialized && ttsAvailable && (
+            <div className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-4 py-2.5 rounded-lg shadow-lg animate-fade-in">
+              <div className="flex items-center gap-2 justify-center">
+                <Volume2 className="w-4 h-4" />
+                <span className="text-xs sm:text-sm font-bold">
+                  Stardust's voice is ready! Listen carefully to her magical words!
+                </span>
+              </div>
+            </div>
+          )}
           
           {/* Accessibility Mode Warning */}
           {accessibilityMode && (listeningPhase === 'listening' || listeningPhase === 'question') && (
@@ -638,6 +957,11 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
               </div>
             </div>
           )}
+
+          {/* Progress Bar */}
+          <Progress value={progress} className="h-2 sm:h-2 mb-3 sm:mb-4 bg-white/30 flex-shrink-0">
+            <div className="h-full bg-gradient-to-r from-pink-400 to-purple-400 rounded-full transition-all duration-500" />
+          </Progress>
           
           {/* Live Caption Display - Only in reveal phase or accessibility mode */}
           {captionsEnabled && currentCaption && (listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode) && (
@@ -653,7 +977,7 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
               <div className="relative mb-2 sm:mb-2 md:mb-3">
                 <div className={cn(
                   "text-5xl sm:text-5xl md:text-6xl lg:text-7xl mb-2 sm:mb-2", 
-                  "animate-float"
+                  getCharacterAnimation()
                 )}>
                   <span className={cn(
                     current.id === 'celebration' && 'animate-celebration-party'
@@ -675,6 +999,11 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
                       )} 
                     />
                   ))}
+                </div>
+
+                {/* Environment Icon */}
+                <div className="absolute top-1 right-1 sm:top-2 sm:right-2 animate-float-slow">
+                  <EnvironmentIcon className="w-6 h-6 sm:w-6 sm:h-6 md:w-8 md:h-8 text-purple-500 opacity-70" />
                 </div>
               </div>
 
@@ -963,7 +1292,7 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
                 <div className="relative">
                   <div className={cn(
                     "text-7xl md:text-8xl lg:text-9xl mb-4 lg:mb-6", 
-                    "animate-float"
+                    getCharacterAnimation()
                   )}>
                     <span className={cn(
                       current.id === 'celebration' && 'animate-celebration-party'
@@ -985,6 +1314,11 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
                         )} 
                       />
                     ))}
+                  </div>
+
+                  {/* Environment Icon */}
+                  <div className="absolute -top-6 -right-6 lg:-top-8 lg:-right-8 animate-float-slow">
+                    <EnvironmentIcon className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 text-purple-500 opacity-70" />
                   </div>
                 </div>
               </div>
@@ -1255,11 +1589,38 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
               </div>
             </div>
           </div>
+
+          {/* Floating Elements - Positioned around left visual area on desktop */}
+          <div className="hidden lg:block absolute top-20 left-8 animate-float-slow">
+            <Sparkles className="w-8 h-8 text-purple-400" />
+          </div>
+          <div className="hidden lg:block absolute bottom-20 left-12 animate-float-medium">
+            <Heart className="w-8 h-8 text-pink-400" />
+          </div>
+          <div className="hidden lg:block absolute top-1/2 left-4 animate-float-fast">
+            <Flower className="w-7 h-7 text-purple-400" />
+          </div>
         </CardContent>
       </Card>
 
       {/* Enhanced Custom Animations */}
       <style>{`
+        @keyframes float-slow {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          33% { transform: translateY(-10px) rotate(5deg); }
+          66% { transform: translateY(-5px) rotate(-5deg); }
+        }
+        
+        @keyframes float-medium {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-15px); }
+        }
+        
+        @keyframes float-fast {
+          0%, 100% { transform: translateY(0px) scale(1); }
+          50% { transform: translateY(-8px) scale(1.1); }
+        }
+        
         @keyframes float {
           0%, 100% { transform: translateY(0px); }
           50% { transform: translateY(-20px); }
@@ -1268,6 +1629,11 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
         @keyframes fade-in {
           from { opacity: 0; transform: scale(0.8); }
           to { opacity: 1; transform: scale(1); }
+        }
+        
+        @keyframes gentle-pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.8; }
         }
         
         @keyframes waveform {
@@ -1298,6 +1664,19 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
           }
         }
         
+        @keyframes celebration-sparkle {
+          0%, 100% { 
+            transform: scale(1);
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+          }
+          50% { 
+            transform: scale(1.15);
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8),
+                        0 0 30px rgba(255, 105, 180, 0.6),
+                        0 0 40px rgba(135, 206, 250, 0.4);
+          }
+        }
+        
         @keyframes pulse-slow {
           0%, 100% { 
             transform: scale(1);
@@ -1314,12 +1693,36 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
           100% { transform: translateX(100%); }
         }
         
+        .animate-float-slow {
+          animation: float-slow 4s ease-in-out infinite;
+        }
+        
+        .animate-pulse-slow {
+          animation: pulse-slow 2s ease-in-out infinite;
+        }
+        
+        .animate-shimmer {
+          animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        .animate-float-medium {
+          animation: float-medium 3s ease-in-out infinite;
+        }
+        
+        .animate-float-fast {
+          animation: float-fast 2s ease-in-out infinite;
+        }
+        
         .animate-float {
           animation: float 3s ease-in-out infinite;
         }
         
         .animate-fade-in {
           animation: fade-in 0.5s ease-out;
+        }
+        
+        .animate-gentle-pulse {
+          animation: gentle-pulse 2s ease-in-out infinite;
         }
         
         .animate-waveform {
@@ -1332,12 +1735,8 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
           transform-origin: center;
         }
         
-        .animate-pulse-slow {
-          animation: pulse-slow 2s ease-in-out infinite;
-        }
-        
-        .animate-shimmer {
-          animation: shimmer 3s ease-in-out infinite;
+        .animate-celebration-sparkle {
+          animation: celebration-sparkle 1.5s ease-in-out infinite;
         }
         
         /* Mobile optimizations */
@@ -1350,9 +1749,7 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
         /* Reduced motion for accessibility */
         @media (prefers-reduced-motion: reduce) {
           .animate-celebration-party {
-            animation: none;
-            transform: scale(1);
-            filter: drop-shadow(0 0 5px gold);
+            animation: celebration-sparkle 2s ease-in-out infinite;
           }
         }
         

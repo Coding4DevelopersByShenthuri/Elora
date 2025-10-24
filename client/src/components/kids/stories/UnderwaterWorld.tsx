@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Sparkles, Fish, Star, Volume2, Play, Zap, Waves, X, Ear, Award, Gauge, RotateCcw, FileText } from 'lucide-react';
-import OnlineTTS, { STORY_VOICES } from '@/services/OnlineTTS';
+import { HybridVoiceService, STORY_VOICES } from '@/services/HybridVoiceService';
 import KidsListeningAnalytics, { type StorySession } from '@/services/KidsListeningAnalytics';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,7 +13,7 @@ type Props = {
   onComplete: (score: number) => void;
 };
 
-// Finn's unique voice profile
+// Finn's unique voice profile (uses HybridVoiceService for optimal voice selection)
 const FINN_VOICE = STORY_VOICES.Finn;
 
 const storySteps = [
@@ -274,6 +274,9 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
   
   const [currentSession, setCurrentSession] = useState<StorySession | null>(null);
   const [questionStartTime, setQuestionStartTime] = useState(0);
+  
+  // TTS availability status
+  const [isRevealTextPlaying, setIsRevealTextPlaying] = useState(false);
 
   const current = storySteps[stepIndex];
   const progress = Math.round(((stepIndex + 1) / storySteps.length) * 100);
@@ -284,21 +287,102 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
   const maxReplays = (current as any).maxReplays || 5;
   const unlimitedReplays = true;
 
+  // Initialize hybrid voice service on mount
   useEffect(() => {
     const initializeVoice = async () => {
-      await OnlineTTS.initialize();
-      const available = OnlineTTS.isAvailable();
-      setTtsAvailable(available);
-      // Transcript remains off by default - users can toggle if needed
+      try {
+        // Initialize HybridVoiceService (handles both online and offline TTS)
+        await HybridVoiceService.initialize();
+        
+        // Check if TTS is available
+        const available = HybridVoiceService.isAvailable();
+        setTtsAvailable(available);
+        
+        if (!available) {
+          console.warn('No voice synthesis available, falling back to text-only mode');
+          // Transcript remains off by default - users can toggle if needed
+        } else {
+          console.log(`🎤 HybridVoiceService initialized successfully`);
+          
+          // VERIFY FINN'S UNIQUE VOICE PROFILE
+          console.log('🐠 UNDERWATER WORLD VOICE VERIFICATION:', {
+            character: 'Finn the Fish',
+            voiceProfile: FINN_VOICE,
+            voiceName: FINN_VOICE.voiceName,
+            voiceDescription: FINN_VOICE.description,
+            pitch: FINN_VOICE.pitch,
+            rate: FINN_VOICE.rate,
+            volume: FINN_VOICE.volume,
+            isUniqueVoice: true,
+            note: 'This is Finn\'s unique voice profile using HybridVoiceService',
+            expectedCharacteristics: 'Microsoft David voice for bubbly fish character with character-specific optimizations'
+          });
+          
+          // ENHANCED VOICE DEBUGGING - Check what voice will actually be used
+          console.log('🔍 ENHANCED VOICE DEBUGGING - Checking actual voice selection:');
+          const availableVoices = HybridVoiceService.getAvailableVoices();
+          console.log('Available voices count:', availableVoices.length);
+          console.log('Available voices:', availableVoices.map(v => ({
+            name: v.name,
+            lang: v.lang,
+            localService: v.localService,
+            gender: (v as any).gender || 'unknown'
+          })));
+          
+          // Check if Finn's specific voice is available
+          const finnVoice = availableVoices.find(v => v.name === FINN_VOICE.voiceName);
+          console.log('Finn\'s target voice found:', finnVoice ? finnVoice.name : 'NOT FOUND');
+          
+          // Check for Microsoft David specifically
+          const davidVoice = availableVoices.find(v => v.name.toLowerCase().includes('david'));
+          console.log('Microsoft David voice found:', davidVoice ? davidVoice.name : 'NOT FOUND');
+          
+          // Check for any Microsoft voices
+          const microsoftVoices = availableVoices.filter(v => v.name.toLowerCase().includes('microsoft'));
+          console.log('All Microsoft voices:', microsoftVoices.map(v => v.name));
+          
+          // Test voice selection logic by simulating the selection process
+          console.log('🎯 Testing voice selection logic...');
+          let selectedVoice = 'Unknown';
+          if (finnVoice) {
+            selectedVoice = finnVoice.name;
+            console.log('✅ Using exact match:', selectedVoice);
+          } else if (davidVoice) {
+            selectedVoice = davidVoice.name;
+            console.log('✅ Using David fallback:', selectedVoice);
+          } else if (microsoftVoices.length > 0) {
+            selectedVoice = microsoftVoices[0].name;
+            console.log('✅ Using Microsoft fallback:', selectedVoice);
+          } else {
+            console.log('❌ No suitable voice found');
+          }
+          console.log('Selected voice for Finn:', selectedVoice);
+        }
+      } catch (error) {
+        console.error('Failed to initialize HybridVoiceService:', error);
+        setTtsAvailable(false);
+        // Transcript remains off by default - users can toggle if needed
+      }
     };
     initializeVoice();
     
+    // Initialize analytics session
     const initSession = async () => {
       await KidsListeningAnalytics.initialize(userId);
-      const session = KidsListeningAnalytics.startSession(userId, 'underwater-world', 'Underwater World');
+      const session = KidsListeningAnalytics.startSession(
+        userId,
+        'underwater-world',
+        'Underwater World'
+      );
       setCurrentSession(session);
     };
     initSession();
+
+    // Cleanup function to stop TTS when component unmounts
+    return () => {
+      console.log('🛑 Story component unmounting - stopping TTS immediately');
+      HybridVoiceService.stop();
+    };
   }, [userId]);
 
   useEffect(() => {
@@ -326,34 +410,97 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
     return text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{FE00}-\u{FE0F}]|[\u{E0020}-\u{E007F}]/gu, '').trim();
   };
 
-  const playAudioWithCaptions = async (text: string, showCaptions: boolean = false) => {
+  // Enhanced audio playback (HybridVoiceService: Online + Offline TTS)
+  const playAudioWithCaptions = async (text: string) => {
     try {
+      // Strip emojis/stickers before speaking to prevent TTS from reading emoji names
       const cleanText = stripEmojis(text);
-      const allowCaptions = showCaptions && captionsEnabled && 
-        (listeningPhase === 'reveal' || !current.listeningFirst || accessibilityMode);
       
-      await OnlineTTS.speak(cleanText, FINN_VOICE, {
+      console.log(`🎤 Playing audio with Finn's voice via HybridVoiceService:`, {
+        text: cleanText.substring(0, 50) + '...',
+        voice: FINN_VOICE,
+        step: current.id,
+        phase: listeningPhase,
         speed: playbackSpeed,
-        showCaptions: allowCaptions,
-        onCaptionUpdate: allowCaptions ? setCurrentCaption : () => {}
+        isRevealText: !!(current as any).revealText && text === (current as any).revealText,
+        voiceCharacteristics: {
+          pitch: FINN_VOICE.pitch,
+          rate: FINN_VOICE.rate,
+          volume: FINN_VOICE.volume,
+          voiceName: FINN_VOICE.voiceName,
+          description: FINN_VOICE.description
+        }
       });
-    } catch (error) {
-      setTtsAvailable(false);
-      // Transcript remains off by default - users can toggle if needed
-      throw error;
-    }
+      
+      // REAL-TIME VOICE VERIFICATION - Check what voice is actually being used
+      console.log('🔍 REAL-TIME VOICE VERIFICATION:');
+      const currentVoices = HybridVoiceService.getAvailableVoices();
+      const currentFinnVoice = currentVoices.find(v => v.name === FINN_VOICE.voiceName);
+      const currentDavidVoice = currentVoices.find(v => v.name.toLowerCase().includes('david'));
+      console.log('Current available voices for Finn:', {
+        targetVoice: FINN_VOICE.voiceName,
+        exactMatch: currentFinnVoice ? currentFinnVoice.name : 'NOT FOUND',
+        davidMatch: currentDavidVoice ? currentDavidVoice.name : 'NOT FOUND',
+        totalVoices: currentVoices.length
+      });
+      
+      // Ensure TTS is available before speaking
+      if (!HybridVoiceService.isAvailable()) {
+        throw new Error('TTS not available');
+      }
+      
+      await HybridVoiceService.speak(
+        cleanText,
+        FINN_VOICE,
+        {
+          speed: playbackSpeed,
+          showCaptions: false,
+          onCaptionUpdate: () => {}
+        }
+      );
+      
+      console.log(`✅ Audio playback completed for step: ${current.id}`);
+      } catch (error) {
+        console.error('❌ Voice synthesis failed:', error);
+        console.error('❌ Error details:', {
+          step: current.id,
+          phase: listeningPhase,
+          ttsAvailable,
+          isRevealText: !!(current as any).revealText && text === (current as any).revealText,
+          textLength: text.length
+        });
+        
+        // Don't mark TTS as unavailable immediately - try to recover
+        console.log('🔄 Attempting to recover TTS...');
+        try {
+          await HybridVoiceService.initialize();
+          if (HybridVoiceService.isAvailable()) {
+            console.log('✅ TTS recovered successfully');
+            // Don't throw error, just log it
+            return;
+          }
+        } catch (recoveryError) {
+          console.error('❌ TTS recovery failed:', recoveryError);
+        }
+        
+        setTtsAvailable(false);
+        // Transcript remains off by default - users can toggle if needed
+        throw error;
+      }
   };
 
+  // Auto-play for listening phase ONLY (no text shown)
   useEffect(() => {
     if (listeningPhase === 'listening' && current.listeningFirst && (current as any).audioText) {
       const playListeningAudio = async () => {
         setIsPlaying(true);
         setAudioWaveform(true);
         try {
-          await playAudioWithCaptions((current as any).audioText, true);
+          await playAudioWithCaptions((current as any).audioText);
           setHasListened(true);
         } catch (error) {
-          setHasListened(true);
+          console.log('TTS not available, text mode enabled');
+          setHasListened(true); // Allow progression even without TTS
         }
         setIsPlaying(false);
         setAudioWaveform(false);
@@ -363,35 +510,52 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
     
     // Auto-play for reveal phase (after correct answer)
     if (listeningPhase === 'reveal' && current.listeningFirst && (current as any).revealText && ttsAvailable) {
+      console.log('🎭 Auto-playing reveal text:', {
+        stepId: current.id,
+        revealText: (current as any).revealText.substring(0, 50) + '...',
+        voice: FINN_VOICE,
+        speed: playbackSpeed
+      });
+      
       const playReveal = async () => {
         setIsPlaying(true);
+        setIsRevealTextPlaying(true);
         try {
-          await playAudioWithCaptions((current as any).revealText, true);
+          await playAudioWithCaptions((current as any).revealText);
+          console.log('✅ Auto reveal text playback completed');
+          
+          // Wait a bit more after TTS completes to ensure full reading
+          await new Promise(resolve => setTimeout(resolve, 1000));
         } catch (error) {
-          console.log('TTS not available');
+          console.error('❌ Auto reveal text playback failed:', error);
+        } finally {
+          setIsPlaying(false);
+          setIsRevealTextPlaying(false);
         }
-        setIsPlaying(false);
       };
       playReveal();
     }
     
+    // For non-interactive steps, play the full text automatically
     if (!current.listeningFirst && current.text && ttsAvailable) {
       const playNarration = async () => {
         let textToRead = current.text;
         
         // Handle dynamic celebration text based on stars collected
-        if (current.id === 'grand_celebration') {
+        if (current.id === 'celebration') {
+          console.log(`🎉 Ocean Celebration step - Stars collected: ${stars}`);
           if (stars >= 3) {
-            textToRead = "Congratulations ocean explorer! ... The WHOLE underwater world is celebrating YOU! ... Sea creatures are dancing, bubbles are sparkling, and ocean magic surrounds us! ... You made the ocean proud with your wonderful listening! You should feel SO special! ... Give yourself a splashy cheer!";
+            textToRead = "Congratulations ocean hero! ... The WHOLE ocean is celebrating YOU! ... Fish are swimming in happy circles, dolphins are jumping for joy, and whales are singing your victory song! ... You listened so carefully and learned so much! ... You're a SUPERSTAR swimmer! ... Give yourself a big splash of applause! 🌊✨";
           } else {
             textToRead = `Great diving, young explorer! ... You found ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The sea creatures are happy with your effort! ... Finn is proud of you! ... Every ocean adventure teaches us something. Keep swimming and you'll find all the stars next time! 🐠`;
           }
+          console.log(`🎉 Celebration text selected:`, textToRead.substring(0, 100) + '...');
         }
         
         try {
-          await playAudioWithCaptions(textToRead, true);
+          await playAudioWithCaptions(textToRead);
         } catch (error) {
-          console.log('TTS not available');
+          console.error('❌ TTS not available for non-interactive step:', error);
         }
       };
       playNarration();
@@ -405,19 +569,33 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
       setShowFeedback(false);
       setShowHint(false);
     } else {
+      // Calculate score based on correct answers and time
       const accuracyScore = correctAnswers * 20;
-      const timeBonus = Math.max(0, 360 - timeSpent) * 0.1;
+      const timeBonus = Math.max(0, 300 - timeSpent) * 0.1; // Bonus for faster completion
       const starBonus = stars * 10;
       const score = Math.min(100, 40 + accuracyScore + timeBonus + starBonus);
       
+      // Complete analytics session
       if (currentSession) {
-        KidsListeningAnalytics.completeSession(userId, currentSession, score, stars);
+        KidsListeningAnalytics.completeSession(
+          userId,
+          currentSession,
+          score,
+          stars
+        );
+        console.log('📊 Session analytics saved');
       }
+      
+      // Stop TTS when story completes
+      console.log('🛑 Story completed - stopping TTS');
+      HybridVoiceService.stop();
+      
       onComplete(score);
     }
   };
 
   const handleReplayAudio = async () => {
+    // Allow unlimited replays for accessibility
     if (!unlimitedReplays && replaysUsed >= maxReplays) return;
     if (!current.listeningFirst) return;
     
@@ -425,11 +603,12 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
     setIsPlaying(true);
     setAudioWaveform(true);
     
-    try {
-      await playAudioWithCaptions((current as any).audioText, true);
+      try {
+      await playAudioWithCaptions((current as any).audioText);
       setHasListened(true);
-    } catch (error) {
-      setHasListened(true);
+      } catch (error) {
+      console.log('TTS not available, text mode enabled');
+      setHasListened(true); // Still allow progression
     }
     
     setIsPlaying(false);
@@ -448,9 +627,13 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
     const currentAttempt = attemptCount + 1;
     setAttemptCount(currentAttempt);
     
+    // Calculate time spent on this question
     const questionTime = Math.round((Date.now() - questionStartTime) / 1000);
+    
+    // Check if choice is correct
     const isCorrect = choice === (current as any).audioText;
     
+    // Record attempt in analytics
     if (currentSession && current.listeningFirst) {
       const updatedSession = KidsListeningAnalytics.recordAttempt(
         currentSession,
@@ -466,16 +649,64 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
     
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
-      const starReward = currentAttempt === 1 ? 1 : 0.5;
-      setStars(prev => Math.min(3, prev + starReward));
-      setShowFeedback(true);
-      setRetryMode(false);
       
-      setTimeout(() => setListeningPhase('reveal'), 2500);
-      setTimeout(() => handleNext(), 5000);
+      // Award stars based on specific story steps
+      if (current.id === 'first_star') {
+        // First star - after completing first star step
+        setStars(1);
+        console.log('⭐ First star awarded! (1/3)');
+      } else if (current.id === 'second_star') {
+        // Second star - after completing second star step
+        setStars(2);
+        console.log('⭐ Second star awarded! (2/3)');
+      } else if (current.id === 'final_star') {
+        // Third star - after completing final star step
+        setStars(3);
+        console.log('⭐ Third star awarded! (3/3)');
+      }
+      // Note: Other interactive steps don't award stars, only the specific star steps do
+    
+    setShowFeedback(true);
+      setRetryMode(false);
+    
+      // Auto-advance after showing feedback to reveal phase
+    setTimeout(() => {
+        setListeningPhase('reveal');
+    }, 2500);
+      
+      // Calculate dynamic timing based on reveal text length
+      const revealText = (current as any).revealText || '';
+      const textLength = revealText.length;
+      const wordsPerMinute = playbackSpeed === 'slow' ? 120 : playbackSpeed === 'slower' ? 80 : 160;
+      const estimatedDuration = Math.max(10000, (textLength / 5) * (60000 / wordsPerMinute) + 2000); // At least 10 seconds + 2 second buffer
+      
+      console.log('⏱️ Dynamic timing calculation:', {
+        textLength,
+        wordsPerMinute,
+        estimatedDuration: Math.round(estimatedDuration),
+        playbackSpeed,
+        revealText: revealText.substring(0, 50) + '...'
+      });
+      
+      // Move to next step after reveal text has time to complete
+      setTimeout(() => {
+        // Double-check that reveal text is not still playing
+        if (!isRevealTextPlaying) {
+          handleNext();
+        } else {
+          console.log('⏳ Reveal text still playing, waiting a bit more...');
+          // Wait a bit more if still playing
+          setTimeout(() => {
+            handleNext();
+          }, 2000);
+        }
+      }, estimatedDuration);
     } else {
+      // Wrong answer - offer retry
       setShowFeedback(true);
       setRetryMode(true);
+      
+      // Don't auto-advance on wrong answer - let them retry
     }
   };
   
@@ -483,31 +714,173 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
     setSelectedChoice(null);
     setShowFeedback(false);
     setRetryMode(false);
-    setListeningPhase('listening');
-    setReplaysUsed(0);
+    setListeningPhase('listening'); // Go back to listening phase
+    setReplaysUsed(0); // Reset replays for retry
   };
 
   const playRevealText = async () => {
     let textToSpeak = (current as any).revealText || current.text;
     
+    console.log('🎭 playRevealText called:', {
+      stepId: current.id,
+      hasRevealText: !!(current as any).revealText,
+      hasText: !!current.text,
+      ttsAvailable,
+      textPreview: textToSpeak ? textToSpeak.substring(0, 50) + '...' : 'No text'
+    });
+    
     // Handle dynamic celebration text based on stars collected
-    if (current.id === 'grand_celebration') {
+    if (current.id === 'celebration') {
+      console.log(`🎉 Manual playRevealText - Ocean Celebration - Stars: ${stars}`);
       if (stars >= 3) {
-        textToSpeak = "Congratulations ocean explorer! ... The WHOLE underwater world is celebrating YOU! ... Sea creatures are dancing, bubbles are sparkling, and ocean magic surrounds us! ... You made the ocean proud with your wonderful listening! You should feel SO special! ... Give yourself a splashy cheer!";
+        textToSpeak = "Congratulations ocean hero! ... The WHOLE ocean is celebrating YOU! ... Fish are swimming in happy circles, dolphins are jumping for joy, and whales are singing your victory song! ... You listened so carefully and learned so much! ... You're a SUPERSTAR swimmer! ... Give yourself a big splash of applause! 🌊✨";
       } else {
         textToSpeak = `Great diving, young explorer! ... You found ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The sea creatures are happy with your effort! ... Finn is proud of you! ... Every ocean adventure teaches us something. Keep swimming and you'll find all the stars next time! 🐠`;
       }
+      console.log(`🎉 Manual celebration text:`, textToSpeak.substring(0, 100) + '...');
     }
     
-    if (textToSpeak && ttsAvailable) {
-      setIsPlaying(true);
-      try {
-        await playAudioWithCaptions(textToSpeak, true);
-      } catch (error) {
-        console.log('TTS not available');
-      }
-      setIsPlaying(false);
+    if (!textToSpeak) {
+      console.log('❌ No text to speak in playRevealText');
+      return;
     }
+    
+    if (!ttsAvailable) {
+      console.log('❌ TTS not available in playRevealText, attempting to reinitialize...');
+      try {
+        await HybridVoiceService.initialize();
+        if (HybridVoiceService.isAvailable()) {
+          console.log('✅ TTS reinitialized successfully');
+          setTtsAvailable(true);
+        } else {
+          console.log('❌ TTS still not available after reinitialization');
+          return;
+        }
+      } catch (error) {
+        console.error('❌ TTS reinitialization failed:', error);
+        return;
+      }
+    }
+    
+    console.log('🎤 Starting reveal text playback with Finn voice:', {
+      text: textToSpeak.substring(0, 100) + '...',
+      voice: FINN_VOICE,
+      speed: playbackSpeed
+    });
+    
+    setIsPlaying(true);
+    setIsRevealTextPlaying(true);
+    try {
+      // Force stop any current speech first
+      HybridVoiceService.stop();
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Use playAudioWithCaptions which ensures Finn's voice
+      await playAudioWithCaptions(textToSpeak);
+      console.log('✅ Reveal text playback completed successfully');
+      
+      // Wait a bit more to ensure full completion
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } catch (error) {
+      console.error('❌ TTS error in playRevealText:', error);
+      
+      // Try to reinitialize TTS and retry once
+      try {
+        console.log('🔄 Attempting TTS reinitialization...');
+        await HybridVoiceService.initialize();
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        if (HybridVoiceService.isAvailable()) {
+          console.log('🔄 Retrying reveal text with reinitialized TTS...');
+          await playAudioWithCaptions(textToSpeak);
+          console.log('✅ Retry successful');
+          
+          // Wait after retry too
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      } catch (retryError) {
+        console.error('❌ Retry failed:', retryError);
+      }
+    } finally {
+      setIsPlaying(false);
+      setIsRevealTextPlaying(false);
+    }
+  };
+
+  // Instant speed change function - no delays, immediate response
+  const handleSpeedChange = (newSpeed: 'normal' | 'slow' | 'slower') => {
+    console.log('🔄 INSTANT speed change - Current step:', current.id, 'New speed:', newSpeed);
+    
+    // Update speed state immediately
+    setPlaybackSpeed(newSpeed);
+    
+    // Force stop any currently playing audio immediately
+    HybridVoiceService.stop();
+    
+    // Determine what text to replay
+    let textToPlay = '';
+    
+    if (current.listeningFirst) {
+      // Interactive steps with listening phases
+      if (listeningPhase === 'listening' && (current as any).audioText) {
+        textToPlay = (current as any).audioText;
+        console.log('🎧 INSTANT replay listening audio:', textToPlay.substring(0, 50) + '...');
+      } else if (listeningPhase === 'reveal' && (current as any).revealText) {
+        textToPlay = (current as any).revealText;
+        console.log('🎭 INSTANT replay reveal text:', textToPlay.substring(0, 50) + '...');
+      }
+    } else {
+      // Non-interactive steps (like intro, celebration, etc.)
+      if (current.text) {
+        if (current.id === 'celebration') {
+          textToPlay = stars >= 3 
+            ? "Congratulations ocean hero! ... The WHOLE ocean is celebrating YOU! ... Fish are swimming in happy circles, dolphins are jumping for joy, and whales are singing your victory song! ... You listened so carefully and learned so much! ... You're a SUPERSTAR swimmer! ... Give yourself a big splash of applause! 🌊✨"
+            : `Great diving, young explorer! ... You found ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The sea creatures are happy with your effort! ... Finn is proud of you! ... Every ocean adventure teaches us something. Keep swimming and you'll find all the stars next time! 🐠`;
+          console.log('🎉 INSTANT replay celebration text:', textToPlay.substring(0, 50) + '...');
+        } else {
+          textToPlay = current.text;
+          console.log('📖 INSTANT replay intro/narration text:', textToPlay.substring(0, 50) + '...');
+        }
+      }
+    }
+    
+    if (!textToPlay) {
+      console.log('❌ No text found to replay');
+      return;
+    }
+    
+    if (!ttsAvailable) {
+      console.log('❌ TTS not available');
+      return;
+    }
+    
+    // Start playing immediately with new speed
+    const playWithNewSpeed = async () => {
+      try {
+        const cleanText = stripEmojis(textToPlay);
+        console.log('🎤 INSTANT speaking at new speed:', newSpeed, 'Text length:', cleanText.length);
+        
+        setIsPlaying(true);
+        setIsRevealTextPlaying(listeningPhase === 'reveal');
+        
+        await HybridVoiceService.speak(cleanText, FINN_VOICE, {
+          speed: newSpeed,
+          showCaptions: false,
+          onCaptionUpdate: () => {}
+        });
+        
+        console.log('✅ INSTANT speed change completed successfully');
+        
+      } catch (error) {
+        console.error('❌ INSTANT speed change error:', error);
+      } finally {
+        setIsPlaying(false);
+        setIsRevealTextPlaying(false);
+      }
+    };
+    
+    // Start playing immediately (no await to make it instant)
+    playWithNewSpeed();
   };
 
   const getCorrectFeedback = () => {
@@ -574,34 +947,9 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={async () => {
-                    OnlineTTS.stop();
+                  onClick={() => {
                     const newSpeed = playbackSpeed === 'slow' ? 'slower' : playbackSpeed === 'slower' ? 'normal' : 'slow';
-                    setPlaybackSpeed(newSpeed);
-                    try {
-                      let textToPlay = '';
-                      if (listeningPhase === 'listening' && current.listeningFirst && (current as any).audioText) {
-                        textToPlay = (current as any).audioText;
-                      } else if (listeningPhase === 'reveal' && current.listeningFirst && (current as any).revealText) {
-                        textToPlay = (current as any).revealText;
-                      } else if (!current.listeningFirst && current.text) {
-                        if (current.id === 'celebration') {
-                          textToPlay = stars >= 3 ? "Congratulations ocean explorer! ... The WHOLE underwater world is celebrating YOU! ... Sea creatures are dancing, bubbles are sparkling, and ocean magic surrounds us! ... You made the ocean proud with your wonderful listening! You should feel SO special! ... Give yourself a splashy cheer!" : `Great diving, young explorer! ... You found ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The sea creatures are happy with your effort! ... Finn is proud of you! ... Every ocean adventure teaches us something. Keep swimming and you'll find all the stars next time! 🐠`;
-                        } else {
-                          textToPlay = current.text;
-                        }
-                      }
-                      if (textToPlay && ttsAvailable) {
-                        const cleanText = stripEmojis(textToPlay);
-                        await OnlineTTS.speak(cleanText, FINN_VOICE, {
-                          speed: newSpeed,
-                          showCaptions: captionsEnabled,
-                          onCaptionUpdate: setCurrentCaption
-                        });
-                      }
-                    } catch (error) {
-                      console.log('Could not replay at new speed');
-                    }
+                    handleSpeedChange(newSpeed);
                   }}
                   className="h-7 px-2 rounded-full text-xs bg-blue-50 dark:bg-blue-800 hover:bg-blue-100 dark:hover:bg-blue-700 border border-blue-200 dark:border-blue-600 text-blue-800 dark:text-blue-100 font-semibold shadow-sm"
                   title={`Playback speed (works offline & online): ${playbackSpeed === 'normal' ? 'Normal' : playbackSpeed === 'slow' ? 'Slow (Default)' : 'Very Slow'}`}
