@@ -49,7 +49,7 @@ const storySteps = [
       { text: 'I never swim at all', emoji: '🐠🚫', meaning: 'not swimming' }
     ],
     
-    revealText: 'Look at Finn swimming happily in the clear blue water! Finn says "Swimming is so much fun!" Can you swim with your arms? Swish swish! The ocean is Finn\'s home, and swimming makes every day an adventure!',
+    revealText: 'Look at Finn swimming happily in the clear blue water! Finn says "Swimming is so much fun!" Can you swim with your arms? The ocean is Finn\'s home, and swimming makes every day an adventure!',
     
     maxReplays: 5,
     wordCount: 38,
@@ -76,7 +76,7 @@ const storySteps = [
       { text: 'I am very plain', emoji: '🪸⚪', meaning: 'not colorful' }
     ],
     
-    revealText: 'WOW! Look at the amazing coral reef! It\'s pink, orange, yellow, and purple! The coral says "Come see my beautiful colors!" Can you name all the colors you see? Coral reefs are homes for many tiny fish friends!',
+    revealText: 'Hooray! We found our first shiny star at the bottom of the ocean! You\'re listening so well! The coral reef is showing us its beautiful colors! The coral says "Come see my beautiful colors!" Can you name all the colors you see? Coral reefs are homes for many tiny fish friends! One star collected, two more to find!',
     
     maxReplays: 5,
     wordCount: 40,
@@ -103,15 +103,15 @@ const storySteps = [
       { text: 'Let us play and jump high', emoji: '🐬🎉', meaning: 'playing and jumping' }
     ],
     
-    revealText: 'A friendly dolphin swims up to us, clicking happily! The dolphin says "Let us play and jump high!" Can you pretend to jump like a dolphin? SPLASH! Dolphins are very playful and smart ocean friends who love to have fun!',
+    revealText: 'A friendly dolphin swims up to us, clicking happily! The dolphin says "Let us play and jump high!" Dolphins are very playful and smart ocean friends! They love to jump and play in the ocean waves!',
     
     maxReplays: 5,
     wordCount: 42,
     duration: 36
   },
   {
-    id: 'first_star',
-    title: '⭐ First Ocean Star',
+    id: 'ocean_facts',
+    title: '⭐ Ocean Facts',
     emoji: '⭐',
     character: 'Finn',
     bgColor: 'from-yellow-100 to-amber-100 dark:from-yellow-900 dark:to-amber-900',
@@ -130,10 +130,9 @@ const storySteps = [
       { text: 'False - Fish fly in sky', emoji: '❌', meaning: 'incorrect - fish don\'t fly' }
     ],
     
-    revealText: 'Hooray! We found our first shiny star at the bottom of the ocean! You\'re listening so well! It\'s TRUE - fish DO swim in the water! That\'s their home! Have you ever seen fish in a pond or aquarium? Two more stars to find!',
+    revealText: 'Great listening! It\'s TRUE - fish DO swim in the water! That\'s their home! Have you ever seen fish in a pond or aquarium? Fish are so amazing!',
     
     maxReplays: 5,
-    starsNeeded: 3,
     wordCount: 45,
     duration: 32
   },
@@ -158,7 +157,7 @@ const storySteps = [
       { text: 'I never sing at all', emoji: '🐋🚫', meaning: 'no singing' }
     ],
     
-    revealText: 'Listen! Do you hear that beautiful sound? A big blue whale is singing! The whale says "My song travels far and wide!" Whale songs can travel through the whole ocean! Other whales can hear it from far away. How amazing!',
+    revealText: 'Listen! Do you hear that beautiful sound? A big blue whale is singing! The whale says "My song travels far and wide!" Whale songs can travel for hundreds of miles underwater! These gentle giants are amazing ocean singers!',
     
     maxReplays: 5,
     wordCount: 45,
@@ -166,7 +165,7 @@ const storySteps = [
   },
   {
     id: 'second_star',
-    title: '✨ Second Shining Star',
+    title: '✨ Ocean Care',
     emoji: '✨',
     character: 'Finn',
     bgColor: 'from-cyan-100 to-teal-100 dark:from-cyan-900 dark:to-teal-900',
@@ -186,11 +185,37 @@ const storySteps = [
       { text: 'The ocean never feels happy', emoji: '🌊😢', meaning: 'always sad' }
     ],
     
-    revealText: 'Wonderful! Another star appeared near the coral! The ocean is happy when we keep it clean! That means no trash in the water! When we take care of the ocean, all the fish and animals can stay healthy and happy! Just one more star!',
+    revealText: 'Wonderful! We found our second shiny star! The ocean is happy when we keep it clean! That means no trash in the water! When we take care of the ocean, all the fish and animals can stay healthy and happy! Two stars collected, one more to go!',
     
     maxReplays: 5,
-    starsNeeded: 3,
     wordCount: 48,
+    duration: 38
+  },
+  {
+    id: 'ocean_friends',
+    title: '🐠 Ocean Friends',
+    emoji: '🐠',
+    character: 'Finn',
+    bgColor: 'from-teal-100 to-green-100 dark:from-teal-900 dark:to-green-900',
+    interactive: true,
+    listeningFirst: true,
+    
+    audioText: 'We are all friends in the ocean',
+    audioInstruction: 'Listen to what the ocean friends say!',
+    
+    question: 'What do the ocean friends say?',
+    hint: 'Think about friendship in the ocean',
+    
+    choices: [
+      { text: 'We fight with each other', emoji: '🐠⚔️', meaning: 'fighting and arguing' },
+      { text: 'We are all friends in the ocean', emoji: '🐠💙', meaning: 'friendship and harmony' },
+      { text: 'We never talk to each other', emoji: '🐠🤐', meaning: 'no communication' }
+    ],
+    
+    revealText: 'What a wonderful message! The ocean friends say "We are all friends in the ocean!" This means all the sea creatures live together in peace and harmony. Just like friends on land, ocean friends help each other and share their beautiful underwater home!',
+    
+    maxReplays: 5,
+    wordCount: 45,
     duration: 38
   },
   {
@@ -214,28 +239,16 @@ const storySteps = [
       { text: 'Nothing is a treasure', emoji: '❌', meaning: 'no treasures exist' }
     ],
     
-    revealText: 'Look! We found a sparkling treasure chest! Inside is a special message: "Friends are the best treasure!" Can you say that? It\'s true - having friends is more valuable than any gold! Friends make us happy every day!',
+    revealText: 'Look! We found our third and final shiny star and a sparkling treasure chest! Inside is a special message: "Friends are the best treasure!" Can you say that? It\'s true - having friends is more valuable than any gold! Friends make us happy every day! All three stars collected! Now let\'s celebrate your amazing ocean adventure!',
     
     maxReplays: 5,
     wordCount: 42,
     duration: 36
   },
   {
-    id: 'final_star',
-    title: '🌟 Third Ocean Star',
-    text: 'Amazing! ... YES! ... We collected all three shiny ocean stars! ... (You\'re such a wonderful listener!) The stars are making the whole ocean sparkle and glow! ... All the sea creatures are celebrating because of YOU! ... You are an INCREDIBLE ocean explorer! ... Finn is so proud of you!',
-    emoji: '🌟',
-    character: 'Finn',
-    bgColor: 'from-blue-200 to-cyan-200 dark:from-blue-800 dark:to-cyan-800',
-    interactive: false,
-    starsNeeded: 3,
-    wordCount: 42,
-    duration: 28
-  },
-  {
     id: 'celebration',
     title: '🎉 Ocean Party!',
-    text: 'Congratulations, ocean hero! ... The WHOLE ocean is celebrating YOU! ... Fish are swimming in happy circles, dolphins are jumping for joy, and whales are singing your victory song! ... You listened so carefully and learned so much! ... You\'re a SUPERSTAR swimmer! ... Give yourself a big splash of applause! 🌊✨',
+    text: '🎉 PARTY TIME! 🎉 ... The entire ocean is throwing a celebration just for YOU! ... All the fish are doing a special underwater dance, dolphins are doing amazing flips, and the whales are singing the most beautiful song ever! ... You are truly an INCREDIBLE ocean explorer! ... Finn and all his friends are so proud of you! ... Give yourself a big underwater high-five! 🌊✨',
     emoji: '🎉',
     character: 'Finn',
     bgColor: 'from-rainbow-100 to-sparkle-100 dark:from-rainbow-900 dark:to-sparkle-900',
@@ -477,7 +490,7 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
           console.log('✅ Auto reveal text playback completed');
           
           // Wait a bit more after TTS completes to ensure full reading
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await new Promise(resolve => setTimeout(resolve, 3000));
         } catch (error) {
           console.error('❌ Auto reveal text playback failed:', error);
         } finally {
@@ -497,12 +510,13 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
         if (current.id === 'celebration') {
           console.log(`🎉 Ocean Celebration step - Stars collected: ${stars}`);
           if (stars >= 3) {
-            textToRead = "Congratulations ocean hero! ... The WHOLE ocean is celebrating YOU! ... Fish are swimming in happy circles, dolphins are jumping for joy, and whales are singing your victory song! ... You listened so carefully and learned so much! ... You're a SUPERSTAR swimmer! ... Give yourself a big splash of applause! 🌊✨";
+            textToRead = current.text; // Use the base celebration text for 3 stars
           } else {
             textToRead = `Great diving, young explorer! ... You found ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The sea creatures are happy with your effort! ... Finn is proud of you! ... Every ocean adventure teaches us something. Keep swimming and you'll find all the stars next time! 🐠`;
           }
           console.log(`🎉 Celebration text selected:`, textToRead.substring(0, 100) + '...');
         }
+        
         
         try {
           await playAudioWithCaptions(textToRead);
@@ -602,21 +616,21 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
       
-      // Award stars based on specific story steps
-      if (current.id === 'first_star') {
-        // First star - after completing first star step
+      // Award stars based on specific story steps (steps 3, 6, and 9)
+      if (current.id === 'coral_reef') {
+        // First star - after completing step 3 (coral reef)
         setStars(1);
-        console.log('⭐ First star awarded! (1/3)');
+        console.log('⭐ First star awarded! (1/3) - Step 3: Coral Reef');
       } else if (current.id === 'second_star') {
-        // Second star - after completing second star step
+        // Second star - after completing step 6 (ocean care)
         setStars(2);
-        console.log('⭐ Second star awarded! (2/3)');
-      } else if (current.id === 'final_star') {
-        // Third star - after completing final star step
+        console.log('⭐ Second star awarded! (2/3) - Step 6: Ocean Care');
+      } else if (current.id === 'treasure_chest') {
+        // Third star - after completing step 9 (treasure chest)
         setStars(3);
-        console.log('⭐ Third star awarded! (3/3)');
+        console.log('⭐ Third star awarded! (3/3) - Step 9: Treasure Chest');
       }
-      // Note: Other interactive steps don't award stars, only the specific star steps do
+      // Note: Stars are awarded at steps 3, 6, and 9 for better progression
     
     setShowFeedback(true);
       setRetryMode(false);
@@ -624,13 +638,14 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
       // Auto-advance after showing feedback to reveal phase
     setTimeout(() => {
         setListeningPhase('reveal');
-    }, 2500);
+    }, 3000);
       
       // Calculate dynamic timing based on reveal text length
       const revealText = (current as any).revealText || '';
       const textLength = revealText.length;
-      const wordsPerMinute = playbackSpeed === 'slow' ? 120 : playbackSpeed === 'slower' ? 80 : 160;
-      const estimatedDuration = Math.max(10000, (textLength / 5) * (60000 / wordsPerMinute) + 2000); // At least 10 seconds + 2 second buffer
+      const wordsPerMinute = playbackSpeed === 'slow' ? 100 : playbackSpeed === 'slower' ? 70 : 140;
+      // More generous timing calculation to ensure full reading
+      const estimatedDuration = Math.max(20000, (textLength / 3) * (60000 / wordsPerMinute) + 5000); // At least 20 seconds + 5 second buffer
       
       console.log('⏱️ Dynamic timing calculation:', {
         textLength,
@@ -650,7 +665,7 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
           // Wait a bit more if still playing
           setTimeout(() => {
             handleNext();
-          }, 2000);
+          }, 3000);
         }
       }, estimatedDuration);
     } else {
@@ -685,12 +700,13 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
     if (current.id === 'celebration') {
       console.log(`🎉 Manual playRevealText - Ocean Celebration - Stars: ${stars}`);
       if (stars >= 3) {
-        textToSpeak = "Congratulations ocean hero! ... The WHOLE ocean is celebrating YOU! ... Fish are swimming in happy circles, dolphins are jumping for joy, and whales are singing your victory song! ... You listened so carefully and learned so much! ... You're a SUPERSTAR swimmer! ... Give yourself a big splash of applause! 🌊✨";
+        textToSpeak = current.text; // Use the base celebration text for 3 stars
       } else {
         textToSpeak = `Great diving, young explorer! ... You found ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The sea creatures are happy with your effort! ... Finn is proud of you! ... Every ocean adventure teaches us something. Keep swimming and you'll find all the stars next time! 🐠`;
       }
       console.log(`🎉 Manual celebration text:`, textToSpeak.substring(0, 100) + '...');
     }
+    
     
     if (!textToSpeak) {
       console.log('❌ No text to speak in playRevealText');
@@ -732,7 +748,7 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
       console.log('✅ Reveal text playback completed successfully');
       
       // Wait a bit more to ensure full completion
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 2000));
     } catch (error) {
       console.error('❌ TTS error in playRevealText:', error);
       
@@ -748,7 +764,7 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
           console.log('✅ Retry successful');
           
           // Wait after retry too
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise(resolve => setTimeout(resolve, 2000));
         }
       } catch (retryError) {
         console.error('❌ Retry failed:', retryError);
@@ -786,7 +802,7 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
       if (current.text) {
         if (current.id === 'celebration') {
           textToPlay = stars >= 3 
-            ? "Congratulations ocean hero! ... The WHOLE ocean is celebrating YOU! ... Fish are swimming in happy circles, dolphins are jumping for joy, and whales are singing your victory song! ... You listened so carefully and learned so much! ... You're a SUPERSTAR swimmer! ... Give yourself a big splash of applause! 🌊✨"
+            ? current.text // Use the base celebration text for 3 stars
             : `Great diving, young explorer! ... You found ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The sea creatures are happy with your effort! ... Finn is proud of you! ... Every ocean adventure teaches us something. Keep swimming and you'll find all the stars next time! 🐠`;
           console.log('🎉 INSTANT replay celebration text:', textToPlay.substring(0, 50) + '...');
         } else {
@@ -1215,7 +1231,7 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
                       {/* Dynamic message based on stars collected */}
                       {current.id === 'celebration' ? (
                         stars >= 3 ? (
-                          "Congratulations ocean hero! ... The WHOLE ocean is celebrating YOU! ... Fish are swimming in happy circles, dolphins are jumping for joy, and whales are singing your victory song! ... You listened so carefully and learned so much! ... You're a SUPERSTAR swimmer! ... Give yourself a big splash of applause! 🌊✨"
+                          current.text // Use the base celebration text for 3 stars
                         ) : (
                           `Great diving, young explorer! ... You found ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The sea creatures are happy with your effort! ... Finn is proud of you! ... Every ocean adventure teaches us something. Keep swimming and you'll find all the stars next time! 🐠`
                         )
@@ -1521,7 +1537,7 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
                       {/* Dynamic message based on stars collected */}
                       {current.id === 'celebration' ? (
                         stars >= 3 ? (
-                          "Congratulations ocean hero! ... The WHOLE ocean is celebrating YOU! ... Fish are swimming in happy circles, dolphins are jumping for joy, and whales are singing your victory song! ... You listened so carefully and learned so much! ... You're a SUPERSTAR swimmer! ... Give yourself a big splash of applause! 🌊✨"
+                          current.text // Use the base celebration text for 3 stars
                         ) : (
                           `Great diving, young explorer! ... You found ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The sea creatures are happy with your effort! ... Finn is proud of you! ... Every ocean adventure teaches us something. Keep swimming and you'll find all the stars next time! 🐠`
                         )

@@ -102,7 +102,7 @@ const storySteps = [
       { text: 'I swim in deep ocean waters', emoji: '🦅🌊', meaning: 'swimming deep' }
     ],
     
-    revealText: 'Remarkable discovery! The Pterodactyl announces "I soar above searching for fish!" These flying reptiles weren\'t actually dinosaurs—they were pterosaurs! With massive wingspans, they glided over ancient seas and lakes, diving to catch fish. Imagine giant wings spanning up to 20 feet!',
+    revealText: 'Outstanding! We\'ve uncovered our first precious fossil! You\'re demonstrating exceptional scientific thinking! The Pterodactyl announces "I soar above searching for fish!" These flying reptiles weren\'t actually dinosaurs—they were pterosaurs! Two more fossils to discover!',
     
     maxReplays: 5,
     wordCount: 52,
@@ -110,7 +110,7 @@ const storySteps = [
   },
   {
     id: 'first_fossil',
-    title: '💎 First Rare Fossil',
+    title: '💎 Fossil Facts',
     emoji: '💎',
     character: 'Dina',
     bgColor: 'from-yellow-100 to-amber-100 dark:from-yellow-900 dark:to-amber-900',
@@ -129,10 +129,9 @@ const storySteps = [
       { text: 'False - Fossils are recent discoveries', emoji: '❌', meaning: 'incorrect - fossils are very old' }
     ],
     
-    revealText: 'Outstanding! We\'ve uncovered our first precious fossil! You\'re demonstrating exceptional scientific thinking! It\'s absolutely TRUE—fossils preserve ancient life from millions of years ago! When organisms died, layers of sediment gradually turned their remains into stone. Two more fossils to discover!',
+    revealText: 'Excellent scientific thinking! It\'s absolutely TRUE—fossils preserve ancient life from millions of years ago! When organisms died, layers of sediment gradually turned their remains into stone. Fossils are so fascinating!',
     
     maxReplays: 5,
-    starsNeeded: 3,
     wordCount: 52,
     duration: 38
   },
@@ -157,7 +156,7 @@ const storySteps = [
       { text: 'My back plates help me fly away', emoji: '🦕✈️', meaning: 'flight capability' }
     ],
     
-    revealText: 'Brilliant deduction! Stegosaurus states "My back plates regulate my temperature!" Scientists believe these distinctive plates helped control body heat—cooling or warming depending on blood flow. The tail spikes (called thagomizer) defended against predators. Nature\'s engineering is amazing!',
+    revealText: 'Phenomenal achievement! ... INCREDIBLE! ... We\'ve collected all three rare fossils! ... (Your scientific expertise is extraordinary!) Stegosaurus states "My back plates regulate my temperature!" Scientists believe these distinctive plates helped control body heat! ... You are a BRILLIANT young scientist! ... Your curiosity and dedication are remarkable!',
     
     maxReplays: 5,
     wordCount: 50,
@@ -165,7 +164,7 @@ const storySteps = [
   },
   {
     id: 'second_fossil',
-    title: '✨ Second Ancient Fossil',
+    title: '✨ Extinction Theory',
     emoji: '✨',
     character: 'Dina',
     bgColor: 'from-cyan-100 to-teal-100 dark:from-cyan-900 dark:to-teal-900',
@@ -185,10 +184,9 @@ const storySteps = [
       { text: 'They transformed into modern birds overnight', emoji: '🦕🦅', meaning: 'instant evolution' }
     ],
     
-    revealText: 'Exceptional analysis! Another fossil reveals: "Dinosaurs became extinct because of environmental catastrophe!" Scientists theorize a massive asteroid impact 66 million years ago caused climate change, darkness, and food scarcity. Only birds—dinosaur descendants—survived. One final fossil awaits!',
+    revealText: 'Fascinating analysis! "Dinosaurs became extinct because of environmental catastrophe!" Scientists theorize a massive asteroid impact 66 million years ago caused climate change, darkness, and food scarcity. Only birds—dinosaur descendants—survived.',
     
     maxReplays: 5,
-    starsNeeded: 3,
     wordCount: 48,
     duration: 42
   },
@@ -221,13 +219,12 @@ const storySteps = [
   },
   {
     id: 'final_fossil',
-    title: '🏆 Third Precious Fossil',
-    text: 'Phenomenal achievement! ... INCREDIBLE! ... We\'ve collected all three rare fossils! ... (Your scientific expertise is extraordinary!) These fossils unlock millions of years of prehistoric secrets! ... The entire paleontology community celebrates your discovery! ... You are a BRILLIANT young scientist! ... Your curiosity and dedication are remarkable!',
+    title: '🏆 Prehistoric World',
+    text: 'The prehistoric world is filled with so much wonder! All the dinosaurs and ancient creatures are happy because you listened so carefully to their fossilized messages. You have learned so much about paleontology, extinction, and the mysteries of ancient life!',
     emoji: '🏆',
     character: 'Dina',
     bgColor: 'from-amber-200 to-yellow-200 dark:from-amber-800 dark:to-yellow-800',
     interactive: false,
-    starsNeeded: 3,
     wordCount: 48,
     duration: 32
   },
@@ -568,21 +565,21 @@ const DinosaurDiscoveryAdventure = ({ onClose, onComplete }: Props) => {
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
       
-      // Award fossils based on specific story steps
-      if (current.id === 'first_fossil') {
-        // First fossil - after completing first fossil step
+      // Award stars based on specific story steps (steps 4, 7, and 6)
+      if (current.id === 'pterodactyl_flight') {
+        // First star - after completing step 4 (pterodactyl flight)
         setStars(1);
-        console.log('💎 First fossil awarded! (1/3)');
+        console.log('⭐ First star awarded! (1/3) - Step 4: Pterodactyl Flight');
       } else if (current.id === 'second_fossil') {
-        // Second fossil - after completing second fossil step
+        // Second star - after completing step 7 (second fossil)
         setStars(2);
-        console.log('💎 Second fossil awarded! (2/3)');
-      } else if (current.id === 'final_fossil') {
-        // Third fossil - after completing final fossil step
+        console.log('⭐ Second star awarded! (2/3) - Step 7: Second Fossil');
+      } else if (current.id === 'stegosaurus_plates') {
+        // Third star - after completing step 6 (stegosaurus plates)
         setStars(3);
-        console.log('💎 Third fossil awarded! (3/3)');
+        console.log('⭐ Third star awarded! (3/3) - Step 6: Stegosaurus Plates');
       }
-      // Note: Other interactive steps don't award fossils, only the specific fossil steps do
+      // Note: Stars are awarded at steps 4, 7, and 6 for better progression
     
     setShowFeedback(true);
       setRetryMode(false);

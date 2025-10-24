@@ -102,7 +102,7 @@ const storySteps = [
       { text: 'We only grow in darkness', emoji: '🌸🌙', meaning: 'only night time' }
     ],
     
-    revealText: 'Lovely! The pretty flowers smile and say "We grow with love and sunshine!" Just like you, flowers need care, kindness, and bright sunlight to grow big and beautiful! When we give love, everything blooms!',
+    revealText: 'Perfect! You earned your first petal! The pretty flowers smile and say "We grow with love and sunshine!" Just like you, flowers need care, kindness, and bright sunlight to grow big and beautiful! Two more petals to collect!',
     
     maxReplays: 5,
     wordCount: 38,
@@ -110,7 +110,7 @@ const storySteps = [
   },
   {
     id: 'first_petal',
-    title: '🌺 First Flower Petal',
+    title: '🌺 Fairy Facts',
     emoji: '🌺',
     character: 'Twinkle',
     bgColor: 'from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900',
@@ -129,10 +129,9 @@ const storySteps = [
       { text: 'False - Fairies are big and scary', emoji: '❌', meaning: 'incorrect - fairies are gentle' }
     ],
     
-    revealText: 'Perfect! You earned your first petal! It\'s TRUE - fairies ARE very small and gentle! We flutter on tiny wings and speak in soft voices! Fairies love nature and kindness! Two more petals to collect!',
+    revealText: 'Great listening! It\'s TRUE - fairies ARE very small and gentle! We flutter on tiny wings and speak in soft voices! Fairies love nature and kindness!',
     
     maxReplays: 5,
-    starsNeeded: 3,
     wordCount: 40,
     duration: 34
   },
@@ -157,7 +156,7 @@ const storySteps = [
       { text: 'Dancing is too tiring', emoji: '🦋😓', meaning: 'too hard' }
     ],
     
-    revealText: 'Joyful! The butterfly twirls and says "Dancing makes my heart happy!" When we move to music or spin around, it fills us with happiness! Dancing is a beautiful way to show joy! Let\'s dance together!',
+    revealText: 'Wonderful! ... You found all three flower petals! ... (They\'re making a beautiful crown for you!) The butterfly twirls and says "Dancing makes my heart happy!" When we move to music or spin around, it fills us with happiness! ... You are a MAGICAL friend! ... Twinkle is so happy you visited!',
     
     maxReplays: 5,
     wordCount: 38,
@@ -165,7 +164,7 @@ const storySteps = [
   },
   {
     id: 'second_petal',
-    title: '✨ Second Flower Petal',
+    title: '✨ Garden Wisdom',
     emoji: '✨',
     character: 'Twinkle',
     bgColor: 'from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900',
@@ -185,22 +184,20 @@ const storySteps = [
       { text: 'Nothing is ever special', emoji: '✨😞', meaning: 'nothing matters' }
     ],
     
-    revealText: 'Wise! Another petal appears! "Small things can be very special!" A tiny seed becomes a flower, small acts of kindness change the world, and little fairies make big magic! Being small doesn\'t mean less important! One petal left!',
+    revealText: 'Wise! "Small things can be very special!" A tiny seed becomes a flower, small acts of kindness change the world, and little fairies make big magic!',
     
     maxReplays: 5,
-    starsNeeded: 3,
     wordCount: 40,
     duration: 38
   },
   {
     id: 'final_petal',
-    title: '🌼 Third Flower Petal',
-    text: 'Wonderful! ... You found all three flower petals! ... (They\'re making a beautiful crown for you!) The whole garden celebrates your gentle listening! ... You are a MAGICAL friend! ... Twinkle is so happy you visited! ... You made the garden bloom brighter!',
+    title: '🌼 Fairy Garden',
+    text: 'The garden is filled with so much magic! All the flowers, butterflies, and fairies are happy because you listened so carefully to their gentle messages. You have learned so much about nature, kindness, and the beauty of small things!',
     emoji: '🌼',
     character: 'Twinkle',
     bgColor: 'from-yellow-200 to-pink-200 dark:from-yellow-800 dark:to-pink-800',
     interactive: false,
-    starsNeeded: 3,
     wordCount: 38,
     duration: 28
   },
@@ -542,21 +539,21 @@ const FairyGardenAdventure = ({ onClose, onComplete }: Props) => {
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
       
-      // Award stars based on specific story steps
-      if (current.id === 'first_petal') {
-        // First petal - after completing first petal step
+      // Award stars based on specific story steps (steps 4, 7, and 6)
+      if (current.id === 'blooming_flower') {
+        // First star - after completing step 4 (blooming flower)
         setStars(1);
-        console.log('🌺 First petal awarded! (1/3)');
+        console.log('⭐ First star awarded! (1/3) - Step 4: Blooming Flower');
       } else if (current.id === 'second_petal') {
-        // Second petal - after completing second petal step
+        // Second star - after completing step 7 (second petal)
         setStars(2);
-        console.log('🌺 Second petal awarded! (2/3)');
-      } else if (current.id === 'final_petal') {
-        // Third petal - after completing final petal step
+        console.log('⭐ Second star awarded! (2/3) - Step 7: Second Petal');
+      } else if (current.id === 'butterfly_dance') {
+        // Third star - after completing step 6 (butterfly dance)
         setStars(3);
-        console.log('🌺 Third petal awarded! (3/3)');
+        console.log('⭐ Third star awarded! (3/3) - Step 6: Butterfly Dance');
       }
-      // Note: Other interactive steps don't award petals, only the specific petal steps do
+      // Note: Stars are awarded at steps 4, 7, and 6 for better progression
       
       setShowFeedback(true);
       setRetryMode(false);

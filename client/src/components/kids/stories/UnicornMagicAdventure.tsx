@@ -103,7 +103,7 @@ const storySteps = [
       { text: 'Nothing ever grows here', emoji: '🌸🚫', meaning: 'no growth' }
     ],
     
-    revealText: 'Beautiful! These flowers are singing a sweet song! They say "Love makes everything bloom!" When we show love and kindness, everything grows better! The flowers smile when we\'re nice! Can you smell how sweet they are?',
+    revealText: 'Hooray! We found our first sparkly star! You\'re listening so well! These flowers are singing a sweet song! They say "Love makes everything bloom!" When we show love and kindness, everything grows better! Two more stars to find!',
     
     maxReplays: 5,
     wordCount: 40,
@@ -111,7 +111,7 @@ const storySteps = [
   },
   {
     id: 'first_star',
-    title: '⭐ First Magic Star',
+    title: '⭐ Unicorn Facts',
     emoji: '⭐',
     character: 'Stardust',
     bgColor: 'from-yellow-100 to-amber-100 dark:from-yellow-900 dark:to-amber-900',
@@ -130,10 +130,9 @@ const storySteps = [
       { text: 'False - Unicorns have no horns', emoji: '❌', meaning: 'incorrect - they do have horns' }
     ],
     
-    revealText: 'Hooray! We found our first sparkly star! You\'re listening so well! It\'s TRUE - unicorns DO have magical horns! My horn can make magic and spread happiness! Have you ever imagined riding a unicorn? Two more stars to find!',
+    revealText: 'Great listening! It\'s TRUE - unicorns DO have magical horns! My horn can make magic and spread happiness! Have you ever imagined riding a unicorn? Unicorns are so magical and special!',
     
     maxReplays: 5,
-    starsNeeded: 3,
     wordCount: 42,
     duration: 32
   },
@@ -158,7 +157,7 @@ const storySteps = [
       { text: 'Dreams are silly things', emoji: '💎😞', meaning: 'dreams not important' }
     ],
     
-    revealText: 'Amazing! We\'re inside a sparkling crystal cave! The crystals glow and whisper "Dreams can come true here!" If you believe in magic and work hard, your dreams can happen! What do you dream about? Crystals are so pretty!',
+    revealText: 'Yay! ... We did it! ... All three magic stars are glowing! ... (You made them shine so bright!) The crystals glow and whisper "Dreams can come true here!" If you believe in magic and work hard, your dreams can happen! ... You are an AMAZING magical explorer! ... Stardust is so proud of you!',
     
     maxReplays: 5,
     wordCount: 42,
@@ -166,7 +165,7 @@ const storySteps = [
   },
   {
     id: 'second_star',
-    title: '✨ Second Shining Star',
+    title: '✨ Magic Secrets',
     emoji: '✨',
     character: 'Stardust',
     bgColor: 'from-cyan-100 to-blue-100 dark:from-cyan-900 dark:to-blue-900',
@@ -186,22 +185,20 @@ const storySteps = [
       { text: 'Magic happens when we believe', emoji: '✨💫', meaning: 'believing makes magic' }
     ],
     
-    revealText: 'Wonderful! Another star appeared! The magic tells us "Magic happens when we believe!" When you believe in yourself and in magic, amazing things can happen! Just like how you\'re collecting stars today! One more star to go!',
+    revealText: 'Wonderful! The magic tells us "Magic happens when we believe!" When you believe in yourself and in magic, amazing things can happen! That\'s such a beautiful secret!',
     
     maxReplays: 5,
-    starsNeeded: 3,
     wordCount: 42,
     duration: 36
   },
   {
     id: 'final_star',
-    title: '🌟 Third Magic Star',
-    text: 'Yay! ... We did it! ... All three magic stars are glowing! ... (You made them shine so bright!) The whole kingdom is celebrating because of YOU! ... You are an AMAZING magical explorer! ... Stardust is so proud of you! ... You spread so much magic today!',
+    title: '🌟 Magic Kingdom',
+    text: 'The kingdom is filled with so much magic! All the fairies, flowers, and crystals are happy because you listened so carefully to their messages. You have learned so much about love, dreams, and believing in magic!',
     emoji: '🌟',
     character: 'Stardust',
     bgColor: 'from-yellow-200 to-pink-200 dark:from-yellow-800 dark:to-pink-800',
     interactive: false,
-    starsNeeded: 3,
     wordCount: 40,
     duration: 28
   },
@@ -556,21 +553,21 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
       
-      // Award stars based on specific story steps
-      if (current.id === 'first_star') {
-        // First star - after completing first star step
+      // Award stars based on specific story steps (steps 4, 7, and 8)
+      if (current.id === 'magic_flowers') {
+        // First star - after completing step 4 (magic flowers)
         setStars(1);
-        console.log('⭐ First star awarded! (1/3)');
+        console.log('⭐ First star awarded! (1/3) - Step 4: Magic Flowers');
       } else if (current.id === 'second_star') {
-        // Second star - after completing second star step
+        // Second star - after completing step 7 (second star)
         setStars(2);
-        console.log('⭐ Second star awarded! (2/3)');
-      } else if (current.id === 'final_star') {
-        // Third star - after completing final star step
+        console.log('⭐ Second star awarded! (2/3) - Step 7: Second Star');
+      } else if (current.id === 'crystal_cave') {
+        // Third star - after completing step 6 (crystal cave)
         setStars(3);
-        console.log('⭐ Third star awarded! (3/3)');
+        console.log('⭐ Third star awarded! (3/3) - Step 6: Crystal Cave');
       }
-      // Note: Other interactive steps don't award stars, only the specific star steps do
+      // Note: Stars are awarded at steps 4, 7, and 6 for better progression
     
     setShowFeedback(true);
       setRetryMode(false);

@@ -115,7 +115,7 @@ const storySteps = [
     ],
     
     // Full text revealed AFTER answering correctly
-    revealText: 'WOW! Look at this gorgeous planet with sparkly rings! The planet proudly says "My rings make me special!" Can you repeat that? The rings spin around like a colorful hula hoop! Everyone is special in their own way, just like this amazing planet with its beautiful rings!',
+    revealText: 'Hooray! WOW! We found our first glowing space star! You\'re being such a brilliant listener! The planet proudly says "My rings make me special!" Can you repeat that? The rings spin around like a colorful hula hoop! Two more stars to collect!',
     
     maxReplays: 5,
     wordCount: 50,
@@ -123,7 +123,7 @@ const storySteps = [
   },
   {
     id: 'first_star',
-    title: '⭐ First Cosmic Star',
+    title: '⭐ Star Facts',
     emoji: '⭐',
     character: 'Cosmo',
     bgColor: 'from-yellow-100 to-orange-100 dark:from-yellow-900 dark:to-orange-900',
@@ -146,10 +146,9 @@ const storySteps = [
     ],
     
     // Full text revealed AFTER answering correctly
-    revealText: 'Fantastic! WOW! We found our first glowing space star! You\'re being such a brilliant listener! It\'s TRUE - stars DO twinkle in the night sky, making beautiful patterns! They guide spaceships and make the darkness sparkle! Have you made a wish on a star? Two more stars to collect!',
+    revealText: 'Fantastic! It\'s TRUE - stars DO twinkle in the night sky, making beautiful patterns! They guide spaceships and make the darkness sparkle! Have you made a wish on a star? Stars are so magical and beautiful!',
     
     maxReplays: 5,
-    starsNeeded: 3,
     wordCount: 50,
     duration: 32
   },
@@ -186,7 +185,7 @@ const storySteps = [
   },
   {
     id: 'second_star',
-    title: '✨ Second Shining Star',
+    title: '✨ Twinkling Stars',
     emoji: '✨',
     character: 'Cosmo',
     bgColor: 'from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900',
@@ -210,10 +209,9 @@ const storySteps = [
     ],
     
     // Full text revealed AFTER answering correctly
-    revealText: 'Wonderful! You\'re listening so carefully! Another star appeared near the moon crater! Stars are happy when explorers visit space - they love having visitors! (They\'re winking at you right now!) Just one more star to go! We\'re almost there, space explorer!',
+    revealText: 'Wonderful! Stars are happy when explorers visit space - they love having visitors! (They\'re winking at you right now!) That\'s such a beautiful way to think about the stars!',
     
     maxReplays: 5,
-    starsNeeded: 3,
     wordCount: 45,
     duration: 35
   },
@@ -242,7 +240,7 @@ const storySteps = [
     ],
     
     // Full text revealed AFTER answering correctly
-    revealText: 'Beautiful! Look at those amazing star patterns in the sky! They make pictures like connect-the-dots! The stars say "We shine bright together!" Can you say that? Friends are better together, just like stars! Teamwork makes us all shine brighter!',
+    revealText: 'Hooray! ... YES! ... We collected all three magic stars! ... (YOU did it, amazing space explorer!) The stars say "We shine bright together!" They\'re creating a beautiful star bridge across the galaxy! ... You are a FANTASTIC cosmic adventurer! ... I\'m so proud of your careful listening and brave exploring!',
     
     maxReplays: 5,
     wordCount: 45,
@@ -250,13 +248,12 @@ const storySteps = [
   },
   {
     id: 'final_star',
-    title: '🌟 Third Magic Star',
-    text: 'Hooray! ... YES! ... We collected all three magic stars! ... (YOU did it, amazing space explorer!) They\'re creating a beautiful star bridge across the galaxy, lighting up the whole universe! ... You are a FANTASTIC cosmic adventurer! ... I\'m so proud of your careful listening and brave exploring!',
+    title: '🌟 Space Magic',
+    text: 'The galaxy is filled with so much wonder! All the planets and stars are happy because you listened so carefully to their messages. You have learned so much about space exploration, friendship, and teamwork!',
     emoji: '🌟',
     character: 'Cosmo',
     bgColor: 'from-yellow-200 to-amber-200 dark:from-yellow-800 dark:to-amber-800',
     interactive: false,
-    starsNeeded: 3,
     wordCount: 45,
     duration: 30
   },
@@ -613,21 +610,21 @@ const SpaceAdventure = ({ onClose, onComplete }: Props) => {
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
       
-      // Award stars based on specific story steps
-      if (current.id === 'first_star') {
-        // First star - after completing first star step
+      // Award stars based on specific story steps (steps 4, 7, and 9)
+      if (current.id === 'planet_rings') {
+        // First star - after completing step 4 (planet rings)
         setStars(1);
-        console.log('⭐ First star awarded! (1/3)');
+        console.log('⭐ First star awarded! (1/3) - Step 4: Planet Rings');
       } else if (current.id === 'second_star') {
-        // Second star - after completing second star step
+        // Second star - after completing step 7 (second star)
         setStars(2);
-        console.log('⭐ Second star awarded! (2/3)');
-      } else if (current.id === 'final_star') {
-        // Third star - after completing final star step
+        console.log('⭐ Second star awarded! (2/3) - Step 7: Second Star');
+      } else if (current.id === 'constellation') {
+        // Third star - after completing step 8 (constellation)
         setStars(3);
-        console.log('⭐ Third star awarded! (3/3)');
+        console.log('⭐ Third star awarded! (3/3) - Step 8: Constellation');
       }
-      // Note: Other interactive steps don't award stars, only the specific star steps do
+      // Note: Stars are awarded at steps 4, 7, and 8 for better progression
     
       setShowFeedback(true);
       setRetryMode(false);

@@ -103,7 +103,7 @@ const storySteps = [
       { text: 'Bravery means facing your fears', emoji: '🛡️💪', meaning: 'being courageous despite fear' }
     ],
     
-    revealText: 'Heroic! The shield shows "Bravery means facing your fears!" Being brave doesn\'t mean you\'re never scared—it means you do the right thing even when you feel afraid! Every hero has fears, but they face them with courage!',
+    revealText: 'Amazing! You earned your first hero badge! The shield shows "Bravery means facing your fears!" Being brave doesn\'t mean you\'re never scared—it means you do the right thing even when you feel afraid! Two more badges to earn!',
     
     maxReplays: 5,
     wordCount: 45,
@@ -111,7 +111,7 @@ const storySteps = [
   },
   {
     id: 'first_badge',
-    title: '🏅 First Hero Badge',
+    title: '🏅 Hero Persistence',
     emoji: '🏅',
     character: 'Captain',
     bgColor: 'from-yellow-100 to-amber-100 dark:from-yellow-900 dark:to-amber-900',
@@ -130,10 +130,9 @@ const storySteps = [
       { text: 'False - Heroes quit easily', emoji: '❌', meaning: 'incorrect - heroes persist' }
     ],
     
-    revealText: 'Amazing! You earned your first hero badge! It\'s TRUE - heroes never give up trying! When something is hard, real heroes keep trying and never quit! They practice, learn from mistakes, and get stronger! Two more badges to earn!',
+    revealText: 'Great listening! It\'s TRUE - heroes never give up trying! When something is hard, real heroes keep trying and never quit! They practice, learn from mistakes, and get stronger! Heroes are so determined!',
     
     maxReplays: 5,
-    starsNeeded: 3,
     wordCount: 45,
     duration: 36
   },
@@ -158,7 +157,7 @@ const storySteps = [
       { text: 'Teams are not important', emoji: '🤝😞', meaning: 'teamwork doesn\'t matter' }
     ],
     
-    revealText: 'Powerful! The training reveals "Together we are stronger!" Even the mightiest heroes work with teams! When friends help each other and share their different talents, they can accomplish amazing things! Teamwork makes the dream work!',
+    revealText: 'Incredible! ... YES! ... You earned all three hero badges! ... (You\'re officially a superhero now!) The training reveals "Together we are stronger!" Even the mightiest heroes work with teams! ... You are a TRUE HERO! ... Captain Courage is so proud of you!',
     
     maxReplays: 5,
     wordCount: 42,
@@ -166,7 +165,7 @@ const storySteps = [
   },
   {
     id: 'second_badge',
-    title: '✨ Second Hero Badge',
+    title: '✨ Kindness Power',
     emoji: '✨',
     character: 'Captain',
     bgColor: 'from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900',
@@ -186,22 +185,20 @@ const storySteps = [
       { text: 'Being invisible is greatest', emoji: '✨👻', meaning: 'stealth ability' }
     ],
     
-    revealText: 'Magnificent! Second badge earned! "Kindness is the greatest superpower!" You can have super strength or fly, but being kind to everyone is what makes a true hero! Kind words and actions change the world! One final badge!',
+    revealText: 'Magnificent! "Kindness is the greatest superpower!" You can have super strength or fly, but being kind to everyone is what makes a true hero! Kind words and actions change the world!',
     
     maxReplays: 5,
-    starsNeeded: 3,
     wordCount: 45,
     duration: 38
   },
   {
     id: 'final_badge',
-    title: '🏆 Third Hero Badge',
-    text: 'Incredible! ... YES! ... You earned all three hero badges! ... (You\'re officially a superhero now!) You learned about responsibility, courage, and kindness! ... You are a TRUE HERO! ... Captain Courage is so proud of you! ... You\'ll help make the world better!',
+    title: '🏆 Hero Academy',
+    text: 'The academy is filled with so much heroism! All the heroes and teachers are happy because you listened so carefully to their lessons. You have learned so much about responsibility, courage, and kindness!',
     emoji: '🏆',
     character: 'Captain',
     bgColor: 'from-gold-200 to-amber-200 dark:from-gold-800 dark:to-amber-800',
     interactive: false,
-    starsNeeded: 3,
     wordCount: 45,
     duration: 30
   },
@@ -546,21 +543,21 @@ const SuperheroSchoolAdventure = ({ onClose, onComplete }: Props) => {
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
       
-      // Award stars based on specific story steps
-      if (current.id === 'first_badge') {
-        // First badge - after completing first badge step
+      // Award stars based on specific story steps (steps 4, 7, and 6)
+      if (current.id === 'brave_heart') {
+        // First star - after completing step 4 (brave heart)
         setStars(1);
-        console.log('🏅 First badge awarded! (1/3)');
+        console.log('⭐ First star awarded! (1/3) - Step 4: Brave Heart');
       } else if (current.id === 'second_badge') {
-        // Second badge - after completing second badge step
+        // Second star - after completing step 7 (second badge)
         setStars(2);
-        console.log('🏅 Second badge awarded! (2/3)');
-      } else if (current.id === 'final_badge') {
-        // Third badge - after completing final badge step
+        console.log('⭐ Second star awarded! (2/3) - Step 7: Second Badge');
+      } else if (current.id === 'teamwork_power') {
+        // Third star - after completing step 6 (teamwork power)
         setStars(3);
-        console.log('🏅 Third badge awarded! (3/3)');
+        console.log('⭐ Third star awarded! (3/3) - Step 6: Teamwork Power');
       }
-      // Note: Other interactive steps don't award badges, only the specific badge steps do
+      // Note: Stars are awarded at steps 4, 7, and 6 for better progression
     
     setShowFeedback(true);
       setRetryMode(false);

@@ -103,7 +103,7 @@ const storySteps = [
       { text: 'Fly away from here now', emoji: '🦜✈️', meaning: 'leaving us' }
     ],
     
-    revealText: 'Brilliant! Parrot Pete squawks loudly "Follow me to the treasure!" Parrots are smart and this one knows where the gold is buried! Pete flies ahead, stops, and waits for us. What a helpful feathered friend! Let\'s follow those colorful wings!',
+    revealText: 'Outstanding! We found our first treasure map! Parrot Pete squawks loudly "Follow me to the treasure!" Parrots are smart and this one knows where the gold is buried! Pete flies ahead, stops, and waits for us. Two more maps ahead!',
     
     maxReplays: 5,
     wordCount: 45,
@@ -111,7 +111,7 @@ const storySteps = [
   },
   {
     id: 'first_map',
-    title: '🗺️ First Treasure Map',
+    title: '🗺️ Pirate Rules',
     emoji: '🗺️',
     character: 'Captain',
     bgColor: 'from-orange-100 to-red-100 dark:from-orange-900 dark:to-red-900',
@@ -130,10 +130,9 @@ const storySteps = [
       { text: 'Pirates share treasure with their crew', emoji: '✅', meaning: 'true - teamwork matters' }
     ],
     
-    revealText: 'Outstanding! We found our first treasure map! It\'s TRUE - good pirates DO share treasure with their crew! Everyone who helps gets a fair share because teamwork makes the dream work! Being fair and sharing is what real captains do! Two more maps ahead!',
+    revealText: 'Great listening! It\'s TRUE - good pirates DO share treasure with their crew! Everyone who helps gets a fair share because teamwork makes the dream work! Being fair and sharing is what real captains do!',
     
     maxReplays: 5,
-    starsNeeded: 3,
     wordCount: 48,
     duration: 36
   },
@@ -158,7 +157,7 @@ const storySteps = [
       { text: 'Jump overboard quickly', emoji: '⛈️🏊', meaning: 'abandoning ship' }
     ],
     
-    revealText: 'Courageous! Captain Finn encourages "Stay brave through the storm!" The waves are big and the rain is heavy, but we hold on tight and stay strong together! Bravery means facing challenges! Soon the storm passes and sunshine returns! We did it!',
+    revealText: 'Ahoy! ... Success! ... We found all three treasure maps! ... (You\'re a true pirate legend!) Captain Finn encourages "Stay brave through the storm!" The waves are big and the rain is heavy, but we hold on tight and stay strong together! ... You are an AMAZING adventurer! ... Captain Finn is proud to have you as crew!',
     
     maxReplays: 5,
     wordCount: 45,
@@ -166,7 +165,7 @@ const storySteps = [
   },
   {
     id: 'second_map',
-    title: '✨ Second Treasure Map',
+    title: '✨ Treasure Wisdom',
     emoji: '✨',
     character: 'Captain',
     bgColor: 'from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900',
@@ -186,22 +185,20 @@ const storySteps = [
       { text: 'Treasure is not important', emoji: '✨🚫', meaning: 'nothing valuable' }
     ],
     
-    revealText: 'Wise choice! Another map appears with wisdom: "The best treasure is friendship!" While gold and jewels sparkle, having good friends and crew members is worth more than any treasure chest! Friends help, support, and share adventures! One final map!',
+    revealText: 'Wise choice! The map reveals wisdom: "The best treasure is friendship!" While gold and jewels sparkle, having good friends and crew members is worth more than any treasure chest!',
     
     maxReplays: 5,
-    starsNeeded: 3,
     wordCount: 45,
     duration: 38
   },
   {
     id: 'final_map',
-    title: '🏆 Third Treasure Map',
-    text: 'Ahoy! ... Success! ... We found all three treasure maps! ... (You\'re a true pirate legend!) The maps lead us to a magnificent treasure chest overflowing with gold! ... You are an AMAZING adventurer! ... Captain Finn is proud to have you as crew! ... You never gave up!',
+    title: '🏆 Treasure Found',
+    text: 'The seas are filled with so much adventure! All the maps and treasures are happy because you listened so carefully to their secrets. You have learned so much about bravery, friendship, and teamwork!',
     emoji: '🏆',
     character: 'Captain',
     bgColor: 'from-yellow-200 to-orange-200 dark:from-yellow-800 dark:to-orange-800',
     interactive: false,
-    starsNeeded: 3,
     wordCount: 45,
     duration: 30
   },
@@ -562,21 +559,21 @@ const PirateTreasureAdventure = ({ onClose, onComplete }: Props) => {
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
       
-      // Award stars based on specific story steps
-      if (current.id === 'first_map') {
-        // First map - after completing first map step
+      // Award stars based on specific story steps (steps 4, 7, and 6)
+      if (current.id === 'parrot_friend') {
+        // First star - after completing step 4 (parrot friend)
         setStars(1);
-        console.log('🗺️ First treasure map awarded! (1/3)');
+        console.log('⭐ First star awarded! (1/3) - Step 4: Parrot Friend');
       } else if (current.id === 'second_map') {
-        // Second map - after completing second map step
+        // Second star - after completing step 7 (second map)
         setStars(2);
-        console.log('🗺️ Second treasure map awarded! (2/3)');
-      } else if (current.id === 'final_map') {
-        // Third map - after completing final map step
+        console.log('⭐ Second star awarded! (2/3) - Step 7: Second Map');
+      } else if (current.id === 'stormy_seas') {
+        // Third star - after completing step 6 (stormy seas)
         setStars(3);
-        console.log('🗺️ Third treasure map awarded! (3/3)');
+        console.log('⭐ Third star awarded! (3/3) - Step 6: Stormy Seas');
       }
-      // Note: Other interactive steps don't award maps, only the specific map steps do
+      // Note: Stars are awarded at steps 4, 7, and 6 for better progression
     
     setShowFeedback(true);
       setRetryMode(false);
