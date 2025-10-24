@@ -102,15 +102,42 @@ const storySteps = [
       { text: 'I swim in deep ocean waters', emoji: '🦅🌊', meaning: 'swimming deep' }
     ],
     
-    revealText: 'Outstanding! We\'ve uncovered our first precious fossil! You\'re demonstrating exceptional scientific thinking! The Pterodactyl announces "I soar above searching for fish!" These flying reptiles weren\'t actually dinosaurs—they were pterosaurs! Two more fossils to discover!',
+    revealText: 'Outstanding! The Pterodactyl announces "I soar above searching for fish!" These flying reptiles weren\'t actually dinosaurs—they were pterosaurs! They ruled the skies while dinosaurs ruled the land!',
     
     maxReplays: 5,
     wordCount: 52,
     duration: 44
   },
   {
+    id: 'velociraptor_hunt',
+    title: '🦖 Velociraptor Pack',
+    emoji: '🦖',
+    character: 'Dina',
+    bgColor: 'from-red-100 to-pink-100 dark:from-red-900 dark:to-pink-900',
+    interactive: true,
+    listeningFirst: true,
+    
+    audioText: 'We hunt together as a clever pack',
+    audioInstruction: 'Listen to how Velociraptors work together!',
+    
+    question: 'How do Velociraptors hunt their prey?',
+    hint: 'They are known for their intelligence and teamwork',
+    
+    choices: [
+      { text: 'We hunt together as a clever pack', emoji: '🦖🧠', meaning: 'teamwork and intelligence' },
+      { text: 'I hunt alone in the shadows', emoji: '🦖🌙', meaning: 'solitary hunting' },
+      { text: 'We wait for prey to come to us', emoji: '🦖⏳', meaning: 'passive waiting' }
+    ],
+    
+    revealText: 'Brilliant observation! Velociraptors announce "We hunt together as a clever pack!" These intelligent predators used teamwork and strategy to catch their prey. They were much smaller than movies show, but incredibly smart!',
+    
+    maxReplays: 5,
+    wordCount: 48,
+    duration: 40
+  },
+  {
     id: 'first_fossil',
-    title: '💎 Fossil Facts',
+    title: '💎 First Fossil Discovery!',
     emoji: '💎',
     character: 'Dina',
     bgColor: 'from-yellow-100 to-amber-100 dark:from-yellow-900 dark:to-amber-900',
@@ -129,7 +156,7 @@ const storySteps = [
       { text: 'False - Fossils are recent discoveries', emoji: '❌', meaning: 'incorrect - fossils are very old' }
     ],
     
-    revealText: 'Excellent scientific thinking! It\'s absolutely TRUE—fossils preserve ancient life from millions of years ago! When organisms died, layers of sediment gradually turned their remains into stone. Fossils are so fascinating!',
+    revealText: '🎉 CONGRATULATIONS! You\'ve discovered your FIRST precious fossil! 💎 It\'s absolutely TRUE—fossils preserve ancient life from millions of years ago! When organisms died, layers of sediment gradually turned their remains into stone. One fossil collected, two more to discover!',
     
     maxReplays: 5,
     wordCount: 52,
@@ -156,7 +183,7 @@ const storySteps = [
       { text: 'My back plates help me fly away', emoji: '🦕✈️', meaning: 'flight capability' }
     ],
     
-    revealText: 'Phenomenal achievement! ... INCREDIBLE! ... We\'ve collected all three rare fossils! ... (Your scientific expertise is extraordinary!) Stegosaurus states "My back plates regulate my temperature!" Scientists believe these distinctive plates helped control body heat! ... You are a BRILLIANT young scientist! ... Your curiosity and dedication are remarkable!',
+    revealText: 'Excellent observation! Stegosaurus states "My back plates regulate my temperature!" Scientists believe these distinctive plates helped control body heat! These herbivores were well-adapted to their environment!',
     
     maxReplays: 5,
     wordCount: 50,
@@ -184,7 +211,7 @@ const storySteps = [
       { text: 'They transformed into modern birds overnight', emoji: '🦕🦅', meaning: 'instant evolution' }
     ],
     
-    revealText: 'Fascinating analysis! "Dinosaurs became extinct because of environmental catastrophe!" Scientists theorize a massive asteroid impact 66 million years ago caused climate change, darkness, and food scarcity. Only birds—dinosaur descendants—survived.',
+    revealText: '🎉 AMAZING! You\'ve discovered your SECOND precious fossil! 💎 "Dinosaurs became extinct because of environmental catastrophe!" Scientists theorize a massive asteroid impact 66 million years ago caused climate change, darkness, and food scarcity. Only birds—dinosaur descendants—survived. Two fossils collected, one more to discover!',
     
     maxReplays: 5,
     wordCount: 48,
@@ -211,27 +238,43 @@ const storySteps = [
       { text: 'I hunt smaller dinosaurs for meals', emoji: '🦕🍖', meaning: 'carnivorous hunting' }
     ],
     
-    revealText: 'Magnificent observation! Brachiosaurus declares "My long neck reaches the tallest trees!" These gentle herbivorous giants stood 40 feet tall, accessing vegetation other dinosaurs couldn\'t reach. One Brachiosaurus weighed as much as 12 elephants! Imagine that enormous, peaceful creature!',
+    revealText: '🎉 PHENOMENAL! You\'ve discovered your THIRD and FINAL precious fossil! 💎 Brachiosaurus declares "My long neck reaches the tallest trees!" These gentle herbivorous giants stood 40 feet tall, accessing vegetation other dinosaurs couldn\'t reach. One Brachiosaurus weighed as much as 12 elephants! All three fossils collected! You are a BRILLIANT young scientist!',
     
     maxReplays: 5,
     wordCount: 48,
     duration: 42
   },
   {
-    id: 'final_fossil',
-    title: '🏆 Prehistoric World',
-    text: 'The prehistoric world is filled with so much wonder! All the dinosaurs and ancient creatures are happy because you listened so carefully to their fossilized messages. You have learned so much about paleontology, extinction, and the mysteries of ancient life!',
-    emoji: '🏆',
+    id: 'dinosaur_legacy',
+    title: '🦕 Dinosaur Legacy',
+    emoji: '🦕',
     character: 'Dina',
-    bgColor: 'from-amber-200 to-yellow-200 dark:from-amber-800 dark:to-yellow-800',
-    interactive: false,
-    wordCount: 48,
-    duration: 32
+    bgColor: 'from-purple-100 to-indigo-100 dark:from-purple-900 dark:to-indigo-900',
+    interactive: true,
+    listeningFirst: true,
+    
+    audioText: 'Our legacy lives on through modern birds',
+    audioInstruction: 'Listen to how dinosaurs continue to exist today!',
+    
+    question: 'How do dinosaurs still exist in our world today?',
+    hint: 'Think about what creatures are related to dinosaurs',
+    
+    choices: [
+      { text: 'Our legacy lives on through modern birds', emoji: '🦕🐦', meaning: 'birds are dinosaur descendants' },
+      { text: 'We still roam the Earth as giants', emoji: '🦕🌍', meaning: 'dinosaurs still exist' },
+      { text: 'We transformed into mammals', emoji: '🦕🐭', meaning: 'became mammals' }
+    ],
+    
+    revealText: 'Incredible scientific insight! "Our legacy lives on through modern birds!" Birds are actually living dinosaurs—they evolved from theropod dinosaurs like Velociraptors! Every time you see a bird, you\'re seeing a dinosaur! Science is amazing!',
+    
+    maxReplays: 5,
+    wordCount: 50,
+    duration: 45
   },
   {
     id: 'celebration',
     title: '🎉 Scientific Triumph!',
-    text: 'Congratulations, Master Paleontologist! ... You\'ve completed this extraordinary expedition! ... Museums worldwide will display your incredible fossil discoveries! ... You\'ve demonstrated exceptional listening skills, scientific reasoning, and intellectual curiosity! ... Your understanding of prehistoric life is impressive! ... Continue exploring and questioning the world around you! ... You\'re destined for great scientific adventures! 🦕✨',
+    text: '🎉 EXPEDITION COMPLETE! 🎉 ... Congratulations, Master Paleontologist! ... You\'ve completed this extraordinary expedition! ... Museums worldwide will display your incredible fossil discoveries! ... You\'ve demonstrated exceptional listening skills, scientific reasoning, and intellectual curiosity! ... Your understanding of prehistoric life is impressive! ... Continue exploring and questioning the world around you! ... You\'re destined for great scientific adventures! 🦕✨',
     emoji: '🎉',
     character: 'Dina',
     bgColor: 'from-rainbow-100 to-sparkle-100 dark:from-rainbow-900 dark:to-sparkle-900',
@@ -450,7 +493,7 @@ const DinosaurDiscoveryAdventure = ({ onClose, onComplete }: Props) => {
           console.log('✅ Auto reveal text playback completed');
           
           // Wait a bit more after TTS completes to ensure full reading
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await new Promise(resolve => setTimeout(resolve, 3000));
         } catch (error) {
           console.error('❌ Auto reveal text playback failed:', error);
         } finally {
@@ -465,14 +508,6 @@ const DinosaurDiscoveryAdventure = ({ onClose, onComplete }: Props) => {
       const playNarration = async () => {
         let textToRead = current.text;
         
-        // Handle dynamic celebration text based on stars collected
-        if (current.id === 'grand_celebration') {
-          if (stars >= 3) {
-            textToRead = "Congratulations paleontologist! ... The prehistoric world celebrates your discoveries! ... Dinosaurs roar with joy, fossils glow brightly, and ancient magic fills the air! ... You made history with your excellent listening! You should feel incredibly proud! ... Give yourself a mighty roar!";
-          } else {
-            textToRead = `Great work, young scientist! ... You discovered ${Math.floor(stars)} fossil${Math.floor(stars) !== 1 ? 's' : ''}! ... The dinosaurs are impressed by your dedication! ... Dina is proud of your effort! ... Every expedition teaches us something new. Keep exploring and you'll find all the fossils next time! 🦕`;
-          }
-        }
         
         try {
           await playAudioWithCaptions(textToRead);
@@ -565,21 +600,21 @@ const DinosaurDiscoveryAdventure = ({ onClose, onComplete }: Props) => {
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
       
-      // Award stars based on specific story steps (steps 4, 7, and 6)
-      if (current.id === 'pterodactyl_flight') {
-        // First star - after completing step 4 (pterodactyl flight)
+      // Award fossils based on specific story steps (steps 3, 7, and 10)
+      if (current.id === 'first_fossil') {
+        // First fossil - after completing step 3 (first_fossil)
         setStars(1);
-        console.log('⭐ First star awarded! (1/3) - Step 4: Pterodactyl Flight');
+        console.log('💎 First fossil awarded! (1/3) - Step 3: First Fossil Discovery');
       } else if (current.id === 'second_fossil') {
-        // Second star - after completing step 7 (second fossil)
+        // Second fossil - after completing step 7 (second_fossil)
         setStars(2);
-        console.log('⭐ Second star awarded! (2/3) - Step 7: Second Fossil');
-      } else if (current.id === 'stegosaurus_plates') {
-        // Third star - after completing step 6 (stegosaurus plates)
+        console.log('💎 Second fossil awarded! (2/3) - Step 7: Extinction Theory');
+      } else if (current.id === 'brachiosaurus_height') {
+        // Third fossil - after completing step 9 (brachiosaurus_height)
         setStars(3);
-        console.log('⭐ Third star awarded! (3/3) - Step 6: Stegosaurus Plates');
+        console.log('💎 Third fossil awarded! (3/3) - Step 9: Brachiosaurus Giant');
       }
-      // Note: Stars are awarded at steps 4, 7, and 6 for better progression
+      // Note: Fossils are awarded at steps 3, 7, and 9 for proper progression
     
     setShowFeedback(true);
       setRetryMode(false);
@@ -587,13 +622,14 @@ const DinosaurDiscoveryAdventure = ({ onClose, onComplete }: Props) => {
       // Auto-advance after showing feedback to reveal phase
     setTimeout(() => {
         setListeningPhase('reveal');
-    }, 2500);
+    }, 3000);
       
       // Calculate dynamic timing based on reveal text length
       const revealText = (current as any).revealText || '';
       const textLength = revealText.length;
-      const wordsPerMinute = playbackSpeed === 'slow' ? 120 : playbackSpeed === 'slower' ? 80 : 160;
-      const estimatedDuration = Math.max(10000, (textLength / 5) * (60000 / wordsPerMinute) + 2000); // At least 10 seconds + 2 second buffer
+      const wordsPerMinute = playbackSpeed === 'slow' ? 100 : playbackSpeed === 'slower' ? 70 : 140;
+      // More generous timing calculation to ensure full reading
+      const estimatedDuration = Math.max(20000, (textLength / 3) * (60000 / wordsPerMinute) + 5000); // At least 20 seconds + 5 second buffer
       
       console.log('⏱️ Dynamic timing calculation:', {
         textLength,
@@ -645,7 +681,7 @@ const DinosaurDiscoveryAdventure = ({ onClose, onComplete }: Props) => {
     if (current.id === 'celebration') {
       console.log(`🎉 Manual playRevealText - Dinosaur Celebration - Fossils: ${stars}`);
       if (stars >= 3) {
-        textToSpeak = "Congratulations paleontologist! ... The prehistoric world celebrates your discoveries! ... Dinosaurs roar with joy, fossils glow brightly, and ancient magic fills the air! ... You made history with your excellent listening! You should feel incredibly proud! ... Give yourself a mighty roar!";
+        textToSpeak = current.text; // Use the base celebration text for 3 stars
       } else {
         textToSpeak = `Great work, young scientist! ... You discovered ${Math.floor(stars)} fossil${Math.floor(stars) !== 1 ? 's' : ''}! ... The dinosaurs are impressed by your dedication! ... Dina is proud of your effort! ... Every expedition teaches us something new. Keep exploring and you'll find all the fossils next time! 🦕`;
       }
@@ -692,7 +728,7 @@ const DinosaurDiscoveryAdventure = ({ onClose, onComplete }: Props) => {
       console.log('✅ Reveal text playback completed successfully');
       
       // Wait a bit more to ensure full completion
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 2000));
     } catch (error) {
       console.error('❌ TTS error in playRevealText:', error);
       
@@ -708,7 +744,7 @@ const DinosaurDiscoveryAdventure = ({ onClose, onComplete }: Props) => {
           console.log('✅ Retry successful');
           
           // Wait after retry too
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise(resolve => setTimeout(resolve, 2000));
         }
       } catch (retryError) {
         console.error('❌ Retry failed:', retryError);
@@ -746,7 +782,7 @@ const DinosaurDiscoveryAdventure = ({ onClose, onComplete }: Props) => {
       if (current.text) {
         if (current.id === 'celebration') {
           textToPlay = stars >= 3 
-            ? "Congratulations paleontologist! ... The prehistoric world celebrates your discoveries! ... Dinosaurs roar with joy, fossils glow brightly, and ancient magic fills the air! ... You made history with your excellent listening! You should feel incredibly proud! ... Give yourself a mighty roar!"
+            ? current.text // Use the base celebration text for 3 stars
             : `Great work, young scientist! ... You discovered ${Math.floor(stars)} fossil${Math.floor(stars) !== 1 ? 's' : ''}! ... The dinosaurs are impressed by your dedication! ... Dina is proud of your effort! ... Every expedition teaches us something new. Keep exploring and you'll find all the fossils next time! 🦕`;
           console.log('🎉 INSTANT replay celebration text:', textToPlay.substring(0, 50) + '...');
         } else {
