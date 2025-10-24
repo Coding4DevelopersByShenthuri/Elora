@@ -83,6 +83,33 @@ const storySteps = [
     duration: 35
   },
   {
+    id: 'magic_butterflies',
+    title: '🦋 Dancing Butterflies',
+    emoji: '🦋',
+    character: 'Stardust',
+    bgColor: 'from-yellow-100 to-orange-100 dark:from-yellow-900 dark:to-orange-900',
+    interactive: true,
+    listeningFirst: true,
+    
+    audioText: 'Dance with joy and happiness',
+    audioInstruction: 'Listen to what the butterflies whisper!',
+    
+    question: 'What do the magical butterflies want us to do?',
+    hint: 'They want us to move and be happy',
+    
+    choices: [
+      { text: 'Dance with joy and happiness', emoji: '🦋💃', meaning: 'dance happily' },
+      { text: 'Sit very still and quiet', emoji: '🦋🤫', meaning: 'be motionless' },
+      { text: 'Run away from them', emoji: '🦋🏃', meaning: 'escape' }
+    ],
+    
+    revealText: 'Hooray! We found our first sparkly star! You\'re listening so well! The butterflies flutter around us saying "Dance with joy and happiness!" They love to dance in the magical breeze! Can you wiggle and dance like the butterflies? Dancing makes everything more fun! Two more stars to find!',
+    
+    maxReplays: 5,
+    wordCount: 45,
+    duration: 40
+  },
+  {
     id: 'magic_flowers',
     title: '🌸 Singing Flowers',
     emoji: '🌸',
@@ -103,11 +130,11 @@ const storySteps = [
       { text: 'Nothing ever grows here', emoji: '🌸🚫', meaning: 'no growth' }
     ],
     
-    revealText: 'Hooray! We found our first sparkly star! You\'re listening so well! These flowers are singing a sweet song! They say "Love makes everything bloom!" When we show love and kindness, everything grows better! Two more stars to find!',
+    revealText: 'Beautiful! These flowers are singing a sweet song! They say "Love makes everything bloom!" When we show love and kindness, everything grows better! The magic flowers are so happy you listened carefully!',
     
     maxReplays: 5,
-    wordCount: 40,
-    duration: 36
+    wordCount: 35,
+    duration: 32
   },
   {
     id: 'first_star',
@@ -157,10 +184,10 @@ const storySteps = [
       { text: 'Dreams are silly things', emoji: '💎😞', meaning: 'dreams not important' }
     ],
     
-    revealText: 'Yay! ... We did it! ... All three magic stars are glowing! ... (You made them shine so bright!) The crystals glow and whisper "Dreams can come true here!" If you believe in magic and work hard, your dreams can happen! ... You are an AMAZING magical explorer! ... Stardust is so proud of you!',
+    revealText: 'Yay! The crystals glow and whisper "Dreams can come true here!" If you believe in magic and work hard, your dreams can happen! The crystal cave is so beautiful and magical! Keep listening carefully to find more stars!',
     
     maxReplays: 5,
-    wordCount: 42,
+    wordCount: 35,
     duration: 37
   },
   {
@@ -185,22 +212,38 @@ const storySteps = [
       { text: 'Magic happens when we believe', emoji: '✨💫', meaning: 'believing makes magic' }
     ],
     
-    revealText: 'Wonderful! The magic tells us "Magic happens when we believe!" When you believe in yourself and in magic, amazing things can happen! That\'s such a beautiful secret!',
+    revealText: 'Amazing! We found our second sparkly star! You\'re doing wonderfully! The magic tells us "Magic happens when we believe!" When you believe in yourself and in magic, amazing things can happen! That\'s such a beautiful secret! One more star to go!',
     
     maxReplays: 5,
-    wordCount: 42,
-    duration: 36
+    wordCount: 45,
+    duration: 40
   },
   {
     id: 'final_star',
     title: '🌟 Magic Kingdom',
-    text: 'The kingdom is filled with so much magic! All the fairies, flowers, and crystals are happy because you listened so carefully to their messages. You have learned so much about love, dreams, and believing in magic!',
     emoji: '🌟',
     character: 'Stardust',
     bgColor: 'from-yellow-200 to-pink-200 dark:from-yellow-800 dark:to-pink-800',
-    interactive: false,
-    wordCount: 40,
-    duration: 28
+    interactive: true,
+    listeningFirst: true,
+    
+    audioText: 'You are a magical superstar',
+    audioInstruction: 'Listen to the final magical message!',
+    
+    question: 'What does the magic kingdom say about you?',
+    hint: 'It\'s about how special you are',
+    
+    choices: [
+      { text: 'You are a magical superstar', emoji: '🌟⭐', meaning: 'you are amazing' },
+      { text: 'You need to try harder', emoji: '🌟😞', meaning: 'not good enough' },
+      { text: 'Magic is not real', emoji: '🌟❌', meaning: 'no magic' }
+    ],
+    
+    revealText: 'INCREDIBLE! We found our third and final sparkly star! You\'ve completed the magical journey! All three magic stars are now glowing brightly! The kingdom is filled with so much magic! All the fairies, flowers, and crystals are happy because you listened so carefully to their messages. You have learned so much about love, dreams, and believing in magic! You are truly a magical superstar!',
+    
+    maxReplays: 5,
+    wordCount: 50,
+    duration: 45
   },
   {
     id: 'celebration',
@@ -392,91 +435,121 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
       }
   };
 
-  // Auto-play for listening phase ONLY (no text shown)
+  // SINGLE SEQUENTIAL AUDIO MANAGER - Prevents overlapping and messy playback
   useEffect(() => {
-    if (listeningPhase === 'listening' && current.listeningFirst && (current as any).audioText) {
-      const playListeningAudio = async () => {
-        setIsPlaying(true);
-        setAudioWaveform(true);
-        try {
-          await playAudioWithCaptions((current as any).audioText);
-          setHasListened(true);
-        } catch (error) {
-          console.log('TTS not available, text mode enabled');
-          setHasListened(true); // Allow progression even without TTS
-        }
-        setIsPlaying(false);
-        setAudioWaveform(false);
-      };
-      playListeningAudio();
-    }
-    
-    // Auto-play for reveal phase (after correct answer)
-    if (listeningPhase === 'reveal' && current.listeningFirst && (current as any).revealText && ttsAvailable) {
-      console.log('🎭 Auto-playing reveal text:', {
+    const playSequentialAudio = async () => {
+      // Always stop any current audio first
+      await OnlineTTS.stop();
+      await new Promise(resolve => setTimeout(resolve, 300)); // Wait for complete stop
+      
+      console.log('🎵 Starting sequential audio playback:', {
         stepId: current.id,
-        revealText: (current as any).revealText.substring(0, 50) + '...',
-        voice: STARDUST_VOICE,
-        speed: playbackSpeed
+        phase: listeningPhase,
+        isInteractive: current.listeningFirst,
+        hasAudioText: !!(current as any).audioText,
+        hasRevealText: !!(current as any).revealText,
+        hasText: !!current.text
       });
       
-      const playReveal = async () => {
-        setIsPlaying(true);
-        setIsRevealTextPlaying(true);
-        try {
-          await playAudioWithCaptions((current as any).revealText);
-          console.log('✅ Auto reveal text playback completed');
+      try {
+        // PHASE 1: LISTENING PHASE (Interactive steps only)
+        if (listeningPhase === 'listening' && current.listeningFirst && (current as any).audioText) {
+          console.log('🎧 Playing listening audio...');
+          setIsPlaying(true);
+          setAudioWaveform(true);
           
-          // Wait a bit more after TTS completes to ensure full reading
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        } catch (error) {
-          console.error('❌ Auto reveal text playback failed:', error);
-        } finally {
+          await playAudioWithCaptions((current as any).audioText);
+          setHasListened(true);
+          
+          setIsPlaying(false);
+          setAudioWaveform(false);
+          console.log('✅ Listening audio completed');
+        }
+        
+        // PHASE 2: REVEAL PHASE (Interactive steps only)
+        else if (listeningPhase === 'reveal' && current.listeningFirst && (current as any).revealText && ttsAvailable) {
+          console.log('🎭 Playing reveal text...');
+          setIsPlaying(true);
+          setIsRevealTextPlaying(true);
+          
+          await playAudioWithCaptions((current as any).revealText);
+          
           setIsPlaying(false);
           setIsRevealTextPlaying(false);
+          console.log('✅ Reveal text completed');
         }
-      };
-      playReveal();
-    }
-    
-    // For non-interactive steps, play the full text automatically
-    if (!current.listeningFirst && current.text && ttsAvailable) {
-      const playNarration = async () => {
-        let textToRead = current.text;
         
-        // Handle dynamic celebration text based on stars collected
-        if (current.id === 'celebration') {
-          console.log(`🎉 Unicorn Celebration step - Stars collected: ${stars}`);
-          if (stars >= 3) {
-            textToRead = "Congratulations magical friend! ... The WHOLE enchanted kingdom is celebrating YOU! ... Unicorns are dancing, rainbows are glowing, and pure magic fills the sky! ... You made the magical world so proud with your wonderful listening! You should feel SO special! ... Give yourself a magical twirl!";
-          } else {
-            textToRead = `Beautiful work, little dreamer! ... You collected ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The unicorns are happy you tried your best! ... Rainbow is proud of you! ... Every magical journey helps us learn. Keep believing and you'll collect all the stars next time! 🦄`;
+        // PHASE 3: NON-INTERACTIVE STEPS (Intro, celebration, etc.)
+        else if (!current.listeningFirst && current.text && ttsAvailable) {
+          console.log('📖 Playing narration...');
+          let textToRead = current.text;
+          
+          // Handle dynamic celebration text based on stars collected
+          if (current.id === 'celebration') {
+            console.log(`🎉 Unicorn Celebration step - Stars collected: ${stars}`);
+            if (stars >= 3) {
+              textToRead = "Congratulations magical friend! ... The WHOLE enchanted kingdom is celebrating YOU! ... Unicorns are dancing, rainbows are glowing, and pure magic fills the sky! ... You made the magical world so proud with your wonderful listening! You should feel SO special! ... Give yourself a magical twirl!";
+            } else {
+              textToRead = `Beautiful work, little dreamer! ... You collected ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The unicorns are happy you tried your best! ... Rainbow is proud of you! ... Every magical journey helps us learn. Keep believing and you'll collect all the stars next time! 🦄`;
+            }
+            console.log(`🎉 Celebration text selected:`, textToRead.substring(0, 100) + '...');
           }
-          console.log(`🎉 Celebration text selected:`, textToRead.substring(0, 100) + '...');
+          
+          setIsPlaying(true);
+          await playAudioWithCaptions(textToRead);
+          setIsPlaying(false);
+          console.log('✅ Narration completed');
         }
         
-        try {
-          await playAudioWithCaptions(textToRead);
-        } catch (error) {
-          console.error('❌ TTS not available for non-interactive step:', error);
-        }
-      };
-      playNarration();
+        // Wait a moment after any audio completes
+        await new Promise(resolve => setTimeout(resolve, 500));
+        console.log('🎵 Sequential audio playback finished');
+        
+      } catch (error) {
+        console.error('❌ Sequential audio playback failed:', error);
+        setIsPlaying(false);
+        setIsRevealTextPlaying(false);
+        setAudioWaveform(false);
+      }
+    };
+    
+    // Only play audio if TTS is available
+    if (ttsAvailable) {
+      playSequentialAudio();
     }
-  }, [listeningPhase, stepIndex, playbackSpeed, stars]);
+  }, [listeningPhase, stepIndex, playbackSpeed, stars, ttsAvailable]);
 
   const handleNext = () => {
+    console.log('🔄 handleNext called:', {
+      stepIndex,
+      totalSteps: storySteps.length,
+      currentId: current.id,
+      phase: listeningPhase
+    });
+    
+    // Stop any current TTS before advancing
+    OnlineTTS.stop();
+    
     if (stepIndex < storySteps.length - 1) {
       setStepIndex(stepIndex + 1);
       setSelectedChoice(null);
       setShowFeedback(false);
       setShowHint(false);
+      setCurrentCaption('');
+      console.log('✅ Advanced to next step:', stepIndex + 1);
     } else {
       // Calculate score based on correct answers and time
       const accuracyScore = correctAnswers * 20;
       const timeBonus = Math.max(0, 300 - timeSpent) * 0.1; // Bonus for faster completion
       const starBonus = stars * 10;
       const score = Math.min(100, 40 + accuracyScore + timeBonus + starBonus);
+      
+      console.log('🏁 Story completed!', {
+        correctAnswers,
+        timeSpent,
+        stars,
+        score
+      });
       
       // Complete analytics session
       if (currentSession) {
@@ -502,14 +575,26 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
     if (!unlimitedReplays && replaysUsed >= maxReplays) return;
     if (!current.listeningFirst) return;
     
+    console.log('🔄 Manual replay requested:', {
+      stepId: current.id,
+      phase: listeningPhase,
+      replaysUsed: replaysUsed + 1
+    });
+    
     setReplaysUsed(prev => prev + 1);
+    
+    // Stop any current audio first
+    await OnlineTTS.stop();
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
     setIsPlaying(true);
     setAudioWaveform(true);
     
-      try {
+    try {
       await playAudioWithCaptions((current as any).audioText);
       setHasListened(true);
-      } catch (error) {
+      console.log('✅ Manual replay completed');
+    } catch (error) {
       console.log('TTS not available, text mode enabled');
       setHasListened(true); // Still allow progression
     }
@@ -553,37 +638,37 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
       
-      // Award stars based on specific story steps (steps 4, 7, and 8)
-      if (current.id === 'magic_flowers') {
-        // First star - after completing step 4 (magic flowers)
+      // Award stars based on specific story steps (steps 3, 7, and 9)
+      if (current.id === 'magic_butterflies') {
+        // First star - after completing step 3 (magic butterflies)
         setStars(1);
-        console.log('⭐ First star awarded! (1/3) - Step 4: Magic Flowers');
+        console.log('⭐ First star awarded! (1/3) - Step 3: Magic Butterflies');
       } else if (current.id === 'second_star') {
         // Second star - after completing step 7 (second star)
         setStars(2);
         console.log('⭐ Second star awarded! (2/3) - Step 7: Second Star');
-      } else if (current.id === 'crystal_cave') {
-        // Third star - after completing step 6 (crystal cave)
+      } else if (current.id === 'final_star') {
+        // Third star - after completing step 9 (final star - step 8 in 0-indexed array)
         setStars(3);
-        console.log('⭐ Third star awarded! (3/3) - Step 6: Crystal Cave');
+        console.log('⭐ Third star awarded! (3/3) - Step 9: Final Star');
       }
-      // Note: Stars are awarded at steps 4, 7, and 6 for better progression
+      // Note: Stars are awarded at steps 3, 7, and 9 for proper progression
     
-    setShowFeedback(true);
+      setShowFeedback(true);
       setRetryMode(false);
     
       // Auto-advance after showing feedback to reveal phase
-    setTimeout(() => {
+      setTimeout(() => {
         setListeningPhase('reveal');
-    }, 2500);
+      }, 2500);
       
-      // Calculate dynamic timing based on reveal text length
+      // Calculate dynamic timing based on reveal text length - more generous timing
       const revealText = (current as any).revealText || '';
       const textLength = revealText.length;
-      const wordsPerMinute = playbackSpeed === 'slow' ? 120 : playbackSpeed === 'slower' ? 80 : 160;
-      const estimatedDuration = Math.max(10000, (textLength / 5) * (60000 / wordsPerMinute) + 2000); // At least 10 seconds + 2 second buffer
+      const wordsPerMinute = playbackSpeed === 'slow' ? 100 : playbackSpeed === 'slower' ? 70 : 140;
+      const estimatedDuration = Math.max(12000, (textLength / 4) * (60000 / wordsPerMinute) + 2000); // More conservative timing
       
-      console.log('⏱️ Dynamic timing calculation:', {
+      console.log('⏱️ Sequential timing calculation:', {
         textLength,
         wordsPerMinute,
         estimatedDuration: Math.round(estimatedDuration),
@@ -593,16 +678,15 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
       
       // Move to next step after reveal text has time to complete
       setTimeout(() => {
-        // Double-check that reveal text is not still playing
-        if (!isRevealTextPlaying) {
-          handleNext();
-        } else {
-          console.log('⏳ Reveal text still playing, waiting a bit more...');
-          // Wait a bit more if still playing
-          setTimeout(() => {
-            handleNext();
-          }, 2000);
-        }
+        console.log('🔄 Sequential advance check:', {
+          isRevealTextPlaying,
+          stepId: current.id,
+          phase: listeningPhase
+        });
+        
+        // Always advance after the calculated time - the sequential system ensures clean playback
+        console.log('✅ Sequential timing complete, advancing to next step');
+        handleNext();
       }, estimatedDuration);
     } else {
       // Wrong answer - offer retry
@@ -624,7 +708,7 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
   const playRevealText = async () => {
     let textToSpeak = (current as any).revealText || current.text;
     
-    console.log('🎭 playRevealText called:', {
+    console.log('🎭 Manual playRevealText called:', {
       stepId: current.id,
       hasRevealText: !!(current as any).revealText,
       hasText: !!current.text,
@@ -665,7 +749,11 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
       }
     }
     
-    console.log('🎤 Starting reveal text playback with Stardust voice:', {
+    // Stop any current audio first
+    await OnlineTTS.stop();
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    console.log('🎤 Starting manual reveal text playback:', {
       text: textToSpeak.substring(0, 100) + '...',
       voice: STARDUST_VOICE,
       speed: playbackSpeed
@@ -674,51 +762,31 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
     setIsPlaying(true);
     setIsRevealTextPlaying(true);
     try {
-      // Force stop any current speech first
-      OnlineTTS.stop();
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Use playAudioWithCaptions which ensures Stardust's voice
       await playAudioWithCaptions(textToSpeak);
-      console.log('✅ Reveal text playback completed successfully');
+      console.log('✅ Manual reveal text playback completed successfully');
       
-      // Wait a bit more to ensure full completion
+      // Wait to ensure full completion
       await new Promise(resolve => setTimeout(resolve, 500));
     } catch (error) {
       console.error('❌ TTS error in playRevealText:', error);
-      
-      // Try to reinitialize TTS and retry once
-      try {
-        console.log('🔄 Attempting TTS reinitialization...');
-        await OnlineTTS.initialize();
-        await new Promise(resolve => setTimeout(resolve, 200));
-        
-        if (OnlineTTS.isAvailable()) {
-          console.log('🔄 Retrying reveal text with reinitialized TTS...');
-          await playAudioWithCaptions(textToSpeak);
-          console.log('✅ Retry successful');
-          
-          // Wait after retry too
-          await new Promise(resolve => setTimeout(resolve, 500));
-        }
-      } catch (retryError) {
-        console.error('❌ Retry failed:', retryError);
-      }
     } finally {
       setIsPlaying(false);
       setIsRevealTextPlaying(false);
+      console.log('🎭 Manual reveal text playback finished');
     }
   };
 
-  // Instant speed change function - no delays, immediate response
+  // Sequential speed change function - ensures clean audio transitions
   const handleSpeedChange = (newSpeed: 'normal' | 'slow' | 'slower') => {
-    console.log('🔄 INSTANT speed change - Current step:', current.id, 'New speed:', newSpeed);
+    console.log('🔄 Speed change requested:', {
+      stepId: current.id,
+      oldSpeed: playbackSpeed,
+      newSpeed: newSpeed,
+      phase: listeningPhase
+    });
     
     // Update speed state immediately
     setPlaybackSpeed(newSpeed);
-    
-    // Force stop any currently playing audio immediately
-    OnlineTTS.stop();
     
     // Determine what text to replay
     let textToPlay = '';
@@ -727,10 +795,10 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
       // Interactive steps with listening phases
       if (listeningPhase === 'listening' && (current as any).audioText) {
         textToPlay = (current as any).audioText;
-        console.log('🎧 INSTANT replay listening audio:', textToPlay.substring(0, 50) + '...');
+        console.log('🎧 Speed change - replay listening audio');
       } else if (listeningPhase === 'reveal' && (current as any).revealText) {
         textToPlay = (current as any).revealText;
-        console.log('🎭 INSTANT replay reveal text:', textToPlay.substring(0, 50) + '...');
+        console.log('🎭 Speed change - replay reveal text');
       }
     } else {
       // Non-interactive steps (like intro, celebration, etc.)
@@ -739,50 +807,53 @@ const UnicornMagicAdventure = ({ onClose, onComplete }: Props) => {
           textToPlay = stars >= 3 
             ? "Congratulations magical friend! ... The WHOLE enchanted kingdom is celebrating YOU! ... Unicorns are dancing, rainbows are glowing, and pure magic fills the sky! ... You made the magical world so proud with your wonderful listening! You should feel SO special! ... Give yourself a magical twirl!"
             : `Beautiful work, little dreamer! ... You collected ${Math.floor(stars)} star${Math.floor(stars) !== 1 ? 's' : ''}! ... The unicorns are happy you tried your best! ... Rainbow is proud of you! ... Every magical journey helps us learn. Keep believing and you'll collect all the stars next time! 🦄`;
-          console.log('🎉 INSTANT replay celebration text:', textToPlay.substring(0, 50) + '...');
+          console.log('🎉 Speed change - replay celebration text');
         } else {
           textToPlay = current.text;
-          console.log('📖 INSTANT replay intro/narration text:', textToPlay.substring(0, 50) + '...');
+          console.log('📖 Speed change - replay narration text');
         }
       }
     }
     
     if (!textToPlay) {
-      console.log('❌ No text found to replay');
+      console.log('❌ No text found to replay for speed change');
       return;
     }
     
     if (!ttsAvailable) {
-      console.log('❌ TTS not available');
+      console.log('❌ TTS not available for speed change');
       return;
     }
     
-    // Start playing immediately with new speed
+    // Play with new speed using sequential system
     const playWithNewSpeed = async () => {
       try {
+        // Stop any current audio first
+        await OnlineTTS.stop();
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
         const cleanText = stripEmojis(textToPlay);
-        console.log('🎤 INSTANT speaking at new speed:', newSpeed, 'Text length:', cleanText.length);
+        console.log('🎤 Playing with new speed:', newSpeed, 'Text length:', cleanText.length);
         
         setIsPlaying(true);
         setIsRevealTextPlaying(listeningPhase === 'reveal');
         
-        await OnlineTTS.speak(cleanText, STARDUST_VOICE, {
-          speed: newSpeed,
-          showCaptions: false,
-          onCaptionUpdate: () => {}
-        });
+        await playAudioWithCaptions(cleanText);
         
-        console.log('✅ INSTANT speed change completed successfully');
+        console.log('✅ Speed change playback completed');
+        
+        // Wait after completion
+        await new Promise(resolve => setTimeout(resolve, 500));
         
       } catch (error) {
-        console.error('❌ INSTANT speed change error:', error);
+        console.error('❌ Speed change playback error:', error);
       } finally {
         setIsPlaying(false);
         setIsRevealTextPlaying(false);
       }
     };
     
-    // Start playing immediately (no await to make it instant)
+    // Start playing with new speed
     playWithNewSpeed();
   };
 
