@@ -157,7 +157,7 @@ const storySteps = [
       { text: 'Teams are not important', emoji: '🤝😞', meaning: 'teamwork doesn\'t matter' }
     ],
     
-    revealText: 'Incredible! ... YES! ... You earned all three hero badges! ... (You\'re officially a superhero now!) The training reveals "Together we are stronger!" Even the mightiest heroes work with teams! ... You are a TRUE HERO! ... Captain Courage is so proud of you!',
+    revealText: 'Excellent! You earned your second hero badge! The training reveals "Together we are stronger!" Even the mightiest heroes work with teams! One more badge to become a true superhero!',
     
     maxReplays: 5,
     wordCount: 42,
@@ -185,7 +185,7 @@ const storySteps = [
       { text: 'Being invisible is greatest', emoji: '✨👻', meaning: 'stealth ability' }
     ],
     
-    revealText: 'Magnificent! "Kindness is the greatest superpower!" You can have super strength or fly, but being kind to everyone is what makes a true hero! Kind words and actions change the world!',
+    revealText: 'Incredible! ... YES! ... You earned all three hero badges! ... (You\'re officially a superhero now!) "Kindness is the greatest superpower!" You can have super strength or fly, but being kind to everyone is what makes a true hero! ... You are a TRUE HERO! ... Captain Courage is so proud of you!',
     
     maxReplays: 5,
     wordCount: 45,
@@ -543,21 +543,21 @@ const SuperheroSchoolAdventure = ({ onClose, onComplete }: Props) => {
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
       
-      // Award stars based on specific story steps (steps 4, 7, and 6)
+      // Award stars based on specific story steps (steps 4, 6, and 7)
       if (current.id === 'brave_heart') {
         // First star - after completing step 4 (brave heart)
         setStars(1);
         console.log('⭐ First star awarded! (1/3) - Step 4: Brave Heart');
-      } else if (current.id === 'second_badge') {
-        // Second star - after completing step 7 (second badge)
-        setStars(2);
-        console.log('⭐ Second star awarded! (2/3) - Step 7: Second Badge');
       } else if (current.id === 'teamwork_power') {
-        // Third star - after completing step 6 (teamwork power)
+        // Second star - after completing step 6 (teamwork power)
+        setStars(2);
+        console.log('⭐ Second star awarded! (2/3) - Step 6: Teamwork Power');
+      } else if (current.id === 'second_badge') {
+        // Third star - after completing step 7 (second badge)
         setStars(3);
-        console.log('⭐ Third star awarded! (3/3) - Step 6: Teamwork Power');
+        console.log('⭐ Third star awarded! (3/3) - Step 7: Second Badge');
       }
-      // Note: Stars are awarded at steps 4, 7, and 6 for better progression
+      // Note: Stars are awarded at steps 4, 6, and 7 for proper progression
     
     setShowFeedback(true);
       setRetryMode(false);
