@@ -109,7 +109,7 @@ const storySteps = [
       { text: 'Sleep, all day', emoji: '💧😴', meaning: 'resting quietly' }
     ],
     
-    revealText: 'Listen to the happy river! Do you hear the water flowing? It\'s singing "flow, so free!" Can you sing that song with the river? Let\'s practice together!',
+    revealText: 'Hooray! WOW! We found our first glowing star! You\'re doing an amazing job listening! The river is singing "flow, so free!" and it\'s so happy to see you! Can you sing that song with the river? Two more stars to find! Can you guess where they might be?',
     
     maxReplays: 5,
     wordCount: 28,
@@ -145,7 +145,7 @@ const storySteps = [
   },
   {
     id: 'star_discovery',
-    title: '⭐ First Magic Star',
+    title: '⭐ Star Facts',
     emoji: '⭐',
     character: 'Luna',
     bgColor: 'from-yellow-100 to-amber-100 dark:from-yellow-900 dark:to-amber-900',
@@ -161,13 +161,12 @@ const storySteps = [
     
     choices: [
       { text: 'False - Stars do not shine', emoji: '❌', meaning: 'incorrect - stars do shine' },
-      { text: 'Stars shine brightly at night', emoji: '✅', meaning: 'true - we see stars at night' }
+      { text: 'True - Stars shine brightly at night', emoji: '✅', meaning: 'true - we see stars at night' }
     ],
     
-    revealText: 'Hooray! WOW! We found our first glowing star! You\'re doing an amazing job listening! It\'s TRUE - stars DO shine brightly at night, just like when you look up at bedtime and see them twinkling! Have you ever made a wish on a star? Two more stars to find! Can you guess where they might be?',
+    revealText: 'Great listening! It\'s TRUE - stars DO shine brightly at night, just like when you look up at bedtime and see them twinkling! Have you ever made a wish on a star? Stars are so magical and beautiful!',
     
     maxReplays: 5,
-    starsNeeded: 3,
     wordCount: 35,
     duration: 32
   },
@@ -193,7 +192,7 @@ const storySteps = [
       { text: 'Come rest with me down low', emoji: '🐿️⬇️', meaning: 'low on the ground' }
     ],
     
-    revealText: 'Look up there! Can you see the squirrel jumping on the branches? A friendly squirrel is calling "Come play with me up high!" Can you say that? Let\'s practice! Have you ever seen a squirrel climb a tree?',
+    revealText: 'Incredible! You\'re such a great listener! Another star appeared near the old oak tree! The squirrel is calling "Come play with me up high!" Can you say that? Let\'s practice! One last star to go! We\'re almost there!',
     
     maxReplays: 5,
     wordCount: 30,
@@ -201,7 +200,7 @@ const storySteps = [
   },
   {
     id: 'second_star',
-    title: '✨ Second Shining Star',
+    title: '✨ Twinkling Stars',
     emoji: '✨',
     character: 'Luna',
     bgColor: 'from-purple-100 to-indigo-100 dark:from-purple-900 dark:to-indigo-900',
@@ -222,10 +221,9 @@ const storySteps = [
       { text: 'They are happy to see us', emoji: '✨😊', meaning: 'emotional connection' }
     ],
     
-    revealText: 'Incredible! You\'re such a great listener! Another star appeared near the old oak tree! Stars twinkle because they are happy to see us exploring. One last star to go! We\'re almost there!',
+    revealText: 'Wonderful! Stars twinkle because they are happy to see us exploring! That\'s such a beautiful way to think about the stars. They\'re like little friends watching over us!',
     
     maxReplays: 5,
-    starsNeeded: 3,
     wordCount: 26,
     duration: 30
   },
@@ -251,7 +249,7 @@ const storySteps = [
       { text: 'Always be busy and never stop', emoji: '🦉🏃', meaning: 'move constantly' }
     ],
     
-    revealText: 'Good evening! The wise owl greets us "Always be curious and ask questions!" Can you repeat that? Owls are very wise - they know that asking questions helps us learn, just like when you ask "Why?" at home!',
+    revealText: 'We did it! ... YES! ... All three magic stars are glowing brightly! ... (They\'re shining just for YOU because you listened so well!) The wise owl says "Always be curious and ask questions!" You are an AMAZING explorer! ... I\'m so proud of how hard you tried!',
     
     maxReplays: 5,
     wordCount: 28,
@@ -259,13 +257,12 @@ const storySteps = [
   },
   {
     id: 'final_star',
-    title: '🌟 Third Magic Star',
-    text: 'We did it! ... YES! ... All three magic stars are glowing brightly! ... (They\'re shining just for YOU because you listened so well!) They will keep our forest magical forever. ... You are an AMAZING explorer! ... I\'m so proud of how hard you tried!',
+    title: '🌟 Forest Magic',
+    text: 'The forest is filled with so much magic! All the animals and plants are happy because you listened so carefully to their messages. You have learned so much about being kind, curious, and listening with your heart!',
     emoji: '🌟',
     character: 'Luna',
     bgColor: 'from-yellow-100 to-orange-100 dark:from-yellow-900 dark:to-orange-900',
     interactive: false,
-    starsNeeded: 3,
     wordCount: 23,
     duration: 30
   },
@@ -633,21 +630,21 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
       
-      // Award stars based on specific story steps
-      if (current.id === 'star_discovery') {
-        // First star - after completing star discovery step
+      // Award stars based on specific story steps (steps 4, 7, and 11)
+      if (current.id === 'sparkling_river') {
+        // First star - after completing step 4 (sparkling river)
         setStars(1);
-        console.log('⭐ First star awarded! (1/3)');
-      } else if (current.id === 'second_star') {
-        // Second star - after completing second star step
+        console.log('⭐ First star awarded! (1/3) - Step 4: Sparkling River');
+      } else if (current.id === 'friendly_squirrel') {
+        // Second star - after completing step 7 (friendly squirrel)
         setStars(2);
-        console.log('⭐ Second star awarded! (2/3)');
-      } else if (current.id === 'final_star') {
-        // Third star - after completing final star step
+        console.log('⭐ Second star awarded! (2/3) - Step 7: Friendly Squirrel');
+      } else if (current.id === 'wise_owl') {
+        // Third star - after completing step 9 (wise owl)
         setStars(3);
-        console.log('⭐ Third star awarded! (3/3)');
+        console.log('⭐ Third star awarded! (3/3) - Step 9: Wise Owl');
       }
-      // Note: Other interactive steps don't award stars, only the specific star steps do
+      // Note: Stars are awarded at steps 4, 7, and 9 for better progression
     
     setShowFeedback(true);
       setRetryMode(false);
