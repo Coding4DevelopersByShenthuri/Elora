@@ -162,11 +162,17 @@ export class OnlineTTS {
         // If still not found, try to find a similar voice by gender/age
         if (!voice) {
           const targetName = voiceProfile.voiceName.toLowerCase();
-          if (targetName.includes('female') || targetName.includes('woman')) {
-            voice = this.voices.find(v => v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('woman'));
-          } else if (targetName.includes('male') || targetName.includes('man')) {
-            voice = this.voices.find(v => v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('man'));
+          if (targetName.includes('female') || targetName.includes('woman') || targetName.includes('zira') || targetName.includes('susan')) {
+            voice = this.voices.find(v => v.name.toLowerCase().includes('zira') || v.name.toLowerCase().includes('susan') || v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('woman'));
+          } else if (targetName.includes('male') || targetName.includes('man') || targetName.includes('mark') || targetName.includes('david')) {
+            voice = this.voices.find(v => v.name.toLowerCase().includes('mark') || v.name.toLowerCase().includes('david') || v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('man'));
           }
+        }
+        
+        // If still not found, use the first available voice as fallback
+        if (!voice && this.voices.length > 0) {
+          voice = this.voices[0];
+          console.log(`🔄 Using fallback voice: ${voice.name} for ${voiceProfile.name}`);
         }
         
         if (voice) {
@@ -200,7 +206,21 @@ export class OnlineTTS {
 
       utterance.onerror = (error) => {
         console.error('TTS error:', error);
-        reject(error);
+        console.error('TTS error details:', {
+          error: error.error,
+          type: error.type,
+          charIndex: error.charIndex,
+          charCode: error.charCode,
+          utterance: utterance.text.substring(0, 100) + '...'
+        });
+        
+        // Try to recover from common TTS errors
+        if (error.error === 'interrupted' || error.error === 'canceled') {
+          console.log('🔄 TTS was interrupted or canceled, this is usually recoverable');
+          resolve(); // Don't reject, just resolve
+        } else {
+          reject(error);
+        }
       };
 
       this.synth!.speak(utterance);
@@ -220,7 +240,7 @@ export const STORY_VOICES: Record<string, VoiceProfile> = {
     pitch: 1.0,
     rate: 1.0,
     volume: 1.0,
-    voiceName: 'Google UK English Female', // Google's young female voice
+    voiceName: 'Microsoft Zira Desktop - English (United States)', // Microsoft's young female voice
     description: 'Sweet, gentle rabbit voice with magical wonder'
   },
   
@@ -230,7 +250,7 @@ export const STORY_VOICES: Record<string, VoiceProfile> = {
     pitch: 1.0,
     rate: 1.0,
     volume: 1.0,
-    voiceName: 'Google UK English Male', // Google's young male voice
+    voiceName: 'Microsoft Mark Desktop - English (United States)', // Microsoft's young male voice
     description: 'Confident, adventurous astronaut voice'
   },
   
@@ -260,7 +280,7 @@ export const STORY_VOICES: Record<string, VoiceProfile> = {
     pitch: 1.0,
     rate: 1.0,
     volume: 1.0,
-    voiceName: 'Google US English Female', // Google's young female voice
+    voiceName: 'Microsoft Zira Desktop - English (United States)', // Microsoft's young female voice
     description: 'Enchanting, graceful unicorn voice with dreamy magical quality'
   },
   
@@ -280,7 +300,7 @@ export const STORY_VOICES: Record<string, VoiceProfile> = {
     pitch: 1.0,
     rate: 1.0,
     volume: 1.0,
-    voiceName: 'Google US English Male', // Google's male voice
+    voiceName: 'Microsoft Mark Desktop - English (United States)', // Microsoft's male voice
     description: 'Heroic, confident superhero voice with powerful determination'
   },
   
@@ -290,7 +310,7 @@ export const STORY_VOICES: Record<string, VoiceProfile> = {
     pitch: 1.0,
     rate: 1.0,
     volume: 1.0,
-    voiceName: 'Microsoft Susan Desktop - English (United States)', // Microsoft's young female voice
+    voiceName: 'Microsoft Zira Desktop - English (United States)', // Microsoft's young female voice
     description: 'Delicate, twinkling fairy voice with sweet magical tone'
   }
 };

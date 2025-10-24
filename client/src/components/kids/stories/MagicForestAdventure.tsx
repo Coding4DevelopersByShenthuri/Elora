@@ -434,20 +434,33 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
       );
       
       console.log(`✅ Audio playback completed for step: ${current.id}`);
-    } catch (error) {
-      console.error('❌ Voice synthesis failed:', error);
-      console.error('❌ Error details:', {
-        step: current.id,
-        phase: listeningPhase,
-        ttsAvailable,
-        isRevealText: !!(current as any).revealText && text === (current as any).revealText,
-        textLength: text.length
-      });
-      
-      setTtsAvailable(false);
-      // Transcript remains off by default - users can toggle if needed
-      throw error;
-    }
+      } catch (error) {
+        console.error('❌ Voice synthesis failed:', error);
+        console.error('❌ Error details:', {
+          step: current.id,
+          phase: listeningPhase,
+          ttsAvailable,
+          isRevealText: !!(current as any).revealText && text === (current as any).revealText,
+          textLength: text.length
+        });
+        
+        // Don't mark TTS as unavailable immediately - try to recover
+        console.log('🔄 Attempting to recover TTS...');
+        try {
+          await OnlineTTS.initialize();
+          if (OnlineTTS.isAvailable()) {
+            console.log('✅ TTS recovered successfully');
+            // Don't throw error, just log it
+            return;
+          }
+        } catch (recoveryError) {
+          console.error('❌ TTS recovery failed:', recoveryError);
+        }
+        
+        setTtsAvailable(false);
+        // Transcript remains off by default - users can toggle if needed
+        throw error;
+      }
   };
 
   // Auto-play for listening phase ONLY (no text shown)
@@ -693,8 +706,20 @@ const MagicForestAdventure = ({ onClose, onComplete }: Props) => {
     }
     
     if (!ttsAvailable) {
-      console.log('❌ TTS not available in playRevealText');
-      return;
+      console.log('❌ TTS not available in playRevealText, attempting to reinitialize...');
+      try {
+        await OnlineTTS.initialize();
+        if (OnlineTTS.isAvailable()) {
+          console.log('✅ TTS reinitialized successfully');
+          setTtsAvailable(true);
+        } else {
+          console.log('❌ TTS still not available after reinitialization');
+          return;
+        }
+      } catch (error) {
+        console.error('❌ TTS reinitialization failed:', error);
+        return;
+      }
     }
     
     console.log('🎤 Starting reveal text playback with Luna voice:', {
