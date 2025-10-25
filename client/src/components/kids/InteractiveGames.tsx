@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Trophy, Volume2, RefreshCw, Loader2, BookOpen } from 'lucide-react';
+import { Trophy, Volume2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import EnhancedTTS from '@/services/EnhancedTTS';
 import { WhisperService } from '@/services/WhisperService';
-import VoiceRecorder from './VoiceRecorder';
-import HybridServiceManager from '@/services/HybridServiceManager';
+import KidsVoiceRecorder from './KidsVoiceRecorder';
+// import HybridServiceManager from '@/services/HybridServiceManager';
 import StoryWordsService, { type StoryWord } from '@/services/StoryWordsService';
 import { useAuth } from '@/contexts/AuthContext';
 
-type GameType = 'rhyme' | 'sentence' | 'echo' | 'menu';
+type GameType = 'tongue-twister' | 'word-chain' | 'story-telling' | 'pronunciation-challenge' | 'conversation-practice' | 'menu';
 
 const InteractiveGames = () => {
   const [currentGame, setCurrentGame] = useState<GameType>('menu');
@@ -48,25 +48,34 @@ const InteractiveGames = () => {
           storyWords={storyWords}
         />
       )}
-      {currentGame === 'rhyme' && (
-        <RhymeTime 
+      {currentGame === 'tongue-twister' && (
+        <TongueTwisterGame 
           onBack={() => setCurrentGame('menu')} 
           onScoreUpdate={(points) => setScore(prev => prev + points)}
-          storyWords={storyWords}
         />
       )}
-      {currentGame === 'sentence' && (
-        <SentenceBuilder 
+      {currentGame === 'word-chain' && (
+        <WordChainGame 
           onBack={() => setCurrentGame('menu')} 
           onScoreUpdate={(points) => setScore(prev => prev + points)}
-          storyWords={storyWords}
         />
       )}
-      {currentGame === 'echo' && (
-        <EchoChallenge 
+      {currentGame === 'story-telling' && (
+        <StoryTellingGame 
           onBack={() => setCurrentGame('menu')} 
           onScoreUpdate={(points) => setScore(prev => prev + points)}
-          storyWords={storyWords}
+        />
+      )}
+      {currentGame === 'pronunciation-challenge' && (
+        <PronunciationChallenge 
+          onBack={() => setCurrentGame('menu')} 
+          onScoreUpdate={(points) => setScore(prev => prev + points)}
+        />
+      )}
+      {currentGame === 'conversation-practice' && (
+        <ConversationPractice 
+          onBack={() => setCurrentGame('menu')} 
+          onScoreUpdate={(points) => setScore(prev => prev + points)}
         />
       )}
     </div>
@@ -87,25 +96,39 @@ const GameMenu = ({
 }) => {
   const games = [
     {
-      id: 'rhyme' as GameType,
-      title: 'Rhyme Time',
-      description: 'Find words that rhyme and say them out loud!',
-      emoji: '🎵',
-      color: 'from-pink-400 to-rose-400'
+      id: 'tongue-twister' as GameType,
+      title: 'Tongue Twisters',
+      description: 'Master tricky phrases to improve pronunciation!',
+      emoji: '👅',
+      color: 'from-red-400 to-pink-400'
     },
     {
-      id: 'sentence' as GameType,
-      title: 'Sentence Builder',
-      description: 'Build sentences and speak them correctly!',
-      emoji: '🧩',
+      id: 'word-chain' as GameType,
+      title: 'Word Chain',
+      description: 'Connect words by speaking them in sequence!',
+      emoji: '🔗',
       color: 'from-blue-400 to-cyan-400'
     },
     {
-      id: 'echo' as GameType,
-      title: 'Echo Challenge',
-      description: 'Repeat sentences faster and faster!',
-      emoji: '⚡',
+      id: 'story-telling' as GameType,
+      title: 'Story Telling',
+      description: 'Create and tell your own stories!',
+      emoji: '📖',
+      color: 'from-green-400 to-emerald-400'
+    },
+    {
+      id: 'pronunciation-challenge' as GameType,
+      title: 'Pronunciation Master',
+      description: 'Perfect your pronunciation with fun challenges!',
+      emoji: '🎯',
       color: 'from-purple-400 to-indigo-400'
+    },
+    {
+      id: 'conversation-practice' as GameType,
+      title: 'Chat Practice',
+      description: 'Practice real conversations with AI!',
+      emoji: '💬',
+      color: 'from-orange-400 to-yellow-400'
     }
   ];
 
@@ -114,7 +137,6 @@ const GameMenu = ({
       {/* Story Enrollment Status */}
       <Card className="border-2 border-blue-300/50 bg-blue-50/40 dark:bg-blue-900/10 backdrop-blur-sm shadow-lg">
         <CardContent className="py-4 sm:py-6 text-center px-3 sm:px-4">
-          <BookOpen className="w-10 h-10 sm:w-12 sm:h-12 text-blue-600 dark:text-blue-400 mx-auto mb-2 sm:mb-3" />
           <div className="text-2xl sm:text-3xl font-bold text-blue-700 dark:text-blue-300 mb-2">
             {enrolledStories.length} Story{enrolledStories.length !== 1 ? 's' : ''} Completed
           </div>
@@ -123,7 +145,7 @@ const GameMenu = ({
           </p>
           {enrolledStories.length === 0 && (
             <p className="text-xs sm:text-sm text-orange-600 dark:text-orange-400 font-medium">
-              Complete stories to unlock more words for games! 📚
+              Complete stories to unlock more words for games!
             </p>
           )}
         </CardContent>
@@ -148,17 +170,21 @@ const GameMenu = ({
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-5 md:gap-6">
         {games.map((game, index) => {
           const cardBgColors = [
-            'bg-pink-50/60 dark:bg-pink-900/10',
+            'bg-red-50/60 dark:bg-red-900/10',
             'bg-blue-50/60 dark:bg-blue-900/10',
-            'bg-purple-50/60 dark:bg-purple-900/10'
+            'bg-green-50/60 dark:bg-green-900/10',
+            'bg-purple-50/60 dark:bg-purple-900/10',
+            'bg-orange-50/60 dark:bg-orange-900/10'
           ];
           const cardBorders = [
-            'border-pink-200 dark:border-pink-600',
+            'border-red-200 dark:border-red-600',
             'border-blue-200 dark:border-blue-600',
-            'border-purple-200 dark:border-purple-600'
+            'border-green-200 dark:border-green-600',
+            'border-purple-200 dark:border-purple-600',
+            'border-orange-200 dark:border-orange-600'
           ];
           
           return (
@@ -197,200 +223,198 @@ const GameMenu = ({
   );
 };
 
-// Rhyme Time Game
-const RhymeTime = ({ 
+// Tongue Twister Game - Improves pronunciation and articulation
+const TongueTwisterGame = ({ 
   onBack, 
-  onScoreUpdate, 
-  storyWords 
+  onScoreUpdate
 }: { 
   onBack: () => void; 
   onScoreUpdate: (points: number) => void;
-  storyWords: StoryWord[];
 }) => {
-  const [currentPair, setCurrentPair] = useState(0);
+  const [currentTwister, setCurrentTwister] = useState(0);
   const [result, setResult] = useState<{ correct: boolean; message: string } | null>(null);
+  const [attempts, setAttempts] = useState(0);
+  const [spokenText, setSpokenText] = useState('');
 
-  // Generate rhyme pairs from story words
-  const generateRhymePairs = (words: StoryWord[]) => {
-    if (words.length === 0) {
-      // Fallback to default words
-      return [
-        { word: 'cat', emoji: '🐱', hint: '🐱 Say: KAT', rhymes: ['hat', 'bat', 'mat', 'sat'], incorrect: ['dog', 'sun', 'car'] },
-        { word: 'tree', emoji: '🌳', hint: '🌳 Say: TREE', rhymes: ['bee', 'sea', 'key', 'free'], incorrect: ['bird', 'house', 'ball'] },
-        { word: 'sun', emoji: '☀️', hint: '☀️ Say: SUN', rhymes: ['run', 'fun', 'one', 'bun'], incorrect: ['moon', 'star', 'sky'] },
-        { word: 'night', emoji: '🌙', hint: '🌙 Say: NITE', rhymes: ['light', 'right', 'bright', 'sight'], incorrect: ['dark', 'day', 'time'] }
-      ];
+  const tongueTwisters = [
+    {
+      text: "She sells seashells by the seashore",
+      difficulty: "Easy",
+      emoji: "🐚",
+      hint: "Focus on 's' sounds"
+    },
+    {
+      text: "Peter Piper picked a peck of pickled peppers",
+      difficulty: "Medium", 
+      emoji: "🌶️",
+      hint: "Focus on 'p' sounds"
+    },
+    {
+      text: "How much wood would a woodchuck chuck",
+      difficulty: "Hard",
+      emoji: "🪵",
+      hint: "Focus on 'w' sounds"
+    },
+    {
+      text: "Red leather, yellow leather",
+      difficulty: "Easy",
+      emoji: "👞",
+      hint: "Focus on 'l' and 'th' sounds"
+    },
+    {
+      text: "Unique New York, New York's unique",
+      difficulty: "Medium",
+      emoji: "🗽",
+      hint: "Focus on 'u' and 'n' sounds"
     }
+  ];
 
-    // Use story words for rhyming (simplified rhyming logic)
-    const rhymePairs = words.slice(0, 8).map((storyWord) => {
-      const word = storyWord.word.toLowerCase();
-      const rhymes = generateRhymes(word);
-      const incorrect = generateIncorrectOptions(word);
+  const current = tongueTwisters[currentTwister];
+
+  const handleCorrectPronunciation = async (blob: Blob, _score: number) => {
+    setAttempts(prev => prev + 1);
+    
+    try {
+      // Get the actual transcribed text
+      const result = await WhisperService.transcribe(blob);
+      const transcribedText = result.transcript.toLowerCase().trim();
+      setSpokenText(transcribedText);
       
-      return {
-        word: storyWord.word,
-        emoji: storyWord.emoji,
-        hint: storyWord.hint,
-        rhymes: rhymes.slice(0, 3),
-        incorrect: incorrect.slice(0, 1)
-      };
-    });
+      // Calculate similarity with the tongue twister
+      const similarity = calculateSimilarity(transcribedText, current.text.toLowerCase());
+      const isGoodAttempt = similarity >= 40; // More lenient for tongue twisters
+      
+      setResult({
+        correct: isGoodAttempt,
+        message: isGoodAttempt 
+          ? `🎉 Excellent! You said it ${similarity.toFixed(0)}% correctly!` 
+          : `🤔 Good try! You said it ${similarity.toFixed(0)}% correctly. Keep practicing!`
+      });
 
-    return rhymePairs;
-  };
+      await EnhancedTTS.speak(
+        isGoodAttempt ? 'Great job!' : 'Keep practicing!',
+        { rate: 1.0, emotion: isGoodAttempt ? 'happy' : 'neutral' }
+      );
 
-  const generateRhymes = (word: string): string[] => {
-    // Simple rhyming logic - in a real app, you'd use a proper rhyming dictionary
-    const rhymes: Record<string, string[]> = {
-      'cat': ['hat', 'bat', 'mat', 'sat', 'rat'],
-      'dog': ['log', 'fog', 'bog', 'jog'],
-      'sun': ['run', 'fun', 'bun', 'gun'],
-      'tree': ['bee', 'see', 'free', 'key'],
-      'fish': ['wish', 'dish', 'swish'],
-      'bird': ['word', 'heard', 'herd'],
-      'star': ['car', 'far', 'bar'],
-      'moon': ['soon', 'tune', 'spoon'],
-      'rabbit': ['habit', 'cabinet'],
-      'forest': ['chorus', 'focus'],
-      'magic': ['tragic', 'logic'],
-      'planet': ['banquet', 'blanket'],
-      'dinosaur': ['more', 'door', 'floor'],
-      'unicorn': ['corn', 'born', 'thorn'],
-      'pirate': ['pirate', 'irate'],
-      'treasure': ['pleasure', 'measure'],
-      'superhero': ['zero', 'hero'],
-      'fairy': ['hairy', 'scary'],
-      'sparkle': ['darkle', 'markle']
-    };
-    
-    return rhymes[word] || ['hat', 'bat', 'mat'];
-  };
-
-  const generateIncorrectOptions = (word: string): string[] => {
-    const incorrect: Record<string, string[]> = {
-      'cat': ['dog', 'sun', 'car'],
-      'dog': ['cat', 'bird', 'fish'],
-      'sun': ['moon', 'star', 'sky'],
-      'tree': ['bird', 'house', 'ball'],
-      'fish': ['bird', 'cat', 'dog'],
-      'bird': ['fish', 'cat', 'dog'],
-      'star': ['moon', 'sun', 'sky'],
-      'moon': ['sun', 'star', 'sky'],
-      'rabbit': ['fish', 'bird', 'cat'],
-      'forest': ['ocean', 'desert', 'mountain'],
-      'magic': ['normal', 'real', 'ordinary'],
-      'planet': ['star', 'moon', 'sky'],
-      'dinosaur': ['bird', 'fish', 'cat'],
-      'unicorn': ['horse', 'donkey', 'zebra'],
-      'pirate': ['sailor', 'captain', 'soldier'],
-      'treasure': ['trash', 'garbage', 'waste'],
-      'superhero': ['villain', 'enemy', 'bad guy'],
-      'fairy': ['witch', 'wizard', 'monster'],
-      'sparkle': ['dull', 'dark', 'dim']
-    };
-    
-    return incorrect[word] || ['dog', 'sun', 'car'];
-  };
-
-  const rhymePairs = generateRhymePairs(storyWords);
-
-  const current = rhymePairs[currentPair];
-  const allOptions = [...current.rhymes.slice(0, 3), ...current.incorrect.slice(0, 1)].sort(() => Math.random() - 0.5);
-
-  const handleWordClick = async (word: string) => {
-    const isCorrect = current.rhymes.includes(word);
-    
-    setResult({
-      correct: isCorrect,
-      message: isCorrect 
-        ? `Perfect! "${word}" rhymes with "${current.word}"!` 
-        : `Not quite! "${word}" doesn't rhyme with "${current.word}". Try again!`
-    });
-
-    await EnhancedTTS.speak(
-      isCorrect ? 'Correct!' : 'Try again!',
-      { rate: 1.0, emotion: isCorrect ? 'happy' : 'neutral' }
-    );
-
-    if (isCorrect) {
-      onScoreUpdate(10);
-      setTimeout(() => {
-        setCurrentPair((prev) => (prev + 1) % rhymePairs.length);
-        setResult(null);
-      }, 2000);
+      if (isGoodAttempt) {
+        onScoreUpdate(15);
+        setTimeout(() => {
+          setCurrentTwister((prev) => (prev + 1) % tongueTwisters.length);
+          setResult(null);
+          setAttempts(0);
+          setSpokenText('');
+        }, 3000);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setResult({
+        correct: false,
+        message: 'Sorry, please try again!'
+      });
     }
   };
 
-  const speakWord = async () => {
-    await EnhancedTTS.speak(`Find a word that rhymes with ${current.word}`, { rate: 0.9 });
+  const calculateSimilarity = (str1: string, str2: string): number => {
+    const words1 = str1.split(' ');
+    const words2 = str2.split(' ');
+    const matches = words1.filter(word => words2.includes(word)).length;
+    return (matches / Math.max(words1.length, words2.length)) * 100;
+  };
+
+
+  const speakTwister = async () => {
+    await EnhancedTTS.speak(current.text, { rate: 0.7 });
   };
 
   return (
-    <Card className="border-2 border-pink-300 dark:border-pink-600 bg-pink-50/50 dark:bg-pink-900/10 backdrop-blur-sm">
+    <Card className="border-2 border-red-300 dark:border-red-600 bg-red-50/50 dark:bg-red-900/10 backdrop-blur-sm">
       <CardHeader>
         <CardTitle className="flex items-center justify-between text-gray-900 dark:text-white">
           <span className="flex items-center gap-3">
-            🎵 Rhyme Time
+            👅 Tongue Twisters
           </span>
-          <Button variant="outline" size="sm" onClick={onBack} className="rounded-xl border-2 border-pink-300 dark:border-pink-600 bg-pink-100/50 dark:bg-pink-900/20 hover:bg-pink-200/60 dark:hover:bg-pink-900/30 text-gray-900 dark:text-white font-semibold">
+          <Button variant="outline" size="sm" onClick={onBack} className="rounded-xl border-2 border-red-300 dark:border-red-600 bg-red-100/50 dark:bg-red-900/20 hover:bg-red-200/60 dark:hover:bg-red-900/30 text-gray-900 dark:text-white font-semibold">
             Back to Menu
           </Button>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Target Word */}
+        {/* Current Twister */}
         <div className="text-center space-y-4">
-          <p className="text-lg text-gray-600 dark:text-gray-300">
-            Find a word that rhymes with:
-          </p>
-          <div className="text-6xl font-extrabold text-pink-600 bg-pink-50 dark:bg-pink-900/20 rounded-2xl p-8 flex items-center justify-center gap-3">
-            {current.emoji && <span className="text-7xl">{current.emoji}</span>}
-            <span>{current.word}</span>
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <span className="text-4xl">{current.emoji}</span>
+            <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+              {current.difficulty} Level
+            </span>
           </div>
-          {current.hint && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-              {current.hint}
-            </p>
-          )}
-          <Button
-            variant="outline"
-            onClick={speakWord}
-            className="rounded-xl"
-          >
-            <Volume2 className="w-4 h-4 mr-2" />
-            Hear the Word
-          </Button>
+          
+          <div className="text-2xl sm:text-3xl font-bold text-red-600 bg-red-50 dark:bg-red-900/20 rounded-2xl p-6 leading-relaxed">
+            "{current.text}"
+          </div>
+          
+          <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+            💡 {current.hint}
+          </p>
+          
+          <div className="flex gap-3 justify-center">
+            <Button
+              variant="outline"
+              onClick={speakTwister}
+              className="rounded-xl"
+            >
+              <Volume2 className="w-4 h-4 mr-2" />
+              Hear It
+            </Button>
+            <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
+              Attempts: {attempts}
+            </span>
+          </div>
         </div>
 
-        {/* Options */}
-        <div className="grid grid-cols-2 gap-4">
-          {allOptions.map((word, idx) => (
-            <Button
-              key={idx}
-              size="lg"
-              variant="outline"
-              onClick={() => handleWordClick(word)}
-              disabled={result !== null}
-              className={cn(
-                "text-2xl font-bold h-24 rounded-2xl border-2",
-                result?.correct && current.rhymes.includes(word) && "border-green-500 bg-green-50",
-                result && !result.correct && "opacity-50"
-              )}
-            >
-              {word}
-            </Button>
-          ))}
-        </div>
+        {/* Spoken Text Display */}
+        {spokenText && (
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4">
+            <h3 className="text-lg font-bold text-center mb-3">You said:</h3>
+            <p className="text-center text-xl font-semibold text-gray-700 dark:text-gray-300 italic">
+              "{spokenText}"
+            </p>
+          </div>
+        )}
+
+        {/* Recording */}
+        {!result && (
+          <div className="text-center space-y-4">
+            <p className="text-lg text-gray-600 dark:text-gray-300">
+              Now you try! Speak the tongue twister:
+            </p>
+            <KidsVoiceRecorder
+              targetWord="tongue twister"
+              onCorrectPronunciation={handleCorrectPronunciation}
+              maxDuration={15}
+              autoAnalyze={true}
+            />
+          </div>
+        )}
 
         {/* Result */}
         {result && (
           <div className={cn(
-            "text-center p-6 rounded-2xl",
-            result.correct ? "bg-green-50 border-2 border-green-200" : "bg-red-50 border-2 border-red-200"
+            "text-center p-6 rounded-2xl border-2",
+            result.correct ? "bg-green-50 border-green-200" : "bg-yellow-50 border-yellow-200"
           )}>
             <div className="text-4xl mb-2">{result.correct ? '🎉' : '🤔'}</div>
             <p className="text-lg font-semibold">{result.message}</p>
+            {!result.correct && (
+              <Button 
+                onClick={() => {
+                  setResult(null);
+                  setSpokenText('');
+                }}
+                className="mt-3 bg-red-500 hover:bg-red-600 text-white"
+              >
+                Try Again
+              </Button>
+            )}
           </div>
         )}
       </CardContent>
@@ -398,164 +422,107 @@ const RhymeTime = ({
   );
 };
 
-// Sentence Builder Game
-const SentenceBuilder = ({ 
+// Word Chain Game - Improves vocabulary and speaking fluency
+const WordChainGame = ({ 
   onBack, 
-  onScoreUpdate, 
-  storyWords 
+  onScoreUpdate
 }: { 
   onBack: () => void; 
   onScoreUpdate: (points: number) => void;
-  storyWords: StoryWord[];
 }) => {
-  const [currentLevel, setCurrentLevel] = useState(0);
-  const [selectedWords, setSelectedWords] = useState<string[]>([]);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [showFeedback, setShowFeedback] = useState(false);
-  const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [currentWord, setCurrentWord] = useState('');
+  const [chain, setChain] = useState<string[]>([]);
+  const [result, setResult] = useState<{ correct: boolean; message: string } | null>(null);
+  const [score, setScore] = useState(0);
+  const [spokenWord, setSpokenWord] = useState('');
 
-  // Generate sentence levels from story words
-  const generateSentenceLevels = (words: StoryWord[]) => {
-    if (words.length === 0) {
-      // Fallback to default levels
-      return [
-        {
-          correct: ['The', 'cat', 'is', 'happy'],
-          words: ['The', 'cat', 'is', 'happy', 'sad', 'dog'],
-          image: '😺',
-          storyTitle: 'Basic Words',
-          category: 'animals'
-        },
-        {
-          correct: ['I', 'like', 'to', 'play'],
-          words: ['I', 'like', 'to', 'play', 'swim', 'run'],
-          image: '🎮',
-          storyTitle: 'Basic Words',
-          category: 'actions'
-        },
-        {
-          correct: ['The', 'sun', 'is', 'bright'],
-          words: ['The', 'sun', 'is', 'bright', 'dark', 'moon'],
-          image: '☀️',
-          storyTitle: 'Basic Words',
-          category: 'nature'
-        }
-      ];
-    }
+  const startWords = [
+    'cat', 'dog', 'sun', 'moon', 'tree', 'house', 'car', 'book', 'ball', 'fish',
+    'bird', 'star', 'rain', 'snow', 'fire', 'water', 'earth', 'wind', 'light', 'dark'
+  ];
 
-    // Create sentence levels using story words
-    const levels = [];
-    const storyWordsByCategory = words.reduce((acc, word) => {
-      if (!acc[word.category]) acc[word.category] = [];
-      acc[word.category].push(word);
-      return acc;
-    }, {} as Record<string, StoryWord[]>);
-
-    // Generate 3 levels using different story themes
-    const categories = Object.keys(storyWordsByCategory);
-    for (let i = 0; i < Math.min(3, categories.length); i++) {
-      const category = categories[i];
-      const categoryWords = storyWordsByCategory[category];
-      
-      if (categoryWords.length >= 4) {
-        const selectedWords = categoryWords.slice(0, 4);
-        const correct = selectedWords.map(w => w.word);
-        const incorrect = categoryWords.slice(4, 6).map(w => w.word);
-        
-        levels.push({
-          correct,
-          words: [...correct, ...incorrect],
-          image: selectedWords[0].emoji,
-          storyTitle: selectedWords[0].storyTitle,
-          category: category
-        });
-      }
-    }
-
-    // Fill remaining levels with default if needed
-    while (levels.length < 3) {
-      levels.push({
-        correct: ['The', 'cat', 'is', 'happy'],
-        words: ['The', 'cat', 'is', 'happy', 'sad', 'dog'],
-        image: '😺',
-        storyTitle: 'Basic Words',
-        category: 'animals'
-      });
-    }
-
-    return levels;
-  };
-
-  const levels = generateSentenceLevels(storyWords);
-
-  const current = levels[currentLevel];
-
-  const handleWordClick = (word: string) => {
-    if (!selectedWords.includes(word)) {
-      setSelectedWords([...selectedWords, word]);
-    }
-  };
-
-  const handleRemoveWord = (index: number) => {
-    setSelectedWords(selectedWords.filter((_, i) => i !== index));
-  };
-
-  const handleRecordingComplete = async (blob: Blob) => {
-    setIsProcessing(true);
+  const getNextWord = (lastWord: string): string => {
+    const lastLetter = lastWord.toLowerCase().slice(-1);
+    const availableWords = startWords.filter(word => 
+      word.toLowerCase().startsWith(lastLetter) && 
+      !chain.includes(word)
+    );
     
+    if (availableWords.length === 0) {
+      return startWords[Math.floor(Math.random() * startWords.length)];
+    }
+    
+    return availableWords[Math.floor(Math.random() * availableWords.length)];
+  };
+
+  const startNewChain = () => {
+    const firstWord = startWords[Math.floor(Math.random() * startWords.length)];
+    setCurrentWord(firstWord);
+    setChain([firstWord]);
+    setScore(0);
+    setResult(null);
+    setSpokenWord('');
+  };
+
+  const handleCorrectPronunciation = async (blob: Blob, _score: number) => {
     try {
-      // Transcribe
       const result = await WhisperService.transcribe(blob);
-      const transcript = result.transcript.toLowerCase().trim();
-      const expected = current.correct.join(' ').toLowerCase();
+      const transcribedWord = result.transcript.toLowerCase().trim();
+      setSpokenWord(transcribedWord);
       
-      // Check if correct
-      const isCorrect = transcript === expected || 
-                       transcript.includes(expected) ||
-                       selectedWords.join(' ').toLowerCase() === expected;
-      
-      setFeedbackMessage(
-        isCorrect 
-          ? '🎉 Perfect! You built and spoke the sentence correctly!' 
-          : '🤔 Try again! Make sure you build the sentence correctly first.'
-      );
-      setShowFeedback(true);
-      
-      await EnhancedTTS.speak(
-        isCorrect ? 'Excellent work!' : 'Try again!',
-        { rate: 1.0, emotion: isCorrect ? 'happy' : 'neutral' }
-      );
+      // Check if word starts with last letter of current word
+      const lastLetter = currentWord.toLowerCase().slice(-1);
+      const isCorrect = transcribedWord.startsWith(lastLetter) && 
+                       transcribedWord.length > 1 && 
+                       !chain.includes(transcribedWord);
       
       if (isCorrect) {
-        onScoreUpdate(20);
+        const newChain = [...chain, transcribedWord];
+        setChain(newChain);
+        setCurrentWord(transcribedWord);
+        setScore(prev => prev + 10);
         
-        // Save progress
-        await HybridServiceManager.recordSession({
-          sessionType: 'grammar',
-          score: 100,
-          duration: 2,
-          details: { game: 'sentence-builder', level: currentLevel }
+        setResult({
+          correct: true,
+          message: `🎉 Great! "${transcribedWord}" starts with "${lastLetter}"! Chain: ${newChain.length} words`
         });
+
+        await EnhancedTTS.speak(
+          `Excellent! ${transcribedWord} starts with ${lastLetter}`,
+          { rate: 1.0, emotion: 'happy' }
+        );
+
+        onScoreUpdate(10);
         
+        // Get next word
         setTimeout(() => {
-          setCurrentLevel((prev) => (prev + 1) % levels.length);
-          setSelectedWords([]);
-          setShowFeedback(false);
-        }, 3000);
+          const nextWord = getNextWord(transcribedWord);
+          setCurrentWord(nextWord);
+          setResult(null);
+          setSpokenWord('');
+        }, 2000);
+      } else {
+        setResult({
+          correct: false,
+          message: `🤔 "${transcribedWord}" doesn't start with "${lastLetter}". Try again!`
+        });
+
+        await EnhancedTTS.speak(
+          'Try again! Think of a word that starts with the last letter.',
+          { rate: 0.9, emotion: 'neutral' }
+        );
       }
     } catch (error) {
       console.error('Error:', error);
-      setFeedbackMessage('Sorry, please try again!');
-      setShowFeedback(true);
-    } finally {
-      setIsProcessing(false);
+      setResult({
+        correct: false,
+        message: 'Sorry, please try again!'
+      });
     }
   };
 
-  const speakSentence = async () => {
-    if (selectedWords.length > 0) {
-      await EnhancedTTS.speak(selectedWords.join(' '), { rate: 0.9 });
-    }
+  const speakCurrentWord = async () => {
+    await EnhancedTTS.speak(`The current word is ${currentWord}. Think of a word that starts with ${currentWord.slice(-1)}`, { rate: 0.8 });
   };
 
   return (
@@ -563,7 +530,7 @@ const SentenceBuilder = ({
       <CardHeader>
         <CardTitle className="flex items-center justify-between text-gray-900 dark:text-white">
           <span className="flex items-center gap-3">
-            🧩 Sentence Builder
+            🔗 Word Chain
           </span>
           <Button variant="outline" size="sm" onClick={onBack} className="rounded-xl border-2 border-blue-300 dark:border-blue-600 bg-blue-100/50 dark:bg-blue-900/20 hover:bg-blue-200/60 dark:hover:bg-blue-900/30 text-gray-900 dark:text-white font-semibold">
             Back to Menu
@@ -571,120 +538,114 @@ const SentenceBuilder = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Level Indicator */}
-        <div className="text-center">
-          <p className="text-lg text-gray-600 dark:text-gray-300 mb-2">
-            Level {currentLevel + 1} of {levels.length}
-          </p>
-          <div className="text-8xl mb-4">{current.image}</div>
-          <p className="text-sm text-gray-500 dark:text-gray-200 mb-2">
-            Build the sentence by tapping the words below
-          </p>
-          {current.storyTitle && current.storyTitle !== 'Basic Words' && (
-            <div className="bg-blue-100 dark:bg-blue-900/20 rounded-lg p-2 mb-2">
-              <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                Words from: {current.storyTitle}
-              </p>
-              {current.category && (
-                <p className="text-xs text-blue-500 dark:text-blue-500">
-                  Category: {current.category}
-                </p>
-              )}
+        {/* Game Info */}
+        <div className="text-center space-y-4">
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">Score</div>
+              <div className="text-3xl font-bold">{score}</div>
             </div>
-          )}
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">Chain</div>
+              <div className="text-3xl font-bold">{chain.length}</div>
+            </div>
+          </div>
+          
+          <p className="text-lg text-gray-600 dark:text-gray-300">
+            Say a word that starts with the last letter of the current word!
+          </p>
+          </div>
+
+        {/* Current Word */}
+        <div className="text-center space-y-4">
+          <div className="text-4xl font-bold text-blue-600 bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-6">
+            {currentWord.toUpperCase()}
+          </div>
+          
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Think of a word that starts with <span className="font-bold text-blue-600">{currentWord.slice(-1).toUpperCase()}</span>
+          </p>
+          
+          <Button
+            variant="outline"
+            onClick={speakCurrentWord}
+            className="rounded-xl"
+          >
+            <Volume2 className="w-4 h-4 mr-2" />
+            Hear Instructions
+          </Button>
         </div>
 
-        {/* Selected Words (Sentence Area) */}
-        <div className="min-h-24 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-2xl p-6 border-2 border-blue-200">
-          {selectedWords.length === 0 ? (
-            <p className="text-center text-gray-300 text-lg">Tap words to build your sentence</p>
-          ) : (
+        {/* Spoken Word Display */}
+        {spokenWord && (
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4">
+            <h3 className="text-lg font-bold text-center mb-3">You said:</h3>
+            <p className="text-center text-xl font-semibold text-gray-700 dark:text-gray-300 italic">
+              "{spokenWord}"
+            </p>
+          </div>
+        )}
+
+        {/* Word Chain Display */}
+        {chain.length > 0 && (
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4">
+            <h3 className="text-lg font-bold text-center mb-3">Your Word Chain:</h3>
             <div className="flex flex-wrap gap-2 justify-center">
-              {selectedWords.map((word, idx) => (
-                <Button
-                  key={idx}
-                  variant="outline"
-                  onClick={() => handleRemoveWord(idx)}
-                  className="text-2xl font-bold h-16 px-6 rounded-xl bg-white"
+              {chain.map((word, index) => (
+                <span 
+                  key={index}
+                  className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm font-semibold"
                 >
                   {word}
-                </Button>
+                </span>
               ))}
             </div>
-          )}
-        </div>
-
-        {/* Word Bank */}
-        <div className="grid grid-cols-3 gap-3">
-          {current.words.map((word, idx) => (
-            <Button
-              key={idx}
-              size="lg"
-              variant="outline"
-              onClick={() => handleWordClick(word)}
-              disabled={selectedWords.includes(word)}
-              className={cn(
-                "text-xl font-semibold h-16 rounded-xl",
-                selectedWords.includes(word) && "opacity-30"
-              )}
-            >
-              {word}
-            </Button>
-          ))}
-        </div>
-
-        {/* Actions */}
-        {selectedWords.length > 0 && !isProcessing && !showFeedback && (
-          <div className="space-y-4">
-            <div className="flex gap-3 justify-center">
-              <Button
-                variant="outline"
-                onClick={speakSentence}
-                className="rounded-xl"
-              >
-                <Volume2 className="w-4 h-4 mr-2" />
-                Hear It
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setSelectedWords([])}
-                className="rounded-xl"
-              >
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Reset
-              </Button>
-            </div>
-            
-            <div className="text-center">
-              <p className="text-lg text-gray-600 dark:text-gray-300 mb-4">
-                Now speak the sentence!
-              </p>
-              <VoiceRecorder
-                onRecordingComplete={handleRecordingComplete}
-                maxDuration={10}
-                showPlayback={false}
-              />
-            </div>
           </div>
         )}
 
-        {/* Processing */}
-        {isProcessing && (
-          <div className="text-center py-6">
-            <Loader2 className="w-12 h-12 text-blue-500 animate-spin mx-auto mb-3" />
-            <p className="text-lg font-semibold">Checking...</p>
+        {/* Recording */}
+        {!result && (
+          <div className="text-center space-y-4">
+            <p className="text-lg text-gray-600 dark:text-gray-300">
+              Speak your word now:
+            </p>
+            <KidsVoiceRecorder
+              targetWord="word"
+              onCorrectPronunciation={handleCorrectPronunciation}
+              maxDuration={10}
+              autoAnalyze={true}
+            />
           </div>
         )}
 
-        {/* Feedback */}
-        {showFeedback && (
+        {/* Result */}
+        {result && (
           <div className={cn(
             "text-center p-6 rounded-2xl border-2",
-            feedbackMessage.includes('Perfect') 
-              ? "bg-green-50 border-green-200" 
-              : "bg-yellow-50 border-yellow-200"
+            result.correct ? "bg-green-50 border-green-200" : "bg-yellow-50 border-yellow-200"
           )}>
-            <p className="text-xl font-semibold">{feedbackMessage}</p>
+            <div className="text-4xl mb-2">{result.correct ? '🎉' : '🤔'}</div>
+            <p className="text-lg font-semibold">{result.message}</p>
+            {!result.correct && (
+              <Button 
+                onClick={() => setResult(null)}
+                className="mt-3 bg-blue-500 hover:bg-blue-600 text-white"
+              >
+                Try Again
+              </Button>
+            )}
+          </div>
+        )}
+
+        {/* Start Button */}
+        {chain.length === 0 && (
+          <div className="text-center">
+            <Button 
+              onClick={startNewChain}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 text-lg"
+            >
+              Start New Chain
+            </Button>
           </div>
         )}
       </CardContent>
@@ -692,125 +653,308 @@ const SentenceBuilder = ({
   );
 };
 
-// Echo Challenge Game
-const EchoChallenge = ({ 
+// Story Telling Game - Improves narrative speaking and creativity
+const StoryTellingGame = ({ 
   onBack, 
-  onScoreUpdate, 
-  storyWords 
+  onScoreUpdate
 }: { 
   onBack: () => void; 
   onScoreUpdate: (points: number) => void;
-  storyWords: StoryWord[];
 }) => {
-  const [level, setLevel] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [feedback, setFeedback] = useState<string | null>(null);
+  const [currentPrompt, setCurrentPrompt] = useState<any>(null);
+  const [result, setResult] = useState<{ correct: boolean; message: string } | null>(null);
+  const [story, setStory] = useState('');
 
-  // Generate challenges from story words
-  const generateChallenges = (words: StoryWord[]) => {
-    if (words.length === 0) {
-      // Fallback to default challenges
-      return [
-        { phrase: 'Hello friend', speed: 0.9, points: 10, storyTitle: 'Basic Words' },
-        { phrase: 'I love English', speed: 1.0, points: 15, storyTitle: 'Basic Words' },
-        { phrase: 'Learning is fun', speed: 1.1, points: 20, storyTitle: 'Basic Words' },
-        { phrase: 'Practice makes perfect', speed: 1.2, points: 25, storyTitle: 'Basic Words' },
-        { phrase: 'I can speak English well', speed: 1.3, points: 30, storyTitle: 'Basic Words' }
-      ];
+  const storyPrompts = [
+    {
+      title: "My Pet Adventure",
+      prompt: "Tell me about your pet or an animal you'd like to have. What does it look like? What does it like to do?",
+      emoji: "🐕",
+      keywords: ["pet", "animal", "looks", "likes", "does"]
+    },
+    {
+      title: "Magic Day",
+      prompt: "If you had one magic power for a day, what would it be? What would you do with it?",
+      emoji: "✨",
+      keywords: ["magic", "power", "day", "would", "do"]
+    },
+    {
+      title: "Space Journey",
+      prompt: "Imagine you're going to space! What planet would you visit first? What would you see there?",
+      emoji: "🚀",
+      keywords: ["space", "planet", "visit", "see", "there"]
+    },
+    {
+      title: "Best Friend",
+      prompt: "Tell me about your best friend. What makes them special? What do you like to do together?",
+      emoji: "👫",
+      keywords: ["friend", "special", "together", "like", "do"]
+    },
+    {
+      title: "Dream House",
+      prompt: "Describe your dream house. What rooms would it have? What would be in your bedroom?",
+      emoji: "🏠",
+      keywords: ["house", "rooms", "bedroom", "would", "have"]
     }
+  ];
 
-    // Create challenges using story words
-    const challenges = [];
-    const shortWords = words.filter(w => w.word.length <= 6).slice(0, 15);
-    
-    if (shortWords.length >= 5) {
-      // Create 5 challenges with increasing difficulty
-      const phrases = [
-        `${shortWords[0].word} ${shortWords[1].word}`,
-        `The ${shortWords[2].word} is ${shortWords[3].word}`,
-        `I see a ${shortWords[4].word}`,
-        `${shortWords[5].word} and ${shortWords[6].word} are friends`,
-        `The ${shortWords[7].word} loves to ${shortWords[8].word}`
-      ];
-
-      phrases.forEach((phrase, index) => {
-        challenges.push({
-          phrase,
-          speed: 0.9 + (index * 0.1),
-          points: 10 + (index * 5),
-          storyTitle: shortWords[index]?.storyTitle || 'Story Words'
-        });
-      });
-    }
-
-    // Fill remaining challenges with default if needed
-    while (challenges.length < 5) {
-      challenges.push({
-        phrase: 'Hello friend',
-        speed: 0.9 + (challenges.length * 0.1),
-        points: 10 + (challenges.length * 5),
-        storyTitle: 'Basic Words'
-      });
-    }
-
-    return challenges;
+  const getRandomPrompt = () => {
+    const randomIndex = Math.floor(Math.random() * storyPrompts.length);
+    setCurrentPrompt(storyPrompts[randomIndex]);
+    setStory('');
+    setResult(null);
   };
 
-  const challenges = generateChallenges(storyWords);
-
-  const current = challenges[level];
-
-  const playPhrase = async () => {
-    setIsPlaying(true);
+  const handleCorrectPronunciation = async (blob: Blob, _score: number) => {
     try {
-      await EnhancedTTS.speak(current.phrase, { rate: current.speed });
-    } finally {
-      setIsPlaying(false);
+      const result = await WhisperService.transcribe(blob);
+      const transcript = result.transcript.toLowerCase().trim();
+      setStory(transcript);
+      
+      // Check if story contains key elements
+      const keywordMatches = currentPrompt.keywords.filter((keyword: string) => 
+        transcript.includes(keyword)
+      ).length;
+      
+      const storyLength = transcript.split(' ').length;
+      const isGoodStory = keywordMatches >= 2 && storyLength >= 10;
+      
+      setResult({
+        correct: isGoodStory,
+        message: isGoodStory 
+          ? `🎉 Wonderful story! You used ${keywordMatches} key words and told a ${storyLength}-word story!` 
+          : `🤔 Good start! Try to include more details and use words like: ${currentPrompt.keywords.slice(0, 3).join(', ')}`
+      });
+
+      await EnhancedTTS.speak(
+        isGoodStory ? 'What a great story!' : 'Try adding more details!',
+        { rate: 1.0, emotion: isGoodStory ? 'happy' : 'neutral' }
+      );
+
+      if (isGoodStory) {
+        onScoreUpdate(20);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setResult({
+        correct: false,
+        message: 'Sorry, please try again!'
+      });
     }
   };
 
-  const handleRecordingComplete = async (blob: Blob) => {
-    setIsProcessing(true);
+  const speakPrompt = async () => {
+    await EnhancedTTS.speak(currentPrompt.prompt, { rate: 0.8 });
+  };
+
+  return (
+    <Card className="border-2 border-green-300 dark:border-green-600 bg-green-50/50 dark:bg-green-900/10 backdrop-blur-sm">
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between text-gray-900 dark:text-white">
+          <span className="flex items-center gap-3">
+            📖 Story Telling
+          </span>
+          <Button variant="outline" size="sm" onClick={onBack} className="rounded-xl border-2 border-green-300 dark:border-green-600 bg-green-100/50 dark:bg-green-900/20 hover:bg-green-200/60 dark:hover:bg-green-900/30 text-gray-900 dark:text-white font-semibold">
+            Back to Menu
+          </Button>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Story Prompt */}
+        {currentPrompt && (
+          <div className="text-center space-y-4">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <span className="text-4xl">{currentPrompt.emoji}</span>
+              <span className="text-lg font-bold text-green-600">{currentPrompt.title}</span>
+            </div>
+            
+            <div className="bg-green-50 dark:bg-green-900/20 rounded-2xl p-6">
+              <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+                {currentPrompt.prompt}
+              </p>
+            </div>
+            
+            <Button
+              variant="outline"
+              onClick={speakPrompt}
+              className="rounded-xl"
+            >
+              <Volume2 className="w-4 h-4 mr-2" />
+              Hear the Prompt
+            </Button>
+          </div>
+        )}
+
+        {/* Story Display */}
+        {story && (
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4">
+            <h3 className="text-lg font-bold text-center mb-3">You said:</h3>
+            <p className="text-center text-xl font-semibold text-gray-700 dark:text-gray-300 italic">
+              "{story}"
+            </p>
+          </div>
+        )}
+
+        {/* Recording */}
+        {!result && (
+          <div className="text-center space-y-4">
+            <p className="text-lg text-gray-600 dark:text-gray-300">
+              Now tell your story! Speak for at least 10 seconds:
+            </p>
+            <KidsVoiceRecorder
+              targetWord="story"
+              onCorrectPronunciation={handleCorrectPronunciation}
+              maxDuration={60}
+              autoAnalyze={true}
+            />
+          </div>
+        )}
+
+        {/* Result */}
+        {result && (
+          <div className={cn(
+            "text-center p-6 rounded-2xl border-2",
+            result.correct ? "bg-green-50 border-green-200" : "bg-yellow-50 border-yellow-200"
+          )}>
+            <div className="text-4xl mb-2">{result.correct ? '🎉' : '🤔'}</div>
+            <p className="text-lg font-semibold">{result.message}</p>
+            <div className="flex gap-3 justify-center mt-4">
+              <Button 
+                onClick={() => {
+                  setResult(null);
+                  setStory('');
+                }}
+                className="bg-green-500 hover:bg-green-600 text-white"
+              >
+                Try Again
+              </Button>
+              <Button 
+                onClick={getRandomPrompt}
+                className="bg-blue-500 hover:bg-blue-600 text-white"
+              >
+                New Story
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Start Button */}
+        {!currentPrompt && (
+          <div className="text-center">
+            <Button 
+              onClick={getRandomPrompt}
+              className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 text-lg"
+            >
+              Start Story Telling
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+// Pronunciation Challenge Game - Focuses on specific sounds
+const PronunciationChallenge = ({ 
+  onBack, 
+  onScoreUpdate
+}: { 
+  onBack: () => void; 
+  onScoreUpdate: (points: number) => void;
+}) => {
+  const [currentChallenge, setCurrentChallenge] = useState(0);
+  const [result, setResult] = useState<{ correct: boolean; message: string } | null>(null);
+  const [attempts, setAttempts] = useState(0);
+  const [spokenText, setSpokenText] = useState('');
+
+  const pronunciationChallenges = [
+    {
+      sound: "TH",
+      words: ["think", "thought", "three", "through", "thick"],
+      emoji: "👅",
+      instruction: "Put your tongue between your teeth and blow air out",
+      difficulty: "Hard"
+    },
+    {
+      sound: "R",
+      words: ["red", "rabbit", "rain", "run", "right"],
+      emoji: "🔴",
+      instruction: "Curl your tongue back and vibrate",
+      difficulty: "Medium"
+    },
+    {
+      sound: "L",
+      words: ["love", "light", "long", "little", "laugh"],
+      emoji: "💡",
+      instruction: "Touch the tip of your tongue to the roof of your mouth",
+      difficulty: "Easy"
+    },
+    {
+      sound: "S",
+      words: ["snake", "sun", "sister", "smile", "sweet"],
+      emoji: "🐍",
+      instruction: "Keep your tongue behind your teeth and hiss like a snake",
+      difficulty: "Easy"
+    },
+    {
+      sound: "SH",
+      words: ["shoe", "ship", "sheep", "shy", "shout"],
+      emoji: "👟",
+      instruction: "Make your lips round and blow air out",
+      difficulty: "Medium"
+    }
+  ];
+
+  const current = pronunciationChallenges[currentChallenge];
+
+  const handleCorrectPronunciation = async (blob: Blob, _score: number) => {
+    setAttempts(prev => prev + 1);
     
     try {
       const result = await WhisperService.transcribe(blob);
       const transcript = result.transcript.toLowerCase().trim();
-      const expected = current.phrase.toLowerCase();
+      setSpokenText(transcript);
       
-      // Calculate similarity
-      const words = transcript.split(' ');
-      const expectedWords = expected.split(' ');
-      const matchCount = words.filter(w => expectedWords.includes(w)).length;
-      const accuracy = (matchCount / expectedWords.length) * 100;
-      
-      const isCorrect = accuracy >= 80;
-      
-      setFeedback(
-        isCorrect 
-          ? `🎉 Amazing! You kept up with the speed! +${current.points} points!`
-          : '🤔 Close! Try listening again and repeat carefully.'
+      // Check if any of the target words were spoken
+      const spokenWords = current.words.filter(word => 
+        transcript.includes(word.toLowerCase())
       );
       
+      const isCorrect = spokenWords.length >= 2;
+      
+      setResult({
+        correct: isCorrect,
+        message: isCorrect 
+          ? `🎉 Excellent! You said ${spokenWords.length} words correctly: ${spokenWords.join(', ')}` 
+          : `🤔 Good try! You said ${spokenWords.length} words. Practice the ${current.sound} sound more.`
+      });
+      
       await EnhancedTTS.speak(
-        isCorrect ? 'Excellent!' : 'Try again!',
+        isCorrect ? 'Great pronunciation!' : 'Keep practicing!',
         { rate: 1.0, emotion: isCorrect ? 'happy' : 'neutral' }
       );
       
       if (isCorrect) {
-        onScoreUpdate(current.points);
-        
+        onScoreUpdate(15);
         setTimeout(() => {
-          setLevel((prev) => (prev + 1) % challenges.length);
-          setFeedback(null);
-        }, 2500);
+          setCurrentChallenge((prev) => (prev + 1) % pronunciationChallenges.length);
+          setResult(null);
+          setAttempts(0);
+          setSpokenText('');
+        }, 3000);
       }
     } catch (error) {
       console.error('Error:', error);
-      setFeedback('Please try again!');
-    } finally {
-      setIsProcessing(false);
+      setResult({
+        correct: false,
+        message: 'Sorry, please try again!'
+      });
     }
+  };
+
+  const speakWords = async () => {
+    const wordsToSpeak = current.words.slice(0, 3).join(', ');
+    await EnhancedTTS.speak(`Listen to these words: ${wordsToSpeak}`, { rate: 0.7 });
   };
 
   return (
@@ -818,7 +962,7 @@ const EchoChallenge = ({
       <CardHeader>
         <CardTitle className="flex items-center justify-between text-gray-900 dark:text-white">
           <span className="flex items-center gap-3">
-            ⚡ Echo Challenge
+            🎯 Pronunciation Master
           </span>
           <Button variant="outline" size="sm" onClick={onBack} className="rounded-xl border-2 border-purple-300 dark:border-purple-600 bg-purple-100/50 dark:bg-purple-900/20 hover:bg-purple-200/60 dark:hover:bg-purple-900/30 text-gray-900 dark:text-white font-semibold">
             Back to Menu
@@ -826,94 +970,327 @@ const EchoChallenge = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Level Display */}
+        {/* Current Challenge */}
         <div className="text-center space-y-4">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            {challenges.map((_, idx) => (
-              <div
-                key={idx}
-                className={cn(
-                  "w-4 h-4 rounded-full",
-                  idx === level ? "bg-purple-500 scale-150" : idx < level ? "bg-green-500" : "bg-gray-300"
-                )}
-              />
-            ))}
-          </div>
-          
-          <h3 className="text-2xl font-bold text-purple-300">
-            Level {level + 1} - Speed {current.speed.toFixed(1)}x
-          </h3>
-          
-          <div className="text-4xl font-extrabold text-gray-800 dark:text-white bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl p-8">
-            {current.phrase}
-          </div>
-          
-          {current.storyTitle && current.storyTitle !== 'Basic Words' && (
-            <div className="bg-purple-100 dark:bg-purple-900/20 rounded-lg p-2 mb-2">
-              <p className="text-xs text-purple-600 dark:text-purple-400 font-medium">
-                Words from: {current.storyTitle}
-              </p>
-            </div>
-          )}
-          
-          <p className="text-sm text-gray-500 dark:text-gray-300">
-            Listen and repeat as fast as you can! ⚡
-          </p>
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <span className="text-4xl">{current.emoji}</span>
+            <span className="text-lg font-bold text-purple-600">{current.sound} Sound</span>
+            <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+              {current.difficulty}
+            </span>
         </div>
 
-        {/* Play Button */}
-        <div className="text-center">
-          <Button
-            size="lg"
-            onClick={playPhrase}
-            disabled={isPlaying}
-            className="rounded-2xl px-8 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-pink-500 hover:to-purple-500"
-          >
-            {isPlaying ? (
-              <>
-                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                Playing...
-              </>
-            ) : (
-              <>
-                <Volume2 className="w-5 h-5 mr-2" />
-                Play Phrase
-              </>
-            )}
-          </Button>
+          <div className="bg-purple-50 dark:bg-purple-900/20 rounded-2xl p-6">
+            <h3 className="text-xl font-bold text-purple-700 dark:text-purple-300 mb-3">
+              Practice these words:
+            </h3>
+            <div className="flex flex-wrap gap-2 justify-center">
+              {current.words.map((word, index) => (
+                <span 
+                  key={index}
+                  className="bg-purple-100 dark:bg-purple-800 text-purple-800 dark:text-purple-200 px-3 py-1 rounded-full text-sm font-semibold"
+                >
+                  {word}
+                </span>
+              ))}
+            </div>
         </div>
+
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-3">
+            <p className="text-sm text-yellow-800 dark:text-yellow-200">
+              💡 {current.instruction}
+            </p>
+        </div>
+
+            <div className="flex gap-3 justify-center">
+              <Button
+                variant="outline"
+              onClick={speakWords}
+                className="rounded-xl"
+              >
+                <Volume2 className="w-4 h-4 mr-2" />
+              Hear Words
+              </Button>
+            <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
+              Attempts: {attempts}
+            </span>
+          </div>
+            </div>
+            
+        {/* Spoken Text Display */}
+        {spokenText && (
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4">
+            <h3 className="text-lg font-bold text-center mb-3">You said:</h3>
+            <p className="text-center text-xl font-semibold text-gray-700 dark:text-gray-300 italic">
+              "{spokenText}"
+            </p>
+          </div>
+        )}
 
         {/* Recording */}
-        {!isProcessing && !feedback && (
-          <div className="space-y-4">
-            <p className="text-center text-lg text-gray-600 dark:text-gray-300">
-              Now you repeat it!
+        {!result && (
+          <div className="text-center space-y-4">
+            <p className="text-lg text-gray-600 dark:text-gray-300">
+              Now say as many of these words as you can:
             </p>
-            <VoiceRecorder
-              onRecordingComplete={handleRecordingComplete}
-              maxDuration={10}
-              showPlayback={false}
+            <KidsVoiceRecorder
+              targetWord="pronunciation"
+              onCorrectPronunciation={handleCorrectPronunciation}
+              maxDuration={15}
+              autoAnalyze={true}
             />
           </div>
         )}
 
-        {/* Processing */}
-        {isProcessing && (
-          <div className="text-center py-6">
-            <Loader2 className="w-12 h-12 text-purple-500 animate-spin mx-auto mb-3" />
-            <p className="text-lg font-semibold">Checking your speed...</p>
+        {/* Result */}
+        {result && (
+          <div className={cn(
+            "text-center p-6 rounded-2xl border-2",
+            result.correct ? "bg-green-50 border-green-200" : "bg-yellow-50 border-yellow-200"
+          )}>
+            <div className="text-4xl mb-2">{result.correct ? '🎉' : '🤔'}</div>
+            <p className="text-lg font-semibold">{result.message}</p>
+            {!result.correct && (
+              <Button 
+                onClick={() => {
+                  setResult(null);
+                  setSpokenText('');
+                }}
+                className="mt-3 bg-purple-500 hover:bg-purple-600 text-white"
+              >
+                Try Again
+              </Button>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+// Conversation Practice Game - Simulates real conversations
+const ConversationPractice = ({ 
+  onBack, 
+  onScoreUpdate
+}: { 
+  onBack: () => void; 
+  onScoreUpdate: (points: number) => void;
+}) => {
+  const [currentScenario, setCurrentScenario] = useState(0);
+  const [result, setResult] = useState<{ correct: boolean; message: string } | null>(null);
+  const [conversation, setConversation] = useState<string[]>([]);
+  const [spokenText, setSpokenText] = useState('');
+
+  const conversationScenarios = [
+    {
+      title: "At the Store",
+      emoji: "🛒",
+      context: "You're at a grocery store and need help finding something",
+      aiResponse: "Hello! How can I help you today?",
+      expectedKeywords: ["hello", "looking", "find", "help", "thank"]
+    },
+    {
+      title: "Making Friends",
+      emoji: "👋",
+      context: "You're meeting a new classmate at school",
+      aiResponse: "Hi there! I'm new here. What's your name?",
+      expectedKeywords: ["hi", "hello", "name", "nice", "meet"]
+    },
+    {
+      title: "Ordering Food",
+      emoji: "🍕",
+      context: "You're at a restaurant and want to order",
+      aiResponse: "Welcome! What would you like to order today?",
+      expectedKeywords: ["would", "like", "order", "please", "thank"]
+    },
+    {
+      title: "Asking for Help",
+      emoji: "❓",
+      context: "You're lost and need directions",
+      aiResponse: "Excuse me, can you help me? I'm looking for the library.",
+      expectedKeywords: ["excuse", "help", "looking", "where", "directions"]
+    },
+    {
+      title: "Sharing News",
+      emoji: "📰",
+      context: "You want to tell someone about something exciting that happened",
+      aiResponse: "Guess what happened to me today!",
+      expectedKeywords: ["guess", "what", "happened", "today", "exciting"]
+    }
+  ];
+
+  const current = conversationScenarios[currentScenario];
+
+  const handleCorrectPronunciation = async (blob: Blob, _score: number) => {
+    try {
+      const result = await WhisperService.transcribe(blob);
+      const transcript = result.transcript.toLowerCase().trim();
+      setSpokenText(transcript);
+      setConversation(prev => [...prev, transcript]);
+      
+      // Check if response contains expected keywords
+      const keywordMatches = current.expectedKeywords.filter((keyword: string) => 
+        transcript.includes(keyword)
+      ).length;
+      
+      const responseLength = transcript.split(' ').length;
+      const isGoodResponse = keywordMatches >= 2 && responseLength >= 3;
+      
+      setResult({
+        correct: isGoodResponse,
+        message: isGoodResponse 
+          ? `🎉 Great response! You used ${keywordMatches} key words and gave a ${responseLength}-word answer!` 
+          : `🤔 Good try! Try to use words like: ${current.expectedKeywords.slice(0, 3).join(', ')}`
+      });
+      
+      await EnhancedTTS.speak(
+        isGoodResponse ? 'That was a great response!' : 'Try to be more conversational!',
+        { rate: 1.0, emotion: isGoodResponse ? 'happy' : 'neutral' }
+      );
+
+      if (isGoodResponse) {
+        onScoreUpdate(25);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setResult({
+        correct: false,
+        message: 'Sorry, please try again!'
+      });
+    }
+  };
+
+  const speakContext = async () => {
+    await EnhancedTTS.speak(`${current.context}. The person says: "${current.aiResponse}"`, { rate: 0.8 });
+  };
+
+  const startNewConversation = () => {
+    const randomIndex = Math.floor(Math.random() * conversationScenarios.length);
+    setCurrentScenario(randomIndex);
+    setConversation([]);
+    setResult(null);
+    setSpokenText('');
+  };
+
+  return (
+    <Card className="border-2 border-orange-300 dark:border-orange-600 bg-orange-50/50 dark:bg-orange-900/10 backdrop-blur-sm">
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between text-gray-900 dark:text-white">
+          <span className="flex items-center gap-3">
+            💬 Chat Practice
+          </span>
+          <Button variant="outline" size="sm" onClick={onBack} className="rounded-xl border-2 border-orange-300 dark:border-orange-600 bg-orange-100/50 dark:bg-orange-900/20 hover:bg-orange-200/60 dark:hover:bg-orange-900/30 text-gray-900 dark:text-white font-semibold">
+            Back to Menu
+          </Button>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Scenario */}
+        <div className="text-center space-y-4">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <span className="text-4xl">{current.emoji}</span>
+            <span className="text-lg font-bold text-orange-600">{current.title}</span>
+          </div>
+          
+          <div className="bg-orange-50 dark:bg-orange-900/20 rounded-2xl p-6">
+            <p className="text-lg text-gray-700 dark:text-gray-300 mb-4">
+              {current.context}
+            </p>
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border-l-4 border-orange-400">
+              <p className="text-gray-600 dark:text-gray-400 italic">
+                "{current.aiResponse}"
+              </p>
+            </div>
+        </div>
+
+          <Button
+            variant="outline"
+            onClick={speakContext}
+            className="rounded-xl"
+          >
+            <Volume2 className="w-4 h-4 mr-2" />
+            Hear the Situation
+          </Button>
+        </div>
+
+        {/* Spoken Text Display */}
+        {spokenText && (
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4">
+            <h3 className="text-lg font-bold text-center mb-3">You said:</h3>
+            <p className="text-center text-xl font-semibold text-gray-700 dark:text-gray-300 italic">
+              "{spokenText}"
+            </p>
           </div>
         )}
 
-        {/* Feedback */}
-        {feedback && (
+        {/* Conversation History */}
+        {conversation.length > 0 && (
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4">
+            <h3 className="text-lg font-bold text-center mb-3">Your Conversation:</h3>
+            <div className="space-y-2">
+              {conversation.map((response, index) => (
+                <div key={index} className="bg-orange-100 dark:bg-orange-900/30 rounded-lg p-3">
+                  <p className="text-gray-700 dark:text-gray-300">
+                    <span className="font-semibold">You:</span> "{response}"
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Recording */}
+        {!result && (
+          <div className="text-center space-y-4">
+            <p className="text-lg text-gray-600 dark:text-gray-300">
+              How would you respond? Speak naturally:
+            </p>
+            <KidsVoiceRecorder
+              targetWord="response"
+              onCorrectPronunciation={handleCorrectPronunciation}
+              maxDuration={20}
+              autoAnalyze={true}
+            />
+          </div>
+        )}
+
+        {/* Result */}
+        {result && (
           <div className={cn(
-            "text-center p-6 rounded-2xl border-2 animate-pulse",
-            feedback.includes('Amazing') 
-              ? "bg-green-50 border-green-200" 
-              : "bg-yellow-50 border-yellow-200"
+            "text-center p-6 rounded-2xl border-2",
+            result.correct ? "bg-green-50 border-green-200" : "bg-yellow-50 border-yellow-200"
           )}>
-            <p className="text-xl font-semibold">{feedback}</p>
+            <div className="text-4xl mb-2">{result.correct ? '🎉' : '🤔'}</div>
+            <p className="text-lg font-semibold">{result.message}</p>
+            <div className="flex gap-3 justify-center mt-4">
+              <Button 
+                onClick={() => {
+                  setResult(null);
+                  setSpokenText('');
+                }}
+                className="bg-orange-500 hover:bg-orange-600 text-white"
+              >
+                Continue
+              </Button>
+              <Button 
+                onClick={startNewConversation}
+                className="bg-blue-500 hover:bg-blue-600 text-white"
+              >
+                New Scenario
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Start Button */}
+        {conversation.length === 0 && (
+          <div className="text-center">
+            <Button 
+              onClick={startNewConversation}
+              className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 text-lg"
+            >
+              Start Conversation
+            </Button>
           </div>
         )}
       </CardContent>

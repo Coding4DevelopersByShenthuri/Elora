@@ -6,7 +6,7 @@ import {
   Sun, CloudRain, Footprints,
   ChevronLeft, ChevronRight, Anchor,
   Shield, Download, Loader2, Crown, Compass,
-  Music, VolumeX, Volume1, Settings, HelpCircle
+  Music, VolumeX, HelpCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -175,6 +175,27 @@ const KidsPage = () => {
       };
     }
   }, [isAuthenticated, userId]);
+
+  // Welcome voice greeting
+  useEffect(() => {
+    if (isAuthenticated && isSoundEnabled) {
+      const welcomeMessages = [
+        "Welcome to Kids Learning Zone! Ready for some fun learning?",
+        "Hello there! Let's explore amazing stories and games together!",
+        "Hi! I'm so excited to learn with you today!",
+        "Welcome back! What would you like to learn today?"
+      ];
+      
+      const randomMessage = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
+      
+      // Delay the greeting slightly to let the page load
+      const timer = setTimeout(() => {
+        EnhancedTTS.speak(randomMessage, { rate: 0.9, emotion: 'happy' }).catch(() => {});
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isAuthenticated, isSoundEnabled]);
 
   // Load progress and generate floating icons only if authenticated
   useEffect(() => {
@@ -835,13 +856,15 @@ const KidsPage = () => {
 
   const handleElementHover = (elementId: string) => {
     setHoveredElement(elementId);
-    playSound('hover');
+    // Remove hover sound feedback as it's annoying for users
+    // playSound('hover');
   };
 
   const handleElementClick = (elementId: string) => {
     playSound('click');
     setPulseAnimation(true);
     setTimeout(() => setPulseAnimation(false), 1000);
+    console.log(`Clicked element: ${elementId}`);
   };
 
   // Show auth modal if not authenticated
@@ -924,6 +947,26 @@ const KidsPage = () => {
         );
       })}
 
+      {/* Celebration Effects */}
+      {celebrating && (
+        <div className="fixed inset-0 pointer-events-none z-50">
+          {Array.from({ length: 20 }, (_, i) => (
+            <div
+              key={i}
+              className="absolute animate-bounce"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 2}s`,
+                animationDuration: `${2 + Math.random() * 2}s`
+              }}
+            >
+              <Sparkles className="w-4 h-4 text-yellow-400" />
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative z-10">
         {/* Header Section */}
         <div className="text-center mb-6 sm:mb-8 relative">
@@ -934,7 +977,7 @@ const KidsPage = () => {
               size="sm"
               onClick={() => {
                 setIsSoundEnabled(!isSoundEnabled);
-                handleElementClick('sound-toggle');
+                // Don't play sound feedback for sound toggle button
               }}
               className={cn(
                 "rounded-full p-2 transition-all duration-300 hover:scale-110",
@@ -949,7 +992,7 @@ const KidsPage = () => {
               size="sm"
               onClick={() => {
                 setIsMusicEnabled(!isMusicEnabled);
-                handleElementClick('music-toggle');
+                // Don't play sound feedback for music toggle button
               }}
               className={cn(
                 "rounded-full p-2 transition-all duration-300 hover:scale-110",
@@ -964,7 +1007,7 @@ const KidsPage = () => {
               size="sm"
               onClick={() => {
                 setShowHelp(!showHelp);
-                handleElementClick('help-toggle');
+                // Don't play sound feedback for help toggle button
               }}
               className={cn(
                 "rounded-full p-2 transition-all duration-300 hover:scale-110",
@@ -1332,7 +1375,7 @@ const KidsPage = () => {
                         const story = allStories[actualIndex];
                         EnhancedTTS.speak(
                           `${story.title}. ${story.description} Difficulty: ${story.difficulty}. Duration: ${story.duration}.`, 
-                          { rate: 0.8, emotion: 'friendly' }
+                          { rate: 0.8, emotion: 'happy' }
                         ).catch(() => {});
                       }
                     }}
@@ -1680,27 +1723,64 @@ const KidsPage = () => {
           <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 max-w-4xl mx-auto">
             <Button 
               variant="outline" 
-              className="rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-3 sm:py-3 md:py-4 border-2 border-green-300 dark:border-green-600 hover:border-green-400 dark:hover:border-green-500 bg-green-50/40 dark:bg-green-900/10 hover:bg-green-100/60 dark:hover:bg-green-900/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 group text-sm sm:text-base w-full sm:w-auto sm:flex-1 sm:min-w-[160px]"
-              onClick={() => handleCategoryClick('pronunciation')}
+              className={cn(
+                "rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-3 sm:py-3 md:py-4 border-2 border-green-300 dark:border-green-600 hover:border-green-400 dark:hover:border-green-500 bg-green-50/40 dark:bg-green-900/10 hover:bg-green-100/60 dark:hover:bg-green-900/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 group text-sm sm:text-base w-full sm:w-auto sm:flex-1 sm:min-w-[160px] cursor-pointer",
+                hoveredElement === 'quick-listen' && "scale-110 shadow-lg"
+              )}
+              onClick={() => {
+                handleElementClick('quick-listen');
+                handleCategoryClick('pronunciation');
+              }}
+              onMouseEnter={() => handleElementHover('quick-listen')}
+              onMouseLeave={() => setHoveredElement(null)}
             >
-              <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-green-600 dark:text-green-400 group-hover:animate-bounce flex-shrink-0" />
-              <span className="font-semibold text-gray-800 dark:text-gray-500 whitespace-nowrap">Listen & Repeat</span>
+              <Volume2 className={cn(
+                "w-4 h-4 sm:w-5 sm:h-5 mr-2 text-green-600 dark:text-green-400 group-hover:animate-bounce flex-shrink-0 transition-all duration-300",
+                hoveredElement === 'quick-listen' && "animate-bounce"
+              )} />
+              <span className="font-semibold text-gray-800 dark:text-gray-500 whitespace-nowrap group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
+                Listen & Repeat
+              </span>
             </Button>
             <Button 
               variant="outline" 
-              className="rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-3 sm:py-3 md:py-4 border-2 border-blue-300 dark:border-blue-600 hover:border-blue-400 dark:hover:border-blue-500 bg-blue-50/40 dark:bg-blue-900/10 hover:bg-blue-100/60 dark:hover:bg-blue-900/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 group text-sm sm:text-base w-full sm:w-auto sm:flex-1 sm:min-w-[160px]"
-              onClick={() => handleCategoryClick('pronunciation')}
+              className={cn(
+                "rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-3 sm:py-3 md:py-4 border-2 border-blue-300 dark:border-blue-600 hover:border-blue-400 dark:hover:border-blue-500 bg-blue-50/40 dark:bg-blue-900/10 hover:bg-blue-100/60 dark:hover:bg-blue-900/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 group text-sm sm:text-base w-full sm:w-auto sm:flex-1 sm:min-w-[160px] cursor-pointer",
+                hoveredElement === 'quick-speak' && "scale-110 shadow-lg"
+              )}
+              onClick={() => {
+                handleElementClick('quick-speak');
+                handleCategoryClick('pronunciation');
+              }}
+              onMouseEnter={() => handleElementHover('quick-speak')}
+              onMouseLeave={() => setHoveredElement(null)}
             >
-              <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-blue-600 dark:text-blue-400 group-hover:animate-pulse flex-shrink-0" />
-              <span className="font-semibold text-gray-800 dark:text-gray-500 whitespace-nowrap">Speak Now</span>
+              <Mic className={cn(
+                "w-4 h-4 sm:w-5 sm:h-5 mr-2 text-blue-600 dark:text-blue-400 group-hover:animate-pulse flex-shrink-0 transition-all duration-300",
+                hoveredElement === 'quick-speak' && "animate-pulse"
+              )} />
+              <span className="font-semibold text-gray-800 dark:text-gray-500 whitespace-nowrap group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                Speak Now
+              </span>
             </Button>
             <Button 
               variant="outline" 
-              className="rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-3 sm:py-3 md:py-4 border-2 border-pink-300 dark:border-pink-600 hover:border-pink-400 dark:hover:border-pink-500 bg-pink-50/40 dark:bg-pink-900/10 hover:bg-pink-100/60 dark:hover:bg-pink-900/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 group text-sm sm:text-base w-full sm:w-auto sm:flex-1 sm:min-w-[160px]"
-              onClick={() => navigate('/favorites')}
+              className={cn(
+                "rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-3 sm:py-3 md:py-4 border-2 border-pink-300 dark:border-pink-600 hover:border-pink-400 dark:hover:border-pink-500 bg-pink-50/40 dark:bg-pink-900/10 hover:bg-pink-100/60 dark:hover:bg-pink-900/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 group text-sm sm:text-base w-full sm:w-auto sm:flex-1 sm:min-w-[160px] cursor-pointer",
+                hoveredElement === 'quick-favorites' && "scale-110 shadow-lg"
+              )}
+              onClick={() => {
+                handleElementClick('quick-favorites');
+                navigate('/favorites');
+              }}
+              onMouseEnter={() => handleElementHover('quick-favorites')}
+              onMouseLeave={() => setHoveredElement(null)}
             >
-              <Heart className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-pink-600 dark:text-pink-400 group-hover:animate-pulse flex-shrink-0" />
-              <span className="font-semibold text-gray-800 dark:text-gray-500 whitespace-nowrap">
+              <Heart className={cn(
+                "w-4 h-4 sm:w-5 sm:h-5 mr-2 text-pink-600 dark:text-pink-400 group-hover:animate-pulse flex-shrink-0 transition-all duration-300",
+                hoveredElement === 'quick-favorites' && "animate-pulse"
+              )} />
+              <span className="font-semibold text-gray-800 dark:text-gray-500 whitespace-nowrap group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
                 Favorite Stories {favorites.length > 0 && `(${favorites.length})`}
               </span>
             </Button>
