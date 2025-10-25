@@ -1770,7 +1770,9 @@ const KidsPage = () => {
                 hoveredElement === 'quick-favorites' && "scale-110 shadow-lg"
               )}
               onClick={() => {
-                handleElementClick('quick-favorites');
+                // Don't play sound feedback for navigation buttons
+                setPulseAnimation(true);
+                setTimeout(() => setPulseAnimation(false), 1000);
                 navigate('/favorites');
               }}
               onMouseEnter={() => handleElementHover('quick-favorites')}
