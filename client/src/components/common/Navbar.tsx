@@ -153,7 +153,16 @@ export const Navbar = () => {
   ];
 
   const categoriesSubmenu = [
-    { to: '/kids', icon: <Baby size={16} />, label: 'Kids', id: 'kids' },
+    {
+      to: '/kids',
+      icon: <Baby size={16} />,
+      label: 'Kids',
+      id: 'kids',
+      children: [
+        { to: '/kids/young', icon: <Baby size={14} />, label: 'Ages 4-10', id: 'kids-young' },
+        { to: '/kids/teen', icon: <Users size={14} />, label: 'Ages 11-17', id: 'kids-teen' },
+      ]
+    },
     {
       to: '/adults',
       icon: <Users size={16} />,
