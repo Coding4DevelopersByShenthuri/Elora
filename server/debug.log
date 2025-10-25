@@ -341,3 +341,4 @@ WARNING 2025-10-25 13:22:36,310 basehttp 13888 10608 "POST /api/vocabulary/ HTTP
 WARNING 2025-10-25 13:24:03,714 log 13888 10608 Not Found: /api/vocabulary/
 WARNING 2025-10-25 13:24:03,723 basehttp 13888 10608 "POST /api/vocabulary/ HTTP/1.1" 404 6344
 INFO 2025-10-25 17:44:22,492 autoreload 12420 3180 Watching for file changes with StatReloader
+INFO 2025-10-25 23:32:03,473 autoreload 11596 11760 Watching for file changes with StatReloader

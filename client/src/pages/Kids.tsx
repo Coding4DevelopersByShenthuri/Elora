@@ -31,7 +31,7 @@ import FairyGardenAdventure from '@/components/kids/stories/FairyGardenAdventure
 import RainbowCastleAdventure from '@/components/kids/stories/RainbowCastleAdventure';
 import JungleExplorerAdventure from '@/components/kids/stories/JungleExplorerAdventure';
 import AuthModal from '@/components/auth/AuthModal';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import HybridServiceManager from '@/services/HybridServiceManager';
 import { ModelManager } from '@/services/ModelManager';
 import { WhisperService } from '@/services/WhisperService';
@@ -45,6 +45,7 @@ const KidsPage = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const { user, isAuthenticated } = useAuth();
   const userId = user?.id ? String(user.id) : 'local-user';
+  const location = useLocation();
   const [points, setPoints] = useState(0);
   const [streak, setStreak] = useState(0);
   const [favorites, setFavorites] = useState<number[]>([]);
@@ -317,6 +318,22 @@ const KidsPage = () => {
 
     loadVocabularyWordsAndPhrases();
   }, [userId, isAuthenticated]);
+
+  // Handle startStory state from Favorites page
+  useEffect(() => {
+    if (isAuthenticated && location.state?.startStory !== undefined) {
+      const storyIndex = location.state.startStory;
+      console.log(`🎯 Starting story from Favorites: ${storyIndex}`);
+      
+      // Clear the state to prevent re-triggering
+      window.history.replaceState({}, document.title);
+      
+      // Start the story after a short delay to ensure the page is fully loaded
+      setTimeout(() => {
+        handleStartLesson(storyIndex);
+      }, 500);
+    }
+  }, [isAuthenticated, location.state]);
 
   const categories = [
     { id: 'stories', label: 'Story Time', icon: BookOpen, emoji: '📚' },
