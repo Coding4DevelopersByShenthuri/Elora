@@ -329,7 +329,13 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
             volume: FINN_VOICE.volume,
             isUniqueVoice: true,
             note: 'This is Finn\'s unique voice profile using OnlineTTS',
-            expectedCharacteristics: 'Microsoft David voice for bubbly fish character'
+            expectedCharacteristics: 'Microsoft David voice with HIGH PITCH (1.4), SLOW RATE (0.85), SOFT VOLUME (0.9) for bubbly fish character',
+            voiceDistinctiveness: {
+              pitchLevel: 'HIGH (1.4) - bubbly and cheerful',
+              rateLevel: 'SLOW (0.85) - gentle underwater flow',
+              volumeLevel: 'SOFT (0.9) - gentle fish voice',
+              uniqueFeatures: 'Higher pitch than other characters, slower pace for underwater feel'
+            }
           });
           
           // Log available voices for debugging
@@ -406,6 +412,12 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
           volume: FINN_VOICE.volume,
           voiceName: FINN_VOICE.voiceName,
           description: FINN_VOICE.description
+        },
+        voiceVerification: {
+          isUniqueVoice: true,
+          expectedSound: 'HIGH PITCH (1.4) + SLOW RATE (0.85) + SOFT VOLUME (0.9) = Bubbly fish voice',
+          shouldSoundDifferent: 'Yes - higher pitch and slower than other characters',
+          voiceType: 'Microsoft David with custom settings for Finn'
         }
       });
       

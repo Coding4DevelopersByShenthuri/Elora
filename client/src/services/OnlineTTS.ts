@@ -291,31 +291,31 @@ export const STORY_VOICES: Record<string, VoiceProfile> = {
   // 1. Magic Forest Adventure - Luna (cheerful 6-year-old girl)
   Luna: {
     name: 'Luna',
-    pitch: 1.0,
-    rate: 1.0,
-    volume: 1.0,
+    pitch: 1.6,        // Higher pitch for sweet, young girl
+    rate: 0.9,         // Slightly slower for gentle magical tone
+    volume: 0.85,      // Softer for gentle rabbit
     voiceName: 'Microsoft Zira - English (United States)', // Microsoft's young female voice
-    description: 'Sweet, gentle rabbit voice with magical wonder'
+    description: 'Sweet, gentle rabbit voice with magical wonder - high pitch, gentle pace'
   },
   
   // 2. Space Adventure - Cosmo (excited 7-year-old boy)
   Cosmo: {
     name: 'Cosmo',
-    pitch: 1.1,
-    rate: 0.95,
-    volume: 1.0,
+    pitch: 1.2,        // Slightly higher for excited boy
+    rate: 1.1,         // Faster for enthusiastic astronaut
+    volume: 1.0,       // Full volume for confident voice
     voiceName: 'Microsoft Mark - English (United States)', // Microsoft's young male voice
-    description: 'Confident, adventurous astronaut voice with cosmic enthusiasm'
+    description: 'Confident, adventurous astronaut voice with cosmic enthusiasm - energetic pace'
   },
   
   // 3. Underwater World - Finn (gentle 6-year-old boy)
   Finn: {
     name: 'Finn',
-    pitch: 1.0,
-    rate: 1.0,
-    volume: 1.0,
+    pitch: 1.4,        // Higher pitch for bubbly, cheerful fish
+    rate: 0.85,        // Slightly slower for gentle underwater flow
+    volume: 0.9,       // Softer volume for gentle fish
     voiceName: 'Microsoft David - English (United States)', // Microsoft's young male voice
-    description: 'Bubbly, cheerful fish voice with underwater flow'
+    description: 'Bubbly, cheerful fish voice with underwater flow - higher pitch, gentle pace'
   },
   
   // 4. Dinosaur Discovery - Dina (bold 8-year-old girl)

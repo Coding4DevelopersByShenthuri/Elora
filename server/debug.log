@@ -310,3 +310,4 @@ WARNING 2025-10-25 02:45:31,540 log 16408 7116 Not Found: /api/vocabulary/
 WARNING 2025-10-25 02:45:31,544 basehttp 16408 7116 "POST /api/vocabulary/ HTTP/1.1" 404 6344
 WARNING 2025-10-25 02:47:30,863 log 16408 7116 Not Found: /api/vocabulary/
 WARNING 2025-10-25 02:47:30,868 basehttp 16408 7116 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+INFO 2025-10-25 10:34:16,639 autoreload 13888 9560 Watching for file changes with StatReloader
