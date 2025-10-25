@@ -311,3 +311,32 @@ WARNING 2025-10-25 02:45:31,544 basehttp 16408 7116 "POST /api/vocabulary/ HTTP/
 WARNING 2025-10-25 02:47:30,863 log 16408 7116 Not Found: /api/vocabulary/
 WARNING 2025-10-25 02:47:30,868 basehttp 16408 7116 "POST /api/vocabulary/ HTTP/1.1" 404 6344
 INFO 2025-10-25 10:34:16,639 autoreload 13888 9560 Watching for file changes with StatReloader
+INFO 2025-10-25 13:14:23,037 basehttp 13888 10148 "OPTIONS /api/vocabulary/ HTTP/1.1" 200 0
+WARNING 2025-10-25 13:14:24,948 log 13888 10148 Not Found: /api/vocabulary/
+WARNING 2025-10-25 13:14:24,951 basehttp 13888 10148 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+WARNING 2025-10-25 13:14:44,866 log 13888 9700 Not Found: /api/vocabulary/
+WARNING 2025-10-25 13:14:44,871 basehttp 13888 9700 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+WARNING 2025-10-25 13:15:08,428 log 13888 5996 Not Found: /api/vocabulary/
+WARNING 2025-10-25 13:15:08,431 basehttp 13888 5996 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+WARNING 2025-10-25 13:15:33,576 log 13888 22720 Not Found: /api/vocabulary/
+WARNING 2025-10-25 13:15:33,581 basehttp 13888 22720 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+WARNING 2025-10-25 13:16:01,198 log 13888 6688 Not Found: /api/vocabulary/
+WARNING 2025-10-25 13:16:01,202 basehttp 13888 6688 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+WARNING 2025-10-25 13:16:33,080 log 13888 5480 Not Found: /api/vocabulary/
+WARNING 2025-10-25 13:16:33,087 basehttp 13888 5480 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+WARNING 2025-10-25 13:16:52,090 log 13888 5480 Not Found: /api/vocabulary/
+WARNING 2025-10-25 13:16:52,095 basehttp 13888 5480 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+WARNING 2025-10-25 13:17:20,958 log 13888 5480 Not Found: /api/vocabulary/
+WARNING 2025-10-25 13:17:20,959 basehttp 13888 5480 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+WARNING 2025-10-25 13:21:04,909 log 13888 23724 Not Found: /api/vocabulary/
+WARNING 2025-10-25 13:21:04,918 basehttp 13888 23724 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+WARNING 2025-10-25 13:21:23,980 log 13888 10608 Not Found: /api/vocabulary/
+WARNING 2025-10-25 13:21:23,986 basehttp 13888 10608 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+WARNING 2025-10-25 13:21:41,643 log 13888 10608 Not Found: /api/vocabulary/
+WARNING 2025-10-25 13:21:41,647 basehttp 13888 10608 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+WARNING 2025-10-25 13:22:14,291 log 13888 10608 Not Found: /api/vocabulary/
+WARNING 2025-10-25 13:22:14,299 basehttp 13888 10608 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+WARNING 2025-10-25 13:22:36,304 log 13888 10608 Not Found: /api/vocabulary/
+WARNING 2025-10-25 13:22:36,310 basehttp 13888 10608 "POST /api/vocabulary/ HTTP/1.1" 404 6344
+WARNING 2025-10-25 13:24:03,714 log 13888 10608 Not Found: /api/vocabulary/
+WARNING 2025-10-25 13:24:03,723 basehttp 13888 10608 "POST /api/vocabulary/ HTTP/1.1" 404 6344

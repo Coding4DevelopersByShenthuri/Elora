@@ -118,11 +118,11 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
   return (
     <div className="space-y-4 sm:space-y-6 max-w-4xl lg:max-w-7xl xl:max-w-[1400px] mx-auto">
       {/* Progress Overview */}
-      <Card className="border-2 border-purple-200 bg-purple-50 dark:bg-purple-900/20">
+      <Card className="border-2 border-yellow-300/50 bg-yellow-50/40 dark:bg-yellow-900/10 backdrop-blur-sm shadow-lg">
         <CardContent className="py-3 sm:py-4 px-3 sm:px-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-3">
             <div className="flex items-center gap-2 sm:gap-3">
-              <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-purple-500 flex-shrink-0" />
+              <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
               <div>
                 <p className="font-bold text-sm sm:text-base text-gray-800 dark:text-white">
                   Vocabulary Progress
@@ -132,13 +132,13 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
                 </p>
               </div>
             </div>
-            <div className="text-2xl sm:text-3xl font-bold text-purple-800 dark:text-purple-400">
+            <div className="text-2xl sm:text-3xl font-bold text-yellow-700 dark:text-yellow-400">
               {Math.round(progress)}%
             </div>
           </div>
-          <div className="h-2 sm:h-3 bg-purple-200 dark:bg-purple-800 rounded-full overflow-hidden">
+          <div className="h-2 sm:h-3 bg-yellow-200/60 dark:bg-yellow-800/40 rounded-full overflow-hidden backdrop-blur-sm">
             <div 
-              className="h-full bg-gradient-to-r from-purple-500 to-purple-600 transition-all duration-500"
+              className="h-full bg-gradient-to-r from-yellow-500 to-orange-500 transition-all duration-500 shadow-lg"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -149,10 +149,10 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
       <Card 
         key={`word-card-${current}`}
         className={cn(
-          "border-2 transition-all duration-300 animate-in fade-in slide-in-from-right-4",
+          "border-2 transition-all duration-300 animate-in fade-in slide-in-from-right-4 backdrop-blur-sm shadow-lg",
           masteredWords.has(current) 
-            ? "border-green-200 bg-green-50 dark:bg-green-900/20" 
-            : "border-blue-200"
+            ? "border-green-300/50 bg-green-100/20 dark:bg-green-900/5" 
+            : "border-blue-300/50 bg-blue-50/40 dark:bg-blue-900/10"
         )}
       >
         <CardHeader className="px-3 sm:px-4 md:px-6 py-3 sm:py-4">
@@ -160,30 +160,30 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
             <span className="text-sm sm:text-base text-gray-600 dark:text-gray-500">
               Word {current + 1} of {words.length}
             </span>
-            {masteredWords.has(current) && (
-              <span className="flex items-center gap-1 sm:gap-2 text-sm sm:text-base text-green-600 dark:text-green-400">
-                <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-green-600 dark:fill-green-400 flex-shrink-0" />
-                Mastered!
-              </span>
-            )}
+                         {masteredWords.has(current) && (
+               <span className="flex items-center gap-1 sm:gap-2 text-sm sm:text-base text-green-900 dark:text-green-900 font-bold">
+                 <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-green-700 dark:fill-green-500 flex-shrink-0" />
+                 Mastered!
+               </span>
+             )}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 sm:space-y-6 px-3 sm:px-4 md:px-6">
           {/* Word Display */}
           <div className="text-center space-y-3 sm:space-y-4">
-            <div className={cn(
-              "text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold transition-all duration-500",
-              showSuccess && "animate-bounce scale-110",
-              masteredWords.has(current) && "text-green-600 dark:text-green-400"
-            )}>
+                         <div className={cn(
+               "text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold transition-all duration-500",
+               showSuccess && "animate-bounce scale-110",
+               masteredWords.has(current) && "text-green-700 dark:text-green-500"
+             )}>
 
-              {card.word}
-              {showSuccess && ' 🎉'}
-              {masteredWords.has(current) && !showSuccess && ' ✨'}
-            </div>
+               {card.word}
+               {showSuccess && ' 🎉'}
+               {masteredWords.has(current) && !showSuccess && ' ✨'}
+             </div>
             
             {card.hint && (
-              <div className="text-sm sm:text-base md:text-lg text-pink-500 dark:text-pink-400 bg-pink-50 dark:bg-pink-900/20 rounded-lg sm:rounded-xl p-2 sm:p-3 max-w-md mx-auto">
+              <div className="text-sm sm:text-base md:text-lg text-pink-600 dark:text-pink-400 bg-pink-50/60 dark:bg-pink-900/20 backdrop-blur-sm rounded-lg sm:rounded-xl p-2 sm:p-3 max-w-md mx-auto border border-pink-300/50">
                 {card.hint}
               </div>
             )}
@@ -219,10 +219,10 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
           {/* Last Score */}
           {lastScore !== null && (
             <div className={cn(
-              "text-center p-4 sm:p-6 rounded-xl sm:rounded-2xl border-2",
-              lastScore >= 80 && "bg-green-50 border-green-200 dark:bg-green-900/20",
-              lastScore >= 60 && lastScore < 80 && "bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20",
-              lastScore < 60 && "bg-red-50 border-red-200 dark:bg-red-900/20"
+              "text-center p-4 sm:p-6 rounded-xl sm:rounded-2xl border-2 backdrop-blur-sm shadow-lg",
+              lastScore >= 80 && "bg-green-50/60 border-green-300/50 dark:bg-green-900/10",
+              lastScore >= 60 && lastScore < 80 && "bg-yellow-50/60 border-yellow-300/50 dark:bg-yellow-900/10",
+              lastScore < 60 && "bg-red-50/60 border-red-300/50 dark:bg-red-900/10"
             )}>
               <div className="text-3xl sm:text-4xl md:text-5xl mb-2">{getScoreEmoji(lastScore)}</div>
               <div className={cn("text-2xl sm:text-3xl md:text-4xl font-bold", getScoreColor(lastScore))}>
@@ -276,12 +276,12 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
 
       {/* Success Message */}
       {showSuccess && (
-        <Card className="border-2 border-green-200 bg-green-50 dark:bg-green-900/20">
+        <Card className="border-2 border-green-300/50 bg-green-50/40 dark:bg-green-900/10 backdrop-blur-sm shadow-lg">
           <CardContent className="py-4 sm:py-6 text-center px-3 sm:px-4">
             <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
               Amazing! Word Mastered!
             </h3>
-            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
+            <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300">
               You can now use this word confidently!
             </p>
           </CardContent>

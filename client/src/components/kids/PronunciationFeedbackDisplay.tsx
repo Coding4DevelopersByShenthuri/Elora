@@ -133,16 +133,16 @@ const PronunciationFeedbackDisplay = ({
         </CardContent>
       </Card>
 
-      {/* Detailed Scores */}
-      {showDetailed && (
-        <Card className="border-2 border-purple-200">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Star className="w-5 h-5 text-purple-500" />
-              Detailed Scores
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+             {/* Detailed Scores */}
+       {showDetailed && (
+         <Card className="border-2 border-orange-300/50 bg-orange-50/40 dark:bg-orange-900/10 backdrop-blur-sm shadow-lg">
+           <CardHeader>
+             <CardTitle className="text-lg flex items-center gap-2 text-orange-700 dark:text-orange-400">
+               <Star className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+               Detailed Scores
+             </CardTitle>
+           </CardHeader>
+           <CardContent className="space-y-4">
             {/* Accuracy */}
             <div>
               <div className="flex items-center justify-between mb-2">
@@ -153,7 +153,12 @@ const PronunciationFeedbackDisplay = ({
                   {Math.round(feedback.accuracy)}%
                 </span>
               </div>
-              <Progress value={feedback.accuracy} className="h-3" />
+              <div className="h-3 bg-yellow-200/60 dark:bg-yellow-800/40 rounded-full overflow-hidden backdrop-blur-sm">
+                <div 
+                  className="h-full bg-gradient-to-r from-yellow-500 to-orange-500 transition-all duration-500"
+                  style={{ width: `${feedback.accuracy}%` }}
+                />
+              </div>
             </div>
 
             {/* Fluency */}
@@ -166,7 +171,12 @@ const PronunciationFeedbackDisplay = ({
                   {Math.round(feedback.fluency)}%
                 </span>
               </div>
-              <Progress value={feedback.fluency} className="h-3" />
+              <div className="h-3 bg-yellow-200/60 dark:bg-yellow-800/40 rounded-full overflow-hidden backdrop-blur-sm">
+                <div 
+                  className="h-full bg-gradient-to-r from-yellow-500 to-orange-500 transition-all duration-500"
+                  style={{ width: `${feedback.fluency}%` }}
+                />
+              </div>
             </div>
 
             {/* Completeness */}
@@ -179,21 +189,26 @@ const PronunciationFeedbackDisplay = ({
                   {Math.round(feedback.completeness)}%
                 </span>
               </div>
-              <Progress value={feedback.completeness} className="h-3" />
+              <div className="h-3 bg-yellow-200/60 dark:bg-yellow-800/40 rounded-full overflow-hidden backdrop-blur-sm">
+                <div 
+                  className="h-full bg-gradient-to-r from-yellow-500 to-orange-500 transition-all duration-500"
+                  style={{ width: `${feedback.completeness}%` }}
+                />
+              </div>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Transcription Comparison */}
-      {feedback.expectedText && feedback.transcript && (
-        <Card className="border-2 border-blue-200">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-blue-500" />
-              What You Said
-            </CardTitle>
-          </CardHeader>
+             {/* Transcription Comparison */}
+       {feedback.expectedText && feedback.transcript && (
+         <Card className="border-2 border-blue-300/50 bg-blue-50/40 dark:bg-blue-900/10 backdrop-blur-sm shadow-lg">
+           <CardHeader>
+             <CardTitle className="text-lg flex items-center gap-2 text-blue-700 dark:text-blue-400">
+               <CheckCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+               What You Said
+             </CardTitle>
+           </CardHeader>
           <CardContent className="space-y-3">
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Expected:</p>
@@ -211,15 +226,15 @@ const PronunciationFeedbackDisplay = ({
         </Card>
       )}
 
-      {/* Word-Level Scores */}
-      {showDetailed && feedback.wordScores && feedback.wordScores.length > 0 && (
-        <Card className="border-2 border-orange-200">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-orange-500" />
-              Word-by-Word Analysis
-            </CardTitle>
-          </CardHeader>
+             {/* Word-Level Scores */}
+       {showDetailed && feedback.wordScores && feedback.wordScores.length > 0 && (
+         <Card className="border-2 border-yellow-300/50 bg-yellow-50/40 dark:bg-yellow-900/10 backdrop-blur-sm shadow-lg">
+           <CardHeader>
+             <CardTitle className="text-lg flex items-center gap-2 text-yellow-700 dark:text-yellow-400">
+               <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+               Word-by-Word Analysis
+             </CardTitle>
+           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-3">
               {feedback.wordScores.map((wordScore, idx) => (
@@ -252,15 +267,15 @@ const PronunciationFeedbackDisplay = ({
         </Card>
       )}
 
-      {/* Recommendations */}
-      {feedback.recommendations && feedback.recommendations.length > 0 && (
-        <Card className="border-2 border-pink-200 bg-pink-50 dark:bg-pink-900/20">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Lightbulb className="w-5 h-5 text-pink-500" />
-              Tips to Improve
-            </CardTitle>
-          </CardHeader>
+             {/* Recommendations */}
+       {feedback.recommendations && feedback.recommendations.length > 0 && (
+         <Card className="border-2 border-pink-300/50 bg-pink-50/40 dark:bg-pink-900/10 backdrop-blur-sm shadow-lg">
+           <CardHeader>
+             <CardTitle className="text-lg flex items-center gap-2 text-pink-700 dark:text-pink-400">
+               <Lightbulb className="w-5 h-5 text-pink-600 dark:text-pink-400" />
+               Tips to Improve
+             </CardTitle>
+           </CardHeader>
           <CardContent>
             <ul className="space-y-3">
               {feedback.recommendations.map((rec, idx) => (

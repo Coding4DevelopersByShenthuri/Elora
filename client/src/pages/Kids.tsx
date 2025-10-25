@@ -5,7 +5,8 @@ import {
   Rabbit, Fish, Rocket, Cloud,
   Sun, CloudRain, Footprints,
   ChevronLeft, ChevronRight, Anchor,
-  Shield, Download, Loader2, Crown, Compass
+  Shield, Download, Loader2, Crown, Compass,
+  Music, VolumeX, Volume1, Settings, HelpCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -14,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import KidsProgressService from '@/services/KidsProgressService';
 import KidsApi from '@/services/KidsApi';
+import StoryWordsService from '@/services/StoryWordsService';
 import Vocabulary from '@/components/kids/Vocabulary';
 import Pronunciation from '@/components/kids/Pronunciation';
 import InteractiveGames from '@/components/kids/InteractiveGames';
@@ -35,6 +37,7 @@ import { ModelManager } from '@/services/ModelManager';
 import { WhisperService } from '@/services/WhisperService';
 import { TransformersService } from '@/services/TransformersService';
 import { TimeTracker } from '@/services/TimeTracker';
+import EnhancedTTS from '@/services/EnhancedTTS';
 
 const KidsPage = () => {
   const [activeCategory, setActiveCategory] = useState('stories');
@@ -62,9 +65,20 @@ const KidsPage = () => {
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [pronunciationAttempts, setPronunciationAttempts] = useState(0);
   const [vocabularyAttempts, setVocabularyAttempts] = useState(0);
+  const [enrolledWords, setEnrolledWords] = useState<Array<{ word: string; hint: string }>>([]);
+  const [enrolledPhrases, setEnrolledPhrases] = useState<Array<{ phrase: string; phonemes: string }>>([]);
   const storiesPerPage = 4;
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
+  // Interactive features state
+  const [isSoundEnabled, setIsSoundEnabled] = useState(true);
+  const [isMusicEnabled, setIsMusicEnabled] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+  const [celebrating, setCelebrating] = useState(false);
+  const [hoveredElement, setHoveredElement] = useState<string | null>(null);
+  const [pulseAnimation, setPulseAnimation] = useState(false);
+  const [selectedAchievement, setSelectedAchievement] = useState<number | null>(null);
 
   // SLM & Model Management State
   const [modelsReady, setModelsReady] = useState(false);
@@ -231,6 +245,58 @@ const KidsPage = () => {
     return () => clearInterval(progressInterval);
   }, [userId, isAuthenticated]);
 
+  // Load vocabulary words and phrases from enrolled stories
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const loadVocabularyWordsAndPhrases = () => {
+      try {
+        // Get words from enrolled stories
+        const storyWords = StoryWordsService.getWordsFromEnrolledStories(userId);
+        
+        if (storyWords.length > 0) {
+          // Convert StoryWord[] to the format expected by Vocabulary component
+          const words = storyWords.map(sw => ({
+            word: sw.word,
+            hint: sw.hint
+          }));
+          
+          console.log(`📚 Loaded ${words.length} words from enrolled stories:`, words);
+          setEnrolledWords(words);
+        } else {
+          // No enrolled stories yet, use default words
+          console.log('📚 No enrolled stories found, using default words');
+          setEnrolledWords(vocabWords);
+        }
+
+        // Get phrases from enrolled stories
+        const storyPhrases = StoryWordsService.getPhrasesFromEnrolledStories(userId);
+        
+        if (storyPhrases.length > 0) {
+          // Convert StoryPhrase[] to the format expected by Pronunciation component
+          const phrases = storyPhrases.map(sp => ({
+            phrase: sp.phrase,
+            phonemes: sp.phonemes
+          }));
+          
+          console.log(`🎤 Loaded ${phrases.length} phrases from enrolled stories:`, phrases);
+          setEnrolledPhrases(phrases);
+        } else {
+          // No enrolled stories yet, use default phrases
+          console.log('🎤 No enrolled stories found, using default phrases');
+          setEnrolledPhrases(pronounceItems);
+        }
+      } catch (error) {
+        console.error('Error loading vocabulary words and phrases:', error);
+        // Fallback to default words and phrases on error
+        setEnrolledWords(vocabWords);
+        setEnrolledPhrases(pronounceItems);
+      }
+    };
+
+    loadVocabularyWordsAndPhrases();
+  }, [userId, isAuthenticated]);
+
   const categories = [
     { id: 'stories', label: 'Story Time', icon: BookOpen, emoji: '📚' },
     { id: 'vocabulary', label: 'Word Games', icon: Zap, emoji: '🎮' },
@@ -283,7 +349,7 @@ const KidsPage = () => {
       description: "Explore prehistoric times with Dina!",
       difficulty: 'Hard',
       duration: '7 min',
-      words: 520,
+      words: 550,
       image: '🦖',
       character: Footprints,
       gradient: 'from-orange-400 to-red-400',
@@ -296,7 +362,7 @@ const KidsPage = () => {
       description: "Join Stardust in a magical kingdom!",
       difficulty: 'Easy',
       duration: '5 min',
-      words: 390,
+      words: 400,
       image: '🦄',
       character: Sparkles,
       gradient: 'from-pink-400 to-purple-400',
@@ -309,7 +375,7 @@ const KidsPage = () => {
       description: "Sail with Captain Finn on a treasure hunt!",
       difficulty: 'Medium',
       duration: '5 min',
-      words: 430,
+      words: 350,
       image: '🏴‍☠️',
       character: Anchor,
       gradient: 'from-amber-400 to-yellow-400',
@@ -348,7 +414,7 @@ const KidsPage = () => {
       description: "Join Princess Aurora on a magical rainbow adventure!",
       difficulty: 'Easy',
       duration: '6 min',
-      words: 420,
+      words: 350,
       image: '🌈',
       character: Crown,
       gradient: 'from-pink-400 to-purple-400',
@@ -361,7 +427,7 @@ const KidsPage = () => {
       description: "Join Captain Leo on an exciting jungle expedition!",
       difficulty: 'Medium',
       duration: '8 min',
-      words: 520,
+      words: 350,
       image: '🦁',
       character: Compass,
       gradient: 'from-orange-400 to-yellow-400',
@@ -409,7 +475,7 @@ const KidsPage = () => {
   ];
   const completedAchievements = achievements.filter(a => a.progress === 100).length;
 
-  // Offline kids lesson content for modules
+  // Default words for when no stories are enrolled yet
   const vocabWords = [
     { word: 'rabbit', hint: '🐰 Say: RAB-it' },
     { word: 'forest', hint: '🌲 Say: FOR-est' },
@@ -426,6 +492,9 @@ const KidsPage = () => {
     { word: 'moonflower', hint: '🌙🌸 Say: MOON-flow-er' },
     { word: 'sparkle', hint: '⭐ Say: SPAR-kul' }
   ];
+
+  // Use enrolled words if available, otherwise use default words
+  const vocabularyWordsToUse = enrolledWords.length > 0 ? enrolledWords : vocabWords;
 
   const pronounceItems = [
     { phrase: 'Hello Luna', phonemes: '👋 Say: heh-LOW LOO-nah' },
@@ -448,6 +517,17 @@ const KidsPage = () => {
     if (!isAuthenticated) {
       setShowAuthModal(true);
       return;
+    }
+
+    handleElementClick(`story-${storyIndex}`);
+    
+    // Play story-specific voice introduction
+    if (isSoundEnabled) {
+      const story = allStories[storyIndex];
+      await EnhancedTTS.speak(
+        `Welcome to ${story.title}! ${story.description} Let's begin our adventure!`, 
+        { rate: 0.9, emotion: 'excited' }
+      ).catch(() => {});
     }
 
     // storyIndex is already the correct index in allStories array
@@ -625,6 +705,27 @@ const KidsPage = () => {
         score
       );
       
+      // Reload vocabulary words and phrases to include data from this newly completed story
+      const storyWords = StoryWordsService.getWordsFromEnrolledStories(userId);
+      if (storyWords.length > 0) {
+        const words = storyWords.map(sw => ({
+          word: sw.word,
+          hint: sw.hint
+        }));
+        console.log(`🎉 Story completed! Loaded ${words.length} total words from enrolled stories`);
+        setEnrolledWords(words);
+      }
+
+      const storyPhrases = StoryWordsService.getPhrasesFromEnrolledStories(userId);
+      if (storyPhrases.length > 0) {
+        const phrases = storyPhrases.map(sp => ({
+          phrase: sp.phrase,
+          phonemes: sp.phonemes
+        }));
+        console.log(`🎉 Story completed! Loaded ${phrases.length} total phrases from enrolled stories`);
+        setEnrolledPhrases(phrases);
+      }
+      
       if (token && token !== 'local-token') {
         const current = await KidsApi.getProgress(token);
         const details = { ...((current as any).details || {}) };
@@ -672,6 +773,24 @@ const KidsPage = () => {
       setShowAuthModal(true);
       return;
     }
+    
+    handleElementClick(`category-${categoryId}`);
+    
+    // Play category-specific voice instructions
+    const categoryInstructions = {
+      stories: "Let's read amazing stories together!",
+      vocabulary: "Time to learn new words!",
+      pronunciation: "Let's practice speaking!",
+      games: "Ready for some fun games?"
+    };
+    
+    if (isSoundEnabled) {
+      EnhancedTTS.speak(categoryInstructions[categoryId as keyof typeof categoryInstructions] || "Let's learn!", { 
+        rate: 1.0, 
+        emotion: 'happy' 
+      }).catch(() => {});
+    }
+    
     setActiveCategory(categoryId);
   };
 
@@ -684,6 +803,45 @@ const KidsPage = () => {
     setShowAuthModal(false);
     // Redirect to home page when user closes the auth modal without logging in
     navigate('/');
+  };
+
+  // Interactive functions
+  const playSound = async (soundType: 'click' | 'success' | 'celebration' | 'hover' | 'error') => {
+    if (!isSoundEnabled) return;
+    
+    try {
+      const soundMessages = {
+        click: 'Click!',
+        success: 'Great job!',
+        celebration: 'Congratulations!',
+        hover: 'Hover!',
+        error: 'Try again!'
+      };
+      
+      await EnhancedTTS.speak(soundMessages[soundType], { 
+        rate: 1.2, 
+        emotion: soundType === 'celebration' ? 'excited' : 'happy' 
+      });
+    } catch (error) {
+      console.log('Sound playback not available');
+    }
+  };
+
+  const triggerCelebration = () => {
+    setCelebrating(true);
+    playSound('celebration');
+    setTimeout(() => setCelebrating(false), 3000);
+  };
+
+  const handleElementHover = (elementId: string) => {
+    setHoveredElement(elementId);
+    playSound('hover');
+  };
+
+  const handleElementClick = (elementId: string) => {
+    playSound('click');
+    setPulseAnimation(true);
+    setTimeout(() => setPulseAnimation(false), 1000);
   };
 
   // Show auth modal if not authenticated
@@ -769,26 +927,120 @@ const KidsPage = () => {
       <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative z-10">
         {/* Header Section */}
         <div className="text-center mb-6 sm:mb-8 relative">
+          {/* Interactive Controls */}
+          <div className="absolute top-0 right-0 flex gap-2 z-20">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setIsSoundEnabled(!isSoundEnabled);
+                handleElementClick('sound-toggle');
+              }}
+              className={cn(
+                "rounded-full p-2 transition-all duration-300 hover:scale-110",
+                isSoundEnabled ? "text-green-600 hover:bg-green-100" : "text-gray-400 hover:bg-gray-100"
+              )}
+              title={isSoundEnabled ? "Sound On" : "Sound Off"}
+            >
+              {isSoundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setIsMusicEnabled(!isMusicEnabled);
+                handleElementClick('music-toggle');
+              }}
+              className={cn(
+                "rounded-full p-2 transition-all duration-300 hover:scale-110",
+                isMusicEnabled ? "text-purple-600 hover:bg-purple-100" : "text-gray-400 hover:bg-gray-100"
+              )}
+              title={isMusicEnabled ? "Music On" : "Music Off"}
+            >
+              <Music className="w-5 h-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setShowHelp(!showHelp);
+                handleElementClick('help-toggle');
+              }}
+              className={cn(
+                "rounded-full p-2 transition-all duration-300 hover:scale-110",
+                showHelp ? "text-blue-600 hover:bg-blue-100" : "text-gray-400 hover:bg-gray-100"
+              )}
+              title="Help & Tips"
+            >
+              <HelpCircle className="w-5 h-5" />
+            </Button>
+          </div>
+
+          {/* Help Panel */}
+          {showHelp && (
+            <div className="absolute top-12 right-0 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-4 max-w-xs z-30 border-2 border-blue-200 dark:border-blue-600">
+              <h3 className="font-bold text-sm mb-2 text-blue-600 dark:text-blue-400">🎯 Quick Tips!</h3>
+              <ul className="text-xs text-gray-600 dark:text-gray-300 space-y-1">
+                <li>• Click any story to start learning!</li>
+                <li>• Use the microphone to practice speaking</li>
+                <li>• Complete stories to unlock new words</li>
+                <li>• Play games to earn more points!</li>
+              </ul>
+            </div>
+          )}
+
           {/* Decorative stars - Green and Orange */}
-          <div className="absolute -top-4 left-1/4 w-8 h-8 text-green-500 opacity-60 hidden md:block animate-pulse">
+          <div 
+            className={cn(
+              "absolute -top-4 left-1/4 w-8 h-8 text-green-500 opacity-60 hidden md:block animate-pulse cursor-pointer transition-transform duration-300",
+              hoveredElement === 'star-1' && "scale-125"
+            )}
+            onMouseEnter={() => handleElementHover('star-1')}
+            onClick={() => handleElementClick('star-1')}
+          >
             <svg viewBox="0 0 100 100" fill="currentColor" className="w-full h-full">
               <path d="M50 10L60 40L90 50L60 60L50 90L40 60L10 50L40 40Z"/>
             </svg>
           </div>
-          <div className="absolute -top-2 right-1/4 w-10 h-10 text-orange-500 opacity-70 hidden md:block animate-bounce">
+          <div 
+            className={cn(
+              "absolute -top-2 right-1/4 w-10 h-10 text-orange-500 opacity-70 hidden md:block animate-bounce cursor-pointer transition-transform duration-300",
+              hoveredElement === 'star-2' && "scale-125"
+            )}
+            onMouseEnter={() => handleElementHover('star-2')}
+            onClick={() => handleElementClick('star-2')}
+          >
             <svg viewBox="0 0 100 100" fill="currentColor" className="w-full h-full">
               <path d="M50 10L60 40L90 50L60 60L50 90L40 60L10 50L40 40Z"/>
             </svg>
           </div>
+          
           <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4 px-2">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] rounded-full blur-md opacity-60 animate-pulse"></div>
+              <div className={cn(
+                "absolute inset-0 bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] rounded-full blur-md opacity-60 animate-pulse transition-all duration-300",
+                celebrating && "animate-ping"
+              )}></div>
             </div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#118AB2] bg-clip-text text-transparent">
+            <h1 
+              className={cn(
+                "text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#118AB2] bg-clip-text text-transparent cursor-pointer transition-all duration-300 hover:scale-105",
+                pulseAnimation && "animate-pulse"
+              )}
+              onClick={() => {
+                handleElementClick('title');
+                triggerCelebration();
+              }}
+              onMouseEnter={() => handleElementHover('title')}
+            >
               Kids Learning Zone
             </h1>
           </div>
-          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-500 dark:text-gray-300 max-w-2xl mx-auto mb-3 sm:mb-4 px-4">
+          <p 
+            className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-500 dark:text-gray-300 max-w-2xl mx-auto mb-3 sm:mb-4 px-4 cursor-pointer transition-all duration-300 hover:text-gray-700 dark:hover:text-gray-100"
+            onClick={() => handleElementClick('subtitle')}
+            onMouseEnter={() => handleElementHover('subtitle')}
+          >
             Fun stories, exciting games, and magical adventures to learn English!
           </p>
           
@@ -828,62 +1080,132 @@ const KidsPage = () => {
         {/* Stats Bar */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-5 lg:gap-6 mb-6 sm:mb-8 px-2 sm:px-0 relative">
           {/* Decorative circles - Green */}
-          <div className="absolute -top-4 -left-4 w-12 h-12 text-green-500 opacity-30 hidden lg:block">
+          <div 
+            className={cn(
+              "absolute -top-4 -left-4 w-12 h-12 text-green-500 opacity-30 hidden lg:block cursor-pointer transition-all duration-300",
+              hoveredElement === 'deco-circle' && "scale-110 opacity-60"
+            )}
+            onMouseEnter={() => handleElementHover('deco-circle')}
+            onClick={() => handleElementClick('deco-circle')}
+          >
             <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
               <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="3" strokeDasharray="10,5"/>
             </svg>
           </div>
           {/* Decorative arrow - Orange */}
-          <div className="absolute -bottom-6 -right-6 w-16 h-16 text-orange-500 opacity-40 hidden lg:block">
+          <div 
+            className={cn(
+              "absolute -bottom-6 -right-6 w-16 h-16 text-orange-500 opacity-40 hidden lg:block cursor-pointer transition-all duration-300",
+              hoveredElement === 'deco-arrow' && "scale-110 opacity-60"
+            )}
+            onMouseEnter={() => handleElementHover('deco-arrow')}
+            onClick={() => handleElementClick('deco-arrow')}
+          >
             <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
               <path d="M20 20C40 10 60 30 80 20C85 18 90 22 90 25C90 30 85 35 80 30C70 25 50 15 30 25C25 27 20 25 20 20Z" stroke="currentColor" strokeWidth="2" fill="currentColor"/>
             </svg>
           </div>
-          <Card className="bg-yellow-50/30 dark:bg-yellow-900/10 backdrop-blur-sm border-2 border-yellow-200 dark:border-yellow-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative">
+          <Card 
+            className={cn(
+              "bg-yellow-50/30 dark:bg-yellow-900/10 backdrop-blur-sm border-2 border-yellow-200 dark:border-yellow-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative cursor-pointer group",
+              hoveredElement === 'points-card' && "scale-105 shadow-2xl"
+            )}
+            onMouseEnter={() => handleElementHover('points-card')}
+            onClick={() => {
+              handleElementClick('points-card');
+              triggerCelebration();
+            }}
+          >
             {/* Decorative dot - Orange */}
-            <div className="absolute -top-2 -right-2 w-6 h-6 text-orange-500 opacity-70">
+            <div className="absolute -top-2 -right-2 w-6 h-6 text-orange-500 opacity-70 group-hover:animate-spin">
               <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
                 <circle cx="12" cy="12" r="10"/>
               </svg>
             </div>
             <CardContent className="p-4 sm:p-5 md:p-6 text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-                <Trophy className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-yellow-600 dark:text-yellow-500 flex-shrink-0" />
-                <span className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">{points}</span>
+                <Trophy className={cn(
+                  "w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-yellow-600 dark:text-yellow-500 flex-shrink-0 transition-all duration-300",
+                  hoveredElement === 'points-card' && "animate-bounce"
+                )} />
+                <span className={cn(
+                  "text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white transition-all duration-300",
+                  celebrating && "animate-pulse"
+                )}>{points}</span>
               </div>
-              <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-300 font-bold">Sparkle Points ✨</p>
+              <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-300 font-bold group-hover:text-yellow-600 dark:group-hover:text-yellow-400 transition-colors">
+                Sparkle Points ✨
+              </p>
             </CardContent>
           </Card>
           
-          <Card className="bg-green-50/30 dark:bg-green-900/10 backdrop-blur-sm border-2 border-green-200 dark:border-green-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative">
+          <Card 
+            className={cn(
+              "bg-green-50/30 dark:bg-green-900/10 backdrop-blur-sm border-2 border-green-200 dark:border-green-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative cursor-pointer group",
+              hoveredElement === 'streak-card' && "scale-105 shadow-2xl"
+            )}
+            onMouseEnter={() => handleElementHover('streak-card')}
+            onClick={() => {
+              handleElementClick('streak-card');
+              playSound('success');
+            }}
+          >
             {/* Decorative star - Green */}
-            <div className="absolute -top-2 -right-2 w-6 h-6 text-green-500 opacity-70">
+            <div className="absolute -top-2 -right-2 w-6 h-6 text-green-500 opacity-70 group-hover:animate-spin">
               <svg viewBox="0 0 100 100" fill="currentColor" className="w-full h-full">
                 <path d="M50 10L60 40L90 50L60 60L50 90L40 60L10 50L40 40Z"/>
               </svg>
             </div>
             <CardContent className="p-4 sm:p-5 md:p-6 text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-                <Zap className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-green-600 dark:text-green-500 animate-pulse flex-shrink-0" />
-                <span className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">{streak} days</span>
+                <Zap className={cn(
+                  "w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-green-600 dark:text-green-500 flex-shrink-0 transition-all duration-300",
+                  hoveredElement === 'streak-card' && "animate-pulse"
+                )} />
+                <span className={cn(
+                  "text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white transition-all duration-300",
+                  celebrating && "animate-pulse"
+                )}>{streak} days</span>
               </div>
-              <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-300 font-bold">Learning Streak 🔥</p>
+              <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-300 font-bold group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
+                Learning Streak 🔥
+              </p>
             </CardContent>
           </Card>
           
-          <Card className="bg-blue-50/30 dark:bg-blue-900/10 backdrop-blur-sm border-2 border-blue-200 dark:border-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative">
+          <Card 
+            className={cn(
+              "bg-blue-50/30 dark:bg-blue-900/10 backdrop-blur-sm border-2 border-blue-200 dark:border-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative cursor-pointer group",
+              hoveredElement === 'achievements-card' && "scale-105 shadow-2xl"
+            )}
+            onMouseEnter={() => handleElementHover('achievements-card')}
+            onClick={() => {
+              handleElementClick('achievements-card');
+              if (completedAchievements > 0) {
+                triggerCelebration();
+              }
+            }}
+          >
             {/* Decorative squiggle - Orange */}
-            <div className="absolute top-2 right-2 w-8 h-8 text-orange-500 opacity-60">
+            <div className="absolute top-2 right-2 w-8 h-8 text-orange-500 opacity-60 group-hover:animate-bounce">
               <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
                 <path d="M10 50Q30 20 50 50T90 50" stroke="currentColor" strokeWidth="2" fill="none"/>
               </svg>
             </div>
             <CardContent className="p-4 sm:p-5 md:p-6 text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-                <Award className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-blue-600 dark:text-blue-500 flex-shrink-0" />
-                <span className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">{completedAchievements}/{achievements.length}</span>
+                <Award className={cn(
+                  "w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-blue-600 dark:text-blue-500 flex-shrink-0 transition-all duration-300",
+                  hoveredElement === 'achievements-card' && "animate-bounce"
+                )} />
+                <span className={cn(
+                  "text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white transition-all duration-300",
+                  celebrating && "animate-pulse"
+                )}>{completedAchievements}/{achievements.length}</span>
               </div>
-              <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-300 font-bold">Super Achievements 🏆</p>
+              <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-300 font-bold group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                Super Achievements 🏆
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -908,17 +1230,28 @@ const KidsPage = () => {
                   key={category.id}
                   variant={activeCategory === category.id ? "default" : "outline"}
                   className={cn(
-                    "rounded-xl px-3 py-4 text-sm font-bold transition-all duration-300 relative overflow-hidden group h-auto min-h-[80px] flex flex-col items-center justify-center gap-2",
+                    "rounded-xl px-3 py-4 text-sm font-bold transition-all duration-300 relative overflow-hidden group h-auto min-h-[80px] flex flex-col items-center justify-center gap-2 cursor-pointer",
                     activeCategory === category.id 
-                      ? "bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white shadow-xl" 
-                      : `${getCategoryColor()} backdrop-blur-sm text-gray-800 dark:text-white border-2 hover:shadow-md`
+                      ? "bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white shadow-xl scale-105" 
+                      : `${getCategoryColor()} backdrop-blur-sm text-gray-800 dark:text-white border-2 hover:shadow-md hover:scale-105`,
+                    hoveredElement === `category-${category.id}` && "scale-110 shadow-lg"
                   )}
                   onClick={() => handleCategoryClick(category.id)}
+                  onMouseEnter={() => handleElementHover(`category-${category.id}`)}
+                  onMouseLeave={() => setHoveredElement(null)}
                 >
-                  <span className="text-3xl flex-shrink-0">{category.emoji}</span>
-                  <span className="text-xs font-semibold text-center leading-tight">{category.label}</span>
+                  <span className={cn(
+                    "text-3xl flex-shrink-0 transition-all duration-300",
+                    hoveredElement === `category-${category.id}` && "animate-bounce"
+                  )}>{category.emoji}</span>
+                  <span className="text-xs font-semibold text-center leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    {category.label}
+                  </span>
                   {activeCategory === category.id && (
                     <Sparkles className="w-3 h-3 absolute top-1 right-1 animate-spin flex-shrink-0" />
+                  )}
+                  {hoveredElement === `category-${category.id}` && !activeCategory && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl animate-pulse" />
                   )}
                 </Button>
               );
@@ -943,17 +1276,28 @@ const KidsPage = () => {
                   key={category.id}
                   variant={activeCategory === category.id ? "default" : "outline"}
                   className={cn(
-                    "rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 lg:px-10 py-2.5 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg lg:text-xl font-bold transition-all duration-300 relative overflow-hidden group",
+                    "rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 lg:px-10 py-2.5 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg lg:text-xl font-bold transition-all duration-300 relative overflow-hidden group cursor-pointer",
                     activeCategory === category.id 
                       ? "bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white shadow-2xl transform hover:scale-110" 
-                      : `${getCategoryColor()} backdrop-blur-sm text-gray-800 dark:text-white border-2 hover:shadow-lg hover:scale-105`
+                      : `${getCategoryColor()} backdrop-blur-sm text-gray-800 dark:text-white border-2 hover:shadow-lg hover:scale-105`,
+                    hoveredElement === `category-${category.id}` && "scale-110 shadow-lg"
                   )}
                   onClick={() => handleCategoryClick(category.id)}
+                  onMouseEnter={() => handleElementHover(`category-${category.id}`)}
+                  onMouseLeave={() => setHoveredElement(null)}
                 >
-                  <span className="text-lg sm:text-xl md:text-2xl lg:text-3xl mr-1.5 sm:mr-2 md:mr-3 flex-shrink-0">{category.emoji}</span>
-                  <span className="whitespace-nowrap">{category.label}</span>
+                  <span className={cn(
+                    "text-lg sm:text-xl md:text-2xl lg:text-3xl mr-1.5 sm:mr-2 md:mr-3 flex-shrink-0 transition-all duration-300",
+                    hoveredElement === `category-${category.id}` && "animate-bounce"
+                  )}>{category.emoji}</span>
+                  <span className="whitespace-nowrap group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    {category.label}
+                  </span>
                   {activeCategory === category.id && (
                     <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 ml-1.5 sm:ml-2 animate-spin flex-shrink-0" />
+                  )}
+                  {hoveredElement === `category-${category.id}` && !activeCategory && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl animate-pulse" />
                   )}
                 </Button>
               );
@@ -974,9 +1318,24 @@ const KidsPage = () => {
                     key={actualIndex} 
                     className={cn(
                       "group cursor-pointer bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-2 border-transparent hover:border-[#FF6B6B] transition-all duration-500 hover:shadow-2xl overflow-hidden w-full",
-                      bounceAnimation && currentStory === actualIndex && "animate-bounce"
+                      bounceAnimation && currentStory === actualIndex && "animate-bounce",
+                      hoveredElement === `story-card-${actualIndex}` && "scale-105 shadow-2xl"
                     )}
-                    onMouseEnter={() => setCurrentStory(actualIndex)}
+                    onMouseEnter={() => {
+                      setCurrentStory(actualIndex);
+                      handleElementHover(`story-card-${actualIndex}`);
+                    }}
+                    onMouseLeave={() => setHoveredElement(null)}
+                    onClick={() => {
+                      // Play story preview on click
+                      if (isSoundEnabled) {
+                        const story = allStories[actualIndex];
+                        EnhancedTTS.speak(
+                          `${story.title}. ${story.description} Difficulty: ${story.difficulty}. Duration: ${story.duration}.`, 
+                          { rate: 0.8, emotion: 'friendly' }
+                        ).catch(() => {});
+                      }
+                    }}
                   >
                     <CardContent className="p-0 overflow-hidden rounded-xl sm:rounded-2xl lg:rounded-3xl">
                       <div className={cn(
@@ -986,14 +1345,27 @@ const KidsPage = () => {
                         <div className="absolute top-0 right-0 w-20 h-20 sm:w-32 sm:h-32 bg-white/20 dark:bg-black/20 rounded-full -mr-10 sm:-mr-16 -mt-10 sm:-mt-16"></div>
                         <div className="absolute bottom-0 left-0 w-16 h-16 sm:w-24 sm:h-24 bg-white/20 dark:bg-black/20 rounded-full -ml-8 sm:-ml-12 -mb-8 sm:-mb-12"></div>
                         <div className="relative z-10 text-center">
-                          <div className={cn("text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4 transform transition-transform duration-300 group-hover:scale-110", story.animation)}>
+                          <div className={cn(
+                            "text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4 transform transition-transform duration-300 group-hover:scale-110", 
+                            story.animation,
+                            hoveredElement === `story-card-${actualIndex}` && "animate-bounce"
+                          )}>
                             {story.image}
                           </div>
-                          <CharacterIcon className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 mx-auto mb-2 sm:mb-3 text-gray-600 dark:text-gray-300 opacity-80" />
-                          <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2 text-gray-800 dark:text-white">
+                          <CharacterIcon className={cn(
+                            "w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 mx-auto mb-2 sm:mb-3 text-gray-600 dark:text-gray-300 opacity-80 transition-all duration-300",
+                            hoveredElement === `story-card-${actualIndex}` && "animate-pulse scale-110"
+                          )} />
+                          <h3 className={cn(
+                            "text-lg sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2 text-gray-800 dark:text-white transition-all duration-300",
+                            hoveredElement === `story-card-${actualIndex}` && "text-blue-600 dark:text-blue-400"
+                          )}>
                             {story.title}
                           </h3>
-                          <p className="text-xs sm:text-sm leading-relaxed text-gray-600 dark:text-gray-300 px-2">
+                          <p className={cn(
+                            "text-xs sm:text-sm leading-relaxed text-gray-600 dark:text-gray-300 px-2 transition-all duration-300",
+                            hoveredElement === `story-card-${actualIndex}` && "text-gray-700 dark:text-gray-200"
+                          )}>
                             {story.description}
                           </p>
                         </div>
@@ -1108,25 +1480,89 @@ const KidsPage = () => {
 
         {activeCategory === 'vocabulary' && (
           <div className="mb-8 sm:mb-10 md:mb-12 px-2 sm:px-0 mx-auto w-full lg:max-w-7xl xl:max-w-[1400px]">
-            <Vocabulary 
-              words={vocabWords} 
-              onWordPracticed={() => {
-                // Track vocabulary attempts
-                setVocabularyAttempts(prev => prev + 1);
-              }}
-            />
+            {vocabularyWordsToUse.length === 0 ? (
+              <Card className="border-2 border-yellow-300/50 bg-yellow-50/40 dark:bg-yellow-900/10 backdrop-blur-sm shadow-lg p-6 text-center">
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-3">
+                  📚 No Words Yet!
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Complete a story first to unlock vocabulary words from that story!
+                </p>
+                <Button
+                  onClick={() => setActiveCategory('stories')}
+                  className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white font-bold py-3 px-6 rounded-xl"
+                >
+                  Go to Stories →
+                </Button>
+              </Card>
+            ) : (
+              <div>
+                <Card className="border-2 border-blue-300/50 bg-blue-50/40 dark:bg-blue-900/10 backdrop-blur-sm shadow-lg p-4 mb-4">
+                  <div className="flex items-center gap-3">
+                    <BookOpen className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                    <div>
+                      <h3 className="font-bold text-gray-800 dark:text-white">
+                        Words from Your Stories
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                        {vocabularyWordsToUse.length} words from your enrolled stories
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+                <Vocabulary 
+                  words={vocabularyWordsToUse} 
+                  onWordPracticed={() => {
+                    // Track vocabulary attempts
+                    setVocabularyAttempts(prev => prev + 1);
+                  }}
+                />
+              </div>
+            )}
           </div>
         )}
         
         {activeCategory === 'pronunciation' && (
-          <div className="mb-8 sm:mb-10 md:mb-12 px-2 sm:px-0">
-            <Pronunciation 
-              items={pronounceItems}
-              onPhrasePracticed={() => {
-                // Track pronunciation attempts
-                setPronunciationAttempts(prev => prev + 1);
-              }}
-            />
+          <div className="mb-8 sm:mb-10 md:mb-12 px-2 sm:px-0 mx-auto w-full lg:max-w-7xl xl:max-w-[1400px]">
+            {enrolledPhrases.length === 0 ? (
+              <Card className="border-2 border-orange-300/50 bg-orange-50/40 dark:bg-orange-900/10 backdrop-blur-sm shadow-lg p-6 text-center">
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-3">
+                  🎤 No Phrases Yet!
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Complete a story first to unlock pronunciation phrases from that story!
+                </p>
+                <Button
+                  onClick={() => setActiveCategory('stories')}
+                  className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white font-bold py-3 px-6 rounded-xl"
+                >
+                  Go to Stories →
+                </Button>
+              </Card>
+            ) : (
+              <div>
+                <Card className="border-2 border-orange-300/50 bg-orange-50/40 dark:bg-orange-900/10 backdrop-blur-sm shadow-lg p-4 mb-4">
+                  <div className="flex items-center gap-3">
+                    <Mic className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+                    <div>
+                      <h3 className="font-bold text-gray-800 dark:text-white">
+                        Phrases from Your Stories
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                        {enrolledPhrases.length} phrases from your enrolled stories
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+                <Pronunciation 
+                  items={enrolledPhrases}
+                  onPhrasePracticed={() => {
+                    // Track pronunciation attempts
+                    setPronunciationAttempts(prev => prev + 1);
+                  }}
+                />
+              </div>
+            )}
           </div>
         )}
         
@@ -1162,21 +1598,43 @@ const KidsPage = () => {
             {achievements.map((achievement, index) => {
               const isComplete = achievement.progress === 100;
               return (
-                <div key={index} className="text-center group cursor-pointer transform hover:scale-110 transition-transform duration-300">
+                <div 
+                  key={index} 
+                  className={cn(
+                    "text-center group cursor-pointer transform hover:scale-110 transition-all duration-300 relative",
+                    hoveredElement === `achievement-${index}` && "scale-110"
+                  )}
+                  onMouseEnter={() => handleElementHover(`achievement-${index}`)}
+                  onMouseLeave={() => setHoveredElement(null)}
+                  onClick={() => {
+                    handleElementClick(`achievement-${index}`);
+                    setSelectedAchievement(selectedAchievement === index ? null : index);
+                    if (isComplete) {
+                      triggerCelebration();
+                    }
+                  }}
+                >
                   <div className="relative inline-block mb-2 sm:mb-3">
                     <div className={cn(
                       "w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-1 sm:mb-2 transition-all duration-300",
                       isComplete 
                         ? "bg-gradient-to-r from-yellow-400 to-orange-400 shadow-lg" 
-                        : "bg-white/80 dark:bg-gray-700 border-2 border-purple-200 dark:border-gray-600"
+                        : "bg-white/80 dark:bg-gray-700 border-2 border-purple-200 dark:border-gray-600",
+                      hoveredElement === `achievement-${index}` && "shadow-xl scale-110"
                     )}>
-                      <span className="text-xl sm:text-2xl">{achievement.emoji}</span>
+                      <span className={cn(
+                        "text-xl sm:text-2xl transition-all duration-300",
+                        hoveredElement === `achievement-${index}` && "animate-bounce"
+                      )}>{achievement.emoji}</span>
                       {isComplete && (
                         <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-white absolute -top-1 -right-1 animate-ping" />
                       )}
                     </div>
                   </div>
-                  <p className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white mb-1 sm:mb-2 px-1">{achievement.name}</p>
+                  <p className={cn(
+                    "text-xs sm:text-sm font-bold text-gray-900 dark:text-white mb-1 sm:mb-2 px-1 transition-all duration-300",
+                    hoveredElement === `achievement-${index}` && "text-blue-600 dark:text-blue-400"
+                  )}>{achievement.name}</p>
                   <p className="text-xs text-gray-600 dark:text-gray-500 mb-2 font-semibold">{achievement.description}</p>
                   <Progress value={achievement.progress} className="h-2 sm:h-3 bg-purple-200/60 dark:bg-gray-600 rounded-full mb-1 sm:mb-2">
                     <div 
@@ -1186,7 +1644,30 @@ const KidsPage = () => {
                       )}
                     />
                   </Progress>
-                  <span className="text-s font-bold text-teal-700">{achievement.progress.toFixed(0)}%</span>
+                  <span className={cn(
+                    "text-s font-bold text-teal-700 transition-all duration-300",
+                    hoveredElement === `achievement-${index}` && "text-blue-600 dark:text-blue-400"
+                  )}>{achievement.progress.toFixed(0)}%</span>
+                  
+                  {/* Achievement Details Popup */}
+                  {selectedAchievement === index && (
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-3 z-50 border-2 border-blue-200 dark:border-blue-600 min-w-[200px]">
+                      <h4 className="font-bold text-sm mb-2 text-blue-600 dark:text-blue-400">
+                        {achievement.name} {achievement.emoji}
+                      </h4>
+                      <p className="text-xs text-gray-600 dark:text-gray-300 mb-2">
+                        {achievement.description}
+                      </p>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        Progress: {achievement.progress.toFixed(0)}%
+                      </div>
+                      {isComplete && (
+                        <div className="text-xs text-green-600 dark:text-green-400 font-bold mt-1">
+                          🎉 Completed!
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               );
             })}

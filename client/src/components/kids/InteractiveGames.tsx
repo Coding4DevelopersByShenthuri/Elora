@@ -110,15 +110,15 @@ const GameMenu = ({
   ];
 
   return (
-    <div className="space-y-4 sm:space-y-6 max-w-6xl mx-auto">
+    <div className="space-y-4 sm:space-y-6 w-full lg:max-w-7xl xl:max-w-[1400px] mx-auto">
       {/* Story Enrollment Status */}
-      <Card className="border-2 border-blue-200 bg-blue-50 dark:bg-blue-900/20">
+      <Card className="border-2 border-blue-300/50 bg-blue-50/40 dark:bg-blue-900/10 backdrop-blur-sm shadow-lg">
         <CardContent className="py-4 sm:py-6 text-center px-3 sm:px-4">
-          <BookOpen className="w-10 h-10 sm:w-12 sm:h-12 text-blue-500 mx-auto mb-2 sm:mb-3" />
-          <div className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-500 mb-2">
+          <BookOpen className="w-10 h-10 sm:w-12 sm:h-12 text-blue-600 dark:text-blue-400 mx-auto mb-2 sm:mb-3" />
+          <div className="text-2xl sm:text-3xl font-bold text-blue-700 dark:text-blue-300 mb-2">
             {enrolledStories.length} Story{enrolledStories.length !== 1 ? 's' : ''} Completed
           </div>
-          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 font-semibold mb-2">
+          <p className="text-sm sm:text-base text-gray-700 dark:text-gray-200 font-semibold mb-2">
             {storyWords.length} words available for games
           </p>
           {enrolledStories.length === 0 && (
@@ -130,11 +130,11 @@ const GameMenu = ({
       </Card>
 
       {/* Score Display */}
-      <Card className="border-2 border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20">
+      <Card className="border-2 border-yellow-300/50 bg-yellow-50/40 dark:bg-yellow-900/10 backdrop-blur-sm shadow-lg">
         <CardContent className="py-4 sm:py-6 text-center px-3 sm:px-4">
-          <Trophy className="w-10 h-10 sm:w-12 sm:h-12 text-yellow-500 mx-auto mb-2 sm:mb-3" />
-          <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-yellow-600 dark:text-yellow-500 mb-2">{totalScore}</div>
-          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 font-semibold">Total Game Points</p>
+          <Trophy className="w-10 h-10 sm:w-12 sm:h-12 text-yellow-600 dark:text-yellow-400 mx-auto mb-2 sm:mb-3" />
+          <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-yellow-700 dark:text-yellow-300 mb-2">{totalScore}</div>
+          <p className="text-sm sm:text-base text-gray-700 dark:text-gray-200 font-semibold">Total Game Points</p>
         </CardContent>
       </Card>
 
