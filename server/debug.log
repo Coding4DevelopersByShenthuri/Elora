@@ -730,3 +730,10 @@ INFO 2025-10-27 01:47:45,151 autoreload 10388 15160 C:\Users\shent\OneDrive\Desk
 INFO 2025-10-27 01:47:45,694 autoreload 18196 10504 Watching for file changes with StatReloader
 INFO 2025-10-27 01:51:54,705 autoreload 18196 10504 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
 INFO 2025-10-27 01:51:55,414 autoreload 21128 11036 Watching for file changes with StatReloader
+INFO 2025-10-27 01:53:05,591 autoreload 21128 11036 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-27 01:53:06,737 autoreload 22316 19884 Watching for file changes with StatReloader
+INFO 2025-10-27 01:53:16,610 autoreload 22316 19884 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-27 01:53:17,180 autoreload 3156 21852 Watching for file changes with StatReloader
+INFO 2025-10-27 01:53:35,672 autoreload 3156 21852 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-27 01:53:36,402 autoreload 19320 1592 Watching for file changes with StatReloader
+INFO 2025-10-27 01:54:07,973 views 2372 18672 Verification email sent successfully to shenthurim123@gmail.com

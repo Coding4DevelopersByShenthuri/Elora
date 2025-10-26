@@ -4,7 +4,6 @@ from . import views
 urlpatterns = [
     # ============= Health Check =============
     path('health', views.health_check, name='health-check'),
-    path('test-email', views.test_email_send, name='test-email'),
     
     # ============= Authentication =============
     path('auth/register', views.register, name='register'),
