@@ -723,3 +723,10 @@ WARNING 2025-10-27 01:44:51,541 basehttp 22084 2020 "POST /api/auth/register HTT
 INFO 2025-10-27 01:45:22,723 basehttp 22084 20580 "OPTIONS /api/auth/login HTTP/1.1" 200 0
 WARNING 2025-10-27 01:45:23,005 log 22084 20580 Unauthorized: /api/auth/login
 WARNING 2025-10-27 01:45:23,008 basehttp 22084 20580 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-27 01:47:21,924 autoreload 22084 21108 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-27 01:47:23,310 autoreload 10388 15160 Watching for file changes with StatReloader
+INFO 2025-10-27 01:47:38,006 basehttp 10388 18064 "GET /api/test-email?email=shenthurimaran@gmail.com HTTP/1.1" 200 96
+INFO 2025-10-27 01:47:45,151 autoreload 10388 15160 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-27 01:47:45,694 autoreload 18196 10504 Watching for file changes with StatReloader
+INFO 2025-10-27 01:51:54,705 autoreload 18196 10504 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-27 01:51:55,414 autoreload 21128 11036 Watching for file changes with StatReloader
