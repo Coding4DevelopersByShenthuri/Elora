@@ -4,12 +4,14 @@ from . import views
 urlpatterns = [
     # ============= Health Check =============
     path('health', views.health_check, name='health-check'),
+    path('test-email', views.test_email_send, name='test-email'),
     
     # ============= Authentication =============
     path('auth/register', views.register, name='register'),
     path('auth/login', views.login, name='login'),
     path('auth/profile', views.user_profile, name='user-profile'),
     path('auth/user', views.user_info, name='user-info'),
+    path('verify-email/<str:token>/', views.verify_email, name='verify-email'),
     
     # ============= Lessons =============
     path('lessons/', views.lessons_list, name='lessons-list'),

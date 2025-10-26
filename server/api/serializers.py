@@ -40,6 +40,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     confirm_password = serializers.CharField(write_only=True, required=True)
     name = serializers.CharField(write_only=True, required=True)
+    username = serializers.CharField(required=False, allow_blank=True)  # Make username optional
 
     class Meta:
         model = User
@@ -50,12 +51,15 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"password": "Passwords do not match."})
         
         # Create username from email if not provided
-        if not attrs.get('username'):
+        if not attrs.get('username') or attrs.get('username') == '':
             attrs['username'] = attrs['email'].split('@')[0]
+    
         
-        # Check if email already exists
-        if User.objects.filter(email=attrs['email']).exists():
-            raise serializers.ValidationError({"email": "This email is already registered."})
+        # Check if username already exists
+        if User.objects.filter(username=attrs['username']).exists():
+            # Append a random number to make it unique
+            import random
+            attrs['username'] = f"{attrs['username']}{random.randint(1000, 9999)}"
         
         return attrs
 
@@ -69,11 +73,9 @@ class RegisterSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             password=validated_data['password'],
             first_name=name_parts[0],
-            last_name=name_parts[1] if len(name_parts) > 1 else ''
+            last_name=name_parts[1] if len(name_parts) > 1 else '',
+            is_active=False  # User needs to verify email before activation
         )
-        
-        # Create user profile
-        UserProfile.objects.create(user=user)
         
         return user
 

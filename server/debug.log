@@ -344,3 +344,382 @@ INFO 2025-10-25 17:44:22,492 autoreload 12420 3180 Watching for file changes wit
 INFO 2025-10-25 23:32:03,473 autoreload 11596 11760 Watching for file changes with StatReloader
 INFO 2025-10-26 11:57:56,824 autoreload 16452 17300 Watching for file changes with StatReloader
 INFO 2025-10-26 13:48:20,277 autoreload 944 5088 Watching for file changes with StatReloader
+INFO 2025-10-26 13:57:24,734 autoreload 944 5088 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-10-26 13:57:28,148 autoreload 1132 2884 Watching for file changes with StatReloader
+INFO 2025-10-26 13:57:35,175 autoreload 1132 2884 C:\Users\shent\OneDrive\Desktop\Elora\server\api\models.py changed, reloading.
+INFO 2025-10-26 13:57:38,653 autoreload 20200 884 Watching for file changes with StatReloader
+INFO 2025-10-26 13:58:08,077 autoreload 20200 884 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-26 13:58:11,541 autoreload 928 16948 Watching for file changes with StatReloader
+INFO 2025-10-26 13:58:15,854 autoreload 928 16948 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-26 13:58:19,517 autoreload 14996 18344 Watching for file changes with StatReloader
+INFO 2025-10-26 13:58:25,879 autoreload 14996 18344 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-26 13:58:29,065 autoreload 16812 3372 Watching for file changes with StatReloader
+INFO 2025-10-26 13:58:37,313 autoreload 16812 3372 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-26 13:58:40,394 autoreload 20720 16256 Watching for file changes with StatReloader
+INFO 2025-10-26 13:58:43,825 autoreload 20720 16256 C:\Users\shent\OneDrive\Desktop\Elora\server\api\urls.py changed, reloading.
+INFO 2025-10-26 13:58:46,725 autoreload 16660 13248 Watching for file changes with StatReloader
+INFO 2025-10-26 14:00:19,512 autoreload 16660 13248 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-26 14:00:22,885 autoreload 4000 1868 Watching for file changes with StatReloader
+INFO 2025-10-26 14:00:41,478 autoreload 4000 1868 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
+INFO 2025-10-26 14:00:43,606 autoreload 1844 19052 Watching for file changes with StatReloader
+INFO 2025-10-26 14:03:09,406 basehttp 1844 7328 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+WARNING 2025-10-26 14:03:09,549 log 1844 7328 Not Found: /api/auth/register
+WARNING 2025-10-26 14:03:09,558 basehttp 1844 7328 "POST /api/auth/register HTTP/1.1" 404 6549
+INFO 2025-10-26 14:03:13,929 basehttp 1844 7328 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-26 14:03:13,997 log 1844 7328 Not Found: /api/auth/login
+WARNING 2025-10-26 14:03:14,005 basehttp 1844 7328 "POST /api/auth/login HTTP/1.1" 404 6540
+INFO 2025-10-26 14:07:47,085 autoreload 1844 19052 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-10-26 14:07:50,714 autoreload 2652 19004 Watching for file changes with StatReloader
+INFO 2025-10-26 14:07:55,287 autoreload 2652 19004 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-26 14:07:58,225 autoreload 7256 10160 Watching for file changes with StatReloader
+INFO 2025-10-26 14:08:03,322 autoreload 7256 10160 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-26 14:08:06,333 autoreload 12356 14464 Watching for file changes with StatReloader
+INFO 2025-10-26 14:08:10,752 autoreload 12356 14464 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-10-26 14:08:13,782 autoreload 5168 16296 Watching for file changes with StatReloader
+INFO 2025-10-26 14:08:17,453 autoreload 5168 16296 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-10-26 14:08:20,326 autoreload 20384 19704 Watching for file changes with StatReloader
+INFO 2025-10-26 14:08:37,294 autoreload 20384 19704 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-10-26 14:08:39,969 autoreload 20664 7616 Watching for file changes with StatReloader
+INFO 2025-10-26 14:09:23,942 autoreload 20664 7616 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-10-26 14:09:26,658 autoreload 11012 3912 Watching for file changes with StatReloader
+INFO 2025-10-26 14:09:30,336 autoreload 11012 3912 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-10-26 14:09:33,248 autoreload 19468 11200 Watching for file changes with StatReloader
+INFO 2025-10-26 14:09:47,069 autoreload 19468 11200 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-26 14:09:50,051 autoreload 17852 19676 Watching for file changes with StatReloader
+INFO 2025-10-26 14:09:53,584 autoreload 17852 19676 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-10-26 14:09:56,453 autoreload 3796 13540 Watching for file changes with StatReloader
+INFO 2025-10-26 14:10:07,275 autoreload 3796 13540 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-26 14:10:09,335 autoreload 10068 8832 Watching for file changes with StatReloader
+INFO 2025-10-26 14:10:12,588 autoreload 10068 8832 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-10-26 14:10:15,392 autoreload 21356 6764 Watching for file changes with StatReloader
+INFO 2025-10-26 14:10:18,919 autoreload 21356 6764 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
+INFO 2025-10-26 14:10:21,198 autoreload 16004 20912 Watching for file changes with StatReloader
+INFO 2025-10-26 14:10:34,863 autoreload 16004 20912 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-26 14:10:37,082 autoreload 9388 9952 Watching for file changes with StatReloader
+WARNING 2025-10-26 14:10:43,086 log 9388 15752 Not Found: /api/auth/login
+WARNING 2025-10-26 14:10:43,088 basehttp 9388 15752 "POST /api/auth/login HTTP/1.1" 404 6540
+INFO 2025-10-26 14:12:52,831 basehttp 9388 10208 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+WARNING 2025-10-26 14:12:52,909 log 9388 10208 Not Found: /api/auth/register
+WARNING 2025-10-26 14:12:52,921 basehttp 9388 10208 "POST /api/auth/register HTTP/1.1" 404 6549
+INFO 2025-10-26 14:13:25,133 basehttp 9388 10208 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-26 14:13:25,177 log 9388 10208 Not Found: /api/auth/login
+WARNING 2025-10-26 14:13:25,182 basehttp 9388 10208 "POST /api/auth/login HTTP/1.1" 404 6540
+INFO 2025-10-26 14:18:03,399 autoreload 9388 9952 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-10-26 14:18:06,533 autoreload 8724 16788 Watching for file changes with StatReloader
+INFO 2025-10-26 14:18:13,700 autoreload 8724 16788 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-26 14:18:16,462 autoreload 19372 20996 Watching for file changes with StatReloader
+INFO 2025-10-26 14:18:19,844 autoreload 19372 20996 C:\Users\shent\OneDrive\Desktop\Elora\server\api\urls.py changed, reloading.
+INFO 2025-10-26 14:18:22,683 autoreload 12604 19936 Watching for file changes with StatReloader
+WARNING 2025-10-26 14:18:36,127 log 12604 9408 Not Found: /api/test-email
+WARNING 2025-10-26 14:18:36,129 basehttp 12604 9408 "GET /api/test-email HTTP/1.1" 404 6715
+INFO 2025-10-26 14:18:56,777 basehttp 12604 9408 "GET /test-email?email=shenthurim123@gmail.com HTTP/1.1" 200 95
+INFO 2025-10-26 14:19:34,016 autoreload 12604 19936 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-10-26 14:19:36,209 autoreload 11544 12972 Watching for file changes with StatReloader
+INFO 2025-10-26 14:20:25,361 autoreload 15112 9464 Watching for file changes with StatReloader
+INFO 2025-10-26 14:26:02,184 basehttp 15112 12276 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+WARNING 2025-10-26 14:26:02,348 log 15112 12276 Not Found: /api/auth/register
+WARNING 2025-10-26 14:26:02,351 basehttp 15112 12276 "POST /api/auth/register HTTP/1.1" 404 6725
+INFO 2025-10-26 14:26:06,289 basehttp 15112 12276 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-26 14:26:06,336 log 15112 12276 Not Found: /api/auth/login
+WARNING 2025-10-26 14:26:06,339 basehttp 15112 12276 "POST /api/auth/login HTTP/1.1" 404 6716
+INFO 2025-10-26 14:28:54,166 autoreload 15112 9464 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-10-26 14:28:57,054 autoreload 12840 1748 Watching for file changes with StatReloader
+INFO 2025-10-26 14:29:03,184 autoreload 12840 1748 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-26 14:29:05,993 autoreload 16520 7492 Watching for file changes with StatReloader
+INFO 2025-10-26 14:29:25,005 views 16520 14792 Verification email sent successfully to test123@gmail.com
+INFO 2025-10-26 14:29:25,128 basehttp 16520 14792 "POST /api/auth/register HTTP/1.1" 201 826
+INFO 2025-10-26 14:29:31,052 autoreload 16520 7492 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\urls.py changed, reloading.
+INFO 2025-10-26 14:29:33,930 autoreload 18288 5272 Watching for file changes with StatReloader
+INFO 2025-10-26 14:29:40,985 autoreload 18288 5272 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\urls.py changed, reloading.
+INFO 2025-10-26 14:29:43,152 autoreload 14320 17832 Watching for file changes with StatReloader
+INFO 2025-10-26 14:30:04,095 autoreload 15196 20928 Watching for file changes with StatReloader
+INFO 2025-10-26 14:30:53,921 basehttp 15196 5940 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+WARNING 2025-10-26 14:30:54,596 log 15196 5940 Bad Request: /api/auth/register
+WARNING 2025-10-26 14:30:54,631 basehttp 15196 5940 "POST /api/auth/register HTTP/1.1" 400 83
+INFO 2025-10-26 14:30:58,495 basehttp 15196 5940 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-26 14:30:59,344 log 15196 5940 Unauthorized: /api/auth/login
+WARNING 2025-10-26 14:30:59,347 basehttp 15196 5940 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-26 14:32:44,169 autoreload 14484 10032 Watching for file changes with StatReloader
+INFO 2025-10-26 14:34:07,899 basehttp 14484 12264 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+WARNING 2025-10-26 14:34:08,046 log 14484 12264 Bad Request: /api/auth/register
+WARNING 2025-10-26 14:34:08,049 basehttp 14484 12264 "POST /api/auth/register HTTP/1.1" 400 83
+INFO 2025-10-26 14:34:11,417 basehttp 14484 12264 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-26 14:34:12,583 log 14484 12264 Unauthorized: /api/auth/login
+WARNING 2025-10-26 14:34:12,587 basehttp 14484 12264 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-26 23:43:18,925 autoreload 19964 19076 Watching for file changes with StatReloader
+INFO 2025-10-26 23:44:42,309 basehttp 19964 16932 "OPTIONS /api/verify-email/test-token-123/ HTTP/1.1" 200 0
+WARNING 2025-10-26 23:44:42,489 log 19964 16932 Bad Request: /api/verify-email/test-token-123/
+WARNING 2025-10-26 23:44:42,493 basehttp 19964 16932 "GET /api/verify-email/test-token-123/ HTTP/1.1" 400 67
+WARNING 2025-10-26 23:45:06,207 log 19964 18472 Bad Request: /api/verify-email/test-token-123/
+WARNING 2025-10-26 23:45:06,210 basehttp 19964 18472 "GET /api/verify-email/test-token-123/ HTTP/1.1" 400 67
+INFO 2025-10-26 23:50:42,914 autoreload 19964 19076 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-10-26 23:50:45,838 autoreload 20248 18684 Watching for file changes with StatReloader
+INFO 2025-10-26 23:51:03,076 autoreload 20248 18684 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-10-26 23:51:03,826 autoreload 19264 19896 Watching for file changes with StatReloader
+INFO 2025-10-26 23:52:23,230 autoreload 19824 18944 Watching for file changes with StatReloader
+INFO 2025-10-26 23:53:09,281 basehttp 19824 16488 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+WARNING 2025-10-26 23:53:09,538 log 19824 16488 Bad Request: /api/auth/register
+WARNING 2025-10-26 23:53:09,560 basehttp 19824 16488 "POST /api/auth/register HTTP/1.1" 400 83
+INFO 2025-10-26 23:53:17,306 basehttp 19824 16488 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-26 23:53:17,671 log 19824 16488 Unauthorized: /api/auth/login
+WARNING 2025-10-26 23:53:17,672 basehttp 19824 16488 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-26 23:56:01,052 basehttp 19824 2820 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+WARNING 2025-10-26 23:56:01,105 log 19824 2820 Bad Request: /api/auth/register
+WARNING 2025-10-26 23:56:01,108 basehttp 19824 2820 "POST /api/auth/register HTTP/1.1" 400 83
+INFO 2025-10-26 23:56:04,839 basehttp 19824 2820 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-26 23:56:04,871 log 19824 2820 Unauthorized: /api/auth/login
+WARNING 2025-10-26 23:56:04,875 basehttp 19824 2820 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-26 23:58:28,715 autoreload 19824 18944 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-10-26 23:58:33,798 autoreload 19468 21132 Watching for file changes with StatReloader
+INFO 2025-10-26 23:59:50,738 basehttp 19468 20816 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+WARNING 2025-10-26 23:59:50,889 log 19468 20816 Bad Request: /api/auth/register
+WARNING 2025-10-26 23:59:50,897 basehttp 19468 20816 "POST /api/auth/register HTTP/1.1" 400 83
+INFO 2025-10-27 00:00:27,229 autoreload 19468 21132 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-27 00:00:36,442 autoreload 9768 21272 Watching for file changes with StatReloader
+INFO 2025-10-27 00:01:49,415 autoreload 9768 21272 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
+INFO 2025-10-27 00:01:53,879 autoreload 10980 5468 Watching for file changes with StatReloader
+INFO 2025-10-27 00:02:00,528 autoreload 10980 5468 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
+INFO 2025-10-27 00:02:02,461 autoreload 4860 18824 Watching for file changes with StatReloader
+INFO 2025-10-27 00:02:12,095 autoreload 4860 18824 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
+INFO 2025-10-27 00:02:14,944 autoreload 18588 19468 Watching for file changes with StatReloader
+INFO 2025-10-27 00:02:26,407 autoreload 18588 19468 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
+INFO 2025-10-27 00:02:28,805 autoreload 18488 4552 Watching for file changes with StatReloader
+INFO 2025-10-27 00:03:39,227 autoreload 18488 4552 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
+INFO 2025-10-27 00:03:43,587 autoreload 21260 12920 Watching for file changes with StatReloader
+INFO 2025-10-27 00:03:54,835 autoreload 21456 19784 Watching for file changes with StatReloader
+INFO 2025-10-27 00:04:35,482 basehttp 21456 6720 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+WARNING 2025-10-27 00:04:35,611 log 21456 6720 Bad Request: /api/auth/register
+WARNING 2025-10-27 00:04:35,616 basehttp 21456 6720 "POST /api/auth/register HTTP/1.1" 400 83
+INFO 2025-10-27 00:04:39,776 basehttp 21456 6720 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-27 00:04:40,217 log 21456 6720 Unauthorized: /api/auth/login
+WARNING 2025-10-27 00:04:40,222 basehttp 21456 6720 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-27 00:06:35,634 basehttp 21456 17204 "GET /api/test-email?email=shenthurim123@gmail.com HTTP/1.1" 200 95
+INFO 2025-10-27 00:07:56,874 basehttp 21456 17204 "GET /api/test-email?email=shenthurimaran@gmail.com HTTP/1.1" 200 96
+ERROR 2025-10-27 00:09:35,301 views 21456 21488 Registration error: JSON parse error - Expecting property name enclosed in double quotes: line 1 column 2 (char 1)
+ERROR 2025-10-27 00:09:35,302 log 21456 21488 Internal Server Error: /api/auth/register
+ERROR 2025-10-27 00:09:35,303 basehttp 21456 21488 "POST /api/auth/register HTTP/1.1" 500 156
+WARNING 2025-10-27 00:09:42,959 log 21456 18644 Bad Request: /api/auth/register
+WARNING 2025-10-27 00:09:42,962 basehttp 21456 18644 "POST /api/auth/register HTTP/1.1" 400 83
+INFO 2025-10-27 00:10:07,671 autoreload 21456 19784 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-27 00:10:08,631 autoreload 19920 17980 Watching for file changes with StatReloader
+INFO 2025-10-27 00:10:20,068 views 19920 19724 Registration request received. Data: {'email': 'testregistration123@gmail.com', 'name': 'Test Email User', 'password': 'TestPassword123!', 'confirm_password': 'TestPassword123!'}
+WARNING 2025-10-27 00:10:20,092 views 19920 19724 Registration validation failed: {'username': [ErrorDetail(string='This field is required.', code='required')]}
+WARNING 2025-10-27 00:10:20,094 log 19920 19724 Bad Request: /api/auth/register
+WARNING 2025-10-27 00:10:20,094 basehttp 19920 19724 "POST /api/auth/register HTTP/1.1" 400 83
+INFO 2025-10-27 00:10:28,959 autoreload 19920 17980 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
+INFO 2025-10-27 00:10:30,349 autoreload 8480 19644 Watching for file changes with StatReloader
+INFO 2025-10-27 00:10:42,267 views 8480 20400 Registration request received. Data: {'email': 'testregistration456@gmail.com', 'name': 'Test Email User', 'password': 'TestPassword123!', 'confirm_password': 'TestPassword123!'}
+INFO 2025-10-27 00:10:42,522 views 8480 20400 Created verification token for user testregistration456@gmail.com
+INFO 2025-10-27 00:10:46,750 views 8480 20400 Verification email sent successfully to testregistration456@gmail.com
+INFO 2025-10-27 00:10:46,802 basehttp 8480 20400 "POST /api/auth/register HTTP/1.1" 201 871
+INFO 2025-10-27 00:11:15,263 autoreload 8480 19644 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
+INFO 2025-10-27 00:11:16,108 autoreload 18928 5456 Watching for file changes with StatReloader
+INFO 2025-10-27 00:11:54,417 autoreload 10592 3876 Watching for file changes with StatReloader
+INFO 2025-10-27 00:13:36,713 basehttp 10592 19608 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+INFO 2025-10-27 00:13:36,743 views 10592 19608 Registration request received. Data: {'name': 'Shenthuri', 'email': 'shenthurim123@gmail.com', 'password': 'Shen@101112', 'confirm_password': 'Shen@101112'}
+WARNING 2025-10-27 00:13:36,901 views 10592 19608 Registration validation failed: {'email': [ErrorDetail(string='This email is already registered.', code='invalid')]}
+WARNING 2025-10-27 00:13:36,934 log 10592 19608 Bad Request: /api/auth/register
+WARNING 2025-10-27 00:13:36,940 basehttp 10592 19608 "POST /api/auth/register HTTP/1.1" 400 90
+INFO 2025-10-27 00:13:40,565 basehttp 10592 19608 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-27 00:13:40,913 log 10592 19608 Unauthorized: /api/auth/login
+WARNING 2025-10-27 00:13:40,918 basehttp 10592 19608 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-27 00:17:01,233 views 10592 4680 Registration request received. Data: {'email': 'finaltest123@gmail.com', 'name': 'Final Test User', 'password': 'TestPassword123!', 'confirm_password': 'TestPassword123!'}
+INFO 2025-10-27 00:17:01,909 views 10592 4680 Created verification token for user finaltest123@gmail.com
+INFO 2025-10-27 00:17:06,300 views 10592 4680 Verification email sent successfully to finaltest123@gmail.com
+INFO 2025-10-27 00:17:06,342 basehttp 10592 4680 "POST /api/auth/register HTTP/1.1" 201 857
+INFO 2025-10-27 00:18:25,900 basehttp 10592 7108 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+INFO 2025-10-27 00:18:25,907 views 10592 7108 Registration request received. Data: {'name': 'Shenthuri', 'email': 'shenthurim123@gmail.com', 'password': 'Shen@101112', 'confirm_password': 'Shen@101112'}
+WARNING 2025-10-27 00:18:25,932 views 10592 7108 Registration validation failed: {'email': [ErrorDetail(string='This email is already registered.', code='invalid')]}
+WARNING 2025-10-27 00:18:25,934 log 10592 7108 Bad Request: /api/auth/register
+WARNING 2025-10-27 00:18:25,936 basehttp 10592 7108 "POST /api/auth/register HTTP/1.1" 400 90
+INFO 2025-10-27 00:18:30,066 basehttp 10592 21184 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-27 00:18:30,856 log 10592 21184 Unauthorized: /api/auth/login
+WARNING 2025-10-27 00:18:30,860 basehttp 10592 21184 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-27 00:20:11,098 views 10592 17264 Registration request received. Data: {'email': 'newtest123@example.com', 'name': 'Test User New', 'password': 'TestPassword123!', 'confirm_password': 'TestPassword123!'}
+INFO 2025-10-27 00:20:11,296 views 10592 17264 Created verification token for user newtest123@example.com
+INFO 2025-10-27 00:20:15,140 views 10592 17264 Verification email sent successfully to newtest123@example.com
+INFO 2025-10-27 00:20:15,148 basehttp 10592 17264 "POST /api/auth/register HTTP/1.1" 201 853
+INFO 2025-10-27 00:22:08,641 basehttp 10592 17868 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+INFO 2025-10-27 00:22:08,650 views 10592 17868 Registration request received. Data: {'name': 'Shenthuri', 'email': 'shenthurim123@gmail.com', 'password': 'Shen@101112', 'confirm_password': 'Shen@101112'}
+WARNING 2025-10-27 00:22:08,670 views 10592 17868 Registration validation failed: {'email': [ErrorDetail(string='This email is already registered.', code='invalid')]}
+WARNING 2025-10-27 00:22:08,674 log 10592 17868 Bad Request: /api/auth/register
+WARNING 2025-10-27 00:22:08,678 basehttp 10592 17868 "POST /api/auth/register HTTP/1.1" 400 90
+INFO 2025-10-27 00:22:12,375 basehttp 10592 17868 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-27 00:22:13,042 log 10592 17868 Unauthorized: /api/auth/login
+WARNING 2025-10-27 00:22:13,045 basehttp 10592 17868 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-27 00:24:03,352 basehttp 10592 20512 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+INFO 2025-10-27 00:24:03,380 views 10592 20512 Registration request received. Data: {'name': 'Shenthuri Maran', 'email': 'shenthurimaran@gmail.com', 'password': 'Shen@101112', 'confirm_password': 'Shen@101112'}
+INFO 2025-10-27 00:24:03,995 views 10592 20512 Created verification token for user shenthurimaran@gmail.com
+INFO 2025-10-27 00:24:08,808 views 10592 20512 Verification email sent successfully to shenthurimaran@gmail.com
+INFO 2025-10-27 00:24:08,834 basehttp 10592 20512 - Broken pipe from ('127.0.0.1', 60363)
+INFO 2025-10-27 00:24:53,982 basehttp 10592 11772 "OPTIONS /api/verify-email/xiqGgQ_7UKEPcEjLHJ5XVNQVQyNO4Wp7o5zqyPeMiNE/ HTTP/1.1" 200 0
+INFO 2025-10-27 00:24:54,083 basehttp 10592 11772 "GET /api/verify-email/xiqGgQ_7UKEPcEjLHJ5XVNQVQyNO4Wp7o5zqyPeMiNE/ HTTP/1.1" 200 77
+INFO 2025-10-27 00:25:00,580 basehttp 10592 4596 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+INFO 2025-10-27 00:25:08,152 basehttp 10592 4596 - Broken pipe from ('127.0.0.1', 62244)
+WARNING 2025-10-27 00:26:51,441 log 10592 19508 Bad Request: /api/verify-email/xiqGgQ_7UKEPcEjLHJ5XVNQVQyNO4Wp7o5zqyPeMiNE/
+WARNING 2025-10-27 00:26:51,445 basehttp 10592 19508 "GET /api/verify-email/xiqGgQ_7UKEPcEjLHJ5XVNQVQyNO4Wp7o5zqyPeMiNE/ HTTP/1.1" 400 67
+INFO 2025-10-27 00:29:06,497 basehttp 10592 16980 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+INFO 2025-10-27 00:29:06,515 views 10592 16980 Registration request received. Data: {'name': 'Shenthuri Maran', 'email': 'shenthurimaran@gmail.com', 'password': 'Shen"101112', 'confirm_password': 'Shen"101112'}
+WARNING 2025-10-27 00:29:06,538 views 10592 16980 Registration validation failed: {'email': [ErrorDetail(string='This email is already registered.', code='invalid')]}
+WARNING 2025-10-27 00:29:06,546 log 10592 16980 Bad Request: /api/auth/register
+WARNING 2025-10-27 00:29:06,550 basehttp 10592 16980 "POST /api/auth/register HTTP/1.1" 400 90
+INFO 2025-10-27 00:30:16,041 basehttp 10592 19256 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-27 00:30:16,566 log 10592 19256 Unauthorized: /api/auth/login
+WARNING 2025-10-27 00:30:16,572 basehttp 10592 19256 "POST /api/auth/login HTTP/1.1" 401 39
+WARNING 2025-10-27 00:30:20,420 log 10592 5456 Unauthorized: /api/auth/login
+WARNING 2025-10-27 00:30:20,423 basehttp 10592 5456 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-27 00:30:59,768 basehttp 10592 14364 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-27 00:31:00,115 log 10592 14364 Unauthorized: /api/auth/login
+WARNING 2025-10-27 00:31:00,119 basehttp 10592 14364 "POST /api/auth/login HTTP/1.1" 401 39
+WARNING 2025-10-27 00:31:02,644 log 10592 14364 Unauthorized: /api/auth/login
+WARNING 2025-10-27 00:31:02,646 basehttp 10592 14364 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-27 00:31:19,589 autoreload 10592 3876 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-27 00:31:21,121 autoreload 3304 10176 Watching for file changes with StatReloader
+INFO 2025-10-27 00:33:26,178 basehttp 3304 19744 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+INFO 2025-10-27 00:33:26,216 views 3304 19744 Registration request received. Data: {'name': 'Shen', 'email': 'shen21476@gmail.com', 'password': 'Shen"101112', 'confirm_password': 'Shen"101112'}
+INFO 2025-10-27 00:33:27,147 views 3304 19744 Created verification token for user shen21476@gmail.com
+INFO 2025-10-27 00:33:31,262 views 3304 19744 Verification email sent successfully to shen21476@gmail.com
+INFO 2025-10-27 00:33:31,323 basehttp 3304 19744 - Broken pipe from ('127.0.0.1', 63295)
+INFO 2025-10-27 00:33:57,744 basehttp 3304 20768 "OPTIONS /api/verify-email/9R5ebuE78Glp1-UcC0SxCTzsUQ2P3NtVndBJctHyQ0M/ HTTP/1.1" 200 0
+INFO 2025-10-27 00:33:57,785 basehttp 3304 20768 "GET /api/verify-email/9R5ebuE78Glp1-UcC0SxCTzsUQ2P3NtVndBJctHyQ0M/ HTTP/1.1" 200 77
+INFO 2025-10-27 00:35:33,571 basehttp 3304 6264 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+INFO 2025-10-27 00:35:34,414 basehttp 3304 6264 "POST /api/auth/login HTTP/1.1" 200 1059
+INFO 2025-10-27 00:37:14,289 autoreload 3304 10176 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-27 00:37:15,078 autoreload 2384 13276 Watching for file changes with StatReloader
+INFO 2025-10-27 00:37:30,038 autoreload 2384 13276 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-27 00:37:30,679 autoreload 15164 19324 Watching for file changes with StatReloader
+INFO 2025-10-27 00:37:38,673 autoreload 15164 19324 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-10-27 00:38:46,367 autoreload 1948 15592 Watching for file changes with StatReloader
+INFO 2025-10-27 00:38:58,233 autoreload 1948 15592 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-10-27 00:38:59,479 autoreload 20080 8344 Watching for file changes with StatReloader
+INFO 2025-10-27 00:39:03,052 autoreload 20080 8344 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-27 00:39:03,715 autoreload 21104 18620 Watching for file changes with StatReloader
+INFO 2025-10-27 00:39:06,246 autoreload 21104 18620 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-10-27 00:39:06,896 autoreload 20736 18240 Watching for file changes with StatReloader
+INFO 2025-10-27 00:39:16,233 autoreload 14992 21336 Watching for file changes with StatReloader
+INFO 2025-10-27 00:42:46,083 basehttp 14992 8644 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+INFO 2025-10-27 00:42:46,094 views 14992 8644 Registration request received for email: shenthum21@gmail.com
+INFO 2025-10-27 00:42:46,747 views 14992 8644 Created verification token for user shenthum21@gmail.com
+INFO 2025-10-27 00:42:51,878 views 14992 8644 Verification email sent successfully to shenthum21@gmail.com
+INFO 2025-10-27 00:42:51,928 basehttp 14992 8644 - Broken pipe from ('127.0.0.1', 52320)
+INFO 2025-10-27 00:42:56,414 basehttp 14992 21240 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-27 00:42:56,904 log 14992 21240 Unauthorized: /api/auth/login
+WARNING 2025-10-27 00:42:56,906 basehttp 14992 21240 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-27 00:44:14,878 basehttp 14992 21240 "OPTIONS /api/verify-email/1TJl-tLuN8BHFnE_AUbfKXIzY7gphdh8YErfCxH_Icc/ HTTP/1.1" 200 0
+INFO 2025-10-27 00:44:14,900 views 14992 21240 Email verification successful for user shenthum21@gmail.com
+INFO 2025-10-27 00:44:14,902 basehttp 14992 21240 "GET /api/verify-email/1TJl-tLuN8BHFnE_AUbfKXIzY7gphdh8YErfCxH_Icc/ HTTP/1.1" 200 77
+INFO 2025-10-27 00:55:12,835 autoreload 14564 2032 Watching for file changes with StatReloader
+INFO 2025-10-27 01:00:13,349 autoreload 14564 2032 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-27 01:00:33,134 autoreload 15076 10736 Watching for file changes with StatReloader
+INFO 2025-10-27 01:00:58,914 autoreload 15076 10736 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-27 01:00:59,974 autoreload 19856 20276 Watching for file changes with StatReloader
+INFO 2025-10-27 01:01:13,322 autoreload 19856 20276 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-27 01:01:13,966 autoreload 19508 20780 Watching for file changes with StatReloader
+INFO 2025-10-27 01:02:26,207 autoreload 20168 2744 Watching for file changes with StatReloader
+INFO 2025-10-27 01:03:33,740 basehttp 20168 20772 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+INFO 2025-10-27 01:03:34,028 views 20168 20772 Registration request received for email: shenthurimaran292@gmail.com
+WARNING 2025-10-27 01:03:34,153 views 20168 20772 Registration validation failed: {'email': [ErrorDetail(string='This email is already registered.', code='invalid')]}
+WARNING 2025-10-27 01:03:34,183 log 20168 20772 Bad Request: /api/auth/register
+WARNING 2025-10-27 01:03:34,190 basehttp 20168 20772 "POST /api/auth/register HTTP/1.1" 400 90
+INFO 2025-10-27 01:07:40,631 basehttp 20168 21128 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-27 01:07:40,948 log 20168 21128 Unauthorized: /api/auth/login
+WARNING 2025-10-27 01:07:40,951 basehttp 20168 21128 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-27 01:09:51,524 autoreload 20168 2744 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-27 01:09:53,511 autoreload 11132 20196 Watching for file changes with StatReloader
+INFO 2025-10-27 01:09:57,927 autoreload 11132 20196 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-27 01:09:58,717 autoreload 1188 10604 Watching for file changes with StatReloader
+INFO 2025-10-27 01:10:37,508 autoreload 1188 10604 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-27 01:10:39,012 autoreload 15080 11820 Watching for file changes with StatReloader
+INFO 2025-10-27 01:12:21,170 basehttp 15080 10184 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+INFO 2025-10-27 01:12:21,200 views 15080 10184 Registration request received for email: shenthurimaran09@gmail.com
+INFO 2025-10-27 01:12:21,727 views 15080 10184 Created verification token for user shenthurimaran09@gmail.com
+INFO 2025-10-27 01:12:25,789 views 15080 10184 Verification email sent successfully to shenthurimaran09@gmail.com
+INFO 2025-10-27 01:12:26,056 basehttp 15080 10184 - Broken pipe from ('127.0.0.1', 62223)
+INFO 2025-10-27 01:13:22,602 basehttp 15080 21464 "OPTIONS /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/ HTTP/1.1" 200 0
+INFO 2025-10-27 01:13:22,659 views 15080 21464 Email verification successful for user shenthurimaran09@gmail.com
+INFO 2025-10-27 01:13:22,667 basehttp 15080 21464 "GET /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/ HTTP/1.1" 200 77
+INFO 2025-10-27 01:13:45,078 basehttp 15080 21464 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-27 01:13:45,437 log 15080 21464 Unauthorized: /api/auth/login
+WARNING 2025-10-27 01:13:45,439 basehttp 15080 21464 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-27 01:14:06,466 basehttp 15080 5400 "POST /api/auth/login HTTP/1.1" 200 1079
+WARNING 2025-10-27 01:22:28,083 log 15080 16540 Bad Request: /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/
+WARNING 2025-10-27 01:22:28,085 basehttp 15080 16540 "GET /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/ HTTP/1.1" 400 67
+WARNING 2025-10-27 01:22:37,416 log 15080 16540 Bad Request: /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/
+WARNING 2025-10-27 01:22:37,419 basehttp 15080 16540 "GET /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/ HTTP/1.1" 400 67
+WARNING 2025-10-27 01:22:42,905 log 15080 16540 Bad Request: /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/
+WARNING 2025-10-27 01:22:42,910 basehttp 15080 16540 "GET /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/ HTTP/1.1" 400 67
+WARNING 2025-10-27 01:22:46,925 log 15080 16540 Bad Request: /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/
+WARNING 2025-10-27 01:22:46,928 basehttp 15080 16540 "GET /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/ HTTP/1.1" 400 67
+WARNING 2025-10-27 01:23:54,361 log 15080 16540 Bad Request: /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/
+WARNING 2025-10-27 01:23:54,362 basehttp 15080 16540 "GET /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/ HTTP/1.1" 400 67
+WARNING 2025-10-27 01:24:08,585 log 15080 16540 Bad Request: /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/
+WARNING 2025-10-27 01:24:08,587 basehttp 15080 16540 "GET /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/ HTTP/1.1" 400 67
+WARNING 2025-10-27 01:24:13,752 log 15080 16540 Bad Request: /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/
+WARNING 2025-10-27 01:24:13,764 basehttp 15080 16540 "GET /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/ HTTP/1.1" 400 67
+WARNING 2025-10-27 01:24:48,562 log 15080 16540 Bad Request: /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/
+WARNING 2025-10-27 01:24:48,566 basehttp 15080 16540 "GET /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/ HTTP/1.1" 400 67
+WARNING 2025-10-27 01:24:54,818 log 15080 16540 Bad Request: /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/
+WARNING 2025-10-27 01:24:54,826 basehttp 15080 16540 "GET /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/ HTTP/1.1" 400 67
+WARNING 2025-10-27 01:25:05,850 log 15080 16540 Bad Request: /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/
+WARNING 2025-10-27 01:25:05,854 basehttp 15080 16540 "GET /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/ HTTP/1.1" 400 67
+WARNING 2025-10-27 01:25:09,253 log 15080 16540 Bad Request: /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/
+WARNING 2025-10-27 01:25:09,254 basehttp 15080 16540 "GET /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/ HTTP/1.1" 400 67
+WARNING 2025-10-27 01:25:21,257 log 15080 16540 Bad Request: /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/
+WARNING 2025-10-27 01:25:21,259 basehttp 15080 16540 "GET /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/ HTTP/1.1" 400 67
+WARNING 2025-10-27 01:25:29,422 log 15080 16540 Bad Request: /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/
+WARNING 2025-10-27 01:25:29,422 basehttp 15080 16540 "GET /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/ HTTP/1.1" 400 67
+WARNING 2025-10-27 01:25:33,400 log 15080 16540 Bad Request: /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/
+WARNING 2025-10-27 01:25:33,402 basehttp 15080 16540 "GET /api/verify-email/R-VMLSiIk5QFj430tKc_NIZqZNhyzY3FSwMtnuEEm7Y/ HTTP/1.1" 400 67
+INFO 2025-10-27 01:27:02,204 basehttp 15080 20260 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+INFO 2025-10-27 01:27:02,227 views 15080 20260 Registration request received for email: shenthurim123@gmail.com
+WARNING 2025-10-27 01:27:02,320 views 15080 20260 Registration validation failed: {'email': [ErrorDetail(string='This email is already registered.', code='invalid')]}
+WARNING 2025-10-27 01:27:02,327 log 15080 20260 Bad Request: /api/auth/register
+WARNING 2025-10-27 01:27:02,338 basehttp 15080 20260 "POST /api/auth/register HTTP/1.1" 400 90
+INFO 2025-10-27 01:27:57,386 basehttp 15080 8568 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-27 01:27:57,807 log 15080 8568 Unauthorized: /api/auth/login
+WARNING 2025-10-27 01:27:57,809 basehttp 15080 8568 "POST /api/auth/login HTTP/1.1" 401 39
+WARNING 2025-10-27 01:28:10,363 log 15080 20092 Unauthorized: /api/auth/login
+WARNING 2025-10-27 01:28:10,367 basehttp 15080 20092 "POST /api/auth/login HTTP/1.1" 401 39
+WARNING 2025-10-27 01:28:35,271 log 15080 20448 Unauthorized: /api/auth/login
+WARNING 2025-10-27 01:28:35,274 basehttp 15080 20448 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-27 01:32:37,760 basehttp 15080 10028 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+INFO 2025-10-27 01:32:37,775 views 15080 10028 Registration request received for email: shenthurimaran2001@gmail.com
+WARNING 2025-10-27 01:32:37,821 views 15080 10028 Registration validation failed: {'email': [ErrorDetail(string='This email is already registered.', code='invalid')]}
+WARNING 2025-10-27 01:32:37,826 log 15080 10028 Bad Request: /api/auth/register
+WARNING 2025-10-27 01:32:37,830 basehttp 15080 10028 "POST /api/auth/register HTTP/1.1" 400 90
+INFO 2025-10-27 01:34:13,558 views 15080 10028 Registration request received for email: shenthurimaran2001@gmail.com
+WARNING 2025-10-27 01:34:13,576 views 15080 10028 Registration validation failed: {'email': [ErrorDetail(string='This email is already registered.', code='invalid')]}
+WARNING 2025-10-27 01:34:13,582 log 15080 10028 Bad Request: /api/auth/register
+WARNING 2025-10-27 01:34:13,588 basehttp 15080 10028 "POST /api/auth/register HTTP/1.1" 400 90
+INFO 2025-10-27 01:37:30,820 autoreload 15080 11820 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-27 01:37:32,638 autoreload 19304 16500 Watching for file changes with StatReloader
+INFO 2025-10-27 01:37:49,746 autoreload 19304 16500 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-27 01:37:50,959 autoreload 5640 10092 Watching for file changes with StatReloader
+INFO 2025-10-27 01:37:53,107 autoreload 5640 10092 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-27 01:37:54,361 autoreload 12696 1488 Watching for file changes with StatReloader
+INFO 2025-10-27 01:38:05,079 autoreload 12696 1488 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
+INFO 2025-10-27 01:38:05,778 autoreload 4584 14556 Watching for file changes with StatReloader
+INFO 2025-10-27 01:38:10,987 autoreload 4584 14556 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-27 01:38:11,756 autoreload 18888 20048 Watching for file changes with StatReloader
+INFO 2025-10-27 01:38:15,465 autoreload 18888 20048 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
+INFO 2025-10-27 01:38:16,125 autoreload 10660 20088 Watching for file changes with StatReloader
+INFO 2025-10-27 01:38:27,015 autoreload 16616 15920 Watching for file changes with StatReloader
+INFO 2025-10-27 01:38:35,973 autoreload 16616 15920 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
+INFO 2025-10-27 01:38:36,739 autoreload 19848 17556 Watching for file changes with StatReloader
+INFO 2025-10-27 01:39:44,160 basehttp 19848 22292 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+INFO 2025-10-27 01:39:44,206 views 19848 22292 Registration request received for email: shenthurim123@gmail.com
+WARNING 2025-10-27 01:39:44,228 views 19848 22292 Registration attempt with already active email: shenthurim123@gmail.com
+WARNING 2025-10-27 01:39:44,243 log 19848 22292 Bad Request: /api/auth/register
+WARNING 2025-10-27 01:39:44,249 basehttp 19848 22292 "POST /api/auth/register HTTP/1.1" 400 122
+INFO 2025-10-27 01:40:31,849 basehttp 19848 22300 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-27 01:40:32,283 log 19848 22300 Unauthorized: /api/auth/login
+WARNING 2025-10-27 01:40:32,287 basehttp 19848 22300 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-27 01:44:03,969 autoreload 22084 21108 Watching for file changes with StatReloader
+INFO 2025-10-27 01:44:51,455 basehttp 22084 2020 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+INFO 2025-10-27 01:44:51,498 views 22084 2020 Registration request received for email: shenthurim123@gmail.com
+WARNING 2025-10-27 01:44:51,524 views 22084 2020 Registration attempt with already active email: shenthurim123@gmail.com
+WARNING 2025-10-27 01:44:51,539 log 22084 2020 Bad Request: /api/auth/register
+WARNING 2025-10-27 01:44:51,541 basehttp 22084 2020 "POST /api/auth/register HTTP/1.1" 400 122
+INFO 2025-10-27 01:45:22,723 basehttp 22084 20580 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-27 01:45:23,005 log 22084 20580 Unauthorized: /api/auth/login
+WARNING 2025-10-27 01:45:23,008 basehttp 22084 20580 "POST /api/auth/login HTTP/1.1" 401 39

@@ -1,6 +1,47 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.conf import settings
+import secrets
+from datetime import timedelta
+from django.utils import timezone
+
+
+# ============= Email Verification =============
+class EmailVerificationToken(models.Model):
+    """Store email verification tokens"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='email_verification_tokens')
+    token = models.CharField(max_length=100, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"Verification token for {self.user.email}"
+    
+    def is_valid(self):
+        """Check if token is still valid (24 hours)"""
+        if self.is_used:
+            return False
+        expiry = timezone.now() - timedelta(hours=24)
+        return self.created_at > expiry
+    
+    @staticmethod
+    def generate_token(user):
+        """Generate a new verification token for user"""
+        token = secrets.token_urlsafe(32)
+        while EmailVerificationToken.objects.filter(token=token, is_used=False).exists():
+            token = secrets.token_urlsafe(32)
+        
+        # Invalidate old tokens
+        EmailVerificationToken.objects.filter(user=user, is_used=False).update(is_used=True)
+        
+        return EmailVerificationToken.objects.create(
+            user=user,
+            token=token
+        )
 
 
 # ============= User Profile & Survey Data =============

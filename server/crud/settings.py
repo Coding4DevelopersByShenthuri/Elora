@@ -1,5 +1,6 @@
 from pathlib import Path
 from datetime import timedelta
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -176,6 +177,9 @@ CORS_ALLOWED_ORIGINS = [
 
 CORS_ALLOW_CREDENTIALS = True
 
+# Frontend URL for email verification links
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
+
 CORS_ALLOW_METHODS = [
     'DELETE',
     'GET',
@@ -201,6 +205,19 @@ CORS_ALLOW_HEADERS = [
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+# Email Configuration
+# For development: Use console backend to see emails in console
+# For production: Use SMTP backend
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Development - Emails print to console
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # Production - Sends real emails
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'elora.toinfo@gmail.com'
+EMAIL_HOST_PASSWORD = 'ekfw ckmu luuv ebdl'  # Gmail app password with spaces  
+DEFAULT_FROM_EMAIL = 'elora.toinfo@gmail.com'
 
 # Logging configuration
 LOGGING = {

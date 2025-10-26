@@ -5,8 +5,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
 } from '@/components/ui/dialog';
-import { Loader2, Mail, Lock, User, Eye, EyeOff, Home, AlertCircle, ArrowLeft, FileText, Check } from 'lucide-react';
+import { Loader2, Mail, Lock, User, Eye, EyeOff, Home, AlertCircle, ArrowLeft, FileText, Check, MailCheck } from 'lucide-react';
 import { TERMS_AND_CONDITIONS, SECURITY_QUESTIONS } from '../../data/terms-and-conditions';
 import { userDataService } from '@/services/UserDataService';
 import '../../styles/AuthModal.css';
@@ -389,7 +390,7 @@ const authService = {
 };
 
 const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = false, onAuthSuccess }: AuthModalProps) => {
-  const { login } = useAuth();
+  const { login, registerWithServer, loginWithServer } = useAuth();
   const [authMode, setAuthMode] = useState<AuthMode>(initialMode);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -427,11 +428,26 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
   // New state for kids page redirect handling
   const [isCheckingUser, setIsCheckingUser] = useState(false);
 
+  // Track newly registered users for activation message
+  const [newlyRegisteredEmail, setNewlyRegisteredEmail] = useState<string | null>(null);
+  const [showActivationMessage, setShowActivationMessage] = useState(false);
+
   // Add this useEffect to handle auth mode changes specifically for forgot password
   useEffect(() => {
     if (isOpen) {
+      // Check if there's a stored mode from the custom event
+      const storedMode = sessionStorage.getItem('speakbee_auth_mode');
+      const modeToUse = storedMode && (storedMode === 'login' || storedMode === 'register') 
+        ? storedMode as AuthMode 
+        : authMode;
+      
+      if (storedMode && (storedMode === 'login' || storedMode === 'register')) {
+        setAuthMode(storedMode as AuthMode);
+        sessionStorage.removeItem('speakbee_auth_mode'); // Clear it after use
+      }
+      
       // Update panel state based on current auth mode
-      if (authMode === 'register' || authMode === 'forgot-password') {
+      if (modeToUse === 'register' || modeToUse === 'forgot-password') {
         setIsRightPanelActive(true);
       } else {
         setIsRightPanelActive(false);
@@ -441,7 +457,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
       setSuccess('');
 
       // Auto-fill credentials when switching to login after registration
-      if (authMode === 'login' && autoFillCredentials) {
+      if (modeToUse === 'login' && autoFillCredentials) {
         setFormData(prev => ({
           ...prev,
           email: autoFillCredentials.email,
@@ -689,6 +705,47 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
 
     try {
       if (authMode === 'login') {
+        // Try server login first, fallback to offline if it fails
+        try {
+          const serverResult = await loginWithServer(formData.email, formData.password);
+          if (serverResult.success) {
+            setSuccess('Login successful!');
+            setTimeout(() => {
+              if (redirectFromKids && onAuthSuccess) {
+                onAuthSuccess();
+              } else {
+                onClose();
+              }
+              resetForm();
+            }, 1000);
+            return;
+          } else {
+            // Check if it's a verification error
+            if (serverResult.message && serverResult.message.includes('verify your email')) {
+              setError('Activate your account first. Please check your email inbox and click the verification link to activate your account.');
+              return;
+            }
+            setError(serverResult.message || 'Login failed');
+            return;
+          }
+        } catch (serverError) {
+          console.log('Server login failed, trying offline mode');
+        }
+
+        // For offline login, check if the user is newly registered and not yet activated
+        if (newlyRegisteredEmail && newlyRegisteredEmail.toLowerCase() === formData.email.toLowerCase()) {
+          // Check if this is a valid newly registered user trying to login without activation
+          const users: User[] = JSON.parse(localStorage.getItem("speakbee_users") || "[]");
+          const user = users.find(u => u.email.toLowerCase() === formData.email.toLowerCase());
+          
+          if (user && authService.verifyPassword(formData.password, user.password)) {
+            setError('Activate your account first. Please check your email inbox and click the verification link to activate your account.');
+            setShowActivationMessage(true);
+            return;
+          }
+        }
+
+        // Fallback to offline login
         const { token, user: userData } = await authService.login(formData.email, formData.password);
 
         localStorage.setItem('speakbee_auth_token', token);
@@ -707,7 +764,46 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
           resetForm();
         }, 1000);
       } else {
-        const { token, user: userData } = await authService.register(
+        // Try server registration first
+        try {
+          const serverResult = await registerWithServer({
+            name: formData.name.trim(),
+            email: formData.email,
+            password: formData.password,
+            confirm_password: formData.confirmPassword
+          });
+
+          if (serverResult.success) {
+            // Track newly registered email
+            setNewlyRegisteredEmail(formData.email);
+            setShowActivationMessage(true);
+            
+            // Use the server's message which includes professional instructions
+            const successMsg = serverResult.message || 'Registration successful! Please check your email to verify your account.';
+            setSuccess(successMsg);
+            
+            // Switch to login mode immediately to show the activation message
+            setAuthMode('login');
+            setIsRightPanelActive(false);
+            setAutoFillCredentials({
+              email: formData.email,
+              password: formData.password
+            });
+            
+            // Clear the success message after 8 seconds
+            setTimeout(() => {
+              setSuccess('');
+            }, 8000);
+            return;
+          }
+        } catch (serverError) {
+          console.log('Server registration failed, trying offline mode');
+        }
+
+        // Fallback to offline registration
+        // IMPORTANT: For offline mode, do NOT store authentication until account is verified
+        // This prevents auto-login before email activation
+        await authService.register(
           formData.name.trim(),
           formData.email,
           formData.password,
@@ -715,8 +811,8 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
           formData.securityAnswer
         );
 
-        localStorage.setItem('speakbee_auth_token', token);
-        localStorage.setItem('speakbee_current_user', JSON.stringify(userData));
+        // DO NOT store token or user data for offline users - they must verify first
+        // No authentication credentials are stored until email verification is complete
 
         // Store credentials for auto-fill and switch to login
         setAutoFillCredentials({
@@ -724,15 +820,17 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
           password: formData.password
         });
 
-        setSuccess('Registration successful! Redirecting to login...');
+        // Track newly registered email for activation message
+        setNewlyRegisteredEmail(formData.email);
+        setShowActivationMessage(true);
+
+        setSuccess('Registration successful! Please check your email to verify your account. You will not be able to login until you verify your email.');
 
         // Switch to login mode after a short delay
         setTimeout(() => {
           setAuthMode('login');
           setIsRightPanelActive(false);
         }, 1500);
-
-        // Don't close the modal yet, let user login immediately
       }
     } catch (error) {
       console.error('Authentication error:', error);
@@ -758,6 +856,8 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
     setIsRightPanelActive(false);
     setAcceptedTerms(false);
     setAutoFillCredentials(null);
+    setNewlyRegisteredEmail(null);
+    setShowActivationMessage(false);
     resetForgotPasswordFlow();
   };
 
@@ -963,7 +1063,10 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
         resetForm();
       }
     }}>
-      <DialogContent className="sm:max-w-4xl p-0 overflow-hidden border-0 bg-transparent flex items-center justify-center min-h-screen max-h-screen">
+      <DialogContent className="sm:max-w-4xl p-0 overflow-hidden border-0 bg-transparent flex items-center justify-center min-h-screen max-h-screen" aria-describedby="auth-description">
+        <DialogDescription id="auth-description" className="sr-only">
+          Elora authentication dialog for login and registration
+        </DialogDescription>
         {/* Home Button */}
         <div className="auth-page-home-button">
           <button className="auth-home-button" onClick={onClose}>
@@ -1184,6 +1287,40 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
                   <p className="text-[#4BB6B7] text-sm md:text-base">Welcome back to your English learning journey</p>
                 </div>
 
+                {/* Activation Message Popup */}
+                {showActivationMessage && (
+                  <div className="mb-3 p-3 bg-gradient-to-r from-blue-50 to-teal-50 dark:from-blue-900/30 dark:to-teal-900/30 border-2 border-teal-500 rounded-lg shadow-md">
+                    <div className="flex items-start gap-2">
+                      <div className="flex-shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-teal-500 flex items-center justify-center">
+                          <MailCheck className="w-4 h-4 text-white" />
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                            Check your email
+                          </h3>
+                          <div className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse"></div>
+                        </div>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">
+                          We sent an activation link to <strong className="text-teal-600 dark:text-teal-400 font-normal">{newlyRegisteredEmail}</strong>
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowActivationMessage(false)}
+                        className="flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                        aria-label="Close message"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {/* Error Message */}
                 {error && (
                   <div className="mb-3 md:mb-4 p-2 md:p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center text-sm">
@@ -1194,8 +1331,9 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
 
                 {/* Success Message */}
                 {success && (
-                  <div className="mb-3 md:mb-4 p-2 md:p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg flex items-center text-sm">
-                    <span className="text-xs md:text-sm">{success}</span>
+                  <div className="mb-3 md:mb-4 p-3 md:p-4 bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 text-green-800 dark:text-green-200 rounded-lg flex items-start gap-2">
+                    <Check className="w-5 h-5 mt-0.5 flex-shrink-0 text-green-500 dark:text-green-400" />
+                    <span className="text-xs md:text-sm leading-relaxed">{success}</span>
                   </div>
                 )}
 
@@ -1330,8 +1468,9 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
 
                 {/* Success Message */}
                 {success && (
-                  <div className="mb-3 md:mb-4 p-2 md:p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg flex items-center">
-                    <span className="text-xs md:text-sm">{success}</span>
+                  <div className="mb-3 md:mb-4 p-3 md:p-4 bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 text-green-800 dark:text-green-200 rounded-lg flex items-start gap-2">
+                    <Check className="w-5 h-5 mt-0.5 flex-shrink-0 text-green-500 dark:text-green-400" />
+                    <span className="text-xs md:text-sm leading-relaxed">{success}</span>
                   </div>
                 )}
 

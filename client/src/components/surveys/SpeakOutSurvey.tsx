@@ -43,7 +43,7 @@ const SpeakOutSurvey: React.FC<SpeakOutSurveyProps> = ({
 
                 <h1 className="text-3xl sm:text-4xl font-bold text-blue-900 mb-4 leading-snug">
                   Speak out loud to learn English.<br />
-                  With <span className="text-teal-600">Elora</span>,<br />
+                  With <span className="text-teal-500">Elora</span>,<br />
                   it’s simple and fun.
                 </h1>
               </div>
@@ -83,7 +83,7 @@ const SpeakOutSurvey: React.FC<SpeakOutSurveyProps> = ({
                 <SurveyProgress currentStep={currentStep} totalSteps={totalSteps} onBack={onBack} variant="desktop" />
 
                 <h1 className="text-2xl md:text-[40px] leading-snug md:leading-[1.2] font-bold text-blue-900 mb-10 md:mb-24 text-center">
-                  Speak out loud to learn English. With <span className="text-yellow-600">Elora</span>, it's simple and fun.
+                  Speak out loud to learn English. With <span className="text-teal-500">Elora</span>, it's simple and fun.
                 </h1>
 
                 <div className="flex justify-center">

@@ -134,27 +134,38 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const response = await API.auth.register(data);
       
-      if (response.success && 'data' in response && response.data) {
-        const userData = response.data.user;
-        const transformedUser: User = {
-          id: userData.id.toString(),
-          username: userData.username,
-          email: userData.email,
-          name: userData.name,
-          createdAt: userData.date_joined || new Date().toISOString(),
-          lastLogin: new Date().toISOString(),
-          profile: {
-            level: 'beginner',
-            points: 0,
-            streak: 0
-          }
-        };
-        
-        login(transformedUser);
-        return { success: true, message: response.message };
+      if (response.success) {
+        // Check if we have data property
+        if ('data' in response && response.data) {
+          // The API returns user data directly in response.data, not nested under 'user'
+          const userData = (response.data as any).user || response.data;
+          
+          // DO NOT login the user yet - they need to verify email first
+          // The email verification will activate their account
+          // Only return success with the message to inform the user
+          
+          return { 
+            success: true, 
+            message: response.message || 'Registration successful! Please check your email to verify your account.',
+            verified: (response.data as any).verified || false,
+            email_sent: (response.data as any).email_sent || false
+          };
+        } else {
+          // Response successful but no data returned
+          return { 
+            success: true, 
+            message: response.message || 'Registration successful!',
+            verified: false,
+            email_sent: false
+          };
+        }
       }
       
-      return { success: false, message: response.message || 'Registration failed' };
+      // Registration failed - use the error message from the API
+      return { 
+        success: false, 
+        message: response.message || 'Registration failed. Please try again.' 
+      };
     } catch (error) {
       console.error('Registration error:', error);
       return { success: false, message: 'Registration failed. Please try again.' };

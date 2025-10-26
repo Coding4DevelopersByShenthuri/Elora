@@ -42,6 +42,7 @@ import Advanced from "@/pages/adults/Advanced";
 import IeltsPte from "@/pages/IeltsPte";
 import NotFound from "@/pages/NotFound";
 import PricingPage from "@/pages/PricingPage";
+import VerifyEmail from "@/pages/VerifyEmail";
 
 // ✅ Import AuthModal, UserSurvey, and SurveyManager
 import AuthModal from "@/components/auth/AuthModal";
@@ -152,6 +153,24 @@ const AppRoutes = () => {
     }
   }, []);
 
+  // Handle custom event to open auth modal from other pages
+  useEffect(() => {
+    const handleOpenAuthModal = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      setIsAuthModalOpen(true);
+      // Store the mode in sessionStorage so AuthModal can read it
+      if (customEvent.detail?.mode) {
+        sessionStorage.setItem('speakbee_auth_mode', customEvent.detail.mode);
+      }
+    };
+
+    window.addEventListener('openAuthModal', handleOpenAuthModal);
+    
+    return () => {
+      window.removeEventListener('openAuthModal', handleOpenAuthModal);
+    };
+  }, []);
+
   return (
     <>
       <Routes>
@@ -179,6 +198,7 @@ const AppRoutes = () => {
         <Route path="/ielts-pte" element={<PageTransition><IeltsPte /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
         <Route path="/pricing" element={<PageTransition><PricingPage /></PageTransition>} />
+        <Route path="/verify-email/:token" element={<PageTransition><VerifyEmail /></PageTransition>} />
       </Routes>
       
       {/* Global Auth Modal */}

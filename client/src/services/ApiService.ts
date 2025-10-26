@@ -14,10 +14,27 @@ const getAuthToken = (): string | null => {
 const handleApiError = (error: any) => {
   if (error.response) {
     // Server responded with error
+    const errorData = error.response.data || {};
+    let errorMessage = errorData.message || 'An error occurred';
+    
+    // If there are field-specific errors, extract them
+    if (errorData.errors) {
+      const errorKeys = Object.keys(errorData.errors);
+      if (errorKeys.length > 0) {
+        const firstError = errorData.errors[errorKeys[0]];
+        // If it's an array of errors, get the first one
+        if (Array.isArray(firstError)) {
+          errorMessage = firstError[0];
+        } else {
+          errorMessage = firstError;
+        }
+      }
+    }
+    
     return {
       success: false,
-      message: error.response.data?.message || 'An error occurred',
-      errors: error.response.data?.errors || null,
+      message: errorMessage,
+      errors: errorData.errors || null,
       status: error.response.status
     };
   } else if (error.request) {
@@ -113,9 +130,13 @@ export const AuthAPI = {
         body: JSON.stringify(data),
       });
       
-      // Store token
-      if (result.token) {
+      // CRITICAL: Only store token if account is verified
+      // Unverified accounts should NOT be logged in
+      if (result.token && result.verified === true) {
         localStorage.setItem('speakbee_auth_token', result.token);
+      } else if (result.token) {
+        // If token exists but user is not verified, DO NOT store it
+        console.log('Registration successful but account not verified - not storing token');
       }
       
       return {

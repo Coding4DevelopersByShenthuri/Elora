@@ -9,6 +9,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
 from datetime import datetime, timedelta
 import logging
+from django.core.mail import send_mail, EmailMultiAlternatives
+from django.conf import settings
+from django.urls import reverse
+from django.template.loader import render_to_string
 
 from .serializers import (
     RegisterSerializer, LoginSerializer, UserSerializer, UserProfileSerializer,
@@ -20,7 +24,8 @@ from .serializers import (
 from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
     VocabularyWord, Achievement, UserAchievement,
-    KidsLesson, KidsProgress, KidsAchievement, WaitlistEntry
+    KidsLesson, KidsProgress, KidsAchievement, WaitlistEntry,
+    EmailVerificationToken
 )
 
 logger = logging.getLogger(__name__)
@@ -43,27 +48,158 @@ def calculate_level(points):
 
 
 # ============= Authentication Views =============
+def send_verification_email(user, verification_token):
+    """Send verification email to user"""
+    try:
+        # Create verification URL - dynamically determine frontend URL
+        frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:5173')
+        verification_url = f"{frontend_url}/verify-email/{verification_token.token}/"
+        
+        # Email content
+        subject = "Activate to learn with Elora"
+        
+        # Plain text message (fallback for email clients that don't support HTML)
+        plain_message = f"""Welcome to Elora! 👋
+
+Please click the following link to activate your account:
+
+{verification_url}
+
+IMPORTANT: This activation link will expire in 24 hours for security purposes.
+
+We are excited to help you achieve your language learning goals!
+
+If you have any questions or need assistance, please contact us at +94750363903 and our support team will be happy to help you.
+
+Best regards,
+The Elora Team
+
+---
+This is an automated email. Please do not reply to this message.
+© 2025 Elora. All rights reserved."""
+        
+        # Render HTML email template
+        html_message = render_to_string('email/verification_email.html', {
+            'verification_url': verification_url,
+        })
+        
+        # Create email message with both plain text and HTML versions
+        msg = EmailMultiAlternatives(
+            subject=subject,
+            body=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[user.email]
+        )
+        msg.attach_alternative(html_message, "text/html")
+        
+        # Send the email
+        result = msg.send(fail_silently=False)
+        
+        logger.info(f"Verification email sent successfully to {user.email}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"Failed to send verification email to {user.email}: {str(e)}")
+        return False
+
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register(request):
     """Register a new user"""
     try:
+        logger.info(f"Registration request received for email: {request.data.get('email', 'unknown')}")
+        
+        email = request.data.get('email')
+        
+        # Check if user with this email already exists
+        if User.objects.filter(email=email).exists():
+            existing_user = User.objects.get(email=email)
+            
+            # If user exists and is active, return error
+            if existing_user.is_active:
+                logger.warning(f"Registration attempt with already active email: {email}")
+                return Response({
+                    "message": "This email is already registered and activated. Please login instead.",
+                    "email_exists": True,
+                    "user_active": True
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # If user exists but is inactive, handle reactivation
+            if not existing_user.is_active:
+                logger.info(f"Resending verification email for inactive account: {email}")
+                
+                # Verify password before proceeding
+                serializer_data = request.data.copy()
+                if not authenticate(username=existing_user.username, password=serializer_data.get('password')):
+                    return Response({
+                        "message": "Incorrect password. Please use the same password you registered with.",
+                        "email_exists": True,
+                        "user_active": False
+                    }, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Update user password if provided
+                if 'password' in serializer_data:
+                    existing_user.set_password(serializer_data['password'])
+                    existing_user.save()
+                
+                # Generate new verification token
+                verification_token = EmailVerificationToken.generate_token(existing_user)
+                logger.info(f"Generated new verification token for inactive user {existing_user.email}")
+                
+                # Send verification email
+                email_sent = send_verification_email(existing_user, verification_token)
+                
+                user_serializer = UserSerializer(existing_user)
+                
+                response_message = "We've sent a new verification email to your inbox. Please check your email (including spam folder) and click the activation link to verify your account."
+                if not email_sent:
+                    logger.warning(f"Verification email not sent to inactive user {existing_user.email}")
+                    response_message = "We couldn't send the verification email. Please contact support at elora.toinfo@gmail.com with your email address to activate your account."
+                
+                return Response({
+                    "success": True,
+                    "message": response_message,
+                    "user": user_serializer.data,
+                    "verified": False,
+                    "email_sent": email_sent,
+                    "reactivated": True
+                }, status=status.HTTP_200_OK)
+        
+        # If email doesn't exist, proceed with normal registration
         serializer = RegisterSerializer(data=request.data)
         
         if serializer.is_valid():
             user = serializer.save()
-            tokens = get_tokens_for_user(user)
+            
+            # Check if profile already exists
+            if not UserProfile.objects.filter(user=user).exists():
+                UserProfile.objects.create(user=user)
+            
+            # Create verification token
+            verification_token = EmailVerificationToken.generate_token(user)
+            logger.info(f"Created verification token for user {user.email}")
+            
+            # Send verification email
+            email_sent = send_verification_email(user, verification_token)
             
             # Serialize user with profile
             user_serializer = UserSerializer(user)
             
-            return Response({
-                "message": "Registration successful",
-                "user": user_serializer.data,
-                "token": tokens['token'],
-                "refresh": tokens['refresh']
-            }, status=status.HTTP_201_CREATED)
+            response_message = "Account created successfully! We've sent a verification email to your inbox. Please check your email (including spam folder) and click the activation link to verify your account. You won't be able to login until you verify your email."
+            if not email_sent:
+                logger.warning(f"Registration successful but email not sent to {user.email}")
+                response_message = "Account created successfully! However, we couldn't send the verification email. Please contact support at elora.toinfo@gmail.com with your email address to activate your account."
             
+            return Response({
+                "success": True,
+                "message": response_message,
+                "user": user_serializer.data,
+                "verified": False,
+                "email_sent": email_sent
+            }, status=status.HTTP_201_CREATED)
+        
+        logger.warning(f"Registration validation failed: {serializer.errors}")
         return Response({
             "message": "Registration failed",
             "errors": serializer.errors
@@ -71,6 +207,8 @@ def register(request):
         
     except Exception as e:
         logger.error(f"Registration error: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
         return Response({
             "message": "An error occurred during registration",
             "error": str(e)
@@ -100,23 +238,34 @@ def login(request):
                 "message": "Invalid email or password"
             }, status=status.HTTP_401_UNAUTHORIZED)
         
+        # Check if email is verified BEFORE authentication
+        if not user.is_active:
+            # Verify password to avoid revealing if user exists
+            temp_auth = authenticate(username=user.username, password=password)
+            if temp_auth is None:
+                return Response({
+                    "message": "Invalid email or password"
+                }, status=status.HTTP_401_UNAUTHORIZED)
+            
+            return Response({
+                "message": "Please verify your email before logging in. Check your inbox for the verification link.",
+                "verified": False,
+                "email": user.email
+            }, status=status.HTTP_401_UNAUTHORIZED)
+        
+        # Now authenticate the active user
         user = authenticate(username=user.username, password=password)
         
         if user is not None:
-            if user.is_active:
-                tokens = get_tokens_for_user(user)
-                user_serializer = UserSerializer(user)
-                
-                return Response({
-                    "message": "Login successful",
-                    "user": user_serializer.data,
-                    "token": tokens['token'],
-                    "refresh": tokens['refresh']
-                })
-            else:
-                return Response({
-                    "message": "Account is disabled"
-                }, status=status.HTTP_401_UNAUTHORIZED)
+            tokens = get_tokens_for_user(user)
+            user_serializer = UserSerializer(user)
+            
+            return Response({
+                "message": "Login successful",
+                "user": user_serializer.data,
+                "token": tokens['token'],
+                "refresh": tokens['refresh']
+            })
         else:
             return Response({
                 "message": "Invalid email or password"
@@ -126,6 +275,52 @@ def login(request):
         logger.error(f"Login error: {str(e)}")
         return Response({
             "message": "An error occurred during login"
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def verify_email(request, token):
+    """Verify user email with token"""
+    try:
+        # Find the token
+        try:
+            verification_token = EmailVerificationToken.objects.get(token=token, is_used=False)
+        except EmailVerificationToken.DoesNotExist:
+            return Response({
+                "message": "Invalid or expired verification token",
+                "success": False
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if token is still valid
+        if not verification_token.is_valid():
+            return Response({
+                "message": "Verification token has expired. Please request a new one.",
+                "success": False
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Activate user account
+        user = verification_token.user
+        user.is_active = True
+        user.save()
+        
+        # Mark token as used
+        verification_token.is_used = True
+        verification_token.save()
+        
+        logger.info(f"Email verification successful for user {user.email}")
+        
+        return Response({
+            "message": "Email verified successfully! You can now log in.",
+            "success": True
+        })
+        
+    except Exception as e:
+        logger.error(f"Email verification error: {str(e)}")
+        return Response({
+            "message": "An error occurred during verification",
+            "success": False,
+            "error": str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -743,3 +938,47 @@ def health_check(request):
         "message": "Elora API is running",
         "version": "1.0.0"
     })
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def test_email_send(request):
+    """Test email sending"""
+    try:
+        test_email = request.query_params.get('email', 'shenthurim123@gmail.com')
+        verification_url = "http://localhost:5173/verify-email/test-token-123/"
+        
+        subject = "Test Email - Activate to learn with Elora"
+        message = f"""Welcome to Elora! 👋
+
+Please click the following link to activate your account:
+
+{verification_url}
+
+We are excited to have you on board and help you in your learning journey!
+
+Please feel free to contact us at +94750363903 with any additional questions.
+
+Best regards,
+The Elora Team"""
+        
+        result = send_mail(
+            subject=subject,
+            message=message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[test_email],
+            fail_silently=False,
+        )
+        
+        return Response({
+            "success": True,
+            "message": f"Test email sent successfully to {test_email}",
+            "result": result
+        })
+        
+    except Exception as e:
+        logger.error(f"Test email error: {str(e)}")
+        return Response({
+            "success": False,
+            "message": f"Failed to send test email: {str(e)}"
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
