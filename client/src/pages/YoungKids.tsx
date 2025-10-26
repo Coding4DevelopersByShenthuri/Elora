@@ -184,7 +184,6 @@ const YoungKidsPage = () => {
       const welcomeMessages = [
         "Welcome to Kids Learning Zone! Ready for some fun learning?",
         "Hello there! Let's explore amazing stories and games together!",
-        "Hi! I'm so excited to learn with you today!",
         "Welcome back! What would you like to learn today?"
       ];
       
@@ -214,13 +213,13 @@ const YoungKidsPage = () => {
             setPoints(serverProgress.points ?? 0);
             setStreak(serverProgress.streak ?? 0);
             const fav = (serverProgress as any)?.details?.favorites ?? [];
-            // Convert old number-based favorites to new string-based format for young kids
+            // Convert old number-based favorites to new string-based format
             const convertedFavorites = Array.isArray(fav) ? fav.map((f: any) => {
               if (typeof f === 'number') {
                 return `young-${f}`;
               }
               return f;
-            }).filter((f: string) => f.startsWith('young-')) : [];
+            }) : [];
             setFavorites(convertedFavorites);
             
             // Load pronunciation and vocabulary attempts
@@ -239,7 +238,7 @@ const YoungKidsPage = () => {
                 return `young-${f}`;
               }
               return f;
-            }).filter((f: string) => f.startsWith('young-')) : [];
+            }) : [];
             setFavorites(convertedFavorites);
             
             const details = (localProgress as any).details || {};
@@ -258,7 +257,7 @@ const YoungKidsPage = () => {
               return `young-${f}`;
             }
             return f;
-          }).filter((f: string) => f.startsWith('young-')) : [];
+          }) : [];
           setFavorites(convertedFavorites);
           
           const details = (localProgress as any).details || {};
@@ -917,15 +916,13 @@ const YoungKidsPage = () => {
   };
 
   // Interactive functions
-  const playSound = async (soundType: 'click' | 'success' | 'celebration' | 'hover' | 'error') => {
+  const playSound = async (soundType: 'success' | 'celebration' | 'error') => {
     if (!isSoundEnabled) return;
     
     try {
       const soundMessages = {
-        click: 'Click!',
         success: 'Great job!',
         celebration: 'Congratulations!',
-        hover: 'Hover!',
         error: 'Try again!'
       };
       
@@ -946,12 +943,9 @@ const YoungKidsPage = () => {
 
   const handleElementHover = (elementId: string) => {
     setHoveredElement(elementId);
-    // Remove hover sound feedback as it's annoying for users
-    // playSound('hover');
   };
 
   const handleElementClick = (elementId: string) => {
-    playSound('click');
     setPulseAnimation(true);
     setTimeout(() => setPulseAnimation(false), 1000);
     console.log(`Clicked element: ${elementId}`);
@@ -1162,11 +1156,10 @@ const YoungKidsPage = () => {
               )}
               onClick={() => {
                 handleElementClick('title');
-                triggerCelebration();
               }}
               onMouseEnter={() => handleElementHover('title')}
             >
-Little Learners (Ages 4-10)
+               Little Learners
             </h1>
           </div>
           <p 
@@ -1174,7 +1167,7 @@ Little Learners (Ages 4-10)
             onClick={() => handleElementClick('subtitle')}
             onMouseEnter={() => handleElementHover('subtitle')}
           >
-Magical stories, fun games, and exciting adventures for young minds!
+              Magical stories, fun games, and exciting adventures for young minds!                   
           </p>
           
           {/* AI Status Badge */}
@@ -1280,7 +1273,6 @@ Magical stories, fun games, and exciting adventures for young minds!
             onMouseEnter={() => handleElementHover('streak-card')}
             onClick={() => {
               handleElementClick('streak-card');
-              playSound('success');
             }}
           >
             {/* Decorative star - Green */}

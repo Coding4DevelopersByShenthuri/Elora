@@ -180,13 +180,13 @@ const TeenKidsPage = () => {
             setPoints(serverProgress.points ?? 0);
             setStreak(serverProgress.streak ?? 0);
             const fav = (serverProgress as any)?.details?.favorites ?? [];
-            // Convert old number-based favorites to new string-based format for teen kids
+            // Convert old number-based favorites to new string-based format
             const convertedFavorites = Array.isArray(fav) ? fav.map((f: any) => {
               if (typeof f === 'number') {
                 return `teen-${f}`;
               }
               return f;
-            }).filter((f: string) => f.startsWith('teen-')) : [];
+            }) : [];
             setFavorites(convertedFavorites);
             
             const details = (serverProgress as any)?.details || {};
@@ -204,7 +204,7 @@ const TeenKidsPage = () => {
                 return `teen-${f}`;
               }
               return f;
-            }).filter((f: string) => f.startsWith('teen-')) : [];
+            }) : [];
             setFavorites(convertedFavorites);
             
             const details = (localProgress as any).details || {};
@@ -223,7 +223,7 @@ const TeenKidsPage = () => {
               return `teen-${f}`;
             }
             return f;
-          }).filter((f: string) => f.startsWith('teen-')) : [];
+          }) : [];
           setFavorites(convertedFavorites);
           
           const details = (localProgress as any).details || {};
@@ -631,15 +631,13 @@ const TeenKidsPage = () => {
   };
 
   // Interactive functions
-  const playSound = async (soundType: 'click' | 'success' | 'celebration' | 'hover' | 'error') => {
+  const playSound = async (soundType: 'success' | 'celebration' | 'error') => {
     if (!isSoundEnabled) return;
     
     try {
       const soundMessages = {
-        click: 'Click!',
         success: 'Excellent work!',
         celebration: 'Outstanding achievement!',
-        hover: 'Hover!',
         error: 'Try again!'
       };
       
@@ -663,7 +661,6 @@ const TeenKidsPage = () => {
   };
 
   const handleElementClick = (elementId: string) => {
-    playSound('click');
     setPulseAnimation(true);
     setTimeout(() => setPulseAnimation(false), 1000);
     console.log(`Clicked element: ${elementId}`);
@@ -839,11 +836,10 @@ const TeenKidsPage = () => {
               )}
               onClick={() => {
                 handleElementClick('title');
-                triggerCelebration();
               }}
               onMouseEnter={() => handleElementHover('title')}
             >
-              Teen Explorers (Ages 11-17)
+              Teen Explorers
             </h1>
           </div>
           <p 
@@ -925,7 +921,6 @@ const TeenKidsPage = () => {
             onMouseEnter={() => handleElementHover('streak-card')}
             onClick={() => {
               handleElementClick('streak-card');
-              playSound('success');
             }}
           >
             <CardContent className="p-4 sm:p-5 md:p-6 text-center">
