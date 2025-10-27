@@ -386,6 +386,16 @@ export const STORY_VOICES: Record<string, VoiceProfile> = {
     volume: 1.0,
     voiceName: 'Microsoft Mark - English (United States)', // Microsoft's young male voice
     description: 'Bold, adventurous explorer voice with jungle wisdom'
+  },
+
+  // 11. Mystery Detective - Detective (analytical 14-year-old investigator)
+  Detective: {
+    name: 'Detective',
+    pitch: 0.95,        // Slightly lower for mature, analytical tone
+    rate: 0.85,         // Slower for thoughtful, investigative pace
+    volume: 0.95,       // Clear but measured
+    voiceName: 'Google US English Female', // Google's alternative voice for uniqueness
+    description: 'Analytical, sharp detective voice with investigative determination'
   }
 };
 

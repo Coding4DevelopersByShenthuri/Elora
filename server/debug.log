@@ -737,3 +737,4 @@ INFO 2025-10-27 01:53:17,180 autoreload 3156 21852 Watching for file changes wit
 INFO 2025-10-27 01:53:35,672 autoreload 3156 21852 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
 INFO 2025-10-27 01:53:36,402 autoreload 19320 1592 Watching for file changes with StatReloader
 INFO 2025-10-27 01:54:07,973 views 2372 18672 Verification email sent successfully to shenthurim123@gmail.com
+INFO 2025-10-27 14:03:00,373 autoreload 17656 3636 Watching for file changes with StatReloader
