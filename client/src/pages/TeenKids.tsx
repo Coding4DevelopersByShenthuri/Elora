@@ -20,6 +20,7 @@ import Vocabulary from '@/components/kids/Vocabulary';
 import Pronunciation from '@/components/kids/Pronunciation';
 import InteractiveGames from '@/components/kids/InteractiveGames';
 import SyncStatusIndicator from '@/components/kids/SyncStatusIndicator';
+import MysteryDetectiveAdventure from '@/components/kids/stories/MysteryDetectiveAdventure';
 import AuthModal from '@/components/auth/AuthModal';
 import { useNavigate, useLocation } from 'react-router-dom';
 import HybridServiceManager from '@/services/HybridServiceManager';
@@ -65,6 +66,9 @@ const TeenKidsPage = () => {
   // SLM & Model Management State
   const [modelsReady, setModelsReady] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
+  
+  // Story modal state
+  const [showMysteryDetective, setShowMysteryDetective] = useState(false);
 
   // Check authentication and user existence on mount
   useEffect(() => {
@@ -511,6 +515,14 @@ const TeenKidsPage = () => {
     setCurrentStory(storyId);
     setIsPlaying(true);
     setBounceAnimation(true);
+    
+    // Open appropriate adventure modal based on story type
+    const storyType = allStories[storyIndex].type;
+    if (storyType === 'mystery') {
+      setShowMysteryDetective(true);
+      setIsPlaying(false);
+      return;
+    }
     
     // Add celebration effects
     const newPoints = points + 100;
@@ -1477,6 +1489,21 @@ const TeenKidsPage = () => {
           animation: float-fast 2s ease-in-out infinite;
         }
       `}</style>
+
+      {/* Story Modals */}
+      {showMysteryDetective && (
+        <MysteryDetectiveAdventure 
+          onClose={() => setShowMysteryDetective(false)} 
+          onComplete={(score) => {
+            setShowMysteryDetective(false);
+            // Handle story completion - update progress, points, etc.
+            const newPoints = points + 100;
+            const newStreak = streak + 1;
+            setPoints(newPoints);
+            setStreak(newStreak);
+          }}
+        />
+      )}
     </div>
   );
 };
