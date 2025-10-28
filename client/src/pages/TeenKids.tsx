@@ -21,6 +21,10 @@ import Pronunciation from '@/components/kids/Pronunciation';
 import InteractiveGames from '@/components/kids/InteractiveGames';
 import SyncStatusIndicator from '@/components/kids/SyncStatusIndicator';
 import MysteryDetectiveAdventure from '@/components/kids/stories/MysteryDetectiveAdventure';
+import SpaceExplorerAdventure from '@/components/kids/stories/SpaceExplorerAdventure';
+import EnvironmentalHeroAdventure from '@/components/kids/stories/EnvironmentalHeroAdventure';
+import TechInnovatorAdventure from '@/components/kids/stories/TechInnovatorAdventure';
+import GlobalCitizenAdventure from '@/components/kids/stories/GlobalCitizenAdventure';
 import AuthModal from '@/components/auth/AuthModal';
 import { useNavigate, useLocation } from 'react-router-dom';
 import HybridServiceManager from '@/services/HybridServiceManager';
@@ -69,6 +73,24 @@ const TeenKidsPage = () => {
   
   // Story modal state
   const [showMysteryDetective, setShowMysteryDetective] = useState(false);
+  const [showSpaceExplorer, setShowSpaceExplorer] = useState(false);
+  const [showEnvironmentalHero, setShowEnvironmentalHero] = useState(false);
+  const [showTechInnovator, setShowTechInnovator] = useState(false);
+  const [showGlobalCitizen, setShowGlobalCitizen] = useState(false);
+
+  // Reset bounce animation when all modals are closed
+  useEffect(() => {
+    const anyModalOpen = showMysteryDetective || showSpaceExplorer || showEnvironmentalHero || 
+                         showTechInnovator || showGlobalCitizen;
+    
+    if (!anyModalOpen) {
+      // Reset bounce animation when modal closes
+      setBounceAnimation(false);
+      setCurrentStory('');
+      setIsPlaying(false);
+    }
+  }, [showMysteryDetective, showSpaceExplorer, showEnvironmentalHero, 
+      showTechInnovator, showGlobalCitizen]);
 
   // Check authentication and user existence on mount
   useEffect(() => {
@@ -520,6 +542,26 @@ const TeenKidsPage = () => {
     const storyType = allStories[storyIndex].type;
     if (storyType === 'mystery') {
       setShowMysteryDetective(true);
+      setIsPlaying(false);
+      return;
+    }
+    if (storyType === 'space') {
+      setShowSpaceExplorer(true);
+      setIsPlaying(false);
+      return;
+    }
+    if (storyType === 'environment') {
+      setShowEnvironmentalHero(true);
+      setIsPlaying(false);
+      return;
+    }
+    if (storyType === 'technology') {
+      setShowTechInnovator(true);
+      setIsPlaying(false);
+      return;
+    }
+    if (storyType === 'culture') {
+      setShowGlobalCitizen(true);
       setIsPlaying(false);
       return;
     }
@@ -1497,6 +1539,54 @@ const TeenKidsPage = () => {
           onComplete={(score) => {
             setShowMysteryDetective(false);
             // Handle story completion - update progress, points, etc.
+            const newPoints = points + 100;
+            const newStreak = streak + 1;
+            setPoints(newPoints);
+            setStreak(newStreak);
+          }}
+        />
+      )}
+      {showSpaceExplorer && (
+        <SpaceExplorerAdventure 
+          onClose={() => setShowSpaceExplorer(false)} 
+          onComplete={(score) => {
+            setShowSpaceExplorer(false);
+            const newPoints = points + 100;
+            const newStreak = streak + 1;
+            setPoints(newPoints);
+            setStreak(newStreak);
+          }}
+        />
+      )}
+      {showEnvironmentalHero && (
+        <EnvironmentalHeroAdventure 
+          onClose={() => setShowEnvironmentalHero(false)} 
+          onComplete={(score) => {
+            setShowEnvironmentalHero(false);
+            const newPoints = points + 100;
+            const newStreak = streak + 1;
+            setPoints(newPoints);
+            setStreak(newStreak);
+          }}
+        />
+      )}
+      {showTechInnovator && (
+        <TechInnovatorAdventure 
+          onClose={() => setShowTechInnovator(false)} 
+          onComplete={(score) => {
+            setShowTechInnovator(false);
+            const newPoints = points + 100;
+            const newStreak = streak + 1;
+            setPoints(newPoints);
+            setStreak(newStreak);
+          }}
+        />
+      )}
+      {showGlobalCitizen && (
+        <GlobalCitizenAdventure 
+          onClose={() => setShowGlobalCitizen(false)} 
+          onComplete={(score) => {
+            setShowGlobalCitizen(false);
             const newPoints = points + 100;
             const newStreak = streak + 1;
             setPoints(newPoints);

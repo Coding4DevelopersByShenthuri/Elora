@@ -76,7 +76,7 @@ const storySteps = [
       { text: 'Forensic science is unreliable', emoji: '🔬⚠️', meaning: 'not trustworthy' }
     ],
     
-    revealText: 'Brilliant! Forensic science is our detective\'s best tool. It reveals hidden truth through careful analysis of evidence. Science doesn\'t lie - it shows us exactly what happened. This is why detectives use fingerprints, DNA, and other scientific methods. The evidence points us toward the solution!',
+    revealText: 'Hooray! We found our first sparkly star! You\'re listening so well! The evidence reveals hidden truth through careful analysis! Forensic science doesn\'t lie - it shows us exactly what happened. Keep investigating with this sharp attention! Two more stars to find!',
     
     maxReplays: 5,
     wordCount: 52,
@@ -157,7 +157,7 @@ const storySteps = [
       { text: 'Ignoring clues solves mysteries', emoji: '🧠👀', meaning: 'avoiding evidence' }
     ],
     
-    revealText: 'Outstanding! Deductive reasoning is the detective\'s superpower. It connects all the clues together like pieces of a puzzle. When you use logic and careful thinking, the solution appears! Great detectives don\'t just collect clues - they analyze them and see the big picture!',
+    revealText: 'Amazing! We found our second sparkly star! You\'re doing wonderfully! Deductive reasoning connects all the clues together like pieces of a puzzle. When you use logic and careful thinking, the solution appears! This is the magic of detective work! One more star to go!',
     
     maxReplays: 5,
     wordCount: 58,
@@ -212,7 +212,7 @@ const storySteps = [
       { text: 'Justice requires no proof at all', emoji: '✅❌', meaning: 'no evidence needed' }
     ],
     
-    revealText: 'Perfect! Justice requires proof and careful investigation. We can\'t accuse someone without evidence. This is the cornerstone of detective work - never act on suspicion alone, always follow the evidence. You\'ve learned the most important lesson: truth comes from facts, not assumptions. Congratulations, detective!',
+    revealText: 'Yay! ... We did it! ... All three magic stars are glowing! ... (You made them shine so bright!) Justice requires proof and careful investigation. Never act on suspicion alone, always follow the evidence. You\'ve learned the most important lesson: truth comes from facts, not assumptions! ... You are an AMAZING detective! ... Detective Alex is so proud of you!',
     
     maxReplays: 5,
     wordCount: 65,
@@ -286,6 +286,22 @@ const MysteryDetectiveAdventure = ({ onClose, onComplete }: Props) => {
   // Increased replay limits + unlimited option
   const maxReplays = (current as any).maxReplays || 5; // Increased from 3 to 5
   const unlimitedReplays = true; // Allow unlimited for accessibility
+
+  // Dynamic celebration text based on stars
+  const getCelebrationText = (): string => {
+    if (current.id === 'grand_celebration') {
+      if (stars >= 3) {
+        return "Congratulations, brilliant investigator! You've successfully completed your training! Your attention to detail and analytical thinking have impressed me! The missing masterpiece has been found, and justice has been served!. Remember: great detectives listen carefully, think logically, and never give up! You should be extremely proud of your detective work! Give yourself a detective's salute!";
+      } else if (stars === 2) {
+        return `Great work, investigator! You earned 2 evidence badges! Your detective skills are developing. Every case is an opportunity to improve your investigative abilities. Keep listening carefully and thinking logically, and you'll solve every mystery! Complete all challenges next time to earn the third badge and unlock the full detective achievement!`;
+      } else if (stars === 1) {
+        return `Good effort, investigator! You earned 1 evidence badge demonstrating your commitment to detective work. Mystery solving requires mastering many skills. Continue practicing and you'll become a stellar detective! Keep investigating—your next case awaits!`;
+      } else {
+        return `Case closed, investigator! You explored detective work and gained valuable experience. While you didn't earn all badges this time, every case teaches something valuable. Keep practicing your listening and analytical skills. The mysteries are waiting for you!`;
+      }
+    }
+    return current.text || '';
+  };
 
   // Initialize online TTS on mount
   useEffect(() => {
@@ -481,14 +497,10 @@ const MysteryDetectiveAdventure = ({ onClose, onComplete }: Props) => {
       const playNarration = async () => {
         let textToRead = current.text;
         
-    // Handle dynamic celebration text based on badges collected
+    // Use centralized celebration text
     if (current.id === 'grand_celebration') {
+      textToRead = getCelebrationText();
       console.log(`🎉 Detective Celebration step - Badges collected: ${stars}`);
-      if (stars >= 3) {
-        textToRead = "Congratulations, brilliant investigator! You've successfully completed your training! Your attention to detail and analytical thinking have impressed me! The missing masterpiece has been found, and justice has been served!. Remember: great detectives listen carefully, think logically, and never give up! You should be extremely proud of your detective work! Give yourself a detective's salute!";
-      } else {
-        textToRead = `Great work, investigator! You earned ${Math.floor(stars)} evidence badge${Math.floor(stars) !== 1 ? 's' : ''}! Your detective skills are developing. Every case is an opportunity to improve your investigative abilities. Keep listening carefully and thinking logically, and you'll solve every mystery!`;
-      }
       console.log(`🎉 Celebration text selected:`, textToRead.substring(0, 100) + '...');
     }
         
@@ -599,19 +611,29 @@ const MysteryDetectiveAdventure = ({ onClose, onComplete }: Props) => {
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
       
-      // Award badges based on specific story steps
+      // Award badges based on specific story steps (Step 3, 7, 9)
+      // Only award stars on correct answers for specific interactive steps
       if (current.id === 'fingerprint_analysis') {
-        // First badge - after completing fingerprint analysis
-        setStars(1);
-        console.log('⭐ First badge awarded! (1/3) - Step 3: Fingerprint Analysis');
+        // First star - step 3 (index 2 in full story, interactive step 3)
+        setStars(prev => {
+          const newStars = Math.min(3, prev + 1);
+          console.log(`⭐ First badge awarded! (${newStars}/3) - Step 3: Fingerprint Analysis`);
+          return newStars;
+        });
       } else if (current.id === 'logical_deduction') {
-        // Second badge - after completing logical deduction
-        setStars(2);
-        console.log('⭐ Second badge awarded! (2/3) - Step 5: Logical Deduction');
+        // Second star - step 6 (index 5 in full story, interactive step 6)
+        setStars(prev => {
+          const newStars = Math.min(3, prev + 1);
+          console.log(`⭐ Second badge awarded! (${newStars}/3) - Step 6: Logical Deduction`);
+          return newStars;
+        });
       } else if (current.id === 'solution') {
-        // Third badge - after solving the case
-        setStars(3);
-        console.log('⭐ Third badge awarded! (3/3) - Step 7: Case Solution');
+        // Third star - step 8 (index 7 in full story, interactive step 8)
+        setStars(prev => {
+          const newStars = Math.min(3, prev + 1);
+          console.log(`⭐ Third badge awarded! (${newStars}/3) - Step 8: Case Solution`);
+          return newStars;
+        });
       }
     
     setShowFeedback(true);
@@ -677,14 +699,10 @@ const MysteryDetectiveAdventure = ({ onClose, onComplete }: Props) => {
       textPreview: textToSpeak ? textToSpeak.substring(0, 50) + '...' : 'No text'
     });
     
-    // Handle dynamic celebration text based on badges collected
+    // Use centralized celebration text
     if (current.id === 'grand_celebration') {
+      textToSpeak = getCelebrationText();
       console.log(`🎉 Manual playRevealText - Detective Celebration - Badges: ${stars}`);
-      if (stars >= 3) {
-        textToSpeak = "Congratulations, brilliant investigator! You've successfully completed your training! Your attention to detail and analytical thinking have impressed me! The missing masterpiece has been found, and justice has been served!. Remember: great detectives listen carefully, think logically, and never give up! You should be extremely proud of your detective work! Give yourself a detective's salute!";
-      } else {
-        textToSpeak = `Great work, investigator! You earned ${Math.floor(stars)} evidence badge${Math.floor(stars) !== 1 ? 's' : ''}! Your detective skills are developing. Every case is an opportunity to improve your investigative abilities. Keep listening carefully and thinking logically, and you'll solve every mystery!`;
-      }
       console.log(`🎉 Manual celebration text:`, textToSpeak.substring(0, 100) + '...');
     }
     
@@ -781,9 +799,7 @@ const MysteryDetectiveAdventure = ({ onClose, onComplete }: Props) => {
       // Non-interactive steps (like intro, celebration, etc.)
       if (current.text) {
         if (current.id === 'grand_celebration') {
-          textToPlay = stars >= 3 
-            ? "Congratulations, brilliant investigator! You've successfully completed your training! Your attention to detail and analytical thinking have impressed me! The missing masterpiece has been found, and justice has been served!. Remember: great detectives listen carefully, think logically, and never give up! You should be extremely proud of your detective work! Give yourself a detective's salute!"
-            : `Great work, investigator! You earned ${Math.floor(stars)} evidence badge${Math.floor(stars) !== 1 ? 's' : ''}! Your detective skills are developing. Every case is an opportunity to improve your investigative abilities. Keep listening carefully and thinking logically, and you'll solve every mystery!`;
+          textToPlay = getCelebrationText();
           console.log('🎉 INSTANT replay celebration text:', textToPlay.substring(0, 50) + '...');
         } else {
           textToPlay = current.text;
@@ -1302,17 +1318,7 @@ const MysteryDetectiveAdventure = ({ onClose, onComplete }: Props) => {
                     
                     <p className="text-base text-gray-700 dark:text-gray-200 leading-relaxed">
                       {/* Dynamic message based on stars collected */}
-                      {current.id === 'grand_celebration' ? (
-                        stars >= 3 ? (
-                          // 3 badges - Full celebration
-                          "Congratulations, brilliant investigator! You've successfully completed your training! Your attention to detail and analytical thinking have impressed me! The missing masterpiece has been found, and justice has been served!. Remember: great detectives listen carefully, think logically, and never give up! You should be extremely proud of your detective work! Give yourself a detective's salute!"
-                        ) : (
-                          // 1-2 badges - Encouraging message
-                          `Great work, investigator! You earned ${Math.floor(stars)} evidence badge${Math.floor(stars) !== 1 ? 's' : ''}! Your detective skills are developing. Every case is an opportunity to improve your investigative abilities. Keep listening carefully and thinking logically, and you'll solve every mystery!`
-                        )
-                      ) : (
-                        current.text
-                      )}
+                      {current.id === 'grand_celebration' ? getCelebrationText() : current.text}
                     </p>
                     
                     <div className="flex justify-center gap-3 mt-4 text-sm text-gray-500 dark:text-gray-400">
@@ -1626,17 +1632,7 @@ const MysteryDetectiveAdventure = ({ onClose, onComplete }: Props) => {
                     
                     <p className="text-sm md:text-base text-gray-700 dark:text-gray-200 leading-relaxed px-2">
                       {/* Dynamic message based on stars collected */}
-                      {current.id === 'grand_celebration' ? (
-                        stars >= 3 ? (
-                          // 3 badges - Full celebration
-                          "Congratulations, brilliant investigator! You've successfully completed your training! Your attention to detail and analytical thinking have impressed me! The missing masterpiece has been found, and justice has been served!. Remember: great detectives listen carefully, think logically, and never give up! You should be extremely proud of your detective work! Give yourself a detective's salute!"
-                        ) : (
-                          // 1-2 badges - Encouraging message
-                          `Great work, investigator! You earned ${Math.floor(stars)} evidence badge${Math.floor(stars) !== 1 ? 's' : ''}! Your detective skills are developing. Every case is an opportunity to improve your investigative abilities. Keep listening carefully and thinking logically, and you'll solve every mystery!`
-                        )
-                      ) : (
-                        current.text
-                      )}
+                      {current.id === 'grand_celebration' ? getCelebrationText() : current.text}
                     </p>
                     
                     <div className="flex justify-center gap-2 mt-2 text-xs text-gray-500 dark:text-gray-400">

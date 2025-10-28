@@ -738,3 +738,26 @@ INFO 2025-10-27 01:53:35,672 autoreload 3156 21852 C:\Users\shent\OneDrive\Deskt
 INFO 2025-10-27 01:53:36,402 autoreload 19320 1592 Watching for file changes with StatReloader
 INFO 2025-10-27 01:54:07,973 views 2372 18672 Verification email sent successfully to shenthurim123@gmail.com
 INFO 2025-10-27 14:03:00,373 autoreload 17656 3636 Watching for file changes with StatReloader
+INFO 2025-10-28 12:20:54,583 autoreload 6248 15836 Watching for file changes with StatReloader
+INFO 2025-10-28 14:24:15,771 basehttp 6248 20752 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+ERROR 2025-10-28 14:24:16,399 views 6248 20752 Login error: get() returned more than one User -- it returned 2!
+ERROR 2025-10-28 14:24:16,428 log 6248 20752 Internal Server Error: /api/auth/login
+ERROR 2025-10-28 14:24:16,433 basehttp 6248 20752 "POST /api/auth/login HTTP/1.1" 500 44
+ERROR 2025-10-28 14:24:31,514 views 6248 16388 Login error: get() returned more than one User -- it returned 2!
+ERROR 2025-10-28 14:24:31,518 log 6248 16388 Internal Server Error: /api/auth/login
+ERROR 2025-10-28 14:24:31,520 basehttp 6248 16388 "POST /api/auth/login HTTP/1.1" 500 44
+INFO 2025-10-28 14:24:48,650 basehttp 6248 13744 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+INFO 2025-10-28 14:24:48,661 views 6248 13744 Registration request received for email: shenthurim123@gmail.com
+ERROR 2025-10-28 14:24:48,699 views 6248 13744 Registration error: get() returned more than one User -- it returned 2!
+ERROR 2025-10-28 14:24:49,081 views 6248 13744 Traceback (most recent call last):
+  File "C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py", line 117, in register
+    existing_user = User.objects.get(email=email)
+  File "C:\Users\shent\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\shent\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\site-packages\django\db\models\query.py", line 640, in get
+    raise self.model.MultipleObjectsReturned(
+django.contrib.auth.models.User.MultipleObjectsReturned: get() returned more than one User -- it returned 2!
+
+ERROR 2025-10-28 14:24:49,083 log 6248 13744 Internal Server Error: /api/auth/register
+ERROR 2025-10-28 14:24:49,084 basehttp 6248 13744 "POST /api/auth/register HTTP/1.1" 500 113
+INFO 2025-10-28 16:58:15,598 autoreload 4496 20716 Watching for file changes with StatReloader
