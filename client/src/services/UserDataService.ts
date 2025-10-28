@@ -49,8 +49,19 @@ export interface UserSettings {
   theme: 'light' | 'dark' | 'auto';
 }
 
+export interface OutboxItem {
+  id?: number;
+  timestamp: number;
+  status: 'pending' | 'syncing' | 'synced' | 'failed';
+  entity: string; // 'LessonProgress', 'PracticeSession', etc.
+  operation: 'create' | 'update' | 'delete';
+  data: any;
+  retries: number;
+  error?: string;
+}
+
 class UserDataService {
-  private dbName = 'SpeakBeeDB';
+  private dbName = 'Elora';
   private version = 1;
   private db: IDBDatabase | null = null;
 
@@ -86,6 +97,14 @@ class UserDataService {
           const store = db.createObjectStore('audioRecordings', { keyPath: 'id', autoIncrement: true });
           store.createIndex('userId', 'userId', { unique: false });
           store.createIndex('sessionId', 'sessionId', { unique: false });
+        }
+        
+        // Create outbox store for offline sync
+        if (!db.objectStoreNames.contains('syncOutbox')) {
+          const store = db.createObjectStore('syncOutbox', { keyPath: 'id', autoIncrement: true });
+          store.createIndex('status', 'status', { unique: false });
+          store.createIndex('timestamp', 'timestamp', { unique: false });
+          store.createIndex('entity', 'entity', { unique: false });
         }
       };
     });
@@ -262,6 +281,84 @@ class UserDataService {
 
       transaction.oncomplete = () => resolve();
       transaction.onerror = () => reject(transaction.error);
+    });
+  }
+
+  // ============= Outbox Management for Offline Sync =============
+  
+  // Add item to outbox (for offline sync)
+  async addToOutbox(item: Omit<OutboxItem, 'id' | 'status' | 'retries'>): Promise<void> {
+    if (!this.db) await this.initDB();
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction(['syncOutbox'], 'readwrite');
+      const store = transaction.objectStore('syncOutbox');
+      
+      const outboxItem: OutboxItem = {
+        ...item,
+        status: 'pending',
+        retries: 0
+      };
+      
+      const request = store.add(outboxItem);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  // Get pending outbox items
+  async getPendingOutbox(): Promise<OutboxItem[]> {
+    if (!this.db) await this.initDB();
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction(['syncOutbox'], 'readonly');
+      const store = transaction.objectStore('syncOutbox');
+      const index = store.index('status');
+      
+      const request = index.getAll('pending');
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  // Update outbox item status
+  async updateOutboxStatus(id: number, status: OutboxItem['status'], error?: string): Promise<void> {
+    if (!this.db) await this.initDB();
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction(['syncOutbox'], 'readwrite');
+      const store = transaction.objectStore('syncOutbox');
+      
+      const getRequest = store.get(id);
+      getRequest.onsuccess = () => {
+        const item = getRequest.result;
+        if (item) {
+          item.status = status;
+          item.retries += 1;
+          if (error) item.error = error;
+          
+          const updateRequest = store.put(item);
+          updateRequest.onsuccess = () => resolve();
+          updateRequest.onerror = () => reject(updateRequest.error);
+        } else {
+          resolve();
+        }
+      };
+      getRequest.onerror = () => reject(getRequest.error);
+    });
+  }
+
+  // Delete synced items from outbox
+  async deleteOutboxItem(id: number): Promise<void> {
+    if (!this.db) await this.initDB();
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction(['syncOutbox'], 'readwrite');
+      const store = transaction.objectStore('syncOutbox');
+      
+      const request = store.delete(id);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
     });
   }
 }

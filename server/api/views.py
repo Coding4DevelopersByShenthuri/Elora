@@ -13,6 +13,7 @@ from django.core.mail import send_mail, EmailMultiAlternatives
 from django.conf import settings
 from django.urls import reverse
 from django.template.loader import render_to_string
+from django.core.cache import cache
 
 from .serializers import (
     RegisterSerializer, LoginSerializer, UserSerializer, UserProfileSerializer,
@@ -257,6 +258,10 @@ def login(request):
         user = authenticate(username=user.username, password=password)
         
         if user is not None:
+            # Update last_login timestamp in database (MySQL/SQLite)
+            user.last_login = timezone.now()
+            user.save()
+            
             tokens = get_tokens_for_user(user)
             user_serializer = UserSerializer(user)
             
@@ -925,6 +930,287 @@ def waitlist_signup(request):
         logger.error(f"Waitlist signup error: {str(e)}")
         return Response({
             "message": "An error occurred"
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# ============= Sync & Offline Support =============
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def sync_changes(request):
+    """
+    Get changes since last sync (for offline-first synchronization)
+    Returns all entities that have been modified since the given timestamp
+    """
+    try:
+        since = request.query_params.get('since')
+        
+        if since:
+            try:
+                since_dt = datetime.fromisoformat(since.replace('Z', '+00:00'))
+                if since_dt.tzinfo is None:
+                    since_dt = timezone.make_aware(since_dt)
+            except (ValueError, AttributeError):
+                since_dt = timezone.now() - timedelta(days=30)  # Default to 30 days
+        else:
+            since_dt = timezone.now() - timedelta(days=30)
+        
+        changes = []
+        
+        # Get all entities that were updated after the given timestamp
+        # Profile changes
+        profiles = UserProfile.objects.filter(
+            user=request.user,
+            updated_at__gte=since_dt
+        )
+        for profile in profiles:
+            serializer = UserProfileSerializer(profile)
+            changes.append({
+                'entity': 'UserProfile',
+                'entity_id': profile.id,
+                'operation': 'update',
+                'data': serializer.data,
+                'updated_at': profile.updated_at.isoformat()
+            })
+        
+        # Lesson progress changes
+        progress_items = LessonProgress.objects.filter(
+            user=request.user,
+            updated_at__gte=since_dt
+        )
+        for item in progress_items:
+            serializer = LessonProgressSerializer(item)
+            changes.append({
+                'entity': 'LessonProgress',
+                'entity_id': item.id,
+                'operation': 'update',
+                'data': serializer.data,
+                'updated_at': item.updated_at.isoformat()
+            })
+        
+        # Practice sessions changes
+        sessions = PracticeSession.objects.filter(
+            user=request.user,
+            session_date__gte=since_dt
+        )
+        for session in sessions:
+            serializer = PracticeSessionSerializer(session)
+            changes.append({
+                'entity': 'PracticeSession',
+                'entity_id': session.id,
+                'operation': 'update',
+                'data': serializer.data,
+                'updated_at': session.session_date.isoformat()
+            })
+        
+        # Vocabulary changes
+        vocab_items = VocabularyWord.objects.filter(
+            user=request.user,
+            last_practiced__gte=since_dt
+        )
+        for vocab in vocab_items:
+            serializer = VocabularyWordSerializer(vocab)
+            changes.append({
+                'entity': 'VocabularyWord',
+                'entity_id': vocab.id,
+                'operation': 'update',
+                'data': serializer.data,
+                'updated_at': vocab.last_practiced.isoformat()
+            })
+        
+        # Kids progress changes
+        kids_progress = KidsProgress.objects.filter(
+            user=request.user,
+            updated_at__gte=since_dt
+        )
+        for progress in kids_progress:
+            serializer = KidsProgressSerializer(progress)
+            changes.append({
+                'entity': 'KidsProgress',
+                'entity_id': progress.id,
+                'operation': 'update',
+                'data': serializer.data,
+                'updated_at': progress.updated_at.isoformat()
+            })
+        
+        # Kids achievements changes
+        kids_achievements = KidsAchievement.objects.filter(
+            user=request.user,
+            updated_at__gte=since_dt
+        )
+        for ach in kids_achievements:
+            serializer = KidsAchievementSerializer(ach)
+            changes.append({
+                'entity': 'KidsAchievement',
+                'entity_id': ach.id,
+                'operation': 'update',
+                'data': serializer.data,
+                'updated_at': ach.updated_at.isoformat()
+            })
+        
+        return Response({
+            'changes': changes,
+            'total': len(changes),
+            'since': since or since_dt.isoformat(),
+            'next_cursor': timezone.now().isoformat()
+        })
+    
+    except Exception as e:
+        logger.error(f"Sync changes error: {str(e)}")
+        return Response({
+            "message": "An error occurred"
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def idempotent_upsert(request):
+    """
+    Idempotent upsert endpoint for offline sync
+    Uses Idempotency-Key header to prevent duplicate processing
+    """
+    try:
+        # Check for idempotency key
+        idempotency_key = request.headers.get('Idempotency-Key')
+        if not idempotency_key:
+            return Response({
+                "error": "Idempotency-Key header is required"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check cache for duplicate request
+        cache_key = f"sync_{request.user.id}_{idempotency_key}"
+        cached_response = cache.get(cache_key)
+        
+        if cached_response:
+            logger.info(f"Returning cached response for idempotency key: {idempotency_key}")
+            return Response(cached_response)
+        
+        # Process the request
+        entity_type = request.data.get('entity_type')
+        entity_id = request.data.get('entity_id')
+        operation = request.data.get('operation')  # 'create' or 'update'
+        data = request.data.get('data', {})
+        
+        if not entity_type or operation not in ['create', 'update']:
+            return Response({
+                "error": "entity_type and operation are required"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Route to appropriate handler
+        result = None
+        
+        if entity_type == 'LessonProgress' and data.get('lesson'):
+            # Upsert lesson progress
+            try:
+                from .models import Lesson
+                lesson = Lesson.objects.get(id=data['lesson'])
+                progress, created = LessonProgress.objects.get_or_create(
+                    user=request.user,
+                    lesson=lesson
+                )
+                
+                # Update fields
+                for key, value in data.items():
+                    if key != 'lesson' and hasattr(progress, key):
+                        setattr(progress, key, value)
+                progress.save()
+                
+                result = {
+                    'entity': 'LessonProgress',
+                    'entity_id': progress.id,
+                    'operation': 'created' if created else 'updated',
+                    'data': LessonProgressSerializer(progress).data
+                }
+            except Exception as e:
+                return Response({
+                    "error": str(e)
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        elif entity_type == 'PracticeSession':
+            # Upsert practice session
+            serializer = PracticeSessionSerializer(data=data)
+            if serializer.is_valid():
+                instance = serializer.save(user=request.user)
+                result = {
+                    'entity': 'PracticeSession',
+                    'entity_id': instance.id,
+                    'operation': 'created',
+                    'data': PracticeSessionSerializer(instance).data
+                }
+            else:
+                return Response({
+                    "error": serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        elif entity_type == 'VocabularyWord':
+            # Upsert vocabulary word
+            word = data.get('word', '').lower()
+            vocab, created = VocabularyWord.objects.get_or_create(
+                user=request.user,
+                word=word,
+                defaults=data
+            )
+            if not created:
+                # Update existing
+                for key, value in data.items():
+                    if hasattr(vocab, key) and key != 'word':
+                        setattr(vocab, key, value)
+                vocab.save()
+            
+            result = {
+                'entity': 'VocabularyWord',
+                'entity_id': vocab.id,
+                'operation': 'created' if created else 'updated',
+                'data': VocabularyWordSerializer(vocab).data
+            }
+        
+        elif entity_type == 'KidsProgress':
+            # Upsert kids progress
+            obj, created = KidsProgress.objects.get_or_create(user=request.user)
+            serializer = KidsProgressSerializer(obj, data=data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                result = {
+                    'entity': 'KidsProgress',
+                    'entity_id': obj.id,
+                    'operation': 'updated',
+                    'data': serializer.data
+                }
+            else:
+                return Response({
+                    "error": serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        elif entity_type == 'KidsAchievement':
+            # Upsert kids achievement
+            name = data.get('name')
+            if name:
+                ach, created = KidsAchievement.objects.get_or_create(
+                    user=request.user,
+                    name=name
+                )
+                serializer = KidsAchievementSerializer(ach, data=data, partial=True)
+                if serializer.is_valid():
+                    serializer.save()
+                    result = {
+                        'entity': 'KidsAchievement',
+                        'entity_id': ach.id,
+                        'operation': 'created' if created else 'updated',
+                        'data': serializer.data
+                    }
+        
+        if result:
+            # Cache the response for 24 hours
+            cache.set(cache_key, result, 86400)  # 24 hours
+            return Response(result, status=status.HTTP_201_CREATED if result['operation'] == 'created' else status.HTTP_200_OK)
+        else:
+            return Response({
+                "error": f"Unknown entity type: {entity_type}"
+            }, status=status.HTTP_400_BAD_REQUEST)
+    
+    except Exception as e:
+        logger.error(f"Idempotent upsert error: {str(e)}")
+        return Response({
+            "error": str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 

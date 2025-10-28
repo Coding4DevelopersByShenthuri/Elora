@@ -390,7 +390,7 @@ const authService = {
 };
 
 const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = false, onAuthSuccess }: AuthModalProps) => {
-  const { login, registerWithServer, loginWithServer } = useAuth();
+  const { registerWithServer, loginWithServer } = useAuth();
   const [authMode, setAuthMode] = useState<AuthMode>(initialMode);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -729,40 +729,10 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
             return;
           }
         } catch (serverError) {
-          console.log('Server login failed, trying offline mode');
+          // Server login failed - user needs to be online to login
+          setError('Unable to connect to server. Please check your internet connection and try again.');
+          return;
         }
-
-        // For offline login, check if the user is newly registered and not yet activated
-        if (newlyRegisteredEmail && newlyRegisteredEmail.toLowerCase() === formData.email.toLowerCase()) {
-          // Check if this is a valid newly registered user trying to login without activation
-          const users: User[] = JSON.parse(localStorage.getItem("speakbee_users") || "[]");
-          const user = users.find(u => u.email.toLowerCase() === formData.email.toLowerCase());
-          
-          if (user && authService.verifyPassword(formData.password, user.password)) {
-            setError('Activate your account first. Please check your email inbox and click the verification link to activate your account.');
-            setShowActivationMessage(true);
-            return;
-          }
-        }
-
-        // Fallback to offline login
-        const { token, user: userData } = await authService.login(formData.email, formData.password);
-
-        localStorage.setItem('speakbee_auth_token', token);
-        localStorage.setItem('speakbee_current_user', JSON.stringify(userData));
-        login(userData); // Pass userData to login
-
-        setSuccess('Login successful!');
-
-        setTimeout(() => {
-          // If redirected from kids page, don't close the modal but call onAuthSuccess
-          if (redirectFromKids && onAuthSuccess) {
-            onAuthSuccess();
-          } else {
-            onClose();
-          }
-          resetForm();
-        }, 1000);
       } else {
         // Try server registration first
         try {
@@ -797,40 +767,10 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
             return;
           }
         } catch (serverError) {
-          console.log('Server registration failed, trying offline mode');
+          // Server registration failed - user needs to be online to register
+          setError('Unable to connect to server. Please check your internet connection and try again.');
+          return;
         }
-
-        // Fallback to offline registration
-        // IMPORTANT: For offline mode, do NOT store authentication until account is verified
-        // This prevents auto-login before email activation
-        await authService.register(
-          formData.name.trim(),
-          formData.email,
-          formData.password,
-          formData.securityQuestion,
-          formData.securityAnswer
-        );
-
-        // DO NOT store token or user data for offline users - they must verify first
-        // No authentication credentials are stored until email verification is complete
-
-        // Store credentials for auto-fill and switch to login
-        setAutoFillCredentials({
-          email: formData.email,
-          password: formData.password
-        });
-
-        // Track newly registered email for activation message
-        setNewlyRegisteredEmail(formData.email);
-        setShowActivationMessage(true);
-
-        setSuccess('Registration successful! Please check your email to verify your account. You will not be able to login until you verify your email.');
-
-        // Switch to login mode after a short delay
-        setTimeout(() => {
-          setAuthMode('login');
-          setIsRightPanelActive(false);
-        }, 1500);
       }
     } catch (error) {
       console.error('Authentication error:', error);

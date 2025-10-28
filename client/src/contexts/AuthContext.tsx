@@ -103,7 +103,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           email: userData.email,
           name: userData.name,
           createdAt: userData.date_joined || new Date().toISOString(),
-          lastLogin: new Date().toISOString(),
+          lastLogin: userData.last_login || new Date().toISOString(), // Use server's last_login
           profile: {
             level: userData.profile?.level || 'beginner',
             points: userData.profile?.points || 0,
@@ -119,6 +119,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           } : undefined
         };
         
+        // transformedUser is already used in login() above, no need to reference it here
         login(transformedUser);
         return { success: true, message: response.message };
       }
@@ -137,9 +138,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (response.success) {
         // Check if we have data property
         if ('data' in response && response.data) {
-          // The API returns user data directly in response.data, not nested under 'user'
-          const userData = (response.data as any).user || response.data;
-          
           // DO NOT login the user yet - they need to verify email first
           // The email verification will activate their account
           // Only return success with the message to inform the user

@@ -1,19 +1,25 @@
 from pathlib import Path
 from datetime import timedelta
 import os
+import logging
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Initialize logger
+logger = logging.getLogger(__name__)
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-wo(!w-s!_(hlg6grj0d04ey^ef*h$4o2r*_v*&a33kn4$v@d01'
+# Load from environment variable or use default for development
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-wo(!w-s!_(hlg6grj0d04ey^ef*h$4o2r*_v*&a33kn4$v@d01')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
 
@@ -67,13 +73,45 @@ WSGI_APPLICATION = 'crud.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+# Configure database via environment variables:
+# - Development: SQLite (default, no env vars needed)
+# - Production: Set these in your production environment:
+#   DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_PORT
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Check if MySQL is configured
+db_name = config('DATABASE_NAME', default=None)
+db_user = config('DATABASE_USER', default=None)
+db_password = config('DATABASE_PASSWORD', default='')
+db_host = config('DATABASE_HOST', default='localhost')
+db_port = config('DATABASE_PORT', default='3306')
+
+if db_name and db_user:
+    # MySQL database configuration
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': db_name,
+            'USER': db_user,
+            'PASSWORD': db_password if db_password else '',
+            'HOST': db_host,
+            'PORT': db_port,
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+                'collation': 'utf8mb4_unicode_ci',
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            },
+        }
     }
-}
+    logger.info(f"Using MySQL database: {db_name} on {db_host}")
+else:
+    # Development: SQLite database
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+    logger.info("Using SQLite database (development mode)")
 
 
 # Password validation
@@ -178,7 +216,7 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = True
 
 # Frontend URL for email verification links
-FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
+FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:5173')
 
 CORS_ALLOW_METHODS = [
     'DELETE',
@@ -210,14 +248,14 @@ AUTHENTICATION_BACKENDS = [
 # For development: Use console backend to see emails in console
 # For production: Use SMTP backend
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Development - Emails print to console
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # Production - Sends real emails
+EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')  # Production - Sends real emails
 
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'elora.toinfo@gmail.com'
-EMAIL_HOST_PASSWORD = 'ekfw ckmu luuv ebdl'  # Gmail app password with spaces  
-DEFAULT_FROM_EMAIL = 'elora.toinfo@gmail.com'
+EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='')
 
 # Logging configuration
 LOGGING = {

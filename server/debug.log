@@ -761,3 +761,106 @@ django.contrib.auth.models.User.MultipleObjectsReturned: get() returned more tha
 ERROR 2025-10-28 14:24:49,083 log 6248 13744 Internal Server Error: /api/auth/register
 ERROR 2025-10-28 14:24:49,084 basehttp 6248 13744 "POST /api/auth/register HTTP/1.1" 500 113
 INFO 2025-10-28 16:58:15,598 autoreload 4496 20716 Watching for file changes with StatReloader
+INFO 2025-10-28 21:16:09,919 autoreload 4496 20716 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-10-28 21:30:35,738 autoreload 12860 8596 Watching for file changes with StatReloader
+INFO 2025-10-28 21:31:50,603 autoreload 15280 21216 Watching for file changes with StatReloader
+INFO 2025-10-28 21:40:34,463 basehttp 15280 6700 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-28 21:40:34,855 log 15280 6700 Unauthorized: /api/auth/login
+WARNING 2025-10-28 21:40:34,864 basehttp 15280 6700 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-28 21:40:51,531 basehttp 15280 16676 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+INFO 2025-10-28 21:40:51,545 views 15280 16676 Registration request received for email: shen21476@gmail.com
+INFO 2025-10-28 21:40:52,357 views 15280 16676 Created verification token for user shen21476@gmail.com
+INFO 2025-10-28 21:40:56,417 views 15280 16676 Verification email sent successfully to shen21476@gmail.com
+INFO 2025-10-28 21:40:56,687 basehttp 15280 16676 - Broken pipe from ('127.0.0.1', 49374)
+WARNING 2025-10-28 21:41:01,196 log 15280 11936 Unauthorized: /api/auth/login
+WARNING 2025-10-28 21:41:01,214 basehttp 15280 11936 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-28 21:47:20,780 views 15280 9860 Registration request received for email: shen21476@gmail.com
+INFO 2025-10-28 21:47:20,817 views 15280 9860 Resending verification email for inactive account: shen21476@gmail.com
+WARNING 2025-10-28 21:47:21,096 log 15280 9860 Bad Request: /api/auth/register
+WARNING 2025-10-28 21:47:21,099 basehttp 15280 9860 "POST /api/auth/register HTTP/1.1" 400 123
+INFO 2025-10-28 21:52:30,175 basehttp 15280 16304 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+INFO 2025-10-28 21:52:30,187 views 15280 16304 Registration request received for email: shen21476@gmail.com
+INFO 2025-10-28 21:52:30,234 views 15280 16304 Resending verification email for inactive account: shen21476@gmail.com
+WARNING 2025-10-28 21:52:30,588 log 15280 16304 Bad Request: /api/auth/register
+WARNING 2025-10-28 21:52:30,588 basehttp 15280 16304 "POST /api/auth/register HTTP/1.1" 400 123
+INFO 2025-10-28 21:52:45,842 basehttp 15280 16304 "OPTIONS /api/verify-email/0uvLCshiFDe3fsVpLqY_U08KEcKw_hHDeOi8iBS3VHY/ HTTP/1.1" 200 0
+INFO 2025-10-28 21:52:45,865 views 15280 16304 Email verification successful for user shen21476@gmail.com
+INFO 2025-10-28 21:52:45,866 basehttp 15280 16304 "GET /api/verify-email/0uvLCshiFDe3fsVpLqY_U08KEcKw_hHDeOi8iBS3VHY/ HTTP/1.1" 200 77
+INFO 2025-10-28 21:52:50,343 basehttp 15280 16304 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-28 21:52:50,692 log 15280 16304 Unauthorized: /api/auth/login
+WARNING 2025-10-28 21:52:50,700 basehttp 15280 16304 "POST /api/auth/login HTTP/1.1" 401 39
+WARNING 2025-10-28 21:53:26,288 log 15280 8672 Unauthorized: /api/auth/login
+WARNING 2025-10-28 21:53:26,288 basehttp 15280 8672 "POST /api/auth/login HTTP/1.1" 401 39
+WARNING 2025-10-28 21:54:00,777 log 15280 8672 Bad Request: /api/verify-email/0uvLCshiFDe3fsVpLqY_U08KEcKw_hHDeOi8iBS3VHY/
+WARNING 2025-10-28 21:54:00,778 basehttp 15280 8672 "GET /api/verify-email/0uvLCshiFDe3fsVpLqY_U08KEcKw_hHDeOi8iBS3VHY/ HTTP/1.1" 400 67
+WARNING 2025-10-28 21:54:11,284 log 15280 8672 Unauthorized: /api/auth/login
+WARNING 2025-10-28 21:54:11,284 basehttp 15280 8672 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-28 22:02:04,115 basehttp 15280 16820 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+INFO 2025-10-28 22:02:04,126 views 15280 16820 Registration request received for email: shen21476@gmail.com
+WARNING 2025-10-28 22:02:04,179 views 15280 16820 Registration attempt with already active email: shen21476@gmail.com
+WARNING 2025-10-28 22:02:04,179 log 15280 16820 Bad Request: /api/auth/register
+WARNING 2025-10-28 22:02:04,190 basehttp 15280 16820 "POST /api/auth/register HTTP/1.1" 400 122
+INFO 2025-10-28 22:02:09,782 basehttp 15280 16820 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-28 22:02:10,211 log 15280 16820 Unauthorized: /api/auth/login
+WARNING 2025-10-28 22:02:10,214 basehttp 15280 16820 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-28 22:07:20,090 basehttp 15280 15772 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+INFO 2025-10-28 22:07:20,109 views 15280 15772 Registration request received for email: shenthurimaran2001@gmail.com
+INFO 2025-10-28 22:07:20,638 views 15280 15772 Created verification token for user shenthurimaran2001@gmail.com
+INFO 2025-10-28 22:07:24,305 views 15280 15772 Verification email sent successfully to shenthurimaran2001@gmail.com
+INFO 2025-10-28 22:07:24,362 basehttp 15280 15772 "POST /api/auth/register HTTP/1.1" 201 863
+INFO 2025-10-28 22:07:37,882 basehttp 15280 15772 "OPTIONS /api/verify-email/k0K4PY4jvrQZ7GfTzj9fWzbhFx_QRmDAbZYkqcGkR6s/ HTTP/1.1" 200 0
+INFO 2025-10-28 22:07:37,927 views 15280 15772 Email verification successful for user shenthurimaran2001@gmail.com
+INFO 2025-10-28 22:07:37,936 basehttp 15280 15772 "GET /api/verify-email/k0K4PY4jvrQZ7GfTzj9fWzbhFx_QRmDAbZYkqcGkR6s/ HTTP/1.1" 200 77
+INFO 2025-10-28 22:07:58,549 basehttp 15280 9748 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+INFO 2025-10-28 22:08:05,300 basehttp 15280 9748 - Broken pipe from ('127.0.0.1', 52828)
+INFO 2025-10-28 22:08:15,354 basehttp 15280 6436 "POST /api/auth/login HTTP/1.1" 200 1082
+INFO 2025-10-28 22:08:35,712 basehttp 15280 15588 "POST /api/auth/login HTTP/1.1" 200 1082
+INFO 2025-10-28 22:11:45,500 autoreload 15280 21216 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-28 22:11:48,703 autoreload 8824 19756 Watching for file changes with StatReloader
+INFO 2025-10-28 22:11:52,837 autoreload 8824 19756 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-28 22:11:54,351 autoreload 10952 19800 Watching for file changes with StatReloader
+INFO 2025-10-28 22:12:01,574 autoreload 10952 19800 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-28 22:12:02,903 autoreload 11540 5848 Watching for file changes with StatReloader
+INFO 2025-10-28 22:12:05,897 autoreload 11540 5848 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-28 22:12:06,746 autoreload 13624 2536 Watching for file changes with StatReloader
+INFO 2025-10-28 22:13:18,650 autoreload 13624 2536 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-28 22:13:23,937 autoreload 20920 1668 Watching for file changes with StatReloader
+INFO 2025-10-28 22:22:17,457 basehttp 20920 3132 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+INFO 2025-10-28 22:22:17,611 views 20920 3132 Registration request received for email: shenthurimaran@gmail.com
+INFO 2025-10-28 22:22:19,058 views 20920 3132 Created verification token for user shenthurimaran@gmail.com
+INFO 2025-10-28 22:22:23,748 views 20920 3132 Verification email sent successfully to shenthurimaran@gmail.com
+INFO 2025-10-28 22:22:23,814 basehttp 20920 3132 - Broken pipe from ('127.0.0.1', 64910)
+INFO 2025-10-28 22:22:37,598 basehttp 20920 3504 "OPTIONS /api/verify-email/x_f3dCZdaAGQNZWVnPBcstCa6hf5vqgduLARz773ZLI/ HTTP/1.1" 200 0
+INFO 2025-10-28 22:22:37,632 views 20920 3504 Email verification successful for user shenthurimaran@gmail.com
+INFO 2025-10-28 22:22:37,634 basehttp 20920 3504 "GET /api/verify-email/x_f3dCZdaAGQNZWVnPBcstCa6hf5vqgduLARz773ZLI/ HTTP/1.1" 200 77
+INFO 2025-10-28 22:22:42,580 basehttp 20920 3504 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+INFO 2025-10-28 22:22:43,505 basehttp 20920 3504 "POST /api/auth/login HTTP/1.1" 200 1105
+INFO 2025-10-28 22:24:24,117 basehttp 20920 11804 "POST /api/auth/login HTTP/1.1" 200 1105
+INFO 2025-10-28 22:26:17,692 autoreload 11180 19176 Watching for file changes with StatReloader
+INFO 2025-10-28 22:31:41,500 basehttp 11180 8108 "POST /api/auth/login HTTP/1.1" 200 1105
+INFO 2025-10-28 22:33:42,775 basehttp 11180 19580 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+INFO 2025-10-28 22:33:42,783 views 11180 19580 Registration request received for email: shenthurimaran09@gmail.com
+INFO 2025-10-28 22:33:43,436 views 11180 19580 Created verification token for user shenthurimaran09@gmail.com
+INFO 2025-10-28 22:33:46,743 views 11180 19580 Verification email sent successfully to shenthurimaran09@gmail.com
+INFO 2025-10-28 22:33:46,754 basehttp 11180 19580 "POST /api/auth/register HTTP/1.1" 201 857
+INFO 2025-10-28 22:33:58,225 basehttp 11180 19580 "OPTIONS /api/verify-email/WCpq4R7l-qU9PQK8YPs7k6nM8jcvCw7cyFmco35f7jY/ HTTP/1.1" 200 0
+INFO 2025-10-28 22:33:58,265 views 11180 19580 Email verification successful for user shenthurimaran09@gmail.com
+INFO 2025-10-28 22:33:58,267 basehttp 11180 19580 "GET /api/verify-email/WCpq4R7l-qU9PQK8YPs7k6nM8jcvCw7cyFmco35f7jY/ HTTP/1.1" 200 77
+WARNING 2025-10-28 22:34:11,333 log 11180 19580 Bad Request: /api/verify-email/WCpq4R7l-qU9PQK8YPs7k6nM8jcvCw7cyFmco35f7jY/
+WARNING 2025-10-28 22:34:11,335 basehttp 11180 19580 "GET /api/verify-email/WCpq4R7l-qU9PQK8YPs7k6nM8jcvCw7cyFmco35f7jY/ HTTP/1.1" 400 67
+INFO 2025-10-28 22:34:21,744 basehttp 11180 19580 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+INFO 2025-10-28 22:34:22,128 basehttp 11180 19580 "POST /api/auth/login HTTP/1.1" 200 1101
+INFO 2025-10-28 22:38:01,071 basehttp 11180 14844 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-28 22:38:01,181 log 11180 14844 Unauthorized: /api/auth/login
+WARNING 2025-10-28 22:38:01,184 basehttp 11180 14844 "POST /api/auth/login HTTP/1.1" 401 39
+WARNING 2025-10-28 22:41:14,864 log 11180 10044 Unauthorized: /api/auth/login
+WARNING 2025-10-28 22:41:14,864 basehttp 11180 10044 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-28 22:41:36,777 basehttp 11180 18288 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-28 22:41:37,350 log 11180 18288 Unauthorized: /api/auth/login
+WARNING 2025-10-28 22:41:37,350 basehttp 11180 18288 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-28 22:42:00,961 basehttp 11180 17588 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+INFO 2025-10-28 22:42:01,611 basehttp 11180 17588 "POST /api/auth/login HTTP/1.1" 200 1107
+INFO 2025-10-28 22:47:20,457 autoreload 11180 19176 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-10-28 22:49:37,678 autoreload 5956 2992 Watching for file changes with StatReloader
+INFO 2025-10-28 22:53:31,215 basehttp 5956 20908 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+INFO 2025-10-28 22:53:32,223 basehttp 5956 20908 "POST /api/auth/login HTTP/1.1" 200 1107

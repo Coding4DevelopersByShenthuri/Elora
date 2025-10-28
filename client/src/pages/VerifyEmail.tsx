@@ -65,15 +65,33 @@ const VerifyEmail: React.FC = () => {
             <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">
               Email Verified!
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-gray-600 dark:text-gray-400 mb-2">
               {message}
             </p>
-            <Button
-              onClick={() => navigate('/')}
-              className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg transition-colors"
-            >
-              Go to Homepage
-            </Button>
+            <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">
+              Your account has been activated. Please login with your email and password.
+            </p>
+            <div className="flex gap-3 justify-center">
+              <Button
+                onClick={() => {
+                  // Open login modal
+                  window.dispatchEvent(new CustomEvent('openAuthModal', { 
+                    detail: { mode: 'login' } 
+                  }));
+                  navigate('/');
+                }}
+                className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-2 rounded-lg transition-colors font-semibold"
+              >
+                Login Now
+              </Button>
+              <Button
+                onClick={() => navigate('/')}
+                variant="outline"
+                className="px-6 py-2 rounded-lg transition-colors"
+              >
+                Go to Homepage
+              </Button>
+            </div>
           </div>
         )}
 

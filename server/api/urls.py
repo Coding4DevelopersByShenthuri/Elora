@@ -43,4 +43,8 @@ urlpatterns = [
     
     # ============= Waitlist =============
     path('waitlist/signup', views.waitlist_signup, name='waitlist-signup'),
+    
+    # ============= Sync & Offline Support =============
+    path('sync/changes', views.sync_changes, name='sync-changes'),
+    path('sync/upsert', views.idempotent_upsert, name='sync-upsert'),
 ]
