@@ -1853,7 +1853,7 @@ const YoungKidsPage = () => {
                 // Don't play sound feedback for navigation buttons
                 setPulseAnimation(true);
                 setTimeout(() => setPulseAnimation(false), 1000);
-                navigate('/favorites');
+                navigate('/favorites/young');
               }}
               onMouseEnter={() => handleElementHover('quick-favorites')}
               onMouseLeave={() => setHoveredElement(null)}
@@ -1863,7 +1863,7 @@ const YoungKidsPage = () => {
                 hoveredElement === 'quick-favorites' && "animate-pulse"
               )} />
               <span className="font-semibold text-gray-800 dark:text-gray-500 whitespace-nowrap group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
-                Favorite Stories {favorites.length > 0 && `(${favorites.length})`}
+                Favorite Stories {(() => { const youngFavorites = favorites.filter(f => f.startsWith('young-')); return youngFavorites.length > 0 ? `(${youngFavorites.length})` : ''; })()}
               </span>
             </Button>
           </div>

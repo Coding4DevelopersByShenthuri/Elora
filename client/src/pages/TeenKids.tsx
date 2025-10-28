@@ -6,7 +6,7 @@ import {
   ChevronLeft, ChevronRight, Target,
   Shield, Download, Loader2, Crown, Compass,
   Music, VolumeX, HelpCircle,
-  TrendingUp, Clock, CheckCircle
+  TrendingUp, Clock, CheckCircle, Cpu, Lock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -399,6 +399,34 @@ const TeenKidsPage = () => {
       animation: 'animate-float-fast',
       type: 'digital',
       id: 'teen-7'
+    },
+    {
+      title: "AI Ethics Explorer",
+      description: "Navigate the ethical landscape of artificial intelligence and machine learning!",
+      difficulty: 'Hard',
+      duration: '14 min',
+      words: 980,
+      image: '🤖',
+      character: Cpu,
+      gradient: 'from-indigo-400 to-violet-400',
+      bgGradient: 'from-indigo-200 to-violet-300 dark:from-indigo-900 dark:to-violet-900',
+      animation: 'animate-float-medium',
+      type: 'ai',
+      id: 'teen-8'
+    },
+    {
+      title: "Digital Security Guardian",
+      description: "Master encryption, data protection, and cybersecurity fundamentals!",
+      difficulty: 'Hard',
+      duration: '13 min',
+      words: 920,
+      image: '🔐',
+      character: Lock,
+      gradient: 'from-red-400 to-rose-400',
+      bgGradient: 'from-red-200 to-rose-300 dark:from-red-900 dark:to-rose-900',
+      animation: 'animate-float-slow',
+      type: 'cybersecurity',
+      id: 'teen-9'
     }
   ];
 
@@ -451,9 +479,9 @@ const TeenKidsPage = () => {
     { 
       name: 'Story Master', 
       icon: BookOpen, 
-      progress: Math.min(100, favorites.length * 12.5), 
+      progress: Math.min(100, favorites.length * 10), 
       emoji: '📖',
-      description: `${favorites.length}/8 favorite stories`
+      description: `${favorites.length}/10 favorite stories`
     },
     { 
       name: 'Speaking Pro', 
@@ -1482,7 +1510,7 @@ const TeenKidsPage = () => {
               onClick={() => {
                 setPulseAnimation(true);
                 setTimeout(() => setPulseAnimation(false), 1000);
-                navigate('/favorites');
+                navigate('/favorites/teen');
               }}
               onMouseEnter={() => handleElementHover('quick-favorites')}
               onMouseLeave={() => setHoveredElement(null)}
@@ -1492,7 +1520,7 @@ const TeenKidsPage = () => {
                 hoveredElement === 'quick-favorites' && "animate-pulse"
               )} />
               <span className="font-semibold text-gray-800 dark:text-gray-500 whitespace-nowrap group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
-                Favorite Adventures {favorites.length > 0 && `(${favorites.length})`}
+                Favorite Adventures {(() => { const teenFavorites = favorites.filter(f => f.startsWith('teen-')); return teenFavorites.length > 0 ? `(${teenFavorites.length})` : ''; })()}
               </span>
             </Button>
           </div>
