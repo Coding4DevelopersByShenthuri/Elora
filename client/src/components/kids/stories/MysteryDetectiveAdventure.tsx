@@ -99,8 +99,8 @@ const storySteps = [
     hint: 'Think about how detectives read people',
     
     choices: [
-      { text: 'False - Body language means nothing', emoji: '❌', meaning: 'incorrect' },
-      { text: 'True - Body language can reveal deception', emoji: '✅', meaning: 'correct' }
+      { text: 'Body language means nothing', emoji: '❌', meaning: 'incorrect' },
+      { text: 'Body language can reveal deception', emoji: '✅', meaning: 'correct' }
     ],
     
     revealText: 'Excellent detective insight! It is TRUE - body language can reveal deception. Professional detectives are trained to notice nervous gestures, inconsistent statements, and subtle behaviors. Sometimes what people don\'t say is just as important as what they do say!',

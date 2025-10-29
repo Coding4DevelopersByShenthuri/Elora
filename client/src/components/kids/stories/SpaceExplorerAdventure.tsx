@@ -108,8 +108,8 @@ const storySteps = [
     question: 'True or False: Procedure discipline protects the crew.',
     hint: 'Consider why checklists exist',
     choices: [
-      { text: 'True - Procedure discipline protects the crew', emoji: '✅', meaning: 'correct' },
-      { text: 'False - Procedures slow people down', emoji: '❌', meaning: 'incorrect' }
+      { text: 'Procedure discipline protects the crew', emoji: '✅', meaning: 'correct' },
+      { text: 'Procedures slow people down', emoji: '❌', meaning: 'incorrect' }
     ],
     revealText: 'Correct. Procedures and checklists exist to reduce risk. In complex systems, discipline prevents small errors from becoming emergencies.',
     maxReplays: 5,
