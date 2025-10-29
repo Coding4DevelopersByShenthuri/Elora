@@ -91,7 +91,7 @@ const HelpPage = () => {
                                     No worries—our team is happy to help. You can email us directly or fill out a contact form.
                                 </p>
                                 <ul className="list-disc list-inside mt-4 space-y-1 text-foreground/80">
-                                    <li>Email: <a href="mailto:support@speakbee.ai" className="text-teal-600 underline">support@speakbee.ai</a></li>
+                                    <li>Email: <a href="mailto:elora.toinfo@gmail.com" className="text-teal-600 underline">elora.toinfo@gmail.com</a></li>
                                     <li><Link to="/contact" className="text-teal-600 underline">Contact Form</Link> — Get a response within 24 hours.</li>
                                 </ul>
                             </>

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -391,6 +392,7 @@ const authService = {
 
 const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = false, onAuthSuccess }: AuthModalProps) => {
   const { registerWithServer, loginWithServer } = useAuth();
+  const navigate = useNavigate();
   const [authMode, setAuthMode] = useState<AuthMode>(initialMode);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -988,7 +990,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
         {/* Contact Information */}
         <div className="text-center mt-3 md:mt-4 pt-3 md:pt-4 border-t border-[#4BB6B7]/30">
           <p className="text-[#4BB6B7] text-xs">
-            Questions? Contact us at <strong>support@speakbee.ai</strong>
+            Questions? Contact us at <strong>elora.toinfo@gmail.com</strong>
           </p>
         </div>
       </div>
@@ -1186,7 +1188,10 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
                         I agree to the{' '}
                         <button
                           type="button"
-                          onClick={() => setAuthMode('terms')}
+                          onClick={() => {
+                            onClose();
+                            navigate('/terms-and-conditions');
+                          }}
                           className="text-[#4BB6B7] hover:text-[#28CACD] underline transition-colors font-semibold"
                         >
                           Terms and Conditions
@@ -1360,7 +1365,10 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
                     <div className="auth-terms-container auth-compact-terms flex items-center justify-center flex-wrap gap-2">
                       <button
                         type="button"
-                        onClick={() => setAuthMode('terms')}
+                        onClick={() => {
+                          onClose();
+                          navigate('/terms-and-conditions');
+                        }}
                         className="auth-terms-link flex items-center text-xs md:text-sm"
                       >
                         <FileText className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />

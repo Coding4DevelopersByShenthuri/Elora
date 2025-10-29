@@ -45,6 +45,7 @@ import IeltsPte from "@/pages/IeltsPte";
 import NotFound from "@/pages/NotFound";
 import PricingPage from "@/pages/PricingPage";
 import VerifyEmail from "@/pages/VerifyEmail";
+import TermsAndConditionsPage from "@/pages/TermsAndConditionsPage";
 
 // ✅ Import AuthModal, UserSurvey, and SurveyManager
 import AuthModal from "@/components/auth/AuthModal";
@@ -202,6 +203,7 @@ const AppRoutes = () => {
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
         <Route path="/pricing" element={<PageTransition><PricingPage /></PageTransition>} />
         <Route path="/verify-email/:token" element={<PageTransition><VerifyEmail /></PageTransition>} />
+        <Route path="/terms-and-conditions" element={<PageTransition><TermsAndConditionsPage /></PageTransition>} />
       </Routes>
       
       {/* Global Auth Modal */}

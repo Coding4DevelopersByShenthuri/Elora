@@ -2,7 +2,7 @@ export const TERMS_AND_CONDITIONS = `
 Terms and Conditions Agreement
 
 www.speakbee.com 
-support@speakbee.ai
+elora.toinfo@gmail.com
 Last Updated: ${new Date().toLocaleDateString()}
 
 The Agreement
@@ -242,7 +242,7 @@ Contact Information and Support
 
 For questions, concerns, or support regarding these Terms and Conditions, contact:
 
-Email: support@speakbee.ai 
+Email: elora.toinfo@gmail.com 
 Website: www.speakbee.com  
 Support Hours: Monday-Friday, 9:00 AM - 6:00 PM IST
 
