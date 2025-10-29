@@ -25,6 +25,11 @@ import SpaceExplorerAdventure from '@/components/kids/stories/SpaceExplorerAdven
 import EnvironmentalHeroAdventure from '@/components/kids/stories/EnvironmentalHeroAdventure';
 import TechInnovatorAdventure from '@/components/kids/stories/TechInnovatorAdventure';
 import GlobalCitizenAdventure from '@/components/kids/stories/GlobalCitizenAdventure';
+import SocialMediaExpertAdventure from '@/components/kids/stories/SocialMediaExpertAdventure';
+import FutureLeaderAdventure from '@/components/kids/stories/FutureLeaderAdventure';
+import ScientificDiscoveryAdventure from '@/components/kids/stories/ScientificDiscoveryAdventure';
+import AIEthicsExplorerAdventure from '@/components/kids/stories/AIEthicsExplorerAdventure';
+import DigitalSecurityGuardianAdventure from '@/components/kids/stories/DigitalSecurityGuardianAdventure';
 import AuthModal from '@/components/auth/AuthModal';
 import { useNavigate, useLocation } from 'react-router-dom';
 import HybridServiceManager from '@/services/HybridServiceManager';
@@ -77,11 +82,16 @@ const TeenKidsPage = () => {
   const [showEnvironmentalHero, setShowEnvironmentalHero] = useState(false);
   const [showTechInnovator, setShowTechInnovator] = useState(false);
   const [showGlobalCitizen, setShowGlobalCitizen] = useState(false);
+  const [showFutureLeader, setShowFutureLeader] = useState(false);
+  const [showScientificDiscovery, setShowScientificDiscovery] = useState(false);
+  const [showSocialMediaExpert, setShowSocialMediaExpert] = useState(false);
+  const [showAIEthics, setShowAIEthics] = useState(false);
+  const [showDigitalSecurity, setShowDigitalSecurity] = useState(false);
 
   // Reset bounce animation when all modals are closed
   useEffect(() => {
     const anyModalOpen = showMysteryDetective || showSpaceExplorer || showEnvironmentalHero || 
-                         showTechInnovator || showGlobalCitizen;
+                         showTechInnovator || showGlobalCitizen || showFutureLeader || showScientificDiscovery || showSocialMediaExpert || showAIEthics;
     
     if (!anyModalOpen) {
       // Reset bounce animation when modal closes
@@ -90,7 +100,7 @@ const TeenKidsPage = () => {
       setIsPlaying(false);
     }
   }, [showMysteryDetective, showSpaceExplorer, showEnvironmentalHero, 
-      showTechInnovator, showGlobalCitizen]);
+      showTechInnovator, showGlobalCitizen, showFutureLeader, showScientificDiscovery, showSocialMediaExpert, showAIEthics]);
 
   // Check authentication and user existence on mount
   useEffect(() => {
@@ -590,6 +600,31 @@ const TeenKidsPage = () => {
     }
     if (storyType === 'culture') {
       setShowGlobalCitizen(true);
+      setIsPlaying(false);
+      return;
+    }
+    if (storyType === 'leadership') {
+      setShowFutureLeader(true);
+      setIsPlaying(false);
+      return;
+    }
+    if (storyType === 'science') {
+      setShowScientificDiscovery(true);
+      setIsPlaying(false);
+      return;
+    }
+    if (storyType === 'digital') {
+      setShowSocialMediaExpert(true);
+      setIsPlaying(false);
+      return;
+    }
+    if (storyType === 'ai') {
+      setShowAIEthics(true);
+      setIsPlaying(false);
+      return;
+    }
+    if (storyType === 'cybersecurity') {
+      setShowDigitalSecurity(true);
       setIsPlaying(false);
       return;
     }
@@ -1615,6 +1650,66 @@ const TeenKidsPage = () => {
           onClose={() => setShowGlobalCitizen(false)} 
           onComplete={(score) => {
             setShowGlobalCitizen(false);
+            const newPoints = points + 100;
+            const newStreak = streak + 1;
+            setPoints(newPoints);
+            setStreak(newStreak);
+          }}
+        />
+      )}
+      {showFutureLeader && (
+        <FutureLeaderAdventure 
+          onClose={() => setShowFutureLeader(false)} 
+          onComplete={(score) => {
+            setShowFutureLeader(false);
+            const newPoints = points + 100;
+            const newStreak = streak + 1;
+            setPoints(newPoints);
+            setStreak(newStreak);
+          }}
+        />
+      )}
+      {showScientificDiscovery && (
+        <ScientificDiscoveryAdventure 
+          onClose={() => setShowScientificDiscovery(false)} 
+          onComplete={(score) => {
+            setShowScientificDiscovery(false);
+            const newPoints = points + 100;
+            const newStreak = streak + 1;
+            setPoints(newPoints);
+            setStreak(newStreak);
+          }}
+        />
+      )}
+      {showSocialMediaExpert && (
+        <SocialMediaExpertAdventure 
+          onClose={() => setShowSocialMediaExpert(false)} 
+          onComplete={(score) => {
+            setShowSocialMediaExpert(false);
+            const newPoints = points + 100;
+            const newStreak = streak + 1;
+            setPoints(newPoints);
+            setStreak(newStreak);
+          }}
+        />
+      )}
+      {showAIEthics && (
+        <AIEthicsExplorerAdventure 
+          onClose={() => setShowAIEthics(false)} 
+          onComplete={(score) => {
+            setShowAIEthics(false);
+            const newPoints = points + 100;
+            const newStreak = streak + 1;
+            setPoints(newPoints);
+            setStreak(newStreak);
+          }}
+        />
+      )}
+      {showDigitalSecurity && (
+        <DigitalSecurityGuardianAdventure 
+          onClose={() => setShowDigitalSecurity(false)} 
+          onComplete={(score) => {
+            setShowDigitalSecurity(false);
             const newPoints = points + 100;
             const newStreak = streak + 1;
             setPoints(newPoints);

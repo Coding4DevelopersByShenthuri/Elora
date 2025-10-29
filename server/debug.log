@@ -864,3 +864,10 @@ INFO 2025-10-28 22:47:20,457 autoreload 11180 19176 C:\Users\shent\OneDrive\Desk
 INFO 2025-10-28 22:49:37,678 autoreload 5956 2992 Watching for file changes with StatReloader
 INFO 2025-10-28 22:53:31,215 basehttp 5956 20908 "OPTIONS /api/auth/login HTTP/1.1" 200 0
 INFO 2025-10-28 22:53:32,223 basehttp 5956 20908 "POST /api/auth/login HTTP/1.1" 200 1107
+INFO 2025-10-29 09:16:04,366 autoreload 11832 19944 Watching for file changes with StatReloader
+INFO 2025-10-29 09:55:40,301 basehttp 11832 16780 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-29 09:55:41,884 log 11832 16780 Unauthorized: /api/auth/login
+WARNING 2025-10-29 09:55:41,888 basehttp 11832 16780 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-29 09:56:07,946 basehttp 11832 19140 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-10-29 09:56:08,837 log 11832 19140 Unauthorized: /api/auth/login
+WARNING 2025-10-29 09:56:08,847 basehttp 11832 19140 "POST /api/auth/login HTTP/1.1" 401 39

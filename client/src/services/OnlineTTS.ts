@@ -404,14 +404,14 @@ export const STORY_VOICES: Record<string, VoiceProfile> = {
     pitch: 1.05,      // Slightly bright but mature
     rate: 1.0,        // Natural pace for technical narration
     volume: 1.0,      // Clear and present
-    voiceName: 'Google UK English Male', // Unique vs others in project
+    voiceName: 'Microsoft David - English (United States)', // Unique Microsoft voice
     description: 'Calm, confident science narrator with futuristic clarity for teens'
   },
 
   // Teen: Environmental Hero - Terra (nature-focused 15-year-old activist)
   TerraTeen: {
     name: 'Terra',
-    pitch: 0.98,      // Warm, natural tone
+    pitch: 1.05,      // Warm, natural tone
     rate: 0.92,       // Thoughtful environmental pace
     volume: 0.95,     // Clear and passionate
     voiceName: 'Google UK English Female',
@@ -424,24 +424,24 @@ export const STORY_VOICES: Record<string, VoiceProfile> = {
     pitch: 1.08,      // Bright and forward-thinking
     rate: 1.05,       // Quick, innovative pace
     volume: 1.0,      // Clear and dynamic
-    voiceName: 'Microsoft Zira - English (United States)',
+    voiceName: 'Google US English Female',
     description: 'Dynamic, tech-forward innovator voice with cutting-edge energy'
   },
 
   // Teen: Global Citizen - Kai (worldly 15-year-old traveler)
   KaiTeen: {
     name: 'Kai',
-    pitch: 1.0,       // Balanced, worldly tone
-    rate: 0.95,       // Respectful, global pace
+    pitch: 1.08,      // Balanced, worldly tone
+    rate: 0.93,       // Respectful, global pace
     volume: 0.98,     // Warm and inclusive
-    voiceName: 'Google US English Female',
+    voiceName: 'Google UK English Male',
     description: 'Culturally aware, inclusive global citizen voice with worldly wisdom'
   },
 
   // Teen: Future Leader - Valor (confident 16-year-old leader)
   ValorTeen: {
     name: 'Valor',
-    pitch: 0.95,      // Authoritative but approachable
+    pitch: 0.93,      // Authoritative but approachable
     rate: 0.88,       // Measured, leadership pace
     volume: 1.0,      // Confident and inspiring
     voiceName: 'Google US English Male',
@@ -451,21 +451,43 @@ export const STORY_VOICES: Record<string, VoiceProfile> = {
   // Teen: Scientific Discovery - Quest (analytical 15-year-old scientist)
   QuestTeen: {
     name: 'Quest',
-    pitch: 1.02,      // Curious but professional
-    rate: 0.9,        // Methodical scientific pace
-    volume: 0.97,     // Precise and engaging
-    voiceName: 'Microsoft Mark - English (United States)',
-    description: 'Curious, analytical scientific mind with research-driven clarity'
+    pitch: 0.99,      // Professional scientist tone
+    rate: 0.92,       // Methodical scientific pace
+    volume: 0.98,     // Precise and engaging
+    voiceName: 'Microsoft Zira - English (United States)',
+    description: 'Analytical, precision-focused scientific researcher voice with methodical clarity'
   },
 
   // Teen: Social Media Expert - Pixel (digital-native 14-year-old)
   PixelTeen: {
     name: 'Pixel',
-    pitch: 1.1,       // Young, digital-native energy
+    pitch: 1.12,      // Young, digital-native energy
     rate: 1.08,       // Quick, online-savvy pace
     volume: 0.93,     // Bright and modern
-    voiceName: 'Google US English Female',
+    voiceName: 'Microsoft Mark - English (United States)',
     description: 'Bright, digital-native voice with modern online intelligence'
+  },
+
+  // Teen: AI Ethics Explorer - Aria (clear, responsible 15-year-old narrator)
+  AIEthicsTeen: {
+    name: 'Aria',
+    pitch: 1.02,       // Balanced, professional teen tone
+    rate: 0.96,       // Thoughtful, clear pacing for ethics topics
+    volume: 1.0,      // Present and clear
+    // Unique Microsoft online voice not used elsewhere in the project
+    voiceName: 'Microsoft Aria Online (Natural) - English (United States)',
+    description: 'Calm, trustworthy narrator voice for responsible AI topics'
+  },
+
+  // Teen: Digital Security Guardian - Cipher (confident 15-year-old cybersecurity guide)
+  DigitalSecurityTeen: {
+    name: 'Cipher',
+    pitch: 0.94,      // Calm, confident technical tone
+    rate: 0.97,       // Clear, steady pacing for security concepts
+    volume: 1.0,      // Present and authoritative
+    // Unique Microsoft online voice not used elsewhere in the project
+    voiceName: 'Microsoft Guy Online (Natural) - English (United States)',
+    description: 'Confident, trustworthy cybersecurity guide voice for teens'
   }
 };
 
