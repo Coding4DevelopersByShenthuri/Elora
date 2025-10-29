@@ -443,7 +443,7 @@ const TeenKidsPage = () => {
   // Handle story opening from Favorites page
   useEffect(() => {
     if (location.state?.startStory && location.state?.storyType) {
-      const { startStory, storyTitle } = location.state;
+      const { startStory, storyType } = location.state;
       
       // Find the story by ID
       const story = allStories.find(s => s.id === startStory);
@@ -451,26 +451,40 @@ const TeenKidsPage = () => {
         // Set flag to indicate we're opening from Favorites
         setIsOpeningFromFavorites(true);
         
-        // Set current story
+        // Set current story and open the appropriate adventure
         setCurrentStory(startStory);
         setIsPlaying(true);
         setBounceAnimation(true);
         
-        // Skip welcome message when coming from Favorites - go directly to story
-        // For now, show a message that the story is being prepared
-        // In the future, this will open the actual teen story adventure
-        if (isSoundEnabled) {
-          EnhancedTTS.speak(
-            `Opening ${storyTitle}! This teen story adventure is coming soon. For now, you can explore other features.`, 
-            { rate: 0.9, emotion: 'excited' }
-          ).catch(() => {});
+        // Open the story adventure based on type (skip welcome message when coming from Favorites)
+        // Open immediately without any delays when coming from Favorites
+        if (storyType === 'mystery') {
+          setShowMysteryDetective(true);
+        } else if (storyType === 'space') {
+          setShowSpaceExplorer(true);
+        } else if (storyType === 'environment') {
+          setShowEnvironmentalHero(true);
+        } else if (storyType === 'technology') {
+          setShowTechInnovator(true);
+        } else if (storyType === 'culture') {
+          setShowGlobalCitizen(true);
+        } else if (storyType === 'leadership') {
+          setShowFutureLeader(true);
+        } else if (storyType === 'science') {
+          setShowScientificDiscovery(true);
+        } else if (storyType === 'digital') {
+          setShowSocialMediaExpert(true);
+        } else if (storyType === 'ai') {
+          setShowAIEthics(true);
+        } else if (storyType === 'cybersecurity') {
+          setShowDigitalSecurity(true);
         }
         
         // Clear the location state to prevent re-opening
         navigate(location.pathname, { replace: true });
       }
     }
-  }, [location.state, allStories, navigate, location.pathname, isSoundEnabled]);
+  }, [location.state, allStories, navigate, location.pathname]);
 
   // Calculate pagination
   const startIndex = (currentPage - 1) * storiesPerPage;
