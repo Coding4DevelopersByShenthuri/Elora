@@ -84,11 +84,11 @@ const Footer = () => {
           <div className="space-y-2 mb-4 text-sm">
             <div className="flex items-center gap-2">
               <Mail className="w-4 h-4 text-primary" />
-              <span>speakbee.ai@gmail.com</span>
+              <span>elora.toinfo@gmail.com</span>
             </div>
             <div className="flex items-center gap-2">
               <Phone className="w-4 h-4 text-primary" />
-              <span>+94 74 389 9907</span>
+              <span>+94 75 036 3903</span>
             </div>
             <div className="flex items-center gap-2">
               <MapPin className="w-4 h-4 text-primary" />
@@ -96,14 +96,20 @@ const Footer = () => {
             </div>
           </div>
 
-          <div className="rounded-lg p-3 border border-gray-300 dark:border-white/30 flex gap-2 bg-white/50 dark:bg-transparent">
+          {/* Stay Updated - Newsletter */}
+          <h4 className="font-semibold text-sm mb-2 text-black dark:text-white">Stay updated</h4>
+          <p className="text-xs mb-3 text-gray-700 dark:text-gray-300">
+            Get the latest updates on new features and AI capabilities.
+          </p>
+          <div className="rounded-lg p-2 border border-gray-300 dark:border-white/30 flex gap-2 lg:gap-1 bg-white/50 dark:bg-transparent max-w-sm lg:max-w-xs">
             <input
               type="email"
-              placeholder="Email"
-              className="flex-1 bg-transparent border border-gray-300 dark:border-white/20 rounded-md px-2 py-1.5 text-sm placeholder-gray-400 dark:placeholder-white/50 text-black dark:text-white focus:outline-none focus:border-primary"
+              placeholder="Enter your email"
+              aria-label="Email address"
+              className="flex-1 bg-transparent border border-gray-300 dark:border-white/20 rounded-md px-2 py-1.5 lg:py-1 text-sm lg:text-xs placeholder-gray-400 dark:placeholder-white/50 text-black dark:text-white focus:outline-none focus:border-primary"
             />
-            <button className="bg-gradient-to-r from-primary to-accent px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-300 flex items-center gap-1 text-white">
-              <span>Go</span>
+            <button className="bg-gradient-to-r from-primary to-accent px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-md text-xs lg:text-[11px] font-medium transition-all duration-300 flex items-center gap-1 text-white">
+              <span>Subscribe</span>
               <ArrowRight className="w-3 h-3" />
             </button>
           </div>

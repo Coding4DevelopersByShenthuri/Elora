@@ -237,8 +237,8 @@ Built by passionate educators and engineers dedicated to making English learning
 
 ## 📞 Contact
 
-- **Email:** speakbee.ai@gmail.com
-- **Phone:** +94 74 389 9907
+- **Email:** elora.toinfo@gmail.com
+- **Phone:** +94 75 036 3903
 - **Location:** Jaffna, Sri Lanka
 - **Website:** [Coming Soon]
 
