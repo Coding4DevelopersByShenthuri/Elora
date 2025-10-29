@@ -251,6 +251,7 @@ const SpaceExplorerAdventure = ({ onClose, onComplete }: Props) => {
   const [accessibilityMode, setAccessibilityMode] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [isRevealTextPlaying, setIsRevealTextPlaying] = useState(false);
+  const [shuffledChoices, setShuffledChoices] = useState<any[] | null>(null);
 
   const current = storySteps[stepIndex] as any;
   const progress = Math.round(((stepIndex + 1) / storySteps.length) * 100);
@@ -326,6 +327,24 @@ const SpaceExplorerAdventure = ({ onClose, onComplete }: Props) => {
       setShowFeedback(false);
     }
   }, [stepIndex]);
+
+  // Shuffle answers when entering question phase so correct answer position varies
+  const shuffleArray = (arr: any[]) => {
+    const copy = [...arr];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  };
+
+  useEffect(() => {
+    if (current.listeningFirst && listeningPhase === 'question' && current.choices) {
+      setShuffledChoices(shuffleArray(current.choices));
+    } else {
+      setShuffledChoices(null);
+    }
+  }, [stepIndex, listeningPhase]);
 
   const stripEmojis = (text: string) => text.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim();
 
@@ -647,7 +666,7 @@ const SpaceExplorerAdventure = ({ onClose, onComplete }: Props) => {
                 </div>
                 {current.choices && (
                     <div className="grid grid-cols-1 gap-2.5">
-                    {current.choices.map((choice: any, idx: number) => {
+                    {(shuffledChoices || current.choices).map((choice: any, idx: number) => {
                       const isSelected = selectedChoice === choice.text;
                       const isCorrect = (current.questionType === 'true-false') ? choice.text === 'True - Procedure discipline protects the crew' : choice.text === current.audioText;
                       const showResult = showFeedback && isSelected;
@@ -664,9 +683,8 @@ const SpaceExplorerAdventure = ({ onClose, onComplete }: Props) => {
                           )}
                         >
                           <div className="flex items-center gap-3 w-full">
-                              <span className="text-lg">{choice.emoji}</span>
                             <div className="flex-1 text-left">
-                                <p className="font-bold text-xs">{choice.text}</p>
+                                <p className="font-bold text-xs">{stripEmojis(choice.text)}</p>
                               <p className="text-xs opacity-70">{choice.meaning}</p>
                             </div>
                             {showResult && isCorrect && (
@@ -811,7 +829,7 @@ const SpaceExplorerAdventure = ({ onClose, onComplete }: Props) => {
                     </div>
                     {current.choices && (
                       <div className="grid grid-cols-1 gap-1.5">
-                        {current.choices.map((choice: any, idx: number) => {
+                        {(shuffledChoices || current.choices).map((choice: any, idx: number) => {
                           const isSelected = selectedChoice === choice.text;
                           const isCorrect = (current.questionType === 'true-false') ? choice.text === 'True - Procedure discipline protects the crew' : choice.text === current.audioText;
                           const showResult = showFeedback && isSelected;
@@ -828,9 +846,8 @@ const SpaceExplorerAdventure = ({ onClose, onComplete }: Props) => {
                               )}
                             >
                               <div className="flex items-center gap-2 w-full">
-                                <span className="text-lg md:text-xl">{choice.emoji}</span>
                                 <div className="flex-1 text-left">
-                                  <p className="font-bold text-xs md:text-sm">{choice.text}</p>
+                                  <p className="font-bold text-xs md:text-sm">{stripEmojis(choice.text)}</p>
                                   <p className="text-xs opacity-70">{choice.meaning}</p>
                                 </div>
                                 {showResult && isCorrect && (

@@ -185,6 +185,7 @@ const SocialMediaExpertAdventure = ({ onClose, onComplete }: Props) => {
   const [ttsInitialized, setTtsInitialized] = useState(false);
   const [isRevealTextPlaying, setIsRevealTextPlaying] = useState(false);
   const [canContinue, setCanContinue] = useState(false);
+  const [shuffledChoices, setShuffledChoices] = useState<any[] | null>(null);
 
   const current = storySteps[stepIndex];
   const progress = Math.round(((stepIndex + 1) / storySteps.length) * 100);
@@ -238,6 +239,24 @@ const SocialMediaExpertAdventure = ({ onClose, onComplete }: Props) => {
     setSelectedChoice(null); setShowFeedback(false); setShowHint(false);
     setCanContinue(false);
   }, [stepIndex]);
+
+  // Shuffle answers when entering question phase so correct answer position varies
+  const shuffleArray = (arr: any[]) => {
+    const copy = [...arr];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  };
+
+  useEffect(() => {
+    if ((current as any).listeningFirst && listeningPhase === 'question' && (current as any).choices) {
+      setShuffledChoices(shuffleArray((current as any).choices));
+    } else {
+      setShuffledChoices(null);
+    }
+  }, [stepIndex, listeningPhase]);
 
   const stripEmojis = (text: string): string => text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{FE00}-\u{FE0F}]|[\u{E0020}-\u{E007F}]/gu, '').trim();
 
@@ -485,12 +504,12 @@ const SocialMediaExpertAdventure = ({ onClose, onComplete }: Props) => {
                     {showHint ? <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">💡 {(current as any).hint}</p> : <Button variant="outline" size="sm" onClick={() => setShowHint(true)} className="text-yellow-600 border-yellow-300 hover:bg-yellow-100 text-xs">Need a hint? 🧩</Button>}
                   </div>
                   <div className="flex justify-center mb-2"><Button onClick={handleReplayAudio} disabled={isPlaying} className="rounded-xl px-5 py-2 bg-pink-500 hover:bg-pink-600 text-white font-bold"><Volume2 className="w-4 h-4 mr-2" />Listen Again</Button></div>
-                  <div className="grid grid-cols-1 gap-3">{(current as any).choices?.map((choice: any, idx: number) => {
+                  <div className="grid grid-cols-1 gap-3">{(shuffledChoices || (current as any).choices)?.map((choice: any, idx: number) => {
                     const isSelected = selectedChoice === choice.text;
                     const correctForChoice = isCorrectChoice(choice.text);
                     const showResult = showFeedback && isSelected;
-                    return <Button key={idx} onClick={() => handleChoice(choice)} disabled={showFeedback} className={cn("rounded-xl px-4 py-3 text-sm font-bold h-auto min-h-[55px]", showResult && correctForChoice && "bg-green-500 hover:bg-green-600 text-white animate-bounce", showResult && !correctForChoice && "bg-red-500 hover:bg-red-600 text-white", !showResult && "bg-white/90 hover:bg-white text-gray-700 border-2 border-gray-200")}>
-                      <div className="flex items-center gap-2 w-full"><span className="text-lg">{choice.emoji}</span><div className="flex-1 text-left"><p className="font-bold">{choice.text}</p><p className="text-xs opacity-70">{choice.meaning}</p></div></div>
+                    return <Button key={idx} onClick={() => handleChoice(choice)} disabled={showFeedback} className={cn("rounded-xl px-4 py-3 text-sm font-bold h-auto min-h-[55px]", showResult && correctForChoice && "bg-green-500 hover:bg-green-600 text-white animate-bounce", showResult && !correctForChoice && "bg-red-500 hover:bg-red-600 text-white", !showResult && "bg-white/90 hover:bg-white text-gray-700 border-2 border-gray-200")}> 
+                      <div className="flex items-center gap-2 w-full"><div className="flex-1 text-left"><p className="font-bold">{stripEmojis(choice.text)}</p><p className="text-xs opacity-70">{choice.meaning}</p></div></div>
                     </Button>;
                   })}</div>
                   {showFeedback && <div className="mt-2"><div className={cn("text-center p-4 rounded-lg", isCorrectChoice(selectedChoice || '') ? "bg-green-100 dark:bg-green-900" : "bg-red-100 dark:bg-red-900")}>
@@ -614,12 +633,12 @@ const SocialMediaExpertAdventure = ({ onClose, onComplete }: Props) => {
                       {showHint ? <p className="text-xs md:text-sm text-gray-600 dark:text-gray-300">💡 {(current as any).hint}</p> : <Button variant="outline" size="sm" onClick={() => setShowHint(true)} className="text-yellow-600 border-yellow-300 hover:bg-yellow-100 h-7 px-3">Need a hint? 🧩</Button>}
                     </div>
                     <div className="flex justify-center"><Button onClick={handleReplayAudio} disabled={isPlaying} className="bg-pink-500 hover:bg-pink-600 text-white rounded-lg px-4 py-1.5 text-xs"><Volume2 className="w-3 h-3 mr-1.5" />Replay</Button></div>
-                    <div className="grid grid-cols-1 gap-1.5">{(current as any).choices?.map((choice: any, idx: number) => {
+                    <div className="grid grid-cols-1 gap-1.5">{(shuffledChoices || (current as any).choices)?.map((choice: any, idx: number) => {
                       const isSelected = selectedChoice === choice.text;
                       const correctForChoice = isCorrectChoice(choice.text);
                       const showResult = showFeedback && isSelected;
-                      return <Button key={idx} onClick={() => handleChoice(choice)} disabled={showFeedback} className={cn("rounded-lg px-2.5 py-2 text-xs md:text-sm font-bold h-auto min-h[42px] relative", showResult && correctForChoice && "bg-green-500 hover:bg-green-600 text-white", showResult && !correctForChoice && "bg-red-500 hover:bg-red-600 text-white", !showResult && "bg-white/90 hover:bg-white text-gray-700 border-2 border-gray-300")}>
-                        <div className="flex items-center gap-2"><span className="text-lg">{choice.emoji}</span><div className="flex-1 text-left"><p className="font-bold text-xs md:text-sm">{choice.text}</p><p className="text-xs opacity-70">{choice.meaning}</p></div></div>
+                      return <Button key={idx} onClick={() => handleChoice(choice)} disabled={showFeedback} className={cn("rounded-lg px-2.5 py-2 text-xs md:text-sm font-bold h-auto min-h[42px] relative", showResult && correctForChoice && "bg-green-500 hover:bg-green-600 text-white", showResult && !correctForChoice && "bg-red-500 hover:bg-red-600 text-white", !showResult && "bg-white/90 hover:bg-white text-gray-700 border-2 border-gray-300")}> 
+                        <div className="flex items-center gap-2"><div className="flex-1 text-left"><p className="font-bold text-xs md:text-sm">{stripEmojis(choice.text)}</p><p className="text-xs opacity-70">{choice.meaning}</p></div></div>
                       </Button>;
                     })}</div>
                     {showFeedback && <div className="mt-1.5"><div className={cn("rounded-lg p-2", isCorrectChoice(selectedChoice || '') ? "bg-green-50 dark:bg-green-900/20 text-green-600" : "bg-rose-50 dark:bg-rose-900/20 text-rose-700")}><p className="text-xs md:text-sm font-bold">{isCorrectChoice(selectedChoice || '') ? getCorrectFeedback() : getWrongFeedback(attemptCount)}</p></div>{!isCorrectChoice(selectedChoice || '') && retryMode && <div className="flex justify-center gap-2 mt-2"><Button onClick={handleRetry} className="bg-pink-500 hover:bg-pink-600 text-white rounded-lg px-5 py-2"><RotateCcw className="w-4 h-4 mr-1.5" />Try Again</Button><Button onClick={handleNext} variant="outline" className="rounded-lg px-5 py-2 border-2 border-gray-600">Skip</Button></div>}</div>}

@@ -276,6 +276,7 @@ const MysteryDetectiveAdventure = ({ onClose, onComplete }: Props) => {
   // TTS availability status
   const [ttsInitialized, setTtsInitialized] = useState(false);
   const [isRevealTextPlaying, setIsRevealTextPlaying] = useState(false);
+  const [shuffledChoices, setShuffledChoices] = useState<any[] | null>(null);
 
   const current = storySteps[stepIndex];
   const progress = Math.round(((stepIndex + 1) / storySteps.length) * 100);
@@ -370,6 +371,24 @@ const MysteryDetectiveAdventure = ({ onClose, onComplete }: Props) => {
     setShowHint(false);
     // Don't reset accessibility mode - keep it persistent across steps if enabled
   }, [stepIndex]);
+
+  // Shuffle answer options when a question is presented so correct answer position varies per step
+  const shuffleArray = (arr: any[]) => {
+    const copy = [...arr];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  };
+
+  useEffect(() => {
+    if (current.listeningFirst && listeningPhase === 'question' && (current as any).choices) {
+      setShuffledChoices(shuffleArray((current as any).choices));
+    } else {
+      setShuffledChoices(null);
+    }
+  }, [stepIndex, listeningPhase]);
 
   // Timer for tracking session duration
   useEffect(() => {
@@ -1186,7 +1205,7 @@ const MysteryDetectiveAdventure = ({ onClose, onComplete }: Props) => {
                   {/* Choice Buttons */}
                   {(current as any).choices && (
                     <div className="grid grid-cols-1 gap-2.5 sm:gap-2 md:gap-3 justify-center">
-                      {(current as any).choices.map((choice: any, idx: number) => {
+                      {(shuffledChoices || (current as any).choices).map((choice: any, idx: number) => {
                         const isSelected = selectedChoice === choice.text;
                         const isCorrect = (current as any).questionType === 'true-false' 
                           ? choice.text === 'True - Body language can reveal deception'
@@ -1206,9 +1225,8 @@ const MysteryDetectiveAdventure = ({ onClose, onComplete }: Props) => {
                             )}
                           >
                             <div className="flex items-center gap-2 sm:gap-3 md:gap-4 w-full">
-                              <span className="text-lg sm:text-lg md:text-xl">{choice.emoji}</span>
                               <div className="flex-1 text-left">
-                                <p className="font-bold text-xs sm:text-sm md:text-base">{choice.text}</p>
+                                <p className="font-bold text-xs sm:text-sm md:text-base">{stripEmojis(choice.text)}</p>
                                 <p className="text-xs opacity-70">{choice.meaning}</p>
                               </div>
                               {showResult && isCorrect && (
@@ -1500,7 +1518,7 @@ const MysteryDetectiveAdventure = ({ onClose, onComplete }: Props) => {
 
                   {(current as any).choices && (
                     <div className="grid grid-cols-1 gap-1.5">
-                      {(current as any).choices.map((choice: any, idx: number) => {
+                      {(shuffledChoices || (current as any).choices).map((choice: any, idx: number) => {
                         const isSelected = selectedChoice === choice.text;
                         const isCorrect = (current as any).questionType === 'true-false' 
                           ? choice.text === 'True - Body language can reveal deception'
@@ -1520,9 +1538,8 @@ const MysteryDetectiveAdventure = ({ onClose, onComplete }: Props) => {
                             )}
                           >
                             <div className="flex items-center gap-2 w-full">
-                              <span className="text-lg md:text-xl">{choice.emoji}</span>
                               <div className="flex-1 text-left">
-                                <p className="font-bold text-xs md:text-sm">{choice.text}</p>
+                                <p className="font-bold text-xs md:text-sm">{stripEmojis(choice.text)}</p>
                                 <p className="text-xs opacity-70">{choice.meaning}</p>
                               </div>
                               {showResult && isCorrect && (
