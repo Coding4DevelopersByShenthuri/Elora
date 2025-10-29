@@ -871,3 +871,50 @@ WARNING 2025-10-29 09:55:41,888 basehttp 11832 16780 "POST /api/auth/login HTTP/
 INFO 2025-10-29 09:56:07,946 basehttp 11832 19140 "OPTIONS /api/auth/login HTTP/1.1" 200 0
 WARNING 2025-10-29 09:56:08,837 log 11832 19140 Unauthorized: /api/auth/login
 WARNING 2025-10-29 09:56:08,847 basehttp 11832 19140 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-10-29 15:40:29,496 basehttp 11832 1396 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+INFO 2025-10-29 15:40:29,540 views 11832 1396 Registration request received for email: shen21476@gmail.com
+WARNING 2025-10-29 15:40:29,772 views 11832 1396 Registration attempt with already active email: shen21476@gmail.com
+WARNING 2025-10-29 15:40:29,772 log 11832 1396 Bad Request: /api/auth/register
+WARNING 2025-10-29 15:40:29,772 basehttp 11832 1396 "POST /api/auth/register HTTP/1.1" 400 122
+INFO 2025-10-29 15:40:39,223 views 11832 22764 Registration request received for email: shen21476@gmail.com
+WARNING 2025-10-29 15:40:39,264 views 11832 22764 Registration attempt with already active email: shen21476@gmail.com
+WARNING 2025-10-29 15:40:39,264 log 11832 22764 Bad Request: /api/auth/register
+WARNING 2025-10-29 15:40:39,264 basehttp 11832 22764 "POST /api/auth/register HTTP/1.1" 400 122
+INFO 2025-10-29 15:40:42,565 views 11832 22764 Registration request received for email: shen21476@gmail.com
+WARNING 2025-10-29 15:40:42,606 views 11832 22764 Registration attempt with already active email: shen21476@gmail.com
+WARNING 2025-10-29 15:40:42,606 log 11832 22764 Bad Request: /api/auth/register
+WARNING 2025-10-29 15:40:42,606 basehttp 11832 22764 "POST /api/auth/register HTTP/1.1" 400 122
+INFO 2025-10-29 15:40:43,521 views 11832 22764 Registration request received for email: shen21476@gmail.com
+WARNING 2025-10-29 15:40:43,537 views 11832 22764 Registration attempt with already active email: shen21476@gmail.com
+WARNING 2025-10-29 15:40:43,537 log 11832 22764 Bad Request: /api/auth/register
+WARNING 2025-10-29 15:40:43,543 basehttp 11832 22764 "POST /api/auth/register HTTP/1.1" 400 122
+INFO 2025-10-29 15:40:44,203 views 11832 22764 Registration request received for email: shen21476@gmail.com
+WARNING 2025-10-29 15:40:44,230 views 11832 22764 Registration attempt with already active email: shen21476@gmail.com
+WARNING 2025-10-29 15:40:44,232 log 11832 22764 Bad Request: /api/auth/register
+WARNING 2025-10-29 15:40:44,235 basehttp 11832 22764 "POST /api/auth/register HTTP/1.1" 400 122
+INFO 2025-10-29 15:40:45,151 views 11832 18464 Registration request received for email: shen21476@gmail.com
+WARNING 2025-10-29 15:40:45,200 views 11832 18464 Registration attempt with already active email: shen21476@gmail.com
+WARNING 2025-10-29 15:40:45,202 log 11832 18464 Bad Request: /api/auth/register
+WARNING 2025-10-29 15:40:45,206 basehttp 11832 18464 "POST /api/auth/register HTTP/1.1" 400 122
+INFO 2025-10-29 15:40:45,586 views 11832 18464 Registration request received for email: shen21476@gmail.com
+WARNING 2025-10-29 15:40:45,620 views 11832 18464 Registration attempt with already active email: shen21476@gmail.com
+WARNING 2025-10-29 15:40:45,620 log 11832 18464 Bad Request: /api/auth/register
+WARNING 2025-10-29 15:40:45,620 basehttp 11832 18464 "POST /api/auth/register HTTP/1.1" 400 122
+INFO 2025-10-29 15:41:06,673 views 11832 18464 Registration request received for email: shen21476@gmail.com
+WARNING 2025-10-29 15:41:06,700 views 11832 18464 Registration attempt with already active email: shen21476@gmail.com
+WARNING 2025-10-29 15:41:06,702 log 11832 18464 Bad Request: /api/auth/register
+WARNING 2025-10-29 15:41:06,705 basehttp 11832 18464 "POST /api/auth/register HTTP/1.1" 400 122
+INFO 2025-10-29 15:41:07,708 views 11832 18464 Registration request received for email: shen21476@gmail.com
+WARNING 2025-10-29 15:41:07,734 views 11832 18464 Registration attempt with already active email: shen21476@gmail.com
+WARNING 2025-10-29 15:41:07,740 log 11832 18464 Bad Request: /api/auth/register
+WARNING 2025-10-29 15:41:07,742 basehttp 11832 18464 "POST /api/auth/register HTTP/1.1" 400 122
+INFO 2025-10-29 15:41:08,471 views 11832 18464 Registration request received for email: shen21476@gmail.com
+WARNING 2025-10-29 15:41:08,500 views 11832 18464 Registration attempt with already active email: shen21476@gmail.com
+WARNING 2025-10-29 15:41:08,500 log 11832 18464 Bad Request: /api/auth/register
+WARNING 2025-10-29 15:41:08,500 basehttp 11832 18464 "POST /api/auth/register HTTP/1.1" 400 122
+INFO 2025-10-29 15:41:09,187 views 11832 18464 Registration request received for email: shen21476@gmail.com
+WARNING 2025-10-29 15:41:09,215 views 11832 18464 Registration attempt with already active email: shen21476@gmail.com
+WARNING 2025-10-29 15:41:09,216 log 11832 18464 Bad Request: /api/auth/register
+WARNING 2025-10-29 15:41:09,216 basehttp 11832 18464 "POST /api/auth/register HTTP/1.1" 400 122
+INFO 2025-10-29 15:41:12,165 basehttp 11832 3540 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+INFO 2025-10-29 15:41:15,585 basehttp 11832 3540 "POST /api/auth/login HTTP/1.1" 200 1084

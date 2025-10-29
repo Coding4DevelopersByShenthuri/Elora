@@ -16,6 +16,7 @@ import Footer from "@/components/landing/Footer";
 import FloatingIconsLayer from "@/components/common/FloatingIconsLayer";
 import { LoadingScreen } from "@/components/landing/LoadingScreen";
 import OfflineIndicator from "@/components/common/OfflineIndicator";
+import CookieConsent from "@/components/common/CookieConsent";
 
 // ✅ Pages
 import Index from "@/pages/Index";
@@ -553,6 +554,7 @@ const App = () => {
                     <AppRoutes />
                   </main>
                   <Footer />
+                  <CookieConsent />
                 </div>
               )}
             </BrowserRouter>
