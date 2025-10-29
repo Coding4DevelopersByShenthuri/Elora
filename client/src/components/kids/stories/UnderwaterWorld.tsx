@@ -275,6 +275,7 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
   const [replaysUsed, setReplaysUsed] = useState(0);
   const [hasListened, setHasListened] = useState(false);
   const [audioWaveform, setAudioWaveform] = useState(false);
+  const [shuffledChoices, setShuffledChoices] = useState<any[] | null>(null);
   
   const [showTranscript, setShowTranscript] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState<'normal' | 'slow' | 'slower'>('slow'); // Default to slow for better comprehension
@@ -383,6 +384,24 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
     setShowHint(false);
     setCurrentCaption('');
   }, [stepIndex]);
+
+  // Shuffle answers when entering a question step so correct answer position varies
+  const shuffleArray = (arr: any[]) => {
+    const copy = [...arr];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  };
+
+  useEffect(() => {
+    if (current.listeningFirst && listeningPhase === 'question' && (current as any).choices) {
+      setShuffledChoices(shuffleArray((current as any).choices));
+    } else {
+      setShuffledChoices(null);
+    }
+  }, [stepIndex, listeningPhase]);
 
   useEffect(() => {
     const timer = setInterval(() => setTimeSpent(prev => prev + 1), 1000);
@@ -1135,16 +1154,15 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
                   </div>
                   {(current as any).choices && (
                     <div className="grid grid-cols-1 gap-2.5">
-                      {(current as any).choices.map((choice: any, idx: number) => {
+                      {(shuffledChoices ?? (current as any).choices).map((choice: any, idx: number) => {
                         const isSelected = selectedChoice === choice.text;
                         const isCorrect = choice.text === (current as any).audioText;
                         const showResult = showFeedback && isSelected;
                         return (
                           <Button key={idx} onClick={() => handleChoice(choice)} disabled={showFeedback} className={cn("rounded-lg px-3 py-2.5 text-xs font-bold h-auto min-h-[55px]", showResult && isCorrect && "bg-green-500 text-white animate-bounce", showResult && !isCorrect && "bg-red-500 text-white", !showResult && "bg-white/90 text-gray-700 border-2")}>
                             <div className="flex items-center gap-2 w-full">
-                              <span className="text-lg">{choice.emoji}</span>
                               <div className="flex-1 text-left">
-                                <p className="font-bold text-xs">{choice.text}</p>
+                                <p className="font-bold text-xs">{stripEmojis(choice.text)}</p>
                                 <p className="text-xs opacity-70">{choice.meaning}</p>
                               </div>
                             </div>
@@ -1422,7 +1440,7 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
 
                   {(current as any).choices && (
                     <div className="grid grid-cols-1 gap-1.5">
-                      {(current as any).choices.map((choice: any, idx: number) => {
+                      {(shuffledChoices ?? (current as any).choices).map((choice: any, idx: number) => {
                         const isSelected = selectedChoice === choice.text;
                         const isCorrect = choice.text === (current as any).audioText;
                         const showResult = showFeedback && isSelected;
@@ -1440,9 +1458,8 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
                             )}
                           >
                             <div className="flex items-center gap-2 w-full">
-                              <span className="text-lg md:text-xl">{choice.emoji}</span>
                               <div className="flex-1 text-left">
-                                <p className="font-bold text-xs md:text-sm">{choice.text}</p>
+                                <p className="font-bold text-xs md:text-sm">{stripEmojis(choice.text)}</p>
                                 <p className="text-xs opacity-70">{choice.meaning}</p>
                               </div>
                               {showResult && isCorrect && (
