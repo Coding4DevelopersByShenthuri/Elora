@@ -200,6 +200,59 @@ class OfflineKidsApi {
     return [];
   }
 
+  static async checkAchievements(token: string) {
+    if (this.isOnline()) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/achievements/check`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          signal: AbortSignal.timeout(5000)
+        });
+        if (res.ok) {
+          return res.json();
+        }
+      } catch (error) {
+        console.warn('Failed to check achievements:', error);
+      }
+    }
+    return { success: true, offline: !this.isOnline() } as any;
+  }
+
+  static async issueCertificate(token: string, payload: { cert_id: string; title: string; file_url?: string }) {
+    if (this.isOnline()) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/kids/certificates/issue`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify(payload),
+          signal: AbortSignal.timeout(5000)
+        });
+        if (res.ok) return res.json();
+      } catch (e) {
+        console.warn('Failed to issue certificate:', e);
+      }
+    }
+    return { success: true, offline: !this.isOnline() } as any;
+  }
+
+  static async getIssuedCertificates(token: string) {
+    if (this.isOnline()) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/kids/certificates/my`, {
+          headers: { Authorization: `Bearer ${token}` },
+          signal: AbortSignal.timeout(5000)
+        });
+        if (res.ok) return res.json();
+      } catch (e) {
+        console.warn('Failed to fetch certificates:', e);
+      }
+    }
+    return [];
+  }
+
   // Helper to extract user ID from token (simplified)
   private static getUserIdFromToken(_token: string): string {
     try {

@@ -19,13 +19,13 @@ from .serializers import (
     RegisterSerializer, LoginSerializer, UserSerializer, UserProfileSerializer,
     LessonSerializer, LessonProgressSerializer, PracticeSessionSerializer,
     VocabularyWordSerializer, AchievementSerializer, UserAchievementSerializer,
-    KidsLessonSerializer, KidsProgressSerializer, KidsAchievementSerializer,
+    KidsLessonSerializer, KidsProgressSerializer, KidsAchievementSerializer, KidsCertificateSerializer,
     WaitlistSerializer, DailyProgressSerializer, WeeklyStatsSerializer, UserStatsSerializer
 )
 from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
     VocabularyWord, Achievement, UserAchievement,
-    KidsLesson, KidsProgress, KidsAchievement, WaitlistEntry,
+    KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, WaitlistEntry,
     EmailVerificationToken
 )
 
@@ -907,6 +907,39 @@ def kids_achievements_list(request):
     return Response(serializer.data)
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def kids_issue_certificate(request):
+    """Record an issued certificate (optional file_url for share)."""
+    cert_id = request.data.get('cert_id')
+    title = request.data.get('title')
+    file_url = request.data.get('file_url', '')
+    if not cert_id or not title:
+        return Response({"message": "cert_id and title are required"}, status=status.HTTP_400_BAD_REQUEST)
+    obj, _ = KidsCertificate.objects.get_or_create(user=request.user, cert_id=cert_id, defaults={
+        'title': title,
+        'file_url': file_url
+    })
+    # Update title/url if provided later
+    updated = False
+    if title and obj.title != title:
+        obj.title = title
+        updated = True
+    if file_url and obj.file_url != file_url:
+        obj.file_url = file_url
+        updated = True
+    if updated:
+        obj.save()
+    return Response(KidsCertificateSerializer(obj).data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def kids_my_certificates(request):
+    qs = KidsCertificate.objects.filter(user=request.user).order_by('-issued_at')
+    return Response(KidsCertificateSerializer(qs, many=True).data)
+
+
 # ============= Waitlist Views =============
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -1225,4 +1258,30 @@ def health_check(request):
         "version": "1.0.0"
     })
 
+
+# ============= Kids Analytics (Listening) =============
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def kids_analytics(request):
+    """Accept listening analytics sessions from client.
+    For now, this endpoint stores nothing persistently; it validates payload shape and returns 201.
+    """
+    try:
+        data = request.data or {}
+        # Basic validation of expected keys
+        if 'user_id' not in data or 'session_data' not in data:
+            return Response({
+                "message": "user_id and session_data are required"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Optionally, attach request.user for server-side correlation
+        _ = request.user.id  # touch to ensure auth path exercised
+
+        # In future, persist to a model or analytics store.
+        return Response({ "ok": True }, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        logger.error(f"Kids analytics error: {str(e)}")
+        return Response({
+            "message": "An error occurred"
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

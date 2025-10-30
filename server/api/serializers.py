@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
     VocabularyWord, Achievement, UserAchievement,
-    KidsLesson, KidsProgress, KidsAchievement, WaitlistEntry
+    KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, WaitlistEntry
 )
 from django.contrib.auth.password_validation import validate_password
 
@@ -195,6 +195,14 @@ class KidsAchievementSerializer(serializers.ModelSerializer):
     class Meta:
         model = KidsAchievement
         fields = ["user_id", "name", "icon", "progress", "unlocked", "updated_at"]
+
+
+class KidsCertificateSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+
+    class Meta:
+        model = KidsCertificate
+        fields = ["user_id", "cert_id", "title", "file_url", "issued_at"]
 
 
 # ============= Waitlist Serializer =============

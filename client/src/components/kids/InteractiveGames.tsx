@@ -51,15 +51,32 @@ const InteractiveGames = () => {
         // Update via API
         const current = await KidsApi.getProgress(token);
         const currentPoints = (current as any).points || 0;
+        const details = { ...((current as any).details || {}) };
+        details.games = details.games || {};
+        details.games.points = Number(details.games.points || 0) + points;
+        const arr = Array.isArray(details.games.types) ? details.games.types : [];
+        if (_gameType && !arr.includes(_gameType)) arr.push(_gameType);
+        details.games.types = arr;
         await KidsApi.updateProgress(token, {
-          points: currentPoints + points
+          points: currentPoints + points,
+          details
         });
       } else {
         // Update locally
-        await KidsProgressService.update(userId, (progress) => ({
-          ...progress,
-          points: progress.points + points
-        }));
+        await KidsProgressService.update(userId, (progress) => {
+          const anyP: any = progress as any;
+          const details = { ...(anyP.details || {}) };
+          details.games = details.games || {};
+          details.games.points = Number(details.games.points || 0) + points;
+          const arr = Array.isArray(details.games.types) ? details.games.types : [];
+          if (_gameType && !arr.includes(_gameType)) arr.push(_gameType);
+          details.games.types = arr;
+          return {
+            ...progress,
+            points: progress.points + points,
+            details
+          } as any;
+        });
       }
     } catch (error) {
       console.error('Error updating game score:', error);

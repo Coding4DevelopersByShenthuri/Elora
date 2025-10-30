@@ -973,3 +973,70 @@ INFO 2025-10-30 11:42:41,745 basehttp 15260 19548 "GET /api/kids/lessons HTTP/1.
 INFO 2025-10-30 11:42:45,350 basehttp 15260 19548 "GET /api/kids/lessons HTTP/1.1" 200 2
 INFO 2025-10-30 11:46:59,826 basehttp 15260 19548 "GET /api/kids/lessons HTTP/1.1" 200 2
 INFO 2025-10-30 11:47:49,774 basehttp 15260 19548 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 11:53:15,081 basehttp 15260 18732 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 11:53:21,802 basehttp 15260 18732 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 11:53:35,215 basehttp 15260 18732 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 11:53:50,065 basehttp 15260 18732 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 11:54:00,234 basehttp 15260 18732 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 11:54:18,097 basehttp 15260 18732 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 11:54:36,852 basehttp 15260 18732 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 11:54:51,651 basehttp 15260 18732 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 11:54:51,817 basehttp 15260 18732 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 11:55:02,934 basehttp 15260 18732 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 11:55:08,272 basehttp 15260 20340 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 11:58:31,069 basehttp 15260 20340 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 11:58:43,715 basehttp 15260 20340 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 11:59:33,038 basehttp 15260 20340 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 11:59:36,950 basehttp 15260 20340 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 12:05:37,060 basehttp 15260 19916 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 12:06:09,154 basehttp 15260 9460 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 12:28:00,289 basehttp 15260 3788 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 14:11:29,315 autoreload 15260 5416 C:\Users\shent\OneDrive\Desktop\Elora\server\api\models.py changed, reloading.
+INFO 2025-10-30 14:11:39,294 autoreload 17404 15300 Watching for file changes with StatReloader
+INFO 2025-10-30 14:12:11,186 autoreload 17404 15300 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
+INFO 2025-10-30 14:12:13,061 autoreload 3212 19072 Watching for file changes with StatReloader
+INFO 2025-10-30 14:12:16,716 autoreload 3212 19072 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
+INFO 2025-10-30 14:12:17,754 autoreload 5896 17444 Watching for file changes with StatReloader
+INFO 2025-10-30 14:12:35,540 autoreload 5896 17444 C:\Users\shent\OneDrive\Desktop\Elora\server\api\urls.py changed, reloading.
+INFO 2025-10-30 14:12:36,283 autoreload 10700 17124 Watching for file changes with StatReloader
+INFO 2025-10-30 14:12:44,749 autoreload 10700 17124 C:\Users\shent\OneDrive\Desktop\Elora\server\api\urls.py changed, reloading.
+INFO 2025-10-30 14:12:45,641 autoreload 11060 13032 Watching for file changes with StatReloader
+INFO 2025-10-30 14:12:55,873 autoreload 11060 13032 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-30 14:12:56,970 autoreload 18428 17012 Watching for file changes with StatReloader
+INFO 2025-10-30 14:13:15,038 autoreload 18428 17012 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-30 14:13:16,101 autoreload 720 14404 Watching for file changes with StatReloader
+INFO 2025-10-30 14:13:31,243 autoreload 720 14404 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-30 14:13:32,830 autoreload 9736 2336 Watching for file changes with StatReloader
+INFO 2025-10-30 14:14:03,492 autoreload 9736 2336 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-30 14:14:04,084 autoreload 13812 16920 Watching for file changes with StatReloader
+INFO 2025-10-30 14:16:28,377 basehttp 13812 17956 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 14:16:48,677 basehttp 13812 18936 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 14:25:39,148 basehttp 13812 19524 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 14:30:01,076 basehttp 13812 19524 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 14:30:15,585 basehttp 13812 19524 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 14:36:26,593 basehttp 13812 20248 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 14:37:21,999 basehttp 13812 20248 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 14:42:58,592 basehttp 13812 2672 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 14:49:26,390 basehttp 13812 19240 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 14:57:41,807 basehttp 13812 11212 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 15:07:19,001 basehttp 13812 5828 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 15:07:24,381 basehttp 13812 21044 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 15:09:23,424 basehttp 13812 21044 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 15:26:13,131 basehttp 13812 21488 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 15:26:22,968 autoreload 13812 16920 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-30 15:26:28,768 autoreload 10464 16136 Watching for file changes with StatReloader
+INFO 2025-10-30 15:26:42,473 autoreload 10464 16136 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-30 15:26:44,723 autoreload 3396 10160 Watching for file changes with StatReloader
+INFO 2025-10-30 15:27:00,764 autoreload 3396 10160 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-10-30 15:27:01,812 autoreload 7308 7468 Watching for file changes with StatReloader
+INFO 2025-10-30 15:27:03,578 autoreload 7308 7468 C:\Users\shent\OneDrive\Desktop\Elora\server\api\urls.py changed, reloading.
+INFO 2025-10-30 15:27:04,375 autoreload 20716 6060 Watching for file changes with StatReloader
+INFO 2025-10-30 15:29:36,182 basehttp 20716 2404 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 15:42:49,787 basehttp 20716 16136 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-30 15:43:34,644 basehttp 20716 12960 "GET /api/kids/lessons HTTP/1.1" 200 2
+WARNING 2025-10-30 15:51:38,177 log 20716 11824 Unauthorized: /api/auth/user
+WARNING 2025-10-30 15:51:38,178 basehttp 20716 11824 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-10-30 15:54:35,514 log 20716 9748 Unauthorized: /api/auth/user
+WARNING 2025-10-30 15:54:35,515 basehttp 20716 9748 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-10-30 15:57:19,018 log 20716 5032 Unauthorized: /api/auth/user
+WARNING 2025-10-30 15:57:19,020 basehttp 20716 5032 "GET /api/auth/user HTTP/1.1" 401 172

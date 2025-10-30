@@ -46,6 +46,7 @@ import NotFound from "@/pages/NotFound";
 import PricingPage from "@/pages/PricingPage";
 import VerifyEmail from "@/pages/VerifyEmail";
 import TermsAndConditionsPage from "@/pages/TermsAndConditionsPage";
+import CertificatesPage from "@/pages/Certificates";
 
 // ✅ Import AuthModal, UserSurvey, and SurveyManager
 import AuthModal from "@/components/auth/AuthModal";
@@ -191,6 +192,7 @@ const AppRoutes = () => {
         <Route path="/kids" element={<PageTransition><KidsPage /></PageTransition>} />
         <Route path="/kids/young" element={<PageTransition><YoungKidsPage /></PageTransition>} />
         <Route path="/kids/teen" element={<PageTransition><TeenKidsPage /></PageTransition>} />
+        <Route path="/kids/certificates" element={<PageTransition><CertificatesPage /></PageTransition>} />
         <Route path="/favorites/young" element={<PageTransition><YoungKidsFavoritesPage /></PageTransition>} />
         <Route path="/favorites/teen" element={<PageTransition><TeenKidsFavoritesPage /></PageTransition>} />
         <Route path="/model-manager" element={<PageTransition><ModelManagerPage /></PageTransition>} />

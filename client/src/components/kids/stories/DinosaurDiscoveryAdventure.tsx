@@ -153,7 +153,7 @@ const storySteps = [
     
     choices: [
       { text: 'Fossils preserve ancient life from millions of years ago', emoji: '✅', meaning: 'true - fossils are ancient remains' },
-      { text: 'False - Fossils are recent discoveries', emoji: '❌', meaning: 'incorrect - fossils are very old' }
+      { text: 'Fossils are recent discoveries', emoji: '❌', meaning: 'incorrect - fossils are very old' }
     ],
     
     revealText: '🎉 CONGRATULATIONS! You\'ve discovered your FIRST precious fossil! 💎 It\'s absolutely TRUE—fossils preserve ancient life from millions of years ago! When organisms died, layers of sediment gradually turned their remains into stone. One fossil collected, two more to discover!',

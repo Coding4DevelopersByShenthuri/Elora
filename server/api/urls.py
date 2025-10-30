@@ -40,6 +40,9 @@ urlpatterns = [
     path('kids/progress', views.kids_progress_get, name='kids-progress-get'),
     path('kids/progress/update', views.kids_progress_update, name='kids-progress-update'),
     path('kids/achievements', views.kids_achievements_list, name='kids-achievements'),
+    path('kids/certificates/issue', views.kids_issue_certificate, name='kids-issue-certificate'),
+    path('kids/certificates/my', views.kids_my_certificates, name='kids-my-certificates'),
+    path('kids/analytics', views.kids_analytics, name='kids-analytics'),
     
     # ============= Waitlist =============
     path('waitlist/signup', views.waitlist_signup, name='waitlist-signup'),

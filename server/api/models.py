@@ -342,6 +342,17 @@ class KidsAchievement(models.Model):
         return f"KidsAchievement(user={self.user_id}, name={self.name})"
 
 
+class KidsCertificate(models.Model):
+    """Issued certificate record for kids."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='kids_certificates')
+    cert_id = models.CharField(max_length=128)
+    title = models.CharField(max_length=255)
+    file_url = models.URLField(blank=True)
+    issued_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "cert_id")
+
 # ============= Waitlist =============
 class WaitlistEntry(models.Model):
     """Track waitlist signups"""

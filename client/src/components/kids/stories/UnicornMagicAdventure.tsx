@@ -154,7 +154,7 @@ const storySteps = [
     
     choices: [
       { text: 'Unicorns have magical horns', emoji: '✅', meaning: 'true - unicorns are special' },
-      { text: 'False - Unicorns have no horns', emoji: '❌', meaning: 'incorrect - they do have horns' }
+      { text: 'Unicorns have no horns', emoji: '❌', meaning: 'incorrect - they do have horns' }
     ],
     
     revealText: 'Great listening! It\'s TRUE - unicorns DO have magical horns! My horn can make magic and spread happiness! Have you ever imagined riding a unicorn? Unicorns are so magical and special!',

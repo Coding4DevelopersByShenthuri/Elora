@@ -22,3 +22,31 @@ Offline model settings:
 Notes:
 - The service worker is registered in `index.html` and supports `CACHE_URLS` messages for additional caching.
 - Feedback scoring is computed in `SLMEvaluator`, with text guidance produced by `LocalLLM`.
+
+## Cloud storage (optional)
+
+To enable shareable URLs for generated certificates, configure Supabase Storage:
+
+Env vars in `.env` (or `.env.local`):
+
+```
+VITE_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
+VITE_SUPABASE_ANON_KEY=YOUR-ANON-KEY
+# Optional overrides
+VITE_SUPABASE_BUCKET=public
+VITE_SUPABASE_CERT_BUCKET=certificates
+```
+
+Usage example:
+
+```ts
+import CertificatesService from './src/services/CertificatesService';
+import StorageService from './src/services/StorageService';
+
+// Generate a PNG Blob, then upload and get a public URL
+const pngBlob = await CertificatesService.generatePNG(layout, childName, new Date());
+const publicUrl = await StorageService.uploadCertificateBlob(pngBlob, `${childName}-certificate.png`);
+
+// Pass the URL to issueCertificate
+// KidsApi.issueCertificate(token, { cert_id: 'cert-123', title: 'Completion', file_url: publicUrl })
+```

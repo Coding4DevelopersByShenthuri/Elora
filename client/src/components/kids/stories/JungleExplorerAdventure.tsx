@@ -132,8 +132,8 @@ const storySteps = [
     hint: 'Think about what lives in jungles',
     
     choices: [
-      { text: 'True - Jungles are home to many animals', emoji: '✅', meaning: 'correct - lots of wildlife' },
-      { text: 'False - Jungles have no animals', emoji: '❌', meaning: 'wrong - jungles do have wildlife' }
+      { text: 'Jungles are home to many animals', emoji: '✅', meaning: 'correct - lots of wildlife' },
+      { text: 'Jungles have no animals', emoji: '❌', meaning: 'wrong - jungles do have wildlife' }
     ],
     
     revealText: 'Excellent listening! It\'s TRUE - jungles ARE home to many animals! Tigers, monkeys, birds, and so many other amazing creatures live in the jungle!',

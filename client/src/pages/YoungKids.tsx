@@ -629,43 +629,8 @@ const YoungKidsPage = () => {
     ? serverAchievements.filter((a: any) => a.unlocked === true).length
     : achievements.filter(a => a.progress === 100).length;
 
-  // Default words for when no stories are enrolled yet
-  const vocabWords = [
-    { word: 'rabbit', hint: '🐰 Say: RAB-it' },
-    { word: 'forest', hint: '🌲 Say: FOR-est' },
-    { word: 'planet', hint: '🪐 Say: PLAN-it' },
-    { word: 'dinosaur', hint: '🦖 Say: DY-no-sawr' },
-    { word: 'unicorn', hint: '🦄 Say: YOU-ni-corn' },
-    { word: 'pirate', hint: '🏴‍☠️ Say: PY-rate' },
-    { word: 'treasure', hint: '💎 Say: TREZH-er' },
-    { word: 'parrot', hint: '🦜 Say: PAIR-ut' },
-    { word: 'superhero', hint: '🦸 Say: SOO-per-hero' },
-    { word: 'rescue', hint: '🚁 Say: RES-kyoo' },
-    { word: 'fairy', hint: '🧚 Say: FAIR-ee' },
-    { word: 'magic', hint: '✨ Say: MAJ-ik' },
-    { word: 'moonflower', hint: '🌙🌸 Say: MOON-flow-er' },
-    { word: 'sparkle', hint: '⭐ Say: SPAR-kul' }
-  ];
-
   // Use enrolled words only for Word Games (no fallback to defaults)
   const vocabularyWordsToUse = enrolledWords;
-
-  const pronounceItems = [
-    { phrase: 'Hello Luna', phonemes: '👋 Say: heh-LOW LOO-nah' },
-    { phrase: 'Magic forest', phonemes: '✨🌲 Say: MAJ-ik FOR-est' },
-    { phrase: 'Happy rabbit', phonemes: '😊🐰 Say: HAP-ee RAB-it' },
-    { phrase: 'Big dinosaur', phonemes: '🦖 Say: BIG DY-no-sawr' },
-    { phrase: 'Rainbow unicorn', phonemes: '🌈🦄 Say: RAIN-bow YOU-ni-corn' },
-    { phrase: 'Pirate treasure', phonemes: '🏴‍☠️💎 Say: PY-rate TREZH-er' },
-    { phrase: 'Captain Finn', phonemes: '⚓ Say: CAP-tin FIN' },
-    { phrase: 'Buried treasure', phonemes: '🏝️💰 Say: BER-eed TREZH-er' },
-    { phrase: 'Superhero training', phonemes: '🦸‍♂️💪 Say: SOO-per-hero TRAIN-ing' },
-    { phrase: 'Rescue mission', phonemes: '🚁🆘 Say: RES-kyoo MISH-un' },
-    { phrase: 'Fairy dust', phonemes: '🧚✨ Say: FAIR-ee DUST' },
-    { phrase: 'Magic sparkles', phonemes: '✨⭐ Say: MAJ-ik SPAR-kulz' },
-    { phrase: 'Talking bunnies', phonemes: '🐰💬 Say: TAWK-ing BUN-eez' },
-    { phrase: 'Glowing moonflowers', phonemes: '🌙🌸 Say: GLOW-ing MOON-flow-erz' }
-  ];
 
   const handleStartLesson = async (storyId: string) => {
     if (!isAuthenticated) {
@@ -749,6 +714,10 @@ const YoungKidsPage = () => {
           streak: newStreak, 
           details 
         });
+        // Check and refresh achievements after update
+        await (KidsApi as any).checkAchievements(token);
+        const ach = await (KidsApi as any).getAchievements(token);
+        if (Array.isArray(ach)) setServerAchievements(ach);
       } else {
         await KidsProgressService.update(userId, (p) => {
           const details = updateDetails((p as any).details || {});
@@ -935,6 +904,10 @@ const YoungKidsPage = () => {
           streak: newStreak, 
           details 
         });
+        // Check and refresh achievements after update
+        await (KidsApi as any).checkAchievements(token);
+        const ach = await (KidsApi as any).getAchievements(token);
+        if (Array.isArray(ach)) setServerAchievements(ach);
       } else {
         await KidsProgressService.update(userId, (p) => {
           const details = { ...(p as any).details };
@@ -996,6 +969,9 @@ const YoungKidsPage = () => {
         const current = await KidsApi.getProgress(token);
         const currentPoints = (current as any)?.points ?? 0;
         await KidsApi.updateProgress(token, { points: currentPoints + delta });
+        await (KidsApi as any).checkAchievements(token);
+        const ach = await (KidsApi as any).getAchievements(token);
+        if (Array.isArray(ach)) setServerAchievements(ach);
       } else {
         await KidsProgressService.update(userId, (p) => ({ ...p, points: p.points + delta } as any));
       }
@@ -1141,6 +1117,52 @@ const YoungKidsPage = () => {
           <CloudRain className="w-10 h-10 sm:w-14 sm:h-14 text-blue-300/60 dark:text-blue-600/60" />
         </div>
       </div>
+
+      {/* My Badges Strip */}
+      {serverAchievements && serverAchievements.length > 0 && (
+        <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative z-10 mb-4 sm:mb-6">
+          <Card className="bg-white/80 dark:bg-gray-900/40 border-2 border-purple-200 dark:border-purple-700 rounded-xl p-3 sm:p-4">
+            <CardContent className="p-0">
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <div className="text-sm sm:text-base font-extrabold text-purple-700 dark:text-purple-300 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4" />
+                  My Badges
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  {serverAchievements.filter((a: any) => a.unlocked).length} unlocked
+                </div>
+              </div>
+              <div className="flex overflow-x-auto gap-2 pb-1">
+                {serverAchievements
+                  .filter((a: any) => a.unlocked)
+                  .slice(0, 12)
+                  .map((a: any, idx: number) => (
+                    <div key={`${a.id || a.name || idx}`}
+                      className="min-w-[90px] bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-lg px-3 py-2 text-center">
+                      <div className="text-lg">🏅</div>
+                      <div className="text-[10px] font-bold text-gray-700 dark:text-gray-300 truncate" title={(a.title || a.name || 'Badge') as string}>
+                        {(a.title || a.name || 'Badge') as string}
+                      </div>
+                    </div>
+                  ))}
+                {serverAchievements.filter((a: any) => !a.unlocked).length > 0 && (
+                  <div className="min-w-[120px] bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg px-3 py-2 text-center">
+                    <div className="text-lg">✨</div>
+                    <div className="text-[10px] font-bold text-gray-700 dark:text-gray-300">Coming Next</div>
+                    <div className="text-[10px] text-gray-500 dark:text-gray-400 truncate">
+                      {(() => {
+                        const locked = serverAchievements.filter((a: any) => !a.unlocked);
+                        const next = locked.sort((a: any, b: any) => (b.progress || 0) - (a.progress || 0))[0];
+                        return (next?.title || next?.name || 'Keep going!') as string;
+                      })()}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Floating Icons */}
       {floatingIcons.map((icon) => {
@@ -1749,40 +1771,21 @@ const YoungKidsPage = () => {
               </Card>
             ) : (
               <div>
-                {/* Story filter for Word Games (shows enrolled stories only) */}
-                <div className="flex flex-wrap items-center gap-2 mb-3">
-                  <Button
-                    variant={selectedStoryFilter === 'all' ? 'default' : 'outline'}
-                    size="sm"
-                    className={cn(
-                      'rounded-lg px-3 py-1.5 text-xs font-bold',
-                      selectedStoryFilter === 'all' 
-                        ? 'bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white' 
-                        : 'border-2'
-                    )}
-                    onClick={() => setSelectedStoryFilter('all')}
+                {/* Story filter for Word Games (dropdown of enrolled stories) */}
+                <div className="flex items-center gap-2 mb-3">
+                  <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Story:</label>
+                  <select
+                    className="text-xs font-semibold rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                    value={selectedStoryFilter}
+                    onChange={(e) => setSelectedStoryFilter(e.target.value)}
                   >
-                    All Stories
-                  </Button>
-                  {Array.from(new Map(
-                    enrolledStoryWordsDetailed.map(w => [w.storyId, w.storyTitle])
-                  ).entries()).map(([sid, title]) => (
-                    <Button
-                      key={sid}
-                      variant={selectedStoryFilter === sid ? 'default' : 'outline'}
-                      size="sm"
-                      className={cn(
-                        'rounded-lg px-3 py-1.5 text-xs font-bold',
-                        selectedStoryFilter === sid 
-                          ? 'bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white' 
-                          : 'border-2'
-                      )}
-                      onClick={() => setSelectedStoryFilter(String(sid))}
-                      title={String(title)}
-                    >
-                      {String(title)}
-                    </Button>
-                  ))}
+                    <option value="all">All Stories</option>
+                    {Array.from(new Map(
+                      enrolledStoryWordsDetailed.map(w => [w.storyId, w.storyTitle])
+                    ).entries()).map(([sid, title]) => (
+                      <option key={String(sid)} value={String(sid)}>{String(title)}</option>
+                    ))}
+                  </select>
                 </div>
                 <Card className="border-2 border-blue-300/50 bg-blue-50/40 dark:bg-blue-900/10 backdrop-blur-sm shadow-lg p-4 mb-4">
                   <div className="flex items-center gap-3">
@@ -1828,40 +1831,21 @@ const YoungKidsPage = () => {
               </Card>
             ) : (
               <div>
-                {/* Story filter for Speak & Repeat (shows enrolled stories only) */}
-                <div className="flex flex-wrap items-center gap-2 mb-3">
-                  <Button
-                    variant={selectedPhraseFilter === 'all' ? 'default' : 'outline'}
-                    size="sm"
-                    className={cn(
-                      'rounded-lg px-3 py-1.5 text-xs font-bold',
-                      selectedPhraseFilter === 'all' 
-                        ? 'bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white' 
-                        : 'border-2'
-                    )}
-                    onClick={() => setSelectedPhraseFilter('all')}
+                {/* Story filter for Speak & Repeat (dropdown of enrolled stories) */}
+                <div className="flex items-center gap-2 mb-3">
+                  <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Story:</label>
+                  <select
+                    className="text-xs font-semibold rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                    value={selectedPhraseFilter}
+                    onChange={(e) => setSelectedPhraseFilter(e.target.value)}
                   >
-                    All Stories
-                  </Button>
-                  {Array.from(new Map(
-                    enrolledStoryPhrasesDetailed.map(p => [p.storyId, p.storyTitle])
-                  ).entries()).map(([sid, title]) => (
-                    <Button
-                      key={sid}
-                      variant={selectedPhraseFilter === sid ? 'default' : 'outline'}
-                      size="sm"
-                      className={cn(
-                        'rounded-lg px-3 py-1.5 text-xs font-bold',
-                        selectedPhraseFilter === sid 
-                          ? 'bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white' 
-                          : 'border-2'
-                      )}
-                      onClick={() => setSelectedPhraseFilter(String(sid))}
-                      title={String(title)}
-                    >
-                      {String(title)}
-                    </Button>
-                  ))}
+                    <option value="all">All Stories</option>
+                    {Array.from(new Map(
+                      enrolledStoryPhrasesDetailed.map(p => [p.storyId, p.storyTitle])
+                    ).entries()).map(([sid, title]) => (
+                      <option key={String(sid)} value={String(sid)}>{String(title)}</option>
+                    ))}
+                  </select>
                 </div>
                 <Card className="border-2 border-orange-300/50 bg-orange-50/40 dark:bg-orange-900/10 backdrop-blur-sm shadow-lg p-4 mb-4">
                   <div className="flex items-center gap-3">
@@ -2069,6 +2053,27 @@ const YoungKidsPage = () => {
               )} />
               <span className="font-semibold text-gray-800 dark:text-gray-500 whitespace-nowrap group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
                 Favorite Stories {(() => { const youngFavorites = favorites.filter(f => f.startsWith('young-')); return youngFavorites.length > 0 ? `(${youngFavorites.length})` : ''; })()}
+              </span>
+            </Button>
+            <Button 
+              variant="outline" 
+              className={cn(
+                "rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-3 sm:py-3 md:py-4 border-2 border-purple-300 dark:border-purple-600 hover:border-purple-400 dark:hover:border-purple-500 bg-purple-50/40 dark:bg-purple-900/10 hover:bg-purple-100/60 dark:hover:bg-purple-900/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 group text-sm sm:text-base w-full sm:w-auto sm:flex-1 sm:min-w-[160px] cursor-pointer",
+                hoveredElement === 'quick-certificates' && "scale-110 shadow-lg"
+              )}
+              onClick={() => {
+                handleElementClick('quick-certificates');
+                navigate('/kids/certificates');
+              }}
+              onMouseEnter={() => handleElementHover('quick-certificates')}
+              onMouseLeave={() => setHoveredElement(null)}
+            >
+              <Crown className={cn(
+                "w-4 h-4 sm:w-5 sm:h-5 mr-2 text-purple-600 dark:text-purple-400 group-hover:animate-pulse flex-shrink-0 transition-all duration-300",
+                hoveredElement === 'quick-certificates' && "animate-pulse"
+              )} />
+              <span className="font-semibold text-gray-800 dark:text-gray-500 whitespace-nowrap group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                Certificates
               </span>
             </Button>
           </div>
