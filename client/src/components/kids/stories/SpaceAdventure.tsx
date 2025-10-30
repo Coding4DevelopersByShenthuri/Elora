@@ -142,7 +142,7 @@ const storySteps = [
     // Choices are aurally DIFFERENT (correct answer in position 1)
     choices: [
       { text: 'Stars twinkle in the night sky', emoji: '✅', meaning: 'true - we see them sparkle' },
-      { text: 'False - Stars never twinkle', emoji: '❌', meaning: 'incorrect - they do twinkle' }
+      { text: 'Stars never twinkle', emoji: '❌', meaning: 'incorrect - they do twinkle' }
     ],
     
     // Full text revealed AFTER answering correctly

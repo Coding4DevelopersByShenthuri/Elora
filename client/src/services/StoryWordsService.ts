@@ -144,52 +144,99 @@ export class StoryWordsService {
     'magic-forest': [
       { phrase: 'Hello Luna', phonemes: '👋 Say: heh-LOW LOO-nah', emoji: '👋🐰', storyId: 'magic-forest', storyTitle: 'Magic Forest Adventure', difficulty: 'easy' },
       { phrase: 'Magic forest', phonemes: '✨🌲 Say: MAJ-ik FOR-est', emoji: '✨🌲', storyId: 'magic-forest', storyTitle: 'Magic Forest Adventure', difficulty: 'easy' },
-      { phrase: 'Happy rabbit', phonemes: '😊🐰 Say: HAP-ee RAB-it', emoji: '😊🐰', storyId: 'magic-forest', storyTitle: 'Magic Forest Adventure', difficulty: 'easy' }
+      { phrase: 'Happy rabbit', phonemes: '😊🐰 Say: HAP-ee RAB-it', emoji: '😊🐰', storyId: 'magic-forest', storyTitle: 'Magic Forest Adventure', difficulty: 'easy' },
+      { phrase: 'Welcome to our forest', phonemes: '🌲 Say: WEL-kum TO OUR FOR-est', emoji: '🌲', storyId: 'magic-forest', storyTitle: 'Magic Forest Adventure', difficulty: 'medium' },
+      { phrase: 'I love this sunny day', phonemes: '🦋☀️ Say: I LUV THIS SUN-ee DAY', emoji: '🦋☀️', storyId: 'magic-forest', storyTitle: 'Magic Forest Adventure', difficulty: 'medium' },
+      { phrase: 'Flow so free', phonemes: '💧 Say: FLO SO FRE', emoji: '💧', storyId: 'magic-forest', storyTitle: 'Magic Forest Adventure', difficulty: 'easy' },
+      { phrase: 'Being kind makes everyone smile', phonemes: '🌸😊 Say: BE-ing KIND MAKS EV-ree-wun SMILE', emoji: '🌸😊', storyId: 'magic-forest', storyTitle: 'Magic Forest Adventure', difficulty: 'hard' },
+      { phrase: 'Stars shine brightly at night', phonemes: '⭐ Say: STARZ SHIYN BRYT-lee AT NIYT', emoji: '⭐', storyId: 'magic-forest', storyTitle: 'Magic Forest Adventure', difficulty: 'medium' },
+      { phrase: 'Collecting makes me happy', phonemes: '🌰 Say: kol-EK-ting MAKS ME HAP-ee', emoji: '🌰', storyId: 'magic-forest', storyTitle: 'Magic Forest Adventure', difficulty: 'medium' },
+      { phrase: 'The most important thing is kindness', phonemes: '💝 Say: THE MOST im-POR-tant THING IS KIND-ness', emoji: '💝', storyId: 'magic-forest', storyTitle: 'Magic Forest Adventure', difficulty: 'hard' }
     ],
     'space-adventure': [
       { phrase: 'We are flying to the stars', phonemes: '🚀✨ Say: WE ARE FLY-ing TO THE STARZ', emoji: '🚀✨', storyId: 'space-adventure', storyTitle: 'Space Adventure', difficulty: 'easy' },
       { phrase: 'Hello Cosmo', phonemes: '👋 Say: heh-LOW KOZ-mo', emoji: '👋👨‍🚀', storyId: 'space-adventure', storyTitle: 'Space Adventure', difficulty: 'easy' },
-      { phrase: 'Blast off', phonemes: '🚀 Say: BLAST OFF', emoji: '🚀', storyId: 'space-adventure', storyTitle: 'Space Adventure', difficulty: 'easy' }
+      { phrase: 'Blast off', phonemes: '🚀 Say: BLAST OFF', emoji: '🚀', storyId: 'space-adventure', storyTitle: 'Space Adventure', difficulty: 'easy' },
+      { phrase: 'Hello new friend from Earth', phonemes: '👽👋 Say: heh-LOW NYOO FREND FRUM UHRS', emoji: '👽👋', storyId: 'space-adventure', storyTitle: 'Space Adventure', difficulty: 'medium' },
+      { phrase: 'My rings make me special', phonemes: '🪐💍 Say: MY RINGZ MAK ME SPE-shul', emoji: '🪐💍', storyId: 'space-adventure', storyTitle: 'Space Adventure', difficulty: 'medium' },
+      { phrase: 'Stars twinkle in the night sky', phonemes: '⭐ Say: STARZ TWIN-kul IN THE NIYT SKY', emoji: '⭐', storyId: 'space-adventure', storyTitle: 'Space Adventure', difficulty: 'medium' },
+      { phrase: 'I can jump so high here', phonemes: '🌙 Say: I KAN JUMP SO HY HERE', emoji: '🌙', storyId: 'space-adventure', storyTitle: 'Space Adventure', difficulty: 'medium' },
+      { phrase: 'Teamwork makes our mission succeed', phonemes: '🤝 Say: TEAM-work MAKS OUR MISH-un suk-SEED', emoji: '🤝', storyId: 'space-adventure', storyTitle: 'Space Adventure', difficulty: 'hard' }
     ],
     'underwater-world': [
       { phrase: 'Hello Finn', phonemes: '👋 Say: heh-LOW FIN', emoji: '👋🐠', storyId: 'underwater-world', storyTitle: 'Underwater World', difficulty: 'easy' },
       { phrase: 'Swimming is so much fun', phonemes: '🏊 Say: SWIM-ing IS SO MUCH FUN', emoji: '🏊🐠', storyId: 'underwater-world', storyTitle: 'Underwater World', difficulty: 'medium' },
-      { phrase: 'Beautiful ocean', phonemes: '🌊 Say: BYOO-ti-ful O-shun', emoji: '🌊', storyId: 'underwater-world', storyTitle: 'Underwater World', difficulty: 'easy' }
+      { phrase: 'Beautiful ocean', phonemes: '🌊 Say: BYOO-ti-ful O-shun', emoji: '🌊', storyId: 'underwater-world', storyTitle: 'Underwater World', difficulty: 'easy' },
+      { phrase: 'Come see my beautiful colors', phonemes: '🪸🌈 Say: KUM SEE MY BYOO-ti-ful KUL-urz', emoji: '🪸🌈', storyId: 'underwater-world', storyTitle: 'Underwater World', difficulty: 'medium' },
+      { phrase: 'Let us play and jump high', phonemes: '🐬 Say: LET US PLA AND JUMP HY', emoji: '🐬', storyId: 'underwater-world', storyTitle: 'Underwater World', difficulty: 'medium' },
+      { phrase: 'Fish swim in the water', phonemes: '🐠 Say: FISH SWIM IN THE WAH-tur', emoji: '🐠', storyId: 'underwater-world', storyTitle: 'Underwater World', difficulty: 'easy' },
+      { phrase: 'My song travels far and wide', phonemes: '🐋🎵 Say: MY SONG TRA-vulz FAR AND WYD', emoji: '🐋🎵', storyId: 'underwater-world', storyTitle: 'Underwater World', difficulty: 'medium' },
+      { phrase: 'The ocean is happy when we keep it clean', phonemes: '🌊 Say: THE O-shun IS HAP-ee WEN WE KEEP IT KLEN', emoji: '🌊', storyId: 'underwater-world', storyTitle: 'Underwater World', difficulty: 'hard' }
     ],
     'dinosaur-discovery': [
       { phrase: 'Hello Dina', phonemes: '👋 Say: heh-LOW DEE-nah', emoji: '👋🦕', storyId: 'dinosaur-discovery', storyTitle: 'Dinosaur Discovery', difficulty: 'easy' },
       { phrase: 'Big dinosaur', phonemes: '🦖 Say: BIG DY-no-sawr', emoji: '🦖', storyId: 'dinosaur-discovery', storyTitle: 'Dinosaur Discovery', difficulty: 'easy' },
-      { phrase: 'Ancient fossil', phonemes: '🦴 Say: AYN-shent FOS-il', emoji: '🦴', storyId: 'dinosaur-discovery', storyTitle: 'Dinosaur Discovery', difficulty: 'medium' }
+      { phrase: 'Ancient fossil', phonemes: '🦴 Say: AYN-shent FOS-il', emoji: '🦴', storyId: 'dinosaur-discovery', storyTitle: 'Dinosaur Discovery', difficulty: 'medium' },
+      { phrase: 'Dig carefully to find bones', phonemes: '⛏️ Say: DIG KAYR-ful-ee TO FYND BONZ', emoji: '⛏️🦴', storyId: 'dinosaur-discovery', storyTitle: 'Dinosaur Discovery', difficulty: 'medium' },
+      { phrase: 'Fossils show us ancient creatures', phonemes: '🦴 Say: FOS-ulz SHO US AYN-shent KREE-churz', emoji: '🦴', storyId: 'dinosaur-discovery', storyTitle: 'Dinosaur Discovery', difficulty: 'hard' },
+      { phrase: 'I love discovering new things', phonemes: '🔍 Say: I LUV dis-KUV-er-ing NYOO THINGZ', emoji: '🔍', storyId: 'dinosaur-discovery', storyTitle: 'Dinosaur Discovery', difficulty: 'medium' }
     ],
     'unicorn-magic': [
       { phrase: 'Hello Stardust', phonemes: '👋 Say: heh-LOW STAR-dust', emoji: '👋🦄', storyId: 'unicorn-magic', storyTitle: 'Unicorn Magic Adventure', difficulty: 'easy' },
       { phrase: 'Rainbow unicorn', phonemes: '🌈🦄 Say: RAIN-bow YOU-ni-corn', emoji: '🌈🦄', storyId: 'unicorn-magic', storyTitle: 'Unicorn Magic Adventure', difficulty: 'easy' },
-      { phrase: 'Magic sparkles', phonemes: '✨⭐ Say: MAJ-ik SPAR-kulz', emoji: '✨⭐', storyId: 'unicorn-magic', storyTitle: 'Unicorn Magic Adventure', difficulty: 'medium' }
+      { phrase: 'Magic sparkles', phonemes: '✨⭐ Say: MAJ-ik SPAR-kulz', emoji: '✨⭐', storyId: 'unicorn-magic', storyTitle: 'Unicorn Magic Adventure', difficulty: 'medium' },
+      { phrase: 'My horn makes wishes come true', phonemes: '🦄 Say: MY HORN MAKS WISH-uz KUM TROO', emoji: '🦄✨', storyId: 'unicorn-magic', storyTitle: 'Unicorn Magic Adventure', difficulty: 'hard' },
+      { phrase: 'Dreams can come true', phonemes: '💭 Say: DREEMZ KAN KUM TROO', emoji: '💭⭐', storyId: 'unicorn-magic', storyTitle: 'Unicorn Magic Adventure', difficulty: 'easy' }
     ],
     'pirate-treasure': [
       { phrase: 'Hello Captain Finn', phonemes: '👋⚓ Say: heh-LOW CAP-tin FIN', emoji: '👋⚓', storyId: 'pirate-treasure', storyTitle: 'Pirate Treasure Adventure', difficulty: 'easy' },
       { phrase: 'Pirate treasure', phonemes: '🏴‍☠️💎 Say: PY-rate TREZH-er', emoji: '🏴‍☠️💎', storyId: 'pirate-treasure', storyTitle: 'Pirate Treasure Adventure', difficulty: 'easy' },
-      { phrase: 'Buried treasure', phonemes: '🏝️💰 Say: BER-eed TREZH-er', emoji: '🏝️💰', storyId: 'pirate-treasure', storyTitle: 'Pirate Treasure Adventure', difficulty: 'medium' }
+      { phrase: 'Buried treasure', phonemes: '🏝️💰 Say: BER-eed TREZH-er', emoji: '🏝️💰', storyId: 'pirate-treasure', storyTitle: 'Pirate Treasure Adventure', difficulty: 'medium' },
+      { phrase: 'Hoist the sails and catch the wind', phonemes: '⛵💨 Say: HOYST THE SAILZ AND KACH THE WIND', emoji: '⛵💨', storyId: 'pirate-treasure', storyTitle: 'Pirate Treasure Adventure', difficulty: 'medium' },
+      { phrase: 'X marks the spot where treasure hides', phonemes: '🗺️💰 Say: EKS MARKS THE SPOT WHERE TREZH-er HYDS', emoji: '🗺️💰', storyId: 'pirate-treasure', storyTitle: 'Pirate Treasure Adventure', difficulty: 'hard' },
+      { phrase: 'Follow me to the treasure', phonemes: '🦜💎 Say: FOL-ow ME TO THE TREZH-er', emoji: '🦜💎', storyId: 'pirate-treasure', storyTitle: 'Pirate Treasure Adventure', difficulty: 'medium' },
+      { phrase: 'Stay brave through the storm', phonemes: '⛈️💪 Say: STA BRAV THROO THE STORM', emoji: '⛈️💪', storyId: 'pirate-treasure', storyTitle: 'Pirate Treasure Adventure', difficulty: 'medium' },
+      { phrase: 'The best treasure is friendship', phonemes: '💝 Say: THE BEST TREZH-er IS FREND-ship', emoji: '💝', storyId: 'pirate-treasure', storyTitle: 'Pirate Treasure Adventure', difficulty: 'medium' }
     ],
     'superhero-school': [
       { phrase: 'Hello Captain Courage', phonemes: '👋🛡️ Say: heh-LOW CAP-tin KUR-ij', emoji: '👋🛡️', storyId: 'superhero-school', storyTitle: 'Superhero School Adventure', difficulty: 'easy' },
       { phrase: 'Superhero training', phonemes: '🦸‍♂️💪 Say: SOO-per-hero TRAIN-ing', emoji: '🦸‍♂️💪', storyId: 'superhero-school', storyTitle: 'Superhero School Adventure', difficulty: 'medium' },
-      { phrase: 'Rescue mission', phonemes: '🚁🆘 Say: RES-kyoo MISH-un', emoji: '🚁🆘', storyId: 'superhero-school', storyTitle: 'Superhero School Adventure', difficulty: 'medium' }
+      { phrase: 'Rescue mission', phonemes: '🚁🆘 Say: RES-kyoo MISH-un', emoji: '🚁🆘', storyId: 'superhero-school', storyTitle: 'Superhero School Adventure', difficulty: 'medium' },
+      { phrase: 'With great power comes great responsibility', phonemes: '💪🛡️ Say: WITH GRAT POW-er KUMZ GRAT ri-spon-suh-BIL-i-tee', emoji: '💪🛡️', storyId: 'superhero-school', storyTitle: 'Superhero School Adventure', difficulty: 'hard' },
+      { phrase: 'True heroes help people in need', phonemes: '❤️🤝 Say: TROO HE-roes HELP PEE-pul IN NEED', emoji: '❤️🤝', storyId: 'superhero-school', storyTitle: 'Superhero School Adventure', difficulty: 'hard' },
+      { phrase: 'Bravery means facing your fears', phonemes: '🛡️💪 Say: BRAV-ree MEENZ FAS-ing YOR FEERZ', emoji: '🛡️💪', storyId: 'superhero-school', storyTitle: 'Superhero School Adventure', difficulty: 'hard' },
+      { phrase: 'Together we are stronger', phonemes: '🤝💪 Say: tuh-GETH-er WE ARE STRONG-er', emoji: '🤝💪', storyId: 'superhero-school', storyTitle: 'Superhero School Adventure', difficulty: 'medium' },
+      { phrase: 'Kindness is the greatest superpower', phonemes: '✨❤️ Say: KIND-ness IS THE GRAT-est SOO-per-pow-er', emoji: '✨❤️', storyId: 'superhero-school', storyTitle: 'Superhero School Adventure', difficulty: 'hard' }
     ],
     'fairy-garden': [
       { phrase: 'Hello Twinkle', phonemes: '👋 Say: heh-LOW TWIN-kul', emoji: '👋🧚', storyId: 'fairy-garden', storyTitle: 'Fairy Garden Adventure', difficulty: 'easy' },
       { phrase: 'Fairy dust', phonemes: '🧚✨ Say: FAIR-ee DUST', emoji: '🧚✨', storyId: 'fairy-garden', storyTitle: 'Fairy Garden Adventure', difficulty: 'easy' },
-      { phrase: 'Magic sparkles', phonemes: '✨⭐ Say: MAJ-ik SPAR-kulz', emoji: '✨⭐', storyId: 'fairy-garden', storyTitle: 'Fairy Garden Adventure', difficulty: 'medium' }
+      { phrase: 'Magic sparkles', phonemes: '✨⭐ Say: MAJ-ik SPAR-kulz', emoji: '✨⭐', storyId: 'fairy-garden', storyTitle: 'Fairy Garden Adventure', difficulty: 'medium' },
+      { phrase: 'Dewdrops shine like tiny diamonds', phonemes: '💧💎 Say: DYOO-drops SHIYN LYK TY-nee DY-mundz', emoji: '💧💎', storyId: 'fairy-garden', storyTitle: 'Fairy Garden Adventure', difficulty: 'hard' },
+      { phrase: 'Hello little fairy friend', phonemes: '🐞👋 Say: heh-LOW LIT-ul FAIR-ee FREND', emoji: '🐞👋', storyId: 'fairy-garden', storyTitle: 'Fairy Garden Adventure', difficulty: 'medium' },
+      { phrase: 'We grow with love and sunshine', phonemes: '🌸☀️ Say: WE GRO WITH LUV AND SUN-shiyn', emoji: '🌸☀️', storyId: 'fairy-garden', storyTitle: 'Fairy Garden Adventure', difficulty: 'medium' },
+      { phrase: 'Dancing makes my heart happy', phonemes: '🦋💃 Say: DANS-ing MAKS MY HART HAP-ee', emoji: '🦋💃', storyId: 'fairy-garden', storyTitle: 'Fairy Garden Adventure', difficulty: 'medium' },
+      { phrase: 'Small things can be very special', phonemes: '✨💝 Say: SMAL THINGZ KAN BE VER-ee SPE-shul', emoji: '✨💝', storyId: 'fairy-garden', storyTitle: 'Fairy Garden Adventure', difficulty: 'hard' }
     ],
     'rainbow-castle': [
       { phrase: 'Hello Princess Aurora', phonemes: '👋👸 Say: heh-LOW PRIN-sess aw-ROR-ah', emoji: '👋👸', storyId: 'rainbow-castle', storyTitle: 'Rainbow Castle Adventure', difficulty: 'easy' },
       { phrase: 'Rainbow castle', phonemes: '🌈🏰 Say: RAIN-bow KAS-ul', emoji: '🌈🏰', storyId: 'rainbow-castle', storyTitle: 'Rainbow Castle Adventure', difficulty: 'easy' },
-      { phrase: 'Beautiful crown', phonemes: '👑 Say: BYOO-ti-ful KROWN', emoji: '👑', storyId: 'rainbow-castle', storyTitle: 'Rainbow Castle Adventure', difficulty: 'medium' }
+      { phrase: 'Beautiful crown', phonemes: '👑 Say: BYOO-ti-ful KROWN', emoji: '👑', storyId: 'rainbow-castle', storyTitle: 'Rainbow Castle Adventure', difficulty: 'medium' },
+      { phrase: 'Welcome to our royal castle', phonemes: '🚪👑 Say: WEL-kum TO OUR ROY-ul KAS-ul', emoji: '🚪👑', storyId: 'rainbow-castle', storyTitle: 'Rainbow Castle Adventure', difficulty: 'medium' },
+      { phrase: 'I protect the castle with love', phonemes: '🐉💚 Say: I pro-TEKT THE KAS-ul WITH LUV', emoji: '🐉💚', storyId: 'rainbow-castle', storyTitle: 'Rainbow Castle Adventure', difficulty: 'medium' },
+      { phrase: 'Wishes come true here', phonemes: '⛲✨ Say: WISH-uz KUM TROO HERE', emoji: '⛲✨', storyId: 'rainbow-castle', storyTitle: 'Rainbow Castle Adventure', difficulty: 'medium' },
+      { phrase: 'Colors make everything beautiful', phonemes: '🌈🎨 Say: KUL-urz MAK EV-ree-thing BYOO-ti-ful', emoji: '🌈🎨', storyId: 'rainbow-castle', storyTitle: 'Rainbow Castle Adventure', difficulty: 'hard' },
+      { phrase: 'Kindness is the greatest magic', phonemes: '✨💝 Say: KIND-ness IS THE GRAT-est MAJ-ik', emoji: '✨💝', storyId: 'rainbow-castle', storyTitle: 'Rainbow Castle Adventure', difficulty: 'hard' }
     ],
     'jungle-explorer': [
       { phrase: 'Hello Captain Leo', phonemes: '👋 Say: heh-LOW CAP-tin LEE-oh', emoji: '👋🦁', storyId: 'jungle-explorer', storyTitle: 'Jungle Explorer Adventure', difficulty: 'easy' },
       { phrase: 'Jungle adventure', phonemes: '🌴🗺️ Say: JUNG-ul ad-VEN-chur', emoji: '🌴🗺️', storyId: 'jungle-explorer', storyTitle: 'Jungle Explorer Adventure', difficulty: 'medium' },
-      { phrase: 'Talking bunnies', phonemes: '🐰💬 Say: TAWK-ing BUN-eez', emoji: '🐰💬', storyId: 'jungle-explorer', storyTitle: 'Jungle Explorer Adventure', difficulty: 'easy' }
+      { phrase: 'Talking bunnies', phonemes: '🐰💬 Say: TAWK-ing BUN-eez', emoji: '🐰💬', storyId: 'jungle-explorer', storyTitle: 'Jungle Explorer Adventure', difficulty: 'easy' },
+      { phrase: 'Follow the winding jungle path', phonemes: '🛤️🌿 Say: FOL-ow THE WYND-ing JUNG-ul PATH', emoji: '🛤️🌿', storyId: 'jungle-explorer', storyTitle: 'Jungle Explorer Adventure', difficulty: 'medium' },
+      { phrase: 'I will help you explore safely', phonemes: '🐒🤝 Say: I WIL HELP YOO ex-PLOR SAF-lee', emoji: '🐒🤝', storyId: 'jungle-explorer', storyTitle: 'Jungle Explorer Adventure', difficulty: 'hard' },
+      { phrase: 'Water flows from the mountain top', phonemes: '💧🏔️ Say: WAH-tur FLOZ FRUM THE MOWN-tun TOP', emoji: '💧🏔️', storyId: 'jungle-explorer', storyTitle: 'Jungle Explorer Adventure', difficulty: 'medium' },
+      { phrase: 'I have lived here for many years', phonemes: '🌳⏰ Say: I HAV LIVD HERE FOR MEN-ee YEARZ', emoji: '🌳⏰', storyId: 'jungle-explorer', storyTitle: 'Jungle Explorer Adventure', difficulty: 'medium' },
+      { phrase: 'Nature teaches us to be patient', phonemes: '🔍⏳ Say: NAY-chur TEE-chez US TO BE PA-shunt', emoji: '🔍⏳', storyId: 'jungle-explorer', storyTitle: 'Jungle Explorer Adventure', difficulty: 'hard' }
     ]
   };
 

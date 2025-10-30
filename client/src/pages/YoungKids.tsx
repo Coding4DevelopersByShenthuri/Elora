@@ -67,11 +67,16 @@ const YoungKidsPage = () => {
   const [pronunciationAttempts, setPronunciationAttempts] = useState(0);
   const [vocabularyAttempts, setVocabularyAttempts] = useState(0);
   const [enrolledWords, setEnrolledWords] = useState<Array<{ word: string; hint: string }>>([]);
+  const [enrolledStoryWordsDetailed, setEnrolledStoryWordsDetailed] = useState<Array<{ word: string; hint: string; storyId: string; storyTitle: string }>>([]);
+  const [selectedStoryFilter, setSelectedStoryFilter] = useState<string>('all');
   const [enrolledPhrases, setEnrolledPhrases] = useState<Array<{ phrase: string; phonemes: string }>>([]);
+  const [enrolledStoryPhrasesDetailed, setEnrolledStoryPhrasesDetailed] = useState<Array<{ phrase: string; phonemes: string; storyId: string; storyTitle: string }>>([]);
+  const [selectedPhraseFilter, setSelectedPhraseFilter] = useState<string>('all');
   const storiesPerPage = 4;
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const [dynamicStories, setDynamicStories] = useState<typeof allStories | null>(null);
 
   // Interactive features state
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
@@ -296,49 +301,49 @@ const YoungKidsPage = () => {
       try {
         // Get words from enrolled stories
         const storyWords = StoryWordsService.getWordsFromEnrolledStories(userId);
-        
-        if (storyWords.length > 0) {
-          // Convert StoryWord[] to the format expected by Vocabulary component
-          const words = storyWords.map(sw => ({
-            word: sw.word,
-            hint: sw.hint
-          }));
-          
-          console.log(`📚 Loaded ${words.length} words from enrolled stories:`, words);
-          setEnrolledWords(words);
-        } else {
-          // No enrolled stories yet, use default words
-          console.log('📚 No enrolled stories found, using default words');
-          setEnrolledWords(vocabWords);
-        }
+        // Save detailed for filtering; do NOT fallback to defaults for Word Games
+        const detailed = storyWords.map(sw => ({
+          word: sw.word,
+          hint: sw.hint,
+          storyId: sw.storyId,
+          storyTitle: sw.storyTitle
+        }));
+        setEnrolledStoryWordsDetailed(detailed);
+        // Apply current filter immediately
+        const filtered = selectedStoryFilter === 'all' 
+          ? detailed
+          : detailed.filter(w => w.storyId === selectedStoryFilter);
+        const words = filtered.map(w => ({ word: w.word, hint: w.hint }));
+        console.log(`📚 Loaded ${words.length} words from enrolled stories${selectedStoryFilter !== 'all' ? ' (filtered)' : ''}`);
+        setEnrolledWords(words);
 
         // Get phrases from enrolled stories
         const storyPhrases = StoryWordsService.getPhrasesFromEnrolledStories(userId);
-        
-        if (storyPhrases.length > 0) {
-          // Convert StoryPhrase[] to the format expected by Pronunciation component
-          const phrases = storyPhrases.map(sp => ({
-            phrase: sp.phrase,
-            phonemes: sp.phonemes
-          }));
-          
-          console.log(`🎤 Loaded ${phrases.length} phrases from enrolled stories:`, phrases);
-          setEnrolledPhrases(phrases);
-        } else {
-          // No enrolled stories yet, use default phrases
-          console.log('🎤 No enrolled stories found, using default phrases');
-          setEnrolledPhrases(pronounceItems);
-        }
+        // Save detailed for filtering; do NOT fallback to defaults for Speak & Repeat
+        const detailedPhrases = storyPhrases.map(sp => ({
+          phrase: sp.phrase,
+          phonemes: sp.phonemes,
+          storyId: sp.storyId,
+          storyTitle: sp.storyTitle
+        }));
+        setEnrolledStoryPhrasesDetailed(detailedPhrases);
+        // Apply current filter immediately
+        const filteredPhrases = selectedPhraseFilter === 'all' 
+          ? detailedPhrases
+          : detailedPhrases.filter(p => p.storyId === selectedPhraseFilter);
+        const phrases = filteredPhrases.map(p => ({ phrase: p.phrase, phonemes: p.phonemes }));
+        console.log(`🎤 Loaded ${phrases.length} phrases from enrolled stories${selectedPhraseFilter !== 'all' ? ' (filtered)' : ''}`);
+        setEnrolledPhrases(phrases);
       } catch (error) {
         console.error('Error loading vocabulary words and phrases:', error);
-        // Fallback to default words and phrases on error
-        setEnrolledWords(vocabWords);
-        setEnrolledPhrases(pronounceItems);
+        // For Word Games and Speak & Repeat, do not fallback to defaults; show empty state
+        setEnrolledWords([]);
+        setEnrolledPhrases([]);
       }
     };
 
     loadVocabularyWordsAndPhrases();
-  }, [userId, isAuthenticated]);
+  }, [userId, isAuthenticated, selectedStoryFilter, selectedPhraseFilter]);
 
   const categories = [
     { id: 'stories', label: 'Story Time', icon: BookOpen, emoji: '📚' },
@@ -490,13 +495,40 @@ const YoungKidsPage = () => {
     }
   ];
 
+  // Load dynamic kids lessons from server (fallback to defaults)
+  useEffect(() => {
+    const loadLessons = async () => {
+      try {
+        const lessons: any[] = await (KidsApi as any).getLessons();
+        if (Array.isArray(lessons) && lessons.length > 0) {
+          const mapped = allStories.map((s, idx) => {
+            const l = lessons[idx] || lessons[lessons.length - 1];
+            const mappedType = l?.lesson_type || s.type;
+            return {
+              ...s,
+              title: l?.title || s.title,
+              type: mappedType
+            };
+          });
+          setDynamicStories(mapped);
+        } else {
+          setDynamicStories(allStories);
+        }
+      } catch {
+        setDynamicStories(allStories);
+      }
+    };
+    loadLessons();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
+
   // Handle story opening from Favorites page
   useEffect(() => {
     if (location.state?.startStory && location.state?.storyType) {
       const { startStory, storyType } = location.state;
       
       // Find the story by ID
-      const story = allStories.find(s => s.id === startStory);
+      const story = (dynamicStories || allStories).find(s => s.id === startStory);
       if (story) {
         // Set flag to indicate we're opening from Favorites
         setIsOpeningFromFavorites(true);
@@ -534,12 +566,13 @@ const YoungKidsPage = () => {
         navigate(location.pathname, { replace: true });
       }
     }
-  }, [location.state, allStories, navigate, location.pathname]);
+  }, [location.state, dynamicStories, allStories, navigate, location.pathname]);
 
   // Calculate pagination
+  const effectiveStories = dynamicStories || allStories;
   const startIndex = (currentPage - 1) * storiesPerPage;
-  const paginatedStories = allStories.slice(startIndex, startIndex + storiesPerPage);
-  const totalPages = Math.ceil(allStories.length / storiesPerPage);
+  const paginatedStories = effectiveStories.slice(startIndex, startIndex + storiesPerPage);
+  const totalPages = Math.ceil(effectiveStories.length / storiesPerPage);
 
   // Dynamic achievements based on real-time progress
   const achievements = [
@@ -592,8 +625,8 @@ const YoungKidsPage = () => {
     { word: 'sparkle', hint: '⭐ Say: SPAR-kul' }
   ];
 
-  // Use enrolled words if available, otherwise use default words
-  const vocabularyWordsToUse = enrolledWords.length > 0 ? enrolledWords : vocabWords;
+  // Use enrolled words only for Word Games (no fallback to defaults)
+  const vocabularyWordsToUse = enrolledWords;
 
   const pronounceItems = [
     { phrase: 'Hello Luna', phonemes: '👋 Say: heh-LOW LOO-nah' },
@@ -618,14 +651,14 @@ const YoungKidsPage = () => {
       return;
     }
 
-    const storyIndex = allStories.findIndex(s => s.id === storyId);
+    const storyIndex = effectiveStories.findIndex(s => s.id === storyId);
     if (storyIndex === -1) return;
 
     handleElementClick(`story-${storyId}`);
     
     // Play story-specific voice introduction (skip if opening from Favorites)
     if (isSoundEnabled && !isOpeningFromFavorites) {
-      const story = allStories[storyIndex];
+      const story = effectiveStories[storyIndex];
       await EnhancedTTS.speak(
         `Welcome to ${story.title}! ${story.description} Let's begin our adventure!`, 
         { rate: 0.9, emotion: 'excited' }
@@ -643,7 +676,7 @@ const YoungKidsPage = () => {
     setBounceAnimation(true);
     
     // Open appropriate adventure module
-    const storyType = allStories[storyIndex].type;
+    const storyType = effectiveStories[storyIndex].type;
     if (storyType === 'forest') {
       setShowMagicForest(true);
     } else if (storyType === 'space') {
@@ -786,10 +819,27 @@ const YoungKidsPage = () => {
     }
   };
 
+  // Helper function to map story type to internal StoryWordsService ID
+  const getInternalStoryId = (storyType: string): string => {
+    const mapping: Record<string, string> = {
+      'forest': 'magic-forest',
+      'space': 'space-adventure',
+      'ocean': 'underwater-world',
+      'dinosaur': 'dinosaur-discovery',
+      'unicorn': 'unicorn-magic',
+      'pirate': 'pirate-treasure',
+      'superhero': 'superhero-school',
+      'fairy': 'fairy-garden',
+      'rainbow': 'rainbow-castle',
+      'jungle': 'jungle-explorer'
+    };
+    return mapping[storyType] || storyType;
+  };
+
   const handleAdventureComplete = async (storyId: string, score: number) => {
     if (!isAuthenticated) return;
 
-    const storyIndex = allStories.findIndex(s => s.id === storyId);
+    const storyIndex = (dynamicStories || allStories).findIndex(s => s.id === storyId);
     if (storyIndex === -1) return;
 
     const newPoints = points + 100;
@@ -798,43 +848,56 @@ const YoungKidsPage = () => {
     setStreak(newStreak);
     
     // Get story information for enrollment
-    const story = allStories[storyIndex];
+    const story = (dynamicStories || allStories)[storyIndex];
     const storyType = story.type;
     const storyTitle = story.title;
+    
+    // Map the story ID from young-X format to internal StoryWordsService format
+    const internalStoryId = getInternalStoryId(storyType);
     
     try {
       const token = localStorage.getItem('speakbee_auth_token');
       const key = `story-${storyIndex}`;
       
-      // Record story completion and enrollment
+      // Record story completion and enrollment using internal story ID
       await KidsProgressService.recordStoryCompletion(
-        userId, 
-        storyType, 
-        storyTitle, 
-        story.type, 
+        userId,
+        internalStoryId,
+        storyTitle,
+        storyType,
         score
       );
       
       // Reload vocabulary words and phrases to include data from this newly completed story
       const storyWords = StoryWordsService.getWordsFromEnrolledStories(userId);
-      if (storyWords.length > 0) {
-        const words = storyWords.map(sw => ({
-          word: sw.word,
-          hint: sw.hint
-        }));
-        console.log(`🎉 Story completed! Loaded ${words.length} total words from enrolled stories`);
-        setEnrolledWords(words);
-      }
+      const detailedWords = storyWords.map(sw => ({
+        word: sw.word,
+        hint: sw.hint,
+        storyId: sw.storyId,
+        storyTitle: sw.storyTitle
+      }));
+      setEnrolledStoryWordsDetailed(detailedWords);
+      const filteredWords = selectedStoryFilter === 'all' 
+        ? detailedWords
+        : detailedWords.filter(w => w.storyId === selectedStoryFilter);
+      const words = filteredWords.map(w => ({ word: w.word, hint: w.hint }));
+      console.log(`🎉 Story completed! Loaded ${words.length} total words from enrolled stories`);
+      setEnrolledWords(words);
 
       const storyPhrases = StoryWordsService.getPhrasesFromEnrolledStories(userId);
-      if (storyPhrases.length > 0) {
-        const phrases = storyPhrases.map(sp => ({
-          phrase: sp.phrase,
-          phonemes: sp.phonemes
-        }));
-        console.log(`🎉 Story completed! Loaded ${phrases.length} total phrases from enrolled stories`);
-        setEnrolledPhrases(phrases);
-      }
+      const detailedPhrases = storyPhrases.map(sp => ({
+        phrase: sp.phrase,
+        phonemes: sp.phonemes,
+        storyId: sp.storyId,
+        storyTitle: sp.storyTitle
+      }));
+      setEnrolledStoryPhrasesDetailed(detailedPhrases);
+      const filteredPhrases = selectedPhraseFilter === 'all' 
+        ? detailedPhrases
+        : detailedPhrases.filter(p => p.storyId === selectedPhraseFilter);
+      const phrases = filteredPhrases.map(p => ({ phrase: p.phrase, phonemes: p.phonemes }));
+      console.log(`🎉 Story completed! Loaded ${phrases.length} total phrases from enrolled stories`);
+      setEnrolledPhrases(phrases);
       
       if (token && token !== 'local-token') {
         const current = await KidsApi.getProgress(token);
@@ -1620,12 +1683,47 @@ const YoungKidsPage = () => {
               </Card>
             ) : (
               <div>
+                {/* Story filter for Word Games (shows enrolled stories only) */}
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  <Button
+                    variant={selectedStoryFilter === 'all' ? 'default' : 'outline'}
+                    size="sm"
+                    className={cn(
+                      'rounded-lg px-3 py-1.5 text-xs font-bold',
+                      selectedStoryFilter === 'all' 
+                        ? 'bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white' 
+                        : 'border-2'
+                    )}
+                    onClick={() => setSelectedStoryFilter('all')}
+                  >
+                    All Stories
+                  </Button>
+                  {Array.from(new Map(
+                    enrolledStoryWordsDetailed.map(w => [w.storyId, w.storyTitle])
+                  ).entries()).map(([sid, title]) => (
+                    <Button
+                      key={sid}
+                      variant={selectedStoryFilter === sid ? 'default' : 'outline'}
+                      size="sm"
+                      className={cn(
+                        'rounded-lg px-3 py-1.5 text-xs font-bold',
+                        selectedStoryFilter === sid 
+                          ? 'bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white' 
+                          : 'border-2'
+                      )}
+                      onClick={() => setSelectedStoryFilter(String(sid))}
+                      title={String(title)}
+                    >
+                      {String(title)}
+                    </Button>
+                  ))}
+                </div>
                 <Card className="border-2 border-blue-300/50 bg-blue-50/40 dark:bg-blue-900/10 backdrop-blur-sm shadow-lg p-4 mb-4">
                   <div className="flex items-center gap-3">
                     <BookOpen className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                     <div>
                       <h3 className="font-bold text-gray-800 dark:text-white">
-                        Words from Your Stories
+                        Words from Your {selectedStoryFilter === 'all' ? 'Stories' : 'Selected Story'}
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-300">
                         {vocabularyWordsToUse.length} words from your enrolled stories
@@ -1664,12 +1762,47 @@ const YoungKidsPage = () => {
               </Card>
             ) : (
               <div>
+                {/* Story filter for Speak & Repeat (shows enrolled stories only) */}
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  <Button
+                    variant={selectedPhraseFilter === 'all' ? 'default' : 'outline'}
+                    size="sm"
+                    className={cn(
+                      'rounded-lg px-3 py-1.5 text-xs font-bold',
+                      selectedPhraseFilter === 'all' 
+                        ? 'bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white' 
+                        : 'border-2'
+                    )}
+                    onClick={() => setSelectedPhraseFilter('all')}
+                  >
+                    All Stories
+                  </Button>
+                  {Array.from(new Map(
+                    enrolledStoryPhrasesDetailed.map(p => [p.storyId, p.storyTitle])
+                  ).entries()).map(([sid, title]) => (
+                    <Button
+                      key={sid}
+                      variant={selectedPhraseFilter === sid ? 'default' : 'outline'}
+                      size="sm"
+                      className={cn(
+                        'rounded-lg px-3 py-1.5 text-xs font-bold',
+                        selectedPhraseFilter === sid 
+                          ? 'bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white' 
+                          : 'border-2'
+                      )}
+                      onClick={() => setSelectedPhraseFilter(String(sid))}
+                      title={String(title)}
+                    >
+                      {String(title)}
+                    </Button>
+                  ))}
+                </div>
                 <Card className="border-2 border-orange-300/50 bg-orange-50/40 dark:bg-orange-900/10 backdrop-blur-sm shadow-lg p-4 mb-4">
                   <div className="flex items-center gap-3">
                     <Mic className="w-6 h-6 text-orange-600 dark:text-orange-400" />
                     <div>
                       <h3 className="font-bold text-gray-800 dark:text-white">
-                        Phrases from Your Stories
+                        Phrases from Your {selectedPhraseFilter === 'all' ? 'Stories' : 'Selected Story'}
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-300">
                         {enrolledPhrases.length} phrases from your enrolled stories
