@@ -6,16 +6,17 @@ import { cn } from '@/lib/utils';
 import EnhancedTTS from '@/services/EnhancedTTS';
 import { WhisperService } from '@/services/WhisperService';
 import KidsVoiceRecorder from './KidsVoiceRecorder';
-// import HybridServiceManager from '@/services/HybridServiceManager';
 import StoryWordsService, { type StoryWord } from '@/services/StoryWordsService';
 import { useAuth } from '@/contexts/AuthContext';
+import KidsApi from '@/services/KidsApi';
+import KidsProgressService from '@/services/KidsProgressService';
 
 type GameType = 'tongue-twister' | 'word-chain' | 'story-telling' | 'pronunciation-challenge' | 'conversation-practice' | 'menu';
 
 const InteractiveGames = () => {
   const [currentGame, setCurrentGame] = useState<GameType>('menu');
-  const [score, setScore] = useState(0);
-  const { user } = useAuth();
+  const [gameScore, setGameScore] = useState(0);
+  const { user, isAuthenticated } = useAuth();
   const userId = user?.id ? String(user.id) : 'local-user';
   const [enrolledStories, setEnrolledStories] = useState<string[]>([]);
   const [storyWords, setStoryWords] = useState<StoryWord[]>([]);
@@ -38,12 +39,39 @@ const InteractiveGames = () => {
     loadStoryData();
   }, [userId]);
 
+  // Handle score updates with backend sync
+  const handleScoreUpdate = async (points: number, _gameType: string) => {
+    setGameScore(prev => prev + points);
+    
+    if (!isAuthenticated) return;
+    
+    try {
+      const token = localStorage.getItem('speakbee_auth_token');
+      if (token && token !== 'local-token') {
+        // Update via API
+        const current = await KidsApi.getProgress(token);
+        const currentPoints = (current as any).points || 0;
+        await KidsApi.updateProgress(token, {
+          points: currentPoints + points
+        });
+      } else {
+        // Update locally
+        await KidsProgressService.update(userId, (progress) => ({
+          ...progress,
+          points: progress.points + points
+        }));
+      }
+    } catch (error) {
+      console.error('Error updating game score:', error);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {currentGame === 'menu' && (
         <GameMenu 
           onSelectGame={setCurrentGame} 
-          totalScore={score} 
+          totalScore={gameScore} 
           enrolledStories={enrolledStories}
           storyWords={storyWords}
         />
@@ -51,31 +79,31 @@ const InteractiveGames = () => {
       {currentGame === 'tongue-twister' && (
         <TongueTwisterGame 
           onBack={() => setCurrentGame('menu')} 
-          onScoreUpdate={(points) => setScore(prev => prev + points)}
+          onScoreUpdate={(points) => handleScoreUpdate(points, 'tongue-twister')}
         />
       )}
       {currentGame === 'word-chain' && (
         <WordChainGame 
           onBack={() => setCurrentGame('menu')} 
-          onScoreUpdate={(points) => setScore(prev => prev + points)}
+          onScoreUpdate={(points) => handleScoreUpdate(points, 'word-chain')}
         />
       )}
       {currentGame === 'story-telling' && (
         <StoryTellingGame 
           onBack={() => setCurrentGame('menu')} 
-          onScoreUpdate={(points) => setScore(prev => prev + points)}
+          onScoreUpdate={(points) => handleScoreUpdate(points, 'story-telling')}
         />
       )}
       {currentGame === 'pronunciation-challenge' && (
         <PronunciationChallenge 
           onBack={() => setCurrentGame('menu')} 
-          onScoreUpdate={(points) => setScore(prev => prev + points)}
+          onScoreUpdate={(points) => handleScoreUpdate(points, 'pronunciation-challenge')}
         />
       )}
       {currentGame === 'conversation-practice' && (
         <ConversationPractice 
           onBack={() => setCurrentGame('menu')} 
-          onScoreUpdate={(points) => setScore(prev => prev + points)}
+          onScoreUpdate={(points) => handleScoreUpdate(points, 'conversation-practice')}
         />
       )}
     </div>
@@ -156,7 +184,8 @@ const GameMenu = ({
         <CardContent className="py-4 sm:py-6 text-center px-3 sm:px-4">
           <Trophy className="w-10 h-10 sm:w-12 sm:h-12 text-yellow-600 dark:text-yellow-400 mx-auto mb-2 sm:mb-3" />
           <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-yellow-700 dark:text-yellow-300 mb-2">{totalScore}</div>
-          <p className="text-sm sm:text-base text-gray-700 dark:text-gray-200 font-semibold">Total Game Points</p>
+          <p className="text-sm sm:text-base text-gray-700 dark:text-gray-200 font-semibold">Current Session Points</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Points sync to your total score!</p>
         </CardContent>
       </Card>
 

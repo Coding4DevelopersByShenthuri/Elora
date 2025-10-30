@@ -181,6 +181,25 @@ class OfflineKidsApi {
     return { success: true, offline: true };
   }
 
+  static async getAchievements(token: string) {
+    // Try online first
+    if (this.isOnline()) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/kids/achievements`, {
+          headers: { Authorization: `Bearer ${token}` },
+          signal: AbortSignal.timeout(5000)
+        });
+        if (res.ok) {
+          return res.json();
+        }
+      } catch (error) {
+        console.warn('Failed to fetch achievements from server:', error);
+      }
+    }
+    // Fallback: minimal offline structure
+    return [];
+  }
+
   // Helper to extract user ID from token (simplified)
   private static getUserIdFromToken(_token: string): string {
     try {

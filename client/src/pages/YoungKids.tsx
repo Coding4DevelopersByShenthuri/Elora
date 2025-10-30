@@ -77,6 +77,7 @@ const YoungKidsPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [dynamicStories, setDynamicStories] = useState<typeof allStories | null>(null);
+  const [serverAchievements, setServerAchievements] = useState<any[]>([]);
 
   // Interactive features state
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
@@ -277,6 +278,25 @@ const YoungKidsPage = () => {
     };
 
     loadProgress();
+
+    // Load achievements from server (fallback to empty)
+    (async () => {
+      try {
+        const token = localStorage.getItem('speakbee_auth_token');
+        if (token && token !== 'local-token') {
+          const ach = await (KidsApi as any).getAchievements(token);
+          if (Array.isArray(ach)) {
+            setServerAchievements(ach);
+          } else if (Array.isArray((ach as any)?.data)) {
+            setServerAchievements((ach as any).data);
+          }
+        } else {
+          setServerAchievements([]);
+        }
+      } catch (e) {
+        setServerAchievements([]);
+      }
+    })();
 
     const icons = ['star', 'heart', 'sparkles', 'zap'];
     const newFloatingIcons = Array.from({ length: 8 }, (_, i) => ({
@@ -605,7 +625,9 @@ const YoungKidsPage = () => {
       description: `${vocabularyAttempts}/14 words learned`
     },
   ];
-  const completedAchievements = achievements.filter(a => a.progress === 100).length;
+  const completedAchievements = serverAchievements.length > 0
+    ? serverAchievements.filter((a: any) => a.unlocked === true).length
+    : achievements.filter(a => a.progress === 100).length;
 
   // Default words for when no stories are enrolled yet
   const vocabWords = [
@@ -967,6 +989,51 @@ const YoungKidsPage = () => {
     setActiveCategory(categoryId);
   };
 
+  const awardEngagementPoints = async (delta: number) => {
+    try {
+      const token = localStorage.getItem('speakbee_auth_token');
+      if (token && token !== 'local-token') {
+        const current = await KidsApi.getProgress(token);
+        const currentPoints = (current as any)?.points ?? 0;
+        await KidsApi.updateProgress(token, { points: currentPoints + delta });
+      } else {
+        await KidsProgressService.update(userId, (p) => ({ ...p, points: p.points + delta } as any));
+      }
+      setPoints((p) => p + delta);
+    } catch (_) {}
+  };
+
+  const incrementStreakIfNeeded = async (source: string) => {
+    try {
+      const todayKey = new Date().toDateString();
+      const localKey = `kids_streak_last_engagement_${userId}`;
+      const last = localStorage.getItem(localKey);
+      if (last === todayKey) return; // already counted today
+
+      const token = localStorage.getItem('speakbee_auth_token');
+      if (token && token !== 'local-token') {
+        const current = await KidsApi.getProgress(token);
+        const currentStreak = (current as any)?.streak ?? 0;
+        const details = { ...((current as any)?.details || {}) };
+        details.engagement = details.engagement || {};
+        details.engagement.lastStreakDate = todayKey;
+        details.engagement.source = source;
+        await KidsApi.updateProgress(token, { streak: currentStreak + 1, details });
+      } else {
+        await KidsProgressService.update(userId, (p) => {
+          const anyP: any = p as any;
+          const details = { ...(anyP.details || {}) };
+          details.engagement = details.engagement || {};
+          details.engagement.lastStreakDate = todayKey;
+          details.engagement.source = source;
+          return { ...(p as any), streak: p.streak + 1, details } as any;
+        });
+      }
+      setStreak((s) => s + 1);
+      localStorage.setItem(localKey, todayKey);
+    } catch (_) {}
+  };
+
 
   const handleAuthSuccess = () => {
     setShowAuthModal(false);
@@ -1302,7 +1369,6 @@ const YoungKidsPage = () => {
             onMouseEnter={() => handleElementHover('points-card')}
             onClick={() => {
               handleElementClick('points-card');
-              triggerCelebration();
             }}
           >
             {/* Decorative dot - Orange */}
@@ -1943,6 +2009,8 @@ const YoungKidsPage = () => {
               onClick={() => {
                 handleElementClick('quick-listen');
                 handleCategoryClick('pronunciation');
+                awardEngagementPoints(5);
+                incrementStreakIfNeeded('quick-listen');
               }}
               onMouseEnter={() => handleElementHover('quick-listen')}
               onMouseLeave={() => setHoveredElement(null)}
@@ -1964,6 +2032,8 @@ const YoungKidsPage = () => {
               onClick={() => {
                 handleElementClick('quick-speak');
                 handleCategoryClick('pronunciation');
+                awardEngagementPoints(5);
+                incrementStreakIfNeeded('quick-speak');
               }}
               onMouseEnter={() => handleElementHover('quick-speak')}
               onMouseLeave={() => setHoveredElement(null)}
@@ -1986,6 +2056,8 @@ const YoungKidsPage = () => {
                 // Don't play sound feedback for navigation buttons
                 setPulseAnimation(true);
                 setTimeout(() => setPulseAnimation(false), 1000);
+                awardEngagementPoints(5);
+                incrementStreakIfNeeded('quick-favorites');
                 navigate('/favorites/young');
               }}
               onMouseEnter={() => handleElementHover('quick-favorites')}
