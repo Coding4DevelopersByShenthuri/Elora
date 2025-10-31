@@ -16,26 +16,61 @@ interface VocabularyProps {
 
 export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) {
   const [current, setCurrent] = useState(0);
-  const [masteredWords, setMasteredWords] = useState<Set<number>>(new Set());
+  const [masteredWords, setMasteredWords] = useState<Set<string>>(new Set());
   const [currentAttempts, setCurrentAttempts] = useState(0);
   const [lastScore, setLastScore] = useState<number | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
 
   const card = words[current];
-  const progress = (masteredWords.size / words.length) * 100;
+  
+  // Calculate progress based on filtered words - only count mastered words that are in current word list
+  const masteredCount = words.filter(word => masteredWords.has(word.word)).length;
+  const progress = words.length > 0 ? (masteredCount / words.length) * 100 : 0;
 
   useEffect(() => {
-    // Load mastered words from local storage
+    // Load mastered words from local storage (stored as word strings)
     const saved = localStorage.getItem('mastered_vocabulary');
     if (saved) {
-      setMasteredWords(new Set(JSON.parse(saved)));
+      try {
+        const parsed = JSON.parse(saved);
+        // Handle both old format (indices) and new format (word strings)
+        if (Array.isArray(parsed)) {
+          if (parsed.length > 0 && typeof parsed[0] === 'number') {
+            // Old format: convert indices to word strings based on original word list
+            // This won't work perfectly with filtering, but is best effort migration
+            const oldWords = localStorage.getItem('vocabulary_words_list');
+            if (oldWords) {
+              const wordList = JSON.parse(oldWords);
+              const wordStrings = parsed.map((idx: number) => wordList[idx]).filter(Boolean);
+              setMasteredWords(new Set(wordStrings));
+            } else {
+              setMasteredWords(new Set());
+            }
+          } else {
+            // New format: word strings
+            setMasteredWords(new Set(parsed));
+          }
+        } else {
+          setMasteredWords(new Set());
+        }
+      } catch (error) {
+        console.warn('Error loading mastered vocabulary:', error);
+        setMasteredWords(new Set());
+      }
     }
   }, []);
 
   useEffect(() => {
-    // Save mastered words
+    // Save mastered words as word strings
     localStorage.setItem('mastered_vocabulary', JSON.stringify(Array.from(masteredWords)));
   }, [masteredWords]);
+  
+  // Reset current word index if it's out of bounds when words change
+  useEffect(() => {
+    if (current >= words.length && words.length > 0) {
+      setCurrent(0);
+    }
+  }, [words, current]);
 
   const speak = async () => {
     try {
@@ -51,10 +86,10 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
   };
 
   const handleCorrectPronunciation = async (_blob: Blob, score: number) => {
-    // Mark as mastered immediately
+    // Mark as mastered immediately (by word string, not index)
     setLastScore(score);
     setCurrentAttempts(prev => prev + 1);
-    setMasteredWords(prev => new Set([...prev, current]));
+    setMasteredWords(prev => new Set([...prev, card.word]));
     setShowSuccess(true);
     
     // Notify parent component
@@ -128,7 +163,7 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
                   Vocabulary Progress
                 </p>
                 <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
-                  {masteredWords.size} / {words.length} words mastered
+                  {masteredCount} / {words.length} words mastered
                 </p>
               </div>
             </div>
@@ -146,11 +181,11 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
       </Card>
 
       {/* Word Card */}
-      <Card 
+          <Card 
         key={`word-card-${current}`}
         className={cn(
           "border-2 transition-all duration-300 animate-in fade-in slide-in-from-right-4 backdrop-blur-sm shadow-lg",
-          masteredWords.has(current) 
+          masteredWords.has(card.word) 
             ? "border-green-300/50 bg-green-100/20 dark:bg-green-900/5" 
             : "border-blue-300/50 bg-blue-50/40 dark:bg-blue-900/10"
         )}
@@ -160,7 +195,7 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
             <span className="text-sm sm:text-base text-gray-600 dark:text-gray-500">
               Word {current + 1} of {words.length}
             </span>
-                         {masteredWords.has(current) && (
+                         {masteredWords.has(card.word) && (
                <span className="flex items-center gap-1 sm:gap-2 text-sm sm:text-base text-green-900 dark:text-green-900 font-bold">
                  <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-green-700 dark:fill-green-500 flex-shrink-0" />
                  Mastered!
@@ -174,12 +209,12 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
                          <div className={cn(
                "text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold transition-all duration-500",
                showSuccess && "animate-bounce scale-110",
-               masteredWords.has(current) && "text-green-700 dark:text-green-500"
+               masteredWords.has(card.word) && "text-green-700 dark:text-green-500"
              )}>
 
                {card.word}
                {showSuccess && ' 🎉'}
-               {masteredWords.has(current) && !showSuccess && ' ✨'}
+               {masteredWords.has(card.word) && !showSuccess && ' ✨'}
              </div>
             
             {card.hint && (
@@ -246,13 +281,13 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
             </Button>
 
             <div className="flex gap-1 sm:gap-2 flex-wrap justify-center">
-              {words.map((_, idx) => (
+              {words.map((word, idx) => (
                 <div
                   key={idx}
                   className={cn(
                     "w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300",
                     idx === current && "scale-125 sm:scale-150",
-                    masteredWords.has(idx) 
+                    masteredWords.has(word.word) 
                       ? "bg-green-500" 
                       : idx === current 
                         ? "bg-blue-500" 

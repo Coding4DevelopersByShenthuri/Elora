@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   Volume2, Star, Trophy, Play, BookOpen, 
   Mic, Award, Zap, Heart, Sparkles,
@@ -6,7 +6,7 @@ import {
   Sun, CloudRain, Footprints,
   ChevronLeft, ChevronRight, Anchor,
   Shield, Download, Loader2, Crown, Compass,
-  Music, VolumeX, HelpCircle
+  Music, VolumeX, HelpCircle, CheckCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -78,6 +78,14 @@ const YoungKidsPage = () => {
   const location = useLocation();
   const [dynamicStories, setDynamicStories] = useState<typeof allStories | null>(null);
   const [serverAchievements, setServerAchievements] = useState<any[]>([]);
+
+  // Enrolled internal story IDs, derived from enrolled words/phrases (populated after completion)
+  const enrolledInternalStoryIds = useMemo(() => {
+    const ids = new Set<string>();
+    enrolledStoryWordsDetailed.forEach(w => ids.add(w.storyId));
+    enrolledStoryPhrasesDetailed.forEach(p => ids.add(p.storyId));
+    return ids;
+  }, [enrolledStoryWordsDetailed, enrolledStoryPhrasesDetailed]);
 
   // Interactive features state
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
@@ -1616,6 +1624,12 @@ const YoungKidsPage = () => {
                         "p-4 sm:p-6 md:p-8 relative overflow-hidden bg-gradient-to-br",
                         story.bgGradient
                       )}>
+                        {enrolledInternalStoryIds.has(getInternalStoryId(story.type)) && (
+                          <div className="absolute top-2 left-2 bg-white/85 dark:bg-gray-900/60 border border-indigo-400/70 text-indigo-700 dark:text-indigo-300 text-[10px] sm:text-xs font-semibold px-2.5 py-0.5 sm:py-1 rounded-full shadow-sm backdrop-blur-sm inline-flex items-center gap-1">
+                            <CheckCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                            Enrolled
+                          </div>
+                        )}
                         <div className="absolute top-0 right-0 w-20 h-20 sm:w-32 sm:h-32 bg-white/20 dark:bg-black/20 rounded-full -mr-10 sm:-mr-16 -mt-10 sm:-mt-16"></div>
                         <div className="absolute bottom-0 left-0 w-16 h-16 sm:w-24 sm:h-24 bg-white/20 dark:bg-black/20 rounded-full -ml-8 sm:-ml-12 -mb-8 sm:-mb-12"></div>
                         <div className="relative z-10 text-center">

@@ -127,7 +127,7 @@ const storySteps = [
     
     choices: [
       { text: 'Fish swim in the water', emoji: '✅', meaning: 'true - fish live in water' },
-      { text: 'False - Fish fly in sky', emoji: '❌', meaning: 'incorrect - fish don\'t fly' }
+      { text: 'Fish fly in sky', emoji: '❌', meaning: 'incorrect - fish don\'t fly' }
     ],
     
     revealText: 'Great listening! It\'s TRUE - fish DO swim in the water! That\'s their home! Have you ever seen fish in a pond or aquarium? Fish are so amazing!',

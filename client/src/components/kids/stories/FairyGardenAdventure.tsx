@@ -126,7 +126,7 @@ const storySteps = [
     
     choices: [
       { text: 'Fairies are very small and gentle', emoji: '✅', meaning: 'true - fairies are tiny and kind' },
-      { text: 'False - Fairies are big and scary', emoji: '❌', meaning: 'incorrect - fairies are gentle' }
+      { text: 'Fairies are big and scary', emoji: '❌', meaning: 'incorrect - fairies are gentle' }
     ],
     
     revealText: 'Great listening! It\'s TRUE - fairies ARE very small and gentle! We flutter on tiny wings and speak in soft voices! Fairies love nature and kindness!',

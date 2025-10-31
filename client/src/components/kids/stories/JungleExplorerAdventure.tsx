@@ -578,12 +578,9 @@ const JungleExplorerAdventure = ({ onClose, onComplete }: Props) => {
     
     // Handle true/false questions specially
     if ((current as any).questionType === 'true-false') {
-      // For true/false questions, check if the choice contains the correct answer
+      // Correct when the selected statement exactly matches the heard statement
       const audioText = (current as any).audioText;
-      if (audioText === 'Jungles are home to many animals') {
-        // The statement is true, so "True - ..." is correct
-        isCorrect = choice.includes('True - Jungles are home to many animals');
-      }
+      isCorrect = choice === audioText;
     } else {
       // For regular listening questions, use exact match
       isCorrect = choice === (current as any).audioText;
@@ -1184,9 +1181,7 @@ const JungleExplorerAdventure = ({ onClose, onComplete }: Props) => {
                         let isCorrect = false;
                         if ((current as any).questionType === 'true-false') {
                           const audioText = (current as any).audioText;
-                          if (audioText === 'Jungles are home to many animals') {
-                            isCorrect = choice.text.includes('True - Jungles are home to many animals');
-                          }
+                          isCorrect = choice.text === audioText;
                         } else {
                           isCorrect = choice.text === (current as any).audioText;
                         }
@@ -1512,9 +1507,7 @@ const JungleExplorerAdventure = ({ onClose, onComplete }: Props) => {
                         let isCorrect = false;
                         if ((current as any).questionType === 'true-false') {
                           const audioText = (current as any).audioText;
-                          if (audioText === 'Jungles are home to many animals') {
-                            isCorrect = choice.text.includes('True - Jungles are home to many animals');
-                          }
+                          isCorrect = choice.text === audioText;
                         } else {
                           isCorrect = choice.text === (current as any).audioText;
                         }
