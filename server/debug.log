@@ -1117,3 +1117,12 @@ INFO 2025-10-31 14:40:53,983 basehttp 1716 14276 "GET /api/kids/lessons HTTP/1.1
 INFO 2025-10-31 14:44:20,234 basehttp 1716 17664 "GET /api/kids/lessons HTTP/1.1" 200 2
 INFO 2025-10-31 15:03:12,793 basehttp 1716 18032 "GET /api/kids/lessons HTTP/1.1" 200 2
 INFO 2025-10-31 15:03:20,711 basehttp 1716 18032 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-31 15:17:55,846 basehttp 1716 20720 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-31 15:21:09,470 basehttp 1716 20720 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-31 15:24:44,123 basehttp 1716 20720 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-31 15:24:56,236 basehttp 1716 20720 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-31 15:30:08,763 basehttp 1716 21788 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-31 15:38:11,087 basehttp 1716 972 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-31 15:38:25,362 basehttp 1716 972 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-31 15:52:06,004 basehttp 1716 21520 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-10-31 15:52:21,097 basehttp 1716 21520 "GET /api/kids/lessons HTTP/1.1" 200 2
