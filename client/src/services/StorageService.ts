@@ -21,7 +21,34 @@ export interface UploadOptions {
 }
 
 export class StorageService {
+  /**
+   * Check if Supabase is properly configured
+   */
+  static isSupabaseConfigured(): boolean {
+    const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+    const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
+    return !!(url && anonKey);
+  }
+
+  /**
+   * Delete a file from storage
+   */
+  static async deleteFile(path: string, bucket?: string): Promise<void> {
+    if (!this.isSupabaseConfigured()) {
+      throw new Error('Supabase not configured');
+    }
+    const supabase = getSupabase();
+    const bucketName = bucket || (import.meta.env.VITE_SUPABASE_CERT_BUCKET as string) || 'certificates';
+    const { error } = await supabase.storage.from(bucketName).remove([path]);
+    if (error) {
+      throw new Error(`Failed to delete file: ${error.message}`);
+    }
+  }
+
   static async uploadPublicFile(blob: Blob, options: UploadOptions = {}): Promise<{ publicUrl: string; path: string; bucket: string; }> {
+    if (!this.isSupabaseConfigured()) {
+      throw new Error('Supabase not configured. Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY');
+    }
     const supabase = getSupabase();
     const bucket = options.bucket || (import.meta.env.VITE_SUPABASE_BUCKET as string) || 'public';
     const contentType = options.contentType || blob.type || 'application/octet-stream';
@@ -50,18 +77,18 @@ export class StorageService {
     return { publicUrl: data.publicUrl, path: uploadData?.path || path, bucket };
   }
 
-  static async uploadCertificateBlob(blob: Blob, filename: string, userId?: string): Promise<string> {
+  static async uploadCertificateBlob(blob: Blob, filename: string, userId?: string): Promise<{ publicUrl: string; path: string }> {
     const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
     const uid = userId || StorageService.getCurrentUserId();
     const datePrefix = new Date().toISOString().slice(0, 10);
     const path = `${uid}/${datePrefix}/${Date.now()}-${safeName}`;
-    const { publicUrl } = await StorageService.uploadPublicFile(blob, {
+    const { publicUrl, path: uploadedPath } = await StorageService.uploadPublicFile(blob, {
       bucket: (import.meta.env.VITE_SUPABASE_CERT_BUCKET as string) || 'certificates',
       path,
       contentType: blob.type || (safeName.toLowerCase().endsWith('.png') ? 'image/png' : 'application/pdf'),
       upsert: true
     });
-    return publicUrl;
+    return { publicUrl, path: uploadedPath };
   }
 
   private static getCurrentUserId(): string {

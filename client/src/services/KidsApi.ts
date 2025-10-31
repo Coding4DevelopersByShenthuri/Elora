@@ -238,6 +238,23 @@ class OfflineKidsApi {
     return { success: true, offline: !this.isOnline() } as any;
   }
 
+  static async unlockTrophy(token: string, payload: { trophy_id: string; title: string }) {
+    if (this.isOnline()) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/kids/trophies/unlock`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify(payload),
+          signal: AbortSignal.timeout(5000)
+        });
+        if (res.ok) return res.json();
+      } catch (e) {
+        console.warn('Failed to unlock trophy:', e);
+      }
+    }
+    return { success: true, offline: !this.isOnline() } as any;
+  }
+
   static async getIssuedCertificates(token: string) {
     if (this.isOnline()) {
       try {

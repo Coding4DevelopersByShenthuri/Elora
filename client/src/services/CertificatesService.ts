@@ -1,7 +1,10 @@
 export type CertificateLayout = {
   templatePath?: string; // Optional. If missing/unavailable, a styled background is rendered
-  namePosition: { x: number; y: number };
-  datePosition: { x: number; y: number };
+  namePosition?: { x: number; y: number };
+  datePosition?: { x: number; y: number };
+  // Relative positions in 0..1 range (used when template sizes vary)
+  namePositionRel?: { x: number; y: number };
+  datePositionRel?: { x: number; y: number };
   nameFont?: string; // e.g. 'bold 64px Poppins'
   dateFont?: string; // e.g. '500 28px Poppins'
   nameColor?: string;
@@ -10,6 +13,13 @@ export type CertificateLayout = {
   style?: 'kids' | 'pro';
   titleText?: string; // e.g., 'Certificate of Achievement'
   subtitleText?: string; // e.g., 'Awarded to'
+  // Optional image overlays (e.g., badge, app logo)
+  overlays?: Array<{
+    src: string;
+    positionRel: { x: number; y: number }; // center position relative to canvas
+    sizeRel: { w: number; h: number }; // size relative to canvas width/height
+    opacity?: number;
+  }>;
 };
 
 export class CertificatesService {
@@ -125,20 +135,77 @@ export class CertificatesService {
       ctx.fillText(subtitle, canvas.width / 2, 320);
     }
 
-    // Name
+    // Optional overlays (badge, app logo)
+    if (layout.overlays && layout.overlays.length) {
+      try {
+        const images = await Promise.all(
+          layout.overlays.map(o => CertificatesService.loadImage(o.src))
+        );
+        layout.overlays.forEach((o, idx) => {
+          const overlayImg = images[idx];
+          const drawW = Math.max(1, Math.round(o.sizeRel.w * canvas.width));
+          const drawH = Math.max(1, Math.round(o.sizeRel.h * canvas.height));
+          const centerX = Math.round(o.positionRel.x * canvas.width);
+          const centerY = Math.round(o.positionRel.y * canvas.height);
+          const x = centerX - Math.round(drawW / 2);
+          const y = centerY - Math.round(drawH / 2);
+          const oldAlpha = ctx.globalAlpha;
+          if (typeof o.opacity === 'number') ctx.globalAlpha = o.opacity;
+          ctx.drawImage(overlayImg, x, y, drawW, drawH);
+          ctx.globalAlpha = oldAlpha;
+        });
+      } catch (_) {
+        // ignore overlay failures
+      }
+    }
+
+    // Name - with overflow handling (supports absolute or relative positions)
+    const resolvePos = (
+      abs: { x: number; y: number } | undefined,
+      rel: { x: number; y: number } | undefined,
+      fallback: { x: number; y: number }
+    ) => {
+      if (abs && typeof abs.x === 'number' && typeof abs.y === 'number') return abs;
+      if (rel && typeof rel.x === 'number' && typeof rel.y === 'number') {
+        return { x: Math.round(rel.x * canvas.width), y: Math.round(rel.y * canvas.height) };
+      }
+      return fallback;
+    };
+
+    const namePos = resolvePos(layout.namePosition as any, layout.namePositionRel as any, { x: Math.round(canvas.width * 0.64), y: Math.round(canvas.height * 0.5) });
     ctx.font = layout.nameFont || 'bold 64px system-ui, sans-serif';
     ctx.fillStyle = layout.nameColor || '#1f2937';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(childName, layout.namePosition.x, layout.namePosition.y);
+    
+    const maxWidth = Math.max(320, Math.round(canvas.width * 0.45));
+    const metrics = ctx.measureText(childName);
+    if (metrics.width > maxWidth) {
+      const fontSize = parseInt(ctx.font) || 64;
+      const scale = maxWidth / metrics.width;
+      const newFontSize = Math.max(28, Math.floor(fontSize * scale * 0.92));
+      ctx.font = ctx.font.replace(/\d+px/, `${newFontSize}px`);
+    }
+    let displayName = childName;
+    let textMetrics = ctx.measureText(displayName);
+    if (textMetrics.width > maxWidth) {
+      while (textMetrics.width > maxWidth && displayName.length > 0) {
+        displayName = displayName.slice(0, -1);
+        textMetrics = ctx.measureText(displayName + '...');
+      }
+      displayName = displayName + '...';
+    }
+    ctx.fillText(displayName, namePos.x, namePos.y);
 
     // Date string
     const dateStr = issueDate.toLocaleDateString(undefined, {
       year: 'numeric', month: 'long', day: 'numeric'
     });
+    const datePos = resolvePos(layout.datePosition as any, layout.datePositionRel as any, { x: Math.round(canvas.width * 0.75), y: Math.round(canvas.height * 0.85) });
     ctx.font = layout.dateFont || '500 28px system-ui, sans-serif';
     ctx.fillStyle = layout.dateColor || '#374151';
-    ctx.fillText(dateStr, layout.datePosition.x, layout.datePosition.y);
+    ctx.textAlign = 'center';
+    ctx.fillText(dateStr, datePos.x, datePos.y);
 
     return await new Promise<Blob>((resolve) => canvas.toBlob(b => resolve(b as Blob), 'image/png'));
   }

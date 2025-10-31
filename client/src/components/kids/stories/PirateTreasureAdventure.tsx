@@ -126,7 +126,7 @@ const storySteps = [
     hint: 'Think about teamwork',
     
     choices: [
-      { text: 'False - Pirates keep it all', emoji: '❌', meaning: 'incorrect - sharing is important' },
+      { text: 'Pirates keep it all', emoji: '❌', meaning: 'incorrect - sharing is important' },
       { text: 'Pirates share treasure with their crew', emoji: '✅', meaning: 'true - teamwork matters' }
     ],
     

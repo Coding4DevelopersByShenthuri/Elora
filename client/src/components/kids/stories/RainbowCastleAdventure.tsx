@@ -132,8 +132,8 @@ const storySteps = [
     hint: 'Think about who lives in castles',
     
     choices: [
-      { text: 'True - Castles are homes for royalty', emoji: '✅', meaning: 'correct - kings and queens live there' },
-      { text: 'False - Castles are just buildings', emoji: '❌', meaning: 'wrong - royalty does live in castles' }
+      { text: 'Castles are homes for royalty', emoji: '✅', meaning: 'correct - kings and queens live there' },
+      { text: 'Castles are just buildings', emoji: '❌', meaning: 'wrong - royalty does live in castles' }
     ],
     
     revealText: 'Excellent listening! It\'s TRUE - castles ARE homes for royalty! Kings, queens, princes, and princesses live in these magnificent buildings!',
@@ -578,12 +578,9 @@ const RainbowCastleAdventure = ({ onClose, onComplete }: Props) => {
     
     // Handle true/false questions specially
     if ((current as any).questionType === 'true-false') {
-      // For true/false questions, check if the choice contains the correct answer
+      // For true/false questions, the correct choice matches the spoken statement
       const audioText = (current as any).audioText;
-      if (audioText === 'Castles are homes for royalty') {
-        // The statement is true, so "True - ..." is correct
-        isCorrect = choice.includes('True - Castles are homes for royalty');
-      }
+      isCorrect = choice === audioText;
     } else {
       // For regular listening questions, use exact match
       isCorrect = choice === (current as any).audioText;
@@ -1184,9 +1181,7 @@ const RainbowCastleAdventure = ({ onClose, onComplete }: Props) => {
                         let isCorrect = false;
                         if ((current as any).questionType === 'true-false') {
                           const audioText = (current as any).audioText;
-                          if (audioText === 'Castles are homes for royalty') {
-                            isCorrect = choice.text.includes('True - Castles are homes for royalty');
-                          }
+                          isCorrect = choice.text === audioText;
                         } else {
                           isCorrect = choice.text === (current as any).audioText;
                         }
@@ -1512,9 +1507,7 @@ const RainbowCastleAdventure = ({ onClose, onComplete }: Props) => {
                         let isCorrect = false;
                         if ((current as any).questionType === 'true-false') {
                           const audioText = (current as any).audioText;
-                          if (audioText === 'Castles are homes for royalty') {
-                            isCorrect = choice.text.includes('True - Castles are homes for royalty');
-                          }
+                          isCorrect = choice.text === audioText;
                         } else {
                           isCorrect = choice.text === (current as any).audioText;
                         }

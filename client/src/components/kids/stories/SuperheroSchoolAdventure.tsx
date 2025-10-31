@@ -127,7 +127,7 @@ const storySteps = [
     
     choices: [
       { text: 'Heroes never give up trying', emoji: '✅', meaning: 'true - heroes persevere' },
-      { text: 'False - Heroes quit easily', emoji: '❌', meaning: 'incorrect - heroes persist' }
+      { text: 'Heroes quit easily', emoji: '❌', meaning: 'incorrect - heroes persist' }
     ],
     
     revealText: 'Great listening! It\'s TRUE - heroes never give up trying! When something is hard, real heroes keep trying and never quit! They practice, learn from mistakes, and get stronger! Heroes are so determined!',
