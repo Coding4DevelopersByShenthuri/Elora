@@ -18,12 +18,26 @@
   padding: 20px;
 }
 
-/* Home button positioned at top left corner of login form */
+/* Home button positioned at top right corner - Responsive */
 .auth-page-home-button {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: 15px;
+  right: 15px;
   z-index: 1000;
+}
+
+@media (max-width: 768px) {
+  .auth-page-home-button {
+    top: 10px;
+    right: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-page-home-button {
+    top: 8px;
+    right: 8px;
+  }
 }
 
 .auth-home-button {
@@ -41,6 +55,22 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+@media (max-width: 768px) {
+  .auth-home-button {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-home-button {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+  }
+}
+
 .auth-home-button:hover {
   background-color: #6be1f9;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -48,8 +78,27 @@
 
 .auth-home-button svg {
   fill: #4bb6b7;
-  width: 30px;
-  height: 30px;
+  width: 24px;
+  height: 24px;
+  transition: fill 0.3s;
+}
+
+@media (max-width: 768px) {
+  .auth-home-button svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-home-button svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.auth-home-button:hover svg {
+  fill: #ffffff;
 }
 
 .auth-modal-wrapper h1 {
@@ -218,9 +267,16 @@
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
   position: relative;
   overflow: hidden;
-  width: 768px;
+  width: 750px;
   max-width: 100%;
-  min-height: 500px;
+  min-height: 520px;
+}
+
+/* Desktop height - reduced */
+@media (min-width: 1025px) {
+  .auth-modal-container {
+    min-height: 520px;
+  }
 }
 
 /* Terms mode active state */
@@ -241,6 +297,19 @@
 .auth-login-container {
   left: 0;
   z-index: 2;
+}
+
+/* Login form styling - no scrollbars, centered content */
+.auth-login-container form {
+  overflow: visible !important;
+  overflow-y: visible !important;
+  overflow-x: visible !important;
+}
+
+@media (max-width: 767px) {
+  .auth-login-container form {
+    justify-content: center;
+  }
 }
 
 .auth-register-container {
@@ -299,7 +368,7 @@
 }
 
 .auth-overlay {
-  background-image: url('image.gif');
+  background-image: url('/image.gif');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 0 0;
@@ -814,39 +883,23 @@
 .auth-register-container form {
   padding: 0 30px !important;
   justify-content: center !important;
+  overflow: visible !important;
 }
 
-/* Desktop: No scrolling */
+/* No scrolling for register form */
 .auth-register-content {
-  overflow: hidden !important;
+  overflow: visible !important;
+  overflow-y: visible !important;
+  overflow-x: visible !important;
 }
 
-/* Mobile: Enable scrolling to see all content including title */
+/* Mobile: No scrolling - form adjusts to content */
 @media (max-width: 768px) {
   .auth-register-content {
-    overflow-y: auto !important;
-    justify-content: flex-start !important;
-    padding-top: 20px !important;
-    padding-bottom: 20px !important;
-  }
-  
-  /* Custom scrollbar for mobile register form */
-  .auth-register-content::-webkit-scrollbar {
-    width: 4px;
-  }
-  
-  .auth-register-content::-webkit-scrollbar-track {
-    background: #022A2D;
-    border-radius: 2px;
-  }
-  
-  .auth-register-content::-webkit-scrollbar-thumb {
-    background: #4BB6B7;
-    border-radius: 2px;
-  }
-  
-  .auth-register-content::-webkit-scrollbar-thumb:hover {
-    background: #28CACD;
+    overflow: visible !important;
+    overflow-y: visible !important;
+    overflow-x: visible !important;
+    justify-content: center !important;
   }
 }
 
@@ -951,7 +1004,7 @@
   .auth-modal-container {
     width: 95%;
     max-width: 768px;
-    min-height: 480px;
+    min-height: 580px;
   }
 
   .auth-overlay-panel {
@@ -998,7 +1051,7 @@
   .auth-modal-container {
     width: 100%;
     max-width: 100%;
-    min-height: 450px;
+    min-height: 580px;
     border-radius: 20px;
   }
 
@@ -1118,7 +1171,7 @@
   }
 
   .auth-modal-container {
-    min-height: 420px;
+    min-height: 560px;
     border-radius: 18px;
   }
 
@@ -1222,7 +1275,7 @@
   }
 
   .auth-modal-container {
-    min-height: 400px;
+    min-height: 540px;
     border-radius: 16px;
   }
 
@@ -1312,7 +1365,7 @@
 /* Very small devices - adjust slightly but maintain layout */
 @media (max-width: 360px) {
   .auth-modal-container {
-    min-height: 380px;
+    min-height: 520px;
     border-radius: 14px;
   }
 
@@ -1364,7 +1417,7 @@
 /* Landscape orientation for mobile */
 @media (max-height: 500px) and (orientation: landscape) {
   .auth-modal-container {
-    min-height: 320px;
+    min-height: 450px;
     max-height: 90vh;
   }
 

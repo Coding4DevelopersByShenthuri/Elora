@@ -6,11 +6,11 @@ import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
 } from '@/components/ui/dialog';
 import { Loader2, Mail, Lock, User, Eye, EyeOff, Home, AlertCircle, ArrowLeft, FileText, Check, MailCheck } from 'lucide-react';
 import { TERMS_AND_CONDITIONS, SECURITY_QUESTIONS } from '../../data/terms-and-conditions';
 import { userDataService } from '@/services/UserDataService';
+import { GoogleLogin } from '@react-oauth/google';
 import '../../styles/AuthModal.css';
 
 interface AuthModalProps {
@@ -391,7 +391,7 @@ const authService = {
 };
 
 const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = false, onAuthSuccess }: AuthModalProps) => {
-  const { registerWithServer, loginWithServer } = useAuth();
+  const { registerWithServer, loginWithServer, loginWithGoogle, login } = useAuth();
   const navigate = useNavigate();
   const [authMode, setAuthMode] = useState<AuthMode>(initialMode);
   const [isLoading, setIsLoading] = useState(false);
@@ -707,7 +707,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
 
     try {
       if (authMode === 'login') {
-        // Try server login first, fallback to offline if it fails
+        // Try server login first, fallback to offline if server is unavailable
         try {
           const serverResult = await loginWithServer(formData.email, formData.password);
           if (serverResult.success) {
@@ -725,15 +725,63 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
             // Check if it's a verification error
             if (serverResult.message && serverResult.message.includes('verify your email')) {
               setError('Activate your account first. Please check your email inbox and click the verification link to activate your account.');
+              setIsLoading(false);
               return;
             }
+            // If server login fails due to wrong credentials, don't fallback to offline
+            // Only fallback if it's a network/server error (which will be caught in catch block)
             setError(serverResult.message || 'Login failed');
+            setIsLoading(false);
             return;
           }
-        } catch (serverError) {
-          // Server login failed - user needs to be online to login
-          setError('Unable to connect to server. Please check your internet connection and try again.');
-          return;
+        } catch (serverError: any) {
+          // Server login failed - check if it's a network error (should try offline) or auth error (should not)
+          const isNetworkError = !serverError?.response || 
+                                 serverError?.response?.status === 0 || 
+                                 serverError?.response?.status === 408 ||
+                                 (serverError?.response?.data?.message && 
+                                  (serverError.response.data.message.includes('not reachable') || 
+                                   serverError.response.data.message.includes('timeout') ||
+                                   serverError.response.data.message.includes('connection')));
+          
+          if (isNetworkError) {
+            // Network/server error - try offline login as fallback
+            console.log('Server login failed due to network issue, trying offline login:', serverError);
+            try {
+              const offlineResult = await authService.login(formData.email, formData.password);
+              if (offlineResult && offlineResult.token) {
+                // Use the login function from context to set user
+                login(offlineResult.user);
+                setSuccess('Login successful (offline mode)!');
+                setTimeout(() => {
+                  if (redirectFromKids && onAuthSuccess) {
+                    onAuthSuccess();
+                  } else {
+                    onClose();
+                  }
+                  resetForm();
+                }, 1000);
+                return;
+              } else {
+                setError('Invalid email or password. Please check your credentials.');
+                setIsLoading(false);
+                return;
+              }
+            } catch (offlineError) {
+              // Both server and offline login failed
+              setError('Invalid email or password. If you registered online, please ensure your account is activated via email.');
+              setIsLoading(false);
+              return;
+            }
+          } else {
+            // Authentication error (wrong credentials, etc.) - don't try offline
+            const errorMsg = serverError?.response?.data?.message || 
+                            serverError?.message || 
+                            'Unable to connect to server. Please check your internet connection and try again.';
+            setError(errorMsg);
+            setIsLoading(false);
+            return;
+          }
         }
       } else {
         // Try server registration first
@@ -767,10 +815,36 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
               setSuccess('');
             }, 8000);
             return;
+          } else {
+            // Registration failed - display the error message from the server
+            let errorMsg = serverResult.message || 'Registration failed. Please try again.';
+            
+            // If there are field-specific errors, format them nicely
+            if ((serverResult as any).errors) {
+              const errors = (serverResult as any).errors;
+              const errorKeys = Object.keys(errors);
+              if (errorKeys.length > 0) {
+                const firstError = errors[errorKeys[0]];
+                if (Array.isArray(firstError)) {
+                  errorMsg = firstError[0];
+                } else {
+                  errorMsg = firstError;
+                }
+              }
+            }
+            
+            setError(errorMsg);
+            setIsLoading(false);
+            return;
           }
-        } catch (serverError) {
+        } catch (serverError: any) {
           // Server registration failed - user needs to be online to register
-          setError('Unable to connect to server. Please check your internet connection and try again.');
+          console.error('Registration server error:', serverError);
+          const errorMsg = serverError?.response?.data?.message || 
+                          serverError?.message || 
+                          'Unable to connect to server. Please check your internet connection and try again.';
+          setError(errorMsg);
+          setIsLoading(false);
           return;
         }
       }
@@ -1005,10 +1079,11 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
         resetForm();
       }
     }}>
-      <DialogContent className="sm:max-w-4xl p-0 overflow-hidden border-0 bg-transparent flex items-center justify-center min-h-screen max-h-screen" aria-describedby="auth-description">
-        <DialogDescription id="auth-description" className="sr-only">
-          Elora authentication dialog for login and registration
-        </DialogDescription>
+      <DialogContent 
+        className="sm:max-w-4xl p-0 overflow-hidden border-0 bg-transparent flex items-center justify-center min-h-screen max-h-screen"
+        title="Authentication"
+        description="Elora authentication dialog for login and registration"
+      >
         {/* Home Button */}
         <div className="auth-page-home-button">
           <button className="auth-home-button" onClick={onClose}>
@@ -1226,7 +1301,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
           {/* Login Form */}
           {!isTermsMode && (
             <div className="auth-form-container auth-login-container">
-              <form onSubmit={handleAuth} className="h-full bg-[#143C3D] p-4 md:p-8 flex flex-col justify-center">
+              <form onSubmit={handleAuth} className="h-full bg-[#143C3D] p-4 md:p-8 flex flex-col justify-center overflow-visible">
                 <div className="text-center mb-4 md:mb-6">
                   <h1 className="text-2xl md:text-3xl font-bold text-white mb-1 md:mb-2">Elora</h1>
                   <p className="text-[#4BB6B7] text-sm md:text-base">Welcome back to your English learning journey</p>
@@ -1289,6 +1364,41 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
                   </div>
                 ) : (
                   <>
+                    {/* Google Sign In Button - Standard placement at top */}
+                    <GoogleSignInButton onSuccess={async (token) => {
+                      setIsLoading(true);
+                      setError('');
+                      setSuccess('');
+                      
+                      try {
+                        const result = await loginWithGoogle(token);
+                        if (result.success) {
+                          setSuccess('Google authentication successful!');
+                          setTimeout(() => {
+                            if (redirectFromKids && onAuthSuccess) {
+                              onAuthSuccess();
+                            } else {
+                              onClose();
+                            }
+                            resetForm();
+                          }, 1000);
+                        } else {
+                          setError(result.message || 'Google authentication failed');
+                        }
+                      } catch (error) {
+                        setError('An error occurred during Google authentication');
+                      } finally {
+                        setIsLoading(false);
+                      }
+                    }} isLoading={isLoading} />
+
+                    {/* Divider */}
+                    <div className="flex items-center mb-3 md:mb-4">
+                      <div className="flex-1 border-t border-[#4BB6B7]/30"></div>
+                      <span className="px-3 text-xs md:text-sm text-[#4BB6B7]">OR</span>
+                      <div className="flex-1 border-t border-[#4BB6B7]/30"></div>
+                    </div>
+
                     <div className="auth-input-container mb-3 md:mb-4">
                       <div className="auth-input-wrapper">
                         <Mail className="auth-input-icon" />
@@ -1359,20 +1469,6 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
                         className="text-[#4BB6B7] hover:text-[#28CACD] text-xs md:text-sm transition-colors font-medium"
                       >
                         Forgot your password?
-                      </button>
-                    </div>
-
-                    <div className="auth-terms-container auth-compact-terms flex items-center justify-center flex-wrap gap-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          onClose();
-                          navigate('/terms-and-conditions');
-                        }}
-                        className="auth-terms-link flex items-center text-xs md:text-sm"
-                      >
-                        <FileText className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-                        Terms and Conditions
                       </button>
                     </div>
                   </>
@@ -1604,6 +1700,33 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
         </div>
       </DialogContent>
     </Dialog>
+  );
+};
+
+// Google Sign In Button Component
+const GoogleSignInButton = ({ onSuccess, isLoading }: { onSuccess: (token: string) => void; isLoading: boolean }) => {
+  return (
+    <div className="w-full" style={{ display: 'flex', justifyContent: 'center' }}>
+      <div style={{ width: '100%', maxWidth: '100%', opacity: isLoading ? 0.5 : 1, pointerEvents: isLoading ? 'none' : 'auto' }}>
+        <GoogleLogin
+          onSuccess={(credentialResponse: { credential?: string }) => {
+            if (credentialResponse.credential) {
+              // credentialResponse.credential contains the ID token
+              onSuccess(credentialResponse.credential);
+            }
+          }}
+          onError={() => {
+            console.error('Google login failed');
+          }}
+          useOneTap={false}
+          theme="outline"
+          size="large"
+          text="signin_with"
+          shape="rectangular"
+          logo_alignment="left"
+        />
+      </div>
+    </div>
   );
 };
 

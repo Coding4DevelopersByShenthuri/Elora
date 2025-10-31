@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import {
   Brain, Search, Upload, User, Settings, LogOut, Moon, Sun,
   Table, Info, HelpCircle, Code, Menu, Users, Baby, FolderTree, Lightbulb,
-  GraduationCap, Layers, Award
+  GraduationCap, Layers, Award, BookOpen, Notebook
 } from 'lucide-react';
 import { useRippleEffect } from '@/lib/animations';
 import { cn } from '@/lib/utils';
@@ -159,8 +159,8 @@ export const Navbar = () => {
       label: 'Kids',
       id: 'kids',
       children: [
-        { to: '/kids/young', icon: <Baby size={14} />, label: 'Ages 4-10', id: 'kids-young' },
-        { to: '/kids/teen', icon: <Users size={14} />, label: 'Ages 11-17', id: 'kids-teen' },
+        { to: '/kids/young', icon: <BookOpen size={14} />, label: 'Ages 4-10', id: 'kids-young' },
+        { to: '/kids/teen', icon: <Notebook size={14} />, label: 'Ages 11-17', id: 'kids-teen' },
       ]
     },
     {

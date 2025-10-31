@@ -7,3 +7,6 @@ python-decouple==3.8
 setuptools<81
 mysqlclient==2.2.0; sys_platform == 'win32'
 mysql-connector-python==8.3.0; sys_platform != 'win32'
+google-auth==2.27.0
+google-auth-oauthlib==1.2.0
+google-auth-httplib2==0.2.0

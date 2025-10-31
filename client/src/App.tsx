@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 // ✅ Contexts & Providers
 import { ThemeProvider } from "@/contexts/ThemeContext";
@@ -539,14 +540,18 @@ const App = () => {
     }
   }, []);
 
+  // Get Google Client ID from environment variables
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
+      <GoogleOAuthProvider clientId={googleClientId}>
+        <ThemeProvider>
+          <AuthProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
               {isInitialLoading ? (
                 <LoadingScreen />
               ) : (
@@ -565,6 +570,7 @@ const App = () => {
           </TooltipProvider>
         </AuthProvider>
       </ThemeProvider>
+      </GoogleOAuthProvider>
     </QueryClientProvider>
   );
 };

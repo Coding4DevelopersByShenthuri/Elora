@@ -8,6 +8,7 @@ urlpatterns = [
     # ============= Authentication =============
     path('auth/register', views.register, name='register'),
     path('auth/login', views.login, name='login'),
+    path('auth/google', views.google_auth, name='google-auth'),
     path('auth/profile', views.user_profile, name='user-profile'),
     path('auth/user', views.user_info, name='user-info'),
     path('verify-email/<str:token>/', views.verify_email, name='verify-email'),

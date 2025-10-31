@@ -14,6 +14,9 @@ from django.conf import settings
 from django.urls import reverse
 from django.template.loader import render_to_string
 from django.core.cache import cache
+from decouple import config
+import google.oauth2.id_token
+import google.auth.transport.requests
 
 from .serializers import (
     RegisterSerializer, LoginSerializer, UserSerializer, UserProfileSerializer,
@@ -212,6 +215,115 @@ def register(request):
         logger.error(traceback.format_exc())
         return Response({
             "message": "An error occurred during registration",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def google_auth(request):
+    """Authenticate user with Google OAuth token"""
+    try:
+        token = request.data.get('token')
+        
+        if not token:
+            return Response({
+                "message": "Google token is required",
+                "success": False
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Verify the Google token
+        try:
+            request_obj = google.auth.transport.requests.Request()
+            id_info = google.oauth2.id_token.verify_oauth2_token(
+                token, request_obj, config('GOOGLE_CLIENT_ID', default='')
+            )
+            
+            # Verify the token is for our app
+            if id_info['aud'] != config('GOOGLE_CLIENT_ID', default=''):
+                raise ValueError('Token audience mismatch')
+            
+            # Extract user information from Google token
+            google_id = id_info['sub']
+            email = id_info.get('email')
+            first_name = id_info.get('given_name', '')
+            last_name = id_info.get('family_name', '')
+            name = id_info.get('name', f"{first_name} {last_name}".strip() or email.split('@')[0])
+            picture = id_info.get('picture', '')
+            
+            if not email:
+                return Response({
+                    "message": "Email not provided by Google",
+                    "success": False
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Check if user exists by email
+            try:
+                user = User.objects.get(email=email)
+                # Update user info if needed
+                if not user.first_name and first_name:
+                    user.first_name = first_name
+                if not user.last_name and last_name:
+                    user.last_name = last_name
+                user.last_login = timezone.now()
+                user.save()
+            except User.DoesNotExist:
+                # Create new user from Google account
+                username = email.split('@')[0]
+                # Ensure username is unique
+                base_username = username
+                counter = 1
+                while User.objects.filter(username=username).exists():
+                    username = f"{base_username}{counter}"
+                    counter += 1
+                
+                user = User.objects.create_user(
+                    username=username,
+                    email=email,
+                    first_name=first_name,
+                    last_name=last_name,
+                    is_active=True,  # Google verified users don't need email verification
+                    last_login=timezone.now()
+                )
+                user.save()
+                
+                # Create user profile
+                UserProfile.objects.create(
+                    user=user,
+                    level='beginner',
+                    points=0,
+                    streak=0
+                )
+                
+                logger.info(f"New user created via Google OAuth: {email}")
+            
+            # Generate JWT tokens
+            tokens = get_tokens_for_user(user)
+            user_serializer = UserSerializer(user)
+            
+            return Response({
+                "message": "Google authentication successful",
+                "success": True,
+                "user": user_serializer.data,
+                "token": tokens['token'],
+                "refresh": tokens['refresh']
+            })
+            
+        except ValueError as e:
+            logger.error(f"Google token verification failed: {str(e)}")
+            return Response({
+                "message": "Invalid Google token",
+                "success": False,
+                "error": str(e)
+            }, status=status.HTTP_401_UNAUTHORIZED)
+            
+    except Exception as e:
+        logger.error(f"Google authentication error: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return Response({
+            "message": "An error occurred during Google authentication",
+            "success": False,
             "error": str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

@@ -29,6 +29,7 @@ interface AuthContextType {
   user: User | null;
   login: (userData: User) => void;
   loginWithServer: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
+  loginWithGoogle: (token: string) => Promise<{ success: boolean; message?: string }>;
   registerWithServer: (data: { name: string; email: string; password: string; confirm_password: string }) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
   updateUserProfile: (updates: Partial<User['profile']>) => void;
@@ -131,6 +132,45 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const loginWithGoogle = async (token: string) => {
+    try {
+      const response = await API.auth.googleAuth(token);
+      
+      if (response.success && 'data' in response && response.data) {
+        const userData = response.data.user;
+        const transformedUser: User = {
+          id: userData.id.toString(),
+          username: userData.username,
+          email: userData.email,
+          name: userData.name,
+          createdAt: userData.date_joined || new Date().toISOString(),
+          lastLogin: userData.last_login || new Date().toISOString(),
+          profile: {
+            level: userData.profile?.level || 'beginner',
+            points: userData.profile?.points || 0,
+            streak: userData.profile?.current_streak || 0,
+            avatar: userData.profile?.avatar
+          },
+          surveyData: userData.profile ? {
+            ageRange: userData.profile.age_range,
+            nativeLanguage: userData.profile.native_language,
+            englishLevel: userData.profile.english_level,
+            learningPurpose: userData.profile.learning_purpose,
+            completedAt: userData.profile.survey_completed_at
+          } : undefined
+        };
+        
+        login(transformedUser);
+        return { success: true, message: response.message || 'Google authentication successful' };
+      }
+      
+      return { success: false, message: response.message || 'Google authentication failed' };
+    } catch (error) {
+      console.error('Google login error:', error);
+      return { success: false, message: 'Google authentication failed. Please try again.' };
+    }
+  };
+
   const registerWithServer = async (data: { name: string; email: string; password: string; confirm_password: string }) => {
     try {
       const response = await API.auth.register(data);
@@ -160,13 +200,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
       
       // Registration failed - use the error message from the API
+      // Include errors object if available for field-specific errors
+      const errorMessage = response.message || 'Registration failed. Please try again.';
+      const errors = (response as any).errors || null;
+      
       return { 
         success: false, 
-        message: response.message || 'Registration failed. Please try again.' 
+        message: errorMessage,
+        errors: errors
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Registration error:', error);
-      return { success: false, message: 'Registration failed. Please try again.' };
+      // If error has response data, extract the message
+      const errorMessage = error?.response?.data?.message || 
+                          error?.message || 
+                          'Registration failed. Please try again.';
+      return { 
+        success: false, 
+        message: errorMessage,
+        errors: error?.response?.data?.errors || null
+      };
     }
   };
 
@@ -252,6 +305,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       user,
       login,
       loginWithServer,
+      loginWithGoogle,
       registerWithServer,
       logout,
       updateUserProfile,

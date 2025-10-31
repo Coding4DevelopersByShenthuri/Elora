@@ -17,6 +17,11 @@ const handleApiError = (error: any) => {
     const errorData = error.response.data || {};
     let errorMessage = errorData.message || 'An error occurred';
     
+    // Handle timeout errors with better messaging
+    if (error.response.status === 408) {
+      errorMessage = errorData.message || 'Request timed out. Please check your internet connection and try again.';
+    }
+    
     // If there are field-specific errors, extract them
     if (errorData.errors) {
       const errorKeys = Object.keys(errorData.errors);
@@ -64,7 +69,7 @@ const isServerEnabled = (): boolean => {
 };
 
 // Helper function for fetch requests
-const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
+const fetchWithAuth = async (endpoint: string, options: RequestInit = {}, timeoutMs: number = 15000) => {
   // Check if we should even try server connection
   if (!isServerEnabled()) {
     throw { 
@@ -89,7 +94,7 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
     const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
       ...options,
       headers,
-      signal: AbortSignal.timeout(5000), // 5 second timeout
+      signal: AbortSignal.timeout(timeoutMs), // Configurable timeout
     });
 
     if (!response.ok) {
@@ -99,8 +104,17 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
 
     return response.json();
   } catch (error: any) {
+    // Handle timeout errors specifically
+    if (error.name === 'AbortError' || error.name === 'TimeoutError') {
+      throw {
+        response: {
+          data: { message: 'Request timed out. The server may be slow or the email service is taking longer than expected. Please try again.' },
+          status: 408
+        }
+      };
+    }
     // If it's a network error, return offline error
-    if (error.name === 'AbortError' || error.name === 'TypeError') {
+    if (error.name === 'TypeError') {
       throw {
         response: {
           data: { message: 'Server not reachable - using offline mode' },
@@ -125,10 +139,11 @@ export const AuthAPI = {
     confirm_password: string;
   }) => {
     try {
+      // Use longer timeout for registration (20 seconds) since it includes email sending
       const result = await fetchWithAuth('auth/register', {
         method: 'POST',
         body: JSON.stringify(data),
-      });
+      }, 20000); // 20 second timeout for registration
       
       // CRITICAL: Only store token if account is verified
       // Unverified accounts should NOT be logged in
@@ -154,10 +169,11 @@ export const AuthAPI = {
    */
   login: async (data: { email: string; password: string }) => {
     try {
+      // Use standard timeout for login (15 seconds)
       const result = await fetchWithAuth('auth/login', {
         method: 'POST',
         body: JSON.stringify(data),
-      });
+      }, 15000);
       
       // Store token
       if (result.token) {
@@ -168,6 +184,32 @@ export const AuthAPI = {
         success: true,
         data: result,
         message: result.message
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Authenticate with Google OAuth token
+   */
+  googleAuth: async (token: string) => {
+    try {
+      // Use standard timeout for Google auth (15 seconds)
+      const result = await fetchWithAuth('auth/google', {
+        method: 'POST',
+        body: JSON.stringify({ token }),
+      }, 15000);
+      
+      // Store token
+      if (result.token) {
+        localStorage.setItem('speakbee_auth_token', result.token);
+      }
+      
+      return {
+        success: result.success || true,
+        data: result,
+        message: result.message || 'Google authentication successful'
       };
     } catch (error) {
       return handleApiError(error);
