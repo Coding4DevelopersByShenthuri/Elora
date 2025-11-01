@@ -76,7 +76,7 @@ const ContactPage = () => {
   };
 
   return (
-    <div className="relative overflow-hidden pt-36 pb-24">
+    <div className="relative overflow-hidden pt-24 sm:pt-28 md:pt-36 pb-12 md:pb-16 lg:pb-24">
       {/* Background Decorations */}
       <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-primary/5 to-transparent -z-10"></div>
       <div className="absolute top-1/3 right-0 w-[300px] h-[300px] rounded-full bg-primary/5 blur-3xl -z-10"></div>
@@ -118,7 +118,7 @@ const ContactPage = () => {
           onSubmit={handleSubmit}
         >
           {/* Grid for inputs */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {/* Name */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">

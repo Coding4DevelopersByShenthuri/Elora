@@ -35,17 +35,17 @@ export const ManageSection = ({ show }: ManageSectionProps) => {
 
   return (
     <AnimatedTransition show={show} animation="slide-up" duration={600}>
-      <div className="py-16 md:py-24">
-        <div className="flex flex-col items-center text-center gap-2 mb-12">
-          <h2 className="text-2xl font-bold text-[#529641] md:text-6xl">Features</h2>
-          <p className="text-foreground max-w-3xl text-xl md:text-xl mt-2">
+      <div className="py-8 sm:py-12 md:py-16 lg:py-24">
+        <div className="flex flex-col items-center text-center gap-2 mb-8 sm:mb-12">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold text-[#529641]">Features</h2>
+          <p className="text-foreground max-w-3xl text-base sm:text-lg md:text-xl mt-2 px-4">
             Your first and only personal AI English coach works Offline/Online.
           </p>
         </div>
 
         <CustomIllustration featureIndex={activeFeature ?? 0} className="transition-all duration-500" />
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 mt-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8 mt-8 sm:mt-12">
           {features.map((feature, index) => (
             <div
               key={index}
@@ -55,14 +55,14 @@ export const ManageSection = ({ show }: ManageSectionProps) => {
               onClick={() => handleFeatureClick(index)}
             >
               <div
-                className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-all duration-300 ${
+                className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center mb-2 sm:mb-4 transition-all duration-300 ${
                   activeFeature === index ? 'bg-primary/20 ring-2 ring-primary/50' : 'bg-primary/10'
                 }`}
               >
-                <FeatureIcon index={index} size={32} />
+                <FeatureIcon index={index} size={24} />
               </div>
-              <h3 className="font-bold mb-2">{feature.title}</h3>
-              <p className="text-sm text-muted-foreground">{feature.description}</p>
+              <h3 className="font-bold mb-1 sm:mb-2 text-xs sm:text-sm md:text-base line-clamp-2">{feature.title}</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground line-clamp-3">{feature.description}</p>
             </div>
           ))}
         </div>

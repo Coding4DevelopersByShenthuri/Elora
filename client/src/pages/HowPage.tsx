@@ -53,22 +53,22 @@ const FeatureShowcase = ({
   reversed?: boolean
 }) => {
   return (
-    <div className={`flex flex-col ${reversed ? 'md:flex-row-reverse' : 'md:flex-row'} gap-8 my-16`}>
+    <div className={`flex flex-col ${reversed ? 'md:flex-row-reverse' : 'md:flex-row'} gap-6 md:gap-8 my-8 md:my-12 lg:my-16`}>
       <div className="w-full md:w-1/2">
         <div className="glass-panel rounded-lg overflow-hidden h-full">
           <img src={image} alt={title} className="w-full h-full object-cover" />
         </div>
       </div>
       <div className="w-full md:w-1/2 flex flex-col justify-center">
-        <h3 className="text-2xl font-bold mb-3 text-primary">{title}</h3>
-        <p className="text-foreground/80 mb-6">{description}</p>
-        <div className="space-y-4">
+        <h3 className="text-xl sm:text-2xl font-bold mb-3 text-primary">{title}</h3>
+        <p className="text-sm sm:text-base text-foreground/80 mb-4 md:mb-6">{description}</p>
+        <div className="space-y-3 md:space-y-4">
           {features.map((feature, index) => (
-            <div key={index} className="flex items-start gap-3">
-              <div className="w-6 h-6 mt-1 flex-shrink-0 text-primary">
+            <div key={index} className="flex items-start gap-2 md:gap-3">
+              <div className="w-5 h-5 md:w-6 md:h-6 mt-1 flex-shrink-0 text-primary">
                 {feature.icon}
               </div>
-              <p className="text-foreground/80">{feature.text}</p>
+              <p className="text-sm sm:text-base text-foreground/80">{feature.text}</p>
             </div>
           ))}
         </div>
@@ -133,14 +133,14 @@ const HowPage = () => {
       <div className="absolute top-1/3 right-0 w-[300px] h-[300px] rounded-full bg-primary/5 blur-3xl -z-10"></div>
       <div className="absolute bottom-1/3 left-0 w-[250px] h-[250px] rounded-full bg-accent/5 blur-3xl -z-10"></div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-36 pb-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 md:pt-36 pb-12 md:pb-16 lg:pb-24">
         {/* Hero Section - Model Image Style */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center mb-12 md:mb-16 lg:mb-20">
           {/* Left Side - Student Image */}
           <div className="relative">
             <div className="relative">
               {/* Student Image */}
-              <div className="w-80 h-80 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 overflow-hidden flex items-center justify-center">
+              <div className="w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 overflow-hidden flex items-center justify-center">
                 <img 
                   src="/How.png" 
                   alt="How Elora Works" 
@@ -149,27 +149,27 @@ const HowPage = () => {
               </div>
               
               {/* Background shapes */}
-              <div className="absolute -top-8 -left-8 w-32 h-32 bg-primary/10 rounded-2xl rotate-12"></div>
-              <div className="absolute -bottom-8 -right-8 w-24 h-24 bg-secondary/10 rounded-2xl -rotate-12"></div>
+              <div className="absolute -top-6 -left-6 md:-top-8 md:-left-8 w-24 h-24 md:w-32 md:h-32 bg-primary/10 rounded-xl md:rounded-2xl rotate-12 hidden sm:block"></div>
+              <div className="absolute -bottom-6 -right-6 md:-bottom-8 md:-right-8 w-20 h-20 md:w-24 md:h-24 bg-secondary/10 rounded-xl md:rounded-2xl -rotate-12 hidden sm:block"></div>
               
               {/* Decorative elements */}
-              <div className="absolute top-4 right-4 w-6 h-6 bg-orange-400 rounded-full animate-pulse"></div>
-              <div className="absolute bottom-4 left-4 w-4 h-4 bg-orange-400 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
+              <div className="absolute top-4 right-4 w-5 h-5 md:w-6 md:h-6 bg-orange-400 rounded-full animate-pulse"></div>
+              <div className="absolute bottom-4 left-4 w-3 h-3 md:w-4 md:h-4 bg-orange-400 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
             </div>
           </div>
 
           {/* Right Side - Content */}
-          <div className="space-y-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary font-medium mb-6">
-              <Sparkles className="w-4 h-4" />
+          <div className="space-y-4 md:space-y-8">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-primary/10 text-primary font-medium text-sm md:text-base mb-4 md:mb-6">
+              <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4" />
               <span>How It Works</span>
             </div>
             
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6">
               How <span className="text-primary">Elora</span> Works
             </h1>
             
-            <p className="text-lg text-muted-foreground leading-relaxed">
+            <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
               There's powerful AI and advanced speech technology behind our English Trainer, 
               but we've made it simple and intuitive to use for learners of all ages.
             </p>
@@ -184,26 +184,26 @@ const HowPage = () => {
         </div>
 
         {/* Workflow Section - Model Image Style */}
-        <div className="mb-24 relative">
+        <div className="mb-12 md:mb-16 lg:mb-24 relative">
           {/* Decorative spiral - Green */}
           <div className="absolute -top-10 -right-10 w-24 h-24 text-green-500 opacity-30 hidden xl:block">
             <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
               <path d="M50 10C30 10 10 30 10 50C10 70 30 90 50 90C70 90 90 70 90 50C90 35 80 25 65 25C55 25 45 35 45 45C45 55 55 60 60 60" stroke="currentColor" strokeWidth="2" fill="none"/>
             </svg>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center mb-10 md:mb-16">
             {/* Left Side - Title */}
             <div className="relative">
               {/* Decorative dots - Orange */}
-              <div className="absolute -top-8 left-0 flex gap-2">
+              <div className="absolute -top-6 left-0 flex gap-2 hidden sm:flex">
                 <div className="w-3 h-3 rounded-full bg-orange-500 opacity-60"></div>
                 <div className="w-3 h-3 rounded-full bg-orange-500 opacity-40"></div>
                 <div className="w-3 h-3 rounded-full bg-orange-500 opacity-20"></div>
               </div>
-              <h2 className="text-4xl sm:text-5xl font-bold mb-6">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
                 How the App <span className="relative">
                   <span className="text-primary">Works</span>
-                  <svg className="absolute -bottom-2 left-0 w-full h-3 text-orange-400" viewBox="0 0 200 12" fill="none">
+                  <svg className="absolute -bottom-1 md:-bottom-2 left-0 w-full h-2 md:h-3 text-orange-400" viewBox="0 0 200 12" fill="none">
                     <path d="M2 8C50 2 100 10 150 6C180 4 200 8 200 8" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
                   </svg>
                 </span>
@@ -212,7 +212,7 @@ const HowPage = () => {
 
             {/* Right Side - Description */}
             <div className="relative">
-              <div className="absolute -top-4 -right-4 w-6 h-6 text-primary">
+              <div className="absolute -top-4 -right-4 w-6 h-6 text-primary hidden sm:block">
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                 </svg>
@@ -223,7 +223,7 @@ const HowPage = () => {
                   <path d="M10 50Q30 20 50 50T90 50" stroke="currentColor" strokeWidth="2" fill="none"/>
                 </svg>
               </div>
-              <p className="text-lg text-muted-foreground leading-relaxed">
+              <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
                 Simple steps to start your English learning journey with AI-powered guidance. 
                 Our platform makes it easy for learners to improve their language skills effectively.
               </p>
@@ -237,7 +237,7 @@ const HowPage = () => {
           </div>
 
           {/* Four Step Cards - Model Image Style */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 relative">
             {/* Decorative connecting line - Orange */}
             <div className="absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-orange-300 to-transparent opacity-30 hidden lg:block"></div>
             {[
@@ -245,61 +245,61 @@ const HowPage = () => {
                 number: 1,
                 title: "Choose Your Module",
                 description: "Select the category that fits your learning needs: Kids, Adults, or IELTS/PTE exam practice.",
-                icon: <Target className="w-8 h-8" />,
+                icon: <Target className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" />,
                 color: "from-primary to-primary/80"
               },
               {
                 number: 2,
                 title: "Learn & Practice",
                 description: "Engage in interactive lessons offline with AI-powered conversation simulations and pronunciation feedback.",
-                icon: <BookOpen className="w-8 h-8" />,
+                icon: <BookOpen className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" />,
                 color: "from-primary to-primary/80"
               },
               {
                 number: 3,
                 title: "Track Progress",
                 description: "Monitor your improvements with offline progress tracking, achievement badges, and scores.",
-                icon: <BarChart className="w-8 h-8" />,
+                icon: <BarChart className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" />,
                 color: "from-primary to-primary/80"
               },
               {
                 number: 4,
                 title: "Master English",
                 description: "Apply your skills in real conversations. Our AI provides personalized feedback to enhance fluency.",
-                icon: <Award className="w-8 h-8" />,
+                icon: <Award className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" />,
                 color: "from-primary to-primary/80"
               }
             ].map((step, index) => (
               <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/90 backdrop-blur-sm relative z-10">
                 {/* Random decorative elements on cards */}
                 {index === 0 && (
-                  <div className="absolute -bottom-3 -right-3 w-10 h-10 text-green-500 opacity-60">
+                  <div className="absolute -bottom-3 -right-3 w-8 h-8 md:w-10 md:h-10 text-green-500 opacity-60 hidden sm:block">
                     <svg viewBox="0 0 100 100" fill="currentColor" className="w-full h-full">
                       <path d="M50 10L60 40L90 50L60 60L50 90L40 60L10 50L40 40Z"/>
                     </svg>
                   </div>
                 )}
                 {index === 2 && (
-                  <div className="absolute top-4 right-4 w-8 h-8 text-orange-500 opacity-50">
+                  <div className="absolute top-4 right-4 w-6 h-6 md:w-8 md:h-8 text-orange-500 opacity-50 hidden sm:block">
                     <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
                       <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="2"/>
                     </svg>
                   </div>
                 )}
-                <CardContent className="p-8">
-                  <div className="flex items-start justify-between mb-6">
-                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${step.color} flex items-center justify-center text-teal-400 group-hover:scale-110 transition-transform duration-300`}>
+                <CardContent className="p-5 md:p-6 lg:p-8">
+                  <div className="flex items-start justify-between mb-4 md:mb-6">
+                    <div className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-gradient-to-br ${step.color} flex items-center justify-center text-teal-400 group-hover:scale-110 transition-transform duration-300`}>
                       {step.icon}
                     </div>
-                    <div className="w-8 h-8 rounded-full bg-orange-400 flex items-center justify-center">
-                      <ArrowRight className="w-4 h-4 text-white" />
+                    <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-orange-400 flex items-center justify-center">
+                      <ArrowRight className="w-3 h-3 md:w-4 md:h-4 text-white" />
                     </div>
                   </div>
-                  <div className="w-8 h-8 mb-4 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg">
+                  <div className="w-7 h-7 md:w-8 md:h-8 mb-3 md:mb-4 rounded-full bg-primary text-white flex items-center justify-center font-bold text-base md:text-lg">
                     {step.number}
                   </div>
-                  <h3 className="text-xl font-bold mb-4 text-teal-800">{step.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">{step.description}</p>
+                  <h3 className="text-lg sm:text-xl font-bold mb-3 md:mb-4 text-teal-800">{step.title}</h3>
+                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">{step.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -308,8 +308,8 @@ const HowPage = () => {
 
 
         {/* Feature Showcases */}
-        <div className="mb-24">
-          <h2 className="text-3xl font-bold text-center mb-12">Designed for Smarter English Learning</h2>
+        <div className="mb-12 md:mb-16 lg:mb-24">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 md:mb-12">Designed for Smarter English Learning</h2>
 
           <FeatureShowcase
           //@ts-ignore
@@ -422,42 +422,42 @@ const HowPage = () => {
 
 
         {/* Who is it for section */}
-        <div className="mb-20 glass-panel p-10 rounded-lg">
-          <h2 className="text-3xl font-bold text-center mb-12">
+        <div className="mb-12 md:mb-16 lg:mb-20 glass-panel p-6 md:p-8 lg:p-10 rounded-lg">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 md:mb-12">
             Designed for learners of all ages and levels
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 mt-8 md:mt-12">
             <div className="text-center">
-              <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                <Smile className="w-10 h-10 text-primary" />
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3 md:mb-4">
+                <Smile className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
               </div>
-              <h3 className="font-bold text-lg">Kids</h3>
-              <p className="text-foreground/70 mt-2">Interactive lessons to make learning fun and engaging.</p>
+              <h3 className="font-bold text-base sm:text-lg">Kids</h3>
+              <p className="text-sm sm:text-base text-foreground/70 mt-2">Interactive lessons to make learning fun and engaging.</p>
             </div>
 
             <div className="text-center">
-              <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                <BookOpen className="w-10 h-10 text-primary" />
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3 md:mb-4">
+                <BookOpen className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
               </div>
-              <h3 className="font-bold text-lg">Beginners</h3>
-              <p className="text-foreground/70 mt-2">Step-by-step modules to build a strong foundation in English.</p>
+              <h3 className="font-bold text-base sm:text-lg">Beginners</h3>
+              <p className="text-sm sm:text-base text-foreground/70 mt-2">Step-by-step modules to build a strong foundation in English.</p>
             </div>
 
             <div className="text-center">
-              <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                <Mic className="w-10 h-10 text-primary" />
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3 md:mb-4">
+                <Mic className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
               </div>
-              <h3 className="font-bold text-lg">Intermediate</h3>
-              <p className="text-foreground/70 mt-2">Practice real conversations and improve fluency with AI feedback.</p>
+              <h3 className="font-bold text-base sm:text-lg">Intermediate</h3>
+              <p className="text-sm sm:text-base text-foreground/70 mt-2">Practice real conversations and improve fluency with AI feedback.</p>
             </div>
 
             <div className="text-center">
-              <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                <Award className="w-10 h-10 text-primary" />
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3 md:mb-4">
+                <Award className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
               </div>
-              <h3 className="font-bold text-lg">Advanced & Exam Prep</h3>
-              <p className="text-foreground/70 mt-2">IELTS/PTE exam simulations and performance tracking for success.</p>
+              <h3 className="font-bold text-base sm:text-lg">Advanced & Exam Prep</h3>
+              <p className="text-sm sm:text-base text-foreground/70 mt-2">IELTS/PTE exam simulations and performance tracking for success.</p>
             </div>
           </div>
         </div>

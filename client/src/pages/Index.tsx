@@ -330,8 +330,8 @@ const Index = () => {
                   { number: "48+", label: "Countries We Serve", color: "bg-orange-400" }
                 ].map((stat, index) => (
                   <div key={index} className={`${stat.color} rounded-xl md:rounded-2xl p-4 md:p-6 text-white text-center transform hover:scale-105 transition-transform duration-300`}>
-                    <div className="text-2xl md:text-3xl font-bold mb-1 md:mb-2">{stat.number}</div>
-                    <div className="text-xs md:text-sm font-medium leading-tight">{stat.label}</div>
+                    <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 md:mb-2">{stat.number}</div>
+                    <div className="text-xs sm:text-sm font-medium leading-tight">{stat.label}</div>
                   </div>
                 ))}
               </div>

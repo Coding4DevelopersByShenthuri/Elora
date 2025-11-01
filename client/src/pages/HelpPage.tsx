@@ -16,14 +16,14 @@ const HelpSection = ({
     id: string;
 }) => {
     return (
-        <div id={id} className="mb-16 max-w-4xl mx-auto">
-            <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 flex items-center justify-center rounded-full bg-primary/10">
+        <div id={id} className="mb-12 md:mb-16 max-w-4xl mx-auto">
+            <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
+                <div className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-primary/10">
                     {icon}
                 </div>
-                <h2 className="text-2xl md:text-3xl font-bold text-primary">{title}</h2>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary">{title}</h2>
             </div>
-            <div className="text-foreground/80 space-y-4">
+            <div className="text-foreground/80 space-y-3 md:space-y-4">
                 {content}
             </div>
         </div>
@@ -40,22 +40,22 @@ const HelpPage = () => {
             <div className="absolute top-1/3 right-0 w-[300px] h-[300px] rounded-full bg-primary/5 blur-3xl -z-10"></div>
             <div className="absolute bottom-1/3 left-0 w-[250px] h-[250px] rounded-full bg-accent/5 blur-3xl -z-10"></div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 md:pt-32 lg:pt-36 pb-12 md:pb-16 lg:pb-20">
                 <AnimatedTransition show={showContent} animation="slide-up">
-                    <div className="flex flex-col items-center text-center mb-12">
-                        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-teal-600">
+                    <div className="flex flex-col items-center text-center mb-8 md:mb-12">
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 text-teal-600">
                             Need Help?
                         </h1>
 
-                        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                        <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto px-4">
                             We're here to support you—anytime, anywhere. Explore common questions, support options, and more.
                         </p>
 
-                        <div className="mt-8 glass-panel p-6 md:p-8 rounded-lg max-w-3xl mx-auto shadow-lg border-2 border-primary/20">
-                            <p className="text-xl md:text-2xl text-foreground/90">
+                        <div className="mt-6 md:mt-8 glass-panel p-5 md:p-6 lg:p-8 rounded-lg max-w-3xl mx-auto shadow-lg border-2 border-primary/20">
+                            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-foreground/90">
                                 Whether you're stuck, curious, or just getting started—this page is for you.
                             </p>
-                            <p className="text-xl md:text-2xl text-foreground/90 mt-4">
+                            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-foreground/90 mt-3 md:mt-4">
                                 Find answers, connect with support, and get the most out of Elora.
                             </p>
                         </div>

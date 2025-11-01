@@ -40,17 +40,17 @@ const AboutPage = () => {
 
   const milestones = [
     {
-      year: "2024",
+      year: "2025",
       title: "Elora Launch",
       description: "Released the world's first fully offline AI-powered English trainer for all platforms."
     },
     {
-      year: "2024",
+      year: "2026",
       title: "Multi-Platform Support",
       description: "Expanded to Android, iOS, Windows, macOS, and Progressive Web App."
     },
     {
-      year: "2025",
+      year: "2026",
       title: "Growing Community",
       description: "Thousands of learners worldwide improving their English skills with Elora."
     },

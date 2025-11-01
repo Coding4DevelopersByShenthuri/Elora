@@ -290,7 +290,7 @@ const PricingPage = () => {
   };
 
   return (
-    <div className="min-h-screen pt-29 pb-12 relative overflow-hidden">
+    <div className="min-h-screen pt-24 sm:pt-28 md:pt-36 pb-12 relative overflow-hidden">
       {/* Decorative SVG elements - Green and Orange */}
       <div className="absolute top-32 left-16 w-20 h-20 text-orange-500 opacity-30 hidden xl:block animate-pulse">
         <svg viewBox="0 0 100 100" fill="currentColor" className="w-full h-full">
@@ -315,24 +315,24 @@ const PricingPage = () => {
       
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         {/* Header */}
-        <div className="text-center mb-12 relative">
+        <div className="text-center mb-8 md:mb-12 relative">
           {/* Decorative dots - Orange */}
           <div className="absolute -top-6 left-1/3 flex gap-2 hidden md:flex">
             <div className="w-3 h-3 rounded-full bg-orange-500 opacity-60"></div>
             <div className="w-3 h-3 rounded-full bg-orange-500 opacity-40"></div>
             <div className="w-3 h-3 rounded-full bg-orange-500 opacity-20"></div>
           </div>
-          <h1 className="text-3xl text-teal-600 sm:text-4xl md:text-5xl font-bold tracking-tight mb-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-teal-600 font-bold tracking-tight mb-4">
             Simple, Transparent Pricing
           </h1>
-          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
             Choose the perfect plan for your English learning journey. All plans include our 
             AI-powered feedback system and progress tracking.
           </p>
         </div>
 
         {/* Billing Toggle - Only for Kids */}
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-center mb-6 md:mb-8">
           <div className="bg-muted/50 rounded-lg p-1">
             <button
               onClick={() => setBillingPeriod('monthly')}
@@ -361,18 +361,18 @@ const PricingPage = () => {
 
         {/* Main Pricing Tabs */}
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'kids' | 'adults' | 'ielts')} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8 transition-all duration-300">
+          <TabsList className="grid w-full grid-cols-3 mb-6 md:mb-8 transition-all duration-300">
             <TabsTrigger value="kids" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm transition-all duration-200">
               <Baby size={14} className="sm:w-4 sm:h-4" />
-              <span className="hidden xs:inline">Kids</span>
+              <span>Kids</span>
             </TabsTrigger>
             <TabsTrigger value="adults" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm transition-all duration-200">
               <Users size={14} className="sm:w-4 sm:h-4" />
-              <span className="hidden xs:inline">Adults</span>
+              <span>Adults</span>
             </TabsTrigger>
             <TabsTrigger value="ielts" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm transition-all duration-200">
               <GraduationCap size={14} className="sm:w-4 sm:h-4" />
-              <span className="hidden xs:inline">IELTS/PTE</span>
+              <span className="hidden sm:inline">IELTS/PTE</span>
             </TabsTrigger>
           </TabsList>
 

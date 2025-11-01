@@ -914,20 +914,20 @@ export const CustomIllustration: React.FC<CustomIllustrationProps> = ({
       "w-full rounded-xl overflow-hidden shadow-xl bg-card/30 backdrop-blur-sm border border-border/50",
       className
     )}>
-      <div className={cn("relative h-64 w-full bg-gradient-to-br p-8", bgColor)}>
+      <div className={cn("relative h-48 sm:h-56 md:h-64 w-full bg-gradient-to-br p-4 sm:p-6 md:p-8", bgColor)}>
         <div className="absolute inset-0 w-full h-full overflow-hidden opacity-40">
-          <div className="absolute top-[20%] left-[15%] w-8 h-8 rounded-full bg-primary/30 animate-pulse-slow"></div>
-          <div className="absolute top-[60%] left-[25%] w-6 h-6 rounded-full bg-primary/20 animate-pulse-slow delay-300"></div>
-          <div className="absolute top-[30%] left-[60%] w-10 h-10 rounded-full bg-primary/30 animate-pulse-slow delay-700"></div>
-          <div className="absolute top-[70%] right-[20%] w-8 h-8 rounded-full bg-primary/20 animate-pulse-slow delay-500"></div>
-          <div className="absolute top-[40%] right-[30%] w-6 h-6 rounded-full bg-primary/30 animate-pulse-slow delay-200"></div>
-          <div className="absolute top-[20%] right-[10%] w-4 h-4 rounded-full bg-primary/20 animate-pulse-slow delay-600"></div>
+          <div className="absolute top-[20%] left-[15%] w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary/30 animate-pulse-slow"></div>
+          <div className="absolute top-[60%] left-[25%] w-4 h-4 sm:w-6 sm:h-6 rounded-full bg-primary/20 animate-pulse-slow delay-300"></div>
+          <div className="absolute top-[30%] left-[60%] w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/30 animate-pulse-slow delay-700"></div>
+          <div className="absolute top-[70%] right-[20%] w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary/20 animate-pulse-slow delay-500"></div>
+          <div className="absolute top-[40%] right-[30%] w-4 h-4 sm:w-6 sm:h-6 rounded-full bg-primary/30 animate-pulse-slow delay-200"></div>
+          <div className="absolute top-[20%] right-[10%] w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-primary/20 animate-pulse-slow delay-600"></div>
         </div>
         <div className="relative z-10 h-full">{renderDiagram(featureIndex)}</div>
       </div>
-      <div className="p-4 bg-card/50 backdrop-blur-sm">
-        <h2 className="text-2xl font-bold mb-2 text-foreground">{title}</h2>
-        <p className="text-muted-foreground">{description}</p>
+      <div className="p-3 sm:p-4 bg-card/50 backdrop-blur-sm">
+        <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-2 text-foreground">{title}</h2>
+        <p className="text-xs sm:text-sm text-muted-foreground">{description}</p>
       </div>
     </div>
   );

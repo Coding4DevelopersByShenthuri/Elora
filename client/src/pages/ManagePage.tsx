@@ -65,20 +65,22 @@ const ManagePage = () => {
       <Toaster position="top-right" />
       <AnimatedTransition show={showContent} animation="slide-up">
         <div className="flex h-[calc(100vh-130px)]">
-          <CortexSidebar 
-            onCortexSelect={handleCortexSelect}
-            selectedCategoryId={selectedCategory}
-            selectedItemId={selectedItem}
-          />
+          <div className="hidden md:block">
+            <CortexSidebar 
+              onCortexSelect={handleCortexSelect}
+              selectedCategoryId={selectedCategory}
+              selectedItemId={selectedItem}
+            />
+          </div>
           <div className="flex-1 overflow-x-auto">
-            <div className="flex items-center justify-between px-4 py-2 border-b border-border/50">
+            <div className="flex items-center justify-between px-3 sm:px-4 py-2 border-b border-border/50">
               {isEditing ? (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-1">
                   <Input
                     value={tempTitle}
                     onChange={(e) => setTempTitle(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    className="h-8 text-xl font-semibold w-64"
+                    className="h-8 text-lg sm:text-xl font-semibold w-full max-w-xs"
                     autoFocus
                   />
                   <Button size="icon" variant="ghost" onClick={handleSaveClick}>
@@ -89,13 +91,13 @@ const ManagePage = () => {
                   </Button>
                 </div>
               ) : (
-                <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-semibold">{libraryTitle}</h2>
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <h2 className="text-lg sm:text-xl font-semibold truncate">{libraryTitle}</h2>
                   <Button
                     size="icon"
                     variant="ghost"
                     onClick={handleEditClick}
-                    className="h-8 w-8"
+                    className="h-8 w-8 flex-shrink-0"
                   >
                     <Edit2 size={14} />
                   </Button>

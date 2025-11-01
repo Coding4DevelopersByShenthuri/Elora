@@ -21,33 +21,33 @@ const Footer = () => {
       <div className="absolute bottom-6 left-8 w-16 h-16 rounded-full blur-xl bg-floating-icon-secondary/40 dark:bg-floating-icon-secondary/40"></div>
 
       {/* Footer Content */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-black dark:text-white">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 text-black dark:text-white">
         {/* 1️⃣ Logo & Socials */}
         <div>
-          <Link to="/" className="flex items-center gap-3 mb-4 group">
+          <Link to="/" className="flex items-center gap-2 sm:gap-3 mb-4 group">
             <img
               src="/logo01.png"
               alt="Elora Logo"
-              className="h-16 sm:h-20 md:h-20 lg:h-20 w-auto transition-transform duration-300 group-hover:scale-110"
+              className="h-12 sm:h-16 md:h-20 w-auto transition-transform duration-300 group-hover:scale-110"
             />
-            <p className="text-sm hidden sm:block">
+            <p className="text-xs sm:text-sm hidden sm:block">
               Spoken English Platform
             </p>
           </Link>
 
-          <p className="text-sm mb-4 leading-relaxed">
+          <p className="text-xs sm:text-sm mb-4 leading-relaxed">
             Transform your English speaking skills with our AI-powered
             platform. Designed for all ages.
           </p>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {[Facebook, Instagram, Twitter, Youtube].map((Icon, idx) => (
               <a
                 key={idx}
                 href="#"
-                className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 border border-gray-300 dark:border-white/30 hover:bg-gradient-to-r hover:from-primary hover:to-accent text-black dark:text-white"
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 border border-gray-300 dark:border-white/30 hover:bg-gradient-to-r hover:from-primary hover:to-accent text-black dark:text-white"
               >
-                <Icon className="w-4 h-4" />
+                <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </a>
             ))}
           </div>
@@ -55,8 +55,8 @@ const Footer = () => {
 
         {/* 2️⃣ Learning Paths */}
         <div>
-          <h3 className="font-semibold text-base mb-4 text-black dark:text-white">Learning Paths</h3>
-          <ul className="space-y-2 text-sm">
+          <h3 className="font-semibold text-sm sm:text-base mb-3 sm:mb-4 text-black dark:text-white">Learning Paths</h3>
+          <ul className="space-y-2 text-xs sm:text-sm">
             <li><Link to="/kids" className="hover:text-primary transition">Kids Learning</Link></li>
             <li><Link to="/adults" className="hover:text-primary transition">Adults Program</Link></li>
             <li><Link to="/ielts-pte" className="hover:text-primary transition">IELTS / PTE Prep</Link></li>
@@ -65,8 +65,8 @@ const Footer = () => {
 
         {/* 3️⃣ Quick Links */}
         <div>
-          <h3 className="font-semibold text-base mb-4 text-black dark:text-white">Quick Links</h3>
-          <ul className="space-y-2 text-sm">
+          <h3 className="font-semibold text-sm sm:text-base mb-3 sm:mb-4 text-black dark:text-white">Quick Links</h3>
+          <ul className="space-y-2 text-xs sm:text-sm">
             <li><Link to="/" className="hover:text-primary transition">Home</Link></li>
             <li><Link to="/why" className="hover:text-primary transition">Why Elora</Link></li>
             <li><Link to="/how" className="hover:text-primary transition">How It Works</Link></li>
@@ -78,26 +78,26 @@ const Footer = () => {
 
         {/* 4️⃣ Contact & Newsletter */}
         <div>
-          <h3 className="font-semibold text-base mb-4 flex items-center gap-2 text-black dark:text-white">
-            <Mail className="w-4 h-4 text-primary" /> Contact
+          <h3 className="font-semibold text-sm sm:text-base mb-3 sm:mb-4 flex items-center gap-2 text-black dark:text-white">
+            <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" /> Contact
           </h3>
-          <div className="space-y-2 mb-4 text-sm">
+          <div className="space-y-2 mb-4 text-xs sm:text-sm">
             <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4 text-primary" />
+              <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
               <span>elora.toinfo@gmail.com</span>
             </div>
             <div className="flex items-center gap-2">
-              <Phone className="w-4 h-4 text-primary" />
+              <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
               <span>+94 75 036 3903</span>
             </div>
             <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-primary" />
+              <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
               <span>Jaffna, Sri Lanka</span>
             </div>
           </div>
 
           {/* Stay Updated - Newsletter */}
-          <h4 className="font-semibold text-sm mb-2 text-black dark:text-white">Stay updated</h4>
+          <h4 className="font-semibold text-xs sm:text-sm mb-2 text-black dark:text-white">Stay updated</h4>
           <p className="text-xs mb-3 text-gray-700 dark:text-gray-300">
             Get the latest updates on new features and AI capabilities.
           </p>
@@ -106,7 +106,7 @@ const Footer = () => {
               type="email"
               placeholder="Enter your email"
               aria-label="Email address"
-              className="flex-1 bg-transparent border border-gray-300 dark:border-white/20 rounded-md px-2 py-1.5 lg:py-1 text-sm lg:text-xs placeholder-gray-400 dark:placeholder-white/50 text-black dark:text-white focus:outline-none focus:border-primary"
+              className="flex-1 bg-transparent border border-gray-300 dark:border-white/20 rounded-md px-2 py-1.5 lg:py-1 text-xs sm:text-sm lg:text-xs placeholder-gray-400 dark:placeholder-white/50 text-black dark:text-white focus:outline-none focus:border-primary"
             />
             <button className="bg-gradient-to-r from-primary to-accent px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-md text-xs lg:text-[11px] font-medium transition-all duration-300 flex items-center gap-1 text-white">
               <span>Subscribe</span>

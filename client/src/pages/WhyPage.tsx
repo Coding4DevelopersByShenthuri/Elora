@@ -44,14 +44,14 @@ const WhyPage = () => {
       <div className="absolute top-1/4 right-0 w-[400px] h-[400px] rounded-full bg-secondary/10 blur-3xl -z-10"></div>
       <div className="absolute bottom-1/4 left-0 w-[300px] h-[300px] rounded-full bg-accent/10 blur-3xl -z-10"></div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-36 pb-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 md:pt-36 pb-12 md:pb-16 lg:pb-24">
         {/* Hero Section - Model Image Style */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center mb-12 md:mb-16 lg:mb-20">
           {/* Left Side - Student Image */}
           <div className="relative">
             <div className="relative">
               {/* Student Image */}
-              <div className="w-80 h-80 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20 shadow-2xl">
+              <div className="w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20 shadow-2xl">
                 <img 
                   src="/boy.jpg" 
                   alt="Student learning English" 
@@ -60,39 +60,39 @@ const WhyPage = () => {
               </div>
               
               {/* Background shapes */}
-              <div className="absolute -top-8 -left-8 w-32 h-32 bg-primary/10 rounded-2xl rotate-12"></div>
-              <div className="absolute -bottom-8 -right-8 w-24 h-24 bg-secondary/10 rounded-2xl -rotate-12"></div>
+              <div className="absolute -top-6 -left-6 md:-top-8 md:-left-8 w-24 h-24 md:w-32 md:h-32 bg-primary/10 rounded-xl md:rounded-2xl rotate-12 hidden sm:block"></div>
+              <div className="absolute -bottom-6 -right-6 md:-bottom-8 md:-right-8 w-20 h-20 md:w-24 md:h-24 bg-secondary/10 rounded-xl md:rounded-2xl -rotate-12 hidden sm:block"></div>
               
               {/* Decorative elements */}
-              <div className="absolute top-4 right-4 w-6 h-6 bg-orange-400 rounded-full animate-pulse"></div>
-              <div className="absolute bottom-4 left-4 w-4 h-4 bg-orange-400 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
+              <div className="absolute top-4 right-4 w-5 h-5 md:w-6 md:h-6 bg-orange-400 rounded-full animate-pulse"></div>
+              <div className="absolute bottom-4 left-4 w-3 h-3 md:w-4 md:h-4 bg-orange-400 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
             </div>
           </div>
 
           {/* Right Side - Content */}
-          <div className="space-y-8 relative">
+          <div className="space-y-4 md:space-y-8 relative">
             {/* Decorative curved line - Green */}
             <div className="absolute -top-8 -left-8 w-20 h-20 text-green-500 opacity-40 hidden md:block">
               <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
                 <path d="M10 90Q10 10 90 10" stroke="currentColor" strokeWidth="3" fill="none"/>
               </svg>
             </div>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary font-medium mb-6">
-              <Sparkles className="w-4 h-4" />
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-primary/10 text-primary font-medium text-sm md:text-base mb-4 md:mb-6">
+              <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4" />
               <span>Our Philosophy</span>
             </div>
             
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 relative">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 relative">
               Why <span className="text-primary">Elora</span>?
               {/* Decorative star - Orange */}
-              <div className="absolute -top-4 -right-8 w-8 h-8 text-orange-500 opacity-70 hidden sm:block">
+              <div className="absolute -top-4 -right-8 w-6 h-6 md:w-8 md:h-8 text-orange-500 opacity-70 hidden sm:block">
                 <svg viewBox="0 0 100 100" fill="currentColor" className="w-full h-full">
                   <path d="M50 10L60 40L90 50L60 60L50 90L40 60L10 50L40 40Z"/>
                 </svg>
               </div>
             </h1>
             
-            <p className="text-lg text-muted-foreground leading-relaxed">
+            <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
               Everything we do starts with a simple question: How can we make English learning 
               more accessible, effective, and private for everyone?
             </p>
@@ -107,7 +107,7 @@ const WhyPage = () => {
         </div>
 
         {/* Main Reasons Section - Model Image Style */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20 relative">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12 mb-12 md:mb-16 lg:mb-20 relative">
           {/* Decorative wavy arrow - Orange */}
           <div className="absolute top-10 -left-12 w-24 h-24 text-orange-500 opacity-40 hidden xl:block">
             <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
@@ -116,25 +116,25 @@ const WhyPage = () => {
           </div>
           {[
             {
-              icon: <Lightbulb className="w-8 h-8 text-teal-800" />,
+              icon: <Lightbulb className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-teal-800" />,
               title: "Because learning should be <span className='text-orange-500 font-bold'>accessible</span> to everyone",
               description: "We believe that quality English education shouldn't be limited by internet connectivity, expensive subscriptions, or privacy concerns. Our offline-first approach ensures that anyone, anywhere can learn English effectively.",
               color: "from-primary to-primary/80"
             },
             {
-              icon: <Heart className="w-8 h-8 text-teal-800" />,
+              icon: <Heart className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-teal-800" />,
               title: "Because we care about your <span className='text-orange-500 font-bold'>privacy</span> and data",
               description: "Your learning journey is personal. That's why all your data stays on your device. No cloud storage, no data collection, no tracking. Just pure, private learning.",
               color: "from-primary to-primary/80"
             },
             {
-              icon: <Zap className="w-8 h-8 text-teal-800" />,
+              icon: <Zap className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-teal-800" />,
               title: "Because AI should <span className='text-orange-500 font-bold'>empower</span>, not replace human learning",
               description: "Our AI technology enhances your learning experience by providing instant feedback and personalized guidance, while keeping you in control of your educational journey.",
               color: "from-primary to-primary/80"
             },
             {
-              icon: <Target className="w-8 h-8 text-teal-800" />,
+              icon: <Target className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-teal-800" />,
               title: "Because every learner deserves <span className='text-orange-500 font-bold'>personalized</span> attention",
               description: "Whether you're a child starting out, an adult improving your skills, or preparing for exams, our AI adapts to your pace and learning style for maximum effectiveness.",
               color: "from-primary to-primary/80"
@@ -143,44 +143,44 @@ const WhyPage = () => {
             <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/90 backdrop-blur-sm relative">
               {/* Alternating decorative elements */}
               {index === 0 && (
-                <div className="absolute -top-3 -right-3 w-10 h-10 text-green-500 opacity-60">
+                <div className="absolute -top-3 -right-3 w-8 h-8 md:w-10 md:h-10 text-green-500 opacity-60 hidden sm:block">
                   <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
                     <circle cx="50" cy="50" r="35" stroke="currentColor" strokeWidth="3" strokeDasharray="10,5"/>
                   </svg>
                 </div>
               )}
               {index === 1 && (
-                <div className="absolute -bottom-3 -left-3 w-8 h-8 text-orange-500 opacity-70">
+                <div className="absolute -bottom-3 -left-3 w-6 h-6 md:w-8 md:h-8 text-orange-500 opacity-70 hidden sm:block">
                   <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
                     <circle cx="12" cy="12" r="10"/>
                   </svg>
                 </div>
               )}
               {index === 2 && (
-                <div className="absolute top-4 right-4 w-10 h-10 text-green-500 opacity-50">
+                <div className="absolute top-4 right-4 w-8 h-8 md:w-10 md:h-10 text-green-500 opacity-50 hidden sm:block">
                   <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
                     <path d="M10 50Q30 20 50 50T90 50" stroke="currentColor" strokeWidth="2" fill="none"/>
                   </svg>
                 </div>
               )}
-              <CardContent className="p-8">
-                <div className="flex items-start justify-between mb-6">
-                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${reason.color} flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300`}>
+              <CardContent className="p-5 md:p-6 lg:p-8">
+                <div className="flex items-start justify-between mb-4 md:mb-6">
+                  <div className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-gradient-to-br ${reason.color} flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300`}>
                     {reason.icon}
                   </div>
-                  <div className="w-8 h-8 rounded-full bg-orange-400 flex items-center justify-center">
-                    <ArrowRight className="w-4 h-4 text-white" />
+                  <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-orange-400 flex items-center justify-center">
+                    <ArrowRight className="w-3 h-3 md:w-4 md:h-4 text-white" />
                   </div>
                 </div>
-                <h3 className="text-2xl font-bold mb-4 text-teal-600" dangerouslySetInnerHTML={{ __html: reason.title }} />
-                <p className="text-muted-foreground leading-relaxed text-lg">{reason.description}</p>
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-3 md:mb-4 text-teal-600" dangerouslySetInnerHTML={{ __html: reason.title }} />
+                <p className="text-muted-foreground leading-relaxed text-base sm:text-lg">{reason.description}</p>
               </CardContent>
             </Card>
           ))}
         </div>
 
         {/* Values Section */}
-        <div className="mb-20 relative">
+        <div className="mb-12 md:mb-16 lg:mb-20 relative">
           {/* Decorative circles - Green and Orange */}
           <div className="absolute -top-6 right-20 w-12 h-12 text-orange-500 opacity-30 hidden lg:block">
             <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
@@ -192,23 +192,23 @@ const WhyPage = () => {
               <path d="M50 10L60 40L90 50L60 60L50 90L40 60L10 50L40 40Z" stroke="currentColor" strokeWidth="2" fill="none"/>
             </svg>
           </div>
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+          <div className="text-center mb-10 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 md:mb-6">
               Our Core <span className="text-primary">Values</span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto px-4">
               These principles guide everything we do and every decision we make.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             {values.map((value, index) => (
               <div key={index} className="text-center group">
-                <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-300">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 mx-auto mb-4 md:mb-6 rounded-xl md:rounded-2xl bg-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-300">
                   {value.icon}
                 </div>
-                <h3 className="text-xl font-bold mb-4">{value.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{value.description}</p>
+                <h3 className="text-lg sm:text-xl font-bold mb-3 md:mb-4">{value.title}</h3>
+                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">{value.description}</p>
               </div>
             ))}
           </div>

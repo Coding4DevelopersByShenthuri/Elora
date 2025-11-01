@@ -31,21 +31,21 @@ const Settings = () => {
   };
   
   return (
-    <div className="max-w-7xl mx-auto px-4 pt-24 pb-16">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 md:pt-32 pb-12 md:pb-16">
       <AnimatedTransition show={showContent} animation="slide-up">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold">Settings</h1>
-          <p className="text-muted-foreground mt-2">
+        <div className="text-center mb-6 md:mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">Settings</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-2">
             Customize your digital second brain
           </p>
         </div>
         
         <div className="max-w-3xl mx-auto">
           <Tabs defaultValue="general" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-8">
-              <TabsTrigger value="general">General</TabsTrigger>
-              <TabsTrigger value="appearance">Appearance</TabsTrigger>
-              <TabsTrigger value="integrations">Integrations</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3 mb-6 md:mb-8">
+              <TabsTrigger value="general" className="text-xs sm:text-sm">General</TabsTrigger>
+              <TabsTrigger value="appearance" className="text-xs sm:text-sm">Appearance</TabsTrigger>
+              <TabsTrigger value="integrations" className="text-xs sm:text-sm">Integrations</TabsTrigger>
             </TabsList>
             
             <TabsContent value="general">
