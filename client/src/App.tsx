@@ -526,7 +526,7 @@ const App = () => {
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setIsInitialLoading(false), 800);
+    const timer = window.setTimeout(() => setIsInitialLoading(false), 1500);
     return () => window.clearTimeout(timer);
   }, []);
 
