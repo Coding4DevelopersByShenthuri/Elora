@@ -37,6 +37,7 @@ const KidsVoiceRecorder = ({
   const timerRef = useRef<number | null>(null);
   const analysisIntervalRef = useRef<number | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const skipFinalAnalysisRef = useRef<boolean>(false);
 
   useEffect(() => {
     return () => {
@@ -67,6 +68,11 @@ const KidsVoiceRecorder = ({
   };
 
   const analyzeAudio = async (audioBlob: Blob): Promise<boolean> => {
+    // Prevent multiple simultaneous analyses
+    if (isAnalyzing) {
+      return false;
+    }
+    
     try {
       setIsAnalyzing(true);
       
@@ -124,6 +130,7 @@ const KidsVoiceRecorder = ({
     try {
       setFeedbackMessage('');
       setShowSuccess(false);
+      skipFinalAnalysisRef.current = false;
       
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
@@ -154,10 +161,13 @@ const KidsVoiceRecorder = ({
       mediaRecorder.onstop = async () => {
         const blob = new Blob(chunksRef.current, { type: 'audio/webm;codecs=opus' });
         
-        // Final analysis if not already marked as success
-        if (!showSuccess && chunksRef.current.length > 0) {
+        // Final analysis if not already marked as success and not explicitly skipped
+        if (!showSuccess && !skipFinalAnalysisRef.current && chunksRef.current.length > 0) {
           await analyzeAudio(blob);
         }
+        
+        // Reset skip flag
+        skipFinalAnalysisRef.current = false;
         
         // Stop all tracks
         if (streamRef.current) {
@@ -181,7 +191,7 @@ const KidsVoiceRecorder = ({
         setRecordingTime(prev => {
           const newTime = prev + 1;
           
-          // Auto-stop at max duration
+          // Auto-stop at max duration - this is like a manual stop, needs analysis
           if (newTime >= maxDuration) {
             stopRecording(false);
           }
@@ -236,7 +246,10 @@ const KidsVoiceRecorder = ({
       analysisIntervalRef.current = null;
     }
     
-    if (!success) {
+    // If recording stopped successfully (correct pronunciation), skip final analysis
+    if (success) {
+      skipFinalAnalysisRef.current = true;
+    } else {
       setFeedbackMessage('👍 Good try! Let\'s check your pronunciation...');
     }
   };
@@ -267,7 +280,7 @@ const KidsVoiceRecorder = ({
                 : "bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B]"
           )}
           onClick={showSuccess ? undefined : (isRecording ? () => stopRecording(false) : startRecording)}
-          disabled={disabled || disabledWhileSpeaking || isAnalyzing}
+          disabled={disabled || disabledWhileSpeaking}
         >
           {showSuccess ? (
             <CheckCircle className="w-12 h-12 sm:w-14 sm:h-14 text-white animate-bounce" />
