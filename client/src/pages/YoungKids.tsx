@@ -694,11 +694,13 @@ const YoungKidsPage = () => {
       setShowJungleExplorerAdventure(true);
     }
     
-    // Add celebration effects
-    const newPoints = points + 50;
-    const newStreak = streak + 1;
+    // Add celebration effects - award points for starting a story
+    const pointsToAdd = 50;
+    const newPoints = points + pointsToAdd;
     setPoints(newPoints);
-    setStreak(newStreak);
+    
+    // Update streak correctly (check if user practiced yesterday)
+    await incrementStreakIfNeeded('story-start');
     
     // Persist to server first, fallback to local
     try {
@@ -717,9 +719,11 @@ const YoungKidsPage = () => {
       if (token && token !== 'local-token') {
         const current = await KidsApi.getProgress(token);
         const details = updateDetails((current as any).details || {});
+        const currentPoints = (current as any)?.points ?? 0;
+        const currentStreak = (current as any)?.streak ?? 0;
         await KidsApi.updateProgress(token, { 
-          points: newPoints, 
-          streak: newStreak, 
+          points: currentPoints + pointsToAdd, 
+          streak: currentStreak, // Streak already updated by incrementStreakIfNeeded
           details 
         });
         // Check and refresh achievements after update
@@ -731,8 +735,8 @@ const YoungKidsPage = () => {
           const details = updateDetails((p as any).details || {});
           return { 
             ...p, 
-            points: newPoints, 
-            streak: newStreak, 
+            points: p.points + pointsToAdd, 
+            streak: p.streak, // Streak already updated by incrementStreakIfNeeded
             details 
           } as any;
         });
@@ -841,10 +845,15 @@ const YoungKidsPage = () => {
     const storyIndex = (dynamicStories || allStories).findIndex(s => s.id === storyId);
     if (storyIndex === -1) return;
 
-    const newPoints = points + 100;
-    const newStreak = streak + 1;
+    // Calculate points based on score: base points from score + completion bonus
+    const basePoints = Math.round(score / 10);
+    const completionBonus = 50; // Bonus for completing the story
+    const pointsToAdd = basePoints + completionBonus;
+    const newPoints = points + pointsToAdd;
     setPoints(newPoints);
-    setStreak(newStreak);
+    
+    // Update streak correctly (check if user practiced yesterday)
+    await incrementStreakIfNeeded('story-complete');
     
     // Get story information for enrollment
     const story = (dynamicStories || allStories)[storyIndex];
@@ -900,6 +909,8 @@ const YoungKidsPage = () => {
       
       if (token && token !== 'local-token') {
         const current = await KidsApi.getProgress(token);
+        const currentPoints = (current as any)?.points ?? 0;
+        const currentStreak = (current as any)?.streak ?? 0;
         const details = { ...((current as any).details || {}) };
         details.readAloud = details.readAloud || {};
         const prev = details.readAloud[key] || { bestScore: 0, attempts: 0 };
@@ -908,8 +919,8 @@ const YoungKidsPage = () => {
           attempts: prev.attempts + 1 
         };
         await KidsApi.updateProgress(token, { 
-          points: newPoints, 
-          streak: newStreak, 
+          points: currentPoints + pointsToAdd, 
+          streak: currentStreak, // Streak already updated by incrementStreakIfNeeded
           details 
         });
         // Check and refresh achievements after update
@@ -927,8 +938,8 @@ const YoungKidsPage = () => {
           };
           return { 
             ...p, 
-            points: newPoints, 
-            streak: newStreak, 
+            points: p.points + pointsToAdd, 
+            streak: p.streak, // Streak already updated by incrementStreakIfNeeded
             details 
           } as any;
         });
@@ -977,32 +988,72 @@ const YoungKidsPage = () => {
         const current = await KidsApi.getProgress(token);
         const currentPoints = (current as any)?.points ?? 0;
         await KidsApi.updateProgress(token, { points: currentPoints + delta });
+        // Check and refresh achievements after points update
         await (KidsApi as any).checkAchievements(token);
         const ach = await (KidsApi as any).getAchievements(token);
-        if (Array.isArray(ach)) setServerAchievements(ach);
+        if (Array.isArray(ach)) {
+          setServerAchievements(ach);
+        } else if (Array.isArray((ach as any)?.data)) {
+          setServerAchievements((ach as any).data);
+        }
       } else {
         await KidsProgressService.update(userId, (p) => ({ ...p, points: p.points + delta } as any));
       }
       setPoints((p) => p + delta);
-    } catch (_) {}
+    } catch (error) {
+      console.error('Error awarding engagement points:', error);
+    }
   };
 
   const incrementStreakIfNeeded = async (source: string) => {
     try {
-      const todayKey = new Date().toDateString();
+      const today = new Date();
+      const todayKey = today.toDateString();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayKey = yesterday.toDateString();
+      
       const localKey = `kids_streak_last_engagement_${userId}`;
       const last = localStorage.getItem(localKey);
-      if (last === todayKey) return; // already counted today
+      
+      // Already counted today - don't increment again
+      if (last === todayKey) return;
 
       const token = localStorage.getItem('speakbee_auth_token');
+      let currentStreak = streak;
+      let newStreak: number;
+      
+      // Calculate new streak based on last practice date
+      if (last === yesterdayKey) {
+        // Continued streak - user practiced yesterday
+        newStreak = currentStreak + 1;
+      } else if (!last) {
+        // First time practicing
+        newStreak = 1;
+      } else {
+        // Streak broken - user didn't practice yesterday (or it's been more than 1 day)
+        newStreak = 1;
+      }
+
       if (token && token !== 'local-token') {
         const current = await KidsApi.getProgress(token);
-        const currentStreak = (current as any)?.streak ?? 0;
+        currentStreak = (current as any)?.streak ?? 0;
+        
+        // Recalculate if we have server data
+        const serverLastDate = (current as any)?.details?.engagement?.lastStreakDate;
+        if (serverLastDate === yesterdayKey) {
+          newStreak = currentStreak + 1;
+        } else if (!serverLastDate || serverLastDate !== todayKey) {
+          newStreak = 1;
+        } else {
+          return; // Already counted today
+        }
+        
         const details = { ...((current as any)?.details || {}) };
         details.engagement = details.engagement || {};
         details.engagement.lastStreakDate = todayKey;
         details.engagement.source = source;
-        await KidsApi.updateProgress(token, { streak: currentStreak + 1, details });
+        await KidsApi.updateProgress(token, { streak: newStreak, details });
       } else {
         await KidsProgressService.update(userId, (p) => {
           const anyP: any = p as any;
@@ -1010,10 +1061,10 @@ const YoungKidsPage = () => {
           details.engagement = details.engagement || {};
           details.engagement.lastStreakDate = todayKey;
           details.engagement.source = source;
-          return { ...(p as any), streak: p.streak + 1, details } as any;
+          return { ...(p as any), streak: newStreak, details } as any;
         });
       }
-      setStreak((s) => s + 1);
+      setStreak(newStreak);
       localStorage.setItem(localKey, todayKey);
     } catch (_) {}
   };
@@ -1816,9 +1867,15 @@ const YoungKidsPage = () => {
                 </Card>
                 <Vocabulary 
                   words={vocabularyWordsToUse} 
-                  onWordPracticed={() => {
+                  onWordPracticed={async () => {
                     // Track vocabulary attempts
                     setVocabularyAttempts(prev => prev + 1);
+                    
+                    // Award points for vocabulary practice (base 20 points per word)
+                    await awardEngagementPoints(20);
+                    
+                    // Update streak correctly (check if user practiced yesterday)
+                    await incrementStreakIfNeeded('vocabulary');
                   }}
                 />
               </div>
@@ -1876,9 +1933,15 @@ const YoungKidsPage = () => {
                 </Card>
                 <Pronunciation 
                   items={enrolledPhrases}
-                  onPhrasePracticed={() => {
+                  onPhrasePracticed={async () => {
                     // Track pronunciation attempts
                     setPronunciationAttempts(prev => prev + 1);
+                    
+                    // Award points for pronunciation practice (base 30 points per phrase)
+                    await awardEngagementPoints(30);
+                    
+                    // Update streak correctly (check if user practiced yesterday)
+                    await incrementStreakIfNeeded('pronunciation');
                   }}
                 />
               </div>

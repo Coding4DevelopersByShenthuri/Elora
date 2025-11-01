@@ -1408,3 +1408,22 @@ INFO 2025-11-01 01:13:57,072 basehttp 3216 16832 "POST /api/auth/login HTTP/1.1"
 INFO 2025-11-01 01:14:20,739 basehttp 3216 16832 "OPTIONS /api/auth/google HTTP/1.1" 200 0
 INFO 2025-11-01 01:14:21,138 basehttp 3216 16832 "POST /api/auth/google HTTP/1.1" 200 1122
 INFO 2025-11-01 01:14:34,378 basehttp 3216 16832 "POST /api/auth/login HTTP/1.1" 200 1091
+INFO 2025-11-01 01:15:33,040 basehttp 3216 17536 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-11-01 01:15:33,491 log 3216 17536 Unauthorized: /api/auth/login
+WARNING 2025-11-01 01:15:33,493 basehttp 3216 17536 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-11-01 01:15:38,394 basehttp 3216 17536 "OPTIONS /api/auth/google HTTP/1.1" 200 0
+INFO 2025-11-01 01:15:38,598 basehttp 3216 17536 "POST /api/auth/google HTTP/1.1" 200 1115
+INFO 2025-11-01 01:15:41,523 basehttp 3216 19628 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 01:17:35,420 basehttp 3216 19628 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 01:17:46,182 basehttp 3216 19628 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 01:18:03,130 basehttp 3216 19628 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:32:17,604 autoreload 16120 22564 Watching for file changes with StatReloader
+INFO 2025-11-01 13:33:04,246 basehttp 16120 21840 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:37:48,098 basehttp 16120 17484 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:43:55,431 basehttp 16120 19580 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:44:02,085 basehttp 16120 19580 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:44:11,248 basehttp 16120 19580 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:44:21,889 basehttp 16120 12056 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:44:25,494 basehttp 16120 12056 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:46:06,230 basehttp 16120 21072 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:46:10,929 basehttp 16120 21072 "GET /api/kids/lessons HTTP/1.1" 200 2
