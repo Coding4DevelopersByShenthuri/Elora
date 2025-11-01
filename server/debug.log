@@ -1570,3 +1570,15 @@ INFO 2025-11-01 16:00:59,884 basehttp 16120 19084 "GET /api/kids/lessons HTTP/1.
 INFO 2025-11-01 16:01:12,118 basehttp 16120 23424 "GET /api/kids/lessons HTTP/1.1" 200 2
 INFO 2025-11-01 16:06:25,883 basehttp 16120 9844 "GET /api/kids/lessons HTTP/1.1" 200 2
 INFO 2025-11-01 16:06:47,777 basehttp 16120 9844 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 16:19:57,653 basehttp 16120 22248 "GET /api/kids/lessons HTTP/1.1" 200 2
+WARNING 2025-11-01 16:20:21,758 log 16120 23128 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 16:20:21,764 basehttp 16120 23128 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 16:20:41,460 log 16120 13036 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 16:20:41,461 basehttp 16120 13036 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 16:20:59,847 log 16120 14308 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 16:20:59,851 basehttp 16120 14308 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 16:21:47,867 log 16120 19584 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 16:21:47,869 basehttp 16120 19584 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 16:24:00,118 log 16120 18840 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 16:24:00,121 basehttp 16120 18840 "POST /api/vocabulary/ HTTP/1.1" 401 58
+INFO 2025-11-01 16:24:06,235 basehttp 16120 19576 "GET /api/kids/lessons HTTP/1.1" 200 2
