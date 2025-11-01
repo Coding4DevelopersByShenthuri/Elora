@@ -1546,3 +1546,27 @@ INFO 2025-11-01 15:33:04,380 basehttp 16120 4604 "GET /api/kids/lessons HTTP/1.1
 INFO 2025-11-01 15:38:48,485 basehttp 16120 1880 "GET /api/kids/lessons HTTP/1.1" 200 2
 INFO 2025-11-01 15:39:50,967 basehttp 16120 1880 "GET /api/kids/lessons HTTP/1.1" 200 2
 INFO 2025-11-01 15:39:54,927 basehttp 16120 1880 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:46:13,038 basehttp 16120 4480 "GET /api/kids/lessons HTTP/1.1" 200 2
+WARNING 2025-11-01 15:46:44,524 log 16120 11080 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 15:46:44,527 basehttp 16120 11080 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 15:47:16,869 log 16120 18424 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 15:47:16,876 basehttp 16120 18424 "POST /api/vocabulary/ HTTP/1.1" 401 58
+INFO 2025-11-01 15:48:28,982 basehttp 16120 15668 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:48:35,152 basehttp 16120 15668 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:48:43,931 basehttp 16120 13708 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:48:49,425 basehttp 16120 22616 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:49:06,117 basehttp 16120 14992 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:51:44,639 basehttp 16120 5672 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:52:04,195 basehttp 16120 17052 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:54:55,748 basehttp 16120 17088 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:55:12,401 basehttp 16120 17088 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:55:40,083 basehttp 16120 17088 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:57:32,049 basehttp 16120 20172 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:57:32,257 basehttp 16120 20172 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:58:49,619 basehttp 16120 15708 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:59:53,210 basehttp 16120 7144 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 16:00:59,366 basehttp 16120 19084 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 16:00:59,884 basehttp 16120 19084 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 16:01:12,118 basehttp 16120 23424 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 16:06:25,883 basehttp 16120 9844 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 16:06:47,777 basehttp 16120 9844 "GET /api/kids/lessons HTTP/1.1" 200 2
