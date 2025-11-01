@@ -17,6 +17,8 @@ from django.core.cache import cache
 from decouple import config
 import google.oauth2.id_token
 import google.auth.transport.requests
+import requests
+import json
 
 from .serializers import (
     RegisterSerializer, LoginSerializer, UserSerializer, UserProfileSerializer,
@@ -1050,6 +1052,246 @@ def kids_issue_certificate(request):
 def kids_my_certificates(request):
     qs = KidsCertificate.objects.filter(user=request.user).order_by('-issued_at')
     return Response(KidsCertificateSerializer(qs, many=True).data)
+
+
+# ============= Gemini AI Games =============
+@api_view(['POST'])
+@permission_classes([AllowAny])  # Allow unauthenticated requests - API key is server-side
+def kids_gemini_game(request):
+    """
+    Proxy endpoint for Gemini API - generates AI-powered games for kids.
+    API key is stored server-side, never exposed to clients.
+    Works with both authenticated and local users.
+    """
+    try:
+        # Get Gemini API key from environment
+        gemini_api_key = config('GEMINI_API_KEY', default=None)
+        
+        if not gemini_api_key:
+            logger.error("GEMINI_API_KEY not configured in environment")
+            logger.error("Please set GEMINI_API_KEY in your .env file or environment variables")
+            return Response({
+                "message": "AI service not configured. Please set GEMINI_API_KEY in your server configuration.",
+                "error": "API_KEY_MISSING",
+                "details": "The GEMINI_API_KEY environment variable is not set. Please configure it to enable AI games."
+            }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        
+        # Extract request data
+        game_type = request.data.get('gameType', 'interactive')
+        
+        logger.info(f"Gemini API key found, generating game for type: {game_type}")
+        user_input = request.data.get('userInput', '')
+        conversation_history = request.data.get('conversationHistory', [])
+        context = request.data.get('context', {})
+        
+        # Build system prompt
+        age = context.get('age', 7)
+        level = context.get('level', 'beginner')
+        base_prompt = f"You are a friendly and encouraging AI teacher playing fun educational games with a {age}-year-old child learning English. The child's level is {level}. Be patient, positive, and make learning fun!"
+        
+        # Game-specific prompts for original 5 game categories - optimized for little kids
+        game_prompts = {
+            'tongue-twister': f"{base_prompt}\n\nYou are playing a Tongue Twister game with a {age}-year-old child. Give them SIMPLE, SHORT tongue twisters that are perfect for little kids. Examples: 'Red lorry, yellow lorry' (for 5-7 years), 'Big bug bit' (for 4-6 years), 'Toy boat, toy boat' (for 7-9 years), 'She sells seashells' (for 8+ years). Keep them age-appropriate, fun, and easy to remember. After they try to say it, give them encouraging feedback like 'Great try!', 'Good job!', or 'Excellent!' If they need help, give them pronunciation tips. Format your response as JSON with: {{ \"gameInstruction\": \"Say this fun tongue twister 3 times: [phrase]\", \"content\": \"Here's your tongue twister: [phrase]\n\nSay it 3 times as fast as you can!\", \"feedback\": \"[Encouraging feedback after they try]\" }}",
+            'word-chain': f"{base_prompt}\n\nYou are playing a Word Chain game with a {age}-year-old child. Give them SIMPLE words they know (like cat, dog, sun, fun, run, big, red). Start with a word and ask them to say another word that starts with the last letter. Keep it fun and simple! Give encouraging feedback after each word. Format your response as JSON with: {{ \"gameInstruction\": \"Say a word starting with the letter [X]\", \"content\": \"Great! I said [word]. Now you say a word starting with [letter]!\", \"feedback\": \"Excellent! That's a great word!\" }}",
+            'story-telling': f"{base_prompt}\n\nYou are playing a Story Telling game with a {age}-year-old child. Start a SHORT, EXCITING, and age-appropriate story (2-3 sentences). Use simple words they understand. Themes: animals, adventures, magic, friends, toys. Make it fun and invite them to continue! Format your response as JSON with: {{ \"gameInstruction\": \"Continue the story! What happens next?\", \"content\": \"Once upon a time, there was a brave little [character] who loved [something fun]. One day, [character] went on an adventure to [fun place]...\", \"nextStep\": \"What happens next? Tell me!\", \"feedback\": \"What an exciting story! Keep going!\" }}",
+            'pronunciation-challenge': f"{base_prompt}\n\nYou are playing a Pronunciation Challenge game with a {age}-year-old child. Give them SIMPLE words to practice (like 'cat', 'dog', 'sun', 'fun', 'big', 'red' for beginners, or 'th', 'r', 'l' sounds for advanced). Use words from their daily life. Give encouraging feedback and simple pronunciation tips if needed. Format your response as JSON with: {{ \"gameInstruction\": \"Say this word 3 times: [word]\", \"content\": \"Let's practice saying: [word]\n\nRepeat after me: [word], [word], [word]!\", \"feedback\": \"[Encouraging feedback like 'Perfect!', 'Great job!']\" }}",
+            'conversation-practice': f"{base_prompt}\n\nYou are having a friendly conversation with a {age}-year-old child. Ask them SIMPLE questions about their favorite things (like 'What's your favorite color?', 'Do you have a pet?', 'What's your favorite food?'). Respond naturally and encourage them. Keep sentences short and simple! Format your response as JSON with: {{ \"content\": \"Hi! Let's chat! What's your favorite animal?\", \"feedback\": \"That's so cool! Tell me more!\" }}"
+        }
+        
+        system_prompt = game_prompts.get(game_type, base_prompt)
+        
+        # Build user message - initial prompts for each game type (optimized for little kids)
+        if not user_input:
+            initial_prompts = {
+                'tongue-twister': "Hi! Let's play tongue twisters! Give me a fun tongue twister that's perfect for little kids like me!",
+                'word-chain': "Hi! Let's play word chain! Give me a simple word to start the chain.",
+                'story-telling': "Hi! Let's tell a story together! Start an exciting story for me with simple words.",
+                'pronunciation-challenge': "Hi! Let's practice pronunciation! Give me simple words to practice saying.",
+                'conversation-practice': "Hi! Let's have a conversation. Ask me something fun about my favorite things!"
+            }
+            user_input = initial_prompts.get(game_type, 'Let\'s play a fun English learning game together!')
+        
+        # Build messages for Gemini API (correct format)
+        # Gemini API expects contents array with alternating user/model messages
+        contents = []
+        
+        # Add conversation history if provided (with proper role mapping)
+        if conversation_history and len(conversation_history) > 0:
+            for msg in conversation_history[-10:]:  # Last 10 messages for context
+                role = msg.get('role', 'user')
+                # Map 'assistant' to 'model' for Gemini API
+                gemini_role = 'model' if role == 'assistant' else 'user'
+                contents.append({
+                    'role': gemini_role,
+                    'parts': [{'text': str(msg.get('content', ''))}]
+                })
+        
+        # Combine system prompt and user input into the user message
+        combined_text = f"{system_prompt}\n\n{user_input}"
+        contents.append({
+            'role': 'user',
+            'parts': [{'text': combined_text}]
+        })
+        
+        # Call Gemini API - using Gemini 2.0 Flash Experimental only
+        model_name = 'gemini-2.0-flash-exp'
+        
+        # Build payload
+        payload = {
+            'contents': contents,
+            'generationConfig': {
+                'temperature': 0.8,
+                'topK': 40,
+                'topP': 0.95,
+                'maxOutputTokens': 1024,
+            },
+            'safetySettings': [
+                {
+                    'category': 'HARM_CATEGORY_HARASSMENT',
+                    'threshold': 'BLOCK_MEDIUM_AND_ABOVE'
+                },
+                {
+                    'category': 'HARM_CATEGORY_HATE_SPEECH',
+                    'threshold': 'BLOCK_MEDIUM_AND_ABOVE'
+                },
+                {
+                    'category': 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+                    'threshold': 'BLOCK_MEDIUM_AND_ABOVE'
+                },
+                {
+                    'category': 'HARM_CATEGORY_DANGEROUS_CONTENT',
+                    'threshold': 'BLOCK_MEDIUM_AND_ABOVE'
+                }
+            ]
+        }
+        
+        # Try v1 API first (more stable), fallback to v1beta if needed
+        api_versions_to_try = ['v1', 'v1beta']
+        response = None
+        last_error = None
+        
+        for api_version in api_versions_to_try:
+            try:
+                api_url = f"https://generativelanguage.googleapis.com/{api_version}/models/{model_name}:generateContent?key={gemini_api_key}"
+                
+                logger.info(f"Calling Gemini API: {api_version}/models/{model_name}")
+                
+                response = requests.post(api_url, json=payload, timeout=30)
+                
+                if response.status_code == 200:
+                    logger.info(f"Success with {api_version}/models/{model_name}")
+                    break
+                elif response.status_code == 404:
+                    # Model not found in this version, try next version
+                    logger.warning(f"Model {model_name} not found in {api_version}, trying v1beta")
+                    last_error = {
+                        'status': response.status_code,
+                        'error': response.json() if response.text else {}
+                    }
+                    response = None
+                    continue
+                else:
+                    # Other error
+                    last_error = {
+                        'status': response.status_code,
+                        'error': response.json() if response.text else {}
+                    }
+                    logger.error(f"Gemini API error: {response.status_code} - {last_error.get('error', {})}")
+                    break
+            except requests.exceptions.RequestException as e:
+                last_error = {'status': 0, 'error': {'message': str(e)}}
+                logger.error(f"Request exception with {api_version}: {str(e)}")
+                response = None
+                continue
+        
+        # Check if we got a successful response
+        if not response or response.status_code != 200:
+            if last_error:
+                error_data = last_error.get('error', {})
+                error_message = error_data.get('message', 'Unknown error') if isinstance(error_data, dict) else str(error_data)
+                status_code = last_error.get('status', 500)
+            elif response:
+                error_data = response.json() if response.text else {}
+                error_message = error_data.get('error', {}).get('message', 'Unknown error')
+                status_code = response.status_code
+            else:
+                error_message = 'Failed to connect to Gemini API'
+                status_code = 503
+                
+            logger.error(f"Gemini API error: {status_code} - {error_message}")
+            
+            # Provide more helpful error message
+            if status_code == 400:
+                return Response({
+                    "message": f"Invalid API request: {error_message}. Please check configuration.",
+                    "error": "API_ERROR",
+                    "details": error_message
+                }, status=status.HTTP_400_BAD_REQUEST)
+            elif status_code == 401 or status_code == 403:
+                return Response({
+                    "message": "AI service authentication failed. Please check API key configuration.",
+                    "error": "AUTH_ERROR",
+                    "details": error_message
+                }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+            else:
+                return Response({
+                    "message": "AI service temporarily unavailable. Please try again later.",
+                    "error": "API_ERROR",
+                    "details": error_message
+                }, status=status.HTTP_502_BAD_GATEWAY)
+        
+        data = response.json()
+        content = data.get('candidates', [{}])[0].get('content', {}).get('parts', [{}])[0].get('text', 'Sorry, I could not generate a response.')
+        
+        # Try to parse JSON from response
+        parsed_response = {
+            'content': content.strip(),
+            'gameInstruction': None,
+            'questions': None,
+            'feedback': None,
+            'nextStep': None,
+            'points': 0
+        }
+        
+        # Try to extract JSON from response
+        try:
+            json_match = content.strip().replace('```json', '').replace('```', '').strip()
+            if json_match.startswith('{'):
+                parsed = json.loads(json_match)
+                parsed_response.update({
+                    'content': parsed.get('content', parsed_response['content']),
+                    'gameInstruction': parsed.get('gameInstruction'),
+                    'questions': parsed.get('questions'),
+                    'feedback': parsed.get('feedback'),
+                    'nextStep': parsed.get('nextStep'),
+                    'points': parsed.get('points', 0)
+                })
+        except (json.JSONDecodeError, AttributeError):
+            # If JSON parsing fails, use raw content
+            pass
+        
+        return Response(parsed_response, status=status.HTTP_200_OK)
+    
+    except requests.exceptions.Timeout:
+        logger.error("Gemini API timeout")
+        return Response({
+            "message": "AI service took too long to respond. Please try again.",
+            "error": "TIMEOUT"
+        }, status=status.HTTP_504_GATEWAY_TIMEOUT)
+    
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Gemini API request error: {str(e)}")
+        return Response({
+            "message": "Failed to connect to AI service. Please check your internet connection.",
+            "error": "CONNECTION_ERROR"
+        }, status=status.HTTP_502_BAD_GATEWAY)
+    
+    except Exception as e:
+        logger.error(f"Gemini game error: {str(e)}")
+        return Response({
+            "message": "An unexpected error occurred. Please try again later.",
+            "error": "INTERNAL_ERROR"
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # ============= Waitlist Views =============
