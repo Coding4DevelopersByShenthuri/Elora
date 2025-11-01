@@ -107,7 +107,7 @@ const CertificatesPage = () => {
       title: 'Story Time Champion',
       emoji: '📚',
       badgeSrc: '/story-time-champion-badge.png',
-      description: 'Complete 10 stories',
+      description: 'Completed 10 stories',
       criteria: (c) => {
         // Count from readAloud attempts
         const readAloud = c.details?.readAloud || {};
@@ -479,99 +479,162 @@ const CertificatesPage = () => {
   }, [pendingUnlocks]);
 
   return (
-    <div className="min-h-screen pt-20 sm:pt-24 pb-16 container mx-auto px-3 sm:px-4 max-w-7xl">
-      <div className="flex items-center justify-between mb-4">
-        <Button variant="outline" className="rounded-xl" onClick={() => navigate(-1)}>
-          <ArrowLeft className="w-4 h-4 mr-2" /> Back
+    <div className="min-h-screen pt-20 sm:pt-24 md:pt-28 pb-16 sm:pb-20 container mx-auto px-3 sm:px-4 md:px-6 max-w-7xl">
+      <div className="flex items-center justify-between mb-4 sm:mb-6">
+        <Button 
+          variant="outline" 
+          className="rounded-full flex-shrink-0 hover:bg-gray-200 dark:hover:bg-gray-700 border-2 border-transparent dark:border-gray-600 bg-transparent hover:border-gray-300 dark:hover:border-gray-500 h-10 w-10 sm:h-12 sm:w-12 p-0 transition-all hover:scale-110" 
+          onClick={() => navigate(-1)}
+          type="button"
+        >
+          <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-gray-900 dark:text-gray-100" />
         </Button>
+        <div className="flex-1"></div> {/* Spacer for alignment */}
       </div>
 
-      <div className="text-center mb-6">
-        <h1 className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#118AB2] bg-clip-text text-transparent">
-          Your Certificates
+      <div className="text-center mb-6 sm:mb-8">
+        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#118AB2] bg-clip-text text-transparent mb-3 sm:mb-4 px-2">
+          {activeTab === 'badges' 
+            ? 'Your Badges' 
+            : activeTab === 'trophies' 
+            ? 'Your Trophies' 
+            : 'Your Certificates'}
         </h1>
-        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-2">
-          Keep learning to unlock and download your certificates!
+        <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-300 px-2">
+          {activeTab === 'badges'
+            ? 'Keep learning to unlock and earn more badges!'
+            : activeTab === 'trophies'
+            ? 'Master skills to unlock special trophies!'
+            : 'Keep learning to unlock and download your certificates!'}
         </p>
       </div>
 
-      {/* Top counts like Microsoft Learn */}
-      <div className="flex flex-wrap items-center justify-center gap-4 mb-6">
-        <div className="px-4 py-2 rounded-xl bg-white/80 dark:bg-gray-900/40 border">
-          <div className="text-xs text-gray-500">Badges</div>
-          <div className="text-xl font-extrabold text-gray-800 dark:text-white">{unlockedBadges.length}</div>
-        </div>
-        <div className="px-4 py-2 rounded-xl bg-white/80 dark:bg-gray-900/40 border">
-          <div className="text-xs text-gray-500">Trophies</div>
-          <div className="text-xl font-extrabold text-gray-800 dark:text-white">{trophySpecs.length}</div>
-        </div>
-        <div className="px-4 py-2 rounded-xl bg-white/80 dark:bg-gray-900/40 border">
-          <div className="text-xs text-gray-500">Level</div>
-          <div className="text-xl font-extrabold text-gray-800 dark:text-white">{Math.max(1, Math.floor((ctx.points || 0) / 5000))}</div>
-        </div>
+      {/* Top stats cards - standardized layout */}
+      <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+        <Card className="px-4 sm:px-5 py-3 sm:py-4 rounded-xl bg-white/80 dark:bg-gray-900/40 border-2 border-purple-200 dark:border-purple-700 hover:shadow-lg transition-all">
+          <div className="text-xs sm:text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">Badges</div>
+          <div className="text-xl sm:text-2xl font-extrabold text-black dark:text-black">{unlockedBadges.length}</div>
+        </Card>
+        <Card className="px-4 sm:px-5 py-3 sm:py-4 rounded-xl bg-white/80 dark:bg-gray-900/40 border-2 border-yellow-200 dark:border-yellow-700 hover:shadow-lg transition-all">
+          <div className="text-xs sm:text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">Trophies</div>
+          <div className="text-xl sm:text-2xl font-extrabold text-black dark:text-black">
+            {trophySpecs.filter((t: any) => (trophyProgressMap[t.id] ?? 0) === 100).length}
+          </div>
+        </Card>
+        <Card className="px-4 sm:px-5 py-3 sm:py-4 rounded-xl bg-white/80 dark:bg-gray-900/40 border-2 border-blue-200 dark:border-blue-700 hover:shadow-lg transition-all">
+          <div className="text-xs sm:text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">Level</div>
+          <div className="text-xl sm:text-2xl font-extrabold text-black dark:text-black">{Math.max(1, Math.floor((ctx.points || 0) / 5000))}</div>
+        </Card>
       </div>
 
-      {/* Tabs */}
-      <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
-        <Button variant={activeTab==='certs'?'default':'outline'} className="rounded-xl" onClick={() => setActiveTab('certs')}>Certificates</Button>
-        <Button variant={activeTab==='badges'?'default':'outline'} className="rounded-xl" onClick={() => setActiveTab('badges')}>Badges</Button>
-        <Button variant={activeTab==='trophies'?'default':'outline'} className="rounded-xl" onClick={() => setActiveTab('trophies')}>Trophies</Button>
-        {/* Style controls temporarily removed */}
+      {/* Tabs - standardized styling */}
+      <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-6 sm:mb-8">
+        <Button 
+          variant={activeTab==='certs'?'default':'outline'} 
+          className={`rounded-xl sm:rounded-2xl px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-bold transition-all hover:scale-105 ${
+            activeTab === 'certs' 
+              ? 'bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white shadow-lg' 
+              : ''
+          }`} 
+          onClick={() => setActiveTab('certs')}
+        >
+          Certificates
+        </Button>
+        <Button 
+          variant={activeTab==='badges'?'default':'outline'} 
+          className={`rounded-xl sm:rounded-2xl px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-bold transition-all hover:scale-105 ${
+            activeTab === 'badges' 
+              ? 'bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white shadow-lg' 
+              : ''
+          }`} 
+          onClick={() => setActiveTab('badges')}
+        >
+          Badges
+        </Button>
+        <Button 
+          variant={activeTab==='trophies'?'default':'outline'} 
+          className={`rounded-xl sm:rounded-2xl px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-bold transition-all hover:scale-105 ${
+            activeTab === 'trophies' 
+              ? 'bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white shadow-lg' 
+              : ''
+          }`} 
+          onClick={() => setActiveTab('trophies')}
+        >
+          Trophies
+        </Button>
       </div>
 
       {activeTab === 'certs' && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-          {loading && Array.from({ length: 6 }).map((_, i) => (
-            <div key={`skeleton-${i}`} className="border-2 rounded-2xl bg-white/60 dark:bg-gray-900/30 p-5 animate-pulse">
-              <div className="flex items-center justify-between mb-2">
-                <div className="h-6 w-40 bg-gray-200 dark:bg-gray-700 rounded" />
-                <div className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
-              </div>
-              <div className="h-3 w-full bg-gray-200 dark:bg-gray-700 rounded mb-3" />
-              <div className="h-3 w-full bg-gray-200 dark:bg-gray-700 rounded mb-3" />
-              <div className="flex gap-2">
-                <div className="h-10 w-28 bg-gray-200 dark:bg-gray-700 rounded" />
-                <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded" />
-              </div>
-            </div>
-          ))}
-          {certificates.map((spec, idx) => (
-            <Card key={spec.id} className="border-2 rounded-2xl bg-white/80 dark:bg-gray-900/40 transition-shadow hover:shadow-md">
-              <CardContent className="p-4 sm:p-5">
+        <div className="space-y-4 sm:space-y-6">
+          {/* Certificates Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+            {loading && Array.from({ length: 6 }).map((_, i) => (
+              <div key={`skeleton-${i}`} className="border-2 rounded-2xl bg-white/60 dark:bg-gray-900/30 p-5 animate-pulse">
                 <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2 font-extrabold text-gray-800 dark:text-white">
-                    {spec.badgeSrc ? (
-                      <img
-                        src={spec.badgeSrc}
-                        alt={`${spec.title} badge`}
-                        className="w-8 h-8 sm:w-9 sm:h-9 object-contain"
-                      />
-                    ) : (
-                      <span className="text-xl sm:text-2xl">{spec.emoji}</span>
-                    )}
-                    <span
-                      className={`text-sm sm:text-base ${spec.id === 'story-time-champion' ? 'cursor-pointer hover:underline' : ''}`}
-                      onClick={spec.id === 'story-time-champion' ? () => navigate('/kids/young') : undefined}
-                    >
-                      {spec.title}
-                    </span>
+                  <div className="h-6 w-40 bg-gray-200 dark:bg-gray-700 rounded" />
+                  <div className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
+                </div>
+                <div className="h-3 w-full bg-gray-200 dark:bg-gray-700 rounded mb-3" />
+                <div className="h-3 w-full bg-gray-200 dark:bg-gray-700 rounded mb-3" />
+                <div className="flex gap-2">
+                  <div className="h-10 w-28 bg-gray-200 dark:bg-gray-700 rounded" />
+                  <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded" />
+                </div>
+              </div>
+            ))}
+            {certificates.map((spec, idx) => (
+              <Card key={spec.id} className="border-2 rounded-2xl bg-white/80 dark:bg-gray-900/40 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] relative overflow-hidden">
+                {computed[idx].eligible && (
+                  <div className="absolute top-0 right-0 w-0 h-0 border-l-[40px] border-l-transparent border-t-[40px] border-t-yellow-400"></div>
+                )}
+                <CardContent className="p-4 sm:p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className={`rounded-xl sm:rounded-2xl p-2 sm:p-3 flex items-center justify-center ${computed[idx].eligible ? 'bg-gradient-to-br from-yellow-400 to-orange-400' : 'bg-gray-100 dark:bg-gray-800'}`}>
+                      {spec.badgeSrc ? (
+                        <img
+                          src={spec.badgeSrc}
+                          alt={`${spec.title} badge`}
+                          className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
+                        />
+                      ) : (
+                        <span className="text-2xl sm:text-3xl">{spec.emoji}</span>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div
+                        className={`text-sm sm:text-base md:text-lg font-bold text-gray-800 dark:text-white ${spec.id === 'story-time-champion' ? 'cursor-pointer hover:underline hover:text-[#FF6B6B]' : ''}`}
+                        onClick={spec.id === 'story-time-champion' ? () => navigate('/kids/young') : undefined}
+                      >
+                        {spec.title}
+                      </div>
+                    </div>
                   </div>
                   {computed[idx].eligible ? (
-                    <Crown className="w-5 h-5 text-yellow-500" />
+                    <Crown className="w-6 h-6 sm:w-7 sm:h-7 text-yellow-500 flex-shrink-0" />
                   ) : (
-                    <Award className="w-5 h-5 text-gray-400" />
+                    <Award className="w-6 h-6 sm:w-7 sm:h-7 text-gray-400 flex-shrink-0" />
                   )}
                 </div>
-                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mb-3">{spec.description}</p>
-                <div className="w-full h-2 sm:h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mb-3">
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">{spec.description}</p>
+                <div className="w-full h-2.5 sm:h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mb-3 shadow-inner">
                   <div
-                    className="h-full bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4]"
+                    className={`h-full rounded-full transition-all duration-500 ${
+                      computed[idx].eligible 
+                        ? 'bg-gradient-to-r from-yellow-400 to-orange-400' 
+                        : 'bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4]'
+                    }`}
                     style={{ width: `${computed[idx].progress}%` }}
                   />
                 </div>
-                <div className="text-[11px] sm:text-xs font-semibold text-gray-600 dark:text-gray-300 mb-3">
+                <div className="text-[11px] sm:text-xs font-semibold text-gray-600 dark:text-gray-400 mb-4">
                   {computed[idx].hint}
                 </div>
+                {computed[idx].progress > 0 && (
+                  <div className="text-xs text-center text-gray-500 dark:text-gray-400 mb-3">
+                    {computed[idx].progress}% Complete
+                  </div>
+                )}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                   <Button
                     aria-busy={generatingCertId === spec.id}
@@ -698,22 +761,25 @@ const CertificatesPage = () => {
               </CardContent>
             </Card>
           ))}
+          </div>
         </div>
       )}
 
       {activeTab === 'badges' && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {unlockedBadges.map((b: any, i: number) => (
-            <Card key={`${b.id || i}`} className="border rounded-xl bg-white/80 dark:bg-gray-900/40 shadow-sm hover:shadow-md transition">
+        <div className="space-y-4 sm:space-y-6">
+          {/* Badges Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {unlockedBadges.map((b: any, i: number) => (
+              <Card key={`${b.id || i}`} className="border-2 rounded-xl bg-white/80 dark:bg-gray-900/40 shadow-sm hover:shadow-xl transition-all duration-300 hover:scale-[1.02] relative overflow-hidden">
               <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-start gap-4 min-w-0">
-                    <div className="shrink-0 rounded-full bg-gray-100 dark:bg-gray-800 p-2 flex items-center justify-center">
+                  <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+                    <div className="shrink-0 rounded-xl sm:rounded-2xl bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 p-2 sm:p-3 flex items-center justify-center border-2 border-yellow-200 dark:border-yellow-700">
                     {b.image ? (
                       <img
                         src={b.image}
                         alt={b.title || b.name || 'Badge'}
-                        className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
+                        className="w-12 h-12 sm:w-14 sm:h-14 object-contain"
                         loading="lazy"
                       />
                     ) : (
@@ -721,18 +787,24 @@ const CertificatesPage = () => {
                     )}
                     </div>
                     <div className="min-w-0 flex-1">
-                    <div className="text-[10px] tracking-widest font-semibold text-[#2563EB] dark:text-[#60A5FA] uppercase mb-1">Badge</div>
+                    <div className="text-[10px] tracking-widest font-bold text-[#FF6B6B] dark:text-[#FF8A8A] uppercase mb-1.5">Badge Earned</div>
                     <div
-                      className={`text-sm sm:text-base font-semibold text-gray-800 dark:text-white leading-snug line-clamp-2 ${(b.title || b.name) === 'Story Time Champion' ? 'cursor-pointer hover:underline' : ''}`}
+                      className={`text-sm sm:text-base md:text-lg font-bold text-gray-800 dark:text-white leading-snug line-clamp-2 mb-2 ${(b.title || b.name) === 'Story Time Champion' ? 'cursor-pointer hover:underline hover:text-[#FF6B6B]' : ''}`}
                       onClick={(b.title || b.name) === 'Story Time Champion' ? () => navigate('/kids/young') : undefined}
                     >
                       {b.title || b.name || 'Badge'}
                     </div>
-                    {!!b.unlocked_at && (
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                        Completed on {new Date(b.unlocked_at).toLocaleDateString()}
-                      </div>
-                    )}
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      {b.unlocked_at ? (
+                        <>Earned on {new Date(b.unlocked_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</>
+                      ) : b.unlockedAt ? (
+                        <>Earned on {new Date(b.unlockedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</>
+                      ) : b.date ? (
+                        <>Earned on {new Date(b.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</>
+                      ) : (
+                        <>Earned recently</>
+                      )}
+                    </div>
                     </div>
                   </div>
                   <div className="ml-2 flex items-start gap-2">
@@ -781,49 +853,93 @@ const CertificatesPage = () => {
                   </div>
                 </div>
               </CardContent>
-            </Card>
-          ))}
+              </Card>
+            ))}
           {lockedBadges.length === 0 && unlockedBadges.length === 0 && (
-            <div className="col-span-full text-center text-sm text-gray-500">No badges yet. Start learning to unlock badges!</div>
+            <div className="col-span-full">
+              <Card className="border-2 border-yellow-200 dark:border-yellow-700 bg-yellow-50/40 dark:bg-yellow-900/10 backdrop-blur-sm shadow-lg p-8 text-center">
+                <div className="text-6xl mb-4">🏅</div>
+                <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">
+                  No Badges Yet!
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Start learning to unlock your first badge!
+                </p>
+                <Button
+                  onClick={() => navigate('/kids/young')}
+                  className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white font-bold py-3 px-6 rounded-xl"
+                >
+                  Go to Learning Zone →
+                </Button>
+              </Card>
+            </div>
           )}
+          </div>
         </div>
       )}
 
       {activeTab === 'trophies' && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-          {trophySpecs.map((t: any) => (
-            <Card key={t.id} className="border rounded-xl bg-white/80 dark:bg-gray-900/40">
-              <CardContent className="p-5">
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-2 font-extrabold text-gray-800 dark:text-white">
-                    {t.badgeSrc ? (
-                      <img src={t.badgeSrc} alt={`${t.title} trophy badge`} className="w-7 h-7 object-contain" onError={(e) => { const el = e.currentTarget as HTMLImageElement; if (el.src.endsWith('/Consistency_badge.png')) el.src = '/Consistancy_badge.png'; }} />
-                    ) : (
-                      <span className="text-2xl">{t.emoji}</span>
-                    )}
-                    <span
-                      className={t.id === 'story-master' ? 'cursor-pointer hover:underline' : ''}
-                      onClick={t.id === 'story-master' ? () => navigate('/kids/young') : undefined}
-                    >
-                      {t.title}
-                    </span>
-                  </div>
-                  {trophyProgressMap[t.id] === 100 ? (
-                    <Crown className="w-5 h-5 text-yellow-500" aria-label="Unlocked" />
-                  ) : (
-                    <Award className="w-5 h-5 text-gray-400" aria-label="Locked" />
+        <div className="space-y-4 sm:space-y-6">
+          {/* Trophies Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+            {trophySpecs.map((t: any) => {
+              const progress = trophyProgressMap[t.id] ?? 0;
+              const isUnlocked = progress === 100;
+              return (
+                <Card key={t.id} className="border-2 rounded-xl bg-white/80 dark:bg-gray-900/40 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] relative overflow-hidden">
+                  {isUnlocked && (
+                    <div className="absolute top-0 right-0 w-0 h-0 border-l-[40px] border-l-transparent border-t-[40px] border-t-amber-400"></div>
                   )}
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-300 mb-3">{t.desc}</div>
-                <div className="w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-amber-400 to-orange-500" style={{ width: `${trophyProgressMap[t.id] ?? 0}%` }} />
-                </div>
-                <div className="text-[11px] sm:text-xs font-semibold text-gray-600 dark:text-gray-300 mt-2">
-                  {trophyHintMap[t.id]}
-                </div>
-                {reportedTrophies[t.id] && (
-                  <div className="text-[10px] text-green-600 dark:text-green-400 mt-1">Unlocked on {new Date(reportedTrophies[t.id]).toLocaleDateString()}</div>
-                )}
+                  <CardContent className="p-4 sm:p-5">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                        <div className={`rounded-xl sm:rounded-2xl p-2 sm:p-3 flex items-center justify-center shrink-0 ${isUnlocked ? 'bg-gradient-to-br from-amber-400 to-orange-400' : 'bg-gray-100 dark:bg-gray-800'}`}>
+                          {t.badgeSrc ? (
+                            <img src={t.badgeSrc} alt={`${t.title} trophy badge`} className="w-10 h-10 sm:w-12 sm:h-12 object-contain" onError={(e) => { const el = e.currentTarget as HTMLImageElement; if (el.src.endsWith('/Consistency_badge.png')) el.src = '/Consistancy_badge.png'; }} />
+                          ) : (
+                            <span className="text-2xl sm:text-3xl">{t.emoji}</span>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div
+                            className={`text-sm sm:text-base md:text-lg font-bold text-gray-800 dark:text-white leading-snug ${t.id === 'story-master' ? 'cursor-pointer hover:underline hover:text-[#FF6B6B]' : ''}`}
+                            onClick={t.id === 'story-master' ? () => navigate('/kids/young') : undefined}
+                          >
+                            {t.title}
+                          </div>
+                        </div>
+                      </div>
+                      {isUnlocked ? (
+                        <Crown className="w-6 h-6 sm:w-7 sm:h-7 text-yellow-500 flex-shrink-0" aria-label="Unlocked" />
+                      ) : (
+                        <Award className="w-6 h-6 sm:w-7 sm:h-7 text-gray-400 flex-shrink-0" aria-label="Locked" />
+                      )}
+                    </div>
+                    <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">{t.desc}</div>
+                    <div className="w-full h-2.5 sm:h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mb-3 shadow-inner">
+                      <div 
+                        className={`h-full rounded-full transition-all duration-500 ${
+                          isUnlocked 
+                            ? 'bg-gradient-to-r from-yellow-400 to-orange-400' 
+                            : 'bg-gradient-to-r from-amber-400 to-orange-500'
+                        }`} 
+                        style={{ width: `${progress}%` }} 
+                      />
+                    </div>
+                    <div className="text-[11px] sm:text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">
+                      {trophyHintMap[t.id]}
+                    </div>
+                    {progress > 0 && (
+                      <div className="text-xs text-center text-gray-500 dark:text-gray-400 mb-2">
+                        {progress}% Complete
+                      </div>
+                    )}
+                    {reportedTrophies[t.id] && (
+                      <div className="text-[10px] sm:text-xs text-green-600 dark:text-green-400 font-semibold mt-2 flex items-center gap-1">
+                        <Crown className="w-3 h-3" />
+                        <span>Unlocked on {new Date(reportedTrophies[t.id]).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                      </div>
+                    )}
                 <div className="mt-3 flex items-center gap-2">
                   <Button
                     variant="ghost"
@@ -872,7 +988,9 @@ const CertificatesPage = () => {
                 </div>
               </CardContent>
             </Card>
-          ))}
+              );
+            })}
+          </div>
         </div>
       )}
     </div>

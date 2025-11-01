@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Volume2, ChevronRight, ChevronLeft, Star, Trophy } from 'lucide-react';
+import { Volume2, ChevronRight, ChevronLeft, Star, Trophy, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import EnhancedTTS from '@/services/EnhancedTTS';
 import KidsVoiceRecorder from './KidsVoiceRecorder';
@@ -20,6 +20,8 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
   const [currentAttempts, setCurrentAttempts] = useState(0);
   const [lastScore, setLastScore] = useState<number | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   const card = words[current];
   
@@ -58,6 +60,7 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
         setMasteredWords(new Set());
       }
     }
+    setHasInitialized(true);
   }, []);
 
   useEffect(() => {
@@ -72,7 +75,18 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
     }
   }, [words, current]);
 
+  // Auto-navigate to first unmastered word when loaded
+  useEffect(() => {
+    if (hasInitialized && words.length > 0 && masteredWords.size > 0 && current === 0) {
+      const firstUnmasteredIndex = words.findIndex(word => !masteredWords.has(word.word));
+      if (firstUnmasteredIndex !== -1) {
+        setCurrent(firstUnmasteredIndex);
+      }
+    }
+  }, [words, masteredWords, hasInitialized, current]);
+
   const speak = async () => {
+    setIsSpeaking(true);
     try {
       await EnhancedTTS.speak(card.word, { rate: 0.85, pitch: 1.0 });
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -82,6 +96,8 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
       await EnhancedTTS.speak(example, { rate: 0.9 });
     } catch (error) {
       console.error('Error speaking word:', error);
+    } finally {
+      setIsSpeaking(false);
     }
   };
 
@@ -227,10 +243,20 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
             <Button
               size="lg"
               onClick={speak}
-              className="rounded-xl sm:rounded-2xl px-6 sm:px-8 md:px-10 py-3 sm:py-4 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-purple-500 hover:to-blue-500 text-sm sm:text-base md:text-lg font-bold transition-all hover:scale-105 w-full sm:w-auto"
+              disabled={isSpeaking}
+              className="rounded-xl sm:rounded-2xl px-6 sm:px-8 md:px-10 py-3 sm:py-4 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-purple-500 hover:to-blue-500 text-sm sm:text-base md:text-lg font-bold transition-all hover:scale-105 w-full sm:w-auto disabled:opacity-50"
             >
-              <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
-              Listen to Word
+              {isSpeaking ? (
+                <>
+                  <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin flex-shrink-0" />
+                  Speaking...
+                </>
+              ) : (
+                <>
+                  <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
+                  Listen to Word
+                </>
+              )}
             </Button>
           </div>
 
@@ -245,6 +271,7 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
               onCorrectPronunciation={handleCorrectPronunciation}
               maxDuration={10}
               autoAnalyze={true}
+              disabledWhileSpeaking={isSpeaking}
             />
             <p className="text-xs sm:text-sm text-center text-gray-500 dark:text-gray-400 mt-3 px-4">
               💡 Tip: The recorder will automatically stop when you pronounce it correctly!

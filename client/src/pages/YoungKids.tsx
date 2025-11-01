@@ -31,7 +31,7 @@ import FairyGardenAdventure from '@/components/kids/stories/FairyGardenAdventure
 import RainbowCastleAdventure from '@/components/kids/stories/RainbowCastleAdventure';
 import JungleExplorerAdventure from '@/components/kids/stories/JungleExplorerAdventure';
 import AuthModal from '@/components/auth/AuthModal';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import HybridServiceManager from '@/services/HybridServiceManager';
 import { ModelManager } from '@/services/ModelManager';
 import { WhisperService } from '@/services/WhisperService';
@@ -40,7 +40,9 @@ import { TimeTracker } from '@/services/TimeTracker';
 import EnhancedTTS from '@/services/EnhancedTTS';
 
 const YoungKidsPage = () => {
-  const [activeCategory, setActiveCategory] = useState('stories');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialCategory = searchParams.get('section') || 'stories';
+  const [activeCategory, setActiveCategory] = useState(initialCategory);
   const [isOpeningFromFavorites, setIsOpeningFromFavorites] = useState(false);
   const [currentStory, setCurrentStory] = useState<string>('');
   const [isPlaying, setIsPlaying] = useState(false);
@@ -66,6 +68,7 @@ const YoungKidsPage = () => {
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [pronunciationAttempts, setPronunciationAttempts] = useState(0);
   const [vocabularyAttempts, setVocabularyAttempts] = useState(0);
+  const [gamesAttempts, setGamesAttempts] = useState(0);
   const [enrolledWords, setEnrolledWords] = useState<Array<{ word: string; hint: string }>>([]);
   const [enrolledStoryWordsDetailed, setEnrolledStoryWordsDetailed] = useState<Array<{ word: string; hint: string; storyId: string; storyTitle: string }>>([]);
   const [selectedStoryFilter, setSelectedStoryFilter] = useState<string>('all');
@@ -100,6 +103,15 @@ const YoungKidsPage = () => {
   const [modelsReady, setModelsReady] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
   
+
+  // Sync activeCategory with URL on mount or URL change
+  useEffect(() => {
+    const urlCategory = searchParams.get('section') || 'stories';
+    if (urlCategory !== activeCategory) {
+      setActiveCategory(urlCategory);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   // Check authentication and user existence on mount
   useEffect(() => {
@@ -236,12 +248,20 @@ const YoungKidsPage = () => {
             }) : [];
             setFavorites(convertedFavorites);
             
-            // Load pronunciation and vocabulary attempts
+            // Load pronunciation, vocabulary, and games attempts
             const details = (serverProgress as any)?.details || {};
             const pronCount = Object.keys(details.pronunciation || {}).length;
             const vocabCount = Object.keys(details.vocabulary || {}).length;
+            // Track game attempts: use actual attempts count if available, otherwise estimate from points
+            const gamesAttemptsCount = Number(details.games?.attempts || 0);
+            const gamesPoints = Number(details.games?.points || 0);
+            // Calculate game attempts: prefer actual count, fallback to estimation from points (average 15 points per attempt)
+            const estimatedGamesAttempts = gamesAttemptsCount > 0 
+              ? gamesAttemptsCount 
+              : Math.floor(gamesPoints / 15);
             setPronunciationAttempts(pronCount);
             setVocabularyAttempts(vocabCount);
+            setGamesAttempts(estimatedGamesAttempts);
           } catch {
             const localProgress = await KidsProgressService.get(userId);
             setPoints(localProgress.points);
@@ -258,8 +278,14 @@ const YoungKidsPage = () => {
             const details = (localProgress as any).details || {};
             const pronCount = Object.keys(details.pronunciation || {}).length;
             const vocabCount = Object.keys(details.vocabulary || {}).length;
+            const gamesCount = Array.isArray(details.games?.types) ? details.games.types.length : 0;
+            const gamesPoints = Number(details.games?.points || 0);
+            const estimatedGamesAttempts = gamesCount > 0 
+              ? Math.max(gamesCount, Math.floor(gamesPoints / 15)) 
+              : Math.floor(gamesPoints / 15);
             setPronunciationAttempts(pronCount);
             setVocabularyAttempts(vocabCount);
+            setGamesAttempts(estimatedGamesAttempts);
           }
         } else {
           const localProgress = await KidsProgressService.get(userId);
@@ -277,8 +303,12 @@ const YoungKidsPage = () => {
           const details = (localProgress as any).details || {};
           const pronCount = Object.keys(details.pronunciation || {}).length;
           const vocabCount = Object.keys(details.vocabulary || {}).length;
+          const gamesCount = Array.isArray(details.games?.types) ? details.games.types.length : 0;
+          const gamesPoints = Number(details.games?.points || 0);
+          const estimatedGamesAttempts = gamesCount > 0 ? Math.max(gamesCount, Math.floor(gamesPoints / 10)) : 0;
           setPronunciationAttempts(pronCount);
           setVocabularyAttempts(vocabCount);
+          setGamesAttempts(estimatedGamesAttempts);
         }
       } catch (error) {
         console.error('Error loading progress:', error);
@@ -609,28 +639,40 @@ const YoungKidsPage = () => {
       icon: Star, 
       progress: Math.min(100, Math.round((points / 1000) * 100)), 
       emoji: '🌟',
-      description: `${points}/1000 points`
+      description: points >= 1000 ? '1000+ points' : `${points}/1000 points`,
+      category: 'general'
     },
     { 
       name: 'Story Master', 
       icon: BookOpen, 
-      progress: Math.min(100, favorites.length * 12.5), 
+      progress: Math.min(100, favorites.filter(f => f.startsWith('young-')).length * 10), 
       emoji: '📖',
-      description: `${favorites.length}/8 favorite stories`
+      description: `${favorites.filter(f => f.startsWith('young-')).length}/10 favorite stories`,
+      category: 'stories'
     },
     { 
       name: 'Pronunciation Pro', 
       icon: Mic, 
-      progress: Math.min(100, pronunciationAttempts * 7.14), 
+      progress: Math.min(100, Math.min(pronunciationAttempts, 14) * 7.14), 
       emoji: '🎤',
-      description: `${pronunciationAttempts}/14 practiced`
+      description: `${pronunciationAttempts} practiced`,
+      category: 'pronunciation'
     },
     { 
       name: 'Vocabulary Builder', 
       icon: Zap, 
-      progress: Math.min(100, vocabularyAttempts * 7.14), 
+      progress: Math.min(100, Math.min(vocabularyAttempts, 14) * 7.14), 
       emoji: '⚡',
-      description: `${vocabularyAttempts}/14 words learned`
+      description: `${vocabularyAttempts} words learned`,
+      category: 'vocabulary'
+    },
+    { 
+      name: 'Game Champion', 
+      icon: Trophy, 
+      progress: Math.min(100, gamesAttempts * 20), 
+      emoji: '🎮',
+      description: `${gamesAttempts}/5 games played`,
+      category: 'games'
     },
   ];
   const completedAchievements = serverAchievements.length > 0
@@ -979,6 +1021,9 @@ const YoungKidsPage = () => {
     }
     
     setActiveCategory(categoryId);
+    
+    // Update URL to persist the section on refresh
+    setSearchParams({ section: categoryId });
   };
 
   const awardEngagementPoints = async (delta: number) => {
@@ -1867,9 +1912,38 @@ const YoungKidsPage = () => {
                 </Card>
                 <Vocabulary 
                   words={vocabularyWordsToUse} 
-                  onWordPracticed={async () => {
+                  onWordPracticed={async (word: string) => {
                     // Track vocabulary attempts
-                    setVocabularyAttempts(prev => prev + 1);
+                    const newAttempts = vocabularyAttempts + 1;
+                    setVocabularyAttempts(newAttempts);
+                    
+                    // Save to progress details
+                    try {
+                      const token = localStorage.getItem('speakbee_auth_token');
+                      if (token && token !== 'local-token') {
+                        const current = await KidsApi.getProgress(token);
+                        const details = { ...((current as any).details || {}) };
+                        details.vocabulary = details.vocabulary || {};
+                        details.vocabulary[word] = { 
+                          bestScore: 100, 
+                          attempts: (details.vocabulary[word]?.attempts || 0) + 1 
+                        };
+                        await KidsApi.updateProgress(token, { details });
+                      } else {
+                        await KidsProgressService.update(userId, (p) => {
+                          const anyP: any = p as any;
+                          const details = { ...(anyP.details || {}) };
+                          details.vocabulary = details.vocabulary || {};
+                          details.vocabulary[word] = { 
+                            bestScore: 100, 
+                            attempts: (details.vocabulary[word]?.attempts || 0) + 1 
+                          };
+                          return { ...p, details } as any;
+                        });
+                      }
+                    } catch (error) {
+                      console.error('Error saving vocabulary progress:', error);
+                    }
                     
                     // Award points for vocabulary practice (base 20 points per word)
                     await awardEngagementPoints(20);
@@ -1933,9 +2007,38 @@ const YoungKidsPage = () => {
                 </Card>
                 <Pronunciation 
                   items={enrolledPhrases}
-                  onPhrasePracticed={async () => {
+                  onPhrasePracticed={async (phrase: string) => {
                     // Track pronunciation attempts
-                    setPronunciationAttempts(prev => prev + 1);
+                    const newAttempts = pronunciationAttempts + 1;
+                    setPronunciationAttempts(newAttempts);
+                    
+                    // Save to progress details
+                    try {
+                      const token = localStorage.getItem('speakbee_auth_token');
+                      if (token && token !== 'local-token') {
+                        const current = await KidsApi.getProgress(token);
+                        const details = { ...((current as any).details || {}) };
+                        details.pronunciation = details.pronunciation || {};
+                        details.pronunciation[phrase] = { 
+                          bestScore: 100, 
+                          attempts: (details.pronunciation[phrase]?.attempts || 0) + 1 
+                        };
+                        await KidsApi.updateProgress(token, { details });
+                      } else {
+                        await KidsProgressService.update(userId, (p) => {
+                          const anyP: any = p as any;
+                          const details = { ...(anyP.details || {}) };
+                          details.pronunciation = details.pronunciation || {};
+                          details.pronunciation[phrase] = { 
+                            bestScore: 100, 
+                            attempts: (details.pronunciation[phrase]?.attempts || 0) + 1 
+                          };
+                          return { ...p, details } as any;
+                        });
+                      }
+                    } catch (error) {
+                      console.error('Error saving pronunciation progress:', error);
+                    }
                     
                     // Award points for pronunciation practice (base 30 points per phrase)
                     await awardEngagementPoints(30);
@@ -1977,7 +2080,7 @@ const YoungKidsPage = () => {
             <span>Your Super Achievements!</span>
           </h2>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
             {achievements.map((achievement, index) => {
               const isComplete = achievement.progress === 100;
               return (
@@ -1992,9 +2095,6 @@ const YoungKidsPage = () => {
                   onClick={() => {
                     handleElementClick(`achievement-${index}`);
                     setSelectedAchievement(selectedAchievement === index ? null : index);
-                    if (isComplete) {
-                      triggerCelebration();
-                    }
                   }}
                 >
                   <div className="relative inline-block mb-2 sm:mb-3">
@@ -2009,9 +2109,6 @@ const YoungKidsPage = () => {
                         "text-xl sm:text-2xl transition-all duration-300",
                         hoveredElement === `achievement-${index}` && "animate-bounce"
                       )}>{achievement.emoji}</span>
-                      {isComplete && (
-                        <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-white absolute -top-1 -right-1 animate-ping" />
-                      )}
                     </div>
                   </div>
                   <p className={cn(

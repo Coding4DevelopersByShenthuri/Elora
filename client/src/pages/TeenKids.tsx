@@ -31,7 +31,7 @@ import ScientificDiscoveryAdventure from '@/components/kids/stories/ScientificDi
 import AIEthicsExplorerAdventure from '@/components/kids/stories/AIEthicsExplorerAdventure';
 import DigitalSecurityGuardianAdventure from '@/components/kids/stories/DigitalSecurityGuardianAdventure';
 import AuthModal from '@/components/auth/AuthModal';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import HybridServiceManager from '@/services/HybridServiceManager';
 import { ModelManager } from '@/services/ModelManager';
 import { WhisperService } from '@/services/WhisperService';
@@ -40,7 +40,9 @@ import { TimeTracker } from '@/services/TimeTracker';
 import EnhancedTTS from '@/services/EnhancedTTS';
 
 const TeenKidsPage = () => {
-  const [activeCategory, setActiveCategory] = useState('stories');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialCategory = searchParams.get('section') || 'stories';
+  const [activeCategory, setActiveCategory] = useState(initialCategory);
   const [isOpeningFromFavorites, setIsOpeningFromFavorites] = useState(false);
   const [currentStory, setCurrentStory] = useState<string>('');
   const [isPlaying, setIsPlaying] = useState(false);
@@ -101,6 +103,15 @@ const TeenKidsPage = () => {
     }
   }, [showMysteryDetective, showSpaceExplorer, showEnvironmentalHero, 
       showTechInnovator, showGlobalCitizen, showFutureLeader, showScientificDiscovery, showSocialMediaExpert, showAIEthics]);
+
+  // Sync activeCategory with URL on mount or URL change
+  useEffect(() => {
+    const urlCategory = searchParams.get('section') || 'stories';
+    if (urlCategory !== activeCategory) {
+      setActiveCategory(urlCategory);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   // Check authentication and user existence on mount
   useEffect(() => {
@@ -510,16 +521,16 @@ const TeenKidsPage = () => {
     { 
       name: 'Speaking Pro', 
       icon: Mic, 
-      progress: Math.min(100, pronunciationAttempts * 5), 
+      progress: Math.min(100, Math.min(pronunciationAttempts, 20) * 5), 
       emoji: '🎤',
-      description: `${pronunciationAttempts}/20 practiced`
+      description: `${pronunciationAttempts} practiced`
     },
     { 
       name: 'Vocabulary Expert', 
       icon: Brain, 
-      progress: Math.min(100, vocabularyAttempts * 5), 
+      progress: Math.min(100, Math.min(vocabularyAttempts, 20) * 5), 
       emoji: '🧠',
-      description: `${vocabularyAttempts}/20 words learned`
+      description: `${vocabularyAttempts} words learned`
     },
   ];
   const completedAchievements = achievements.filter(a => a.progress === 100).length;
@@ -750,6 +761,9 @@ const TeenKidsPage = () => {
     }
     
     setActiveCategory(categoryId);
+    
+    // Update URL to persist the section on refresh
+    setSearchParams({ section: categoryId });
   };
 
   const handleAuthSuccess = () => {
@@ -1439,9 +1453,6 @@ const TeenKidsPage = () => {
                   onClick={() => {
                     handleElementClick(`achievement-${index}`);
                     setSelectedAchievement(selectedAchievement === index ? null : index);
-                    if (isComplete) {
-                      triggerCelebration();
-                    }
                   }}
                 >
                   <div className="relative inline-block mb-2 sm:mb-3">
@@ -1456,9 +1467,6 @@ const TeenKidsPage = () => {
                         "text-xl sm:text-2xl transition-all duration-300",
                         hoveredElement === `achievement-${index}` && "animate-bounce"
                       )}>{achievement.emoji}</span>
-                      {isComplete && (
-                        <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-white absolute -top-1 -right-1 animate-ping" />
-                      )}
                     </div>
                   </div>
                   <p className={cn(

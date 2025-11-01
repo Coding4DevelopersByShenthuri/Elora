@@ -1427,3 +1427,122 @@ INFO 2025-11-01 13:44:21,889 basehttp 16120 12056 "GET /api/kids/lessons HTTP/1.
 INFO 2025-11-01 13:44:25,494 basehttp 16120 12056 "GET /api/kids/lessons HTTP/1.1" 200 2
 INFO 2025-11-01 13:46:06,230 basehttp 16120 21072 "GET /api/kids/lessons HTTP/1.1" 200 2
 INFO 2025-11-01 13:46:10,929 basehttp 16120 21072 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:48:20,508 basehttp 16120 21072 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:48:44,004 basehttp 16120 21072 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:49:41,823 basehttp 16120 21072 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:52:05,064 basehttp 16120 21072 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:52:09,953 basehttp 16120 21072 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:52:15,119 basehttp 16120 21072 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:52:22,207 basehttp 16120 21072 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:52:29,735 basehttp 16120 21492 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:52:49,907 basehttp 16120 12048 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:52:50,218 basehttp 16120 12048 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:52:53,921 basehttp 16120 12048 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:53:04,142 basehttp 16120 22476 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:53:33,049 basehttp 16120 23080 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:53:38,160 basehttp 16120 23080 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:55:12,492 basehttp 16120 23080 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:55:24,030 basehttp 16120 23080 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:55:34,176 basehttp 16120 23080 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:55:42,355 basehttp 16120 23080 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:56:08,234 basehttp 16120 23080 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:56:12,124 basehttp 16120 23080 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:59:44,073 basehttp 16120 18944 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:59:49,116 basehttp 16120 18944 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:59:59,665 basehttp 16120 10704 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 13:59:59,889 basehttp 16120 10704 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:00:03,464 basehttp 16120 3108 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:00:16,837 basehttp 16120 3108 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:01:21,087 basehttp 16120 16948 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:01:44,187 basehttp 16120 2548 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:01:52,110 basehttp 16120 8484 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:01:52,282 basehttp 16120 8484 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:02:06,104 basehttp 16120 14160 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:03:56,626 basehttp 16120 21884 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:04:07,299 basehttp 16120 21884 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:04:30,267 basehttp 16120 15792 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:04:44,153 basehttp 16120 15656 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:04:48,674 basehttp 16120 21120 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:23:14,828 basehttp 16120 14716 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:28:48,566 basehttp 16120 14760 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:37:29,909 basehttp 16120 21160 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:38:14,072 basehttp 16120 4224 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:41:01,615 basehttp 16120 4224 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:41:44,196 basehttp 16120 4224 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:42:21,992 basehttp 16120 13480 "OPTIONS /api/vocabulary/ HTTP/1.1" 200 0
+WARNING 2025-11-01 14:42:22,127 log 16120 13480 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 14:42:22,136 basehttp 16120 13480 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 14:42:41,253 log 16120 13480 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 14:42:41,255 basehttp 16120 13480 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 14:42:59,604 log 16120 13480 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 14:42:59,609 basehttp 16120 13480 "POST /api/vocabulary/ HTTP/1.1" 401 58
+INFO 2025-11-01 14:46:55,501 basehttp 16120 3288 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:50:00,922 basehttp 16120 3776 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:50:44,292 basehttp 16120 23144 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:55:12,953 basehttp 16120 20724 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:55:22,250 basehttp 16120 20724 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:56:34,716 basehttp 16120 20724 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:56:39,133 basehttp 16120 20724 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:57:31,153 basehttp 16120 21372 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 14:58:54,780 basehttp 16120 12580 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:01:26,783 basehttp 16120 21964 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:04:48,647 basehttp 16120 21412 "GET /api/kids/lessons HTTP/1.1" 200 2
+WARNING 2025-11-01 15:05:52,590 log 16120 5016 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 15:05:52,594 basehttp 16120 5016 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 15:06:13,307 log 16120 16324 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 15:06:13,312 basehttp 16120 16324 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 15:06:32,033 log 16120 21372 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 15:06:32,037 basehttp 16120 21372 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 15:06:58,720 log 16120 15568 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 15:06:58,724 basehttp 16120 15568 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 15:07:13,669 log 16120 16172 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 15:07:13,670 basehttp 16120 16172 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 15:07:48,060 log 16120 20972 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 15:07:48,062 basehttp 16120 20972 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 15:08:08,286 log 16120 4316 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 15:08:08,287 basehttp 16120 4316 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 15:08:24,163 log 16120 5732 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 15:08:24,166 basehttp 16120 5732 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 15:08:45,493 log 16120 12120 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 15:08:45,495 basehttp 16120 12120 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 15:09:14,589 log 16120 12120 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 15:09:14,590 basehttp 16120 12120 "POST /api/vocabulary/ HTTP/1.1" 401 58
+INFO 2025-11-01 15:09:28,378 basehttp 16120 13360 "GET /api/kids/lessons HTTP/1.1" 200 2
+WARNING 2025-11-01 15:10:08,258 log 16120 12120 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 15:10:08,263 basehttp 16120 12120 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 15:10:44,433 log 16120 10688 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 15:10:44,436 basehttp 16120 10688 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 15:11:13,273 log 16120 10688 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 15:11:13,275 basehttp 16120 10688 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 15:11:29,215 log 16120 10688 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 15:11:29,217 basehttp 16120 10688 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 15:12:21,477 log 16120 10688 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 15:12:21,479 basehttp 16120 10688 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 15:12:55,536 log 16120 10688 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 15:12:55,540 basehttp 16120 10688 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 15:13:24,825 log 16120 10688 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 15:13:24,829 basehttp 16120 10688 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 15:13:48,001 log 16120 10688 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 15:13:48,002 basehttp 16120 10688 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 15:14:33,183 log 16120 10688 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 15:14:33,187 basehttp 16120 10688 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 15:14:56,926 log 16120 10688 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 15:14:56,929 basehttp 16120 10688 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-01 15:15:34,500 log 16120 10688 Unauthorized: /api/vocabulary/
+WARNING 2025-11-01 15:15:34,503 basehttp 16120 10688 "POST /api/vocabulary/ HTTP/1.1" 401 58
+INFO 2025-11-01 15:18:22,943 basehttp 16120 17020 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:22:34,067 basehttp 16120 17020 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:22:36,027 basehttp 16120 17020 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:22:50,819 basehttp 16120 17020 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:23:24,900 basehttp 16120 17020 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:23:32,280 basehttp 16120 18232 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:26:56,178 basehttp 16120 11260 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:28:22,135 basehttp 16120 17740 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:28:34,755 basehttp 16120 12120 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:28:51,659 basehttp 16120 13580 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:29:13,589 basehttp 16120 13580 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:32:58,973 basehttp 16120 15792 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:33:04,380 basehttp 16120 4604 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:38:48,485 basehttp 16120 1880 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:39:50,967 basehttp 16120 1880 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 15:39:54,927 basehttp 16120 1880 "GET /api/kids/lessons HTTP/1.1" 200 2

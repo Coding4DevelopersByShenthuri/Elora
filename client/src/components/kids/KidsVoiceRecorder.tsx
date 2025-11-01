@@ -13,6 +13,7 @@ interface KidsVoiceRecorderProps {
   disabled?: boolean;
   className?: string;
   autoAnalyze?: boolean; // If true, continuously analyzes during recording
+  disabledWhileSpeaking?: boolean; // If true, disable recording while TTS is speaking
 }
 
 const KidsVoiceRecorder = ({
@@ -22,7 +23,8 @@ const KidsVoiceRecorder = ({
   maxDuration = 10,
   disabled = false,
   className,
-  autoAnalyze = true
+  autoAnalyze = true,
+  disabledWhileSpeaking = false
 }: KidsVoiceRecorderProps) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -51,8 +53,12 @@ const KidsVoiceRecorder = ({
       clearInterval(analysisIntervalRef.current);
       analysisIntervalRef.current = null;
     }
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      try {
+        mediaRecorderRef.current.stop();
+      } catch (e) {
+        console.warn('Error stopping recorder in cleanup:', e);
+      }
     }
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
@@ -209,23 +215,29 @@ const KidsVoiceRecorder = ({
   };
 
   const stopRecording = async (success: boolean = false) => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-      
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
+    // Stop immediately without checking isRecording state
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      try {
+        mediaRecorderRef.current.stop();
+      } catch (e) {
+        console.warn('Error stopping recorder:', e);
       }
-      
-      if (analysisIntervalRef.current) {
-        clearInterval(analysisIntervalRef.current);
-        analysisIntervalRef.current = null;
-      }
-      
-      if (!success) {
-        setFeedbackMessage('👍 Good try! Let\'s check your pronunciation...');
-      }
+    }
+    
+    setIsRecording(false);
+    
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    
+    if (analysisIntervalRef.current) {
+      clearInterval(analysisIntervalRef.current);
+      analysisIntervalRef.current = null;
+    }
+    
+    if (!success) {
+      setFeedbackMessage('👍 Good try! Let\'s check your pronunciation...');
     }
   };
 
@@ -255,7 +267,7 @@ const KidsVoiceRecorder = ({
                 : "bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B]"
           )}
           onClick={showSuccess ? undefined : (isRecording ? () => stopRecording(false) : startRecording)}
-          disabled={disabled || isAnalyzing}
+          disabled={disabled || disabledWhileSpeaking || isAnalyzing}
         >
           {showSuccess ? (
             <CheckCircle className="w-12 h-12 sm:w-14 sm:h-14 text-white animate-bounce" />

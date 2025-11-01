@@ -57,6 +57,8 @@ const InteractiveGames = () => {
         const arr = Array.isArray(details.games.types) ? details.games.types : [];
         if (_gameType && !arr.includes(_gameType)) arr.push(_gameType);
         details.games.types = arr;
+        // Track total game attempts (total plays, not just unique types)
+        details.games.attempts = Number(details.games.attempts || 0) + 1;
         await KidsApi.updateProgress(token, {
           points: currentPoints + points,
           details
@@ -71,6 +73,8 @@ const InteractiveGames = () => {
           const arr = Array.isArray(details.games.types) ? details.games.types : [];
           if (_gameType && !arr.includes(_gameType)) arr.push(_gameType);
           details.games.types = arr;
+          // Track total game attempts (total plays, not just unique types)
+          details.games.attempts = Number(details.games.attempts || 0) + 1;
           return {
             ...progress,
             points: progress.points + points,

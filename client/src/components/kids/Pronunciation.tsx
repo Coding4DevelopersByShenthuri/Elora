@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Volume2, ChevronRight, ChevronLeft, Mic, Loader2, Star, Trophy } from 'lucide-react';
+import { Volume2, ChevronRight, ChevronLeft, Loader2, Star, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import EnhancedTTS from '@/services/EnhancedTTS';
 import KidsVoiceRecorder from './KidsVoiceRecorder';
@@ -16,27 +16,74 @@ interface PronunciationProps {
 
 export default function Pronunciation({ items, onPhrasePracticed }: PronunciationProps) {
   const [current, setCurrent] = useState(0);
-  const [masteredPhrases, setMasteredPhrases] = useState<Set<number>>(new Set());
+  const [masteredPhrases, setMasteredPhrases] = useState<Set<string>>(new Set());
   const [currentAttempts, setCurrentAttempts] = useState(0);
   const [lastScore, setLastScore] = useState<number | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   const phrase = items[current];
-  const progress = (masteredPhrases.size / items.length) * 100;
+  
+  // Calculate progress based on filtered phrases - only count mastered phrases that are in current phrase list
+  const masteredCount = items.filter(item => masteredPhrases.has(item.phrase)).length;
+  const progress = items.length > 0 ? (masteredCount / items.length) * 100 : 0;
 
   useEffect(() => {
-    // Load mastered phrases from local storage
+    // Load mastered phrases from local storage (stored as phrase strings)
     const saved = localStorage.getItem('mastered_phrases');
     if (saved) {
-      setMasteredPhrases(new Set(JSON.parse(saved)));
+      try {
+        const parsed = JSON.parse(saved);
+        // Handle both old format (indices) and new format (phrase strings)
+        if (Array.isArray(parsed)) {
+          if (parsed.length > 0 && typeof parsed[0] === 'number') {
+            // Old format: convert indices to phrase strings based on original phrase list
+            // This won't work perfectly with filtering, but is best effort migration
+            const oldPhrases = localStorage.getItem('pronunciation_phrases_list');
+            if (oldPhrases) {
+              const phraseList = JSON.parse(oldPhrases);
+              const phraseStrings = parsed.map((idx: number) => phraseList[idx]).filter(Boolean);
+              setMasteredPhrases(new Set(phraseStrings));
+            } else {
+              setMasteredPhrases(new Set());
+            }
+          } else {
+            // New format: phrase strings
+            setMasteredPhrases(new Set(parsed));
+          }
+        } else {
+          setMasteredPhrases(new Set());
+        }
+      } catch (error) {
+        console.warn('Error loading mastered phrases:', error);
+        setMasteredPhrases(new Set());
+      }
     }
+    setHasInitialized(true);
   }, []);
 
   useEffect(() => {
-    // Save mastered phrases
+    // Save mastered phrases as phrase strings
     localStorage.setItem('mastered_phrases', JSON.stringify(Array.from(masteredPhrases)));
   }, [masteredPhrases]);
+  
+  // Reset current phrase index if it's out of bounds when phrases change
+  useEffect(() => {
+    if (current >= items.length && items.length > 0) {
+      setCurrent(0);
+    }
+  }, [items, current]);
+
+  // Auto-navigate to first unmastered phrase when loaded
+  useEffect(() => {
+    if (hasInitialized && items.length > 0 && masteredPhrases.size > 0 && current === 0) {
+      const firstUnmasteredIndex = items.findIndex(item => !masteredPhrases.has(item.phrase));
+      if (firstUnmasteredIndex !== -1) {
+        setCurrent(firstUnmasteredIndex);
+      }
+    }
+  }, [items, masteredPhrases, hasInitialized, current]);
 
   const speak = async () => {
     setIsSpeaking(true);
@@ -59,10 +106,10 @@ export default function Pronunciation({ items, onPhrasePracticed }: Pronunciatio
   };
 
   const handleCorrectPronunciation = async (_blob: Blob, score: number) => {
-    // Mark as mastered immediately
+    // Mark as mastered immediately (by phrase string, not index)
     setLastScore(score);
     setCurrentAttempts(prev => prev + 1);
-    setMasteredPhrases(prev => new Set([...prev, current]));
+    setMasteredPhrases(prev => new Set([...prev, phrase.phrase]));
     setShowSuccess(true);
     
     // Notify parent component
@@ -136,7 +183,7 @@ export default function Pronunciation({ items, onPhrasePracticed }: Pronunciatio
                   Pronunciation Progress
                 </p>
                 <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
-                  {masteredPhrases.size} / {items.length} phrases mastered
+                  {masteredCount} / {items.length} phrases mastered
                 </p>
               </div>
             </div>
@@ -158,7 +205,7 @@ export default function Pronunciation({ items, onPhrasePracticed }: Pronunciatio
         key={`phrase-card-${current}`}
         className={cn(
           "border-2 transition-all duration-300 animate-in fade-in slide-in-from-right-4 backdrop-blur-sm shadow-lg",
-          masteredPhrases.has(current) 
+          masteredPhrases.has(phrase.phrase) 
             ? "border-green-300/50 bg-green-100/20 dark:bg-green-900/5" 
             : "border-orange-300/50 bg-orange-50/40 dark:bg-orange-900/10"
         )}
@@ -168,7 +215,7 @@ export default function Pronunciation({ items, onPhrasePracticed }: Pronunciatio
             <span className="text-sm sm:text-base text-gray-600 dark:text-gray-500">
               Phrase {current + 1} of {items.length}
             </span>
-            {masteredPhrases.has(current) && (
+            {masteredPhrases.has(phrase.phrase) && (
               <span className="flex items-center gap-1 sm:gap-2 text-sm sm:text-base text-green-900 dark:text-green-900 font-bold">
                 <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-green-700 dark:fill-green-500 flex-shrink-0" />
                 Mastered!
@@ -182,12 +229,12 @@ export default function Pronunciation({ items, onPhrasePracticed }: Pronunciatio
             <div className={cn(
               "text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold transition-all duration-500",
               showSuccess && "animate-bounce scale-110",
-              masteredPhrases.has(current) && "text-green-700 dark:text-green-500",
+              masteredPhrases.has(phrase.phrase) && "text-green-700 dark:text-green-500",
               "text-gray-800 dark:text-white bg-gradient-to-br from-orange-100/40 to-red-100/40 dark:from-orange-900/15 dark:to-red-900/15 rounded-xl sm:rounded-2xl p-4 sm:p-6 backdrop-blur-sm border border-orange-200/30 dark:border-orange-700/30"
             )}>
               {phrase.phrase}
               {showSuccess && ' 🎉'}
-              {masteredPhrases.has(current) && !showSuccess && ' ✨'}
+              {masteredPhrases.has(phrase.phrase) && !showSuccess && ' ✨'}
             </div>
             
             {phrase.phonemes && (
@@ -228,6 +275,7 @@ export default function Pronunciation({ items, onPhrasePracticed }: Pronunciatio
               onCorrectPronunciation={handleCorrectPronunciation}
               maxDuration={15}
               autoAnalyze={true}
+              disabledWhileSpeaking={isSpeaking}
             />
             <p className="text-xs sm:text-sm text-center text-gray-500 dark:text-gray-400 mt-3 px-4">
               💡 Tip: The recorder will automatically stop when you pronounce it correctly!
@@ -264,13 +312,13 @@ export default function Pronunciation({ items, onPhrasePracticed }: Pronunciatio
             </Button>
 
             <div className="flex gap-1 sm:gap-2 flex-wrap justify-center">
-              {items.map((_, idx) => (
+              {items.map((item, idx) => (
                 <div
                   key={idx}
                   className={cn(
                     "w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300",
                     idx === current && "scale-125 sm:scale-150",
-                    masteredPhrases.has(idx) 
+                    masteredPhrases.has(item.phrase) 
                       ? "bg-green-500" 
                       : idx === current 
                         ? "bg-orange-500" 

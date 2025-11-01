@@ -198,6 +198,7 @@ class AdvancedPronunciationScorerClass {
 
   /**
    * Align words and phonemes between expected and spoken
+   * Uses flexible matching for better accuracy with long phrases
    */
   private async alignWords(
     expectedWords: string[],
@@ -206,10 +207,44 @@ class AdvancedPronunciationScorerClass {
   ): Promise<WordAlignment[]> {
     const alignments: WordAlignment[] = [];
     let currentTime = 0;
+    let spokenIndex = 0;
 
     for (let i = 0; i < expectedWords.length; i++) {
       const expectedWord = expectedWords[i];
-      const spokenWord = spokenWords[i] || '';
+      
+      // Try to find best matching spoken word using flexible matching
+      let bestMatch = '';
+      let bestScore = 0;
+      let bestMatchIndex = -1;
+      
+      // Look ahead up to 5 words for better matching (increased for longer phrases)
+      const maxLookAhead = Math.max(5, Math.floor(expectedWords.length * 0.5));
+      for (let j = spokenIndex; j < Math.min(spokenIndex + maxLookAhead, spokenWords.length); j++) {
+        const spokenWord = spokenWords[j];
+        
+        // Calculate similarity score
+        const expectedPhonemes = this.getPhonemes(expectedWord);
+        const spokenPhonemes = this.getPhonemes(spokenWord);
+        const score = this.calculateWordSimilarity(expectedPhonemes, spokenPhonemes);
+        
+        if (score > bestScore) {
+          bestScore = score;
+          bestMatch = spokenWord;
+          bestMatchIndex = j;
+        }
+      }
+      
+      // Use best match or fall back to word at current index
+      // Also check if we should skip this expected word if no good match found
+      let spokenWord = bestMatchIndex >= 0 ? bestMatch : (spokenWords[spokenIndex] || '');
+      
+      // If best match is very poor (<0.3 similarity), allow skipping to next word
+      if (bestMatchIndex >= 0 && bestScore < 0.3 && spokenIndex < spokenWords.length) {
+        // This might be an extra word in the transcription, skip it
+        spokenWord = spokenWords[spokenIndex] || '';
+      } else if (bestMatchIndex >= spokenIndex) {
+        spokenIndex = bestMatchIndex + 1;
+      }
 
       // Get phonemes for expected word
       const expectedPhonemes = this.getPhonemes(expectedWord);
@@ -240,6 +275,42 @@ class AdvancedPronunciationScorerClass {
     }
 
     return alignments;
+  }
+
+  /**
+   * Calculate similarity between two words based on their phonemes
+   */
+  private calculateWordSimilarity(expectedPhonemes: string[], spokenPhonemes: string[]): number {
+    if (expectedPhonemes.length === 0 || spokenPhonemes.length === 0) return 0;
+    
+    // Use dynamic programming for flexible matching
+    const dp: number[][] = Array(expectedPhonemes.length + 1)
+      .fill(0)
+      .map(() => Array(spokenPhonemes.length + 1).fill(0));
+    
+    // Initialize base cases
+    for (let i = 1; i <= expectedPhonemes.length; i++) {
+      dp[i][0] = dp[i-1][0] - 1;
+    }
+    for (let j = 1; j <= spokenPhonemes.length; j++) {
+      dp[0][j] = dp[0][j-1] - 1;
+    }
+    
+    // Fill DP table
+    for (let i = 1; i <= expectedPhonemes.length; i++) {
+      for (let j = 1; j <= spokenPhonemes.length; j++) {
+        const match = this.phonemeSimilarity(expectedPhonemes[i-1], spokenPhonemes[j-1]);
+        dp[i][j] = Math.max(
+          dp[i-1][j-1] + match,
+          dp[i-1][j] - 0.5,
+          dp[i][j-1] - 0.5
+        );
+      }
+    }
+    
+    // Normalize to 0-1 range
+    const maxScore = Math.max(expectedPhonemes.length, spokenPhonemes.length);
+    return Math.max(0, dp[expectedPhonemes.length][spokenPhonemes.length] / maxScore);
   }
 
   /**
@@ -667,8 +738,12 @@ class AdvancedPronunciationScorerClass {
     // 2. Less consistent articulation (more forgiving on clarity)
     // 3. Faster or slower speech rate (more forgiving on timing)
     
-    // Boost scores slightly to be more encouraging
-    const kidsBoost = 5; // 5% boost for encouragement
+    // Determine boost based on phrase length
+    const expectedWords = this.tokenize(expectedText);
+    const isLongPhrase = expectedWords.length > 3;
+    
+    // Boost scores to be more encouraging (more boost for longer phrases)
+    const kidsBoost = isLongPhrase ? 10 : 5; // 10% for long phrases, 5% for short
     
     const adjustedScore: DetailedPronunciationScore = {
       ...baseScore,
@@ -708,12 +783,21 @@ class AdvancedPronunciationScorerClass {
 
   /**
    * Quick check if pronunciation is correct for kids (used for auto-stop)
-   * Returns true if the child pronounced it well enough (70%+ threshold for kids)
+   * Returns true if the child pronounced it well enough (lower threshold for kids and longer phrases)
    */
   async isCorrectForKids(expectedText: string, spokenText: string, audioData?: Blob): Promise<boolean> {
     const score = await this.scoreForKids(expectedText, spokenText, audioData);
-    // Lower threshold for kids - 70% is considered "mastered" to encourage them
-    return score.overall >= 70;
+    
+    // Determine threshold based on phrase length
+    const expectedWords = this.tokenize(expectedText);
+    const isLongPhrase = expectedWords.length > 3;
+    
+    // Use lower threshold for longer phrases (60% for long phrases, 70% for short)
+    const threshold = isLongPhrase ? 60 : 70;
+    
+    console.log(`🎯 Checking pronunciation: score=${score.overall.toFixed(1)}%, threshold=${threshold}%, phrase="${expectedText}" (${expectedWords.length} words)`);
+    
+    return score.overall >= threshold;
   }
 }
 
