@@ -1752,3 +1752,147 @@ WARNING 2025-11-01 17:25:28,036 views 16636 5688 Model gemini-2.0-flash-exp not 
 INFO 2025-11-01 17:25:28,041 views 16636 5688 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
 INFO 2025-11-01 17:25:29,498 views 16636 5688 Success with v1beta/models/gemini-2.0-flash-exp
 INFO 2025-11-01 17:25:29,508 basehttp 16636 5688 "POST /api/kids/gemini/game HTTP/1.1" 200 307
+INFO 2025-11-01 17:32:26,283 basehttp 16636 23616 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 17:32:42,222 views 16636 23128 Gemini API key found, generating game for type: story-telling
+INFO 2025-11-01 17:32:42,229 views 16636 23128 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-01 17:32:42,725 views 16636 23128 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-01 17:32:42,744 views 16636 23128 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 17:32:45,160 views 16636 23128 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 17:32:45,167 basehttp 16636 23128 "POST /api/kids/gemini/game HTTP/1.1" 200 337
+INFO 2025-11-01 17:32:58,433 autoreload 16636 9184 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-01 17:33:04,728 autoreload 20896 1184 Watching for file changes with StatReloader
+INFO 2025-11-01 17:33:19,782 autoreload 20896 1184 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-01 17:33:34,239 autoreload 11136 22384 Watching for file changes with StatReloader
+INFO 2025-11-01 17:34:04,555 basehttp 11136 18792 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 17:34:30,433 autoreload 11136 22384 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-01 17:34:31,546 autoreload 14408 2888 Watching for file changes with StatReloader
+INFO 2025-11-01 17:34:44,569 basehttp 14408 19380 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 17:34:47,892 views 14408 15312 Gemini API key found, generating game for type: conversation-practice
+INFO 2025-11-01 17:34:47,894 views 14408 15312 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-01 17:34:48,172 views 14408 15312 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-01 17:34:48,175 views 14408 15312 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 17:34:49,924 views 14408 15312 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 17:34:49,931 basehttp 14408 15312 "POST /api/kids/gemini/game HTTP/1.1" 200 251
+INFO 2025-11-01 17:36:43,812 basehttp 14408 24560 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 17:37:24,984 autoreload 14408 2888 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-01 17:37:25,709 autoreload 16388 5020 Watching for file changes with StatReloader
+INFO 2025-11-01 17:38:16,082 views 16388 23836 Gemini API key found, generating game for type: tongue-twister
+INFO 2025-11-01 17:38:16,084 views 16388 23836 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-01 17:38:16,710 views 16388 23836 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-01 17:38:16,712 views 16388 23836 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 17:38:18,521 views 16388 23836 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 17:38:18,532 basehttp 16388 23836 "POST /api/kids/gemini/game HTTP/1.1" 200 360
+INFO 2025-11-01 17:41:16,345 basehttp 16388 6820 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 17:41:50,481 autoreload 16388 5020 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-01 17:41:58,016 autoreload 14848 19632 Watching for file changes with StatReloader
+INFO 2025-11-01 17:43:19,698 autoreload 14848 19632 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-01 17:43:21,515 autoreload 13064 18792 Watching for file changes with StatReloader
+INFO 2025-11-01 17:45:22,593 basehttp 13064 348 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 17:45:33,403 views 13064 5300 Gemini API key found, generating game for type: tongue-twister
+INFO 2025-11-01 17:45:33,404 views 13064 5300 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-01 17:45:33,844 views 13064 5300 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-01 17:45:33,847 views 13064 5300 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 17:45:35,592 views 13064 5300 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 17:45:35,605 basehttp 13064 5300 "POST /api/kids/gemini/game HTTP/1.1" 200 349
+INFO 2025-11-01 17:47:39,043 autoreload 13064 18792 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-01 17:47:48,742 autoreload 5368 17660 Watching for file changes with StatReloader
+INFO 2025-11-01 17:48:03,669 autoreload 5368 17660 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-01 17:48:10,552 autoreload 5304 10724 Watching for file changes with StatReloader
+INFO 2025-11-01 17:48:14,184 autoreload 5304 10724 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-01 17:48:15,883 autoreload 5076 20256 Watching for file changes with StatReloader
+INFO 2025-11-01 17:48:22,103 basehttp 5076 19564 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 17:48:25,489 views 5076 1368 Gemini API key found, generating game for type: tongue-twister
+INFO 2025-11-01 17:48:25,491 views 5076 1368 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-01 17:48:26,051 views 5076 1368 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-01 17:48:26,055 views 5076 1368 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 17:48:28,908 views 5076 1368 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 17:48:28,919 basehttp 5076 1368 "POST /api/kids/gemini/game HTTP/1.1" 200 208
+INFO 2025-11-01 17:49:53,951 views 5076 23968 Gemini API key found, generating game for type: word-chain
+INFO 2025-11-01 17:49:53,953 views 5076 23968 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-01 17:49:54,206 views 5076 23968 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-01 17:49:54,209 views 5076 23968 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+ERROR 2025-11-01 17:49:54,955 views 5076 23968 Gemini API error: 429 - {'error': {'code': 429, 'message': 'Resource exhausted. Please try again later. Please refer to https://cloud.google.com/vertex-ai/generative-ai/docs/error-code-429 for more details.', 'status': 'RESOURCE_EXHAUSTED'}}
+ERROR 2025-11-01 17:49:54,957 views 5076 23968 Gemini API error: 429 - Unknown error
+ERROR 2025-11-01 17:49:54,978 log 5076 23968 Bad Gateway: /api/kids/gemini/game
+ERROR 2025-11-01 17:49:54,983 basehttp 5076 23968 "POST /api/kids/gemini/game HTTP/1.1" 502 119
+INFO 2025-11-01 17:50:54,808 autoreload 5076 20256 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-01 17:50:56,995 autoreload 22048 12544 Watching for file changes with StatReloader
+INFO 2025-11-01 17:51:07,224 basehttp 22048 12120 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 17:51:11,299 views 22048 19204 Gemini API key found, generating game for type: tongue-twister
+INFO 2025-11-01 17:51:11,301 views 22048 19204 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-01 17:51:11,593 views 22048 19204 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-01 17:51:11,596 views 22048 19204 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 17:51:13,348 views 22048 19204 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 17:51:13,354 basehttp 22048 19204 "POST /api/kids/gemini/game HTTP/1.1" 200 196
+INFO 2025-11-01 17:51:47,106 views 22048 1768 Gemini API key found, generating game for type: word-chain
+INFO 2025-11-01 17:51:47,107 views 22048 1768 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-01 17:51:47,356 views 22048 1768 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-01 17:51:47,360 views 22048 1768 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 17:51:50,074 views 22048 1768 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 17:51:50,085 basehttp 22048 1768 "POST /api/kids/gemini/game HTTP/1.1" 200 280
+INFO 2025-11-01 17:52:38,821 views 22048 20712 Gemini API key found, generating game for type: story-telling
+INFO 2025-11-01 17:52:38,822 views 22048 20712 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-01 17:52:39,106 views 22048 20712 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-01 17:52:39,108 views 22048 20712 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 17:52:40,921 views 22048 20712 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 17:52:40,929 basehttp 22048 20712 "POST /api/kids/gemini/game HTTP/1.1" 200 399
+INFO 2025-11-01 17:53:22,999 views 22048 23416 Gemini API key found, generating game for type: pronunciation-challenge
+INFO 2025-11-01 17:53:23,000 views 22048 23416 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-01 17:53:23,327 views 22048 23416 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-01 17:53:23,329 views 22048 23416 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 17:53:24,733 views 22048 23416 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 17:53:24,736 basehttp 22048 23416 "POST /api/kids/gemini/game HTTP/1.1" 200 266
+INFO 2025-11-01 17:55:11,690 autoreload 22048 12544 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-01 17:55:16,854 autoreload 18240 23212 Watching for file changes with StatReloader
+INFO 2025-11-01 17:55:23,362 autoreload 18240 23212 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-01 17:55:24,109 autoreload 23920 24256 Watching for file changes with StatReloader
+INFO 2025-11-01 17:55:26,924 autoreload 23920 24256 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-01 17:55:27,729 autoreload 24220 21184 Watching for file changes with StatReloader
+INFO 2025-11-01 17:55:33,224 basehttp 24220 24296 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 17:55:36,624 views 24220 10244 Gemini API key found, generating game for type: pronunciation-challenge
+ERROR 2025-11-01 17:55:36,625 views 24220 10244 Gemini game error: name 'word' is not defined
+ERROR 2025-11-01 17:55:36,638 log 24220 10244 Internal Server Error: /api/kids/gemini/game
+ERROR 2025-11-01 17:55:36,641 basehttp 24220 10244 "POST /api/kids/gemini/game HTTP/1.1" 500 92
+INFO 2025-11-01 17:56:00,211 basehttp 24220 13660 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 17:56:09,310 views 24220 2908 Gemini API key found, generating game for type: pronunciation-challenge
+ERROR 2025-11-01 17:56:09,312 views 24220 2908 Gemini game error: name 'word' is not defined
+ERROR 2025-11-01 17:56:09,315 log 24220 2908 Internal Server Error: /api/kids/gemini/game
+ERROR 2025-11-01 17:56:09,318 basehttp 24220 2908 "POST /api/kids/gemini/game HTTP/1.1" 500 92
+INFO 2025-11-01 17:56:16,080 views 24220 2908 Gemini API key found, generating game for type: story-telling
+ERROR 2025-11-01 17:56:16,082 views 24220 2908 Gemini game error: name 'word' is not defined
+ERROR 2025-11-01 17:56:16,085 log 24220 2908 Internal Server Error: /api/kids/gemini/game
+ERROR 2025-11-01 17:56:16,088 basehttp 24220 2908 "POST /api/kids/gemini/game HTTP/1.1" 500 92
+INFO 2025-11-01 17:56:21,053 basehttp 24220 1800 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 17:58:10,513 basehttp 24220 10888 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 17:58:40,297 views 24220 25392 Gemini API key found, generating game for type: tongue-twister
+ERROR 2025-11-01 17:58:40,301 views 24220 25392 Gemini game error: name 'word' is not defined
+ERROR 2025-11-01 17:58:40,305 log 24220 25392 Internal Server Error: /api/kids/gemini/game
+ERROR 2025-11-01 17:58:40,315 basehttp 24220 25392 "POST /api/kids/gemini/game HTTP/1.1" 500 92
+INFO 2025-11-01 17:58:46,430 basehttp 24220 6876 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 17:58:51,488 views 24220 25392 Gemini API key found, generating game for type: pronunciation-challenge
+ERROR 2025-11-01 17:58:51,497 views 24220 25392 Gemini game error: name 'word' is not defined
+ERROR 2025-11-01 17:58:51,509 log 24220 25392 Internal Server Error: /api/kids/gemini/game
+ERROR 2025-11-01 17:58:51,542 basehttp 24220 25392 "POST /api/kids/gemini/game HTTP/1.1" 500 92
+INFO 2025-11-01 17:59:03,902 autoreload 24220 21184 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-01 17:59:05,378 autoreload 24864 25032 Watching for file changes with StatReloader
+INFO 2025-11-01 17:59:11,211 basehttp 24864 3436 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 17:59:15,380 views 24864 7748 Gemini API key found, generating game for type: pronunciation-challenge
+INFO 2025-11-01 17:59:15,380 views 24864 7748 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-01 17:59:15,903 views 24864 7748 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-01 17:59:15,905 views 24864 7748 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 17:59:17,544 views 24864 7748 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 17:59:17,555 basehttp 24864 7748 "POST /api/kids/gemini/game HTTP/1.1" 200 249
+INFO 2025-11-01 17:59:37,134 views 24864 16872 Gemini API key found, generating game for type: conversation-practice
+INFO 2025-11-01 17:59:37,136 views 24864 16872 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-01 17:59:37,751 views 24864 16872 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-01 17:59:37,754 views 24864 16872 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 17:59:39,469 views 24864 16872 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 17:59:39,474 basehttp 24864 16872 "POST /api/kids/gemini/game HTTP/1.1" 200 267
+INFO 2025-11-01 18:00:08,658 basehttp 24864 7488 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 18:14:31,450 views 24864 24772 Gemini API key found, generating game for type: tongue-twister
+INFO 2025-11-01 18:14:31,453 views 24864 24772 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-01 18:14:32,132 views 24864 24772 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-01 18:14:32,139 views 24864 24772 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 18:14:33,533 views 24864 24772 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 18:14:33,548 basehttp 24864 24772 "POST /api/kids/gemini/game HTTP/1.1" 200 184
+INFO 2025-11-01 18:17:42,660 basehttp 24864 17508 "GET /api/kids/lessons HTTP/1.1" 200 2

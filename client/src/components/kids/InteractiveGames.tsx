@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Trophy, Loader2, Sparkles, AlertCircle, Settings } from 'lucide-react';
+import { Trophy, Loader2, AlertCircle, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import EnhancedTTS from '@/services/EnhancedTTS';
 import { WhisperService } from '@/services/WhisperService';
@@ -29,12 +29,43 @@ const findFemaleVoiceId = (): string | undefined => {
   }
 };
 
+// Helper function to format AI response (remove JSON structure)
+const formatAIResponse = (content: string): string => {
+  if (!content) return '';
+  
+  // Remove JSON code blocks
+  let formatted = content.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+  
+  // If content is JSON-like, try to parse and extract meaningful text
+  if (formatted.startsWith('{')) {
+    try {
+      const parsed = JSON.parse(formatted);
+      const parts = [];
+      
+      if (parsed.content) parts.push(parsed.content);
+      if (parsed.feedback) parts.push(parsed.feedback);
+      if (parsed.nextStep) parts.push(parsed.nextStep);
+      
+      if (parts.length > 0) {
+        formatted = parts.join('\n\n');
+      }
+    } catch (e) {
+      // If parsing fails, just use the content as-is but clean it up
+      formatted = formatted.replace(/^\{\s*/, '').replace(/\s*\}$/, '');
+    }
+  }
+  
+  return formatted.trim();
+};
+
 type GameType = 'tongue-twister' | 'word-chain' | 'story-telling' | 'pronunciation-challenge' | 'conversation-practice';
 
 interface ConversationMessage {
   role: 'user' | 'assistant';
   content: string;
   timestamp: number;
+  isEditable?: boolean; // If true, user can edit this message
+  hasErrors?: boolean; // If true, AI detected errors in this message
 }
 
 const InteractiveGames = () => {
@@ -132,7 +163,10 @@ const InteractiveGames = () => {
         }
       });
 
-      setGameContent(response.content);
+      // Format the response content properly (remove JSON structure if present)
+      const formattedContent = formatAIResponse(response.content);
+      
+      setGameContent(formattedContent);
       if (response.gameInstruction) {
         setGameInstruction(response.gameInstruction);
       }
@@ -140,17 +174,17 @@ const InteractiveGames = () => {
         setQuestions(response.questions);
       }
 
-      // Add AI response to conversation
+      // Add AI response to conversation (only once, clean content)
       setConversationHistory([{
         role: 'assistant',
-        content: response.content,
+        content: formattedContent,
         timestamp: Date.now()
       }]);
 
       // Speak the AI's response if sound is enabled (use female voice)
-      if (isSoundEnabled && response.content) {
+      if (isSoundEnabled && formattedContent) {
         const femaleVoiceId = findFemaleVoiceId();
-        await EnhancedTTS.speak(response.content, { 
+        await EnhancedTTS.speak(formattedContent, { 
           voice: femaleVoiceId,
           rate: 0.9, 
           emotion: 'happy' 
@@ -164,23 +198,33 @@ const InteractiveGames = () => {
     }
   };
 
-  // Handle user input (text or voice)
-  const handleUserInput = async (input: string) => {
-    if (!input.trim() || isLoading || !GeminiService.isReady()) return;
+  // Handle user input - process with AI and detect meaning
+  const handleUserInput = async (input: string, existingMessage?: ConversationMessage) => {
+    if (!input.trim() || !GeminiService.isReady()) {
+      setIsLoading(false);
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
 
-    // Add user message to conversation
-    const userMessage: ConversationMessage = {
-      role: 'user',
-      content: input,
-      timestamp: Date.now()
-    };
-    setConversationHistory(prev => [...prev, userMessage]);
+    // If message already exists in conversation, update it; otherwise add it
+    if (existingMessage) {
+      // Message already added in handleVoiceInput
+    } else {
+      // This shouldn't happen with voice-only, but keep as fallback
+      const userMessage: ConversationMessage = {
+        role: 'user',
+        content: input,
+        timestamp: Date.now(),
+        isEditable: true,
+        hasErrors: false
+      };
+      setConversationHistory(prev => [...prev, userMessage]);
+    }
 
     try {
-      // Get conversation history for context
+      // Get conversation history for context (exclude editable flag)
       const history = conversationHistory.map(msg => ({
         role: msg.role,
         content: msg.content
@@ -192,13 +236,40 @@ const InteractiveGames = () => {
         history
       );
 
-      // Add AI response to conversation
+      // Format the response content properly (remove JSON structure)
+      const formattedContent = formatAIResponse(response.content);
+
+      // Add AI response to conversation (only once, clean content)
       const assistantMessage: ConversationMessage = {
         role: 'assistant',
-        content: response.content,
+        content: formattedContent,
         timestamp: Date.now()
       };
       setConversationHistory(prev => [...prev, assistantMessage]);
+
+      // Check if AI detected errors in user's response
+      const errorKeywords = ['wrong', 'incorrect', 'mistake', 'try again', 'not quite', 'almost', 'better', 'correction'];
+      const hasErrors = errorKeywords.some(keyword => 
+        formattedContent.toLowerCase().includes(keyword)
+      );
+
+      // Update user message if errors detected
+      if (hasErrors && existingMessage) {
+        setConversationHistory(prev => {
+          const updated = [...prev];
+          const userIndex = updated.findIndex((msg, idx) => 
+            msg.role === 'user' && msg.content === input && idx < updated.length - 1
+          );
+          if (userIndex !== -1) {
+            updated[userIndex] = {
+              ...updated[userIndex],
+              hasErrors: true,
+              isEditable: true // Make editable if errors detected
+            };
+          }
+          return updated;
+        });
+      }
 
       // Update game state if needed
       if (response.questions) {
@@ -214,9 +285,9 @@ const InteractiveGames = () => {
       }
 
       // Speak the AI's response if sound is enabled (use female voice)
-      if (isSoundEnabled && response.content) {
+      if (isSoundEnabled && formattedContent) {
         const femaleVoiceId = findFemaleVoiceId();
-        await EnhancedTTS.speak(response.content, { 
+        await EnhancedTTS.speak(formattedContent, { 
           voice: femaleVoiceId,
           rate: 0.9, 
           emotion: 'happy' 
@@ -230,18 +301,67 @@ const InteractiveGames = () => {
     }
   };
 
-  // Handle voice input
+  // Handle voice input - automatically transcribe and send
   const handleVoiceInput = async (blob: Blob, _score: number) => {
     try {
+      setIsLoading(true);
       const result = await WhisperService.transcribe(blob);
       const transcript = result.transcript.trim();
+      
       if (transcript) {
-        await handleUserInput(transcript);
+        // Add user message to conversation immediately (will be editable)
+        const userMessage: ConversationMessage = {
+          role: 'user',
+          content: transcript,
+          timestamp: Date.now(),
+          isEditable: true,
+          hasErrors: false
+        };
+        setConversationHistory(prev => [...prev, userMessage]);
+        
+        // Process with AI (AI will detect meaning and respond)
+        await handleUserInput(transcript, userMessage);
+      } else {
+        setError('I couldn\'t hear what you said. Please try speaking again.');
+        setIsLoading(false);
       }
     } catch (error) {
       console.error('Voice transcription error:', error);
-      setError('Failed to understand your voice. Please try again or type your response.');
+      setError('Failed to understand your voice. Please try speaking again.');
+      setIsLoading(false);
     }
+  };
+
+  // Update user message in conversation (for editing)
+  const updateUserMessage = async (messageIndex: number, newContent: string) => {
+    if (!newContent.trim()) return;
+    
+    // Get current state to check if we need to resend
+    setConversationHistory(prev => {
+      const updated = [...prev];
+      if (updated[messageIndex] && updated[messageIndex].role === 'user') {
+        const originalMessage = updated[messageIndex];
+        const newContentTrimmed = newContent.trim();
+        
+        // Update the message content
+        updated[messageIndex] = {
+          ...originalMessage,
+          content: newContentTrimmed,
+          hasErrors: false // Reset error flag when editing
+        };
+        
+        // If message was edited and had errors, resend to AI
+        if (originalMessage.hasErrors && newContentTrimmed !== originalMessage.content) {
+          // Resend to AI with updated content
+          setIsLoading(true);
+          handleUserInput(newContentTrimmed, updated[messageIndex]).catch(err => {
+            console.error('Error resending message:', err);
+            setIsLoading(false);
+          });
+        }
+      }
+      return updated;
+    });
   };
 
 
@@ -305,6 +425,7 @@ const InteractiveGames = () => {
           }}
       onUserInput={handleUserInput}
       onVoiceInput={handleVoiceInput}
+      onUpdateMessage={updateUserMessage}
         />
       )}
     </div>
@@ -363,33 +484,6 @@ const GameMenu = ({
 
   return (
     <div className="space-y-4 sm:space-y-6 w-full lg:max-w-7xl xl:max-w-[1400px] mx-auto">
-      {/* Status Badge */}
-      <Card className="border-2 border-blue-300/50 bg-blue-50/40 dark:bg-blue-900/10 backdrop-blur-sm shadow-lg">
-        <CardContent className="py-4 sm:py-6 text-center px-3 sm:px-4">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            {isGeminiReady ? (
-              <>
-                <Sparkles className="w-5 h-5 text-green-600" />
-                <span className="text-lg font-bold text-green-700 dark:text-green-300">
-                  AI Games Ready!
-                </span>
-              </>
-            ) : (
-              <>
-                <AlertCircle className="w-5 h-5 text-yellow-600" />
-                <span className="text-lg font-bold text-yellow-700 dark:text-yellow-300">
-                  Setup Required
-                </span>
-              </>
-            )}
-          </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            {isGeminiReady 
-              ? 'All games are powered by Google Gemini AI for endless fun!'
-              : 'Please configure your API key to start playing AI games.'}
-          </p>
-        </CardContent>
-      </Card>
 
       {/* Score Display */}
       <Card className="border-2 border-yellow-300/50 bg-yellow-50/40 dark:bg-yellow-900/10 backdrop-blur-sm shadow-lg">
@@ -410,7 +504,7 @@ const GameMenu = ({
       {/* Game Selection */}
       <div className="text-center mb-4 sm:mb-6 px-3 sm:px-4">
         <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#118AB2] bg-clip-text text-transparent mb-2 drop-shadow-sm">
-          Choose Your AI Game! 🤖
+          Choose Your AI Game!
         </h2>
         <p className="text-sm sm:text-base md:text-lg text-gray-700 dark:text-gray-300 font-medium">
           Pick a fun game powered by AI! 🎮
@@ -497,7 +591,8 @@ const GameView = ({
   error,
   onBack, 
   onUserInput,
-  onVoiceInput
+  onVoiceInput,
+  onUpdateMessage
 }: {
   gameType: GameType;
   gameContent: string;
@@ -507,10 +602,12 @@ const GameView = ({
   isLoading: boolean;
   error: string | null;
   onBack: () => void; 
-  onUserInput: (input: string) => void;
+  onUserInput: (input: string, existingMessage?: ConversationMessage) => void;
   onVoiceInput: (blob: Blob, score: number) => void;
+  onUpdateMessage: (index: number, content: string) => void;
 }) => {
-  const [textInput, setTextInput] = useState('');
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editValue, setEditValue] = useState<string>('');
 
   const gameTitles: Record<GameType, string> = {
     'tongue-twister': '👅 Tongue Twisters',
@@ -520,11 +617,22 @@ const GameView = ({
     'conversation-practice': '💬 Chat Practice'
   };
 
-  const handleSubmit = () => {
-    if (textInput.trim()) {
-      onUserInput(textInput.trim());
-      setTextInput('');
+  const startEditing = (index: number, currentContent: string) => {
+    setEditingIndex(index);
+    setEditValue(currentContent);
+  };
+
+  const saveEdit = (index: number) => {
+    if (editValue.trim()) {
+      onUpdateMessage(index, editValue.trim());
+      setEditingIndex(null);
+      setEditValue('');
     }
+  };
+
+  const cancelEdit = () => {
+    setEditingIndex(null);
+    setEditValue('');
   };
 
   return (
@@ -562,8 +670,8 @@ const GameView = ({
           </div>
         )}
 
-        {/* Game Content */}
-        {gameContent && (
+        {/* Game Content - Only show if no conversation history (initial game start) */}
+        {gameContent && conversationHistory.length === 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border-2 border-gray-200 dark:border-gray-700">
             <p className="text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-relaxed">
               {gameContent}
@@ -596,62 +704,109 @@ const GameView = ({
           </div>
         )}
 
-        {/* Conversation History */}
+        {/* Conversation History - Voice Only Flow - Chat Style */}
         {conversationHistory.length > 0 && (
-          <div className="space-y-3 max-h-96 overflow-y-auto">
+          <div className="space-y-4 max-h-96 overflow-y-auto">
             {conversationHistory.map((msg, idx) => (
               <div
                 key={idx}
                 className={cn(
-                  "rounded-lg p-3",
+                  "rounded-lg p-4 transition-all",
                   msg.role === 'user'
-                    ? "bg-blue-100 dark:bg-blue-900/30 ml-auto max-w-[80%]"
-                    : "bg-gray-100 dark:bg-gray-700 mr-auto max-w-[80%]"
+                    ? "bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-700 ml-auto max-w-[85%]"
+                    : "bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 mr-auto max-w-[85%]"
                 )}
               >
-                <p className="text-sm font-semibold mb-1">
-                  {msg.role === 'user' ? 'You' : 'AI Teacher'}
-                </p>
-                <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                  {msg.content}
-            </p>
-          </div>
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <p className="text-sm font-bold">
+                    {msg.role === 'user' ? 'You' : 'AI Teacher'}
+                  </p>
+                  {msg.role === 'user' && msg.isEditable && !isLoading && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => startEditing(idx, msg.content)}
+                      className="h-6 px-2 text-xs"
+                      disabled={editingIndex === idx}
+                    >
+                      {editingIndex === idx ? 'Editing...' : '✏️ Edit'}
+                    </Button>
+                  )}
+                </div>
+                
+                {editingIndex === idx ? (
+                  <div className="space-y-2">
+                    <Input
+                      type="text"
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && saveEdit(idx)}
+                      className="w-full text-sm"
+                      autoFocus
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        onClick={() => saveEdit(idx)}
+                        className="bg-green-600 hover:bg-green-700"
+                        disabled={!editValue.trim()}
+                      >
+                        Save
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={cancelEdit}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <p className={cn(
+                      "text-sm whitespace-pre-wrap leading-relaxed",
+                      msg.role === 'user' 
+                        ? "text-blue-900 dark:text-blue-100" 
+                        : "text-gray-800 dark:text-gray-200"
+                    )}>
+                      {msg.content}
+                    </p>
+                    {msg.hasErrors && (
+                      <div className="flex items-center gap-2 mt-2">
+                        <AlertCircle className="w-4 h-4 text-orange-500" />
+                        <p className="text-xs text-orange-600 dark:text-orange-400 italic">
+                          AI detected some mistakes. Click Edit to correct!
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         )}
 
-        {/* Input Area */}
-        <div className="space-y-3">
-          <div className="flex gap-2">
-            <Input
-              type="text"
-              placeholder="Type your response..."
-              value={textInput}
-              onChange={(e) => setTextInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
-              className="flex-1"
-              disabled={isLoading}
-            />
-              <Button 
-              onClick={handleSubmit}
-              disabled={isLoading || !textInput.trim()}
-              className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4]"
-            >
-              Send
-              </Button>
-          </div>
-
-          {/* Voice Input */}
-          <div className="text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Or speak your response:</p>
+        {/* Voice Input - Primary and Only Input Method */}
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-6 border-2 border-purple-200 dark:border-purple-700">
+          <div className="text-center space-y-4">
+            <div>
+              <p className="text-base font-bold text-gray-800 dark:text-gray-200 mb-2">
+                🎤 Speak Your Response
+              </p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Click the microphone and speak! The AI will listen and understand what you say.
+              </p>
+            </div>
             <KidsVoiceRecorder
               targetWord="response"
               onCorrectPronunciation={onVoiceInput}
               maxDuration={30}
               autoAnalyze={true}
+              disabled={isLoading}
             />
           </div>
-            </div>
+        </div>
       </CardContent>
     </Card>
   );
