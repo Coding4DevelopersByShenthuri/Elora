@@ -36,7 +36,6 @@ import YoungKidsPage from "@/pages/YoungKids";
 import TeenKidsPage from "@/pages/TeenKids";
 import YoungKidsFavoritesPage from "@/pages/YoungKidsFavorites";
 import TeenKidsFavoritesPage from "@/pages/TeenKidsFavorites";
-import ModelManagerPage from "@/pages/ModelManager";
 import ParentalControlsPage from "@/pages/ParentalControlsPage";
 import KidsGamePage from "@/pages/KidsGamePage";
 import Adults from "@/pages/adults/adults";
@@ -198,7 +197,6 @@ const AppRoutes = () => {
         <Route path="/kids/games/:gameId" element={<PageTransition><KidsGamePage /></PageTransition>} />
         <Route path="/favorites/young" element={<PageTransition><YoungKidsFavoritesPage /></PageTransition>} />
         <Route path="/favorites/teen" element={<PageTransition><TeenKidsFavoritesPage /></PageTransition>} />
-        <Route path="/model-manager" element={<PageTransition><ModelManagerPage /></PageTransition>} />
         <Route path="/parental-controls" element={<PageTransition><ParentalControlsPage /></PageTransition>} />
         <Route path="/adults" element={<PageTransition><Adults /></PageTransition>} />
         <Route path="/adults/beginners" element={<PageTransition><Beginners /></PageTransition>} />

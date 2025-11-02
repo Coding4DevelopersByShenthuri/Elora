@@ -19,6 +19,7 @@ import google.oauth2.id_token
 import google.auth.transport.requests
 import requests
 import json
+import re
 
 from .serializers import (
     RegisterSerializer, LoginSerializer, UserSerializer, UserProfileSerializer,
@@ -1087,15 +1088,77 @@ def kids_gemini_game(request):
         # Build system prompt
         age = context.get('age', 7)
         level = context.get('level', 'beginner')
-        base_prompt = f"You are a friendly and encouraging AI teacher playing fun educational games with a {age}-year-old child learning English. The child's level is {level}. Be patient, positive, and make learning fun!"
+        base_prompt = f"You are a friendly and encouraging AI teacher playing fun educational games with a {age}-year-old child learning English. The child's level is {level}. Be patient, positive, and make learning fun! IMPORTANT: Do NOT use any markdown formatting like **, *, __, _, `, # etc. Use only plain text. NEVER wrap your JSON response in code blocks (no ```json or ```). Return pure JSON only."
         
         # Game-specific prompts for original 5 game categories - optimized for little kids
         game_prompts = {
-            'tongue-twister': f"{base_prompt}\n\nYou are playing a Tongue Twister game with a {age}-year-old child. Give them SIMPLE, SHORT tongue twisters that are perfect for little kids. Examples: 'Red lorry, yellow lorry' (for 5-7 years), 'Big bug bit' (for 4-6 years), 'Toy boat, toy boat' (for 7-9 years), 'She sells seashells' (for 8+ years). Keep them age-appropriate, fun, and easy to remember. LISTEN to what the child says and UNDERSTAND THE MEANING of their response. After they try to say it, give them encouraging feedback naturally in your response. If they said something wrong or with mistakes, gently correct them but be positive. Format your response as JSON with ONLY the content field: {{ \"content\": \"Here's your tongue twister: [phrase]\" }}. For responses after the child tries, use: {{ \"content\": \"[Encouraging natural response like 'Great try!' or 'Excellent! Keep practicing!' or 'Good job!']\" }}",
-            'word-chain': f"{base_prompt}\n\nYou are playing a Word Chain game with a {age}-year-old child. Give them SIMPLE words they know (like cat, dog, sun, fun, run, big, red). Start with a word and ask them to say another word that starts with the last letter. LISTEN to what the child says and UNDERSTAND THE MEANING. If they say a word correctly, celebrate! If they say something wrong, gently help them understand. Keep it fun and simple! Give encouraging feedback after each word. Format your response as JSON with: {{ \"gameInstruction\": \"Say a word starting with the letter [X]\", \"content\": \"Great! I said [word]. Now you say a word starting with [letter]!\", \"feedback\": \"Excellent! That's a great word!\" }}",
-            'story-telling': f"{base_prompt}\n\nYou are playing a Story Telling game with a {age}-year-old child. Start a SHORT, EXCITING, and age-appropriate story (2-3 sentences). Use simple words they understand. Themes: animals, adventures, magic, friends, toys. LISTEN carefully to what the child says to continue the story. UNDERSTAND THE MEANING of their words and respond naturally. If they make mistakes, gently guide them but keep the story flowing! Format your response as JSON with: {{ \"gameInstruction\": \"Continue the story! What happens next?\", \"content\": \"Once upon a time, there was a brave little [character] who loved [something fun]. One day, [character] went on an adventure to [fun place]...\", \"nextStep\": \"What happens next? Tell me!\", \"feedback\": \"What an exciting story! Keep going!\" }}",
-            'pronunciation-challenge': f"{base_prompt}\n\nYou are playing a Pronunciation Challenge game with a {age}-year-old child. Give them SIMPLE words to practice (like 'cat', 'dog', 'sun', 'fun', 'big', 'red' for beginners, or 'th', 'r', 'l' sounds for advanced). LISTEN carefully to how they pronounce words. UNDERSTAND what they're trying to say even if pronunciation isn't perfect. Give encouraging feedback and simple pronunciation tips if needed. Format your response as JSON with: {{ \"gameInstruction\": \"Say this word 3 times: [word]\", \"content\": \"Let's practice saying: [word]\n\nRepeat after me: [word], [word], [word]!\", \"feedback\": \"[Encouraging feedback like 'Perfect!', 'Great job!']\" }}",
-            'conversation-practice': f"{base_prompt}\n\nYou are having a friendly conversation with a {age}-year-old child. Ask them SIMPLE questions about their favorite things (like 'What's your favorite color?', 'Do you have a pet?', 'What's your favorite food?'). LISTEN carefully to their responses and UNDERSTAND THE MEANING of what they're saying. Even if their grammar isn't perfect, understand their meaning and respond naturally. If they make mistakes, gently model correct language but keep the conversation flowing smoothly. Format your response as JSON with: {{ \"content\": \"Hi! Let's chat! What's your favorite animal?\", \"feedback\": \"That's so cool! Tell me more!\" }}"
+            'tongue-twister': f"""{base_prompt}
+
+You are playing a Tongue Twister game with a {age}-year-old child.
+Give them SIMPLE, SHORT tongue twisters that are perfect for little kids.
+Examples: 'Red lorry, yellow lorry' (for 5-7 years)
+Examples: 'Big bug bit' (for 4-6 years)
+Examples: 'Toy boat, toy boat' (for 7-9 years)
+Examples: 'She sells seashells' (for 8+ years)
+Keep them age-appropriate, fun, and easy to remember.
+LISTEN to what the child says and UNDERSTAND THE MEANING of their response.
+After they try to say it, give them encouraging feedback naturally in your response.
+If they said something wrong or with mistakes, gently correct them but be positive.
+IMPORTANT: Award points (10-50) ONLY AFTER the child attempts the tongue twister, NOT when giving the initial tongue twister.
+Format your response as JSON with fields:
+For first prompt: {{ "content": "Here's your tongue twister: [phrase]" }}
+After child attempts: {{ "content": "[Encouraging response like 'Great try!' or 'Excellent! Keep practicing!']", "points": 25 }}""",
+            
+            'word-chain': f"""{base_prompt}
+
+You are playing a Word Chain game with a {age}-year-old child.
+Give them SIMPLE words they know (like cat, dog, sun, fun, run, big, red).
+Start with a word and ask them to say another word that starts with the last letter.
+LISTEN to what the child says and UNDERSTAND THE MEANING.
+If they say a word correctly, celebrate!
+If they say something wrong, gently help them understand.
+Keep it fun and simple!
+Give encouraging feedback after each word.
+ALWAYS award points (15-40) for correct word chains.
+Format your response as JSON with:
+{{ "gameInstruction": "Say a word starting with the letter [X]", "content": "Great! I said [word]. Now you say a word starting with [letter]!", "feedback": "Excellent! That's a great word!", "points": 30 }}""",
+            
+            'story-telling': f"""{base_prompt}
+
+You are playing a Story Telling game with a {age}-year-old child.
+Start a SHORT, EXCITING, and age-appropriate story (2-3 sentences).
+Use simple words they understand.
+Themes: animals, adventures, magic, friends, toys.
+LISTEN carefully to what the child says to continue the story.
+UNDERSTAND THE MEANING of their words and respond naturally.
+If they make mistakes, gently guide them but keep the story flowing!
+ALWAYS award points (20-50) for creative contributions.
+Format your response as JSON with:
+{{ "gameInstruction": "Continue the story! What happens next?", "content": "Once upon a time, there was a brave little [character] who loved [something fun]. One day, [character] went on an adventure to [fun place]...", "nextStep": "What happens next? Tell me!", "feedback": "What an exciting story! Keep going!", "points": 35 }}""",
+            
+            'pronunciation-challenge': f"""{base_prompt}
+
+You are playing a Pronunciation Challenge game with a {age}-year-old child.
+Give them SIMPLE words to practice (like 'cat', 'dog', 'sun', 'fun', 'big', 'red' for beginners, or 'th', 'r', 'l' sounds for advanced).
+IMPORTANT: ONLY award points and give feedback AFTER hearing the child's pronunciation attempt.
+For the INITIAL prompt, give the word to practice WITHOUT any feedback or points.
+After they try, listen carefully and give encouraging feedback or gentle corrections.
+Use simple, clear words - no puns or wordplay.
+ALWAYS award points (10-40) based on pronunciation quality, but ONLY after they speak.
+Format your response as JSON:
+For initial word: {{ "gameInstruction": "Say this word 3 times", "content": "Let's practice saying: [word]\n\nRepeat after me: [word], [word], [word]!" }}
+After child speaks: {{ "content": "[Simple feedback like 'Perfect!' or 'Try again, focus on the [sound] sound']", "feedback": "", "points": 25 }}""",
+            
+            'conversation-practice': f"""{base_prompt}
+
+You are having a friendly conversation with a {age}-year-old child.
+Ask them SIMPLE questions about their favorite things (like 'What's your favorite color?', 'Do you have a pet?', 'What's your favorite food?').
+LISTEN carefully to their responses and UNDERSTAND THE MEANING of what they're saying.
+Even if their grammar isn't perfect, understand their meaning and respond naturally.
+If they make mistakes, gently model correct language but keep the conversation flowing smoothly.
+ALWAYS award points (15-35) for engaging responses.
+Format your response as JSON with:
+{{ "content": "Hi! Let's chat! What's your favorite animal?", "feedback": "That's so cool! Tell me more!", "points": 20 }}"""
         }
         
         system_prompt = game_prompts.get(game_type, base_prompt)
@@ -1133,8 +1196,8 @@ def kids_gemini_game(request):
             'parts': [{'text': combined_text}]
         })
         
-        # Call Gemini API - using Gemini 2.0 Flash Experimental only
-        model_name = 'gemini-2.0-flash-exp'
+        # Call Gemini API - using Gemini 2.5 Flash (stable and fast)
+        model_name = 'gemini-2.5-flash'
         
         # Build payload
         payload = {
@@ -1243,6 +1306,21 @@ def kids_gemini_game(request):
         data = response.json()
         content = data.get('candidates', [{}])[0].get('content', {}).get('parts', [{}])[0].get('text', 'Sorry, I could not generate a response.')
         
+        # Helper function to clean markdown formatting
+        def clean_markdown(text):
+            if not text:
+                return text
+            # Remove common markdown formatting - order matters!
+            text = text.replace('**', '')  # Remove bold
+            text = text.replace('*', '')  # Remove any remaining asterisks
+            text = text.replace('__', '')  # Remove underline
+            text = text.replace('_', '')  # Remove any remaining underscores
+            text = text.replace('`', '')  # Remove code formatting
+            text = text.replace('#', '')  # Remove headers
+            # Don't remove parentheses as they might be part of the text
+            # Don't remove brackets to preserve readability
+            return text.strip()
+        
         # Try to parse JSON from response
         parsed_response = {
             'content': content.strip(),
@@ -1282,11 +1360,11 @@ def kids_gemini_game(request):
                 combined_content = '\n\n'.join(filter(None, message_parts))
                 
                 parsed_response.update({
-                    'content': combined_content if combined_content else parsed.get('content', parsed_response['content']),
-                    'gameInstruction': parsed.get('gameInstruction'),
+                    'content': clean_markdown(combined_content if combined_content else parsed.get('content', parsed_response['content'])),
+                    'gameInstruction': clean_markdown(parsed.get('gameInstruction') if parsed.get('gameInstruction') else None),
                     'questions': parsed.get('questions'),
-                    'feedback': parsed.get('feedback'),
-                    'nextStep': parsed.get('nextStep'),
+                    'feedback': clean_markdown(parsed.get('feedback') if parsed.get('feedback') else None),
+                    'nextStep': clean_markdown(parsed.get('nextStep') if parsed.get('nextStep') else None),
                     'points': parsed.get('points', 0)
                 })
         except (json.JSONDecodeError, AttributeError):
@@ -1301,7 +1379,20 @@ def kids_gemini_game(request):
                     text_parts = [p.strip() for p in parts if p.strip() and not p.strip().startswith('json')]
                     cleaned_content = '\n\n'.join(text_parts) if text_parts else cleaned_content
             
-            parsed_response['content'] = cleaned_content
+            # If cleaned_content still looks like raw JSON, try to extract text from it
+            if cleaned_content.startswith('{') and ('content' in cleaned_content or 'feedback' in cleaned_content):
+                # Try to extract plain text by removing JSON structure
+                # Find all string values in JSON
+                matches = re.findall(r'"([^"]+)":\s*"([^"]+)"', cleaned_content)
+                text_parts = []
+                for key, value in matches:
+                    # Only include non-metadata fields (not points or other JSON keys)
+                    if key in ['content', 'feedback', 'nextStep', 'gameInstruction']:
+                        text_parts.append(value)
+                if text_parts:
+                    cleaned_content = ' '.join(text_parts)
+            
+            parsed_response['content'] = clean_markdown(cleaned_content)
         
         return Response(parsed_response, status=status.HTTP_200_OK)
     

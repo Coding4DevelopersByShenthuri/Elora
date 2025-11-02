@@ -5,7 +5,7 @@ import {
   Rabbit, Fish, Rocket, Cloud,
   Sun, CloudRain, Footprints,
   ChevronLeft, ChevronRight, Anchor,
-  Shield, Download, Loader2, Crown, Compass,
+  Shield, Loader2, Crown, Compass,
   Music, VolumeX, HelpCircle, CheckCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -1425,33 +1425,6 @@ const YoungKidsPage = () => {
           >
               Magical stories, fun games, and exciting adventures for young minds!                   
           </p>
-          
-          {/* AI Status Badge */}
-          <div className="flex items-center justify-center gap-2 flex-wrap px-4">
-            {modelsReady && (
-              <span className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-green-100 dark:bg-green-900/20 border-2 border-green-300 rounded-full text-xs sm:text-sm font-semibold text-green-700 dark:text-green-400">
-                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                <span className="hidden sm:inline">AI Teacher Ready (Offline)</span>
-                <span className="sm:hidden">AI Ready</span>
-              </span>
-            )}
-            {!modelsReady && !isInitializing && (
-              <button
-                onClick={() => navigate('/model-manager')}
-                className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-yellow-100 dark:bg-yellow-900/20 border-2 border-yellow-300 rounded-full text-xs sm:text-sm font-semibold text-yellow-700 dark:text-yellow-400 hover:bg-yellow-200 dark:hover:bg-yellow-900/30 transition-colors"
-              >
-                <Download className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                <span className="hidden sm:inline">Download AI Tutor</span>
-                <span className="sm:hidden">Download AI</span>
-              </button>
-            )}
-            {isInitializing && (
-              <span className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-100 dark:bg-blue-900/20 border-2 border-blue-300 rounded-full text-xs sm:text-sm font-semibold text-blue-700 dark:text-blue-400">
-                <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin flex-shrink-0" />
-                Setting up...
-              </span>
-            )}
-          </div>
         </div>
 
       

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Trophy, Loader2, AlertCircle, ArrowLeft, Volume2 } from 'lucide-react';
+import { Trophy, Loader2, AlertCircle, ArrowLeft, Volume2, Sparkles, RotateCcw, Star, Award } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import EnhancedTTS from '@/services/EnhancedTTS';
 import { WhisperService } from '@/services/WhisperService';
@@ -35,6 +35,7 @@ const formatAIResponse = (content: string): string => {
   
   let formatted = content.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
   
+  // If the content is raw JSON, try to extract readable text from it
   if (formatted.startsWith('{')) {
     try {
       const parsed = JSON.parse(formatted);
@@ -43,12 +44,37 @@ const formatAIResponse = (content: string): string => {
       if (parsed.content) parts.push(parsed.content);
       if (parsed.feedback) parts.push(parsed.feedback);
       if (parsed.nextStep) parts.push(parsed.nextStep);
+      if (parsed.gameInstruction) parts.push(parsed.gameInstruction);
       
       if (parts.length > 0) {
-        formatted = parts.join('\n\n');
+        formatted = parts.join(' ');
+      } else {
+        // If no parts found, just remove JSON structure
+        formatted = formatted.replace(/^\{\s*/, '').replace(/\s*\}$/, '');
       }
     } catch (e) {
-      formatted = formatted.replace(/^\{\s*/, '').replace(/\s*\}$/, '');
+      // If parsing fails, try to extract string values using regex
+      const stringMatches = formatted.match(/"([^"]+)":\s*"([^"]+)"/g);
+      if (stringMatches) {
+        const textParts: string[] = [];
+        stringMatches.forEach(match => {
+          const keyValue = match.match(/"([^"]+)":\s*"([^"]+)"/);
+          if (keyValue) {
+            const key = keyValue[1];
+            const value = keyValue[2];
+            if (key === 'content' || key === 'feedback' || key === 'nextStep' || key === 'gameInstruction') {
+              textParts.push(value);
+            }
+          }
+        });
+        if (textParts.length > 0) {
+          formatted = textParts.join(' ');
+        } else {
+          formatted = formatted.replace(/^\{\s*/, '').replace(/\s*\}$/, '');
+        }
+      } else {
+        formatted = formatted.replace(/^\{\s*/, '').replace(/\s*\}$/, '');
+      }
     }
   }
   
@@ -88,6 +114,10 @@ const KidsGamePage = () => {
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState<string>('');
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [currentRound, setCurrentRound] = useState(0);
+  const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
+  const [currentDifficulty, setCurrentDifficulty] = useState<'beginner' | 'intermediate' | 'advanced'>('beginner');
 
   const currentGame = gameId as GameType;
 
@@ -117,6 +147,7 @@ const KidsGamePage = () => {
     if (currentGame && GeminiService.isReady()) {
       startGame();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentGame]);
 
   // Handle score updates with backend sync
@@ -176,13 +207,17 @@ const KidsGamePage = () => {
     setGameInstruction('');
     setQuestions([]);
     setConversationHistory([]);
+    setCurrentRound(0);
+    setConsecutiveCorrect(0);
+    setShowCelebration(false);
+    setCurrentDifficulty('beginner');
 
     try {
       const response = await GeminiService.generateGame({
         gameType: currentGame,
         context: {
           age: 7,
-          level: 'beginner',
+          level: currentDifficulty,
           completedStories: []
         }
       });
@@ -251,6 +286,13 @@ const KidsGamePage = () => {
         input,
         history
       );
+      
+      // Auto-advance difficulty based on performance
+      if (currentRound >= 5 && currentDifficulty === 'beginner') {
+        setCurrentDifficulty('intermediate');
+      } else if (currentRound >= 15 && currentDifficulty === 'intermediate') {
+        setCurrentDifficulty('advanced');
+      }
 
       const formattedContent = formatAIResponse(response.content);
 
@@ -292,6 +334,12 @@ const KidsGamePage = () => {
 
       if (response.points && response.points > 0) {
         handleScoreUpdate(response.points, currentGame);
+        
+        // Show celebration for points
+        setShowCelebration(true);
+        setConsecutiveCorrect(prev => prev + 1);
+        setCurrentRound(prev => prev + 1);
+        setTimeout(() => setShowCelebration(false), 3000);
       }
 
       if (isSoundEnabled && formattedContent) {
@@ -409,6 +457,26 @@ const KidsGamePage = () => {
 
   return (
     <div className="min-h-screen pb-16 sm:pb-20 pt-24 sm:pt-32 md:pt-40 relative overflow-hidden">
+      {/* Celebration Overlay */}
+      {showCelebration && (
+        <div className="fixed inset-0 pointer-events-none z-50">
+          {Array.from({ length: 20 }, (_, i) => (
+            <div
+              key={i}
+              className="absolute animate-bounce"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 2}s`,
+                animationDuration: `${2 + Math.random() * 2}s`
+              }}
+            >
+              <Sparkles className="w-6 h-6 text-yellow-400" />
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative z-10">
         <Card className="border-2 border-purple-300/50 bg-purple-50/40 dark:bg-purple-900/10 backdrop-blur-sm">
           <CardHeader>
@@ -418,6 +486,16 @@ const KidsGamePage = () => {
                 <span>{gameInfo.title}</span>
               </div>
               <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={startGame}
+                  className="rounded-xl text-green-600 hover:bg-green-50"
+                  disabled={isLoading}
+                >
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  Restart
+                </Button>
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -441,11 +519,39 @@ const KidsGamePage = () => {
           <CardContent className="space-y-6">
             {/* Score Display */}
             <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl p-4 border-2 border-yellow-200">
-              <div className="flex items-center justify-center gap-2">
-                <Trophy className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
-                <span className="text-xl font-bold text-yellow-700 dark:text-yellow-300">
-                  {gameScore} Points
-                </span>
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center gap-2">
+                  <Trophy className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+                  <span className="text-xl font-bold text-yellow-700 dark:text-yellow-300">
+                    {gameScore} Points
+                  </span>
+                </div>
+                {currentRound > 0 && (
+                  <div className="flex items-center gap-4 flex-wrap">
+                    <div className="flex items-center gap-1">
+                      <Star className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                      <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        Round {currentRound}
+                      </span>
+                    </div>
+                    {consecutiveCorrect > 0 && (
+                      <div className="flex items-center gap-1">
+                        <Award className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                          {consecutiveCorrect} in a row! 🔥
+                        </span>
+                      </div>
+                    )}
+                    <div className={cn(
+                      "px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap",
+                      currentDifficulty === 'beginner' && "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+                      currentDifficulty === 'intermediate' && "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+                      currentDifficulty === 'advanced' && "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                    )}>
+                      {currentDifficulty.toUpperCase()}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -647,7 +753,8 @@ const KidsGamePage = () => {
                   targetWord="response"
                   onCorrectPronunciation={handleVoiceInput}
                   maxDuration={30}
-                  autoAnalyze={true}
+                  autoAnalyze={false}
+                  skipPronunciationCheck={true}
                   disabled={isLoading}
                 />
               </div>

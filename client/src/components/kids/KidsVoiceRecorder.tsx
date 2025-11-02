@@ -14,6 +14,7 @@ interface KidsVoiceRecorderProps {
   className?: string;
   autoAnalyze?: boolean; // If true, continuously analyzes during recording
   disabledWhileSpeaking?: boolean; // If true, disable recording while TTS is speaking
+  skipPronunciationCheck?: boolean; // If true, skip pronunciation scoring and just call onCorrectPronunciation with any transcript
 }
 
 const KidsVoiceRecorder = ({
@@ -24,7 +25,8 @@ const KidsVoiceRecorder = ({
   disabled = false,
   className,
   autoAnalyze = true,
-  disabledWhileSpeaking = false
+  disabledWhileSpeaking = false,
+  skipPronunciationCheck = false
 }: KidsVoiceRecorderProps) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -84,6 +86,26 @@ const KidsVoiceRecorder = ({
         console.log('🎤 Child said:', transcript);
       } catch (error) {
         console.warn('Whisper transcription failed:', error);
+        return false;
+      }
+
+      // If skipPronunciationCheck is true, just call onCorrectPronunciation for any transcript
+      if (skipPronunciationCheck) {
+        if (transcript) {
+          console.log('✅ Transcript received (pronunciation check skipped)');
+          setShowSuccess(true);
+          setFeedbackMessage('🎉 Got it!');
+          
+          // Auto-stop recording
+          await stopRecording(true);
+          
+          // Notify parent component with a default score
+          setTimeout(() => {
+            onCorrectPronunciation(audioBlob, 100);
+          }, 1000);
+          
+          return true;
+        }
         return false;
       }
 
