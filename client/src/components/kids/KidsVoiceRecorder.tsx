@@ -183,9 +183,16 @@ const KidsVoiceRecorder = ({
       mediaRecorder.onstop = async () => {
         const blob = new Blob(chunksRef.current, { type: 'audio/webm;codecs=opus' });
         
-        // Final analysis if not already marked as success and not explicitly skipped
-        if (!showSuccess && !skipFinalAnalysisRef.current && chunksRef.current.length > 0) {
-          await analyzeAudio(blob);
+        // Handle transcription based on skipPronunciationCheck flag
+        if (skipPronunciationCheck) {
+          // For games: just call onCorrectPronunciation with the audio blob
+          // The parent component (handleVoiceInput) will transcribe it
+          onCorrectPronunciation(blob, 100);
+        } else {
+          // For pronunciation practice: do full analysis
+          if (!showSuccess && !skipFinalAnalysisRef.current && chunksRef.current.length > 0) {
+            await analyzeAudio(blob);
+          }
         }
         
         // Reset skip flag

@@ -2520,3 +2520,139 @@ INFO 2025-11-02 19:39:45,780 basehttp 4312 22772 "POST /api/kids/gemini/game HTT
 INFO 2025-11-02 19:40:46,476 basehttp 4312 25580 "GET /api/kids/lessons HTTP/1.1" 200 2
 INFO 2025-11-02 19:40:55,452 autoreload 4312 11804 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
 INFO 2025-11-02 19:40:56,228 autoreload 26012 23692 Watching for file changes with StatReloader
+INFO 2025-11-02 20:00:51,864 autoreload 23568 9376 Watching for file changes with StatReloader
+INFO 2025-11-02 20:07:37,607 views 23568 11240 Gemini API key found, generating game for type: tongue-twister
+INFO 2025-11-02 20:07:37,607 views 23568 11240 Calling Gemini API: v1/models/gemini-2.5-flash
+INFO 2025-11-02 20:07:41,286 views 23568 11240 Success with v1/models/gemini-2.5-flash
+INFO 2025-11-02 20:07:41,286 basehttp 23568 11240 "POST /api/kids/gemini/game HTTP/1.1" 200 137
+INFO 2025-11-02 20:12:47,019 views 23568 5260 Gemini API key found, generating game for type: tongue-twister
+INFO 2025-11-02 20:12:47,019 views 23568 5260 Calling Gemini API: v1/models/gemini-2.5-flash
+INFO 2025-11-02 20:12:50,782 views 23568 5260 Success with v1/models/gemini-2.5-flash
+INFO 2025-11-02 20:12:50,784 basehttp 23568 5260 "POST /api/kids/gemini/game HTTP/1.1" 200 144
+INFO 2025-11-02 20:13:34,308 autoreload 23568 9376 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-02 20:13:35,191 autoreload 16996 6300 Watching for file changes with StatReloader
+INFO 2025-11-02 20:13:46,699 autoreload 16996 6300 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-02 20:13:47,391 autoreload 12292 21484 Watching for file changes with StatReloader
+INFO 2025-11-02 20:14:13,241 autoreload 12292 21484 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-02 20:14:14,069 autoreload 5892 1604 Watching for file changes with StatReloader
+INFO 2025-11-02 20:14:14,516 views 5892 9424 Gemini API key found, generating game for type: tongue-twister
+INFO 2025-11-02 20:14:14,516 views 5892 9424 DEBUG: user_input = ''
+INFO 2025-11-02 20:14:14,516 views 5892 9424 DEBUG: conversation_history length = 0
+INFO 2025-11-02 20:14:14,516 views 5892 9424 DEBUG: Adding user_input to payload: 'Hi! Let's play tongue twisters! Give me a fun tongue twister that's perfect for little kids like me!...'
+INFO 2025-11-02 20:14:14,516 views 5892 9424 DEBUG: Total contents count: 1
+INFO 2025-11-02 20:14:14,516 views 5892 9424 DEBUG: Contents[0]: role=user, text=You are a friendly and encouraging AI teacher playing fun educational games with a 7-year-old child ...
+INFO 2025-11-02 20:14:14,516 views 5892 9424 Calling Gemini API: v1/models/gemini-2.5-flash
+INFO 2025-11-02 20:14:18,018 views 5892 9424 Success with v1/models/gemini-2.5-flash
+INFO 2025-11-02 20:14:18,027 basehttp 5892 9424 "POST /api/kids/gemini/game HTTP/1.1" 200 154
+INFO 2025-11-02 20:14:34,909 autoreload 15876 11924 Watching for file changes with StatReloader
+INFO 2025-11-02 20:14:47,884 views 15876 20756 Gemini API key found, generating game for type: tongue-twister
+INFO 2025-11-02 20:14:47,886 views 15876 20756 DEBUG: user_input = ''
+INFO 2025-11-02 20:14:47,887 views 15876 20756 DEBUG: conversation_history length = 0
+INFO 2025-11-02 20:14:47,888 views 15876 20756 DEBUG: Adding user_input to payload: 'Hi! Let's play tongue twisters! Give me a fun tongue twister that's perfect for little kids like me!...'
+INFO 2025-11-02 20:14:47,888 views 15876 20756 DEBUG: Total contents count: 1
+INFO 2025-11-02 20:14:47,888 views 15876 20756 DEBUG: Contents[0]: role=user, text=You are a friendly and encouraging AI teacher playing fun educational games with a 7-year-old child ...
+INFO 2025-11-02 20:14:47,888 views 15876 20756 Calling Gemini API: v1/models/gemini-2.5-flash
+INFO 2025-11-02 20:14:51,157 views 15876 20756 Success with v1/models/gemini-2.5-flash
+INFO 2025-11-02 20:14:51,164 basehttp 15876 20756 "POST /api/kids/gemini/game HTTP/1.1" 200 196
+INFO 2025-11-02 20:16:16,609 autoreload 15876 11924 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-02 20:16:17,788 autoreload 13328 22412 Watching for file changes with StatReloader
+INFO 2025-11-02 20:16:19,027 views 13328 1492 Gemini API key found, generating game for type: tongue-twister
+INFO 2025-11-02 20:16:19,027 views 13328 1492 DEBUG: user_input = ''
+INFO 2025-11-02 20:16:19,027 views 13328 1492 DEBUG: conversation_history length = 0
+INFO 2025-11-02 20:16:19,027 views 13328 1492 DEBUG: Adding user_input to payload: 'Hi! Let's play tongue twisters! Give me a fun tongue twister that's perfect for little kids like me!...'
+INFO 2025-11-02 20:16:19,035 views 13328 1492 DEBUG: Total contents count: 1
+INFO 2025-11-02 20:16:19,035 views 13328 1492 DEBUG: Contents[0]: role=user, text=You are a friendly and encouraging AI teacher playing fun educational games with a 7-year-old child ...
+INFO 2025-11-02 20:16:19,035 views 13328 1492 Calling Gemini API: v1/models/gemini-2.5-flash
+INFO 2025-11-02 20:16:22,695 views 13328 1492 Success with v1/models/gemini-2.5-flash
+INFO 2025-11-02 20:16:22,695 basehttp 13328 1492 "POST /api/kids/gemini/game HTTP/1.1" 200 137
+INFO 2025-11-02 20:16:36,740 views 13328 960 Gemini API key found, generating game for type: tongue-twister
+INFO 2025-11-02 20:16:36,743 views 13328 960 DEBUG: user_input = ''
+INFO 2025-11-02 20:16:36,745 views 13328 960 DEBUG: conversation_history length = 0
+INFO 2025-11-02 20:16:36,745 views 13328 960 DEBUG: Adding user_input to payload: 'Hi! Let's play tongue twisters! Give me a fun tongue twister that's perfect for little kids like me!...'
+INFO 2025-11-02 20:16:36,745 views 13328 960 DEBUG: Total contents count: 1
+INFO 2025-11-02 20:16:36,747 views 13328 960 DEBUG: Contents[0]: role=user, text=You are a friendly and encouraging AI teacher playing fun educational games with a 7-year-old child ...
+INFO 2025-11-02 20:16:36,749 views 13328 960 Calling Gemini API: v1/models/gemini-2.5-flash
+INFO 2025-11-02 20:16:39,097 views 13328 960 Success with v1/models/gemini-2.5-flash
+INFO 2025-11-02 20:16:39,099 basehttp 13328 960 "POST /api/kids/gemini/game HTTP/1.1" 200 273
+INFO 2025-11-02 20:17:45,530 basehttp 13328 1184 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 20:18:07,292 basehttp 13328 24620 "OPTIONS /api/vocabulary/ HTTP/1.1" 200 0
+WARNING 2025-11-02 20:18:07,327 log 13328 24620 Unauthorized: /api/vocabulary/
+WARNING 2025-11-02 20:18:07,333 basehttp 13328 24620 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-02 20:18:59,335 log 13328 3236 Unauthorized: /api/vocabulary/
+WARNING 2025-11-02 20:18:59,340 basehttp 13328 3236 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-02 20:19:18,460 log 13328 9080 Unauthorized: /api/vocabulary/
+WARNING 2025-11-02 20:19:18,477 basehttp 13328 9080 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-02 20:20:01,499 log 13328 23120 Unauthorized: /api/vocabulary/
+WARNING 2025-11-02 20:20:01,503 basehttp 13328 23120 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-02 20:20:20,309 log 13328 23120 Unauthorized: /api/vocabulary/
+WARNING 2025-11-02 20:20:20,319 basehttp 13328 23120 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-02 20:20:39,041 log 13328 23120 Unauthorized: /api/vocabulary/
+WARNING 2025-11-02 20:20:39,048 basehttp 13328 23120 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-02 20:21:04,744 log 13328 23120 Unauthorized: /api/vocabulary/
+WARNING 2025-11-02 20:21:04,746 basehttp 13328 23120 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-02 20:21:23,759 log 13328 23120 Unauthorized: /api/vocabulary/
+WARNING 2025-11-02 20:21:23,776 basehttp 13328 23120 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-02 20:22:11,639 log 13328 23120 Unauthorized: /api/vocabulary/
+WARNING 2025-11-02 20:22:11,641 basehttp 13328 23120 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-02 20:22:30,202 log 13328 23120 Unauthorized: /api/vocabulary/
+WARNING 2025-11-02 20:22:30,205 basehttp 13328 23120 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-02 20:22:48,532 log 13328 23120 Unauthorized: /api/vocabulary/
+WARNING 2025-11-02 20:22:48,535 basehttp 13328 23120 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-02 20:23:06,545 log 13328 23120 Unauthorized: /api/vocabulary/
+WARNING 2025-11-02 20:23:06,547 basehttp 13328 23120 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-02 20:23:24,602 log 13328 23120 Unauthorized: /api/vocabulary/
+WARNING 2025-11-02 20:23:24,604 basehttp 13328 23120 "POST /api/vocabulary/ HTTP/1.1" 401 58
+WARNING 2025-11-02 20:23:42,834 log 13328 23120 Unauthorized: /api/vocabulary/
+WARNING 2025-11-02 20:23:42,837 basehttp 13328 23120 "POST /api/vocabulary/ HTTP/1.1" 401 58
+INFO 2025-11-02 20:24:19,107 basehttp 13328 19064 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 20:26:04,601 basehttp 13328 19064 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 20:26:11,401 basehttp 13328 19064 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 20:26:11,853 basehttp 13328 26596 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 20:26:17,752 basehttp 13328 26596 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 20:26:33,272 basehttp 13328 26596 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 20:26:40,739 basehttp 13328 26596 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 20:27:47,799 basehttp 13328 26596 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 20:30:53,891 basehttp 13328 7100 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 20:31:35,251 basehttp 13328 7100 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 20:32:03,235 basehttp 13328 7100 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 20:33:20,238 basehttp 13328 7100 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 20:34:44,766 basehttp 13328 24128 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 20:35:28,833 basehttp 13328 25776 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 20:35:39,533 views 13328 17268 Gemini API key found, generating game for type: tongue-twister
+INFO 2025-11-02 20:35:39,533 views 13328 17268 DEBUG: user_input = ''
+INFO 2025-11-02 20:35:39,542 views 13328 17268 DEBUG: conversation_history length = 0
+INFO 2025-11-02 20:35:39,549 views 13328 17268 DEBUG: Adding user_input to payload: 'Hi! Let's play tongue twisters! Give me a fun tongue twister that's perfect for little kids like me!...'
+INFO 2025-11-02 20:35:39,551 views 13328 17268 DEBUG: Total contents count: 1
+INFO 2025-11-02 20:35:39,551 views 13328 17268 DEBUG: Contents[0]: role=user, text=You are a friendly and encouraging AI teacher playing fun educational games with a 7-year-old child ...
+INFO 2025-11-02 20:35:39,554 views 13328 17268 Calling Gemini API: v1/models/gemini-2.5-flash
+INFO 2025-11-02 20:35:43,529 views 13328 17268 Success with v1/models/gemini-2.5-flash
+INFO 2025-11-02 20:35:43,529 basehttp 13328 17268 "POST /api/kids/gemini/game HTTP/1.1" 200 254
+INFO 2025-11-02 20:37:25,741 views 13328 17268 Gemini API key found, generating game for type: tongue-twister
+INFO 2025-11-02 20:37:25,741 views 13328 17268 DEBUG: user_input = 'keyboard table'
+INFO 2025-11-02 20:37:25,748 views 13328 17268 DEBUG: conversation_history length = 1
+INFO 2025-11-02 20:37:25,750 views 13328 17268 DEBUG: History[0]: role=assistant, content=Hi there! I'm so excited to play tongue twisters w...
+INFO 2025-11-02 20:37:25,751 views 13328 17268 DEBUG: Adding user_input to payload: 'keyboard table...'
+INFO 2025-11-02 20:37:25,752 views 13328 17268 DEBUG: Total contents count: 2
+INFO 2025-11-02 20:37:25,753 views 13328 17268 DEBUG: Contents[0]: role=model, text=Hi there! I'm so excited to play tongue twisters with you! This is going to be so much fun! Are you ...
+INFO 2025-11-02 20:37:25,754 views 13328 17268 DEBUG: Contents[1]: role=user, text=You are a friendly and encouraging AI teacher playing fun educational games with a 7-year-old child ...
+INFO 2025-11-02 20:37:25,756 views 13328 17268 Calling Gemini API: v1/models/gemini-2.5-flash
+INFO 2025-11-02 20:37:33,396 views 13328 17268 Success with v1/models/gemini-2.5-flash
+INFO 2025-11-02 20:37:33,396 basehttp 13328 17268 "POST /api/kids/gemini/game HTTP/1.1" 200 238
+INFO 2025-11-02 20:39:54,187 views 13328 17268 Gemini API key found, generating game for type: tongue-twister
+INFO 2025-11-02 20:39:54,188 views 13328 17268 DEBUG: user_input = ''
+INFO 2025-11-02 20:39:54,188 views 13328 17268 DEBUG: conversation_history length = 0
+INFO 2025-11-02 20:39:54,189 views 13328 17268 DEBUG: Adding user_input to payload: 'Hi! Let's play tongue twisters! Give me a fun tongue twister that's perfect for little kids like me!...'
+INFO 2025-11-02 20:39:54,189 views 13328 17268 DEBUG: Total contents count: 1
+INFO 2025-11-02 20:39:54,190 views 13328 17268 DEBUG: Contents[0]: role=user, text=You are a friendly and encouraging AI teacher playing fun educational games with a 7-year-old child ...
+INFO 2025-11-02 20:39:54,190 views 13328 17268 Calling Gemini API: v1/models/gemini-2.5-flash
+INFO 2025-11-02 20:39:57,776 views 13328 17268 Success with v1/models/gemini-2.5-flash
+INFO 2025-11-02 20:39:57,776 basehttp 13328 17268 "POST /api/kids/gemini/game HTTP/1.1" 200 170
+INFO 2025-11-02 20:41:03,544 views 13328 17268 Gemini API key found, generating game for type: tongue-twister
+INFO 2025-11-02 20:41:03,544 views 13328 17268 DEBUG: user_input = ''
+INFO 2025-11-02 20:41:03,545 views 13328 17268 DEBUG: conversation_history length = 0
+INFO 2025-11-02 20:41:03,545 views 13328 17268 DEBUG: Adding user_input to payload: 'Hi! Let's play tongue twisters! Give me a fun tongue twister that's perfect for little kids like me!...'
+INFO 2025-11-02 20:41:03,545 views 13328 17268 DEBUG: Total contents count: 1
+INFO 2025-11-02 20:41:03,546 views 13328 17268 DEBUG: Contents[0]: role=user, text=You are a friendly and encouraging AI teacher playing fun educational games with a 7-year-old child ...
+INFO 2025-11-02 20:41:03,546 views 13328 17268 Calling Gemini API: v1/models/gemini-2.5-flash
+INFO 2025-11-02 20:41:06,571 views 13328 17268 Success with v1/models/gemini-2.5-flash
+INFO 2025-11-02 20:41:06,573 basehttp 13328 17268 "POST /api/kids/gemini/game HTTP/1.1" 200 254

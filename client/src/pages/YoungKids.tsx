@@ -1858,15 +1858,15 @@ const YoungKidsPage = () => {
                 <div className="flex items-center gap-2 mb-3">
                   <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Story:</label>
                   <select
-                    className="text-xs font-semibold rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                    className="text-xs font-semibold rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-teal-400 !text-black"
                     value={selectedStoryFilter}
                     onChange={(e) => setSelectedStoryFilter(e.target.value)}
                   >
-                    <option value="all">All Stories</option>
+                    <option value="all" className="!text-black">All Stories</option>
                     {Array.from(new Map(
                       enrolledStoryWordsDetailed.map(w => [w.storyId, w.storyTitle])
                     ).entries()).map(([sid, title]) => (
-                      <option key={String(sid)} value={String(sid)}>{String(title)}</option>
+                      <option key={String(sid)} value={String(sid)} className="!text-black">{String(title)}</option>
                     ))}
                   </select>
                 </div>
@@ -1877,7 +1877,7 @@ const YoungKidsPage = () => {
                       <h3 className="font-bold text-gray-800 dark:text-white">
                         Words from Your {selectedStoryFilter === 'all' ? 'Stories' : 'Selected Story'}
                       </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                      <p className="text-sm text-gray-800 dark:text-gray-300">
                         {vocabularyWordsToUse.length} words from your enrolled stories
                       </p>
                     </div>

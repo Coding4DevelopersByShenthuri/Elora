@@ -1085,6 +1085,13 @@ def kids_gemini_game(request):
         conversation_history = request.data.get('conversationHistory', [])
         context = request.data.get('context', {})
         
+        # Debug logging
+        logger.info(f"DEBUG: user_input = '{user_input}'")
+        logger.info(f"DEBUG: conversation_history length = {len(conversation_history) if conversation_history else 0}")
+        if conversation_history:
+            for idx, msg in enumerate(conversation_history[-3:]):  # Last 3 messages
+                logger.info(f"DEBUG: History[{idx}]: role={msg.get('role')}, content={str(msg.get('content', ''))[:50]}...")
+        
         # Build system prompt
         age = context.get('age', 7)
         level = context.get('level', 'beginner')
@@ -1200,6 +1207,12 @@ Format your response as JSON with:
             'role': 'user',
             'parts': [{'text': combined_text}]
         })
+        
+        # Debug logging for payload construction
+        logger.info(f"DEBUG: Adding user_input to payload: '{user_input[:100]}...'")
+        logger.info(f"DEBUG: Total contents count: {len(contents)}")
+        for idx, msg in enumerate(contents):
+            logger.info(f"DEBUG: Contents[{idx}]: role={msg.get('role')}, text={str(msg.get('parts', [{}])[0].get('text', ''))[:100]}...")
         
         # Call Gemini API - using Gemini 2.5 Flash (stable and fast)
         model_name = 'gemini-2.5-flash'

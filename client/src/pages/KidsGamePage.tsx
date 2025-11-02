@@ -264,6 +264,8 @@ const KidsGamePage = () => {
     setIsLoading(true);
     setError(null);
 
+    let updatedHistory = [...conversationHistory];
+    
     if (!existingMessage) {
       const userMessage: ConversationMessage = {
         role: 'user',
@@ -272,11 +274,12 @@ const KidsGamePage = () => {
         isEditable: true,
         hasErrors: false
       };
-      setConversationHistory(prev => [...prev, userMessage]);
+      updatedHistory = [...conversationHistory, userMessage];
+      setConversationHistory(updatedHistory);
     }
 
     try {
-      const history = conversationHistory.map(msg => ({
+      const history = updatedHistory.map(msg => ({
         role: msg.role,
         content: msg.content
       }));
