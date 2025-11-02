@@ -1915,3 +1915,208 @@ WARNING 2025-11-01 21:16:18,629 views 4880 22112 Model gemini-2.0-flash-exp not 
 INFO 2025-11-01 21:16:18,629 views 4880 22112 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
 INFO 2025-11-01 21:16:20,452 views 4880 22112 Success with v1beta/models/gemini-2.0-flash-exp
 INFO 2025-11-01 21:16:20,467 basehttp 4880 22112 "POST /api/kids/gemini/game HTTP/1.1" 200 235
+INFO 2025-11-01 22:19:53,474 basehttp 4880 12316 "OPTIONS /api/auth/google HTTP/1.1" 200 0
+INFO 2025-11-01 22:19:55,813 basehttp 4880 12316 "POST /api/auth/google HTTP/1.1" 200 1115
+INFO 2025-11-01 22:21:08,944 basehttp 4880 14212 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 22:22:43,582 basehttp 4880 14212 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 22:23:22,525 basehttp 4880 14212 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-01 22:23:50,386 views 4880 24040 Gemini API key found, generating game for type: conversation-practice
+INFO 2025-11-01 22:23:50,389 views 4880 24040 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-01 22:23:51,198 views 4880 24040 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-01 22:23:51,200 views 4880 24040 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 22:23:54,090 views 4880 24040 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-01 22:23:54,095 basehttp 4880 24040 "POST /api/kids/gemini/game HTTP/1.1" 200 367
+INFO 2025-11-02 16:17:34,327 autoreload 23584 13324 Watching for file changes with StatReloader
+INFO 2025-11-02 16:33:17,027 basehttp 23584 12120 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 16:33:32,351 basehttp 23584 12120 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 16:39:54,578 basehttp 23584 19392 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 16:40:33,424 basehttp 23584 12744 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 16:41:43,580 basehttp 23584 14116 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 16:41:52,200 basehttp 23584 17476 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 16:42:25,434 basehttp 23584 24260 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 16:42:30,971 basehttp 23584 24260 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 16:42:37,732 basehttp 23584 22372 "OPTIONS /api/kids/gemini/game HTTP/1.1" 200 0
+INFO 2025-11-02 16:42:37,814 views 23584 22372 Gemini API key found, generating game for type: tongue-twister
+INFO 2025-11-02 16:42:37,868 views 23584 22372 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 16:42:38,685 views 23584 22372 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 16:42:38,689 views 23584 22372 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:42:39,850 views 23584 22372 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:42:39,919 basehttp 23584 22372 "POST /api/kids/gemini/game HTTP/1.1" 200 181
+INFO 2025-11-02 16:44:13,201 views 23584 25188 Gemini API key found, generating game for type: tongue-twister
+INFO 2025-11-02 16:44:13,245 views 23584 25188 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 16:44:13,688 views 23584 25188 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 16:44:13,701 views 23584 25188 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:44:15,022 views 23584 25188 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:44:15,068 basehttp 23584 25188 "POST /api/kids/gemini/game HTTP/1.1" 200 196
+INFO 2025-11-02 16:44:15,584 basehttp 23584 26464 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 16:45:10,984 views 23584 20312 Gemini API key found, generating game for type: word-chain
+INFO 2025-11-02 16:45:10,990 views 23584 20312 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 16:45:11,351 views 23584 20312 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 16:45:11,358 views 23584 20312 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:45:13,460 views 23584 20312 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:45:13,472 basehttp 23584 20312 "POST /api/kids/gemini/game HTTP/1.1" 200 248
+INFO 2025-11-02 16:45:44,674 basehttp 23584 20448 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 16:45:50,513 basehttp 23584 6756 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 16:45:57,559 basehttp 23584 6756 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 16:46:03,900 views 23584 22696 Gemini API key found, generating game for type: conversation-practice
+INFO 2025-11-02 16:46:03,921 views 23584 22696 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+ERROR 2025-11-02 16:46:29,859 views 23584 22696 Request exception with v1: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+INFO 2025-11-02 16:46:29,860 views 23584 22696 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:46:45,405 basehttp 23584 22164 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 16:46:52,346 basehttp 23584 2288 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 16:46:52,791 views 23584 22696 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:46:52,798 basehttp 23584 22696 - Broken pipe from ('127.0.0.1', 58953)
+INFO 2025-11-02 16:46:55,108 views 23584 9284 Gemini API key found, generating game for type: conversation-practice
+INFO 2025-11-02 16:46:55,108 views 23584 9284 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 16:46:55,596 views 23584 9284 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 16:46:55,609 views 23584 9284 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:46:57,206 views 23584 9284 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:46:57,218 basehttp 23584 9284 "POST /api/kids/gemini/game HTTP/1.1" 200 299
+INFO 2025-11-02 16:48:55,441 views 23584 25244 Gemini API key found, generating game for type: conversation-practice
+INFO 2025-11-02 16:48:55,441 views 23584 25244 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 16:48:55,729 views 23584 25244 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 16:48:55,734 views 23584 25244 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:48:55,997 views 23584 19580 Gemini API key found, generating game for type: conversation-practice
+INFO 2025-11-02 16:48:56,001 views 23584 19580 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 16:48:56,441 views 23584 19580 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 16:48:56,443 views 23584 19580 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:48:57,265 views 23584 25244 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:48:57,275 basehttp 23584 25244 "POST /api/kids/gemini/game HTTP/1.1" 200 274
+INFO 2025-11-02 16:48:57,620 views 23584 25244 Gemini API key found, generating game for type: conversation-practice
+INFO 2025-11-02 16:48:57,623 views 23584 25244 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:48:57,915 views 23584 19580 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:48:57,954 basehttp 23584 19580 "POST /api/kids/gemini/game HTTP/1.1" 200 345
+WARNING 2025-11-02 16:48:58,010 views 23584 25244 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 16:48:58,018 views 23584 25244 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:48:59,742 views 23584 25244 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:48:59,747 basehttp 23584 25244 "POST /api/kids/gemini/game HTTP/1.1" 200 344
+INFO 2025-11-02 16:49:03,921 views 23584 21200 Gemini API key found, generating game for type: conversation-practice
+INFO 2025-11-02 16:49:03,923 views 23584 21200 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 16:49:04,483 views 23584 21200 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 16:49:04,513 views 23584 21200 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:49:06,159 views 23584 21200 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:49:06,182 basehttp 23584 21200 "POST /api/kids/gemini/game HTTP/1.1" 200 339
+INFO 2025-11-02 16:49:11,286 views 23584 22996 Gemini API key found, generating game for type: conversation-practice
+INFO 2025-11-02 16:49:11,288 views 23584 22996 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 16:49:11,783 views 23584 22996 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 16:49:11,786 views 23584 22996 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:49:13,315 views 23584 22996 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:49:13,323 basehttp 23584 22996 "POST /api/kids/gemini/game HTTP/1.1" 200 321
+INFO 2025-11-02 16:49:17,855 views 23584 22996 Gemini API key found, generating game for type: conversation-practice
+INFO 2025-11-02 16:49:17,888 views 23584 22996 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 16:49:18,346 views 23584 22996 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 16:49:18,398 views 23584 22996 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:49:19,732 views 23584 22996 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:49:19,739 basehttp 23584 22996 "POST /api/kids/gemini/game HTTP/1.1" 200 268
+INFO 2025-11-02 16:49:25,495 views 23584 9408 Gemini API key found, generating game for type: conversation-practice
+INFO 2025-11-02 16:49:25,495 views 23584 9408 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 16:49:25,824 views 23584 9408 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 16:49:25,829 views 23584 9408 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:49:27,664 views 23584 9408 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:49:27,704 basehttp 23584 9408 "POST /api/kids/gemini/game HTTP/1.1" 200 326
+INFO 2025-11-02 16:49:35,702 views 23584 19768 Gemini API key found, generating game for type: conversation-practice
+INFO 2025-11-02 16:49:35,704 views 23584 19768 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 16:49:36,036 views 23584 19768 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 16:49:36,051 views 23584 19768 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:49:36,852 views 23584 11164 Gemini API key found, generating game for type: conversation-practice
+INFO 2025-11-02 16:49:36,855 views 23584 11164 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 16:49:37,093 views 23584 11164 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 16:49:37,093 views 23584 11164 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:49:37,342 views 23584 19768 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:49:37,344 basehttp 23584 19768 "POST /api/kids/gemini/game HTTP/1.1" 200 323
+INFO 2025-11-02 16:49:38,602 views 23584 11164 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:49:38,630 basehttp 23584 11164 "POST /api/kids/gemini/game HTTP/1.1" 200 292
+INFO 2025-11-02 16:52:27,669 views 23584 23536 Gemini API key found, generating game for type: conversation-practice
+INFO 2025-11-02 16:52:27,678 views 23584 23536 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 16:52:28,350 views 23584 23536 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 16:52:28,364 views 23584 23536 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:52:30,429 views 23584 23536 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:52:30,437 basehttp 23584 23536 "POST /api/kids/gemini/game HTTP/1.1" 200 364
+INFO 2025-11-02 16:52:36,872 basehttp 23584 4584 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 16:52:41,370 views 23584 17996 Gemini API key found, generating game for type: tongue-twister
+INFO 2025-11-02 16:52:41,372 views 23584 17996 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 16:52:41,850 views 23584 17996 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 16:52:41,888 views 23584 17996 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:52:43,129 views 23584 17996 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 16:52:43,144 basehttp 23584 17996 "POST /api/kids/gemini/game HTTP/1.1" 200 182
+INFO 2025-11-02 17:30:21,568 basehttp 23584 11308 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-02 17:30:24,983 views 23584 19136 Gemini API key found, generating game for type: story-telling
+INFO 2025-11-02 17:30:24,993 views 23584 19136 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 17:30:25,588 views 23584 19136 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 17:30:25,597 views 23584 19136 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:30:27,304 views 23584 19136 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:30:27,308 basehttp 23584 19136 "POST /api/kids/gemini/game HTTP/1.1" 200 433
+INFO 2025-11-02 17:32:04,681 views 23584 19136 Gemini API key found, generating game for type: story-telling
+INFO 2025-11-02 17:32:04,681 views 23584 19136 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 17:32:05,171 views 23584 19136 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 17:32:05,171 views 23584 19136 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:32:06,951 views 23584 19136 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:32:06,951 basehttp 23584 19136 "POST /api/kids/gemini/game HTTP/1.1" 200 410
+INFO 2025-11-02 17:32:33,239 views 23584 19136 Gemini API key found, generating game for type: story-telling
+INFO 2025-11-02 17:32:33,239 views 23584 19136 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 17:32:33,739 views 23584 19136 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 17:32:33,739 views 23584 19136 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:32:35,332 views 23584 19136 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:32:35,351 basehttp 23584 19136 "POST /api/kids/gemini/game HTTP/1.1" 200 409
+INFO 2025-11-02 17:34:08,727 views 23584 19136 Gemini API key found, generating game for type: story-telling
+INFO 2025-11-02 17:34:08,728 views 23584 19136 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 17:34:09,242 views 23584 19136 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 17:34:09,243 views 23584 19136 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:34:11,012 views 23584 19136 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:34:11,024 basehttp 23584 19136 "POST /api/kids/gemini/game HTTP/1.1" 200 412
+INFO 2025-11-02 17:34:26,870 views 23584 19136 Gemini API key found, generating game for type: story-telling
+INFO 2025-11-02 17:34:26,871 views 23584 19136 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 17:34:27,205 views 23584 19136 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 17:34:27,206 views 23584 19136 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:34:28,998 views 23584 19136 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:34:29,006 basehttp 23584 19136 "POST /api/kids/gemini/game HTTP/1.1" 200 433
+INFO 2025-11-02 17:34:41,680 views 23584 19136 Gemini API key found, generating game for type: story-telling
+INFO 2025-11-02 17:34:41,680 views 23584 19136 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 17:34:42,083 views 23584 19136 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 17:34:42,083 views 23584 19136 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:34:43,723 views 23584 19136 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:34:43,740 basehttp 23584 19136 "POST /api/kids/gemini/game HTTP/1.1" 200 407
+INFO 2025-11-02 17:35:17,837 views 23584 19136 Gemini API key found, generating game for type: story-telling
+INFO 2025-11-02 17:35:17,837 views 23584 19136 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 17:35:18,222 views 23584 19136 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 17:35:18,222 views 23584 19136 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:35:20,106 views 23584 19136 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:35:20,108 basehttp 23584 19136 "POST /api/kids/gemini/game HTTP/1.1" 200 399
+INFO 2025-11-02 17:35:49,409 views 23584 12064 Gemini API key found, generating game for type: story-telling
+INFO 2025-11-02 17:35:49,409 views 23584 12064 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 17:35:49,811 views 23584 12064 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 17:35:49,812 views 23584 12064 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:35:51,676 views 23584 12064 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:35:51,687 basehttp 23584 12064 "POST /api/kids/gemini/game HTTP/1.1" 200 432
+INFO 2025-11-02 17:36:52,005 views 23584 4328 Gemini API key found, generating game for type: story-telling
+INFO 2025-11-02 17:36:52,007 views 23584 4328 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 17:36:52,448 views 23584 4328 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 17:36:52,448 views 23584 4328 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:36:54,054 views 23584 4328 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:36:54,056 basehttp 23584 4328 "POST /api/kids/gemini/game HTTP/1.1" 200 412
+INFO 2025-11-02 17:37:15,507 views 23584 4328 Gemini API key found, generating game for type: story-telling
+INFO 2025-11-02 17:37:15,508 views 23584 4328 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+ERROR 2025-11-02 17:37:28,071 views 23584 4328 Request exception with v1: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+INFO 2025-11-02 17:37:28,071 views 23584 4328 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:37:35,735 views 23584 4036 Gemini API key found, generating game for type: story-telling
+INFO 2025-11-02 17:37:35,736 views 23584 4036 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+ERROR 2025-11-02 17:37:41,570 views 23584 4328 Request exception with v1beta: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+ERROR 2025-11-02 17:37:41,577 views 23584 4328 Gemini API error: 0 - ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+ERROR 2025-11-02 17:37:41,646 log 23584 4328 Bad Gateway: /api/kids/gemini/game
+ERROR 2025-11-02 17:37:41,651 basehttp 23584 4328 "POST /api/kids/gemini/game HTTP/1.1" 502 241
+ERROR 2025-11-02 17:38:09,680 views 23584 4036 Request exception with v1: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+INFO 2025-11-02 17:38:09,685 views 23584 4036 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:38:11,801 views 23584 4036 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:38:11,805 basehttp 23584 4036 - Broken pipe from ('127.0.0.1', 55895)
+INFO 2025-11-02 17:38:13,791 views 23584 13632 Gemini API key found, generating game for type: story-telling
+INFO 2025-11-02 17:38:13,794 views 23584 13632 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 17:38:14,016 views 23584 13632 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 17:38:14,021 views 23584 13632 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:38:15,409 views 23584 13632 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:38:15,414 basehttp 23584 13632 "POST /api/kids/gemini/game HTTP/1.1" 200 435
+INFO 2025-11-02 17:38:27,680 views 23584 13632 Gemini API key found, generating game for type: story-telling
+INFO 2025-11-02 17:38:27,681 views 23584 13632 Calling Gemini API: v1/models/gemini-2.0-flash-exp
+WARNING 2025-11-02 17:38:27,874 views 23584 13632 Model gemini-2.0-flash-exp not found in v1, trying v1beta
+INFO 2025-11-02 17:38:27,879 views 23584 13632 Calling Gemini API: v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:38:29,363 views 23584 13632 Success with v1beta/models/gemini-2.0-flash-exp
+INFO 2025-11-02 17:38:29,365 basehttp 23584 13632 "POST /api/kids/gemini/game HTTP/1.1" 200 399
