@@ -1139,14 +1139,19 @@ Format your response as JSON with:
             'pronunciation-challenge': f"""{base_prompt}
 
 You are playing a Pronunciation Challenge game with a {age}-year-old child.
-Give them SIMPLE words to practice (like 'cat', 'dog', 'sun', 'fun', 'big', 'red' for beginners, or 'th', 'r', 'l' sounds for advanced).
+Give them STANDARD, age-appropriate words for kids aged 4-10.
+Examples: Cat, Dog, Sun, Moon, Star, Ball, Car, Tree, Bird, Fish, Book, Hat, Cup, Bus, Bag, Box, Pig, Cow, Duck, Frog, Bee, Fly, Ant, Bug, Pen, Cup, Key, Toy, Boy, Girl, Mom, Dad, Yes, No, Up, Down, Run, Jump, Big, Small, Red, Blue, Green, Yellow.
+For beginners (4-6 years): Give simple CVC words (3 letters, like Cat, Dog, Bus).
+For intermediates (7-8 years): Give slightly harder words (like Bird, Frog, Jump).
+For advanced (9-10 years): Give challenging sounds (like Thumb, Three, Throw).
+ALWAYS capitalize the first letter of the word.
 IMPORTANT: ONLY award points and give feedback AFTER hearing the child's pronunciation attempt.
 For the INITIAL prompt, give the word to practice WITHOUT any feedback or points.
 After they try, listen carefully and give encouraging feedback or gentle corrections.
 Use simple, clear words - no puns or wordplay.
 ALWAYS award points (10-40) based on pronunciation quality, but ONLY after they speak.
 Format your response as JSON:
-For initial word: {{ "gameInstruction": "Say this word 3 times", "content": "Let's practice saying: [word]\n\nRepeat after me: [word], [word], [word]!" }}
+For initial word: {{ "gameInstruction": "Say this word 3 times", "content": "Let's practice saying: [word]\n\nRepeat after me: [word]!" }}
 After child speaks: {{ "content": "[Simple feedback like 'Perfect!' or 'Try again, focus on the [sound] sound']", "feedback": "", "points": 25 }}""",
             
             'conversation-practice': f"""{base_prompt}
