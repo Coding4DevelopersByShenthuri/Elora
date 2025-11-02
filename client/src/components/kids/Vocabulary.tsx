@@ -134,10 +134,20 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
       console.warn('TTS celebration failed:', error);
     }
 
-    // Auto-advance to next word after celebration (fresh start)
+    // Auto-advance to next unmastered word after celebration
     setTimeout(() => {
-      next();
-    }, 2000);
+      // Find next unmastered word
+      let nextIndex = (current + 1) % words.length;
+      let attempts = 0;
+      while (masteredWords.has(words[nextIndex].word) && attempts < words.length) {
+        nextIndex = (nextIndex + 1) % words.length;
+        attempts++;
+      }
+      setCurrent(nextIndex);
+      setCurrentAttempts(0);
+      setLastScore(null);
+      setShowSuccess(false);
+    }, 2500);
   };
 
   const next = () => {
@@ -260,21 +270,22 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
             </Button>
           </div>
 
-          {/* Smart Voice Recorder - Auto-stops when correct */}
+          {/* Smart Voice Recorder - Auto-stops when correct, keeps listening if incorrect */}
           <div className="border-t-2 border-gray-200 dark:border-gray-700 pt-4 sm:pt-6">
             <p className="text-center text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-3 sm:mb-4 font-semibold">
               🎤 Now you say it!
             </p>
             <KidsVoiceRecorder
-              key={`recorder-${current}-${card.word}`}
+              key={`recorder-${current}-${card.word}-${showSuccess}`}
               targetWord={card.word}
               onCorrectPronunciation={handleCorrectPronunciation}
-              maxDuration={10}
+              maxDuration={0} // No time limit - keep listening until correct or manual stop
               autoAnalyze={true}
               disabledWhileSpeaking={isSpeaking}
+              autoStart={false} // User must click to start
             />
             <p className="text-xs sm:text-sm text-center text-gray-500 dark:text-gray-400 mt-3 px-4">
-              💡 Tip: The recorder will automatically stop when you pronounce it correctly!
+              💡 Tip: It will automatically submit when you pronounce it correctly, or you can click Stop anytime!
             </p>
           </div>
 

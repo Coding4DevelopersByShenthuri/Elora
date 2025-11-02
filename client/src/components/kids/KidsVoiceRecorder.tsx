@@ -9,12 +9,13 @@ interface KidsVoiceRecorderProps {
   targetWord: string; // The word the child should pronounce
   onCorrectPronunciation: (audioBlob: Blob, score: number) => void;
   onRecordingStart?: () => void;
-  maxDuration?: number; // seconds
+  maxDuration?: number; // seconds (0 or undefined = no limit, keep listening until correct)
   disabled?: boolean;
   className?: string;
   autoAnalyze?: boolean; // If true, continuously analyzes during recording
   disabledWhileSpeaking?: boolean; // If true, disable recording while TTS is speaking
   skipPronunciationCheck?: boolean; // If true, skip pronunciation scoring and just call onCorrectPronunciation with any transcript
+  autoStart?: boolean; // If true, automatically start recording when component mounts
 }
 
 const KidsVoiceRecorder = ({
@@ -26,7 +27,8 @@ const KidsVoiceRecorder = ({
   className,
   autoAnalyze = true,
   disabledWhileSpeaking = false,
-  skipPronunciationCheck = false
+  skipPronunciationCheck = false,
+  autoStart = false
 }: KidsVoiceRecorderProps) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -46,6 +48,22 @@ const KidsVoiceRecorder = ({
       cleanup();
     };
   }, []);
+
+  // Auto-start recording if enabled
+  useEffect(() => {
+    if (autoStart && !disabled && !disabledWhileSpeaking && !isRecording && !isAnalyzing) {
+      // Small delay to ensure component is fully mounted and TTS has finished
+      const timer = setTimeout(() => {
+        if (!isRecording && !isAnalyzing) {
+          startRecording().catch(err => {
+            console.warn('Auto-start recording failed:', err);
+          });
+        }
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoStart, disabled, disabledWhileSpeaking, isRecording, isAnalyzing]);
 
   const cleanup = () => {
     if (timerRef.current) {
@@ -69,42 +87,69 @@ const KidsVoiceRecorder = ({
     }
   };
 
-  const analyzeAudio = async (audioBlob: Blob): Promise<boolean> => {
-    // Prevent multiple simultaneous analyses
-    if (isAnalyzing) {
+  const analyzeAudio = async (audioBlob: Blob, isImmediate: boolean = false): Promise<boolean> => {
+    // Prevent multiple simultaneous analyses (unless immediate detection)
+    if (isAnalyzing && !isImmediate) {
       return false;
     }
     
     try {
       setIsAnalyzing(true);
       
-      // Transcribe with Whisper
+      // Transcribe with Whisper - use longer timeout for kids and enhanced prompts
       let transcript = '';
       try {
-        const result = await WhisperService.transcribe(audioBlob);
-        transcript = result.transcript.trim();
-        console.log('🎤 Child said:', transcript);
+        // Create enhanced prompt with context about the target word
+        // This helps Whisper better recognize what the kid is trying to say
+        const enhancedPrompt = skipPronunciationCheck 
+          ? undefined 
+          : `The child is trying to say the word: "${targetWord}". ` +
+            `The target word is "${targetWord.toLowerCase()}". ` +
+            `Listen carefully for variations like "${targetWord.toLowerCase()}" or similar pronunciations.`;
+        
+        const result = await WhisperService.transcribe(audioBlob, {
+          language: 'en',
+          prompt: enhancedPrompt // Enhanced prompt with target word context
+        });
+        
+        // Normalize transcript: lowercase and remove punctuation for better matching
+        transcript = result.transcript.trim().toLowerCase()
+          .replace(/[.,!?;:'"]/g, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+        console.log('🎤 Child said:', transcript, isImmediate ? '(immediate)' : '(final)', `[target: "${targetWord}"]`);
       } catch (error) {
         console.warn('Whisper transcription failed:', error);
-        return false;
+        // For games/conversations, even if transcription fails, try with what we have
+        if (skipPronunciationCheck && audioBlob.size > 1000) {
+          // If we have audio but transcription failed, still proceed (might be noise issue)
+          console.log('⚠️ Transcription failed but continuing with audio blob for games');
+        } else {
+          return false;
+        }
       }
 
-      // If skipPronunciationCheck is true, just call onCorrectPronunciation for any transcript
+      // If skipPronunciationCheck is true (games/conversations), accept any valid transcript immediately
       if (skipPronunciationCheck) {
-        if (transcript) {
-          console.log('✅ Transcript received (pronunciation check skipped)');
+        // For games: accept transcript as soon as detected (even partial)
+        // Minimum 2 characters to avoid false positives from noise
+        if (transcript && transcript.length >= 2) {
+          console.log('✅ Transcript received (pronunciation check skipped):', transcript);
           setShowSuccess(true);
           setFeedbackMessage('🎉 Got it!');
           
-          // Auto-stop recording
+          // Auto-stop recording immediately
           await stopRecording(true);
           
-          // Notify parent component with a default score
-          setTimeout(() => {
-            onCorrectPronunciation(audioBlob, 100);
-          }, 1000);
+          // Notify parent component immediately (no delay for games/conversations)
+          onCorrectPronunciation(audioBlob, 100);
           
           return true;
+        }
+        // If transcript is too short but we have audio, wait a bit more
+        if (!transcript && audioBlob.size > 2000 && !isImmediate) {
+          // Might be still speaking, don't give up yet
+          return false;
         }
         return false;
       }
@@ -154,21 +199,30 @@ const KidsVoiceRecorder = ({
       setShowSuccess(false);
       skipFinalAnalysisRef.current = false;
       
+      // Audio constraints optimized for kids' voices with enhanced quality settings
+      // Cast to any to allow Google-specific constraints (non-standard but widely supported in Chrome)
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true,
-          // Optimize for kids' voices (higher frequency)
-          sampleRate: 48000
-        } 
+          // Optimize for kids' voices (higher frequency, higher quality)
+          sampleRate: 48000,
+          channelCount: 1, // Mono for better processing
+          // Google-specific constraints for better quality (may be ignored in non-Chrome browsers)
+          googEchoCancellation: true,
+          googAutoGainControl: true,
+          googNoiseSuppression: true,
+          googHighpassFilter: true,
+          googTypingNoiseDetection: true
+        } as any
       });
       
       streamRef.current = stream;
       
       const mediaRecorder = new MediaRecorder(stream, {
         mimeType: 'audio/webm;codecs=opus',
-        audioBitsPerSecond: 128000
+        audioBitsPerSecond: 192000 // Increased from 128k to 192k for better quality
       });
       
       mediaRecorderRef.current = mediaRecorder;
@@ -215,36 +269,55 @@ const KidsVoiceRecorder = ({
         onRecordingStart();
       }
       
-      // Start timer
-      timerRef.current = window.setInterval(() => {
-        setRecordingTime(prev => {
-          const newTime = prev + 1;
-          
-          // Auto-stop at max duration - this is like a manual stop, needs analysis
-          if (newTime >= maxDuration) {
-            stopRecording(false);
-          }
-          
-          return newTime;
-        });
-      }, 1000);
+      // Start timer (only if maxDuration is set and > 0)
+      if (maxDuration && maxDuration > 0) {
+        timerRef.current = window.setInterval(() => {
+          setRecordingTime(prev => {
+            const newTime = prev + 1;
+            
+            // Auto-stop at max duration only if not analyzing for correct pronunciation
+            // For vocabulary practice, we want to keep listening until correct
+            if (newTime >= maxDuration && !skipPronunciationCheck) {
+              // Only auto-stop if maxDuration is reached (give user chance to try again)
+              // For vocabulary, maxDuration is more of a safety limit
+              stopRecording(false);
+            }
+            
+            return newTime;
+          });
+        }, 1000);
+      } else {
+        // No time limit - keep listening until correct or manual stop
+        setRecordingTime(0);
+      }
       
       // Start continuous analysis if enabled
       if (autoAnalyze) {
         let analysisCycleCount = 0;
+        let lastAnalysisTime = Date.now();
         analysisIntervalRef.current = window.setInterval(async () => {
           analysisCycleCount++;
           
-          // Only analyze after 2 seconds of recording and every 1.5 seconds
-          if (chunksRef.current.length >= 2 && analysisCycleCount % 2 === 0) {
+          // For games/conversations (skipPronunciationCheck), analyze more frequently for immediate detection
+          const analysisInterval = skipPronunciationCheck ? 800 : 1500; // 800ms for games, 1.5s for pronunciation
+          const minChunks = skipPronunciationCheck ? 1 : 2; // Start analyzing sooner for games
+          
+          // Analyze more frequently for immediate detection
+          if (chunksRef.current.length >= minChunks) {
             const currentBlob = new Blob(chunksRef.current, { type: 'audio/webm;codecs=opus' });
+            const timeSinceLastAnalysis = Date.now() - lastAnalysisTime;
             
-            // Analyze in background
-            analyzeAudio(currentBlob).catch(err => {
-              console.warn('Background analysis error:', err);
-            });
+            // For games: analyze immediately, for pronunciation: every 1.5s
+            if (skipPronunciationCheck || timeSinceLastAnalysis >= analysisInterval) {
+              lastAnalysisTime = Date.now();
+              
+              // Analyze in background with immediate flag for games
+              analyzeAudio(currentBlob, skipPronunciationCheck).catch(err => {
+                console.warn('Background analysis error:', err);
+              });
+            }
           }
-        }, 1500);
+        }, skipPronunciationCheck ? 500 : 800); // Check every 500ms for games, 800ms for pronunciation
       }
       
     } catch (error) {
@@ -338,9 +411,15 @@ const KidsVoiceRecorder = ({
               Listening...
             </span>
           </div>
-          <div className="text-xl font-mono font-bold text-gray-700 dark:text-gray-300">
-            {formatTime(recordingTime)} / {formatTime(maxDuration)}
-          </div>
+          {maxDuration && maxDuration > 0 ? (
+            <div className="text-xl font-mono font-bold text-gray-700 dark:text-gray-300">
+              {formatTime(recordingTime)} / {formatTime(maxDuration)}
+            </div>
+          ) : (
+            <div className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+              Keep speaking until you get it right! ✨
+            </div>
+          )}
         </div>
       )}
 

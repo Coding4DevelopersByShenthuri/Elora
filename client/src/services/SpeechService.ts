@@ -19,6 +19,9 @@ export interface StartRecognitionOptions {
   interimResults?: boolean;
   continuous?: boolean;
   timeoutMs?: number;
+  onInterimResult?: (transcript: string, isFinal: boolean) => void;
+  autoStopOnSilence?: boolean; // Auto-stop after detecting speech and silence
+  silenceTimeoutMs?: number; // How long to wait after speech before stopping
 }
 
 export class SpeechService {
@@ -113,43 +116,157 @@ export class SpeechService {
 
       const recognition = new RecognitionCtor();
       recognition.lang = options?.lang ?? 'en-US';
-      recognition.interimResults = options?.interimResults ?? false;
-      recognition.continuous = options?.continuous ?? false;
+      recognition.interimResults = options?.interimResults ?? true; // Default to true for better real-time detection
+      recognition.continuous = options?.continuous ?? (options?.interimResults === true); // Enable continuous if interim results are enabled
 
       let resolved = false;
       let startTime = Date.now();
       let timer: number | undefined;
+      let silenceTimer: number | undefined;
+      let lastSpeechTime = Date.now();
+      let finalTranscript = '';
+      let bestConfidence = 0;
 
       const clearTimer = () => {
         if (timer !== undefined) window.clearTimeout(timer);
         timer = undefined;
       };
 
-      if (options?.timeoutMs && options.timeoutMs > 0) {
+      const clearSilenceTimer = () => {
+        if (silenceTimer !== undefined) window.clearTimeout(silenceTimer);
+        silenceTimer = undefined;
+      };
+
+      // Use longer timeout for kids (30 seconds default, or user-specified)
+      const timeoutMs = options?.timeoutMs ?? 30000;
+      
+      if (timeoutMs > 0) {
         timer = window.setTimeout(() => {
           if (!resolved) {
             try { recognition.stop(); } catch {}
-            reject(new Error('STT timeout'));
+            // Return the best transcript we have if any
+            if (finalTranscript) {
+              resolved = true;
+              resolve({ transcript: finalTranscript, confidence: bestConfidence, durationMs: Date.now() - startTime });
+            } else {
+              reject(new Error('STT timeout'));
+            }
           }
-        }, options.timeoutMs);
+        }, timeoutMs);
       }
 
       recognition.onresult = (event: any) => {
-        const result = event.results[0][0];
-        resolved = true;
-        clearTimer();
-        resolve({ transcript: result.transcript, confidence: result.confidence, durationMs: Date.now() - startTime });
+        let interimTranscript = '';
+        let hasFinal = false;
+
+        // Process all results (interim and final)
+        for (let i = 0; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          const isFinal = event.results[i].isFinal;
+          const confidence = event.results[i][0].confidence || 0.8;
+
+          if (isFinal) {
+            finalTranscript += transcript + ' ';
+            hasFinal = true;
+            bestConfidence = Math.max(bestConfidence, confidence);
+          } else {
+            interimTranscript += transcript;
+          }
+
+          // Call interim callback if provided
+          if (options?.onInterimResult) {
+            options.onInterimResult(transcript, isFinal);
+          }
+        }
+
+        // Update last speech time for silence detection
+        lastSpeechTime = Date.now();
+
+        // If we have a final result and auto-stop is enabled, wait for silence then stop
+        if (hasFinal && options?.autoStopOnSilence) {
+          clearSilenceTimer();
+          const silenceTimeout = options.silenceTimeoutMs ?? 1500; // Default 1.5 seconds of silence
+          
+          silenceTimer = window.setTimeout(() => {
+            if (!resolved && finalTranscript.trim()) {
+              resolved = true;
+              clearTimer();
+              clearSilenceTimer();
+              try { recognition.stop(); } catch {}
+              resolve({ 
+                transcript: finalTranscript.trim(), 
+                confidence: bestConfidence || 0.8, 
+                durationMs: Date.now() - startTime 
+              });
+            }
+          }, silenceTimeout);
+        }
+
+        // For immediate detection mode (games/conversations with autoStopOnSilence)
+        // Resolve as soon as we have meaningful speech (even if interim)
+        if (options?.autoStopOnSilence && !resolved) {
+          const meaningfulSpeech = finalTranscript.trim() || interimTranscript.trim();
+          
+          // If we have meaningful speech (at least 2 characters), start the silence timer
+          if (meaningfulSpeech.length >= 2 && !hasFinal) {
+            // We have interim speech, wait for final or silence
+            clearSilenceTimer();
+            const silenceTimeout = options.silenceTimeoutMs ?? 1500;
+            
+            // Start shorter silence timer for interim results (1 second)
+            silenceTimer = window.setTimeout(() => {
+              if (!resolved && meaningfulSpeech.trim().length >= 2) {
+                resolved = true;
+                clearTimer();
+                clearSilenceTimer();
+                try { recognition.stop(); } catch {}
+                resolve({ 
+                  transcript: meaningfulSpeech.trim(), 
+                  confidence: 0.7, // Lower confidence for interim, but acceptable for real-time
+                  durationMs: Date.now() - startTime 
+                });
+              }
+            }, 1000); // 1 second for interim results
+          }
+        }
+        
+        // If we have interim results and callback, notify immediately
+        if (interimTranscript && options?.onInterimResult) {
+          options.onInterimResult(interimTranscript, false);
+        }
       };
 
       recognition.onerror = (event: any) => {
         clearTimer();
-        reject(new Error(event.error || 'STT error'));
+        clearSilenceTimer();
+        // If we have a transcript, return it instead of error
+        if (finalTranscript.trim() && !resolved) {
+          resolved = true;
+          resolve({ 
+            transcript: finalTranscript.trim(), 
+            confidence: bestConfidence || 0.7, 
+            durationMs: Date.now() - startTime 
+          });
+        } else {
+          reject(new Error(event.error || 'STT error'));
+        }
       };
 
       recognition.onend = () => {
         clearTimer();
+        clearSilenceTimer();
         if (!resolved) {
-          reject(new Error('No speech detected'));
+          // Return what we have if available
+          if (finalTranscript.trim()) {
+            resolved = true;
+            resolve({ 
+              transcript: finalTranscript.trim(), 
+              confidence: bestConfidence || 0.7, 
+              durationMs: Date.now() - startTime 
+            });
+          } else {
+            reject(new Error('No speech detected'));
+          }
         }
       };
 
@@ -157,6 +274,7 @@ export class SpeechService {
         recognition.start();
       } catch (e) {
         clearTimer();
+        clearSilenceTimer();
         reject(e as Error);
       }
     });

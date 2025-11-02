@@ -107,10 +107,12 @@ class WhisperServiceClass {
 
   /**
    * Fallback to browser's Web Speech API
+   * Optimized for kids: longer timeout, interim results, immediate detection
+   * Enhanced with prompts for better accuracy
    */
   private async fallbackToWebSpeech(
     _audioBlob: Blob,
-    options: { language?: string }
+    options: { language?: string; prompt?: string }
   ): Promise<WhisperResult> {
     // Import existing SpeechService
     const { SpeechService } = await import('./SpeechService');
@@ -119,16 +121,85 @@ class WhisperServiceClass {
       throw new Error('No speech recognition available');
     }
 
+    // Extract target word from prompt if available (for better accuracy)
+    // The prompt contains context like "The child is trying to say the word: 'word'"
+    let targetWord: string | undefined;
+    if (options.prompt) {
+      const match = options.prompt.match(/word:\s*"([^"]+)"/i);
+      if (match) {
+        targetWord = match[1].toLowerCase();
+      }
+    }
+
+    // Use longer timeout for kids (30 seconds), enable interim results for immediate detection
+    // Extended silence timeout for kids who may pause more
     const result = await SpeechService.startRecognition({
       lang: options.language || 'en-US',
-      timeoutMs: 10000
+      timeoutMs: 30000, // 30 seconds for kids
+      interimResults: true, // Enable for real-time detection
+      continuous: false, // Single utterance mode
+      autoStopOnSilence: true, // Auto-stop after silence
+      silenceTimeoutMs: targetWord ? 2000 : 1500 // Longer silence timeout when we know the target word
     });
 
+    // Normalize transcript for better matching
+    let transcript = result.transcript.trim().toLowerCase()
+      .replace(/[.,!?;:'"]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    // If we have a target word and the transcript is similar, boost confidence
+    let confidence = result.confidence || 0.8;
+    if (targetWord && transcript) {
+      // Calculate similarity to target word
+      const similarity = this.calculateWordSimilarity(targetWord, transcript);
+      if (similarity > 0.7) {
+        // Boost confidence if transcript is similar to target word
+        confidence = Math.min(0.95, confidence + 0.1);
+      }
+    }
+
     return {
-      transcript: result.transcript,
-      confidence: result.confidence || 0.8,
+      transcript,
+      confidence,
       language: options.language || 'en'
     };
+  }
+
+  /**
+   * Calculate similarity between two words using Levenshtein distance
+   */
+  private calculateWordSimilarity(word1: string, word2: string): number {
+    const len1 = word1.length;
+    const len2 = word2.length;
+    
+    if (len1 === 0) return len2 === 0 ? 1 : 0;
+    if (len2 === 0) return 0;
+
+    // Create matrix for dynamic programming
+    const matrix: number[][] = Array(len1 + 1)
+      .fill(null)
+      .map(() => Array(len2 + 1).fill(0));
+
+    // Initialize base cases
+    for (let i = 0; i <= len1; i++) matrix[i][0] = i;
+    for (let j = 0; j <= len2; j++) matrix[0][j] = j;
+
+    // Fill matrix
+    for (let i = 1; i <= len1; i++) {
+      for (let j = 1; j <= len2; j++) {
+        const cost = word1[i - 1] === word2[j - 1] ? 0 : 1;
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j] + 1,      // deletion
+          matrix[i][j - 1] + 1,      // insertion
+          matrix[i - 1][j - 1] + cost // substitution
+        );
+      }
+    }
+
+    const distance = matrix[len1][len2];
+    const maxLen = Math.max(len1, len2);
+    return 1 - distance / maxLen;
   }
 
   /**

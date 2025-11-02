@@ -198,7 +198,8 @@ class AdvancedPronunciationScorerClass {
 
   /**
    * Align words and phonemes between expected and spoken
-   * Uses flexible matching for better accuracy with long phrases
+   * Uses flexible matching for better accuracy with long phrases and single words
+   * Enhanced for kids' pronunciations with better fuzzy matching
    */
   private async alignWords(
     expectedWords: string[],
@@ -210,22 +211,32 @@ class AdvancedPronunciationScorerClass {
     let spokenIndex = 0;
 
     for (let i = 0; i < expectedWords.length; i++) {
-      const expectedWord = expectedWords[i];
+      const expectedWord = expectedWords[i].toLowerCase().trim();
       
       // Try to find best matching spoken word using flexible matching
       let bestMatch = '';
       let bestScore = 0;
       let bestMatchIndex = -1;
       
+      // For single words (Word Games), also check string similarity as fallback
+      const isSingleWord = expectedWords.length === 1;
+      
       // Look ahead up to 5 words for better matching (increased for longer phrases)
       const maxLookAhead = Math.max(5, Math.floor(expectedWords.length * 0.5));
       for (let j = spokenIndex; j < Math.min(spokenIndex + maxLookAhead, spokenWords.length); j++) {
-        const spokenWord = spokenWords[j];
+        const spokenWord = spokenWords[j].toLowerCase().trim();
         
-        // Calculate similarity score
+        // Calculate similarity score using phonemes
         const expectedPhonemes = this.getPhonemes(expectedWord);
         const spokenPhonemes = this.getPhonemes(spokenWord);
-        const score = this.calculateWordSimilarity(expectedPhonemes, spokenPhonemes);
+        let score = this.calculateWordSimilarity(expectedPhonemes, spokenPhonemes);
+        
+        // For single words, also check direct string similarity (fuzzy match)
+        if (isSingleWord) {
+          const stringSimilarity = this.calculateStringSimilarity(expectedWord, spokenWord);
+          // Use the higher of the two scores (phoneme or string-based)
+          score = Math.max(score, stringSimilarity * 0.9); // Weight string similarity slightly less
+        }
         
         if (score > bestScore) {
           bestScore = score;
@@ -235,13 +246,21 @@ class AdvancedPronunciationScorerClass {
       }
       
       // Use best match or fall back to word at current index
-      // Also check if we should skip this expected word if no good match found
+      // More lenient threshold for single words (kids might have slight mispronunciations)
+      const threshold = isSingleWord ? 0.5 : 0.3;
+      
       let spokenWord = bestMatchIndex >= 0 ? bestMatch : (spokenWords[spokenIndex] || '');
       
-      // If best match is very poor (<0.3 similarity), allow skipping to next word
-      if (bestMatchIndex >= 0 && bestScore < 0.3 && spokenIndex < spokenWords.length) {
-        // This might be an extra word in the transcription, skip it
-        spokenWord = spokenWords[spokenIndex] || '';
+      // If best match is poor but acceptable for kids, still use it
+      if (bestMatchIndex >= 0 && bestScore < threshold && spokenIndex < spokenWords.length) {
+        // For single words, be more lenient - accept if similarity > 0.4
+        if (isSingleWord && bestScore >= 0.4) {
+          spokenWord = bestMatch;
+          spokenIndex = bestMatchIndex + 1;
+        } else {
+          // This might be an extra word in the transcription, skip it
+          spokenWord = spokenWords[spokenIndex] || '';
+        }
       } else if (bestMatchIndex >= spokenIndex) {
         spokenIndex = bestMatchIndex + 1;
       }
@@ -278,7 +297,45 @@ class AdvancedPronunciationScorerClass {
   }
 
   /**
+   * Calculate string similarity using Levenshtein distance
+   * Useful for direct word matching when phonemes might differ
+   */
+  private calculateStringSimilarity(str1: string, str2: string): number {
+    const len1 = str1.length;
+    const len2 = str2.length;
+    
+    if (len1 === 0) return len2 === 0 ? 1 : 0;
+    if (len2 === 0) return 0;
+
+    // Create matrix for dynamic programming
+    const matrix: number[][] = Array(len1 + 1)
+      .fill(null)
+      .map(() => Array(len2 + 1).fill(0));
+
+    // Initialize base cases
+    for (let i = 0; i <= len1; i++) matrix[i][0] = i;
+    for (let j = 0; j <= len2; j++) matrix[0][j] = j;
+
+    // Fill matrix
+    for (let i = 1; i <= len1; i++) {
+      for (let j = 1; j <= len2; j++) {
+        const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j] + 1,      // deletion
+          matrix[i][j - 1] + 1,      // insertion
+          matrix[i - 1][j - 1] + cost // substitution
+        );
+      }
+    }
+
+    const distance = matrix[len1][len2];
+    const maxLen = Math.max(len1, len2);
+    return 1 - distance / maxLen;
+  }
+
+  /**
    * Calculate similarity between two words based on their phonemes
+   * Enhanced with better fuzzy matching for kids' pronunciations
    */
   private calculateWordSimilarity(expectedPhonemes: string[], spokenPhonemes: string[]): number {
     if (expectedPhonemes.length === 0 || spokenPhonemes.length === 0) return 0;
@@ -288,29 +345,39 @@ class AdvancedPronunciationScorerClass {
       .fill(0)
       .map(() => Array(spokenPhonemes.length + 1).fill(0));
     
-    // Initialize base cases
+    // Initialize base cases with less penalty for kids
     for (let i = 1; i <= expectedPhonemes.length; i++) {
-      dp[i][0] = dp[i-1][0] - 1;
+      dp[i][0] = dp[i-1][0] - 0.3; // Reduced penalty from -1 to -0.3
     }
     for (let j = 1; j <= spokenPhonemes.length; j++) {
-      dp[0][j] = dp[0][j-1] - 1;
+      dp[0][j] = dp[0][j-1] - 0.3; // Reduced penalty from -1 to -0.3
     }
     
-    // Fill DP table
+    // Fill DP table with improved matching
     for (let i = 1; i <= expectedPhonemes.length; i++) {
       for (let j = 1; j <= spokenPhonemes.length; j++) {
         const match = this.phonemeSimilarity(expectedPhonemes[i-1], spokenPhonemes[j-1]);
         dp[i][j] = Math.max(
           dp[i-1][j-1] + match,
-          dp[i-1][j] - 0.5,
-          dp[i][j-1] - 0.5
+          dp[i-1][j] - 0.2, // Reduced penalty from -0.5 to -0.2
+          dp[i][j-1] - 0.2  // Reduced penalty from -0.5 to -0.2
         );
       }
     }
     
-    // Normalize to 0-1 range
+    // Normalize to 0-1 range with bonus for partial matches
     const maxScore = Math.max(expectedPhonemes.length, spokenPhonemes.length);
-    return Math.max(0, dp[expectedPhonemes.length][spokenPhonemes.length] / maxScore);
+    const rawScore = dp[expectedPhonemes.length][spokenPhonemes.length];
+    const normalized = Math.max(0, rawScore / maxScore);
+    
+    // Bonus if lengths are similar (kids might add/remove sounds but still be understood)
+    const lengthRatio = Math.min(expectedPhonemes.length, spokenPhonemes.length) / 
+                       Math.max(expectedPhonemes.length, spokenPhonemes.length);
+    if (lengthRatio > 0.7) {
+      return Math.min(1.0, normalized + 0.1 * lengthRatio);
+    }
+    
+    return normalized;
   }
 
   /**
@@ -399,20 +466,30 @@ class AdvancedPronunciationScorerClass {
 
   /**
    * Score a word based on phoneme accuracy
+   * Enhanced with better matching for kids' pronunciations
    */
   private scoreWord(expected: string[], spoken: string[]): number {
     if (expected.length === 0) return 0;
 
-    let totalSimilarity = 0;
-    const maxLen = Math.max(expected.length, spoken.length);
-
-    for (let i = 0; i < maxLen; i++) {
-      const exp = expected[i] || '';
-      const spk = spoken[i] || '';
-      totalSimilarity += this.phonemeSimilarity(exp, spk);
+    // Use the improved word similarity method which uses dynamic programming
+    const similarity = this.calculateWordSimilarity(expected, spoken);
+    
+    // Convert similarity (0-1) to score (0-100)
+    let score = Math.round(similarity * 100);
+    
+    // Additional bonus for single words (common in Word Games)
+    // Kids might have slight variations but if the core word is recognized, give bonus
+    if (expected.length <= 5 && spoken.length > 0) {
+      // For short words, be more lenient
+      const lengthMatch = Math.min(expected.length, spoken.length) / 
+                         Math.max(expected.length, spoken.length);
+      if (lengthMatch > 0.6 && similarity > 0.5) {
+        // Give bonus if length is similar and similarity is decent
+        score = Math.min(100, score + 10);
+      }
     }
-
-    return Math.round((totalSimilarity / maxLen) * 100);
+    
+    return score;
   }
 
   /**
@@ -784,18 +861,60 @@ class AdvancedPronunciationScorerClass {
   /**
    * Quick check if pronunciation is correct for kids (used for auto-stop)
    * Returns true if the child pronounced it well enough (lower threshold for kids and longer phrases)
+   * Enhanced with better matching for single words (Word Games)
    */
   async isCorrectForKids(expectedText: string, spokenText: string, audioData?: Blob): Promise<boolean> {
+    // First, do a quick string similarity check for single words (faster path)
+    const expectedWords = this.tokenize(expectedText);
+    const spokenWords = this.tokenize(spokenText);
+    const isSingleWord = expectedWords.length === 1;
+    
+    // For single words, check direct string similarity first (fuzzy matching)
+    if (isSingleWord && spokenWords.length > 0) {
+      const expectedWord = expectedWords[0].toLowerCase().trim();
+      const spokenWord = spokenWords[0].toLowerCase().trim();
+      
+      // Quick string similarity check
+      const stringSimilarity = this.calculateStringSimilarity(expectedWord, spokenWord);
+      
+      // If string similarity is very high (>0.85), accept immediately
+      if (stringSimilarity > 0.85) {
+        console.log(`✅ Quick match: "${spokenWord}" matches "${expectedWord}" (${(stringSimilarity * 100).toFixed(1)}% similarity)`);
+        return true;
+      }
+      
+      // If string similarity is decent (>0.7), do a full phoneme check
+      if (stringSimilarity > 0.7) {
+        // Continue to full scoring below
+      } else {
+        // Check if any spoken word is similar enough
+        let bestSimilarity = stringSimilarity;
+        for (const word of spokenWords) {
+          const sim = this.calculateStringSimilarity(expectedWord, word.toLowerCase().trim());
+          if (sim > bestSimilarity) {
+            bestSimilarity = sim;
+          }
+        }
+        
+        // If we found a better match in other words, use that
+        if (bestSimilarity > 0.85) {
+          console.log(`✅ Fuzzy match found: similarity=${(bestSimilarity * 100).toFixed(1)}%`);
+          return true;
+        }
+      }
+    }
+    
+    // Do full scoring with phoneme analysis
     const score = await this.scoreForKids(expectedText, spokenText, audioData);
     
     // Determine threshold based on phrase length
-    const expectedWords = this.tokenize(expectedText);
     const isLongPhrase = expectedWords.length > 3;
     
-    // Use lower threshold for longer phrases (60% for long phrases, 70% for short)
-    const threshold = isLongPhrase ? 60 : 70;
+    // Use lower threshold for longer phrases (60% for long phrases, 65% for short words/phrases)
+    // More lenient for single words which are common in Word Games
+    const threshold = isSingleWord ? 65 : (isLongPhrase ? 60 : 70);
     
-    console.log(`🎯 Checking pronunciation: score=${score.overall.toFixed(1)}%, threshold=${threshold}%, phrase="${expectedText}" (${expectedWords.length} words)`);
+    console.log(`🎯 Checking pronunciation: score=${score.overall.toFixed(1)}%, threshold=${threshold}%, phrase="${expectedText}" (${expectedWords.length} words, isSingle=${isSingleWord})`);
     
     return score.overall >= threshold;
   }

@@ -361,14 +361,24 @@ const KidsGamePage = () => {
     }
   };
 
-  // Handle voice input
+  // Handle voice input - optimized for immediate detection
   const handleVoiceInput = async (blob: Blob, _score: number) => {
     try {
       setIsLoading(true);
-      const result = await WhisperService.transcribe(blob);
+      setError(null);
+      
+      // Use Whisper with optimized settings for games/conversations
+      const result = await WhisperService.transcribe(blob, {
+        language: 'en',
+        prompt: conversationHistory.length > 0 
+          ? conversationHistory[conversationHistory.length - 1].content 
+          : gameContent // Use context to improve recognition
+      });
+      
       const transcript = result.transcript.trim();
       
-      if (transcript) {
+      if (transcript && transcript.length >= 2) { // Accept transcripts with at least 2 characters
+        console.log('✅ Game voice input received:', transcript);
         const userMessage: ConversationMessage = {
           role: 'user',
           content: transcript,
@@ -378,14 +388,24 @@ const KidsGamePage = () => {
         };
         setConversationHistory(prev => [...prev, userMessage]);
         
+        // Process immediately - AI will respond right away
         await handleUserInput(transcript, userMessage);
       } else {
-        setError('I couldn\'t hear what you said. Please try speaking again.');
+        // If transcript is too short or empty, give user a chance to try again
+        setError('I couldn\'t hear you clearly. Please try speaking again. Speak a bit louder or closer to the microphone.');
         setIsLoading(false);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Voice transcription error:', error);
-      setError('Failed to understand your voice. Please try speaking again.');
+      
+      // More user-friendly error messages
+      if (error.message?.includes('timeout')) {
+        setError('I\'m still listening! Please speak clearly and try again.');
+      } else if (error.message?.includes('No speech')) {
+        setError('I didn\'t hear anything. Please click the microphone and speak again.');
+      } else {
+        setError('Let\'s try again! Please speak clearly into the microphone.');
+      }
       setIsLoading(false);
     }
   };

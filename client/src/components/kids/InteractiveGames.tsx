@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Trophy, Settings } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import KidsApi from '@/services/KidsApi';
@@ -13,9 +13,7 @@ type GameType = 'tongue-twister' | 'word-chain' | 'story-telling' | 'pronunciati
 
 const InteractiveGames = () => {
   const navigate = useNavigate();
-  const [currentGame, setCurrentGame] = useState<'menu' | 'settings'>('menu');
   const [gameScore, setGameScore] = useState(0);
-  const [isSoundEnabled, setIsSoundEnabled] = useState(true);
   const { user, isAuthenticated } = useAuth();
   const userId = user?.id ? String(user.id) : 'local-user';
 
@@ -61,45 +59,11 @@ const InteractiveGames = () => {
 
   return (
     <div className="space-y-6">
-      {/* Settings */}
-      {currentGame === 'settings' && (
-        <Card className="border-2 border-purple-300/50 bg-purple-50/40 dark:bg-purple-900/10 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between text-gray-900 dark:text-white">
-              <span className="flex items-center gap-3">
-                <Settings className="w-5 h-5" />
-                Settings
-              </span>
-              <Button variant="outline" size="sm" onClick={() => setCurrentGame('menu')}>
-                Back to Menu
-              </Button>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-semibold">Sound Effects</label>
-              <Button
-                variant={isSoundEnabled ? "default" : "outline"}
-                size="sm"
-                onClick={() => setIsSoundEnabled(!isSoundEnabled)}
-              >
-                {isSoundEnabled ? 'On' : 'Off'}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Game Menu */}
-      {currentGame === 'menu' && (
-        <GameMenu 
-          onSelectGame={startGame}
-          onOpenSettings={() => setCurrentGame('settings')}
-          totalScore={gameScore} 
-          isGeminiReady={GeminiService.isReady()}
-        />
-      )}
-
+      <GameMenu 
+        onSelectGame={startGame}
+        totalScore={gameScore} 
+        isGeminiReady={GeminiService.isReady()}
+      />
     </div>
   );
 };
@@ -107,12 +71,10 @@ const InteractiveGames = () => {
 // Game Menu Component
 const GameMenu = ({ 
   onSelectGame, 
-  onOpenSettings,
   totalScore, 
   isGeminiReady
 }: { 
   onSelectGame: (game: GameType) => void; 
-  onOpenSettings: () => void;
   totalScore: number;
   isGeminiReady: boolean;
 }) => {
@@ -237,17 +199,6 @@ const GameMenu = ({
         })}
       </div>
 
-      {/* Settings Button */}
-      <div className="text-center pt-4">
-            <Button
-              variant="outline"
-          onClick={onOpenSettings}
-              className="rounded-xl"
-            >
-          <Settings className="w-4 h-4 mr-2" />
-          Settings
-            </Button>
-          </div>
         </div>
   );
 };
