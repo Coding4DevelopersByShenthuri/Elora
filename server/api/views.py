@@ -1997,7 +1997,36 @@ def admin_users_list(request):
                 queryset = queryset.filter(is_active=False)
         
         if level_filter:
-            queryset = queryset.filter(profile__level=level_filter)
+            # Handle new category filters
+            if level_filter == 'kids-4-10':
+                # Filter kids aged 4-10 (check age_range in profile)
+                queryset = queryset.filter(
+                    profile__age_range__in=['4-10', '4-7', '8-10', 'kids-4-10', 'young']
+                )
+            elif level_filter == 'kids-10-17':
+                # Filter kids aged 10-17 (teen/kids)
+                queryset = queryset.filter(
+                    profile__age_range__in=['10-17', '11-17', '12-17', 'kids-10-17', 'teen']
+                )
+            elif level_filter == 'adults-beginner':
+                queryset = queryset.filter(profile__level='beginner')
+            elif level_filter == 'adults-intermediate':
+                queryset = queryset.filter(profile__level='intermediate')
+            elif level_filter == 'adults-advanced':
+                queryset = queryset.filter(profile__level='advanced')
+            elif level_filter == 'ielts-pte':
+                # Filter for IELTS/PTE - check learning_purpose or interests (JSONField)
+                # For JSONField, we need to check if the value exists in the array
+                queryset = queryset.filter(
+                    Q(profile__learning_purpose__contains=['ielts']) |
+                    Q(profile__learning_purpose__contains=['pte']) |
+                    Q(profile__learning_purpose__contains=['exam']) |
+                    Q(profile__interests__contains=['ielts']) |
+                    Q(profile__interests__contains=['pte'])
+                )
+            else:
+                # Fallback to old level filter for backward compatibility
+                queryset = queryset.filter(profile__level=level_filter)
         
         total = queryset.count()
         
@@ -2024,6 +2053,8 @@ def admin_users_list(request):
                     'points': profile.points if profile else 0,
                     'current_streak': profile.current_streak if profile else 0,
                     'longest_streak': profile.longest_streak if profile else 0,
+                    'age_range': profile.age_range if profile else None,
+                    'learning_purpose': profile.learning_purpose if profile else [],
                 } if profile else None,
                 'lessons_completed': LessonProgress.objects.filter(user=user, completed=True).count(),
                 'total_sessions': PracticeSession.objects.filter(user=user).count(),

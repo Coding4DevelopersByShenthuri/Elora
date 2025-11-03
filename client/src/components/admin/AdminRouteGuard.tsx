@@ -42,10 +42,32 @@ export function AdminRouteGuard({ children }: AdminRouteGuardProps) {
     }
   }, [user, isAuthenticated, navigate]);
 
-  // Show loading while checking
+  // Show loading while checking or during redirect
   const token = localStorage.getItem('speakbee_auth_token');
+  const isAdmin = localStorage.getItem('speakbee_is_admin') === 'true';
+  
+  // If no token, will redirect - show loading
   if (!token || token === 'local-token') {
-    return null; // Will redirect
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If user exists but not admin, will redirect
+  if (user && !user.is_staff && !user.is_superuser && !isAdmin) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Verifying admin access...</p>
+        </div>
+      </div>
+    );
   }
 
   return <>{children}</>;

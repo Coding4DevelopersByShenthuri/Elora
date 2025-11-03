@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AdminAPI from '@/services/AdminApiService';
 import { useToast } from '@/hooks/use-toast';
 
@@ -45,6 +46,8 @@ export function UserDetailDialog({
         profile: {
           level: user.profile?.level || 'beginner',
           points: user.profile?.points || 0,
+          age_range: user.profile?.age_range || '',
+          learning_purpose: user.profile?.learning_purpose || [],
         },
       });
     }
@@ -56,13 +59,35 @@ export function UserDetailDialog({
 
     setLoading(true);
     try {
-      const response = await AdminAPI.updateUser(user.id, formData);
+      // Prepare the data to send
+      const updateData = {
+        email: formData.email,
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        is_active: formData.is_active,
+        is_staff: formData.is_staff,
+        is_superuser: formData.is_superuser,
+        profile: {
+          level: formData.profile?.level || 'beginner',
+          points: formData.profile?.points || 0,
+        },
+      };
+
+      // Only include profile fields if they exist
+      if (formData.profile?.age_range) {
+        updateData.profile.age_range = formData.profile.age_range;
+      }
+      if (formData.profile?.learning_purpose) {
+        updateData.profile.learning_purpose = formData.profile.learning_purpose;
+      }
+
+      const response = await AdminAPI.updateUser(user.id, updateData);
       if (response.success) {
         toast({
           title: 'Success',
-          description: 'User updated successfully',
+          description: `User ${formData.email} updated successfully`,
         });
-        onUpdate();
+        onUpdate(); // This will refresh the user list
         onClose();
       } else {
         toast({
@@ -72,9 +97,10 @@ export function UserDetailDialog({
         });
       }
     } catch (error: any) {
+      console.error('Error updating user:', error);
       toast({
         title: 'Error',
-        description: error.message || 'An error occurred',
+        description: error?.message || 'An error occurred while updating user',
         variant: 'destructive',
       });
     } finally {
@@ -140,18 +166,45 @@ export function UserDetailDialog({
                   </div>
                 </div>
                 <div className="grid gap-2">
-                  <Label>Level</Label>
-                  <Input
+                  <Label htmlFor="level">Level</Label>
+                  <Select
                     value={formData.profile?.level || 'beginner'}
+                    onValueChange={(value) =>
+                      setFormData({
+                        ...formData,
+                        profile: {
+                          ...formData.profile,
+                          level: value,
+                        },
+                      })
+                    }
+                  >
+                    <SelectTrigger id="level">
+                      <SelectValue placeholder="Select level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="beginner">Beginner</SelectItem>
+                      <SelectItem value="intermediate">Intermediate</SelectItem>
+                      <SelectItem value="advanced">Advanced</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="points">Points</Label>
+                  <Input
+                    id="points"
+                    type="number"
+                    value={formData.profile?.points || 0}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
                         profile: {
                           ...formData.profile,
-                          level: e.target.value,
+                          points: parseInt(e.target.value) || 0,
                         },
                       })
                     }
+                    min="0"
                   />
                 </div>
                 <div className="flex items-center justify-between">
