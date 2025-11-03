@@ -21,8 +21,12 @@ interface User {
     nativeLanguage?: string;
     englishLevel?: string;
     learningPurpose?: string[];
+    interests?: string[];
     completedAt: string;
   };
+  // Admin flags (optional - only present for admin users)
+  is_staff?: boolean;
+  is_superuser?: boolean;
 }
 
 interface AuthContextType {
@@ -33,7 +37,7 @@ interface AuthContextType {
   registerWithServer: (data: { name: string; email: string; password: string; confirm_password: string }) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
   updateUserProfile: (updates: Partial<User['profile']>) => void;
-  updateUserSurveyData: (surveyData: User['surveyData']) => void;
+  updateUserSurveyData: (surveyData: User['surveyData']) => Promise<void>;
   syncWithServer: () => Promise<void>;
   isAuthenticated: boolean;
   isOnline: boolean;
@@ -98,6 +102,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       
       if (response.success && 'data' in response && response.data) {
         const userData = response.data.user;
+        
+        // Check if survey is completed (has survey_completed_at)
+        const hasSurveyData = userData.profile?.survey_completed_at;
+        const surveyData = hasSurveyData ? {
+          ageRange: userData.profile.age_range,
+          nativeLanguage: userData.profile.native_language,
+          englishLevel: userData.profile.english_level,
+          learningPurpose: userData.profile.learning_purpose,
+          interests: userData.profile.interests,
+          completedAt: userData.profile.survey_completed_at
+        } : undefined;
+
         const transformedUser: User = {
           id: userData.id.toString(),
           username: userData.username,
@@ -111,13 +127,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             streak: userData.profile?.current_streak || 0,
             avatar: userData.profile?.avatar
           },
-          surveyData: userData.profile ? {
-            ageRange: userData.profile.age_range,
-            nativeLanguage: userData.profile.native_language,
-            englishLevel: userData.profile.english_level,
-            learningPurpose: userData.profile.learning_purpose,
-            completedAt: userData.profile.survey_completed_at
-          } : undefined
+          surveyData: surveyData,
+          // Store admin flags for SurveyManager to check
+          is_staff: userData.is_staff,
+          is_superuser: userData.is_superuser
         };
         
         // transformedUser is already used in login() above, no need to reference it here
@@ -235,6 +248,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const response = await API.auth.getUserInfo();
       if (response.success && 'data' in response && response.data) {
         const userData = response.data;
+        
+        // Check if survey is completed on server side
+        const serverSurveyCompleted = userData.profile?.survey_completed_at;
+        const serverSurveyData = serverSurveyCompleted ? {
+          ageRange: userData.profile?.age_range,
+          nativeLanguage: userData.profile?.native_language,
+          englishLevel: userData.profile?.english_level,
+          learningPurpose: userData.profile?.learning_purpose,
+          interests: userData.profile?.interests,
+          completedAt: userData.profile?.survey_completed_at
+        } : undefined;
+
         setUser(prev => {
           if (!prev) return null;
           return {
@@ -245,7 +270,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               points: userData.profile?.points || prev.profile.points,
               streak: userData.profile?.current_streak || prev.profile.streak,
               avatar: userData.profile?.avatar || prev.profile.avatar
-            }
+            },
+            // If server has survey data, use it (server is source of truth)
+            surveyData: serverSurveyData || prev.surveyData
           };
         });
       }
@@ -273,11 +300,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const updateUserSurveyData = (surveyData: User['surveyData']) => {
+  const updateUserSurveyData = async (surveyData: User['surveyData']) => {
     if (user) {
       const mergedSurveyData = {
         ...(user.surveyData || {}),
-        ...surveyData
+        ...surveyData,
+        completedAt: new Date().toISOString() // Ensure completedAt is always set
       } as User['surveyData'];
 
       const updatedUser = {
@@ -296,6 +324,37 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         localStorage.setItem("speakbee_users", JSON.stringify(updatedUsers));
       } catch (error) {
         console.error('Error updating user survey data in storage:', error);
+      }
+
+      // Sync survey data to backend server (if online and not admin user)
+      // Admin users don't need to save survey data - they never take surveys
+      const isAdminUser = (user as any).is_staff || (user as any).is_superuser;
+      if (!isAdminUser && isOnline) {
+        try {
+          const token = localStorage.getItem('speakbee_auth_token');
+          if (token && token !== 'local-token') {
+            // Prepare survey data for backend (map frontend field names to backend field names)
+            const profileUpdateData: any = {
+              age_range: surveyData?.ageRange || null,
+              native_language: surveyData?.nativeLanguage || null,
+              english_level: surveyData?.englishLevel || null,
+              learning_purpose: surveyData?.learningPurpose || [],
+              interests: surveyData?.interests || [],
+              survey_completed_at: new Date().toISOString()
+            };
+
+            // Update profile via API
+            const response = await API.auth.updateProfile(profileUpdateData);
+            if (response.success) {
+              console.log('✅ Survey data saved to backend');
+            } else {
+              console.warn('⚠️ Failed to save survey data to backend:', response.message);
+            }
+          }
+        } catch (error) {
+          console.error('Error syncing survey data to backend:', error);
+          // Don't throw - survey completion should still work offline
+        }
       }
     }
   };

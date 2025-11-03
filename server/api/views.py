@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.utils import timezone
 from django.db.models import Avg, Sum, Count, Q, F
+from collections import defaultdict
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -1739,6 +1740,450 @@ def idempotent_upsert(request):
     except Exception as e:
         logger.error(f"Idempotent upsert error: {str(e)}")
         return Response({
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# ============= Admin Views =============
+def is_admin_user(user):
+    """Check if user is admin/staff"""
+    return user.is_authenticated and (user.is_staff or user.is_superuser)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_dashboard_stats(request):
+    """Get admin dashboard statistics"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        # User statistics
+        total_users = User.objects.count()
+        active_users = User.objects.filter(is_active=True).count()
+        new_users_today = User.objects.filter(date_joined__date=timezone.now().date()).count()
+        new_users_this_month = User.objects.filter(
+            date_joined__gte=timezone.now().replace(day=1)
+        ).count()
+        
+        # User growth by month (last 12 months)
+        user_growth = []
+        for i in range(11, -1, -1):
+            month_start = (timezone.now() - timedelta(days=30*i)).replace(day=1)
+            if i == 0:
+                month_end = timezone.now()
+            else:
+                next_month = month_start + timedelta(days=32)
+                month_end = next_month.replace(day=1) - timedelta(days=1)
+            
+            count = User.objects.filter(
+                date_joined__gte=month_start,
+                date_joined__lte=month_end
+            ).count()
+            
+            user_growth.append({
+                'month': month_start.strftime('%Y-%m'),
+                'month_name': month_start.strftime('%B %Y'),
+                'count': count
+            })
+        
+        # Lesson statistics
+        total_lessons = Lesson.objects.count()
+        active_lessons = Lesson.objects.filter(is_active=True).count()
+        total_progress = LessonProgress.objects.count()
+        completed_lessons = LessonProgress.objects.filter(completed=True).count()
+        
+        # Practice statistics
+        total_sessions = PracticeSession.objects.count()
+        total_practice_time = PracticeSession.objects.aggregate(
+            total=Sum('duration_minutes')
+        )['total'] or 0
+        
+        # Recent activity (last 50 activities)
+        recent_activities = []
+        
+        # Recent user registrations
+        recent_users = User.objects.order_by('-date_joined')[:10]
+        for user in recent_users:
+            recent_activities.append({
+                'type': 'user_registered',
+                'title': f'New user registered: {user.username}',
+                'user': user.username,
+                'timestamp': user.date_joined.isoformat(),
+                'icon': 'user-plus'
+            })
+        
+        # Recent lesson completions
+        recent_completions = LessonProgress.objects.filter(
+            completed=True
+        ).order_by('-updated_at')[:10]
+        for progress in recent_completions:
+            recent_activities.append({
+                'type': 'lesson_completed',
+                'title': f'{progress.user.username} completed {progress.lesson.title}',
+                'user': progress.user.username,
+                'timestamp': progress.updated_at.isoformat(),
+                'icon': 'check-circle'
+            })
+        
+        # Sort by timestamp
+        recent_activities.sort(key=lambda x: x['timestamp'], reverse=True)
+        recent_activities = recent_activities[:50]
+        
+        # Level distribution
+        level_distribution = UserProfile.objects.values('level').annotate(
+            count=Count('id')
+        ).order_by('level')
+        
+        stats = {
+            'users': {
+                'total': total_users,
+                'active': active_users,
+                'new_today': new_users_today,
+                'new_this_month': new_users_this_month,
+                'growth_by_month': user_growth,
+                'level_distribution': list(level_distribution)
+            },
+            'lessons': {
+                'total': total_lessons,
+                'active': active_lessons,
+                'total_progress': total_progress,
+                'completed': completed_lessons,
+                'completion_rate': round((completed_lessons / total_progress * 100) if total_progress > 0 else 0, 2)
+            },
+            'practice': {
+                'total_sessions': total_sessions,
+                'total_time_minutes': total_practice_time,
+                'total_time_hours': round(total_practice_time / 60, 2)
+            },
+            'recent_activities': recent_activities[:20]
+        }
+        
+        return Response(stats)
+    
+    except Exception as e:
+        logger.error(f"Admin dashboard stats error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_users_list(request):
+    """Get list of users for admin"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        search = request.query_params.get('search', '')
+        page = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('page_size', 20))
+        level_filter = request.query_params.get('level', '')
+        active_filter = request.query_params.get('active', '')
+        
+        queryset = User.objects.select_related('profile').all()
+        
+        if search:
+            queryset = queryset.filter(
+                Q(username__icontains=search) |
+                Q(email__icontains=search) |
+                Q(first_name__icontains=search) |
+                Q(last_name__icontains=search)
+            )
+        
+        if active_filter:
+            if active_filter.lower() == 'true':
+                queryset = queryset.filter(is_active=True)
+            elif active_filter.lower() == 'false':
+                queryset = queryset.filter(is_active=False)
+        
+        if level_filter:
+            queryset = queryset.filter(profile__level=level_filter)
+        
+        total = queryset.count()
+        
+        # Pagination
+        start = (page - 1) * page_size
+        end = start + page_size
+        users = queryset[start:end]
+        
+        users_data = []
+        for user in users:
+            profile = getattr(user, 'profile', None)
+            users_data.append({
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'name': f"{user.first_name} {user.last_name}".strip() or user.username,
+                'is_active': user.is_active,
+                'is_staff': user.is_staff,
+                'is_superuser': user.is_superuser,
+                'date_joined': user.date_joined.isoformat() if user.date_joined else None,
+                'last_login': user.last_login.isoformat() if user.last_login else None,
+                'profile': {
+                    'level': profile.level if profile else 'beginner',
+                    'points': profile.points if profile else 0,
+                    'current_streak': profile.current_streak if profile else 0,
+                    'longest_streak': profile.longest_streak if profile else 0,
+                } if profile else None,
+                'lessons_completed': LessonProgress.objects.filter(user=user, completed=True).count(),
+                'total_sessions': PracticeSession.objects.filter(user=user).count(),
+                'vocabulary_count': VocabularyWord.objects.filter(user=user).count()
+            })
+        
+        return Response({
+            'users': users_data,
+            'pagination': {
+                'page': page,
+                'page_size': page_size,
+                'total': total,
+                'pages': (total + page_size - 1) // page_size
+            }
+        })
+    
+    except Exception as e:
+        logger.error(f"Admin users list error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def admin_user_detail(request, user_id):
+    """Get, update, or delete a specific user"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        user = User.objects.get(id=user_id)
+        
+        if request.method == 'GET':
+            profile = getattr(user, 'profile', None)
+            user_data = {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'is_active': user.is_active,
+                'is_staff': user.is_staff,
+                'is_superuser': user.is_superuser,
+                'date_joined': user.date_joined.isoformat() if user.date_joined else None,
+                'last_login': user.last_login.isoformat() if user.last_login else None,
+                'profile': UserProfileSerializer(profile).data if profile else None,
+                'stats': {
+                    'lessons_completed': LessonProgress.objects.filter(user=user, completed=True).count(),
+                    'total_sessions': PracticeSession.objects.filter(user=user).count(),
+                    'total_practice_time': PracticeSession.objects.filter(user=user).aggregate(
+                        total=Sum('duration_minutes')
+                    )['total'] or 0,
+                    'vocabulary_count': VocabularyWord.objects.filter(user=user).count(),
+                    'achievements_unlocked': UserAchievement.objects.filter(user=user, unlocked=True).count(),
+                }
+            }
+            return Response(user_data)
+        
+        elif request.method == 'PUT':
+            # Update user
+            user.first_name = request.data.get('first_name', user.first_name)
+            user.last_name = request.data.get('last_name', user.last_name)
+            user.email = request.data.get('email', user.email)
+            user.is_active = request.data.get('is_active', user.is_active)
+            user.is_staff = request.data.get('is_staff', user.is_staff)
+            user.is_superuser = request.data.get('is_superuser', user.is_superuser)
+            user.save()
+            
+            # Update profile if provided
+            if 'profile' in request.data and profile:
+                profile_data = request.data['profile']
+                profile.level = profile_data.get('level', profile.level)
+                profile.points = profile_data.get('points', profile.points)
+                profile.save()
+            
+            return Response({
+                "message": "User updated successfully",
+                "user": UserSerializer(user).data
+            })
+        
+        elif request.method == 'DELETE':
+            # Don't actually delete, just deactivate
+            user.is_active = False
+            user.save()
+            return Response({
+                "message": "User deactivated successfully"
+            })
+    
+    except User.DoesNotExist:
+        return Response({
+            "message": "User not found"
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        logger.error(f"Admin user detail error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def admin_create_superuser(request):
+    """Create a new superuser"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        username = request.data.get('username')
+        email = request.data.get('email')
+        password = request.data.get('password')
+        first_name = request.data.get('first_name', '')
+        last_name = request.data.get('last_name', '')
+        
+        if not username or not email or not password:
+            return Response({
+                "message": "Username, email, and password are required"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if User.objects.filter(username=username).exists():
+            return Response({
+                "message": "Username already exists"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if User.objects.filter(email=email).exists():
+            return Response({
+                "message": "Email already exists"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+            first_name=first_name,
+            last_name=last_name,
+            is_staff=True,
+            is_superuser=True,
+            is_active=True
+        )
+        
+        # Create profile
+        UserProfile.objects.create(user=user)
+        
+        return Response({
+            "message": "Superuser created successfully",
+            "user": UserSerializer(user).data
+        }, status=status.HTTP_201_CREATED)
+    
+    except Exception as e:
+        logger.error(f"Create superuser error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_analytics(request):
+    """Get analytics data for admin"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        days = int(request.query_params.get('days', 30))
+        end_date = timezone.now().date()
+        start_date = end_date - timedelta(days=days)
+        
+        # Daily user registrations
+        daily_registrations = defaultdict(int)
+        registrations = User.objects.filter(
+            date_joined__date__gte=start_date,
+            date_joined__date__lte=end_date
+        )
+        for user in registrations:
+            date_str = user.date_joined.date().isoformat()
+            daily_registrations[date_str] += 1
+        
+        # Daily lesson completions
+        daily_completions = defaultdict(int)
+        completions = LessonProgress.objects.filter(
+            completed=True,
+            updated_at__date__gte=start_date,
+            updated_at__date__lte=end_date
+        )
+        for progress in completions:
+            date_str = progress.updated_at.date().isoformat()
+            daily_completions[date_str] += 1
+        
+        # Daily practice sessions
+        daily_sessions = defaultdict(int)
+        sessions = PracticeSession.objects.filter(
+            session_date__date__gte=start_date,
+            session_date__date__lte=end_date
+        )
+        for session in sessions:
+            date_str = session.session_date.date().isoformat()
+            daily_sessions[date_str] += 1
+        
+        # Build time series data
+        time_series = []
+        current_date = start_date
+        while current_date <= end_date:
+            date_str = current_date.isoformat()
+            time_series.append({
+                'date': date_str,
+                'registrations': daily_registrations.get(date_str, 0),
+                'completions': daily_completions.get(date_str, 0),
+                'sessions': daily_sessions.get(date_str, 0)
+            })
+            current_date += timedelta(days=1)
+        
+        # Lesson type distribution
+        lesson_type_dist = Lesson.objects.values('lesson_type').annotate(
+            count=Count('id')
+        ).order_by('lesson_type')
+        
+        # Content type distribution
+        content_type_dist = Lesson.objects.values('content_type').annotate(
+            count=Count('id')
+        ).order_by('content_type')
+        
+        # Top lessons by completions
+        top_lessons = Lesson.objects.annotate(
+            completion_count=Count('lessonprogress', filter=Q(lessonprogress__completed=True))
+        ).order_by('-completion_count')[:10]
+        
+        top_lessons_data = [{
+            'id': lesson.id,
+            'title': lesson.title,
+            'lesson_type': lesson.lesson_type,
+            'completions': lesson.completion_count
+        } for lesson in top_lessons]
+        
+        return Response({
+            'time_series': time_series,
+            'lesson_type_distribution': list(lesson_type_dist),
+            'content_type_distribution': list(content_type_dist),
+            'top_lessons': top_lessons_data
+        })
+    
+    except Exception as e:
+        logger.error(f"Admin analytics error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
             "error": str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

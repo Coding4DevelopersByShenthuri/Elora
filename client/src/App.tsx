@@ -5,7 +5,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 
 // ✅ Contexts & Providers
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -48,6 +48,14 @@ import PricingPage from "@/pages/PricingPage";
 import VerifyEmail from "@/pages/VerifyEmail";
 import TermsAndConditionsPage from "@/pages/TermsAndConditionsPage";
 import CertificatesPage from "@/pages/Certificates";
+import AdminLogin from "@/pages/admin/AdminLogin";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
+import AdminUsers from "@/pages/admin/AdminUsers";
+import AdminAnalytics from "@/pages/admin/AdminAnalytics";
+import AdminSettings from "@/pages/admin/AdminSettings";
+import { Analytics } from "@/components/common/Analytics";
+import { AdminRouteGuard } from "@/components/admin/AdminRouteGuard";
+import type { ReactNode } from 'react';
 
 // ✅ Import AuthModal, UserSurvey, and SurveyManager
 import AuthModal from "@/components/auth/AuthModal";
@@ -72,6 +80,40 @@ import SurveyManager from "@/components/surveys/SurveyManager";
 
 const queryClient = new QueryClient();
 
+// ✅ Conditional Layout - Hide Navbar/Footer for Admin Pages
+const ConditionalLayout = ({ children }: { children: ReactNode }) => {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
+
+  if (isAdminRoute) {
+    // Admin pages (including login) get minimal layout (no Navbar, Footer, FloatingIcons, etc.)
+    return (
+      <div className="min-h-screen flex flex-col relative bg-background">
+        <OfflineIndicator />
+        <main className="flex-1">
+          {children}
+        </main>
+        <Analytics />
+      </div>
+    );
+  }
+
+  // Regular pages get full layout with Navbar and Footer
+  return (
+    <div className="min-h-screen flex flex-col relative">
+      <FloatingIconsLayer />
+      <OfflineIndicator />
+      <Navbar />
+      <main className="flex-1">
+        {children}
+      </main>
+      <Footer />
+      <CookieConsent />
+      <Analytics />
+    </div>
+  );
+};
+
 // ✅ Smooth Page Transition Wrapper
 const PageTransition = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
@@ -92,6 +134,7 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
 
 // ✅ Route Definitions
 const AppRoutes = () => {
+  const { updateUserSurveyData } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isSurveyOpen, setIsSurveyOpen] = useState(false);
   const [isLanguageSurveyOpen, setIsLanguageSurveyOpen] = useState(false);
@@ -203,10 +246,19 @@ const AppRoutes = () => {
         <Route path="/adults/intermediates" element={<PageTransition><Intermediates /></PageTransition>} />
         <Route path="/adults/advanced" element={<PageTransition><Advanced /></PageTransition>} />
         <Route path="/ielts-pte" element={<PageTransition><IeltsPte /></PageTransition>} />
-        <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
         <Route path="/pricing" element={<PageTransition><PricingPage /></PageTransition>} />
         <Route path="/verify-email/:token" element={<PageTransition><VerifyEmail /></PageTransition>} />
         <Route path="/terms-and-conditions" element={<PageTransition><TermsAndConditionsPage /></PageTransition>} />
+        
+        {/* Admin Routes - Must come before catch-all route */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={<PageTransition><AdminRouteGuard><AdminDashboard /></AdminRouteGuard></PageTransition>} />
+        <Route path="/admin/users" element={<PageTransition><AdminRouteGuard><AdminUsers /></AdminRouteGuard></PageTransition>} />
+        <Route path="/admin/analytics" element={<PageTransition><AdminRouteGuard><AdminAnalytics /></AdminRouteGuard></PageTransition>} />
+        <Route path="/admin/settings" element={<PageTransition><AdminRouteGuard><AdminSettings /></AdminRouteGuard></PageTransition>} />
+        
+        {/* Catch-all route must be last */}
+        <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
       
       {/* Global Auth Modal */}
@@ -505,9 +557,20 @@ const AppRoutes = () => {
         isOpen={isHelloSurveyOpen}
         currentStep={17}
         totalSteps={17}
-        onComplete={() => {
+        onComplete={async () => {
           setIsHelloSurveyOpen(false);
-          // Survey completed - clear the flag
+          // Survey completed - ensure completion is marked in backend with final timestamp
+          try {
+            if (updateUserSurveyData) {
+              await updateUserSurveyData({
+                completedAt: new Date().toISOString()
+              });
+              console.log('✅ Survey completion saved to backend');
+            }
+          } catch (error) {
+            console.error('Error marking survey as complete:', error);
+          }
+          // Clear the flag
           sessionStorage.removeItem('speakbee_survey_in_progress');
           sessionStorage.removeItem('speakbee_survey_step');
         }}
@@ -555,16 +618,9 @@ const App = () => {
               {isInitialLoading ? (
                 <LoadingScreen />
               ) : (
-                <div className="min-h-screen flex flex-col relative">
-                  <FloatingIconsLayer />
-                  <OfflineIndicator />
-                  <Navbar />
-                  <main className="flex-1">
-                    <AppRoutes />
-                  </main>
-                  <Footer />
-                  <CookieConsent />
-                </div>
+                <ConditionalLayout>
+                  <AppRoutes />
+                </ConditionalLayout>
               )}
             </BrowserRouter>
           </TooltipProvider>

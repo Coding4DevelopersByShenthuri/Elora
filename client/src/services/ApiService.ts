@@ -274,6 +274,53 @@ export const AuthAPI = {
   }
 };
 
+// ============= Admin API =============
+export const AdminAPI = {
+  /**
+   * Get users (admin-only), supports search by email/username
+   */
+  getUsers: async (params?: { search?: string; page?: number; page_size?: number }) => {
+    try {
+      const usp = new URLSearchParams();
+      if (params?.search) usp.append('search', params.search);
+      if (params?.page) usp.append('page', String(params.page));
+      if (params?.page_size) usp.append('page_size', String(params.page_size));
+      const query = usp.toString() ? `?${usp.toString()}` : '';
+      const result = await fetchWithAuth(`admin/users${query}`);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get user detail by id (admin-only)
+   */
+  getUserDetail: async (userId: number) => {
+    try {
+      const result = await fetchWithAuth(`admin/users/${userId}`);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Update user by id (admin-only) — can set is_staff/is_superuser
+   */
+  updateUser: async (userId: number, data: any) => {
+    try {
+      const result = await fetchWithAuth(`admin/users/${userId}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+};
+
 
 // ============= Lessons API =============
 export const LessonsAPI = {

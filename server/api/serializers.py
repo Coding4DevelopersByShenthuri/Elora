@@ -29,8 +29,8 @@ class UserSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'name', 'profile', 'date_joined', 'last_login']
-        read_only_fields = ['id', 'date_joined', 'last_login']
+        fields = ['id', 'username', 'email', 'name', 'profile', 'date_joined', 'last_login', 'is_staff', 'is_superuser', 'is_active']
+        read_only_fields = ['id', 'date_joined', 'last_login', 'is_staff', 'is_superuser', 'is_active']
     
     def get_name(self, obj):
         return f"{obj.first_name} {obj.last_name}".strip() or obj.username
