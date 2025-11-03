@@ -71,6 +71,18 @@ export default function AdminSettings() {
         setGrantMessage(`✅ Admin access granted successfully to ${user.email || grantEmail}`);
         setGrantEmail(''); // Clear field on success
         
+        // Analytics event (GA4)
+        try {
+          // @ts-ignore
+          if (window.gtag) {
+            // @ts-ignore
+            window.gtag('event', 'admin_grant_access', {
+              event_category: 'admin_actions',
+              event_label: user.email || grantEmail,
+            });
+          }
+        } catch {}
+
         // Clear message after 5 seconds
         setTimeout(() => {
           setGrantMessage('');
