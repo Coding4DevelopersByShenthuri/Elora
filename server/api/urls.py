@@ -55,6 +55,7 @@ urlpatterns = [
     
     # ============= Admin Endpoints =============
     path('admin/dashboard/stats', views.admin_dashboard_stats, name='admin-dashboard-stats'),
+    path('admin/activities', views.admin_activities_list, name='admin-activities-list'),
     path('admin/users', views.admin_users_list, name='admin-users-list'),
     path('admin/users/<int:user_id>', views.admin_user_detail, name='admin-user-detail'),
     path('admin/users/create-superuser', views.admin_create_superuser, name='admin-create-superuser'),

@@ -2202,6 +2202,246 @@ def admin_create_superuser(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def admin_activities_list(request):
+    """Get filtered list of admin activities (user registrations, lesson completions, etc.)"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        # Get filter parameters
+        status_filter = request.query_params.get('status', 'all')  # all, in_process, completed, need_info, unassigned
+        year = request.query_params.get('year')
+        month = request.query_params.get('month')
+        search = request.query_params.get('search', '').strip()
+        try:
+            page = int(request.query_params.get('page', 1))
+            page_size = int(request.query_params.get('page_size', 50))
+            if page < 1:
+                page = 1
+            if page_size < 1 or page_size > 100:
+                page_size = 50
+        except (ValueError, TypeError):
+            page = 1
+            page_size = 50
+        
+        activities = []
+        
+        # Helper function to get date range
+        def get_date_range(year_str, month_str=None):
+            """Get start and end datetime for year/month filter"""
+            if not year_str:
+                return None, None
+            try:
+                year_int = int(year_str)
+                if month_str:
+                    month_names = ['January', 'February', 'March', 'April', 'May', 'June',
+                                 'July', 'August', 'September', 'October', 'November', 'December']
+                    try:
+                        month_num = month_names.index(month_str) + 1
+                        month_start = timezone.make_aware(datetime(year_int, month_num, 1))
+                        if month_num == 12:
+                            month_end = timezone.make_aware(datetime(year_int + 1, 1, 1))
+                        else:
+                            month_end = timezone.make_aware(datetime(year_int, month_num + 1, 1))
+                        return month_start, month_end
+                    except ValueError:
+                        return None, None
+                else:
+                    year_start = timezone.make_aware(datetime(year_int, 1, 1))
+                    year_end = timezone.make_aware(datetime(year_int + 1, 1, 1))
+                    return year_start, year_end
+            except (ValueError, TypeError):
+                return None, None
+        
+        # Get user registrations
+        user_query = User.objects.all()
+        
+        # Apply search filter
+        if search:
+            user_query = user_query.filter(
+                Q(username__icontains=search) |
+                Q(email__icontains=search) |
+                Q(first_name__icontains=search) |
+                Q(last_name__icontains=search)
+            )
+        
+        # Apply date filter for users
+        date_start, date_end = get_date_range(year, month)
+        if date_start and date_end:
+            user_query = user_query.filter(date_joined__gte=date_start, date_joined__lt=date_end)
+        
+        # Determine status mapping
+        status_map = {
+            'in_process': 'in_process',
+            'completed': 'completed',
+            'need_info': 'need_info',
+            'unassigned': 'unassigned',
+            'all': 'all'
+        }
+        
+        # Map status to user/activity states
+        if status_filter == 'in_process':
+            # Active users who haven't completed profile
+            user_query = user_query.filter(is_active=True)
+            user_query = user_query.filter(Q(profile__survey_completed_at__isnull=True) | Q(profile__isnull=True))
+        elif status_filter == 'completed':
+            # Users with completed profiles or verified
+            user_query = user_query.filter(is_active=True, profile__survey_completed_at__isnull=False)
+        elif status_filter == 'need_info':
+            # Inactive users who need verification
+            user_query = user_query.filter(is_active=False)
+        elif status_filter == 'unassigned':
+            # Users without profiles
+            user_query = user_query.filter(profile__isnull=True)
+        
+        # Get recent users based on filters
+        # Note: We'll apply pagination after combining with lesson progress
+        recent_users = list(user_query.order_by('-date_joined')[:1000])  # Limit to prevent memory issues
+        
+        for user in recent_users:
+            try:
+                profile = getattr(user, 'profile', None)
+            except Exception:
+                profile = None
+            
+            # Determine status
+            if user.is_active and profile and hasattr(profile, 'survey_completed_at') and profile.survey_completed_at:
+                user_status = 'completed'
+            elif user.is_active:
+                user_status = 'in_process'
+            elif not user.is_active:
+                user_status = 'need_info'
+            else:
+                user_status = 'unassigned'
+            
+            activities.append({
+                'id': f'user_{user.id}',
+                'name': f"{user.first_name} {user.last_name}".strip() or user.username,
+                'type': 'user_registration',
+                'email': user.email,
+                'date_of_birth': None,  # Not stored in current model
+                'mrn': f'USR{user.id:04d}',  # User reference number
+                'service_date': user.date_joined.strftime('%m/%d/%Y') if user.date_joined else None,
+                'assigned_date': user.date_joined.strftime('%m/%d/%Y') if user.date_joined else None,
+                'status': user_status,
+                'document_id': f'usr_{user.id}'
+            })
+        
+        # Also include lesson progress entries
+        if status_filter in ['all', 'completed', 'in_process']:
+            progress_query = LessonProgress.objects.select_related('user', 'lesson')
+            
+            # Apply search filter
+            if search:
+                progress_query = progress_query.filter(
+                    Q(user__username__icontains=search) |
+                    Q(user__email__icontains=search) |
+                    Q(lesson__title__icontains=search)
+                )
+            
+            # Apply date filter (reuse the same date range helper)
+            if date_start and date_end:
+                progress_query = progress_query.filter(updated_at__gte=date_start, updated_at__lt=date_end)
+            
+            # Apply status filter
+            if status_filter == 'completed':
+                progress_query = progress_query.filter(completed=True)
+            elif status_filter == 'in_process':
+                progress_query = progress_query.filter(completed=False)
+            
+            # Get recent progress (limit to prevent memory issues)
+            recent_progress = list(progress_query.order_by('-updated_at')[:1000])
+            
+            for progress in recent_progress:
+                try:
+                    full_name = f"{progress.user.first_name or ''} {progress.user.last_name or ''}".strip()
+                    user_email = progress.user.email
+                    user_username = progress.user.username
+                except Exception:
+                    full_name = ''
+                    user_email = ''
+                    user_username = 'Unknown'
+                
+                try:
+                    lesson_id = progress.lesson.id if progress.lesson else 0
+                    lesson_created = progress.lesson.created_at if progress.lesson and progress.lesson.created_at else None
+                except Exception:
+                    lesson_id = 0
+                    lesson_created = None
+                
+                activities.append({
+                    'id': f'progress_{progress.id}',
+                    'name': full_name or user_username,
+                    'type': 'lesson_progress',
+                    'email': user_email,
+                    'date_of_birth': None,
+                    'mrn': f'LSN{lesson_id:04d}',
+                    'service_date': lesson_created.strftime('%m/%d/%Y') if lesson_created else None,
+                    'assigned_date': progress.updated_at.strftime('%m/%d/%Y') if progress.updated_at else None,
+                    'status': 'completed' if progress.completed else 'in_process',
+                    'document_id': f'prg_{progress.id}'
+                })
+        
+        # Sort by date (most recent first)
+        # Handle None dates gracefully
+        def sort_key(x):
+            date_str = x.get('assigned_date', '')
+            if not date_str or date_str == 'None' or date_str == 'N/A':
+                return ''
+            try:
+                # Convert MM/DD/YYYY to sortable format
+                parts = date_str.split('/')
+                if len(parts) == 3:
+                    return f"{parts[2]}-{parts[0].zfill(2)}-{parts[1].zfill(2)}"
+                return date_str
+            except:
+                return date_str
+        
+        activities.sort(key=sort_key, reverse=True)
+        
+        # Pagination
+        total = len(activities)
+        start = (page - 1) * page_size
+        end = start + page_size
+        paginated_activities = activities[start:end]
+        
+        return Response({
+            'activities': paginated_activities,
+            'pagination': {
+                'page': page,
+                'page_size': page_size,
+                'total': total,
+                'pages': (total + page_size - 1) // page_size
+            }
+        })
+    
+    except ValueError as e:
+        logger.error(f"Admin activities list validation error: {str(e)}")
+        return Response({
+            "message": f"Invalid filter parameters: {str(e)}",
+            "error": str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        logger.error(f"Admin activities list error: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return Response({
+            "message": "An error occurred while loading activities",
+            "error": str(e),
+            "activities": [],
+            "pagination": {
+                "page": 1,
+                "page_size": 50,
+                "total": 0,
+                "pages": 0
+            }
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def admin_analytics(request):
     """Get analytics data for admin"""
     if not is_admin_user(request.user):

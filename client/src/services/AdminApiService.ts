@@ -254,6 +254,127 @@ export const AdminAPI = {
         error: error
       };
     }
+  },
+
+  /**
+   * Get filtered admin activities list
+   */
+  getActivities: async (params?: {
+    status?: string;
+    year?: number;
+    month?: string;
+    search?: string;
+    page?: number;
+    page_size?: number;
+  }) => {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.status) queryParams.append('status', params.status);
+      if (params?.year) queryParams.append('year', params.year.toString());
+      if (params?.month) queryParams.append('month', params.month);
+      if (params?.search) queryParams.append('search', params.search);
+      if (params?.page) queryParams.append('page', params.page.toString());
+      if (params?.page_size) queryParams.append('page_size', params.page_size.toString());
+
+      const query = queryParams.toString() ? `?${queryParams.toString()}` : '';
+      const result = await fetchWithAuth(`admin/activities${query}`);
+      
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch activities',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Export filtered activities to CSV
+   */
+  exportActivities: async (params?: {
+    status?: string;
+    year?: number;
+    month?: string;
+    search?: string;
+  }) => {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.status) queryParams.append('status', params.status);
+      if (params?.year) queryParams.append('year', params.year.toString());
+      if (params?.month) queryParams.append('month', params.month);
+      if (params?.search) queryParams.append('search', params.search);
+      queryParams.append('format', 'csv');
+
+      const query = queryParams.toString() ? `?${queryParams.toString()}` : '';
+      const response = await fetch(`${API_BASE_URL}/admin/activities${query}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${getAuthToken()}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Export failed');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `admin-activities-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      return {
+        success: true,
+        message: 'Export completed successfully'
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.message || 'Failed to export activities',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Health check for platform status
+   * Note: Health endpoint doesn't require auth, so we call it directly
+   */
+  getHealth: async () => {
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+      const response = await fetch(`${API_BASE_URL}/health`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal: AbortSignal.timeout(5000), // 5 second timeout
+      });
+      
+      if (!response.ok) {
+        throw new Error('Health check failed');
+      }
+      
+      const result = await response.json();
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.message || 'Failed to fetch health status',
+        error: error
+      };
+    }
   }
 };
 

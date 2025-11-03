@@ -1,8 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { 
   Users, 
   UserPlus, 
@@ -10,30 +20,54 @@ import {
   Clock, 
   TrendingUp,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Activity,
+  RefreshCw,
+  Download,
+  Search,
+  X
 } from 'lucide-react';
 import AdminAPI from '@/services/AdminApiService';
 import { RecentActivity } from '@/components/admin/RecentActivity';
 import { UserGrowthChart } from '@/components/admin/UserGrowthChart';
+import { LevelsBarChart } from '@/components/admin/LevelsBarChart';
+import { LessonsCompletionMini } from '@/components/admin/LessonsCompletionMini';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'in_process' | 'completed' | 'unassigned' | 'need_info' | 'all'>('in_process');
-  const [yearFilter, setYearFilter] = useState<number>(2025);
-  const [monthFilter, setMonthFilter] = useState<string>('August');
+  const [healthStatus, setHealthStatus] = useState<{ status: string; healthy: boolean; timestamp: Date | null }>({ status: 'checking', healthy: false, timestamp: null });
+  const [refreshing, setRefreshing] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<'in_process' | 'completed' | 'unassigned' | 'need_info' | 'all'>('all');
+  const [yearFilter, setYearFilter] = useState<number>(new Date().getFullYear());
+  const [monthFilter, setMonthFilter] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [monthsRange, setMonthsRange] = useState<number>(12);
   const [activityType, setActivityType] = useState<string>('all');
+  const [activities, setActivities] = useState<any[]>([]);
+  const [activitiesLoading, setActivitiesLoading] = useState(false);
+  const [activitiesError, setActivitiesError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({ page: 1, page_size: 50, total: 0, pages: 0 });
 
-  const documents = [
-    { id: 'fres2uf4sws', name: 'Albert Flores', dob: '8/15/17', mrn: '521', serviceDate: '7/18/2023', assignedDate: '12/4/2023', status: 'in_process' },
-    { id: 'css32uf43E', name: 'Eleanor Pena', dob: '7/27/13', mrn: '521', serviceDate: '8/21/2023', assignedDate: '8/30/2023', status: 'in_process' },
-    { id: 'asws4uf433', name: 'Floyd Miles', dob: '6/19/14', mrn: '521', serviceDate: '5/30/2023', assignedDate: '5/19/2023', status: 'in_process' },
-    { id: 'saw32u4fsd', name: 'Cameron Williamson', dob: '9/18/16', mrn: '521', serviceDate: '4/21/2023', assignedDate: '1/15/2023', status: 'completed' },
-    { id: 'swe2u4f33y', name: 'Courtney Henry', dob: '6/21/19', mrn: '521', serviceDate: '12/10/2023', assignedDate: '5/27/2024', status: 'need_info' },
-  ];
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Generate year options (current year and 5 years back)
+  const yearOptions = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    return Array.from({ length: 6 }, (_, i) => currentYear - i);
+  }, []);
+
+  const monthOptions = ['January', 'February', 'March', 'April', 'May', 'June', 
+    'July', 'August', 'September', 'October', 'November', 'December'];
 
   useEffect(() => {
     // Wait a moment to ensure token is stored after login redirect
@@ -47,18 +81,41 @@ export default function AdminDashboard() {
     // Small delay to ensure token is ready
     const timer = setTimeout(() => {
       loadStats();
+      checkHealth();
+      loadActivities();
     }, 100);
     
-    return () => clearTimeout(timer);
+    // Auto-refresh every 30 seconds
+    const refreshInterval = setInterval(() => {
+      loadStats(true);
+      checkHealth();
+      loadActivities(true);
+    }, 30000);
+    
+    return () => {
+      clearTimeout(timer);
+      clearInterval(refreshInterval);
+    };
   }, [monthsRange]);
 
-  const loadStats = async () => {
+  // Load activities when filters change
+  useEffect(() => {
+    loadActivities();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [statusFilter, yearFilter, monthFilter, debouncedSearch, currentPage]);
+
+  const loadStats = async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) {
+        setLoading(true);
+      } else {
+        setRefreshing(true);
+      }
       const response = await AdminAPI.getDashboardStats({ months: monthsRange });
       
       if (response.success) {
         setStats(response.data);
+        setError('');
       } else {
         // Check if it's an authentication error
         if (response.error?.response?.status === 401 || response.message?.includes('401')) {
@@ -67,7 +124,7 @@ export default function AdminDashboard() {
           setTimeout(() => {
             window.location.href = '/admin/login';
           }, 2000);
-        } else {
+        } else if (!silent) {
           setError(response.message || 'Failed to load dashboard stats');
         }
       }
@@ -77,12 +134,91 @@ export default function AdminDashboard() {
         setTimeout(() => {
           window.location.href = '/admin/login';
         }, 2000);
-      } else {
+      } else if (!silent) {
         setError(err?.message || 'An error occurred');
       }
     } finally {
-      setLoading(false);
+      if (!silent) {
+        setLoading(false);
+      } else {
+        setRefreshing(false);
+      }
     }
+  };
+
+  const checkHealth = async () => {
+    try {
+      const response = await AdminAPI.getHealth();
+      if (response.success && response.data) {
+        setHealthStatus({
+          status: response.data.status || 'healthy',
+          healthy: response.data.status === 'healthy',
+          timestamp: new Date()
+        });
+      } else {
+        setHealthStatus({ status: 'unhealthy', healthy: false, timestamp: new Date() });
+      }
+    } catch (err) {
+      setHealthStatus({ status: 'unreachable', healthy: false, timestamp: new Date() });
+    }
+  };
+
+  const loadActivities = async (silent = false) => {
+    try {
+      if (!silent) {
+        setActivitiesLoading(true);
+      }
+      setActivitiesError('');
+      
+      const response = await AdminAPI.getActivities({
+        status: statusFilter,
+        year: yearFilter,
+        month: monthFilter || undefined,
+        search: debouncedSearch || undefined,
+        page: currentPage,
+        page_size: 50
+      });
+
+      if (response.success && response.data) {
+        setActivities(response.data.activities || []);
+        setPagination(response.data.pagination || { page: 1, page_size: 50, total: 0, pages: 0 });
+      } else {
+        setActivitiesError(response.message || 'Failed to load activities');
+        setActivities([]);
+      }
+    } catch (err: any) {
+      setActivitiesError(err?.message || 'An error occurred while loading activities');
+      setActivities([]);
+    } finally {
+      if (!silent) {
+        setActivitiesLoading(false);
+      }
+    }
+  };
+
+  const handleExport = async () => {
+    try {
+      const response = await AdminAPI.exportActivities({
+        status: statusFilter,
+        year: yearFilter,
+        month: monthFilter || undefined,
+        search: debouncedSearch || undefined
+      });
+      
+      if (!response.success) {
+        alert(response.message || 'Export failed');
+      }
+    } catch (err: any) {
+      alert(err?.message || 'Export failed');
+    }
+  };
+
+  const clearFilters = () => {
+    setStatusFilter('all');
+    setYearFilter(new Date().getFullYear());
+    setMonthFilter('');
+    setSearchQuery('');
+    setCurrentPage(1);
   };
 
   if (loading) {
@@ -168,6 +304,18 @@ export default function AdminDashboard() {
               <p className="text-white/80">Admin insights and document processing</p>
             </div>
             <div className="hidden md:flex items-center gap-2">
+              <button
+                onClick={() => {
+                  loadStats();
+                  checkHealth();
+                }}
+                disabled={refreshing || loading}
+                className="chip bg-white/90 text-black hover:bg-white disabled:opacity-50 flex items-center gap-1"
+                title="Refresh data"
+              >
+                <RefreshCw className={`h-3 w-3 ${refreshing ? 'animate-spin' : ''}`} />
+                Refresh
+              </button>
               <label className="text-white/80 text-sm">Range</label>
               <select value={monthsRange} onChange={(e)=>setMonthsRange(Number(e.target.value))} className="chip bg-white text-black">
                 {[6,12,18,24].map(m=> <option key={m} value={m}>Last {m} months</option>)}
@@ -238,167 +386,428 @@ export default function AdminDashboard() {
           </Card>
         </div>
 
-        {/* Additional Stats */}
+        {/* Lessons Progress, User Levels, Platform Health - Enhanced */}
         <div className="grid gap-4 md:grid-cols-3">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Lessons Progress</CardTitle>
+          {/* Lessons Progress Card */}
+          <Card className="md:col-span-1">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <div>
+                <CardTitle className="text-lg font-semibold">Lessons Progress</CardTitle>
+                <CardDescription>Completion metrics and trends</CardDescription>
+              </div>
+              <BookOpen className="h-5 w-5 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Completed</span>
-                  <span className="text-sm font-medium">
+              <LessonsCompletionMini
+                completionRate={stats?.lessons?.completion_rate || 0}
+                completedLast7={stats?.lessons?.completed_last_7 || 0}
+                completedLast30={stats?.lessons?.completed_last_30 || 0}
+              />
+              <div className="mt-4 space-y-3 border-t pt-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Total Completed</span>
+                  <span className="text-sm font-semibold">
                     {stats?.lessons?.completed || 0}
                   </span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Total Progress</span>
-                  <span className="text-sm font-medium">
+                  <span className="text-sm font-semibold">
                     {stats?.lessons?.total_progress || 0}
                   </span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Completed (7d)</span>
-                  <span className="text-sm font-medium">
-                    {stats?.lessons?.completed_last_7 || 0}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Completed (30d)</span>
-                  <span className="text-sm font-medium">
-                    {stats?.lessons?.completed_last_30 || 0}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Completion Rate</span>
-                  <Badge variant="secondary">
-                    {stats?.lessons?.completion_rate || 0}%
-                  </Badge>
+                <div className="pt-2">
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-muted-foreground">Overall Progress</span>
+                    <span className="font-medium">{stats?.lessons?.completion_rate || 0}%</span>
+                  </div>
+                  <Progress value={stats?.lessons?.completion_rate || 0} className="h-2" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">User Levels</CardTitle>
+          {/* User Levels Card */}
+          <Card className="md:col-span-1">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <div>
+                <CardTitle className="text-lg font-semibold">User Levels</CardTitle>
+                <CardDescription>Distribution across all levels</CardDescription>
+              </div>
+              <Users className="h-5 w-5 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
-                {/* Detailed levels if provided */}
-                {stats?.levels ? (
+              {stats?.levels ? (
+                <LevelsBarChart data={stats.levels} />
+              ) : stats?.users?.level_distribution ? (
+                <LevelsBarChart data={stats.users.level_distribution} />
+              ) : (
+                <div className="h-[260px] flex items-center justify-center text-muted-foreground">
+                  No level data available
+                </div>
+              )}
+              <div className="mt-4 grid grid-cols-2 gap-2 border-t pt-4">
+                {stats?.levels && (
                   <>
-                    <div className="flex justify-between"><span className="text-sm text-muted-foreground">Kids (4–10)</span><Badge variant="outline">{stats?.levels?.kids_4_10 || 0}</Badge></div>
-                    <div className="flex justify-between"><span className="text-sm text-muted-foreground">Kids (11–17)</span><Badge variant="outline">{stats?.levels?.kids_11_17 || 0}</Badge></div>
-                    <div className="flex justify-between"><span className="text-sm text-muted-foreground">Adults – Beginner</span><Badge variant="outline">{stats?.levels?.adults_beginner || 0}</Badge></div>
-                    <div className="flex justify-between"><span className="text-sm text-muted-foreground">Adults – Intermediate</span><Badge variant="outline">{stats?.levels?.adults_intermediate || 0}</Badge></div>
-                    <div className="flex justify-between"><span className="text-sm text-muted-foreground">Adults – Advanced</span><Badge variant="outline">{stats?.levels?.adults_advanced || 0}</Badge></div>
-                    <div className="flex justify-between"><span className="text-sm text-muted-foreground">IELTS Candidates</span><Badge variant="outline">{stats?.levels?.ielts || 0}</Badge></div>
-                    <div className="flex justify-between"><span className="text-sm text-muted-foreground">PTE Candidates</span><Badge variant="outline">{stats?.levels?.pte || 0}</Badge></div>
-                  </>
-                ) : (
-                  (stats?.users?.level_distribution || []).map((level: any) => (
-                    <div key={level.level} className="flex justify-between">
-                      <span className="text-sm text-muted-foreground capitalize">{level.level}</span>
-                      <Badge variant="outline">{level.count}</Badge>
+                    <div className="flex items-center justify-between p-2 rounded-md bg-muted/50">
+                      <span className="text-xs text-muted-foreground">Kids 4–10</span>
+                      <Badge variant="secondary" className="text-xs">{stats.levels.kids_4_10 || 0}</Badge>
                     </div>
-                  ))
+                    <div className="flex items-center justify-between p-2 rounded-md bg-muted/50">
+                      <span className="text-xs text-muted-foreground">Kids 11–17</span>
+                      <Badge variant="secondary" className="text-xs">{stats.levels.kids_11_17 || 0}</Badge>
+                    </div>
+                    <div className="flex items-center justify-between p-2 rounded-md bg-muted/50">
+                      <span className="text-xs text-muted-foreground">Beginner</span>
+                      <Badge variant="secondary" className="text-xs">{stats.levels.adults_beginner || 0}</Badge>
+                    </div>
+                    <div className="flex items-center justify-between p-2 rounded-md bg-muted/50">
+                      <span className="text-xs text-muted-foreground">Intermediate</span>
+                      <Badge variant="secondary" className="text-xs">{stats.levels.adults_intermediate || 0}</Badge>
+                    </div>
+                    <div className="flex items-center justify-between p-2 rounded-md bg-muted/50">
+                      <span className="text-xs text-muted-foreground">Advanced</span>
+                      <Badge variant="secondary" className="text-xs">{stats.levels.adults_advanced || 0}</Badge>
+                    </div>
+                    <div className="flex items-center justify-between p-2 rounded-md bg-muted/50">
+                      <span className="text-xs text-muted-foreground">IELTS</span>
+                      <Badge variant="secondary" className="text-xs">{stats.levels.ielts || 0}</Badge>
+                    </div>
+                  </>
                 )}
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Platform Health</CardTitle>
+          {/* Platform Health Card */}
+          <Card className="md:col-span-1">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <div>
+                <CardTitle className="text-lg font-semibold">Platform Health</CardTitle>
+                <CardDescription>System status and metrics</CardDescription>
+              </div>
+              <Activity className="h-5 w-5 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Status</span>
+              <div className="space-y-4">
+                {/* Health Status */}
+                <div className="flex items-center justify-between p-3 rounded-lg border">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-500" />
-                    <span className="text-sm font-medium">Operational</span>
+                    {healthStatus.healthy ? (
+                      <CheckCircle2 className="h-5 w-5 text-green-500" />
+                    ) : (
+                      <AlertCircle className="h-5 w-5 text-red-500" />
+                    )}
+                    <div>
+                      <div className="font-medium text-sm">API Status</div>
+                      <div className="text-xs text-muted-foreground capitalize">{healthStatus.status}</div>
+                    </div>
+                  </div>
+                  <Badge variant={healthStatus.healthy ? "default" : "destructive"}>
+                    {healthStatus.healthy ? "Operational" : "Issues"}
+                  </Badge>
+                </div>
+
+                {/* Key Metrics */}
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-2 rounded-md bg-muted/50">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">Active Users</span>
+                    </div>
+                    <span className="text-sm font-semibold">{stats?.users?.active || 0}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-2 rounded-md bg-muted/50">
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">Active Lessons</span>
+                    </div>
+                    <span className="text-sm font-semibold">{stats?.lessons?.active || 0}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-2 rounded-md bg-muted/50">
+                    <div className="flex items-center gap-2">
+                      <Activity className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">DAU (7d)</span>
+                    </div>
+                    <span className="text-sm font-semibold">{stats?.engagement?.dau_7 || 0}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-2 rounded-md bg-muted/50">
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">Avg Session</span>
+                    </div>
+                    <span className="text-sm font-semibold">{Math.round(stats?.engagement?.avg_session_minutes || 0)}m</span>
                   </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Active Users</span>
-                  <span className="text-sm font-medium">
-                    {stats?.users?.active || 0}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Active Lessons</span>
-                  <span className="text-sm font-medium">
-                    {stats?.lessons?.active || 0}
-                  </span>
-                </div>
+
+                {/* Refresh Indicator */}
+                {refreshing && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground pt-2 border-t">
+                    <RefreshCw className="h-3 w-3 animate-spin" />
+                    <span>Refreshing data...</span>
+                  </div>
+                )}
+                {healthStatus.timestamp && !refreshing && (
+                  <div className="text-xs text-muted-foreground pt-2 border-t">
+                    Last updated: {healthStatus.timestamp.toLocaleTimeString()}
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Filters like the reference design */}
-        <div className="soft-card bg-card p-4 md:p-5">
-          <div className="flex flex-wrap items-center gap-3">
-            <button className={`chip ${statusFilter==='in_process'?'active':''}`} onClick={()=>setStatusFilter('in_process')}>In Process</button>
-            <button className={`chip ${statusFilter==='completed'?'active':''}`} onClick={()=>setStatusFilter('completed')}>Completed</button>
-            <button className={`chip ${statusFilter==='need_info'?'active':''}`} onClick={()=>setStatusFilter('need_info')}>Need More Info</button>
-            <button className={`chip ${statusFilter==='unassigned'?'active':''}`} onClick={()=>setStatusFilter('unassigned')}>Unassigned</button>
-
-            <div className="ml-auto flex items-center gap-2">
-              <select value={yearFilter} onChange={(e)=>setYearFilter(Number(e.target.value))} className="chip bg-white">
-                {[2025,2024,2023].map(y=> <option key={y} value={y}>{y}</option>)}
-              </select>
-              <select value={monthFilter} onChange={(e)=>setMonthFilter(e.target.value)} className="chip bg-white">
-                {['January','February','March','April','May','June','July','August','September','October','November','December'].map(m=> <option key={m} value={m}>{m}</option>)}
-              </select>
-              <input value={searchQuery} onChange={(e)=>setSearchQuery(e.target.value)} placeholder="Search" className="chip bg-white" />
-              <button className="chip" title="Download">⤓</button>
+        {/* Professional Filters Section */}
+        <Card className="bg-card">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-lg font-semibold">Activities & Documents</CardTitle>
+                <CardDescription>Filter and manage user activities and registrations</CardDescription>
+              </div>
+              {(statusFilter !== 'all' || monthFilter || searchQuery || yearFilter !== new Date().getFullYear()) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  Clear Filters
+                </Button>
+              )}
             </div>
-          </div>
-        </div>
-
-        {/* Documents Table (mock) */}
-        <div className="soft-card bg-card p-0 overflow-hidden">
-          <div className="px-5 py-4 border-b">
-            <h3 className="font-semibold">Documents</h3>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/50">
-                <tr>
-                  <th className="text-left px-5 py-3 font-medium">Patient Name</th>
-                  <th className="text-left px-5 py-3 font-medium">Date of Birth</th>
-                  <th className="text-left px-5 py-3 font-medium">MRN</th>
-                  <th className="text-left px-5 py-3 font-medium">Date of Service</th>
-                  <th className="text-left px-5 py-3 font-medium">Assigned Date</th>
-                  <th className="text-left px-5 py-3 font-medium">Document ID</th>
-                  <th className="text-left px-5 py-3 font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {documents
-                  .filter(d => statusFilter==='all' || d.status===statusFilter)
-                  .filter(d => !searchQuery || d.name.toLowerCase().includes(searchQuery.toLowerCase()) || d.id.toLowerCase().includes(searchQuery.toLowerCase()))
-                  .map((d, idx) => (
-                  <tr key={d.id} className={idx%2===2? 'bg-muted/30':''}>
-                    <td className="px-5 py-3">{d.name}</td>
-                    <td className="px-5 py-3">{d.dob}</td>
-                    <td className="px-5 py-3">{d.mrn}</td>
-                    <td className="px-5 py-3">{d.serviceDate}</td>
-                    <td className="px-5 py-3">{d.assignedDate}</td>
-                    <td className="px-5 py-3">{d.id}</td>
-                    <td className="px-5 py-3">
-                      <button className="chip">View</button>
-                    </td>
-                  </tr>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {/* Status Filter Buttons */}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-sm font-medium text-muted-foreground mr-2">Status:</span>
+                {[
+                  { value: 'all', label: 'All' },
+                  { value: 'in_process', label: 'In Process' },
+                  { value: 'completed', label: 'Completed' },
+                  { value: 'need_info', label: 'Need Info' },
+                  { value: 'unassigned', label: 'Unassigned' }
+                ].map(({ value, label }) => (
+                  <Button
+                    key={value}
+                    variant={statusFilter === value ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => {
+                      setStatusFilter(value as any);
+                      setCurrentPage(1);
+                    }}
+                    className={`${
+                      statusFilter === value
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'hover:bg-accent'
+                    }`}
+                  >
+                    {label}
+                  </Button>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+              </div>
+
+              {/* Search and Date Filters */}
+              <div className="flex flex-wrap items-center gap-3">
+                {/* Search Input */}
+                <div className="relative flex-1 min-w-[200px]">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search by name, email, or ID..."
+                    className="pl-9"
+                  />
+                </div>
+
+                {/* Year Select */}
+                <Select
+                  value={yearFilter.toString()}
+                  onValueChange={(value) => {
+                    setYearFilter(Number(value));
+                    setCurrentPage(1);
+                  }}
+                >
+                  <SelectTrigger className="w-[120px]">
+                    <SelectValue placeholder="Year" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {yearOptions.map((year) => (
+                      <SelectItem key={year} value={year.toString()}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                {/* Month Select */}
+                <Select
+                  value={monthFilter || 'all'}
+                  onValueChange={(value) => {
+                    setMonthFilter(value === 'all' ? '' : value);
+                    setCurrentPage(1);
+                  }}
+                >
+                  <SelectTrigger className="w-[140px]">
+                    <SelectValue placeholder="Month" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Months</SelectItem>
+                    {monthOptions.map((month) => (
+                      <SelectItem key={month} value={month}>
+                        {month}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                {/* Export Button */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExport}
+                  className="ml-auto"
+                  disabled={activitiesLoading}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
+              </div>
+
+              {/* Results Count */}
+              {!activitiesLoading && (
+                <div className="text-sm text-muted-foreground">
+                  Showing {activities.length} of {pagination.total} results
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Activities Table */}
+        <Card className="bg-card">
+          <CardHeader>
+            <CardTitle>Activities & Registrations</CardTitle>
+            <CardDescription>View and manage user activities and lesson progress</CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            {activitiesLoading ? (
+              <div className="p-8 space-y-3">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Skeleton key={i} className="h-12 w-full" />
+                ))}
+              </div>
+            ) : activitiesError ? (
+              <div className="p-8 text-center">
+                <AlertCircle className="h-8 w-8 text-destructive mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">{activitiesError}</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => loadActivities()}
+                  className="mt-4"
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Retry
+                </Button>
+              </div>
+            ) : activities.length === 0 ? (
+              <div className="p-8 text-center">
+                <p className="text-sm text-muted-foreground">No activities found matching your filters.</p>
+              </div>
+            ) : (
+              <>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted/50 border-b">
+                      <tr>
+                        <th className="text-left px-5 py-3 font-medium text-muted-foreground">Name</th>
+                        <th className="text-left px-5 py-3 font-medium text-muted-foreground">Email</th>
+                        <th className="text-left px-5 py-3 font-medium text-muted-foreground">Reference ID</th>
+                        <th className="text-left px-5 py-3 font-medium text-muted-foreground">Type</th>
+                        <th className="text-left px-5 py-3 font-medium text-muted-foreground">Service Date</th>
+                        <th className="text-left px-5 py-3 font-medium text-muted-foreground">Assigned Date</th>
+                        <th className="text-left px-5 py-3 font-medium text-muted-foreground">Status</th>
+                        <th className="text-left px-5 py-3 font-medium text-muted-foreground">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {activities.map((activity, idx) => (
+                        <tr
+                          key={activity.id}
+                          className={`border-b hover:bg-muted/30 transition-colors ${
+                            idx % 2 === 0 ? 'bg-background' : 'bg-muted/10'
+                          }`}
+                        >
+                          <td className="px-5 py-3 font-medium">{activity.name || 'N/A'}</td>
+                          <td className="px-5 py-3 text-muted-foreground">{activity.email || 'N/A'}</td>
+                          <td className="px-5 py-3">
+                            <code className="text-xs bg-muted px-2 py-1 rounded">{activity.mrn || activity.document_id}</code>
+                          </td>
+                          <td className="px-5 py-3">
+                            <Badge variant="outline" className="text-xs">
+                              {activity.type === 'user_registration' ? 'Registration' : 'Lesson Progress'}
+                            </Badge>
+                          </td>
+                          <td className="px-5 py-3 text-muted-foreground">{activity.service_date || 'N/A'}</td>
+                          <td className="px-5 py-3 text-muted-foreground">{activity.assigned_date || 'N/A'}</td>
+                          <td className="px-5 py-3">
+                            <Badge
+                              variant={
+                                activity.status === 'completed'
+                                  ? 'default'
+                                  : activity.status === 'in_process'
+                                  ? 'secondary'
+                                  : 'outline'
+                              }
+                              className="capitalize"
+                            >
+                              {activity.status.replace('_', ' ')}
+                            </Badge>
+                          </td>
+                          <td className="px-5 py-3">
+                            <Button variant="ghost" size="sm" className="h-8">
+                              View
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pagination */}
+                {pagination.pages > 1 && (
+                  <div className="flex items-center justify-between px-5 py-4 border-t">
+                    <div className="text-sm text-muted-foreground">
+                      Page {pagination.page} of {pagination.pages}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                        disabled={currentPage === 1 || activitiesLoading}
+                      >
+                        Previous
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(Math.min(pagination.pages, currentPage + 1))}
+                        disabled={currentPage === pagination.pages || activitiesLoading}
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </AdminLayout>
   );
