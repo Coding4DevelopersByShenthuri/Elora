@@ -3018,3 +3018,33 @@ INFO 2025-11-02 23:40:22,671 autoreload 10592 10708 C:\Users\shent\OneDrive\Desk
 INFO 2025-11-02 23:40:24,370 autoreload 16488 18680 Watching for file changes with StatReloader
 INFO 2025-11-02 23:40:36,952 autoreload 16488 18680 C:\Users\shent\OneDrive\Desktop\Elora\server\api\urls.py changed, reloading.
 INFO 2025-11-02 23:40:38,335 autoreload 19820 23568 Watching for file changes with StatReloader
+INFO 2025-11-03 09:19:45,585 autoreload 17076 1184 Watching for file changes with StatReloader
+INFO 2025-11-03 09:21:27,075 basehttp 17076 13980 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-03 09:23:22,057 basehttp 17076 3768 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-03 09:23:34,797 basehttp 17076 22352 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-03 09:23:51,471 basehttp 17076 24348 "OPTIONS /api/auth/google HTTP/1.1" 200 0
+ERROR 2025-11-03 09:23:52,372 views 17076 24348 Google authentication error: UserProfile() got unexpected keyword arguments: 'streak'
+ERROR 2025-11-03 09:23:52,709 views 17076 24348 Traceback (most recent call last):
+  File "C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py", line 265, in google_auth
+    user = User.objects.get(email=email)
+  File "C:\Users\shent\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\shent\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\site-packages\django\db\models\query.py", line 637, in get
+    raise self.model.DoesNotExist(
+django.contrib.auth.models.User.DoesNotExist: User matching query does not exist.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py", line 294, in google_auth
+    UserProfile.objects.create(
+  File "C:\Users\shent\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\shent\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\site-packages\django\db\models\query.py", line 656, in create
+    obj = self.model(**kwargs)
+  File "C:\Users\shent\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\site-packages\django\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: UserProfile() got unexpected keyword arguments: 'streak'
+
+ERROR 2025-11-03 09:23:52,727 log 17076 24348 Internal Server Error: /api/auth/google
+ERROR 2025-11-03 09:23:52,735 basehttp 17076 24348 "POST /api/auth/google HTTP/1.1" 500 143

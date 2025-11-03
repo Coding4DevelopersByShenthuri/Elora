@@ -96,7 +96,7 @@ const CookieConsent = () => {
                 />
               </div>
               <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold text-foreground flex-1 text-center">
-                {viewingPolicy === 'cookie' ? 'Cookie Policy' : viewingPolicy === 'privacy' ? 'Privacy Policy' : 'Manage Cookie Consent'}
+                {viewingPolicy === 'cookie' ? 'Cookie Policy' : viewingPolicy === 'privacy' ? 'Privacy Policy' : 'Manage Cookie Consent 🍪'}
               </h2>
               <div className="w-10 sm:w-14 md:w-16 lg:w-20" /> {/* Spacer for centering */}
             </div>
