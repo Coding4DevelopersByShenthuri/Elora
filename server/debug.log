@@ -3071,3 +3071,31 @@ INFO 2025-11-03 10:21:42,731 autoreload 19200 21648 C:\Users\shent\OneDrive\Desk
 INFO 2025-11-03 10:21:44,449 autoreload 24584 1152 Watching for file changes with StatReloader
 INFO 2025-11-03 10:22:09,346 autoreload 24584 1152 C:\Users\shent\OneDrive\Desktop\Elora\server\api\urls.py changed, reloading.
 INFO 2025-11-03 10:22:10,453 autoreload 24612 2912 Watching for file changes with StatReloader
+INFO 2025-11-03 10:27:12,541 autoreload 24612 2912 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
+INFO 2025-11-03 10:27:30,519 autoreload 24028 14744 Watching for file changes with StatReloader
+INFO 2025-11-03 10:28:03,962 autoreload 24028 14744 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 10:28:05,971 autoreload 3388 23152 Watching for file changes with StatReloader
+INFO 2025-11-03 10:31:00,613 basehttp 3388 20628 "OPTIONS /api/admin/dashboard/stats HTTP/1.1" 200 0
+INFO 2025-11-03 10:31:00,614 basehttp 3388 17004 "OPTIONS /api/admin/activity?limit=10 HTTP/1.1" 200 0
+WARNING 2025-11-03 10:31:00,714 log 3388 17004 Unauthorized: /api/admin/dashboard/stats
+WARNING 2025-11-03 10:31:00,715 log 3388 20628 Unauthorized: /api/admin/activity
+WARNING 2025-11-03 10:31:00,717 basehttp 3388 17004 "GET /api/admin/dashboard/stats HTTP/1.1" 401 58
+WARNING 2025-11-03 10:31:00,718 basehttp 3388 20628 "GET /api/admin/activity?limit=10 HTTP/1.1" 401 58
+WARNING 2025-11-03 10:31:22,372 log 3388 25144 Unauthorized: /api/admin/dashboard/stats
+WARNING 2025-11-03 10:31:22,374 log 3388 1532 Unauthorized: /api/admin/activity
+WARNING 2025-11-03 10:31:22,375 basehttp 3388 1532 "GET /api/admin/activity?limit=10 HTTP/1.1" 401 58
+WARNING 2025-11-03 10:31:22,375 basehttp 3388 25144 "GET /api/admin/dashboard/stats HTTP/1.1" 401 58
+WARNING 2025-11-03 10:32:23,278 log 3388 16172 Unauthorized: /api/admin/dashboard/stats
+WARNING 2025-11-03 10:32:23,682 log 3388 1744 Unauthorized: /api/admin/activity
+WARNING 2025-11-03 10:32:23,695 basehttp 3388 16172 "GET /api/admin/dashboard/stats HTTP/1.1" 401 58
+WARNING 2025-11-03 10:32:23,988 basehttp 3388 1744 "GET /api/admin/activity?limit=10 HTTP/1.1" 401 58
+INFO 2025-11-03 10:32:34,348 autoreload 3388 23152 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 10:32:41,572 autoreload 6768 12636 Watching for file changes with StatReloader
+INFO 2025-11-03 10:35:49,747 autoreload 6768 12636 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
+INFO 2025-11-03 10:35:52,970 autoreload 11056 18912 Watching for file changes with StatReloader
+INFO 2025-11-03 10:35:56,534 autoreload 11056 18912 C:\Users\shent\OneDrive\Desktop\Elora\server\api\urls.py changed, reloading.
+INFO 2025-11-03 10:35:57,474 autoreload 16488 22100 Watching for file changes with StatReloader
+INFO 2025-11-03 10:36:00,502 autoreload 16488 22100 C:\Users\shent\OneDrive\Desktop\Elora\server\api\models.py changed, reloading.
+INFO 2025-11-03 10:36:02,207 autoreload 13472 13008 Watching for file changes with StatReloader
+INFO 2025-11-03 10:36:04,193 autoreload 13472 13008 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 10:36:05,669 autoreload 16508 14980 Watching for file changes with StatReloader
