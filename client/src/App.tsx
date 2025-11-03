@@ -53,6 +53,12 @@ import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminUsers from "@/pages/admin/AdminUsers";
 import AdminAnalytics from "@/pages/admin/AdminAnalytics";
 import AdminSettings from "@/pages/admin/AdminSettings";
+import AdminLessons from "@/pages/admin/AdminLessons";
+import AdminPractice from "@/pages/admin/AdminPractice";
+import AdminProgress from "@/pages/admin/AdminProgress";
+import AdminVocabulary from "@/pages/admin/AdminVocabulary";
+import AdminAchievements from "@/pages/admin/AdminAchievements";
+import AdminSurveys from "@/pages/admin/AdminSurveys";
 import { Analytics } from "@/components/common/Analytics";
 import { AdminRouteGuard } from "@/components/admin/AdminRouteGuard";
 import type { ReactNode } from 'react';
@@ -254,6 +260,12 @@ const AppRoutes = () => {
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={<PageTransition><AdminRouteGuard><AdminDashboard /></AdminRouteGuard></PageTransition>} />
         <Route path="/admin/users" element={<PageTransition><AdminRouteGuard><AdminUsers /></AdminRouteGuard></PageTransition>} />
+        <Route path="/admin/lessons" element={<PageTransition><AdminRouteGuard><AdminLessons /></AdminRouteGuard></PageTransition>} />
+        <Route path="/admin/practice" element={<PageTransition><AdminRouteGuard><AdminPractice /></AdminRouteGuard></PageTransition>} />
+        <Route path="/admin/progress" element={<PageTransition><AdminRouteGuard><AdminProgress /></AdminRouteGuard></PageTransition>} />
+        <Route path="/admin/vocabulary" element={<PageTransition><AdminRouteGuard><AdminVocabulary /></AdminRouteGuard></PageTransition>} />
+        <Route path="/admin/achievements" element={<PageTransition><AdminRouteGuard><AdminAchievements /></AdminRouteGuard></PageTransition>} />
+        <Route path="/admin/surveys" element={<PageTransition><AdminRouteGuard><AdminSurveys /></AdminRouteGuard></PageTransition>} />
         <Route path="/admin/analytics" element={<PageTransition><AdminRouteGuard><AdminAnalytics /></AdminRouteGuard></PageTransition>} />
         <Route path="/admin/settings" element={<PageTransition><AdminRouteGuard><AdminSettings /></AdminRouteGuard></PageTransition>} />
         
