@@ -585,6 +585,39 @@ const AppRoutes = () => {
           // Clear the flag
           sessionStorage.removeItem('speakbee_survey_in_progress');
           sessionStorage.removeItem('speakbee_survey_step');
+
+          // Smart redirect: send user to recommended page based on survey
+          try {
+            const raw = localStorage.getItem('speakbee_current_user');
+            if (raw) {
+              const u = JSON.parse(raw);
+              const survey = u?.surveyData || {};
+              const age = (survey.ageRange || '').toLowerCase();
+              const purposes: string[] = Array.isArray(survey.learningPurpose) ? survey.learningPurpose.map((p: any)=> String(p).toLowerCase()) : [];
+              const englishLevel = (survey.englishLevel || '').toLowerCase();
+
+              let target = '/';
+              // Kids buckets by age
+              if (age.includes('4-10') || age.includes('4 – 10') || age.includes('4–10') || age.includes('4 to 10')) {
+                target = '/kids/young';
+              } else if (age.includes('11-17') || age.includes('11 – 17') || age.includes('11–17') || age.includes('11 to 17')) {
+                target = '/kids/teen';
+              } else if (purposes.includes('ielts') || purposes.includes('pte')) {
+                target = '/ielts-pte';
+              } else {
+                // Adults by level
+                if (englishLevel.includes('beginner')) target = '/adults/beginners';
+                else if (englishLevel.includes('intermediate')) target = '/adults/intermediates';
+                else if (englishLevel.includes('advanced')) target = '/adults/advanced';
+                else target = '/adults';
+              }
+
+              // Soft redirect: open recommended, user can navigate elsewhere freely
+              window.setTimeout(() => {
+                window.location.assign(target);
+              }, 100);
+            }
+          } catch {}
         }}
         onBack={() => {
           setIsHelloSurveyOpen(false);

@@ -24,6 +24,8 @@ export default function AdminDashboard() {
   const [yearFilter, setYearFilter] = useState<number>(2025);
   const [monthFilter, setMonthFilter] = useState<string>('August');
   const [searchQuery, setSearchQuery] = useState('');
+  const [monthsRange, setMonthsRange] = useState<number>(12);
+  const [activityType, setActivityType] = useState<string>('all');
 
   const documents = [
     { id: 'fres2uf4sws', name: 'Albert Flores', dob: '8/15/17', mrn: '521', serviceDate: '7/18/2023', assignedDate: '12/4/2023', status: 'in_process' },
@@ -48,12 +50,12 @@ export default function AdminDashboard() {
     }, 100);
     
     return () => clearTimeout(timer);
-  }, []);
+  }, [monthsRange]);
 
   const loadStats = async () => {
     try {
       setLoading(true);
-      const response = await AdminAPI.getDashboardStats();
+      const response = await AdminAPI.getDashboardStats({ months: monthsRange });
       
       if (response.success) {
         setStats(response.data);
@@ -154,6 +156,7 @@ export default function AdminDashboard() {
     },
   ];
 
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -163,6 +166,12 @@ export default function AdminDashboard() {
             <div>
               <h1 className="text-3xl font-bold tracking-tight text-white">Overview</h1>
               <p className="text-white/80">Admin insights and document processing</p>
+            </div>
+            <div className="hidden md:flex items-center gap-2">
+              <label className="text-white/80 text-sm">Range</label>
+              <select value={monthsRange} onChange={(e)=>setMonthsRange(Number(e.target.value))} className="chip bg-white text-black">
+                {[6,12,18,24].map(m=> <option key={m} value={m}>Last {m} months</option>)}
+              </select>
             </div>
           </div>
           {/* Place the card-style stats inside the hero */}
@@ -210,11 +219,21 @@ export default function AdminDashboard() {
           {/* Recent Activity */}
           <Card className="md:col-span-1">
             <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-              <CardDescription>Latest platform activities</CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Recent Activity</CardTitle>
+                  <CardDescription>Latest platform activities</CardDescription>
+                </div>
+                <select value={activityType} onChange={(e)=>setActivityType(e.target.value)} className="chip bg-white text-black">
+                  <option value="all">All</option>
+                  <option value="user_registered">Registrations</option>
+                  <option value="lesson_completed">Completions</option>
+                  <option value="practice_session">Practice</option>
+                </select>
+              </div>
             </CardHeader>
             <CardContent>
-              <RecentActivity activities={stats?.recent_activities || []} />
+              <RecentActivity activities={(stats?.recent_activities || []).filter((a:any)=> activityType==='all' ? true : a.type===activityType)} />
             </CardContent>
           </Card>
         </div>
@@ -240,6 +259,18 @@ export default function AdminDashboard() {
                   </span>
                 </div>
                 <div className="flex justify-between">
+                  <span className="text-sm text-muted-foreground">Completed (7d)</span>
+                  <span className="text-sm font-medium">
+                    {stats?.lessons?.completed_last_7 || 0}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-muted-foreground">Completed (30d)</span>
+                  <span className="text-sm font-medium">
+                    {stats?.lessons?.completed_last_30 || 0}
+                  </span>
+                </div>
+                <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Completion Rate</span>
                   <Badge variant="secondary">
                     {stats?.lessons?.completion_rate || 0}%
@@ -255,14 +286,25 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {stats?.users?.level_distribution?.map((level: any) => (
-                  <div key={level.level} className="flex justify-between">
-                    <span className="text-sm text-muted-foreground capitalize">
-                      {level.level}
-                    </span>
-                    <Badge variant="outline">{level.count}</Badge>
-                  </div>
-                ))}
+                {/* Detailed levels if provided */}
+                {stats?.levels ? (
+                  <>
+                    <div className="flex justify-between"><span className="text-sm text-muted-foreground">Kids (4–10)</span><Badge variant="outline">{stats?.levels?.kids_4_10 || 0}</Badge></div>
+                    <div className="flex justify-between"><span className="text-sm text-muted-foreground">Kids (11–17)</span><Badge variant="outline">{stats?.levels?.kids_11_17 || 0}</Badge></div>
+                    <div className="flex justify-between"><span className="text-sm text-muted-foreground">Adults – Beginner</span><Badge variant="outline">{stats?.levels?.adults_beginner || 0}</Badge></div>
+                    <div className="flex justify-between"><span className="text-sm text-muted-foreground">Adults – Intermediate</span><Badge variant="outline">{stats?.levels?.adults_intermediate || 0}</Badge></div>
+                    <div className="flex justify-between"><span className="text-sm text-muted-foreground">Adults – Advanced</span><Badge variant="outline">{stats?.levels?.adults_advanced || 0}</Badge></div>
+                    <div className="flex justify-between"><span className="text-sm text-muted-foreground">IELTS Candidates</span><Badge variant="outline">{stats?.levels?.ielts || 0}</Badge></div>
+                    <div className="flex justify-between"><span className="text-sm text-muted-foreground">PTE Candidates</span><Badge variant="outline">{stats?.levels?.pte || 0}</Badge></div>
+                  </>
+                ) : (
+                  (stats?.users?.level_distribution || []).map((level: any) => (
+                    <div key={level.level} className="flex justify-between">
+                      <span className="text-sm text-muted-foreground capitalize">{level.level}</span>
+                      <Badge variant="outline">{level.count}</Badge>
+                    </div>
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>

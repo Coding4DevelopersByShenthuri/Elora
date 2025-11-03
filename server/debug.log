@@ -3536,3 +3536,82 @@ INFO 2025-11-03 16:00:09,419 basehttp 16152 26172 "GET /api/admin/dashboard/stat
 INFO 2025-11-03 16:00:12,995 basehttp 16152 26172 "GET /api/auth/user HTTP/1.1" 200 619
 INFO 2025-11-03 16:00:14,766 basehttp 16152 26172 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2299
 INFO 2025-11-03 16:00:57,876 basehttp 16152 26172 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2299
+INFO 2025-11-03 16:08:25,580 autoreload 16152 18496 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 16:08:27,271 autoreload 24420 19980 Watching for file changes with StatReloader
+INFO 2025-11-03 16:08:40,127 basehttp 24420 4532 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 16:08:41,873 basehttp 24420 4532 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2484
+INFO 2025-11-03 16:08:54,309 basehttp 24420 4532 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2484
+INFO 2025-11-03 16:09:06,483 autoreload 24420 19980 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 16:09:08,600 autoreload 18872 6028 Watching for file changes with StatReloader
+INFO 2025-11-03 16:09:14,624 basehttp 18872 5320 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 16:09:15,991 basehttp 18872 5320 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2484
+INFO 2025-11-03 16:17:26,166 basehttp 18872 4984 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2484
+INFO 2025-11-03 16:17:35,175 basehttp 18872 256 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2484
+INFO 2025-11-03 16:17:46,746 autoreload 18872 6028 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 16:17:47,981 autoreload 15232 13056 Watching for file changes with StatReloader
+INFO 2025-11-03 16:17:50,161 basehttp 15232 14152 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2484
+INFO 2025-11-03 16:19:55,894 basehttp 15232 12400 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 16:19:57,525 basehttp 15232 12400 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2484
+INFO 2025-11-03 16:20:26,168 autoreload 15232 13056 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 16:20:29,905 autoreload 17892 25120 Watching for file changes with StatReloader
+INFO 2025-11-03 16:20:39,231 basehttp 17892 19920 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2484
+INFO 2025-11-03 16:21:05,018 basehttp 17892 16460 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 16:21:06,722 basehttp 17892 16460 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2484
+INFO 2025-11-03 16:21:11,845 basehttp 17892 16460 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 16:21:17,495 basehttp 17892 2016 "OPTIONS /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 0
+INFO 2025-11-03 16:21:17,660 basehttp 17892 2016 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2484
+INFO 2025-11-03 16:21:35,600 autoreload 17892 25120 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 16:21:37,856 autoreload 17448 25112 Watching for file changes with StatReloader
+INFO 2025-11-03 16:21:44,825 basehttp 17448 1772 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 16:21:46,292 basehttp 17448 1772 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2484
+INFO 2025-11-03 16:21:57,238 basehttp 17448 200 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 16:21:58,699 basehttp 17448 200 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2484
+INFO 2025-11-03 16:22:15,273 basehttp 17448 9108 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2484
+INFO 2025-11-03 16:22:15,925 autoreload 17448 25112 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 16:22:16,930 autoreload 24192 1740 Watching for file changes with StatReloader
+INFO 2025-11-03 16:22:19,415 basehttp 24192 25680 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2484
+INFO 2025-11-03 16:23:28,562 basehttp 24192 6072 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 16:23:30,348 basehttp 24192 6072 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2484
+INFO 2025-11-03 16:23:44,514 basehttp 24192 788 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2484
+INFO 2025-11-03 16:23:49,857 basehttp 24192 788 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2484
+INFO 2025-11-03 16:23:52,822 basehttp 24192 788 "OPTIONS /api/admin/dashboard/stats?months=6 HTTP/1.1" 200 0
+INFO 2025-11-03 16:23:52,957 basehttp 24192 788 "GET /api/admin/dashboard/stats?months=6 HTTP/1.1" 200 2142
+INFO 2025-11-03 16:24:01,837 basehttp 24192 12368 "GET /api/admin/dashboard/stats?months=6 HTTP/1.1" 200 2142
+INFO 2025-11-03 16:25:05,265 autoreload 24192 1740 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 16:25:06,695 autoreload 4984 17144 Watching for file changes with StatReloader
+INFO 2025-11-03 16:25:28,222 basehttp 4984 25768 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2484
+INFO 2025-11-03 16:25:38,021 autoreload 4984 17144 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 16:25:38,745 autoreload 17100 5428 Watching for file changes with StatReloader
+INFO 2025-11-03 16:25:40,335 basehttp 17100 8992 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2484
+INFO 2025-11-03 16:32:22,253 autoreload 17100 5428 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 16:32:22,961 autoreload 10588 8512 Watching for file changes with StatReloader
+INFO 2025-11-03 16:32:23,483 basehttp 10588 9124 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2484
+INFO 2025-11-03 16:33:31,464 autoreload 10588 8512 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 16:33:33,308 autoreload 12304 9772 Watching for file changes with StatReloader
+INFO 2025-11-03 16:34:04,124 basehttp 12304 25436 "OPTIONS /api/auth/user HTTP/1.1" 200 0
+INFO 2025-11-03 16:34:04,298 basehttp 12304 25436 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 16:34:05,970 basehttp 12304 25436 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2649
+INFO 2025-11-03 16:34:13,828 basehttp 12304 25436 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2649
+INFO 2025-11-03 16:34:29,408 autoreload 12304 9772 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 16:34:31,455 autoreload 5128 24216 Watching for file changes with StatReloader
+INFO 2025-11-03 16:34:35,596 basehttp 5128 20272 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 16:34:37,121 basehttp 5128 20272 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2649
+INFO 2025-11-03 16:36:15,274 basehttp 5128 20912 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2649
+INFO 2025-11-03 16:36:16,133 autoreload 5128 24216 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 16:36:17,159 autoreload 24944 6792 Watching for file changes with StatReloader
+INFO 2025-11-03 16:39:37,841 autoreload 24944 6792 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 16:39:41,359 autoreload 14720 14024 Watching for file changes with StatReloader
+INFO 2025-11-03 16:39:52,291 basehttp 14720 21108 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 16:39:54,942 basehttp 14720 21108 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2665
+INFO 2025-11-03 16:39:58,477 autoreload 14720 14024 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 16:40:00,254 autoreload 13552 12220 Watching for file changes with StatReloader
+INFO 2025-11-03 16:40:13,730 basehttp 13552 20156 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 16:40:15,490 basehttp 13552 20156 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2665
+INFO 2025-11-03 16:40:20,420 autoreload 13552 12220 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 16:40:21,408 autoreload 4904 21336 Watching for file changes with StatReloader
+INFO 2025-11-03 16:43:06,348 autoreload 4904 21336 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 16:43:07,163 autoreload 19104 2208 Watching for file changes with StatReloader
+INFO 2025-11-03 16:59:37,669 basehttp 19104 22376 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 16:59:39,860 basehttp 19104 22376 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2665
+INFO 2025-11-03 16:59:57,550 basehttp 19104 26528 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 16:59:59,099 basehttp 19104 26528 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2665

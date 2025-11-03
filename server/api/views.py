@@ -1760,6 +1760,13 @@ def admin_dashboard_stats(request):
         }, status=status.HTTP_403_FORBIDDEN)
     
     try:
+        # Optional timeframe for growth (months)
+        try:
+            months = int(request.query_params.get('months', 12))
+            months = max(6, min(24, months))
+        except (TypeError, ValueError):
+            months = 12
+
         # User statistics
         total_users = User.objects.count()
         active_users = User.objects.filter(is_active=True).count()
@@ -1768,9 +1775,9 @@ def admin_dashboard_stats(request):
             date_joined__gte=timezone.now().replace(day=1)
         ).count()
         
-        # User growth by month (last 12 months)
+        # User growth by month (last N months)
         user_growth = []
-        for i in range(11, -1, -1):
+        for i in range(months - 1, -1, -1):
             month_start = (timezone.now() - timedelta(days=30*i)).replace(day=1)
             if i == 0:
                 month_end = timezone.now()
@@ -1794,12 +1801,72 @@ def admin_dashboard_stats(request):
         active_lessons = Lesson.objects.filter(is_active=True).count()
         total_progress = LessonProgress.objects.count()
         completed_lessons = LessonProgress.objects.filter(completed=True).count()
+        # recent completion windows
+        today = timezone.now().date()
+        last7 = today - timedelta(days=7)
+        last30 = today - timedelta(days=30)
+        completed_last_7 = LessonProgress.objects.filter(completed=True, updated_at__date__gte=last7).count()
+        completed_last_30 = LessonProgress.objects.filter(completed=True, updated_at__date__gte=last30).count()
         
         # Practice statistics
         total_sessions = PracticeSession.objects.count()
         total_practice_time = PracticeSession.objects.aggregate(
             total=Sum('duration_minutes')
         )['total'] or 0
+
+        # Engagement (common dashboard KPIs)
+        # Engagement windows reuse last7/last30 above
+        dau_7 = PracticeSession.objects.filter(session_date__date__gte=last7).values('user_id').distinct().count()
+        dau_30 = PracticeSession.objects.filter(session_date__date__gte=last30).values('user_id').distinct().count()
+        avg_session_minutes = PracticeSession.objects.aggregate(avg=Avg('duration_minutes'))['avg'] or 0
+        avg_score = PracticeSession.objects.aggregate(avg=Avg('score'))['avg'] or 0
+
+        # Verification & surveys
+        verified_users = User.objects.filter(is_active=True).count()
+        verification_rate = round((verified_users / total_users * 100) if total_users > 0 else 0, 2)
+        survey_completed = UserProfile.objects.filter(survey_completed_at__isnull=False).count()
+        survey_completion_rate = round((survey_completed / UserProfile.objects.count() * 100) if UserProfile.objects.count() > 0 else 0, 2)
+
+        # Detailed level distribution
+        # Categories: kids_4_10, kids_11_17, adults_beginner, adults_intermediate, adults_advanced, ielts, pte
+        detailed = {
+            'kids_4_10': 0,
+            'kids_11_17': 0,
+            'adults_beginner': 0,
+            'adults_intermediate': 0,
+            'adults_advanced': 0,
+            'ielts': 0,
+            'pte': 0,
+            'unspecified': 0,
+        }
+        for p in UserProfile.objects.all().only('age_range', 'level', 'learning_purpose'):
+            age = (p.age_range or '').lower()
+            purposes = []
+            try:
+                purposes = [str(x).lower() for x in (p.learning_purpose or [])]
+            except Exception:
+                purposes = []
+            if 'ielts' in purposes:
+                detailed['ielts'] += 1
+            if 'pte' in purposes:
+                detailed['pte'] += 1
+            # Age-based kids buckets
+            if any(x in age for x in ['4-10', '4 – 10', '4 to 10', '4–10']):
+                detailed['kids_4_10'] += 1
+                continue
+            if any(x in age for x in ['11-17', '11 – 17', '11 to 17', '11–17']):
+                detailed['kids_11_17'] += 1
+                continue
+            # Adults by profile level
+            lvl = (p.level or '').lower()
+            if lvl == 'beginner':
+                detailed['adults_beginner'] += 1
+            elif lvl == 'intermediate':
+                detailed['adults_intermediate'] += 1
+            elif lvl == 'advanced':
+                detailed['adults_advanced'] += 1
+            else:
+                detailed['unspecified'] += 1
         
         # Recent activity (last 50 activities)
         recent_activities = []
@@ -1827,6 +1894,17 @@ def admin_dashboard_stats(request):
                 'timestamp': progress.updated_at.isoformat(),
                 'icon': 'check-circle'
             })
+
+        # Recent practice sessions
+        recent_sessions = PracticeSession.objects.order_by('-session_date')[:10]
+        for s in recent_sessions:
+            recent_activities.append({
+                'type': 'practice_session',
+                'title': f'{s.user.username} practiced {s.session_type} ({s.duration_minutes}m)',
+                'user': s.user.username,
+                'timestamp': s.session_date.isoformat(),
+                'icon': 'clock'
+            })
         
         # Sort by timestamp
         recent_activities.sort(key=lambda x: x['timestamp'], reverse=True)
@@ -1851,6 +1929,8 @@ def admin_dashboard_stats(request):
                 'active': active_lessons,
                 'total_progress': total_progress,
                 'completed': completed_lessons,
+                'completed_last_7': completed_last_7,
+                'completed_last_30': completed_last_30,
                 'completion_rate': round((completed_lessons / total_progress * 100) if total_progress > 0 else 0, 2)
             },
             'practice': {
@@ -1858,6 +1938,19 @@ def admin_dashboard_stats(request):
                 'total_time_minutes': total_practice_time,
                 'total_time_hours': round(total_practice_time / 60, 2)
             },
+            'engagement': {
+                'dau_7': dau_7,
+                'dau_30': dau_30,
+                'avg_session_minutes': round(avg_session_minutes, 2),
+                'avg_score': round(avg_score, 2)
+            },
+            'verification': {
+                'verified_users': verified_users,
+                'verification_rate': verification_rate,
+                'survey_completed': survey_completed,
+                'survey_completion_rate': survey_completion_rate
+            },
+            'levels': detailed,
             'recent_activities': recent_activities[:20]
         }
         
@@ -2004,11 +2097,25 @@ def admin_user_detail(request, user_id):
             user.save()
             
             # Update profile if provided
-            if 'profile' in request.data and profile:
+            if 'profile' in request.data:
+                profile = getattr(user, 'profile', None)
+                if not profile:
+                    profile, _ = UserProfile.objects.get_or_create(user=user)
                 profile_data = request.data['profile']
-                profile.level = profile_data.get('level', profile.level)
-                profile.points = profile_data.get('points', profile.points)
-                profile.save()
+                if isinstance(profile_data, dict):
+                    profile.level = profile_data.get('level', profile.level)
+                    profile.points = profile_data.get('points', profile.points)
+                    # allow admin to set age range and purposes
+                    if 'age_range' in profile_data:
+                        profile.age_range = profile_data.get('age_range') or profile.age_range
+                    if 'english_level' in profile_data:
+                        profile.english_level = profile_data.get('english_level') or profile.english_level
+                    if 'learning_purpose' in profile_data:
+                        try:
+                            profile.learning_purpose = profile_data.get('learning_purpose') or profile.learning_purpose
+                        except Exception:
+                            pass
+                    profile.save()
             
             return Response({
                 "message": "User updated successfully",

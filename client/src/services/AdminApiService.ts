@@ -84,9 +84,10 @@ export const AdminAPI = {
   /**
    * Get admin dashboard statistics
    */
-  getDashboardStats: async () => {
+  getDashboardStats: async (params?: { months?: number }) => {
     try {
-      const result = await fetchWithAuth('admin/dashboard/stats');
+      const query = params?.months ? `?months=${params.months}` : '';
+      const result = await fetchWithAuth(`admin/dashboard/stats${query}`);
       return {
         success: true,
         data: result
