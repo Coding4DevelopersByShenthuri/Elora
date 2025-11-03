@@ -3385,3 +3385,133 @@ INFO 2025-11-03 15:06:37,190 basehttp 12320 26368 "GET /api/admin/analytics?days
 INFO 2025-11-03 15:06:40,199 basehttp 12320 26368 "GET /api/admin/analytics?days=30 HTTP/1.1" 200 2234
 INFO 2025-11-03 15:06:45,566 basehttp 12320 26368 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2299
 INFO 2025-11-03 15:06:47,591 basehttp 12320 26368 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2299
+INFO 2025-11-03 15:15:37,496 basehttp 12320 14900 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:15:42,653 basehttp 12320 14900 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:16:32,312 basehttp 12320 23020 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-03 15:16:32,312 basehttp 12320 25960 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:16:32,332 basehttp 12320 25524 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-03 15:16:35,279 basehttp 12320 25524 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:19:34,162 basehttp 12320 2556 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:19:59,738 basehttp 12320 2464 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:20:18,955 basehttp 12320 7520 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:20:40,513 basehttp 12320 5372 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-03 15:20:40,514 basehttp 12320 21512 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-03 15:20:40,515 basehttp 12320 15912 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:20:43,460 basehttp 12320 15912 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:20:43,976 basehttp 12320 15912 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:20:46,457 basehttp 12320 15912 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:20:49,451 basehttp 12320 11184 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:20:52,438 basehttp 12320 11184 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:20:55,456 basehttp 12320 11184 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:20:58,463 basehttp 12320 3732 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:21:01,492 basehttp 12320 3732 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:21:04,419 basehttp 12320 3732 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:21:07,425 basehttp 12320 3732 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:21:10,431 basehttp 12320 22788 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:21:13,578 basehttp 12320 22788 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:21:16,822 basehttp 12320 22788 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:21:19,843 basehttp 12320 6848 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:21:22,863 basehttp 12320 6848 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:21:25,843 basehttp 12320 6848 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:21:28,877 basehttp 12320 26252 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:21:31,830 basehttp 12320 26252 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:21:34,846 basehttp 12320 26252 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:21:37,846 basehttp 12320 16532 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:21:40,843 basehttp 12320 16532 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:21:43,835 basehttp 12320 16532 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:21:46,853 basehttp 12320 16532 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:21:49,860 basehttp 12320 18988 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:21:52,855 basehttp 12320 18988 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:21:55,838 basehttp 12320 18988 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:21:58,871 basehttp 12320 20952 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:22:01,816 basehttp 12320 20952 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:22:07,239 basehttp 12320 20952 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:22:07,426 basehttp 12320 20952 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:22:10,461 basehttp 12320 19864 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:22:13,413 basehttp 12320 19864 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:22:16,455 basehttp 12320 19864 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:22:19,467 basehttp 12320 22352 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:22:22,484 basehttp 12320 22352 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:22:25,436 basehttp 12320 22352 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:22:28,899 basehttp 12320 12220 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:22:31,867 basehttp 12320 12220 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:22:34,283 basehttp 12320 21408 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:22:38,505 basehttp 12320 9560 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:22:38,524 basehttp 12320 9560 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:22:40,819 basehttp 12320 9560 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:22:43,838 basehttp 12320 9560 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:22:46,813 basehttp 12320 9560 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:22:49,813 basehttp 12320 9560 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:22:52,827 basehttp 12320 9560 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:22:55,824 basehttp 12320 9560 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:22:58,826 basehttp 12320 25544 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:23:00,126 basehttp 12320 19904 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:23:01,800 basehttp 12320 25544 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:23:04,820 basehttp 12320 11444 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:23:08,012 basehttp 12320 15912 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:23:09,168 basehttp 12320 6468 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:23:10,822 basehttp 12320 15912 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:23:15,259 basehttp 12320 25924 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:23:16,813 basehttp 12320 25924 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:23:19,825 basehttp 12320 16240 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:23:22,985 basehttp 12320 11412 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:23:48,836 basehttp 12320 24240 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:23:50,153 basehttp 12320 23488 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:23:53,176 basehttp 12320 14612 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2299
+INFO 2025-11-03 15:24:09,257 basehttp 12320 20840 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2299
+INFO 2025-11-03 15:24:48,817 basehttp 12320 26448 "GET /api/kids/progress HTTP/1.1" 200 91
+INFO 2025-11-03 15:25:20,153 basehttp 12320 11524 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2299
+INFO 2025-11-03 15:25:32,751 autoreload 12320 15696 C:\Users\shent\OneDrive\Desktop\Elora\server\api\urls.py changed, reloading.
+INFO 2025-11-03 15:25:44,783 autoreload 18040 2660 Watching for file changes with StatReloader
+INFO 2025-11-03 15:26:52,135 autoreload 18040 2660 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 15:26:54,211 autoreload 4720 8760 Watching for file changes with StatReloader
+INFO 2025-11-03 15:26:58,643 basehttp 4720 21480 - Broken pipe from ('127.0.0.1', 62014)
+INFO 2025-11-03 15:27:00,286 basehttp 4720 11616 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:27:02,019 basehttp 4720 11616 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2299
+INFO 2025-11-03 15:27:19,213 autoreload 4720 8760 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 15:27:21,275 autoreload 15024 8492 Watching for file changes with StatReloader
+INFO 2025-11-03 15:27:29,484 basehttp 15024 21512 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:27:31,846 basehttp 15024 21512 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2299
+INFO 2025-11-03 15:27:47,703 basehttp 15024 20360 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:27:49,725 basehttp 15024 20360 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:27:51,450 basehttp 15024 20360 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2299
+INFO 2025-11-03 15:28:01,319 basehttp 15024 20360 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 2969
+INFO 2025-11-03 15:28:04,438 basehttp 15024 20360 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:28:06,144 basehttp 15024 20360 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2299
+INFO 2025-11-03 15:28:07,308 basehttp 15024 20360 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 2969
+INFO 2025-11-03 15:28:24,018 basehttp 15024 20360 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:28:25,909 basehttp 15024 20360 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2299
+INFO 2025-11-03 15:29:15,956 basehttp 15024 20360 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 2969
+INFO 2025-11-03 15:29:18,822 basehttp 15024 20360 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:29:20,431 basehttp 15024 20360 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 2969
+INFO 2025-11-03 15:29:24,282 basehttp 15024 864 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:29:26,880 basehttp 15024 864 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2299
+INFO 2025-11-03 15:30:14,548 basehttp 15024 5736 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:30:16,900 basehttp 15024 5736 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2299
+INFO 2025-11-03 15:30:21,649 basehttp 15024 6996 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 2969
+INFO 2025-11-03 15:30:24,932 basehttp 15024 6996 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:30:27,833 basehttp 15024 6996 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2299
+INFO 2025-11-03 15:30:35,149 autoreload 22980 26428 Watching for file changes with StatReloader
+INFO 2025-11-03 15:30:47,677 basehttp 22980 7544 "GET /api/health HTTP/1.1" 200 71
+WARNING 2025-11-03 15:30:48,018 log 22980 7544 Not Found: /favicon.ico
+WARNING 2025-11-03 15:30:48,020 basehttp 22980 7544 "GET /favicon.ico HTTP/1.1" 404 2212
+INFO 2025-11-03 15:32:39,943 basehttp 22980 24624 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:32:41,311 basehttp 22980 24624 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2299
+INFO 2025-11-03 15:33:32,295 basehttp 22980 24624 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:33:34,967 basehttp 22980 24624 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2299
+INFO 2025-11-03 15:36:12,605 basehttp 22980 21192 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:36:12,656 basehttp 22980 21192 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:36:14,851 basehttp 22980 21192 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2299
+INFO 2025-11-03 15:36:20,246 basehttp 22980 23140 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:36:21,597 basehttp 22980 23140 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2299
+INFO 2025-11-03 15:37:01,585 autoreload 22980 26428 C:\Users\shent\OneDrive\Desktop\Elora\server\api\urls.py changed, reloading.
+INFO 2025-11-03 15:37:04,341 autoreload 22168 13488 Watching for file changes with StatReloader
+INFO 2025-11-03 15:37:27,824 basehttp 22168 9560 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:37:29,452 basehttp 22168 4268 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2299
+INFO 2025-11-03 15:37:39,797 basehttp 22168 5236 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:37:41,245 basehttp 22168 5236 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2299
+INFO 2025-11-03 15:41:59,203 autoreload 22168 13488 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 15:42:03,750 autoreload 16152 18496 Watching for file changes with StatReloader
+INFO 2025-11-03 15:42:05,171 basehttp 16152 18112 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:42:05,190 basehttp 16152 18112 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 15:42:07,007 basehttp 16152 18112 "GET /api/admin/dashboard/stats HTTP/1.1" 200 2299
