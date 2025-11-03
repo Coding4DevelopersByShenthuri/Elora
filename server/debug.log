@@ -6943,3 +6943,14 @@ INFO 2025-11-03 23:59:05,571 basehttp 23744 17476 "GET /api/admin/notifications/
 INFO 2025-11-03 23:59:05,598 basehttp 23744 17476 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
 INFO 2025-11-03 23:59:20,590 basehttp 23744 17476 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
 INFO 2025-11-03 23:59:20,610 basehttp 23744 17476 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:59:35,573 basehttp 23744 17476 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:59:35,576 basehttp 23744 10260 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:59:35,599 basehttp 23744 10260 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:59:41,294 basehttp 23744 10260 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:59:42,847 basehttp 23744 10260 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:59:42,848 basehttp 23744 17476 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:59:46,322 basehttp 23744 17476 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:59:47,856 basehttp 23744 10260 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:59:47,856 basehttp 23744 17476 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-04 00:00:02,977 basehttp 23744 17476 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-04 00:00:03,010 basehttp 23744 17476 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
