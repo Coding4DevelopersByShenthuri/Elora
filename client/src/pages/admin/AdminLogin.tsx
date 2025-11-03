@@ -108,8 +108,8 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4">
-      <Card className="w-full max-w-md shadow-lg">
+    <div className="min-h-screen admin-theme flex items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md shadow-lg soft-card">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
             <div className="rounded-full bg-primary/10 p-3">

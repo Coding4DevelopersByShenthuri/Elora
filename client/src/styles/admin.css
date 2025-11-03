@@ -1,0 +1,91 @@
+/* Admin-only theme overrides, scoped to .admin-theme */
+.admin-theme {
+  /* Base palette from provided design */
+  --admin-teal: #0C756F;
+  --admin-cream: #EFEADB;
+  --admin-yellow: #FDCF6F;
+  --admin-black: #000201;
+
+  /* Map to shadcn/tailwind CSS variables (scoped) */
+  --background: var(--admin-cream);
+  --foreground: var(--admin-black);
+  --card: #ffffff;
+  --card-foreground: var(--admin-black);
+  --popover: #ffffff;
+  --popover-foreground: var(--admin-black);
+  --primary: var(--admin-teal);
+  --primary-foreground: #ffffff;
+  --secondary: #e7f4f2; /* subtle teal tint */
+  --secondary-foreground: var(--admin-black);
+  --muted: #f4f1e6; /* soft neutral */
+  --muted-foreground: #6b7280; /* gray-500 */
+  --accent: var(--admin-yellow);
+  --accent-foreground: #1f2937; /* gray-800 */
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e5e7eb; /* gray-200 */
+  --input: #e5e7eb;
+  --ring: var(--admin-teal);
+}
+
+/* Sidebar specific helpers */
+.admin-theme .admin-sidebar {
+  background: linear-gradient(180deg, #0f8a83 0%, var(--admin-teal) 60%, #0a5d58 100%);
+}
+
+.admin-theme .admin-nav-link.active {
+  background-color: var(--admin-yellow);
+  color: #1f2937; /* dark text */
+}
+
+.admin-theme .admin-nav-link:hover:not(.active) {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+/* Cards soft shadow like the reference */
+.admin-theme .soft-card {
+  box-shadow: 0 10px 30px rgba(12, 117, 111, 0.05);
+  border-radius: 16px;
+}
+
+/* Hero header like reference */
+.admin-theme .admin-hero {
+  background: linear-gradient(180deg, var(--admin-teal) 0%, #0e7f78 70%, rgba(14,127,120,0.95) 100%);
+  color: #ffffff;
+  border-bottom-left-radius: 28px;
+  border-bottom-right-radius: 28px;
+}
+
+.admin-theme .admin-hero .hero-stat {
+  background: rgba(255,255,255,0.9);
+  color: #1f2937;
+  border-radius: 18px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+}
+
+/* Filter chips */
+.admin-theme .chip {
+  background-color: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.admin-theme .chip.active {
+  background-color: var(--admin-teal);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+/* Tables */
+.admin-theme table tr:hover td {
+  background-color: rgba(12,117,111,0.06);
+}
+
+.admin-theme table thead th {
+  color: #374151; /* gray-700 */
+}
+
+

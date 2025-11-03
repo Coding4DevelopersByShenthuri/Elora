@@ -11,7 +11,8 @@ export default function AdminAnalytics() {
   const [loading, setLoading] = useState(true);
   const [days, setDays] = useState(30);
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+  // Use admin palette
+  const COLORS = ['#0C756F', '#FDCF6F', '#000201', '#82ca9d', '#8884d8'];
 
   useEffect(() => {
     loadAnalytics();
@@ -68,7 +69,7 @@ export default function AdminAnalytics() {
         </div>
 
         {/* Time Series Chart */}
-        <Card>
+        <Card className="soft-card">
           <CardHeader>
             <CardTitle>Activity Over Time</CardTitle>
             <CardDescription>
@@ -93,21 +94,21 @@ export default function AdminAnalytics() {
                   <Line 
                     type="monotone" 
                     dataKey="registrations" 
-                    stroke="#8884d8" 
+                    stroke="#0C756F" 
                     name="Registrations"
                     strokeWidth={2}
                   />
                   <Line 
                     type="monotone" 
                     dataKey="completions" 
-                    stroke="#82ca9d" 
+                    stroke="#FDCF6F" 
                     name="Completions"
                     strokeWidth={2}
                   />
                   <Line 
                     type="monotone" 
                     dataKey="sessions" 
-                    stroke="#ffc658" 
+                    stroke="#000201" 
                     name="Practice Sessions"
                     strokeWidth={2}
                   />
@@ -124,7 +125,7 @@ export default function AdminAnalytics() {
         {/* Distribution Charts */}
         <div className="grid gap-4 md:grid-cols-2">
           {/* Lesson Type Distribution */}
-          <Card>
+          <Card className="soft-card">
             <CardHeader>
               <CardTitle>Lesson Types</CardTitle>
               <CardDescription>Distribution by lesson type</CardDescription>
@@ -139,14 +140,14 @@ export default function AdminAnalytics() {
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ name, percent }) =>
-                        `${name}: ${(percent * 100).toFixed(0)}%`
+                      label={({ name, percent }: any) =>
+                        `${name}: ${(Number(percent) * 100).toFixed(0)}%`
                       }
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="count"
                     >
-                      {analytics.lesson_type_distribution.map((entry: any, index: number) => (
+                      {analytics.lesson_type_distribution.map((_: any, index: number) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
@@ -162,7 +163,7 @@ export default function AdminAnalytics() {
           </Card>
 
           {/* Content Type Distribution */}
-          <Card>
+          <Card className="soft-card">
             <CardHeader>
               <CardTitle>Content Types</CardTitle>
               <CardDescription>Distribution by content type</CardDescription>
@@ -176,7 +177,7 @@ export default function AdminAnalytics() {
                     <XAxis dataKey="content_type" angle={-45} textAnchor="end" height={80} />
                     <YAxis />
                     <Tooltip />
-                    <Bar dataKey="count" fill="#8884d8" />
+                  <Bar dataKey="count" fill="#0C756F" />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (

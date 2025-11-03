@@ -111,7 +111,7 @@ export default function AdminSettings() {
         </div>
 
         <Tabs defaultValue="analytics" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-3 soft-card">
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>
             <TabsTrigger value="general">General</TabsTrigger>
@@ -119,7 +119,7 @@ export default function AdminSettings() {
 
           {/* Analytics Settings */}
           <TabsContent value="analytics" className="space-y-4">
-            <Card>
+            <Card className="soft-card">
               <CardHeader>
                 <CardTitle>Analytics Integration</CardTitle>
                 <CardDescription>
@@ -178,7 +178,7 @@ export default function AdminSettings() {
 
           {/* Security Settings */}
           <TabsContent value="security" className="space-y-4">
-            <Card>
+            <Card className="soft-card">
               <CardHeader>
                 <CardTitle>Security Settings</CardTitle>
                 <CardDescription>
@@ -297,7 +297,7 @@ export default function AdminSettings() {
 
           {/* General Settings */}
           <TabsContent value="general" className="space-y-4">
-            <Card>
+            <Card className="soft-card">
               <CardHeader>
                 <CardTitle>General Settings</CardTitle>
                 <CardDescription>

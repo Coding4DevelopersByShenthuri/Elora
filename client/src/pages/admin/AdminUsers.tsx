@@ -7,10 +7,10 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, UserPlus, Edit, Trash2, Eye } from 'lucide-react';
+import { Search, UserPlus, Trash2, Eye } from 'lucide-react';
 import AdminAPI from '@/services/AdminApiService';
-import { CreateSuperuserDialog } from '@/components/admin/CreateSuperuserDialog';
-import { UserDetailDialog } from '@/components/admin/UserDetailDialog';
+import { CreateSuperuserDialog } from '../../components/admin/CreateSuperuserDialog';
+import { UserDetailDialog } from '../../components/admin/UserDetailDialog';
 import { useToast } from '@/hooks/use-toast';
 
 export default function AdminUsers() {
@@ -123,7 +123,7 @@ export default function AdminUsers() {
         </div>
 
         {/* Filters */}
-        <Card>
+        <Card className="soft-card">
           <CardContent className="pt-6">
             <div className="flex gap-4">
               <div className="flex-1">
@@ -172,7 +172,7 @@ export default function AdminUsers() {
         </Card>
 
         {/* Users Table */}
-        <Card>
+        <Card className="soft-card">
           <CardHeader>
             <CardTitle>Users List</CardTitle>
             <CardDescription>
