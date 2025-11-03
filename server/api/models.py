@@ -373,3 +373,83 @@ class WaitlistEntry(models.Model):
 
     def __str__(self):
         return f"{self.email} - {self.interest or 'General'}"
+
+
+# ============= Admin Notifications =============
+class AdminNotification(models.Model):
+    """Notifications for admin users"""
+    TYPE_CHOICES = [
+        ('user_registered', 'New User Registration'),
+        ('user_activity', 'User Activity'),
+        ('system_alert', 'System Alert'),
+        ('maintenance', 'Maintenance'),
+        ('security', 'Security Alert'),
+        ('analytics', 'Analytics Update'),
+        ('error', 'Error Report'),
+        ('info', 'Information'),
+    ]
+    
+    PRIORITY_CHOICES = [
+        ('low', 'Low'),
+        ('normal', 'Normal'),
+        ('high', 'High'),
+        ('urgent', 'Urgent'),
+    ]
+    
+    # Target admin user (null means all admins)
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='admin_notifications',
+        null=True, 
+        blank=True,
+        help_text="Specific admin user, or null for all admins"
+    )
+    
+    notification_type = models.CharField(max_length=50, choices=TYPE_CHOICES, default='info')
+    priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='normal')
+    
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    link = models.URLField(blank=True, null=True, help_text="Optional link to related page")
+    
+    is_read = models.BooleanField(default=False)
+    read_at = models.DateTimeField(null=True, blank=True)
+    read_by = models.ForeignKey(
+        User, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='read_notifications'
+    )
+    
+    # Additional metadata
+    metadata = models.JSONField(default=dict, blank=True, help_text="Extra data about the notification")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField(null=True, blank=True, help_text="Auto-delete after this date (30 days by default)")
+    
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'is_read', 'created_at']),
+            models.Index(fields=['is_read', 'created_at']),
+            models.Index(fields=['expires_at']),
+        ]
+    
+    def __str__(self):
+        return f"{self.title} ({'Read' if self.is_read else 'Unread'})"
+    
+    def save(self, *args, **kwargs):
+        # Auto-set expiration to 30 days if not set
+        if not self.expires_at:
+            from django.utils import timezone
+            from datetime import timedelta
+            self.expires_at = timezone.now() + timedelta(days=30)
+        super().save(*args, **kwargs)
+    
+    @staticmethod
+    def cleanup_expired():
+        """Delete expired notifications (called by management command or cron)"""
+        from django.utils import timezone
+        return AdminNotification.objects.filter(expires_at__lt=timezone.now()).delete()

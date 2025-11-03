@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import { AdminSidebar } from './AdminSidebar';
-import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Bell } from 'lucide-react';
+import { NotificationDropdown } from './NotificationDropdown';
 import { useAuth } from '@/contexts/AuthContext';
+import { API } from '@/services/ApiService';
 import '@/styles/admin.css';
 
 interface AdminLayoutProps {
@@ -12,7 +12,7 @@ interface AdminLayoutProps {
 }
 
 export function AdminLayout({ children }: AdminLayoutProps) {
-  const { user } = useAuth();
+  const { user, updateUserProfile } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
     try {
       const stored = localStorage.getItem('admin_sidebar_collapsed');
@@ -21,6 +21,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       return false;
     }
   });
+  const [avatarUrl, setAvatarUrl] = useState<string | undefined>(user?.profile?.avatar);
 
   useEffect(() => {
     try {
@@ -29,6 +30,44 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       // ignore
     }
   }, [isCollapsed]);
+
+  // Fetch admin user's profile photo when component mounts
+  useEffect(() => {
+    const fetchAdminProfile = async () => {
+      try {
+        const token = localStorage.getItem('speakbee_auth_token');
+        // Only fetch if we have a real token (not local-token)
+        if (token && token !== 'local-token') {
+          const response = await API.auth.getUserInfo();
+          if (response.success && 'data' in response && response.data) {
+            const userData = response.data;
+            const fetchedAvatar = userData.profile?.avatar;
+            
+            if (fetchedAvatar) {
+              setAvatarUrl(fetchedAvatar);
+              // Update the user profile in context as well
+              updateUserProfile({ avatar: fetchedAvatar });
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching admin profile:', error);
+        // If fetch fails, use the avatar from context if available
+        if (user?.profile?.avatar) {
+          setAvatarUrl(user.profile.avatar);
+        }
+      }
+    };
+
+    fetchAdminProfile();
+  }, [user?.id, updateUserProfile]);
+
+  // Update avatar when user changes
+  useEffect(() => {
+    if (user?.profile?.avatar) {
+      setAvatarUrl(user.profile.avatar);
+    }
+  }, [user?.profile?.avatar]);
 
   const avatarFallback = (user?.name || user?.username || user?.email || 'A')
     .trim()
@@ -41,13 +80,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       <main className={isCollapsed ? 'lg:pl-20 min-h-screen' : 'lg:pl-64 min-h-screen'}>
         {/* Top-right header */}
         <div className="sticky top-0 z-30 flex items-center justify-end gap-3 border-b bg-background/80 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <Button variant="ghost" size="icon" aria-label="Notifications">
-            <Bell className="h-5 w-5" />
-          </Button>
+          <NotificationDropdown />
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8">
-              {user?.profile?.avatar ? (
-                <AvatarImage src={user.profile.avatar} alt={user?.name || user?.email || 'Admin'} />
+              {avatarUrl ? (
+                <AvatarImage src={avatarUrl} alt={user?.name || user?.email || 'Admin'} />
               ) : null}
               <AvatarFallback>{avatarFallback}</AvatarFallback>
             </Avatar>

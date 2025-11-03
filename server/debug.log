@@ -6389,3 +6389,557 @@ INFO 2025-11-03 23:03:54,077 basehttp 18320 23784 "GET /api/auth/user HTTP/1.1" 
 INFO 2025-11-03 23:03:55,668 basehttp 18320 23784 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
 INFO 2025-11-03 23:04:10,410 basehttp 18320 12952 "OPTIONS /api/admin/users/8 HTTP/1.1" 200 0
 INFO 2025-11-03 23:04:10,500 basehttp 18320 12952 "GET /api/admin/users/8 HTTP/1.1" 200 403
+INFO 2025-11-03 23:14:34,194 basehttp 18320 12428 "OPTIONS /api/admin/users/6 HTTP/1.1" 200 0
+INFO 2025-11-03 23:14:34,295 basehttp 18320 12428 "GET /api/admin/users/6 HTTP/1.1" 200 772
+INFO 2025-11-03 23:14:47,504 basehttp 18320 12428 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:14:49,079 autoreload 18320 5248 C:\Users\shent\OneDrive\Desktop\Elora\server\api\models.py changed, reloading.
+INFO 2025-11-03 23:14:53,792 autoreload 13304 10160 Watching for file changes with StatReloader
+INFO 2025-11-03 23:15:02,125 basehttp 13304 26036 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:15:04,162 autoreload 13304 10160 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
+INFO 2025-11-03 23:15:08,909 autoreload 6920 22540 Watching for file changes with StatReloader
+INFO 2025-11-03 23:15:17,292 basehttp 6920 9604 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:15:19,547 basehttp 6920 9604 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:15:20,714 basehttp 6920 9604 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:15:21,786 basehttp 6920 9604 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:15:39,211 autoreload 6920 22540 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
+INFO 2025-11-03 23:15:39,882 autoreload 7456 18672 Watching for file changes with StatReloader
+INFO 2025-11-03 23:15:57,592 autoreload 7456 18672 C:\Users\shent\OneDrive\Desktop\Elora\server\api\models.py changed, reloading.
+INFO 2025-11-03 23:15:58,448 autoreload 1228 11296 Watching for file changes with StatReloader
+INFO 2025-11-03 23:16:06,859 autoreload 1228 11296 C:\Users\shent\OneDrive\Desktop\Elora\server\api\models.py changed, reloading.
+INFO 2025-11-03 23:16:07,742 autoreload 5920 3496 Watching for file changes with StatReloader
+INFO 2025-11-03 23:16:38,854 autoreload 5920 3496 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 23:16:40,171 autoreload 16644 8316 Watching for file changes with StatReloader
+INFO 2025-11-03 23:16:42,372 autoreload 16644 8316 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 23:16:43,705 autoreload 23008 24512 Watching for file changes with StatReloader
+INFO 2025-11-03 23:17:11,231 autoreload 23008 24512 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 23:17:12,057 autoreload 10952 18824 Watching for file changes with StatReloader
+INFO 2025-11-03 23:18:04,196 autoreload 25256 6928 Watching for file changes with StatReloader
+INFO 2025-11-03 23:18:34,968 autoreload 25256 6928 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 23:18:38,151 autoreload 15652 8988 Watching for file changes with StatReloader
+INFO 2025-11-03 23:18:43,828 autoreload 15652 8988 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 23:18:46,079 autoreload 6940 24100 Watching for file changes with StatReloader
+INFO 2025-11-03 23:18:55,378 autoreload 6940 24100 C:\Users\shent\OneDrive\Desktop\Elora\server\api\admin.py changed, reloading.
+INFO 2025-11-03 23:18:56,985 autoreload 3712 26504 Watching for file changes with StatReloader
+INFO 2025-11-03 23:19:01,855 autoreload 3712 26504 C:\Users\shent\OneDrive\Desktop\Elora\server\api\admin.py changed, reloading.
+INFO 2025-11-03 23:19:03,285 autoreload 19724 2940 Watching for file changes with StatReloader
+INFO 2025-11-03 23:19:04,828 autoreload 19724 2940 C:\Users\shent\OneDrive\Desktop\Elora\server\api\admin.py changed, reloading.
+INFO 2025-11-03 23:19:05,666 autoreload 11284 13840 Watching for file changes with StatReloader
+INFO 2025-11-03 23:19:21,431 autoreload 19580 1932 Watching for file changes with StatReloader
+INFO 2025-11-03 23:20:00,345 autoreload 19580 1932 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 23:20:01,460 autoreload 5720 9020 Watching for file changes with StatReloader
+INFO 2025-11-03 23:20:10,685 basehttp 5720 10812 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:20:12,190 basehttp 5720 10812 "OPTIONS /api/admin/notifications?limit=20 HTTP/1.1" 200 0
+ERROR 2025-11-03 23:20:12,306 views 5720 10812 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:20:12,327 log 5720 10812 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:20:12,334 basehttp 5720 10812 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+INFO 2025-11-03 23:20:12,342 basehttp 5720 17068 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+ERROR 2025-11-03 23:20:16,299 views 5720 2732 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:20:16,303 log 5720 2732 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:20:16,309 basehttp 5720 2732 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+INFO 2025-11-03 23:20:18,654 autoreload 5720 9020 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 23:20:23,866 autoreload 20200 22888 Watching for file changes with StatReloader
+INFO 2025-11-03 23:20:24,768 basehttp 20200 13220 "GET /api/auth/user HTTP/1.1" 200 619
+ERROR 2025-11-03 23:20:25,137 views 20200 13220 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:20:25,140 log 20200 13220 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:20:25,141 basehttp 20200 13220 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+INFO 2025-11-03 23:20:25,176 basehttp 20200 21180 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:20:43,365 autoreload 20200 22888 C:\Users\shent\OneDrive\Desktop\Elora\server\api\models.py changed, reloading.
+INFO 2025-11-03 23:20:44,731 autoreload 14312 24828 Watching for file changes with StatReloader
+INFO 2025-11-03 23:20:48,966 autoreload 14312 24828 C:\Users\shent\OneDrive\Desktop\Elora\server\api\urls.py changed, reloading.
+INFO 2025-11-03 23:20:50,220 autoreload 19432 17096 Watching for file changes with StatReloader
+ERROR 2025-11-03 23:20:52,498 views 19432 15312 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:20:52,508 log 19432 15312 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:20:52,510 basehttp 19432 15312 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+INFO 2025-11-03 23:20:52,551 basehttp 19432 632 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:20:52,689 autoreload 19432 17096 C:\Users\shent\OneDrive\Desktop\Elora\server\api\urls.py changed, reloading.
+INFO 2025-11-03 23:20:54,188 autoreload 4192 19388 Watching for file changes with StatReloader
+INFO 2025-11-03 23:20:59,089 autoreload 4192 19388 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 23:21:01,531 autoreload 13004 8864 Watching for file changes with StatReloader
+ERROR 2025-11-03 23:21:03,448 views 13004 1800 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:21:03,458 log 13004 1800 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:21:03,461 basehttp 13004 1800 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+INFO 2025-11-03 23:21:03,509 basehttp 13004 19512 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:21:05,857 autoreload 13004 8864 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 23:21:08,340 autoreload 4036 19184 Watching for file changes with StatReloader
+ERROR 2025-11-03 23:21:10,010 views 4036 22248 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:21:10,014 log 4036 22248 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:21:10,016 basehttp 4036 22248 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+ERROR 2025-11-03 23:21:10,987 views 4036 22248 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:21:10,988 log 4036 22248 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:21:10,989 basehttp 4036 22248 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+INFO 2025-11-03 23:21:18,785 basehttp 4036 21196 "GET /api/auth/user HTTP/1.1" 200 619
+ERROR 2025-11-03 23:21:20,299 views 4036 21196 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:21:20,308 log 4036 21196 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:21:20,311 basehttp 4036 21196 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+INFO 2025-11-03 23:21:20,437 basehttp 4036 10160 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+ERROR 2025-11-03 23:21:22,307 views 4036 10160 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:21:22,309 log 4036 10160 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:21:22,314 basehttp 4036 10160 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+ERROR 2025-11-03 23:21:34,297 views 4036 18228 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:21:34,298 log 4036 18228 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:21:34,299 basehttp 4036 18228 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+INFO 2025-11-03 23:21:40,063 basehttp 4036 18228 "GET /api/auth/user HTTP/1.1" 200 619
+ERROR 2025-11-03 23:21:41,783 views 4036 18228 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:21:41,787 log 4036 18228 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:21:41,792 basehttp 4036 18228 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+INFO 2025-11-03 23:21:41,926 basehttp 4036 25924 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+ERROR 2025-11-03 23:21:44,999 views 4036 25924 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:21:45,003 log 4036 25924 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:21:45,004 basehttp 4036 25924 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+ERROR 2025-11-03 23:21:46,963 views 4036 25924 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:21:46,965 log 4036 25924 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:21:46,967 basehttp 4036 25924 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+ERROR 2025-11-03 23:21:50,706 views 4036 25924 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:21:50,708 log 4036 25924 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:21:50,711 basehttp 4036 25924 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+INFO 2025-11-03 23:22:15,681 autoreload 4036 19184 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 23:22:16,825 autoreload 16720 10628 Watching for file changes with StatReloader
+ERROR 2025-11-03 23:22:17,383 views 16720 11284 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:22:17,386 log 16720 11284 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:22:17,387 basehttp 16720 11284 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+INFO 2025-11-03 23:22:17,414 basehttp 16720 2960 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:22:21,697 basehttp 16720 2960 "GET /api/auth/user HTTP/1.1" 200 619
+ERROR 2025-11-03 23:22:23,244 views 16720 2960 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:22:23,248 log 16720 2960 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:22:23,250 basehttp 16720 2960 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+INFO 2025-11-03 23:22:23,470 basehttp 16720 11284 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+ERROR 2025-11-03 23:22:26,266 views 16720 11284 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:22:26,268 log 16720 11284 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:22:26,270 basehttp 16720 11284 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+ERROR 2025-11-03 23:22:54,283 views 16720 9296 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:22:54,285 log 16720 9296 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:22:54,285 basehttp 16720 9296 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+ERROR 2025-11-03 23:23:01,143 views 16720 9296 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:23:01,144 log 16720 9296 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:23:01,145 basehttp 16720 9296 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+ERROR 2025-11-03 23:23:23,962 views 16720 9296 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:23:23,963 log 16720 9296 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:23:23,964 basehttp 16720 9296 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+ERROR 2025-11-03 23:23:53,516 views 16720 9296 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:23:53,518 log 16720 9296 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:23:53,521 basehttp 16720 9296 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+INFO 2025-11-03 23:24:00,210 basehttp 16720 9296 "GET /api/auth/user HTTP/1.1" 200 619
+ERROR 2025-11-03 23:24:02,207 views 16720 9296 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:24:02,211 log 16720 9296 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:24:02,212 basehttp 16720 9296 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+INFO 2025-11-03 23:24:02,394 basehttp 16720 9296 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+ERROR 2025-11-03 23:24:09,164 views 16720 9296 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:24:09,167 log 16720 9296 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:24:09,170 basehttp 16720 9296 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+ERROR 2025-11-03 23:24:32,196 views 16720 9296 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:24:32,197 log 16720 9296 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:24:32,197 basehttp 16720 9296 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+ERROR 2025-11-03 23:24:42,005 views 16720 9296 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:24:42,006 log 16720 9296 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:24:42,007 basehttp 16720 9296 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+INFO 2025-11-03 23:24:45,906 basehttp 16720 9296 "GET /api/auth/user HTTP/1.1" 200 619
+ERROR 2025-11-03 23:24:47,518 views 16720 9296 Admin notifications error: (1146, "Table 'elora.api_adminnotification' doesn't exist")
+ERROR 2025-11-03 23:24:47,521 log 16720 9296 Internal Server Error: /api/admin/notifications
+ERROR 2025-11-03 23:24:47,527 basehttp 16720 9296 "GET /api/admin/notifications?limit=20 HTTP/1.1" 500 103
+INFO 2025-11-03 23:24:47,669 basehttp 16720 23676 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:25:17,876 basehttp 16720 9040 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 47
+INFO 2025-11-03 23:25:48,296 basehttp 16720 5892 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 47
+INFO 2025-11-03 23:26:07,274 basehttp 16720 5892 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 428
+INFO 2025-11-03 23:26:13,809 autoreload 16720 10628 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 23:26:17,067 autoreload 13980 21628 Watching for file changes with StatReloader
+INFO 2025-11-03 23:26:20,421 basehttp 13980 2916 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:26:22,107 basehttp 13980 2916 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 428
+INFO 2025-11-03 23:26:27,586 basehttp 13980 2916 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:26:30,250 basehttp 13980 2916 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 428
+INFO 2025-11-03 23:26:30,334 basehttp 13980 11636 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:26:39,858 basehttp 13980 11636 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 428
+INFO 2025-11-03 23:26:47,233 basehttp 13980 11636 "OPTIONS /api/admin/notifications/1/read HTTP/1.1" 200 0
+INFO 2025-11-03 23:26:47,321 basehttp 13980 11636 "POST /api/admin/notifications/1/read HTTP/1.1" 200 459
+INFO 2025-11-03 23:26:50,001 basehttp 13980 11636 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 449
+INFO 2025-11-03 23:27:00,991 basehttp 13980 11636 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:27:11,720 basehttp 13980 11636 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:27:14,349 basehttp 13980 11636 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:27:14,476 basehttp 13980 11636 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:27:22,060 basehttp 13980 11636 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:27:22,548 autoreload 13980 21628 C:\Users\shent\OneDrive\Desktop\Elora\server\api\migrations\0004_create_adminnotification_table.py changed, reloading.
+INFO 2025-11-03 23:27:25,257 autoreload 16992 11112 Watching for file changes with StatReloader
+INFO 2025-11-03 23:27:53,303 basehttp 16992 9792 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:28:22,969 basehttp 16992 9792 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:28:39,454 basehttp 16992 9792 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:28:44,895 basehttp 16992 9792 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:28:47,193 basehttp 16992 9792 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:28:47,293 basehttp 16992 9792 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:29:17,534 basehttp 16992 9924 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:29:44,994 basehttp 16992 9924 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:29:47,565 autoreload 16992 11112 C:\Users\shent\OneDrive\Desktop\Elora\server\api\migrations\0003_kidscertificate_adminnotification.py changed, reloading.
+INFO 2025-11-03 23:29:48,735 autoreload 10700 25316 Watching for file changes with StatReloader
+INFO 2025-11-03 23:29:54,251 autoreload 10700 25316 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 23:29:55,824 autoreload 24544 20356 Watching for file changes with StatReloader
+INFO 2025-11-03 23:30:16,339 basehttp 24544 23452 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:30:39,694 basehttp 24544 20972 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:30:42,770 basehttp 24544 20972 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:30:42,832 basehttp 24544 8856 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:31:05,572 autoreload 24544 20356 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 23:31:07,815 autoreload 13276 23996 Watching for file changes with StatReloader
+INFO 2025-11-03 23:31:09,859 autoreload 13276 23996 C:\Users\shent\OneDrive\Desktop\Elora\server\api\urls.py changed, reloading.
+INFO 2025-11-03 23:31:11,054 autoreload 13840 1800 Watching for file changes with StatReloader
+INFO 2025-11-03 23:31:13,375 basehttp 13840 18516 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:31:14,979 basehttp 13840 18516 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:31:23,926 basehttp 13840 3864 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:31:25,248 basehttp 13840 3864 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:31:25,402 basehttp 13840 25236 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:31:27,463 basehttp 13840 20064 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:31:27,614 basehttp 13840 432 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:31:57,128 basehttp 13840 432 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:32:27,129 basehttp 13840 432 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:32:57,118 basehttp 13840 432 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:33:27,770 basehttp 13840 432 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:33:34,005 basehttp 13840 432 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:33:39,760 basehttp 13840 432 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:33:41,808 basehttp 13840 14896 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:33:41,963 basehttp 13840 26036 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:33:47,099 basehttp 13840 26036 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:34:11,727 basehttp 13840 13332 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:34:41,998 basehttp 13840 13332 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:35:11,997 basehttp 13840 13332 "GET /api/admin/notifications?limit=20 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:35:18,973 basehttp 13840 13332 "OPTIONS /api/admin/notifications?limit=50 HTTP/1.1" 200 0
+INFO 2025-11-03 23:35:18,990 basehttp 13840 13332 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:35:30,999 basehttp 13840 13332 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:35:33,983 basehttp 13840 13332 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:35:41,997 basehttp 13840 13332 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:35:44,005 basehttp 13840 13332 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:36:00,268 basehttp 13840 15048 "OPTIONS /api/admin/notifications/unread-count HTTP/1.1" 200 0
+INFO 2025-11-03 23:36:00,293 basehttp 13840 15048 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:36:00,325 basehttp 13840 15048 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:36:03,510 basehttp 13840 15048 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:36:03,564 basehttp 13840 16820 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:36:03,952 autoreload 13840 1800 C:\Users\shent\OneDrive\Desktop\Elora\server\api\urls.py changed, reloading.
+INFO 2025-11-03 23:36:04,913 autoreload 24948 24076 Watching for file changes with StatReloader
+INFO 2025-11-03 23:36:12,988 basehttp 24948 16652 "OPTIONS /api/auth/user HTTP/1.1" 200 0
+INFO 2025-11-03 23:36:13,046 basehttp 24948 16652 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:36:14,250 basehttp 24948 16652 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:36:14,365 basehttp 24948 10300 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:36:15,738 basehttp 24948 10300 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:36:30,299 basehttp 24948 7816 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:36:30,315 basehttp 24948 7816 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:36:42,546 autoreload 24948 24076 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-03 23:36:43,550 autoreload 23744 18580 Watching for file changes with StatReloader
+INFO 2025-11-03 23:36:44,646 basehttp 23744 25584 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:36:44,685 basehttp 23744 25584 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:36:46,740 basehttp 23744 25584 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:36:46,764 basehttp 23744 18612 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:36:49,697 basehttp 23744 18612 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:37:04,707 basehttp 23744 18612 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:37:19,959 basehttp 23744 18612 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:37:34,950 basehttp 23744 18612 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:37:49,956 basehttp 23744 18612 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:37:49,959 basehttp 23744 25584 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:38:04,707 basehttp 23744 25584 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:38:19,720 basehttp 23744 25584 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:38:34,962 basehttp 23744 25584 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:38:49,953 basehttp 23744 25584 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:38:49,963 basehttp 23744 18612 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:39:04,976 basehttp 23744 18612 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:39:19,958 basehttp 23744 18612 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:39:46,963 basehttp 23744 18612 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:39:49,974 basehttp 23744 18612 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:40:17,346 basehttp 23744 18612 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:40:20,299 basehttp 23744 18612 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:40:21,862 basehttp 23744 18612 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:40:22,015 basehttp 23744 25584 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:40:36,955 basehttp 23744 25584 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:40:37,000 basehttp 23744 25584 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:40:51,845 basehttp 23744 25584 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:40:51,857 basehttp 23744 25584 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:41:06,671 basehttp 23744 25584 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:41:08,217 basehttp 23744 25584 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:41:08,577 basehttp 23744 25584 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:41:24,035 basehttp 23744 25584 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:41:24,138 basehttp 23744 25584 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:41:39,307 basehttp 23744 12720 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:41:39,378 basehttp 23744 12720 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:41:53,993 basehttp 23744 12720 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:41:54,102 basehttp 23744 12720 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:42:07,096 basehttp 23744 12720 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:42:07,105 basehttp 23744 19292 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:42:14,984 basehttp 23744 19292 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:42:19,065 basehttp 23744 19292 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:42:20,750 basehttp 23744 12720 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:42:20,751 basehttp 23744 19292 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:42:21,298 basehttp 23744 12720 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:42:33,683 basehttp 23744 12720 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:42:35,979 basehttp 23744 12720 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:42:36,025 basehttp 23744 12720 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:42:41,716 basehttp 23744 14652 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:42:42,960 basehttp 23744 14652 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:42:42,969 basehttp 23744 12580 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:42:43,122 basehttp 23744 14652 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:42:57,963 basehttp 23744 14652 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:42:58,022 basehttp 23744 14652 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:43:12,963 basehttp 23744 14652 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:43:13,009 basehttp 23744 14652 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:43:28,001 basehttp 23744 14652 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:43:28,047 basehttp 23744 14652 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:43:42,965 basehttp 23744 14652 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:43:42,978 basehttp 23744 12580 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:43:43,011 basehttp 23744 12580 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:43:57,968 basehttp 23744 12580 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:43:58,003 basehttp 23744 12580 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:44:12,980 basehttp 23744 12580 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:44:13,035 basehttp 23744 12580 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:44:42,979 basehttp 23744 12580 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:44:46,961 basehttp 23744 12580 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:44:46,981 basehttp 23744 12580 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:45:27,087 basehttp 23744 12580 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:45:27,131 basehttp 23744 12580 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:45:27,950 basehttp 23744 12580 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:45:27,994 basehttp 23744 12580 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:45:30,360 basehttp 23744 12580 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:45:32,151 basehttp 23744 14652 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:45:32,151 basehttp 23744 12580 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:45:32,219 basehttp 23744 14652 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:45:47,968 basehttp 23744 14652 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:45:47,999 basehttp 23744 14652 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:45:51,689 basehttp 23744 14652 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:45:54,437 basehttp 23744 18840 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:45:54,441 basehttp 23744 11084 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:45:54,541 basehttp 23744 6352 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:46:10,264 basehttp 23744 1284 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:46:10,291 basehttp 23744 1284 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:46:24,954 basehttp 23744 1284 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:46:24,977 basehttp 23744 1284 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:46:40,281 basehttp 23744 18840 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:46:40,315 basehttp 23744 18840 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:46:50,713 basehttp 23744 24832 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:46:51,953 basehttp 23744 24832 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:46:51,954 basehttp 23744 16452 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:46:52,094 basehttp 23744 24832 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:47:07,296 basehttp 23744 22228 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:47:07,341 basehttp 23744 22228 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:47:22,274 basehttp 23744 18824 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:47:22,307 basehttp 23744 18824 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:47:35,521 basehttp 23744 16132 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:47:36,811 basehttp 23744 16132 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:47:36,823 basehttp 23744 1772 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:47:37,056 basehttp 23744 16132 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:47:40,552 basehttp 23744 14616 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:47:41,824 basehttp 23744 10608 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:47:41,824 basehttp 23744 14616 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:47:41,986 basehttp 23744 10608 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:47:53,078 basehttp 23744 10608 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-11-03 23:47:53,441 log 23744 10608 Unauthorized: /api/auth/login
+WARNING 2025-11-03 23:47:53,442 basehttp 23744 10608 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-11-03 23:47:57,572 basehttp 23744 10608 "POST /api/auth/login HTTP/1.1" 200 1144
+INFO 2025-11-03 23:47:57,779 basehttp 23744 14616 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:47:57,784 basehttp 23744 10608 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:47:57,849 basehttp 23744 14616 "GET /api/health HTTP/1.1" 200 71
+INFO 2025-11-03 23:47:57,850 basehttp 23744 10608 "OPTIONS /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 0
+INFO 2025-11-03 23:47:57,939 basehttp 23744 24528 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:47:58,062 basehttp 23744 24528 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:47:58,152 basehttp 23744 14616 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2666
+INFO 2025-11-03 23:48:08,381 basehttp 23744 14616 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:48:09,939 basehttp 23744 24528 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:48:09,944 basehttp 23744 14616 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:48:10,022 basehttp 23744 24528 "GET /api/health HTTP/1.1" 200 71
+INFO 2025-11-03 23:48:10,022 basehttp 23744 10608 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:48:10,121 basehttp 23744 10608 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:48:10,211 basehttp 23744 14616 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2666
+INFO 2025-11-03 23:48:13,574 basehttp 23744 14616 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:48:15,148 basehttp 23744 10608 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:48:15,154 basehttp 23744 14616 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:48:15,242 basehttp 23744 10608 "GET /api/health HTTP/1.1" 200 71
+INFO 2025-11-03 23:48:15,244 basehttp 23744 24528 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:48:15,331 basehttp 23744 24528 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:48:15,423 basehttp 23744 14616 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2666
+INFO 2025-11-03 23:48:18,376 basehttp 23744 14616 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:48:19,982 basehttp 23744 24528 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:48:20,001 basehttp 23744 14616 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:48:20,081 basehttp 23744 24528 "GET /api/health HTTP/1.1" 200 71
+INFO 2025-11-03 23:48:20,120 basehttp 23744 10608 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:48:20,213 basehttp 23744 10608 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:48:20,284 basehttp 23744 14616 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2666
+INFO 2025-11-03 23:48:35,956 basehttp 23744 14616 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:48:35,976 basehttp 23744 14616 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:48:50,954 basehttp 23744 24528 "GET /api/health HTTP/1.1" 200 71
+INFO 2025-11-03 23:48:50,969 basehttp 23744 14616 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:48:51,021 basehttp 23744 24528 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:48:51,064 basehttp 23744 10608 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2666
+INFO 2025-11-03 23:48:51,323 basehttp 23744 10608 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:49:05,494 basehttp 23744 10608 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:49:08,156 basehttp 23744 24528 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:49:08,159 basehttp 23744 10608 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:49:08,181 basehttp 23744 14616 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:49:08,956 basehttp 23744 10608 "GET /api/health HTTP/1.1" 200 71
+INFO 2025-11-03 23:49:08,996 basehttp 23744 24528 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:49:09,064 basehttp 23744 14616 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2666
+INFO 2025-11-03 23:49:24,325 basehttp 23744 4268 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:49:24,406 basehttp 23744 4268 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:49:25,149 basehttp 23744 25656 "OPTIONS /api/auth/google HTTP/1.1" 200 0
+INFO 2025-11-03 23:49:25,775 basehttp 23744 25656 "POST /api/auth/google HTTP/1.1" 200 807
+INFO 2025-11-03 23:49:39,346 basehttp 23744 1944 "GET /api/health HTTP/1.1" 200 71
+INFO 2025-11-03 23:49:39,402 basehttp 23744 10640 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:49:39,554 basehttp 23744 25556 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:49:39,716 basehttp 23744 26008 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2666
+INFO 2025-11-03 23:49:40,094 basehttp 23744 26008 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:49:54,021 basehttp 23744 26008 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:49:54,134 basehttp 23744 26008 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:50:09,316 basehttp 23744 18320 "GET /api/health HTTP/1.1" 200 71
+INFO 2025-11-03 23:50:09,373 basehttp 23744 18564 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:50:09,410 basehttp 23744 8936 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:50:09,517 basehttp 23744 24208 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:50:09,676 basehttp 23744 14976 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2666
+INFO 2025-11-03 23:50:09,680 basehttp 23744 24208 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:50:24,342 basehttp 23744 23632 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:50:24,432 basehttp 23744 23632 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:50:39,317 basehttp 23744 16700 "GET /api/health HTTP/1.1" 200 71
+INFO 2025-11-03 23:50:39,354 basehttp 23744 6460 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:50:39,513 basehttp 23744 12232 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:50:39,696 basehttp 23744 18848 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2666
+INFO 2025-11-03 23:50:39,969 basehttp 23744 18848 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:51:09,346 basehttp 23744 21468 "GET /api/health HTTP/1.1" 200 71
+INFO 2025-11-03 23:51:09,431 basehttp 23744 22924 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:51:09,585 basehttp 23744 21676 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:51:09,726 basehttp 23744 6028 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2666
+INFO 2025-11-03 23:51:39,279 basehttp 23744 13252 "GET /api/health HTTP/1.1" 200 71
+INFO 2025-11-03 23:51:39,379 basehttp 23744 20076 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:51:39,464 basehttp 23744 15284 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2666
+INFO 2025-11-03 23:51:46,990 basehttp 23744 15284 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:51:47,057 basehttp 23744 15284 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:51:53,393 basehttp 23744 15284 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:51:53,451 basehttp 23744 15284 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:51:56,518 basehttp 23744 15284 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:51:58,068 basehttp 23744 20076 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:51:58,069 basehttp 23744 15284 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:51:58,112 basehttp 23744 13252 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:51:58,209 basehttp 23744 15284 "GET /api/health HTTP/1.1" 200 71
+INFO 2025-11-03 23:51:58,380 basehttp 23744 20076 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:51:58,492 basehttp 23744 13252 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2666
+INFO 2025-11-03 23:52:10,835 basehttp 23744 20076 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:52:10,840 basehttp 23744 13252 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:52:10,959 basehttp 23744 15284 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:52:13,164 basehttp 23744 15284 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:52:13,172 basehttp 23744 13252 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:52:23,721 basehttp 23744 13252 "OPTIONS /api/admin/users?search=shenthurim123%40gmail.com HTTP/1.1" 200 0
+INFO 2025-11-03 23:52:23,765 basehttp 23744 13252 "GET /api/admin/users?search=shenthurim123%40gmail.com HTTP/1.1" 200 394
+INFO 2025-11-03 23:52:23,818 basehttp 23744 13252 "PUT /api/admin/users/8 HTTP/1.1" 200 297
+INFO 2025-11-03 23:52:28,128 basehttp 23744 13252 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:52:28,181 basehttp 23744 13252 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:52:37,655 basehttp 23744 13252 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:52:43,016 basehttp 23744 13252 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:52:44,562 basehttp 23744 13252 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:52:44,563 basehttp 23744 15284 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:52:49,330 basehttp 23744 15284 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:52:59,561 basehttp 23744 15284 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:52:59,617 basehttp 23744 15284 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:53:14,568 basehttp 23744 15284 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:53:14,624 basehttp 23744 15284 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:53:29,872 basehttp 23744 7748 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:53:29,889 basehttp 23744 7748 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:53:32,088 basehttp 23744 21960 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+WARNING 2025-11-03 23:53:32,414 log 23744 21960 Unauthorized: /api/auth/login
+WARNING 2025-11-03 23:53:32,415 basehttp 23744 21960 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-11-03 23:53:44,878 basehttp 23744 23300 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:53:44,901 basehttp 23744 25176 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:53:44,969 basehttp 23744 25176 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:53:59,894 basehttp 23744 16008 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:53:59,973 basehttp 23744 16008 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:54:14,924 basehttp 23744 17492 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:54:14,999 basehttp 23744 17492 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:54:29,900 basehttp 23744 26456 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:54:29,984 basehttp 23744 26456 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:54:44,893 basehttp 23744 19588 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:54:44,960 basehttp 23744 6956 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:54:45,029 basehttp 23744 6956 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:54:59,582 basehttp 23744 6956 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:54:59,663 basehttp 23744 6956 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+WARNING 2025-11-03 23:55:04,355 log 23744 16792 Unauthorized: /api/auth/login
+WARNING 2025-11-03 23:55:04,360 basehttp 23744 16792 "POST /api/auth/login HTTP/1.1" 401 39
+INFO 2025-11-03 23:55:14,893 basehttp 23744 10260 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:55:14,989 basehttp 23744 10260 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:55:15,112 basehttp 23744 15172 "POST /api/auth/google HTTP/1.1" 200 806
+INFO 2025-11-03 23:55:29,546 basehttp 23744 10260 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:55:29,563 basehttp 23744 10260 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:55:43,897 basehttp 23744 10260 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:55:44,558 basehttp 23744 10260 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:55:44,562 basehttp 23744 13380 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:55:44,578 basehttp 23744 13380 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:55:59,552 basehttp 23744 13380 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:55:59,567 basehttp 23744 13380 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:56:14,561 basehttp 23744 13380 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:56:14,636 basehttp 23744 13380 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:56:23,559 basehttp 23744 13380 "OPTIONS /api/admin/analytics?days=30 HTTP/1.1" 200 0
+INFO 2025-11-03 23:56:23,616 basehttp 23744 10260 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:56:23,618 basehttp 23744 13380 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:56:23,734 basehttp 23744 10260 "GET /api/admin/analytics?days=30 HTTP/1.1" 200 2234
+INFO 2025-11-03 23:56:31,260 basehttp 23744 10260 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:56:32,812 basehttp 23744 13380 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:56:32,818 basehttp 23744 10260 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:56:32,873 basehttp 23744 17476 "GET /api/admin/analytics?days=30 HTTP/1.1" 200 2234
+INFO 2025-11-03 23:56:42,601 basehttp 23744 10260 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:56:42,602 basehttp 23744 17476 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:56:42,731 basehttp 23744 13380 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3201
+INFO 2025-11-03 23:56:45,793 basehttp 23744 13380 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:56:47,339 basehttp 23744 17476 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:56:47,344 basehttp 23744 13380 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:56:47,482 basehttp 23744 10260 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3201
+INFO 2025-11-03 23:57:02,344 basehttp 23744 10260 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:57:02,376 basehttp 23744 10260 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:57:07,104 basehttp 23744 13380 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:57:07,105 basehttp 23744 10260 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:57:07,159 basehttp 23744 17476 "GET /api/admin/analytics?days=30 HTTP/1.1" 200 2234
+INFO 2025-11-03 23:57:12,995 basehttp 23744 10260 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:57:12,996 basehttp 23744 17476 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:57:13,194 basehttp 23744 13380 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3201
+INFO 2025-11-03 23:57:20,746 basehttp 23744 13380 "DELETE /api/admin/users/8 HTTP/1.1" 200 43
+INFO 2025-11-03 23:57:20,904 basehttp 23744 13380 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:57:24,128 basehttp 23744 13380 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:57:25,669 basehttp 23744 13380 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:57:25,670 basehttp 23744 10260 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:57:25,784 basehttp 23744 17476 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3202
+INFO 2025-11-03 23:57:34,398 basehttp 23744 17476 "PUT /api/admin/users/8 HTTP/1.1" 200 297
+INFO 2025-11-03 23:57:34,493 basehttp 23744 17476 "GET /api/admin/users?page=1&page_size=20 HTTP/1.1" 200 3201
+INFO 2025-11-03 23:57:40,648 basehttp 23744 17476 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:57:40,665 basehttp 23744 17476 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:57:46,725 basehttp 23744 10260 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:57:46,727 basehttp 23744 17476 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:57:48,854 basehttp 23744 10260 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:57:48,863 basehttp 23744 17476 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:57:48,912 basehttp 23744 13380 "GET /api/admin/analytics?days=30 HTTP/1.1" 200 2234
+INFO 2025-11-03 23:57:51,613 basehttp 23744 13380 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:57:53,175 basehttp 23744 17476 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:57:53,198 basehttp 23744 13380 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:57:53,248 basehttp 23744 10260 "GET /api/admin/analytics?days=30 HTTP/1.1" 200 2234
+INFO 2025-11-03 23:57:58,339 basehttp 23744 10260 "OPTIONS /api/admin/analytics?days=7 HTTP/1.1" 200 0
+INFO 2025-11-03 23:57:58,374 basehttp 23744 10260 "GET /api/admin/analytics?days=7 HTTP/1.1" 200 647
+INFO 2025-11-03 23:58:05,643 basehttp 23744 13380 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:58:05,679 basehttp 23744 10260 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:58:05,729 basehttp 23744 13380 "GET /api/health HTTP/1.1" 200 71
+INFO 2025-11-03 23:58:05,731 basehttp 23744 17476 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:58:05,839 basehttp 23744 17476 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:58:05,904 basehttp 23744 10260 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2666
+INFO 2025-11-03 23:58:13,793 basehttp 23744 10260 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:58:15,314 basehttp 23744 17476 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:58:15,316 basehttp 23744 10260 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:58:15,350 basehttp 23744 13380 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:58:15,423 basehttp 23744 10260 "GET /api/health HTTP/1.1" 200 71
+INFO 2025-11-03 23:58:15,506 basehttp 23744 17476 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:58:15,592 basehttp 23744 13380 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2666
+INFO 2025-11-03 23:58:23,445 basehttp 23744 13380 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:58:25,012 basehttp 23744 17476 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:58:25,024 basehttp 23744 13380 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:58:25,072 basehttp 23744 10260 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:58:25,118 basehttp 23744 10260 "OPTIONS /api/health HTTP/1.1" 200 0
+INFO 2025-11-03 23:58:25,132 basehttp 23744 10260 "GET /api/health HTTP/1.1" 200 71
+INFO 2025-11-03 23:58:25,225 basehttp 23744 17476 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:58:25,326 basehttp 23744 13380 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2666
+INFO 2025-11-03 23:58:28,713 basehttp 23744 13380 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:58:30,261 basehttp 23744 17476 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:58:30,263 basehttp 23744 13380 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:58:30,292 basehttp 23744 10260 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:58:30,363 basehttp 23744 13380 "GET /api/health HTTP/1.1" 200 71
+INFO 2025-11-03 23:58:30,441 basehttp 23744 17476 "GET /api/admin/activities?status=all&year=2025&page=1&page_size=50 HTTP/1.1" 200 1946
+INFO 2025-11-03 23:58:30,551 basehttp 23744 10260 "GET /api/admin/dashboard/stats?months=12 HTTP/1.1" 200 2666
+INFO 2025-11-03 23:58:35,575 basehttp 23744 10260 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:58:35,575 basehttp 23744 17476 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-03 23:58:47,744 basehttp 23744 17476 "GET /api/admin/users?search=shenthurim123%40gmail.com HTTP/1.1" 200 393
+INFO 2025-11-03 23:58:50,576 basehttp 23744 17476 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:58:50,623 basehttp 23744 17476 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:59:05,571 basehttp 23744 17476 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:59:05,598 basehttp 23744 17476 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254
+INFO 2025-11-03 23:59:20,590 basehttp 23744 17476 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-03 23:59:20,610 basehttp 23744 17476 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 1254

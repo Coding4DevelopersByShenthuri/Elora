@@ -27,13 +27,14 @@ from .serializers import (
     LessonSerializer, LessonProgressSerializer, PracticeSessionSerializer,
     VocabularyWordSerializer, AchievementSerializer, UserAchievementSerializer,
     KidsLessonSerializer, KidsProgressSerializer, KidsAchievementSerializer, KidsCertificateSerializer,
-    WaitlistSerializer, DailyProgressSerializer, WeeklyStatsSerializer, UserStatsSerializer
+    WaitlistSerializer, DailyProgressSerializer, WeeklyStatsSerializer, UserStatsSerializer,
+    AdminNotificationSerializer
 )
 from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
     VocabularyWord, Achievement, UserAchievement,
     KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, WaitlistEntry,
-    EmailVerificationToken
+    EmailVerificationToken, AdminNotification
 )
 
 logger = logging.getLogger(__name__)
@@ -2468,6 +2469,277 @@ def admin_activities_list(request):
                 "total": 0,
                 "pages": 0
             }
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def admin_notifications_list(request):
+    """Get list of notifications for admin or create new notification"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        if request.method == 'GET':
+            # Get query parameters
+            unread_only = request.query_params.get('unread_only', 'false').lower() == 'true'
+            limit = int(request.query_params.get('limit', 50))
+            notification_type = request.query_params.get('type', '')
+            
+            # Filter notifications for this admin (user-specific or global)
+            queryset = AdminNotification.objects.filter(
+                Q(user=request.user) | Q(user__isnull=True)
+            ).filter(expires_at__gt=timezone.now())  # Only non-expired
+            
+            if unread_only:
+                queryset = queryset.filter(is_read=False)
+            
+            if notification_type:
+                queryset = queryset.filter(notification_type=notification_type)
+            
+            notifications = queryset[:limit]
+            serializer = AdminNotificationSerializer(notifications, many=True)
+            
+            # Get unread count
+            unread_count = AdminNotification.objects.filter(
+                Q(user=request.user) | Q(user__isnull=True),
+                is_read=False,
+                expires_at__gt=timezone.now()
+            ).count()
+            
+            return Response({
+                'notifications': serializer.data,
+                'unread_count': unread_count,
+                'total': queryset.count()
+            })
+        
+        elif request.method == 'POST':
+            # Create new notification (for system/automated use)
+            serializer = AdminNotificationSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    except Exception as e:
+        logger.error(f"Admin notifications error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def admin_notification_mark_read(request, notification_id):
+    """Mark a specific notification as read"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        notification = AdminNotification.objects.filter(
+            id=notification_id
+        ).filter(
+            Q(user=request.user) | Q(user__isnull=True)
+        ).first()
+        
+        if not notification:
+            return Response({
+                "message": "Notification not found"
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        if not notification.is_read:
+            notification.is_read = True
+            notification.read_at = timezone.now()
+            notification.read_by = request.user
+            notification.save()
+        
+        return Response({
+            "message": "Notification marked as read",
+            "notification": AdminNotificationSerializer(notification).data
+        })
+    
+    except Exception as e:
+        logger.error(f"Mark notification read error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def admin_create_test_notification(request):
+    """Create a test notification for testing dynamic updates"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        notification_type = request.data.get('type', 'info')
+        priority = request.data.get('priority', 'normal')
+        title = request.data.get('title', 'Test Notification')
+        message = request.data.get('message', 'This is a test notification to verify dynamic updates are working.')
+        link = request.data.get('link', '') or None
+        
+        notification = AdminNotification.objects.create(
+            user=None,  # Global notification for all admins
+            notification_type=notification_type,
+            priority=priority,
+            title=title,
+            message=message,
+            link=link,
+            metadata={'test': True, 'created_by': request.user.username}
+        )
+        
+        serializer = AdminNotificationSerializer(notification)
+        
+        return Response({
+            "message": "Test notification created successfully",
+            "notification": serializer.data
+        }, status=status.HTTP_201_CREATED)
+    
+    except Exception as e:
+        logger.error(f"Create test notification error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def admin_notifications_mark_all_read(request):
+    """Mark all notifications as read for the current admin"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        updated = AdminNotification.objects.filter(
+            Q(user=request.user) | Q(user__isnull=True),
+            is_read=False,
+            expires_at__gt=timezone.now()
+        ).update(
+            is_read=True,
+            read_at=timezone.now(),
+            read_by=request.user
+        )
+        
+        return Response({
+            "message": f"{updated} notifications marked as read",
+            "count": updated
+        })
+    
+    except Exception as e:
+        logger.error(f"Mark all notifications read error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def admin_notification_delete(request, notification_id):
+    """Delete a specific notification"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        notification = AdminNotification.objects.filter(
+            id=notification_id
+        ).filter(
+            Q(user=request.user) | Q(user__isnull=True)
+        ).first()
+        
+        if not notification:
+            return Response({
+                "message": "Notification not found"
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        notification.delete()
+        
+        return Response({
+            "message": "Notification deleted successfully"
+        })
+    
+    except Exception as e:
+        logger.error(f"Delete notification error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def admin_notifications_bulk_delete(request):
+    """Delete multiple notifications"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        notification_ids = request.data.get('ids', [])
+        if not notification_ids:
+            return Response({
+                "message": "No notification IDs provided"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        deleted = AdminNotification.objects.filter(
+            id__in=notification_ids
+        ).filter(
+            Q(user=request.user) | Q(user__isnull=True)
+        ).delete()
+        
+        return Response({
+            "message": f"{deleted[0]} notifications deleted successfully",
+            "count": deleted[0]
+        })
+    
+    except Exception as e:
+        logger.error(f"Bulk delete notifications error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_notifications_unread_count(request):
+    """Get only unread count (lightweight endpoint for polling)"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        unread_count = AdminNotification.objects.filter(
+            Q(user=request.user) | Q(user__isnull=True),
+            is_read=False,
+            expires_at__gt=timezone.now()
+        ).count()
+        
+        return Response({
+            "unread_count": unread_count
+        })
+    
+    except Exception as e:
+        logger.error(f"Get unread count error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 

@@ -3,7 +3,8 @@ from django.contrib.auth.models import User
 from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
     VocabularyWord, Achievement, UserAchievement,
-    KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, WaitlistEntry
+    KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, WaitlistEntry,
+    AdminNotification
 )
 from django.contrib.auth.password_validation import validate_password
 
@@ -212,6 +213,22 @@ class WaitlistSerializer(serializers.ModelSerializer):
         model = WaitlistEntry
         fields = ['id', 'email', 'name', 'interest', 'source', 'notes', 'created_at']
         read_only_fields = ['id', 'created_at']
+
+
+# ============= Admin Notification Serializer =============
+class AdminNotificationSerializer(serializers.ModelSerializer):
+    """Serializer for admin notifications"""
+    type_display = serializers.CharField(source='get_notification_type_display', read_only=True)
+    priority_display = serializers.CharField(source='get_priority_display', read_only=True)
+    
+    class Meta:
+        model = AdminNotification
+        fields = [
+            'id', 'user', 'notification_type', 'type_display', 'priority', 'priority_display',
+            'title', 'message', 'link', 'is_read', 'read_at', 'read_by', 'metadata',
+            'created_at', 'expires_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'read_at', 'read_by']
 
 
 # ============= Stats & Analytics Serializers =============

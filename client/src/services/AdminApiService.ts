@@ -345,6 +345,168 @@ export const AdminAPI = {
   },
 
   /**
+   * Get admin notifications
+   */
+  getNotifications: async (params?: {
+    unread_only?: boolean;
+    limit?: number;
+    type?: string;
+  }) => {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.unread_only) queryParams.append('unread_only', 'true');
+      if (params?.limit) queryParams.append('limit', params.limit.toString());
+      if (params?.type) queryParams.append('type', params.type);
+
+      const query = queryParams.toString() ? `?${queryParams.toString()}` : '';
+      const result = await fetchWithAuth(`admin/notifications${query}`);
+      
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch notifications',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Mark notification as read
+   */
+  markNotificationRead: async (notificationId: number) => {
+    try {
+      const result = await fetchWithAuth(`admin/notifications/${notificationId}/read`, {
+        method: 'POST',
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to mark notification as read',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Create a test notification (for testing purposes)
+   */
+  createTestNotification: async (data?: {
+    type?: string;
+    priority?: string;
+    title?: string;
+    message?: string;
+    link?: string;
+  }) => {
+    try {
+      const result = await fetchWithAuth('admin/notifications/test', {
+        method: 'POST',
+        body: JSON.stringify(data || {}),
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to create test notification',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Mark all notifications as read
+   */
+  markAllNotificationsRead: async () => {
+    try {
+      const result = await fetchWithAuth('admin/notifications/mark-all-read', {
+        method: 'POST',
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to mark all notifications as read',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Get unread count only (lightweight polling)
+   */
+  getUnreadCount: async () => {
+    try {
+      const result = await fetchWithAuth('admin/notifications/unread-count');
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch unread count',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Delete a notification
+   */
+  deleteNotification: async (notificationId: number) => {
+    try {
+      const result = await fetchWithAuth(`admin/notifications/${notificationId}/delete`, {
+        method: 'DELETE',
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to delete notification',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Bulk delete notifications
+   */
+  bulkDeleteNotifications: async (notificationIds: number[]) => {
+    try {
+      const result = await fetchWithAuth('admin/notifications/bulk-delete', {
+        method: 'POST',
+        body: JSON.stringify({ ids: notificationIds }),
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to delete notifications',
+        error: error
+      };
+    }
+  },
+
+  /**
    * Health check for platform status
    * Note: Health endpoint doesn't require auth, so we call it directly
    */

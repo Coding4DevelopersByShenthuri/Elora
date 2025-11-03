@@ -1,8 +1,10 @@
 from django.contrib import admin
+from django.utils import timezone
 from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
     VocabularyWord, Achievement, UserAchievement,
-    KidsLesson, KidsProgress, KidsAchievement, WaitlistEntry
+    KidsLesson, KidsProgress, KidsAchievement, WaitlistEntry,
+    AdminNotification
 )
 
 
@@ -168,3 +170,46 @@ class WaitlistEntryAdmin(admin.ModelAdmin):
         updated = queryset.update(notified=False)
         self.message_user(request, f'{updated} entries marked as not notified.')
     mark_as_not_notified.short_description = "Mark selected as not notified"
+
+
+# ============= Admin Notification Admin =============
+@admin.register(AdminNotification)
+class AdminNotificationAdmin(admin.ModelAdmin):
+    list_display = ['title', 'notification_type', 'priority', 'user', 'is_read', 'created_at', 'expires_at']
+    list_filter = ['notification_type', 'priority', 'is_read', 'created_at']
+    search_fields = ['title', 'message', 'user__username', 'user__email']
+    readonly_fields = ['created_at', 'read_at', 'read_by']
+    date_hierarchy = 'created_at'
+    ordering = ['-created_at']
+    
+    fieldsets = (
+        ('Basic Info', {
+            'fields': ('user', 'notification_type', 'priority', 'title', 'message', 'link')
+        }),
+        ('Status', {
+            'fields': ('is_read', 'read_at', 'read_by')
+        }),
+        ('Metadata', {
+            'fields': ('metadata',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'expires_at')
+        }),
+    )
+    
+    actions = ['mark_as_read', 'mark_as_unread', 'cleanup_expired']
+    
+    def mark_as_read(self, request, queryset):
+        updated = queryset.filter(is_read=False).update(is_read=True, read_at=timezone.now(), read_by=request.user)
+        self.message_user(request, f'{updated} notifications marked as read.')
+    mark_as_read.short_description = "Mark selected as read"
+    
+    def mark_as_unread(self, request, queryset):
+        updated = queryset.filter(is_read=True).update(is_read=False, read_at=None, read_by=None)
+        self.message_user(request, f'{updated} notifications marked as unread.')
+    mark_as_unread.short_description = "Mark selected as unread"
+    
+    def cleanup_expired(self, request, queryset):
+        deleted_count, _ = AdminNotification.cleanup_expired()
+        self.message_user(request, f'{deleted_count} expired notifications deleted.')
+    cleanup_expired.short_description = "Cleanup expired notifications (30+ days old)"

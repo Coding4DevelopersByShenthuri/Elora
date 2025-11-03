@@ -53,7 +53,7 @@ export default function AdminSettings() {
 
       // Check if user already has admin access
       if (user.is_staff || user.is_superuser) {
-        setGrantMessage('✅ This user already has admin access.');
+        setGrantMessage('This user already has admin access.');
         setGrantEmail(''); // Clear field
         return;
       }
@@ -68,7 +68,7 @@ export default function AdminSettings() {
       // Promote to admin (set is_staff = true)
       const update = await AdminAPI.updateUser(Number(user.id), { is_staff: true });
       if (update.success && 'data' in update) {
-        setGrantMessage(`✅ Admin access granted successfully to ${user.email || grantEmail}`);
+        setGrantMessage(`Admin access granted successfully to ${user.email || grantEmail}`);
         setGrantEmail(''); // Clear field on success
         
         // Analytics event (GA4)

@@ -60,4 +60,11 @@ urlpatterns = [
     path('admin/users/<int:user_id>', views.admin_user_detail, name='admin-user-detail'),
     path('admin/users/create-superuser', views.admin_create_superuser, name='admin-create-superuser'),
     path('admin/analytics', views.admin_analytics, name='admin-analytics'),
+    path('admin/notifications', views.admin_notifications_list, name='admin-notifications-list'),
+    path('admin/notifications/unread-count', views.admin_notifications_unread_count, name='admin-notifications-unread-count'),
+    path('admin/notifications/<int:notification_id>/read', views.admin_notification_mark_read, name='admin-notification-mark-read'),
+    path('admin/notifications/<int:notification_id>/delete', views.admin_notification_delete, name='admin-notification-delete'),
+    path('admin/notifications/bulk-delete', views.admin_notifications_bulk_delete, name='admin-notifications-bulk-delete'),
+    path('admin/notifications/mark-all-read', views.admin_notifications_mark_all_read, name='admin-notifications-mark-all-read'),
+    path('admin/notifications/test', views.admin_create_test_notification, name='admin-create-test-notification'),
 ]
