@@ -58,7 +58,7 @@ class UserProfile(models.Model):
     points = models.IntegerField(default=0)
     current_streak = models.IntegerField(default=0)
     longest_streak = models.IntegerField(default=0)
-    avatar = models.CharField(max_length=255, blank=True, null=True)
+    avatar = models.TextField(blank=True, null=True)  # Changed to TextField to support base64 data
     
     # Survey Data
     age_range = models.CharField(max_length=50, blank=True, null=True)
@@ -474,3 +474,40 @@ class AdminNotification(models.Model):
         """Delete expired notifications (called by management command or cron)"""
         from django.utils import timezone
         return AdminNotification.objects.filter(expires_at__lt=timezone.now()).delete()
+
+
+# ============= Platform Settings (Singleton) =============
+class PlatformSettings(models.Model):
+    """Site-wide configurable settings managed from the admin portal.
+
+    This is intended to be a singleton row. Enforce via get_or_create in views.
+    """
+
+    # General
+    platform_name = models.CharField(max_length=255, default="Elora")
+    support_email = models.EmailField(blank=True, default="support@elora.com")
+    maintenance_mode = models.BooleanField(default=False)
+    allow_registrations = models.BooleanField(default=True)
+
+    # Analytics
+    ga_id = models.CharField(max_length=32, blank=True, default="")  # e.g., G-XXXXXXXXXX
+    clarity_id = models.CharField(max_length=64, blank=True, default="")
+    analytics_enabled = models.BooleanField(default=True)
+
+    # Security
+    require_email_verification = models.BooleanField(default=True)
+    two_factor_admin = models.BooleanField(default=False)
+    session_timeout_minutes = models.IntegerField(default=60, validators=[MinValueValidator(5), MaxValueValidator(1440)])
+
+    # Appearance
+    default_theme = models.CharField(max_length=10, default='light', choices=[('light', 'Light'), ('dark', 'Dark'), ('auto', 'Auto')])
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Platform Settings"
+        verbose_name_plural = "Platform Settings"
+
+    def __str__(self):
+        return f"PlatformSettings(id={self.id or 'singleton'})"

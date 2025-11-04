@@ -82,6 +82,116 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
 
 export const AdminAPI = {
   /**
+   * Get platform settings
+   */
+  getSettings: async () => {
+    try {
+      const result = await fetchWithAuth('admin/settings');
+      return { success: true, data: result };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch settings',
+        error,
+      };
+    }
+  },
+
+  /**
+   * Update platform settings (partial update)
+   */
+  updateSettings: async (data: Record<string, any>) => {
+    try {
+      const result = await fetchWithAuth('admin/settings', {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+      return { success: true, data: result };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to update settings',
+        error,
+      };
+    }
+  },
+
+  /**
+   * Upload admin avatar
+   */
+  uploadAvatar: async (avatarData: string) => {
+    try {
+      // Increase timeout for large base64 data (30 seconds)
+      const token = getAuthToken();
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      console.log('📤 Uploading avatar to server...', { 
+        dataLength: avatarData.length,
+        preview: avatarData.substring(0, 50) + '...'
+      });
+
+      const response = await fetch(`${API_BASE_URL}/admin/avatar`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ avatar: avatarData }),
+        signal: AbortSignal.timeout(30000), // 30 second timeout for large files
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ message: 'Request failed' }));
+        console.error('❌ Avatar upload failed:', {
+          status: response.status,
+          error: error
+        });
+        throw { 
+          response: { 
+            data: error, 
+            status: response.status 
+          } 
+        };
+      }
+
+      const result = await response.json();
+      console.log('✅ Avatar upload successful:', result);
+      return { success: true, data: result };
+    } catch (error: any) {
+      console.error('❌ Avatar upload error:', error);
+      const errorMessage = error?.response?.data?.message || 
+                          error?.response?.data?.error ||
+                          error?.message || 
+                          'Failed to upload avatar. Please check your connection and try again.';
+      return {
+        success: false,
+        message: errorMessage,
+        error,
+      };
+    }
+  },
+
+  /**
+   * Remove admin avatar
+   */
+  removeAvatar: async () => {
+    try {
+      const result = await fetchWithAuth('admin/avatar', {
+        method: 'DELETE',
+      });
+      return { success: true, data: result };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to remove avatar',
+        error,
+      };
+    }
+  },
+  /**
    * Get admin dashboard statistics
    */
   getDashboardStats: async (params?: { months?: number }) => {

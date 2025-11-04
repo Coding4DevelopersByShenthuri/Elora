@@ -4,7 +4,7 @@ from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
     VocabularyWord, Achievement, UserAchievement,
     KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, WaitlistEntry,
-    AdminNotification, SurveyStepResponse
+    AdminNotification, SurveyStepResponse, PlatformSettings
 )
 from django.contrib.auth.password_validation import validate_password
 
@@ -19,6 +19,19 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'age_range', 'native_language', 'english_level', 'learning_purpose',
             'interests', 'survey_completed_at', 'voice_speed', 'difficulty',
             'notifications_enabled', 'auto_play', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['created_at', 'updated_at']
+
+
+class PlatformSettingsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlatformSettings
+        fields = [
+            'platform_name', 'support_email', 'maintenance_mode', 'allow_registrations',
+            'ga_id', 'clarity_id', 'analytics_enabled',
+            'require_email_verification', 'two_factor_admin', 'session_timeout_minutes',
+            'default_theme',
+            'created_at', 'updated_at',
         ]
         read_only_fields = ['created_at', 'updated_at']
 

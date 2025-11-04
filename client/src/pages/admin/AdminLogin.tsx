@@ -108,7 +108,7 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen admin-theme flex items-center justify-center bg-background p-4">
+    <div className="min-h-screen admin-theme flex items-center justify-center p-4" style={{ backgroundColor: '#f0fdf4' }}>
       <Card className="w-full max-w-md shadow-lg soft-card">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">

@@ -28,13 +28,13 @@ from .serializers import (
     VocabularyWordSerializer, AchievementSerializer, UserAchievementSerializer,
     KidsLessonSerializer, KidsProgressSerializer, KidsAchievementSerializer, KidsCertificateSerializer,
     WaitlistSerializer, DailyProgressSerializer, WeeklyStatsSerializer, UserStatsSerializer,
-    AdminNotificationSerializer, SurveyStepResponseSerializer
+    AdminNotificationSerializer, SurveyStepResponseSerializer, PlatformSettingsSerializer
 )
 from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
     VocabularyWord, Achievement, UserAchievement,
     KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, WaitlistEntry,
-    EmailVerificationToken, AdminNotification, SurveyStepResponse
+    EmailVerificationToken, AdminNotification, SurveyStepResponse, PlatformSettings
 )
 
 logger = logging.getLogger(__name__)
@@ -1821,6 +1821,97 @@ def is_admin_user(user):
     return user.is_authenticated and (user.is_staff or user.is_superuser)
 
 
+@api_view(['GET', 'PUT'])
+@permission_classes([IsAuthenticated])
+def admin_settings(request):
+    """Get or update platform settings (admin only)."""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+
+    settings_obj, _ = PlatformSettings.objects.get_or_create(id=1)
+
+    if request.method == 'GET':
+        serializer = PlatformSettingsSerializer(settings_obj)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    serializer = PlatformSettingsSerializer(settings_obj, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response({
+        'message': 'Validation error',
+        'errors': serializer.errors
+    }, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def admin_avatar_upload(request):
+    """Upload or remove admin profile avatar"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+
+    try:
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        
+        if request.method == 'POST':
+            # Handle avatar upload - accept base64 or URL
+            avatar_data = request.data.get('avatar')
+            
+            if not avatar_data:
+                return Response({
+                    'message': 'Avatar data is required'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Validate base64 data format (should start with data:image)
+            if isinstance(avatar_data, str) and avatar_data.startswith('data:image'):
+                # Truncate if too long (max 255 chars for CharField, but we'll store full base64)
+                # For now, we'll store the full base64 data
+                # In production, you might want to save to a file and store the URL
+                profile.avatar = avatar_data
+                profile.save()
+                
+                logger.info(f"Avatar uploaded for admin user {request.user.username}")
+                
+                return Response({
+                    'message': 'Avatar updated successfully',
+                    'avatar': profile.avatar
+                }, status=status.HTTP_200_OK)
+            else:
+                # If it's a URL, store it directly
+                profile.avatar = avatar_data
+                profile.save()
+                
+                return Response({
+                    'message': 'Avatar updated successfully',
+                    'avatar': profile.avatar
+                }, status=status.HTTP_200_OK)
+        
+        elif request.method == 'DELETE':
+            # Remove avatar
+            profile.avatar = None
+            profile.save()
+            
+            logger.info(f"Avatar removed for admin user {request.user.username}")
+            
+            return Response({
+                'message': 'Avatar removed successfully'
+            }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        logger.error(f"Avatar upload error: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return Response({
+            "message": "An error occurred while processing avatar",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def admin_dashboard_stats(request):
@@ -2998,7 +3089,7 @@ def admin_notifications_unread_count(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def admin_analytics(request):
-    """Get analytics data for admin"""
+    """Get comprehensive analytics data for admin including Practice analytics"""
     if not is_admin_user(request.user):
         return Response({
             "message": "Unauthorized. Admin access required."
@@ -3030,8 +3121,10 @@ def admin_analytics(request):
             date_str = progress.updated_at.date().isoformat()
             daily_completions[date_str] += 1
         
-        # Daily practice sessions
+        # Daily practice sessions with detailed metrics
         daily_sessions = defaultdict(int)
+        daily_practice_time = defaultdict(int)
+        daily_practice_scores = defaultdict(list)
         sessions = PracticeSession.objects.filter(
             session_date__date__gte=start_date,
             session_date__date__lte=end_date
@@ -3039,17 +3132,25 @@ def admin_analytics(request):
         for session in sessions:
             date_str = session.session_date.date().isoformat()
             daily_sessions[date_str] += 1
+            daily_practice_time[date_str] += session.duration_minutes or 0
+            # Score is required in model, but include it anyway
+            if hasattr(session, 'score') and session.score is not None:
+                daily_practice_scores[date_str].append(session.score)
         
-        # Build time series data
+        # Build time series data with practice metrics
         time_series = []
         current_date = start_date
         while current_date <= end_date:
             date_str = current_date.isoformat()
+            scores = daily_practice_scores.get(date_str, [])
+            avg_score = sum(scores) / len(scores) if scores else 0
             time_series.append({
                 'date': date_str,
-                'registrations': daily_registrations.get(date_str, 0),
-                'completions': daily_completions.get(date_str, 0),
-                'sessions': daily_sessions.get(date_str, 0)
+                'registrations': int(daily_registrations.get(date_str, 0)),
+                'completions': int(daily_completions.get(date_str, 0)),
+                'sessions': int(daily_sessions.get(date_str, 0)),
+                'practice_time_minutes': int(daily_practice_time.get(date_str, 0)),
+                'avg_score': float(round(avg_score, 2))
             })
             current_date += timedelta(days=1)
         
@@ -3075,11 +3176,117 @@ def admin_analytics(request):
             'completions': lesson.completion_count
         } for lesson in top_lessons]
         
+        # ============= Practice Analytics =============
+        # Overall practice statistics
+        total_sessions = PracticeSession.objects.count()
+        total_practice_time = PracticeSession.objects.aggregate(
+            total=Sum('duration_minutes')
+        )['total'] or 0
+        avg_session_duration = PracticeSession.objects.aggregate(
+            avg=Avg('duration_minutes')
+        )['avg'] or 0
+        avg_practice_score = PracticeSession.objects.aggregate(
+            avg=Avg('score')
+        )['avg'] or 0
+        
+        # Practice sessions in the selected period
+        period_sessions = PracticeSession.objects.filter(
+            session_date__date__gte=start_date,
+            session_date__date__lte=end_date
+        )
+        period_total_sessions = period_sessions.count()
+        period_total_time = period_sessions.aggregate(
+            total=Sum('duration_minutes')
+        )['total'] or 0
+        period_avg_score = period_sessions.aggregate(
+            avg=Avg('score')
+        )['avg'] or 0
+        
+        # Practice sessions by type distribution
+        practice_type_dist = period_sessions.values('session_type').annotate(
+            count=Count('id'),
+            avg_score=Avg('score'),
+            avg_duration=Avg('duration_minutes'),
+            total_time=Sum('duration_minutes')
+        ).order_by('-count')
+        
+        # Active users (users who practiced in the period)
+        active_users = period_sessions.values('user_id').distinct().count()
+        
+        # Top performing practice types
+        top_practice_types = period_sessions.values('session_type').annotate(
+            count=Count('id'),
+            avg_score=Avg('score')
+        ).order_by('-avg_score')[:5]
+        
+        # Practice session trends (daily averages)
+        practice_trends = []
+        current_date = start_date
+        while current_date <= end_date:
+            date_str = current_date.isoformat()
+            day_sessions = PracticeSession.objects.filter(
+                session_date__date=current_date
+            )
+            day_count = day_sessions.count()
+            # Calculate average score, handling cases where score might be 0 or missing
+            day_avg_score = day_sessions.aggregate(avg=Avg('score'))['avg']
+            day_avg_score = round(day_avg_score, 2) if day_avg_score is not None else 0
+            day_total_time = day_sessions.aggregate(total=Sum('duration_minutes'))['total'] or 0
+            day_active_users = day_sessions.values('user_id').distinct().count()
+            
+            practice_trends.append({
+                'date': date_str,
+                'sessions': int(day_count),
+                'avg_score': float(day_avg_score),
+                'total_time_minutes': int(day_total_time or 0),
+                'active_users': int(day_active_users)
+            })
+            current_date += timedelta(days=1)
+        
+        # User engagement metrics
+        total_users_practiced = PracticeSession.objects.values('user_id').distinct().count()
+        period_users_practiced = period_sessions.values('user_id').distinct().count()
+        
+        # Practice session quality metrics (handle null scores)
+        high_score_sessions = period_sessions.filter(score__gte=80).count()
+        medium_score_sessions = period_sessions.filter(score__gte=60, score__lt=80).count()
+        low_score_sessions = period_sessions.filter(score__lt=60).count()
+        # Sessions without scores (if any)
+        no_score_sessions = period_sessions.filter(score__isnull=True).count()
+        
         return Response({
             'time_series': time_series,
             'lesson_type_distribution': list(lesson_type_dist),
             'content_type_distribution': list(content_type_dist),
-            'top_lessons': top_lessons_data
+            'top_lessons': top_lessons_data,
+            # Practice Analytics
+            'practice': {
+                'overall': {
+                    'total_sessions': total_sessions,
+                    'total_time_minutes': total_practice_time,
+                    'total_time_hours': round(total_practice_time / 60, 2),
+                    'avg_session_duration': round(avg_session_duration, 2),
+                    'avg_score': round(avg_practice_score, 2),
+                    'total_users_practiced': total_users_practiced
+                },
+                'period': {
+                    'total_sessions': period_total_sessions,
+                    'total_time_minutes': period_total_time,
+                    'total_time_hours': round(period_total_time / 60, 2),
+                    'avg_score': round(period_avg_score, 2),
+                    'active_users': active_users,
+                    'users_practiced': period_users_practiced
+                },
+                'type_distribution': list(practice_type_dist),
+                'top_types': list(top_practice_types),
+                'trends': practice_trends,
+                'quality_metrics': {
+                    'high_score': high_score_sessions,
+                    'medium_score': medium_score_sessions,
+                    'low_score': low_score_sessions,
+                    'no_score': no_score_sessions
+                }
+            }
         })
     
     except Exception as e:

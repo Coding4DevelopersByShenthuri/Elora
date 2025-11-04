@@ -58,6 +58,8 @@ urlpatterns = [
     path('sync/upsert', views.idempotent_upsert, name='sync-upsert'),
     
     # ============= Admin Endpoints =============
+    path('admin/settings', views.admin_settings, name='admin-settings'),
+    path('admin/avatar', views.admin_avatar_upload, name='admin-avatar-upload'),
     path('admin/dashboard/stats', views.admin_dashboard_stats, name='admin-dashboard-stats'),
     path('admin/activities', views.admin_activities_list, name='admin-activities-list'),
     path('admin/activities/<str:activity_id>', views.admin_activity_detail, name='admin-activity-detail'),
