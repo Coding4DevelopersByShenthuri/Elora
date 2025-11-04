@@ -56,6 +56,7 @@ urlpatterns = [
     # ============= Admin Endpoints =============
     path('admin/dashboard/stats', views.admin_dashboard_stats, name='admin-dashboard-stats'),
     path('admin/activities', views.admin_activities_list, name='admin-activities-list'),
+    path('admin/activities/<str:activity_id>', views.admin_activity_detail, name='admin-activity-detail'),
     path('admin/users', views.admin_users_list, name='admin-users-list'),
     path('admin/users/<int:user_id>', views.admin_user_detail, name='admin-user-detail'),
     path('admin/users/create-superuser', views.admin_create_superuser, name='admin-create-superuser'),
@@ -67,4 +68,10 @@ urlpatterns = [
     path('admin/notifications/bulk-delete', views.admin_notifications_bulk_delete, name='admin-notifications-bulk-delete'),
     path('admin/notifications/mark-all-read', views.admin_notifications_mark_all_read, name='admin-notifications-mark-all-read'),
     path('admin/notifications/test', views.admin_create_test_notification, name='admin-create-test-notification'),
+    
+    # ============= Admin Lessons Management =============
+    path('admin/lessons', views.admin_lessons_list, name='admin-lessons-list'),
+    path('admin/lessons/stats', views.admin_lessons_stats, name='admin-lessons-stats'),
+    path('admin/lessons/create', views.admin_lesson_create, name='admin-lesson-create'),
+    path('admin/lessons/<int:lesson_id>', views.admin_lesson_detail, name='admin-lesson-detail'),
 ]

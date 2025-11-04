@@ -32,6 +32,7 @@ import { RecentActivity } from '@/components/admin/RecentActivity';
 import { UserGrowthChart } from '@/components/admin/UserGrowthChart';
 import { LevelsBarChart } from '@/components/admin/LevelsBarChart';
 import { LessonsCompletionMini } from '@/components/admin/LessonsCompletionMini';
+import { ActivityDetailDialog } from '@/components/admin/ActivityDetailDialog';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<any>(null);
@@ -51,6 +52,8 @@ export default function AdminDashboard() {
   const [activitiesError, setActivitiesError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({ page: 1, page_size: 50, total: 0, pages: 0 });
+  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
 
   // Debounce search query
   useEffect(() => {
@@ -768,7 +771,15 @@ export default function AdminDashboard() {
                             </Badge>
                           </td>
                           <td className="px-5 py-3">
-                            <Button variant="ghost" size="sm" className="h-8">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-8"
+                              onClick={() => {
+                                setSelectedActivityId(activity.id);
+                                setIsDetailDialogOpen(true);
+                              }}
+                            >
                               View
                             </Button>
                           </td>
@@ -808,6 +819,13 @@ export default function AdminDashboard() {
             )}
           </CardContent>
         </Card>
+
+        {/* Activity Detail Dialog */}
+        <ActivityDetailDialog
+          activityId={selectedActivityId}
+          open={isDetailDialogOpen}
+          onOpenChange={setIsDetailDialogOpen}
+        />
       </div>
     </AdminLayout>
   );

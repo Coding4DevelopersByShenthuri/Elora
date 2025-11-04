@@ -293,6 +293,25 @@ export const AdminAPI = {
   },
 
   /**
+   * Get detailed information for a specific activity
+   */
+  getActivityDetail: async (activityId: string) => {
+    try {
+      const result = await fetchWithAuth(`admin/activities/${activityId}`);
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch activity details',
+        error: error
+      };
+    }
+  },
+
+  /**
    * Export filtered activities to CSV
    */
   exportActivities: async (params?: {
@@ -534,6 +553,145 @@ export const AdminAPI = {
       return {
         success: false,
         message: error?.message || 'Failed to fetch health status',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Get list of lessons for admin management
+   */
+  getLessons: async (params?: {
+    lesson_type?: string;
+    content_type?: string;
+    is_active?: boolean;
+    search?: string;
+    page?: number;
+    page_size?: number;
+  }) => {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.lesson_type) queryParams.append('lesson_type', params.lesson_type);
+      if (params?.content_type) queryParams.append('content_type', params.content_type);
+      if (params?.is_active !== undefined) queryParams.append('is_active', params.is_active.toString());
+      if (params?.search) queryParams.append('search', params.search);
+      if (params?.page) queryParams.append('page', params.page.toString());
+      if (params?.page_size) queryParams.append('page_size', params.page_size.toString());
+
+      const query = queryParams.toString() ? `?${queryParams.toString()}` : '';
+      const result = await fetchWithAuth(`admin/lessons${query}`);
+      
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch lessons',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Get lesson statistics
+   */
+  getLessonsStats: async () => {
+    try {
+      const result = await fetchWithAuth('admin/lessons/stats');
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch lesson statistics',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Get a specific lesson by ID
+   */
+  getLesson: async (lessonId: number) => {
+    try {
+      const result = await fetchWithAuth(`admin/lessons/${lessonId}`);
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch lesson',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Create a new lesson
+   */
+  createLesson: async (data: any) => {
+    try {
+      const result = await fetchWithAuth('admin/lessons/create', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to create lesson',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Update a lesson
+   */
+  updateLesson: async (lessonId: number, data: any) => {
+    try {
+      const result = await fetchWithAuth(`admin/lessons/${lessonId}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to update lesson',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Delete (deactivate) a lesson
+   */
+  deleteLesson: async (lessonId: number) => {
+    try {
+      const result = await fetchWithAuth(`admin/lessons/${lessonId}`, {
+        method: 'DELETE',
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to delete lesson',
         error: error
       };
     }

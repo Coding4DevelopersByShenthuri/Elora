@@ -85,7 +85,8 @@ class UserProfile(models.Model):
 class Lesson(models.Model):
     """Generic lesson model for all learning paths"""
     LESSON_TYPE_CHOICES = [
-        ('kids', 'Kids'),
+        ('kids_4_10', 'Kids (4-10)'),
+        ('kids_11_17', 'Kids (11-17)'),
         ('beginner', 'Beginner'),
         ('intermediate', 'Intermediate'),
         ('advanced', 'Advanced'),

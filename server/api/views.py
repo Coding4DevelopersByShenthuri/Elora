@@ -2472,6 +2472,188 @@ def admin_activities_list(request):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_activity_detail(request, activity_id):
+    """Get detailed information for a specific activity (user registration or lesson progress)"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        # Parse activity ID to determine type (user_{id} or progress_{id})
+        activity_data = None
+        
+        if activity_id.startswith('user_'):
+            # User registration activity
+            try:
+                user_id = int(activity_id.replace('user_', ''))
+                user = User.objects.select_related('profile').get(id=user_id)
+                
+                profile = getattr(user, 'profile', None)
+                
+                # Determine status
+                if user.is_active and profile and hasattr(profile, 'survey_completed_at') and profile.survey_completed_at:
+                    user_status = 'completed'
+                elif user.is_active:
+                    user_status = 'in_process'
+                elif not user.is_active:
+                    user_status = 'need_info'
+                else:
+                    user_status = 'unassigned'
+                
+                # Get user's lesson progress summary
+                lesson_progress_count = LessonProgress.objects.filter(user=user).count()
+                completed_lessons = LessonProgress.objects.filter(user=user, completed=True).count()
+                total_score = LessonProgress.objects.filter(user=user).aggregate(
+                    avg_score=Avg('score')
+                )['avg_score'] or 0
+                
+                # Get practice sessions summary
+                practice_sessions = PracticeSession.objects.filter(user=user)
+                total_practice_time = practice_sessions.aggregate(
+                    total=Sum('duration_minutes')
+                )['total'] or 0
+                total_practice_sessions = practice_sessions.count()
+                
+                activity_data = {
+                    'id': activity_id,
+                    'type': 'user_registration',
+                    'name': f"{user.first_name} {user.last_name}".strip() or user.username,
+                    'username': user.username,
+                    'email': user.email,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                    'is_active': user.is_active,
+                    'is_staff': user.is_staff,
+                    'is_superuser': user.is_superuser,
+                    'date_joined': user.date_joined.isoformat() if user.date_joined else None,
+                    'last_login': user.last_login.isoformat() if user.last_login else None,
+                    'mrn': f'USR{user.id:04d}',
+                    'status': user_status,
+                    'profile': {
+                        'level': profile.level if profile else None,
+                        'points': profile.points if profile else 0,
+                        'current_streak': profile.current_streak if profile else 0,
+                        'longest_streak': profile.longest_streak if profile else 0,
+                        'age_range': profile.age_range if profile else None,
+                        'native_language': profile.native_language if profile else None,
+                        'english_level': profile.english_level if profile else None,
+                        'learning_purpose': profile.learning_purpose if profile else [],
+                        'interests': profile.interests if profile else [],
+                        'survey_completed_at': profile.survey_completed_at.isoformat() if profile and profile.survey_completed_at else None,
+                        'notifications_enabled': profile.notifications_enabled if profile else False,
+                        'created_at': profile.created_at.isoformat() if profile and profile.created_at else None,
+                        'updated_at': profile.updated_at.isoformat() if profile and profile.updated_at else None,
+                    } if profile else None,
+                    'lesson_progress': {
+                        'total_lessons': lesson_progress_count,
+                        'completed_lessons': completed_lessons,
+                        'average_score': round(total_score, 2),
+                    },
+                    'practice_summary': {
+                        'total_sessions': total_practice_sessions,
+                        'total_time_minutes': total_practice_time,
+                        'total_time_hours': round(total_practice_time / 60, 2),
+                    },
+                }
+            except User.DoesNotExist:
+                return Response({
+                    "message": "User not found",
+                    "error": "User not found"
+                }, status=status.HTTP_404_NOT_FOUND)
+            except ValueError:
+                return Response({
+                    "message": "Invalid activity ID format",
+                    "error": "Invalid activity ID"
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        elif activity_id.startswith('progress_'):
+            # Lesson progress activity
+            try:
+                progress_id = int(activity_id.replace('progress_', ''))
+                progress = LessonProgress.objects.select_related('user', 'lesson').get(id=progress_id)
+                
+                user = progress.user
+                lesson = progress.lesson
+                
+                activity_data = {
+                    'id': activity_id,
+                    'type': 'lesson_progress',
+                    'progress_id': progress.id,
+                    'user': {
+                        'id': user.id,
+                        'username': user.username,
+                        'email': user.email,
+                        'name': f"{user.first_name} {user.last_name}".strip() or user.username,
+                        'first_name': user.first_name,
+                        'last_name': user.last_name,
+                    },
+                    'lesson': {
+                        'id': lesson.id if lesson else None,
+                        'title': lesson.title if lesson else 'Unknown Lesson',
+                        'slug': lesson.slug if lesson else None,
+                        'lesson_type': lesson.lesson_type if lesson else None,
+                        'content_type': lesson.content_type if lesson else None,
+                        'difficulty_level': lesson.difficulty_level if lesson else None,
+                        'duration_minutes': lesson.duration_minutes if lesson else None,
+                        'description': lesson.description if lesson else None,
+                    } if lesson else None,
+                    'progress': {
+                        'completed': progress.completed,
+                        'score': progress.score,
+                        'time_spent_minutes': progress.time_spent_minutes,
+                        'attempts': progress.attempts,
+                        'pronunciation_score': progress.pronunciation_score,
+                        'fluency_score': progress.fluency_score,
+                        'accuracy_score': progress.accuracy_score,
+                        'grammar_score': progress.grammar_score,
+                        'notes': progress.notes,
+                        'details': progress.details,
+                        'last_attempt': progress.last_attempt.isoformat() if progress.last_attempt else None,
+                        'created_at': progress.created_at.isoformat() if progress.created_at else None,
+                        'updated_at': progress.updated_at.isoformat() if progress.updated_at else None,
+                    },
+                    'mrn': f'LSN{lesson.id if lesson else 0:04d}',
+                    'status': 'completed' if progress.completed else 'in_process',
+                    'service_date': lesson.created_at.isoformat() if lesson and lesson.created_at else None,
+                    'assigned_date': progress.updated_at.isoformat() if progress.updated_at else None,
+                }
+            except LessonProgress.DoesNotExist:
+                return Response({
+                    "message": "Lesson progress not found",
+                    "error": "Lesson progress not found"
+                }, status=status.HTTP_404_NOT_FOUND)
+            except ValueError:
+                return Response({
+                    "message": "Invalid activity ID format",
+                    "error": "Invalid activity ID"
+                }, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({
+                "message": "Invalid activity ID format",
+                "error": "Activity ID must start with 'user_' or 'progress_'"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not activity_data:
+            return Response({
+                "message": "Activity not found",
+                "error": "Activity not found"
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        return Response(activity_data)
+    
+    except Exception as e:
+        logger.error(f"Admin activity detail error: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return Response({
+            "message": "An error occurred while loading activity details",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def admin_notifications_list(request):
@@ -2834,6 +3016,367 @@ def admin_analytics(request):
         logger.error(f"Admin analytics error: {str(e)}")
         return Response({
             "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# ============= Admin Lessons Management =============
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_lessons_list(request):
+    """Get all lessons for admin management with filtering and pagination"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        # Query parameters
+        lesson_type = request.query_params.get('lesson_type')
+        content_type = request.query_params.get('content_type')
+        is_active = request.query_params.get('is_active')
+        search = request.query_params.get('search', '').strip()
+        page = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('page_size', 50))
+        
+        # Build queryset - include all lessons (not just active) for admin
+        queryset = Lesson.objects.all()
+        
+        # Apply filters
+        if lesson_type:
+            queryset = queryset.filter(lesson_type=lesson_type)
+        if content_type:
+            queryset = queryset.filter(content_type=content_type)
+        if is_active is not None:
+            queryset = queryset.filter(is_active=is_active.lower() == 'true')
+        if search:
+            queryset = queryset.filter(
+                Q(title__icontains=search) |
+                Q(description__icontains=search) |
+                Q(slug__icontains=search)
+            )
+        
+        # Get total count before pagination
+        total_count = queryset.count()
+        
+        # Order by lesson_type, order, then difficulty
+        queryset = queryset.order_by('lesson_type', 'order', 'difficulty_level')
+        
+        # Pagination
+        start = (page - 1) * page_size
+        end = start + page_size
+        lessons = queryset[start:end]
+        
+        # Serialize lessons
+        serializer = LessonSerializer(lessons, many=True)
+        
+        # Get progress statistics for each lesson
+        lessons_data = []
+        for lesson_data in serializer.data:
+            lesson_id = lesson_data['id']
+            progress_count = LessonProgress.objects.filter(lesson_id=lesson_id).count()
+            completed_count = LessonProgress.objects.filter(lesson_id=lesson_id, completed=True).count()
+            avg_score = LessonProgress.objects.filter(lesson_id=lesson_id).aggregate(
+                avg=Avg('score')
+            )['avg'] or 0
+            
+            lessons_data.append({
+                **lesson_data,
+                'progress_count': progress_count,
+                'completed_count': completed_count,
+                'avg_score': round(avg_score, 2)
+            })
+        
+        return Response({
+            'lessons': lessons_data,
+            'pagination': {
+                'page': page,
+                'page_size': page_size,
+                'total': total_count,
+                'pages': (total_count + page_size - 1) // page_size
+            }
+        })
+    
+    except Exception as e:
+        logger.error(f"Admin lessons list error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_lessons_stats(request):
+    """Get comprehensive statistics about lessons for admin dashboard"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        # Overall stats
+        total_lessons = Lesson.objects.count()
+        active_lessons = Lesson.objects.filter(is_active=True).count()
+        inactive_lessons = total_lessons - active_lessons
+        
+        # Stats by lesson type with detailed analytics
+        by_type = {}
+        for lesson_type, label in Lesson.LESSON_TYPE_CHOICES:
+            lessons_qs = Lesson.objects.filter(lesson_type=lesson_type)
+            count = lessons_qs.count()
+            active_count = lessons_qs.filter(is_active=True).count()
+            
+            # Get progress stats for this lesson type
+            lesson_ids = list(lessons_qs.values_list('id', flat=True))
+            type_progress = LessonProgress.objects.filter(lesson_id__in=lesson_ids)
+            type_total_progress = type_progress.count()
+            type_completed = type_progress.filter(completed=True).count()
+            type_avg_score = type_progress.aggregate(avg=Avg('score'))['avg'] or 0
+            
+            by_type[lesson_type] = {
+                'total': count,
+                'active': active_count,
+                'inactive': count - active_count,
+                'progress': {
+                    'total': type_total_progress,
+                    'completed': type_completed,
+                    'completion_rate': round((type_completed / type_total_progress * 100) if type_total_progress > 0 else 0, 2),
+                    'avg_score': round(type_avg_score, 2)
+                }
+            }
+        
+        # Stats by content type with progress
+        by_content = {}
+        for content_type, label in Lesson.CONTENT_TYPE_CHOICES:
+            lessons_qs = Lesson.objects.filter(content_type=content_type)
+            count = lessons_qs.count()
+            lesson_ids = list(lessons_qs.values_list('id', flat=True))
+            content_progress = LessonProgress.objects.filter(lesson_id__in=lesson_ids)
+            content_completed = content_progress.filter(completed=True).count()
+            
+            by_content[content_type] = {
+                'total': count,
+                'completed': content_completed,
+                'progress_count': content_progress.count()
+            }
+        
+        # Overall progress stats
+        total_progress = LessonProgress.objects.count()
+        completed_progress = LessonProgress.objects.filter(completed=True).count()
+        completion_rate = round((completed_progress / total_progress * 100) if total_progress > 0 else 0, 2)
+        avg_score = LessonProgress.objects.aggregate(avg=Avg('score'))['avg'] or 0
+        
+        # Recent lessons (last 30 days)
+        thirty_days_ago = timezone.now() - timedelta(days=30)
+        recent_lessons = Lesson.objects.filter(created_at__gte=thirty_days_ago).count()
+        
+        # Top performing lessons
+        top_lessons = Lesson.objects.annotate(
+            completion_count=Count('lessonprogress', filter=Q(lessonprogress__completed=True))
+        ).order_by('-completion_count')[:5]
+        
+        top_lessons_data = [{
+            'id': lesson.id,
+            'title': lesson.title,
+            'lesson_type': lesson.lesson_type,
+            'completions': lesson.completion_count
+        } for lesson in top_lessons]
+        
+        # Average difficulty distribution
+        difficulty_dist = {}
+        for i in range(1, 11):
+            difficulty_dist[i] = Lesson.objects.filter(difficulty_level=i).count()
+        
+        return Response({
+            'overall': {
+                'total': total_lessons,
+                'active': active_lessons,
+                'inactive': inactive_lessons,
+                'recent': recent_lessons
+            },
+            'by_type': by_type,
+            'by_content': by_content,
+            'progress': {
+                'total': total_progress,
+                'completed': completed_progress,
+                'completion_rate': completion_rate,
+                'avg_score': round(avg_score, 2)
+            },
+            'top_lessons': top_lessons_data,
+            'difficulty_distribution': difficulty_dist
+        })
+    
+    except Exception as e:
+        logger.error(f"Admin lessons stats error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def admin_lesson_detail(request, lesson_id):
+    """Get, update, or delete a specific lesson"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        lesson = Lesson.objects.get(id=lesson_id)
+    except Lesson.DoesNotExist:
+        return Response({
+            "message": "Lesson not found"
+        }, status=status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'GET':
+        serializer = LessonSerializer(lesson)
+        
+        # Add progress stats
+        progress_count = LessonProgress.objects.filter(lesson=lesson).count()
+        completed_count = LessonProgress.objects.filter(lesson=lesson, completed=True).count()
+        avg_score = LessonProgress.objects.filter(lesson=lesson).aggregate(
+            avg=Avg('score')
+        )['avg'] or 0
+        
+        data = serializer.data
+        data['progress_count'] = progress_count
+        data['completed_count'] = completed_count
+        data['avg_score'] = round(avg_score, 2)
+        
+        return Response(data)
+    
+    elif request.method == 'PUT':
+        data = request.data.copy()
+        
+        # Validate lesson_type if provided
+        if 'lesson_type' in data:
+            valid_lesson_types = [choice[0] for choice in Lesson.LESSON_TYPE_CHOICES]
+            if data['lesson_type'] not in valid_lesson_types:
+                return Response({
+                    "message": f"Invalid lesson_type. Must be one of: {', '.join(valid_lesson_types)}"
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate content_type if provided
+        if 'content_type' in data:
+            valid_content_types = [choice[0] for choice in Lesson.CONTENT_TYPE_CHOICES]
+            if data['content_type'] not in valid_content_types:
+                return Response({
+                    "message": f"Invalid content_type. Must be one of: {', '.join(valid_content_types)}"
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate difficulty_level if provided
+        if 'difficulty_level' in data:
+            difficulty = int(data['difficulty_level'])
+            if difficulty < 1 or difficulty > 10:
+                return Response({
+                    "message": "difficulty_level must be between 1 and 10"
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Auto-generate slug from title if title changed but slug not provided
+        if 'title' in data and not data.get('slug'):
+            from django.utils.text import slugify
+            base_slug = slugify(data['title'])
+            slug = base_slug
+            counter = 1
+            while Lesson.objects.filter(slug=slug).exclude(id=lesson_id).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            data['slug'] = slug
+        
+        serializer = LessonSerializer(lesson, data=data, partial=True)
+        if serializer.is_valid():
+            updated_lesson = serializer.save()
+            # Add progress stats
+            progress_count = LessonProgress.objects.filter(lesson=updated_lesson).count()
+            completed_count = LessonProgress.objects.filter(lesson=updated_lesson, completed=True).count()
+            avg_score = LessonProgress.objects.filter(lesson=updated_lesson).aggregate(
+                avg=Avg('score')
+            )['avg'] or 0
+            
+            result = LessonSerializer(updated_lesson).data
+            result['progress_count'] = progress_count
+            result['completed_count'] = completed_count
+            result['avg_score'] = round(avg_score, 2)
+            return Response(result)
+        return Response({
+            "message": "Validation failed",
+            "errors": serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    elif request.method == 'DELETE':
+        # Don't actually delete, just deactivate
+        lesson.is_active = False
+        lesson.save()
+        return Response({
+            "message": "Lesson deactivated successfully"
+        })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def admin_lesson_create(request):
+    """Create a new lesson with validation"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        data = request.data.copy()
+        
+        # Auto-generate slug from title if not provided
+        if not data.get('slug') and data.get('title'):
+            from django.utils.text import slugify
+            base_slug = slugify(data['title'])
+            slug = base_slug
+            counter = 1
+            while Lesson.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            data['slug'] = slug
+        
+        # Validate lesson_type
+        valid_lesson_types = [choice[0] for choice in Lesson.LESSON_TYPE_CHOICES]
+        if data.get('lesson_type') and data['lesson_type'] not in valid_lesson_types:
+            return Response({
+                "message": f"Invalid lesson_type. Must be one of: {', '.join(valid_lesson_types)}"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate content_type
+        valid_content_types = [choice[0] for choice in Lesson.CONTENT_TYPE_CHOICES]
+        if data.get('content_type') and data['content_type'] not in valid_content_types:
+            return Response({
+                "message": f"Invalid content_type. Must be one of: {', '.join(valid_content_types)}"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate difficulty_level
+        if data.get('difficulty_level'):
+            difficulty = int(data['difficulty_level'])
+            if difficulty < 1 or difficulty > 10:
+                return Response({
+                    "message": "difficulty_level must be between 1 and 10"
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer = LessonSerializer(data=data)
+        if serializer.is_valid():
+            lesson = serializer.save()
+            # Add progress stats (will be 0 for new lesson)
+            result = LessonSerializer(lesson).data
+            result['progress_count'] = 0
+            result['completed_count'] = 0
+            result['avg_score'] = 0
+            return Response(result, status=status.HTTP_201_CREATED)
+        return Response({
+            "message": "Validation failed",
+            "errors": serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        logger.error(f"Admin lesson create error: {str(e)}")
+        return Response({
+            "message": "An error occurred while creating the lesson",
             "error": str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
