@@ -1,4 +1,4 @@
-# 🐝 Elora - Your Personal AI English Trainer
+# Elora - Your Personal AI English Trainer
 
 **Offline-First English Learning Platform with AI-Powered Features**
 
@@ -14,7 +14,7 @@ Elora is a comprehensive English learning platform that works 100% offline while
 
 ### Key Features
 
-- 🔒 **100% Offline** - Works without internet connection
+- 🔒 **Online/Offline** - Works without internet connection
 - 🤖 **AI-Powered** - Offline AI for pronunciation and conversation practice
 - 🎯 **Multi-Level** - Kids, Adults (Beginner/Intermediate/Advanced), IELTS/PTE
 - 📊 **Progress Tracking** - Detailed analytics and achievements
