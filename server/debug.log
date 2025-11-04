@@ -9622,3 +9622,15 @@ INFO 2025-11-04 14:18:53,386 basehttp 9288 10840 "OPTIONS /api/auth/login HTTP/1
 INFO 2025-11-04 14:18:54,001 basehttp 9288 10840 "POST /api/auth/login HTTP/1.1" 200 1147
 INFO 2025-11-04 14:19:42,753 basehttp 9288 9776 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
 INFO 2025-11-04 14:19:42,800 basehttp 9288 6196 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 905
+INFO 2025-11-04 14:20:27,299 basehttp 9288 20572 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-04 14:20:27,342 basehttp 9288 18968 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 905
+INFO 2025-11-04 14:20:30,216 basehttp 9288 18968 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-04 14:20:31,773 basehttp 9288 20572 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-04 14:20:31,784 basehttp 9288 18968 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 905
+INFO 2025-11-04 14:20:31,810 basehttp 9288 20304 "GET /api/admin/surveys?page=1&page_size=20 HTTP/1.1" 200 2444
+INFO 2025-11-04 14:20:31,848 basehttp 9288 20572 "GET /api/admin/surveys/stats HTTP/1.1" 200 252
+INFO 2025-11-04 14:20:47,124 basehttp 9288 20572 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-04 14:21:02,117 basehttp 9288 20572 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-04 14:21:16,768 basehttp 9288 20572 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-04 14:21:32,100 basehttp 9288 20572 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-04 14:21:32,108 basehttp 9288 20304 "GET /api/admin/notifications?limit=50 HTTP/1.1" 200 905
