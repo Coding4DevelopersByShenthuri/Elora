@@ -8114,3 +8114,4 @@ INFO 2025-11-04 11:04:34,313 basehttp 9564 9200 "GET /api/auth/user HTTP/1.1" 20
 INFO 2025-11-04 11:04:34,345 basehttp 9564 15904 "GET /api/admin/lessons?page=1&page_size=50 HTTP/1.1" 200 73
 INFO 2025-11-04 11:04:34,478 basehttp 9564 9200 "GET /api/admin/lessons/stats HTTP/1.1" 200 1541
 INFO 2025-11-04 11:04:42,134 basehttp 9564 8328 "GET /api/kids/progress HTTP/1.1" 200 312
+INFO 2025-11-04 11:04:50,473 basehttp 9564 21896 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
