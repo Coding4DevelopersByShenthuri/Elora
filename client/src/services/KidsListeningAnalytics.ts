@@ -155,7 +155,7 @@ export class KidsListeningAnalytics {
     // Update aggregate stats
     this.updateAggregateStats(stats);
     
-    // Save
+    // Save (async - syncs to MySQL)
     this.saveStats(userId, stats);
     
     // Sync to server if online
@@ -277,12 +277,35 @@ export class KidsListeningAnalytics {
   }
 
   /**
-   * Save stats for a user
+   * Save stats for a user (local + sync to MySQL)
    */
-  private static saveStats(userId: string, stats: ListeningStats): void {
+  private static async saveStats(userId: string, stats: ListeningStats): Promise<void> {
     try {
+      // Save locally first (offline-first)
       const key = `${this.STORAGE_KEY}_${userId}`;
       localStorage.setItem(key, JSON.stringify(stats));
+      
+      // Sync to MySQL if online
+      if (navigator.onLine) {
+        const token = localStorage.getItem('speakbee_auth_token');
+        if (token && token !== 'local-token') {
+          try {
+            await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}/api/kids/analytics`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                user_id: userId,
+                stats: stats
+              })
+            });
+          } catch (error) {
+            console.log('Analytics sync will retry later:', error);
+          }
+        }
+      }
     } catch (error) {
       console.error('Error saving analytics:', error);
     }

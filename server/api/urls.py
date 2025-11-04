@@ -13,6 +13,10 @@ urlpatterns = [
     path('auth/user', views.user_info, name='user-info'),
     path('verify-email/<str:token>/', views.verify_email, name='verify-email'),
     
+    # ============= Survey Step Tracking =============
+    path('survey/step', views.save_survey_step, name='save-survey-step'),
+    path('survey/steps', views.get_survey_steps, name='get-survey-steps'),
+    
     # ============= Lessons =============
     path('lessons/', views.lessons_list, name='lessons-list'),
     path('lessons/<slug:slug>/', views.lesson_detail, name='lesson-detail'),
@@ -74,4 +78,34 @@ urlpatterns = [
     path('admin/lessons/stats', views.admin_lessons_stats, name='admin-lessons-stats'),
     path('admin/lessons/create', views.admin_lesson_create, name='admin-lesson-create'),
     path('admin/lessons/<int:lesson_id>', views.admin_lesson_detail, name='admin-lesson-detail'),
+    
+    # ============= Admin Practice Sessions =============
+    path('admin/practice', views.admin_practice_list, name='admin-practice-list'),
+    path('admin/practice/stats', views.admin_practice_stats, name='admin-practice-stats'),
+    path('admin/practice/<int:session_id>', views.admin_practice_detail, name='admin-practice-detail'),
+    
+    # ============= Admin Progress Tracking =============
+    path('admin/progress', views.admin_progress_list, name='admin-progress-list'),
+    path('admin/progress/stats', views.admin_progress_stats, name='admin-progress-stats'),
+    path('admin/progress/<int:progress_id>', views.admin_progress_detail, name='admin-progress-detail'),
+    
+    # ============= Admin Vocabulary Management =============
+    path('admin/vocabulary', views.admin_vocabulary_list, name='admin-vocabulary-list'),
+    path('admin/vocabulary/stats', views.admin_vocabulary_stats, name='admin-vocabulary-stats'),
+    path('admin/vocabulary/<int:word_id>', views.admin_vocabulary_detail, name='admin-vocabulary-detail'),
+    
+    # ============= Admin Achievements Management =============
+    path('admin/achievements', views.admin_achievements_list, name='admin-achievements-list'),
+    path('admin/achievements/stats', views.admin_achievements_stats, name='admin-achievements-stats'),
+    path('admin/achievements/create', views.admin_achievement_create, name='admin-achievement-create'),
+    path('admin/achievements/<int:achievement_id>', views.admin_achievement_detail, name='admin-achievement-detail'),
+    path('admin/user-achievements', views.admin_user_achievements, name='admin-user-achievements'),
+    
+    # ============= Admin Surveys Management =============
+    path('admin/surveys', views.admin_surveys_list, name='admin-surveys-list'),
+    path('admin/surveys/stats', views.admin_surveys_stats, name='admin-surveys-stats'),
+    path('admin/surveys/<int:user_id>', views.admin_survey_detail, name='admin-survey-detail'),
+    path('admin/surveys/<int:user_id>/update', views.admin_survey_update, name='admin-survey-update'),
+    path('admin/surveys/<int:user_id>/delete', views.admin_survey_delete, name='admin-survey-delete'),
+    path('admin/surveys/<int:user_id>/steps', views.admin_survey_steps, name='admin-survey-steps'),
 ]

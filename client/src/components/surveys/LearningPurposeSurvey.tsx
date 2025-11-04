@@ -49,7 +49,8 @@ const LearningPurposeSurvey: React.FC<LearningPurposeSurveyProps> = ({ isOpen, o
 			learningPurpose: selectedPurposes,
 			completedAt: new Date().toISOString()
 		};
-		updateUserSurveyData(surveyData as any);
+		// Save step 4 (learningPurpose) response to MySQL
+		updateUserSurveyData(surveyData as any, 'learningPurpose', 4);
 		onComplete(surveyData);
 	};
 

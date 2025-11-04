@@ -13,7 +13,8 @@ import {
   CheckCircle2,
   TrendingUp,
   Shield,
-  Trophy
+  Trophy,
+  ClipboardList
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -47,7 +48,7 @@ export function AdminSidebar({ isCollapsed = false, onToggle }: AdminSidebarProp
     { title: 'Progress', icon: CheckCircle2, path: '/admin/progress' },
     { title: 'Vocabulary', icon: TrendingUp, path: '/admin/vocabulary' },
     { title: 'Achievements', icon: Trophy, path: '/admin/achievements' },
-    { title: 'Surveys', icon: BarChart3, path: '/admin/surveys' },
+    { title: 'Surveys', icon: ClipboardList, path: '/admin/surveys' },
     {
       title: 'Analytics',
       icon: BarChart3,

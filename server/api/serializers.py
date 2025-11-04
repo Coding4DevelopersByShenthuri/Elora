@@ -4,7 +4,7 @@ from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
     VocabularyWord, Achievement, UserAchievement,
     KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, WaitlistEntry,
-    AdminNotification
+    AdminNotification, SurveyStepResponse
 )
 from django.contrib.auth.password_validation import validate_password
 
@@ -21,6 +21,20 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'notifications_enabled', 'auto_play', 'created_at', 'updated_at'
         ]
         read_only_fields = ['created_at', 'updated_at']
+
+
+class SurveyStepResponseSerializer(serializers.ModelSerializer):
+    """Serializer for survey step responses"""
+    user_username = serializers.CharField(source='user.username', read_only=True)
+    user_email = serializers.CharField(source='user.email', read_only=True)
+    
+    class Meta:
+        model = SurveyStepResponse
+        fields = [
+            'id', 'user', 'user_username', 'user_email', 'step_name', 'step_number',
+            'response_data', 'completed_at'
+        ]
+        read_only_fields = ['id', 'completed_at', 'user']
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -118,15 +132,17 @@ class LessonProgressSerializer(serializers.ModelSerializer):
 class PracticeSessionSerializer(serializers.ModelSerializer):
     """Serializer for practice sessions"""
     lesson_title = serializers.CharField(source='lesson.title', read_only=True, allow_null=True)
+    user_username = serializers.CharField(source='user.username', read_only=True)
+    user_email = serializers.CharField(source='user.email', read_only=True)
     
     class Meta:
         model = PracticeSession
         fields = [
-            'id', 'session_type', 'lesson', 'lesson_title', 'duration_minutes',
-            'score', 'points_earned', 'words_practiced', 'sentences_practiced',
+            'id', 'user', 'user_username', 'user_email', 'session_type', 'lesson', 'lesson_title', 
+            'duration_minutes', 'score', 'points_earned', 'words_practiced', 'sentences_practiced',
             'mistakes_count', 'details', 'session_date'
         ]
-        read_only_fields = ['session_date']
+        read_only_fields = ['session_date', 'user']
 
 
 # ============= Vocabulary Serializers =============
@@ -151,8 +167,11 @@ class AchievementSerializer(serializers.ModelSerializer):
         model = Achievement
         fields = [
             'id', 'achievement_id', 'title', 'description', 'icon',
-            'category', 'tier', 'points', 'requirement', 'is_active', 'created_at'
+            'category', 'tier', 'points', 'requirement', 
+            'requirement_type', 'requirement_target', 'requirement_metric',
+            'is_active', 'created_at'
         ]
+        read_only_fields = ['requirement', 'created_at']
     
     def get_requirement(self, obj):
         return {

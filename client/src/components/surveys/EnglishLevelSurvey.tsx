@@ -47,7 +47,8 @@ const EnglishLevelSurvey: React.FC<EnglishLevelSurveyProps> = ({ isOpen, onCompl
       englishLevel: levelId,
       completedAt: new Date().toISOString()
     };
-    updateUserSurveyData(surveyData);
+    // Save step 3 (englishLevel) response to MySQL
+    updateUserSurveyData(surveyData, 'englishLevel', 3);
     onComplete(surveyData);
   };
 

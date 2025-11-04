@@ -1,5 +1,6 @@
 import React from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { useAuth } from '@/contexts/AuthContext';
 import SurveyProgress from '@/components/surveys/SurveyProgress';
 
 interface InterestsSurveyProps {
@@ -26,6 +27,7 @@ const InterestsSurvey: React.FC<InterestsSurveyProps> = ({
   const [bounce, setBounce] = React.useState(false);
   const [floatOn, setFloatOn] = React.useState(false);
   const [selected, setSelected] = React.useState<Set<string>>(new Set());
+  const { updateUserSurveyData } = useAuth();
 
   const toggle = React.useCallback((option: string) => {
     setSelected(prev => {
@@ -68,8 +70,14 @@ const InterestsSurvey: React.FC<InterestsSurveyProps> = ({
   }, [isOpen]);
 
   const handleContinue = React.useCallback(() => {
+    // Save step 16 (interests) response to MySQL
+    const surveyData = {
+      interests: Array.from(selected),
+      completedAt: new Date().toISOString()
+    };
+    updateUserSurveyData(surveyData as any, 'interests', 16);
     onComplete();
-  }, [onComplete]);
+  }, [onComplete, selected, updateUserSurveyData]);
 
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>

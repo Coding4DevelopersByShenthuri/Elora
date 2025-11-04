@@ -28,13 +28,13 @@ from .serializers import (
     VocabularyWordSerializer, AchievementSerializer, UserAchievementSerializer,
     KidsLessonSerializer, KidsProgressSerializer, KidsAchievementSerializer, KidsCertificateSerializer,
     WaitlistSerializer, DailyProgressSerializer, WeeklyStatsSerializer, UserStatsSerializer,
-    AdminNotificationSerializer
+    AdminNotificationSerializer, SurveyStepResponseSerializer
 )
 from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
     VocabularyWord, Achievement, UserAchievement,
     KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, WaitlistEntry,
-    EmailVerificationToken, AdminNotification
+    EmailVerificationToken, AdminNotification, SurveyStepResponse
 )
 
 logger = logging.getLogger(__name__)
@@ -458,9 +458,27 @@ def user_profile(request):
             return Response(serializer.data)
         
         elif request.method in ['PUT', 'PATCH']:
-            serializer = UserProfileSerializer(profile, data=request.data, partial=(request.method == 'PATCH'))
+            # Handle survey_completed_at - set it only if survey is being completed
+            data = request.data.copy()
+            
+            # If survey_completed_at is provided and all required survey fields are present, ensure it's set
+            if 'survey_completed_at' in data and data['survey_completed_at']:
+                # Verify that key survey fields are present
+                has_survey_data = (
+                    data.get('age_range') or 
+                    data.get('native_language') or 
+                    data.get('english_level') or 
+                    data.get('learning_purpose')
+                )
+                if not has_survey_data:
+                    # If no survey data is being updated, don't update completed_at
+                    # This allows partial updates without affecting completion status
+                    pass
+            
+            serializer = UserProfileSerializer(profile, data=data, partial=(request.method == 'PATCH'))
             if serializer.is_valid():
                 serializer.save()
+                logger.info(f"Profile updated for user {request.user.username}: survey data saved")
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -483,6 +501,58 @@ def user_info(request):
         logger.error(f"User info error: {str(e)}")
         return Response({
             "message": "An error occurred"
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def save_survey_step(request):
+    """Save individual survey step response to MySQL"""
+    try:
+        step_name = request.data.get('step_name')
+        step_number = request.data.get('step_number')
+        response_data = request.data.get('response_data', {})
+        
+        if not step_name or step_number is None:
+            return Response({
+                "message": "step_name and step_number are required"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Save individual step response
+        step_response = SurveyStepResponse.objects.create(
+            user=request.user,
+            step_name=step_name,
+            step_number=step_number,
+            response_data=response_data
+        )
+        
+        serializer = SurveyStepResponseSerializer(step_response)
+        logger.info(f"Survey step {step_number} ({step_name}) saved for user {request.user.username}")
+        
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    except Exception as e:
+        logger.error(f"Survey step save error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_survey_steps(request):
+    """Get all survey step responses for current user"""
+    try:
+        step_responses = SurveyStepResponse.objects.filter(user=request.user).order_by('step_number', '-completed_at')
+        serializer = SurveyStepResponseSerializer(step_responses, many=True)
+        return Response(serializer.data)
+    
+    except Exception as e:
+        logger.error(f"Get survey steps error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -3381,6 +3451,1592 @@ def admin_lesson_create(request):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+# ============= Admin Practice Sessions =============
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_practice_list(request):
+    """Get list of practice sessions for admin"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        search = request.query_params.get('search', '')
+        page = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('page_size', 20))
+        session_type = request.query_params.get('session_type', '')
+        user_id = request.query_params.get('user_id', '')
+        date_from = request.query_params.get('date_from', '')
+        date_to = request.query_params.get('date_to', '')
+        
+        queryset = PracticeSession.objects.select_related('user', 'lesson').all()
+        
+        if search:
+            queryset = queryset.filter(
+                Q(user__username__icontains=search) |
+                Q(user__email__icontains=search) |
+                Q(lesson__title__icontains=search) |
+                Q(session_type__icontains=search)
+            )
+        
+        if session_type:
+            queryset = queryset.filter(session_type=session_type)
+        
+        if user_id:
+            try:
+                queryset = queryset.filter(user_id=int(user_id))
+            except ValueError:
+                pass
+        
+        if date_from:
+            try:
+                from_date = datetime.fromisoformat(date_from.replace('Z', '+00:00'))
+                queryset = queryset.filter(session_date__gte=from_date)
+            except (ValueError, AttributeError):
+                pass
+        
+        if date_to:
+            try:
+                to_date = datetime.fromisoformat(date_to.replace('Z', '+00:00'))
+                queryset = queryset.filter(session_date__lte=to_date)
+            except (ValueError, AttributeError):
+                pass
+        
+        # Order by most recent first
+        queryset = queryset.order_by('-session_date')
+        
+        # Pagination
+        total = queryset.count()
+        start = (page - 1) * page_size
+        end = start + page_size
+        sessions = queryset[start:end]
+        
+        serializer = PracticeSessionSerializer(sessions, many=True)
+        
+        # Add user info to each session
+        result_data = []
+        for session_data in serializer.data:
+            # Get the session object for additional user info
+            session_obj = next((s for s in sessions if s.id == session_data['id']), None)
+            if session_obj:
+                session_data['user'] = {
+                    'id': session_obj.user.id,
+                    'username': session_obj.user.username,
+                    'email': session_obj.user.email,
+                    'name': f"{session_obj.user.first_name} {session_obj.user.last_name}".strip() or session_obj.user.username
+                }
+            else:
+                # Fallback to serializer data
+                session_data['user'] = {
+                    'id': session_data.get('user'),
+                    'username': session_data.get('user_username', ''),
+                    'email': session_data.get('user_email', ''),
+                    'name': session_data.get('user_username', 'Unknown')
+                }
+            result_data.append(session_data)
+        
+        return Response({
+            'sessions': result_data,
+            'pagination': {
+                'page': page,
+                'page_size': page_size,
+                'total': total,
+                'pages': (total + page_size - 1) // page_size if total > 0 else 1
+            }
+        })
+    
+    except Exception as e:
+        logger.error(f"Admin practice list error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_practice_stats(request):
+    """Get practice session statistics for admin"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        today = timezone.now().date()
+        last7 = today - timedelta(days=7)
+        last30 = today - timedelta(days=30)
+        
+        # Overall stats
+        total_sessions = PracticeSession.objects.count()
+        total_time = PracticeSession.objects.aggregate(
+            total=Sum('duration_minutes')
+        )['total'] or 0
+        avg_score = PracticeSession.objects.aggregate(
+            avg=Avg('score')
+        )['avg'] or 0
+        avg_duration = PracticeSession.objects.aggregate(
+            avg=Avg('duration_minutes')
+        )['avg'] or 0
+        
+        # Recent stats
+        sessions_last_7 = PracticeSession.objects.filter(session_date__date__gte=last7).count()
+        sessions_last_30 = PracticeSession.objects.filter(session_date__date__gte=last30).count()
+        time_last_7 = PracticeSession.objects.filter(session_date__date__gte=last7).aggregate(
+            total=Sum('duration_minutes')
+        )['total'] or 0
+        time_last_30 = PracticeSession.objects.filter(session_date__date__gte=last30).aggregate(
+            total=Sum('duration_minutes')
+        )['total'] or 0
+        
+        # Active users
+        active_users_7 = PracticeSession.objects.filter(
+            session_date__date__gte=last7
+        ).values('user_id').distinct().count()
+        active_users_30 = PracticeSession.objects.filter(
+            session_date__date__gte=last30
+        ).values('user_id').distinct().count()
+        
+        # Session type distribution
+        type_distribution = PracticeSession.objects.values('session_type').annotate(
+            count=Count('id'),
+            avg_score=Avg('score'),
+            total_time=Sum('duration_minutes')
+        ).order_by('-count')
+        
+        # Daily stats for last 30 days
+        daily_stats = []
+        for i in range(30):
+            date = last30 + timedelta(days=i)
+            day_sessions = PracticeSession.objects.filter(session_date__date=date)
+            daily_stats.append({
+                'date': date.isoformat(),
+                'sessions': day_sessions.count(),
+                'total_time': day_sessions.aggregate(total=Sum('duration_minutes'))['total'] or 0,
+                'avg_score': day_sessions.aggregate(avg=Avg('score'))['avg'] or 0,
+                'active_users': day_sessions.values('user_id').distinct().count()
+            })
+        
+        return Response({
+            'overall': {
+                'total_sessions': total_sessions,
+                'total_time_minutes': total_time,
+                'total_time_hours': round(total_time / 60, 2),
+                'avg_score': round(avg_score, 2),
+                'avg_duration_minutes': round(avg_duration, 2)
+            },
+            'recent': {
+                'sessions_last_7': sessions_last_7,
+                'sessions_last_30': sessions_last_30,
+                'time_last_7_minutes': time_last_7,
+                'time_last_7_hours': round(time_last_7 / 60, 2),
+                'time_last_30_minutes': time_last_30,
+                'time_last_30_hours': round(time_last_30 / 60, 2),
+                'active_users_7': active_users_7,
+                'active_users_30': active_users_30
+            },
+            'type_distribution': list(type_distribution),
+            'daily_stats': daily_stats
+        })
+    
+    except Exception as e:
+        logger.error(f"Admin practice stats error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_practice_detail(request, session_id):
+    """Get detailed information about a specific practice session"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        session = PracticeSession.objects.select_related('user', 'lesson').get(id=session_id)
+        serializer = PracticeSessionSerializer(session)
+        
+        result = serializer.data
+        result['user'] = {
+            'id': session.user.id,
+            'username': session.user.username,
+            'email': session.user.email,
+            'name': f"{session.user.first_name} {session.user.last_name}".strip() or session.user.username,
+            'first_name': session.user.first_name,
+            'last_name': session.user.last_name,
+            'date_joined': session.user.date_joined.isoformat() if session.user.date_joined else None
+        }
+        
+        if session.lesson:
+            result['lesson'] = {
+                'id': session.lesson.id,
+                'title': session.lesson.title,
+                'slug': session.lesson.slug,
+                'lesson_type': session.lesson.lesson_type,
+                'content_type': session.lesson.content_type
+            }
+        
+        return Response(result)
+    
+    except PracticeSession.DoesNotExist:
+        return Response({
+            "message": "Practice session not found"
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        logger.error(f"Admin practice detail error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# ============= Admin Progress Tracking =============
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_progress_list(request):
+    """Get list of lesson progress for admin"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        search = request.query_params.get('search', '')
+        page = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('page_size', 20))
+        user_id = request.query_params.get('user_id', '')
+        lesson_id = request.query_params.get('lesson_id', '')
+        lesson_type = request.query_params.get('lesson_type', '')
+        content_type = request.query_params.get('content_type', '')
+        completed = request.query_params.get('completed', '')
+        date_from = request.query_params.get('date_from', '')
+        date_to = request.query_params.get('date_to', '')
+        
+        queryset = LessonProgress.objects.select_related('user', 'lesson').all()
+        
+        if search:
+            queryset = queryset.filter(
+                Q(user__username__icontains=search) |
+                Q(user__email__icontains=search) |
+                Q(lesson__title__icontains=search) |
+                Q(lesson__slug__icontains=search)
+            )
+        
+        if user_id:
+            try:
+                queryset = queryset.filter(user_id=int(user_id))
+            except ValueError:
+                pass
+        
+        if lesson_id:
+            try:
+                queryset = queryset.filter(lesson_id=int(lesson_id))
+            except ValueError:
+                pass
+        
+        if lesson_type:
+            queryset = queryset.filter(lesson__lesson_type=lesson_type)
+        
+        if content_type:
+            queryset = queryset.filter(lesson__content_type=content_type)
+        
+        if completed == 'true':
+            queryset = queryset.filter(completed=True)
+        elif completed == 'false':
+            queryset = queryset.filter(completed=False)
+        
+        if date_from:
+            try:
+                from_date = datetime.fromisoformat(date_from.replace('Z', '+00:00'))
+                queryset = queryset.filter(last_attempt__gte=from_date)
+            except (ValueError, AttributeError):
+                pass
+        
+        if date_to:
+            try:
+                to_date = datetime.fromisoformat(date_to.replace('Z', '+00:00'))
+                queryset = queryset.filter(last_attempt__lte=to_date)
+            except (ValueError, AttributeError):
+                pass
+        
+        # Order by most recent first
+        queryset = queryset.order_by('-last_attempt')
+        
+        # Pagination
+        total = queryset.count()
+        start = (page - 1) * page_size
+        end = start + page_size
+        progress_records = queryset[start:end]
+        
+        serializer = LessonProgressSerializer(progress_records, many=True)
+        
+        # Add user and lesson info to each record
+        result_data = []
+        for progress_data in serializer.data:
+            progress_obj = next((p for p in progress_records if p.id == progress_data['id']), None)
+            if progress_obj:
+                progress_data['user'] = {
+                    'id': progress_obj.user.id,
+                    'username': progress_obj.user.username,
+                    'email': progress_obj.user.email,
+                    'name': f"{progress_obj.user.first_name} {progress_obj.user.last_name}".strip() or progress_obj.user.username
+                }
+                if progress_obj.lesson:
+                    progress_data['lesson'] = {
+                        'id': progress_obj.lesson.id,
+                        'title': progress_obj.lesson.title,
+                        'slug': progress_obj.lesson.slug,
+                        'lesson_type': progress_obj.lesson.lesson_type,
+                        'content_type': progress_obj.lesson.content_type,
+                        'difficulty_level': progress_obj.lesson.difficulty_level
+                    }
+            result_data.append(progress_data)
+        
+        return Response({
+            'progress': result_data,
+            'pagination': {
+                'page': page,
+                'page_size': page_size,
+                'total': total,
+                'pages': (total + page_size - 1) // page_size if total > 0 else 1
+            }
+        })
+    
+    except Exception as e:
+        logger.error(f"Admin progress list error: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_progress_stats(request):
+    """Get lesson progress statistics for admin"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        today = timezone.now().date()
+        last7 = today - timedelta(days=7)
+        last30 = today - timedelta(days=30)
+        
+        # Overall stats
+        total_progress = LessonProgress.objects.count()
+        completed_progress = LessonProgress.objects.filter(completed=True).count()
+        in_progress = LessonProgress.objects.filter(completed=False).count()
+        
+        avg_score = LessonProgress.objects.aggregate(
+            avg=Avg('score')
+        )['avg'] or 0
+        
+        avg_time = LessonProgress.objects.aggregate(
+            avg=Avg('time_spent_minutes')
+        )['avg'] or 0
+        
+        total_time = LessonProgress.objects.aggregate(
+            total=Sum('time_spent_minutes')
+        )['total'] or 0
+        
+        total_attempts = LessonProgress.objects.aggregate(
+            total=Sum('attempts')
+        )['total'] or 0
+        
+        # Recent stats
+        progress_last_7 = LessonProgress.objects.filter(last_attempt__date__gte=last7).count()
+        progress_last_30 = LessonProgress.objects.filter(last_attempt__date__gte=last30).count()
+        completed_last_7 = LessonProgress.objects.filter(
+            completed=True, last_attempt__date__gte=last7
+        ).count()
+        completed_last_30 = LessonProgress.objects.filter(
+            completed=True, last_attempt__date__gte=last30
+        ).count()
+        
+        time_last_7 = LessonProgress.objects.filter(last_attempt__date__gte=last7).aggregate(
+            total=Sum('time_spent_minutes')
+        )['total'] or 0
+        time_last_30 = LessonProgress.objects.filter(last_attempt__date__gte=last30).aggregate(
+            total=Sum('time_spent_minutes')
+        )['total'] or 0
+        
+        # Active users with progress
+        active_users_7 = LessonProgress.objects.filter(
+            last_attempt__date__gte=last7
+        ).values('user_id').distinct().count()
+        active_users_30 = LessonProgress.objects.filter(
+            last_attempt__date__gte=last30
+        ).values('user_id').distinct().count()
+        
+        # Lesson type distribution
+        lesson_type_dist = LessonProgress.objects.filter(
+            lesson__isnull=False
+        ).values('lesson__lesson_type').annotate(
+            count=Count('id'),
+            avg_score=Avg('score'),
+            completed_count=Count('id', filter=Q(completed=True))
+        ).order_by('-count')
+        
+        # Content type distribution
+        content_type_dist = LessonProgress.objects.filter(
+            lesson__isnull=False
+        ).values('lesson__content_type').annotate(
+            count=Count('id'),
+            avg_score=Avg('score'),
+            completed_count=Count('id', filter=Q(completed=True))
+        ).order_by('-count')
+        
+        # Score distribution
+        score_ranges = [
+            {'min': 90, 'max': 100, 'label': '90-100%'},
+            {'min': 80, 'max': 89, 'label': '80-89%'},
+            {'min': 70, 'max': 79, 'label': '70-79%'},
+            {'min': 60, 'max': 69, 'label': '60-69%'},
+            {'min': 0, 'max': 59, 'label': '0-59%'},
+        ]
+        score_distribution = []
+        for range_item in score_ranges:
+            count = LessonProgress.objects.filter(
+                score__gte=range_item['min'],
+                score__lte=range_item['max']
+            ).count()
+            score_distribution.append({
+                'range': range_item['label'],
+                'count': count
+            })
+        
+        # Daily stats for last 30 days
+        daily_stats = []
+        for i in range(30):
+            date = last30 + timedelta(days=i)
+            day_progress = LessonProgress.objects.filter(last_attempt__date=date)
+            daily_stats.append({
+                'date': date.isoformat(),
+                'total': day_progress.count(),
+                'completed': day_progress.filter(completed=True).count(),
+                'avg_score': day_progress.aggregate(avg=Avg('score'))['avg'] or 0,
+                'total_time': day_progress.aggregate(total=Sum('time_spent_minutes'))['total'] or 0,
+                'active_users': day_progress.values('user_id').distinct().count()
+            })
+        
+        # Top lessons by progress count
+        top_lessons = LessonProgress.objects.filter(
+            lesson__isnull=False
+        ).values('lesson__id', 'lesson__title', 'lesson__lesson_type', 'lesson__content_type').annotate(
+            total_progress=Count('id'),
+            completed_progress=Count('id', filter=Q(completed=True)),
+            avg_score=Avg('score')
+        ).order_by('-total_progress')[:10]
+        
+        return Response({
+            'overall': {
+                'total_progress': total_progress,
+                'completed_progress': completed_progress,
+                'in_progress': in_progress,
+                'completion_rate': round((completed_progress / total_progress * 100) if total_progress > 0 else 0, 2),
+                'avg_score': round(avg_score, 2),
+                'avg_time_minutes': round(avg_time, 2),
+                'total_time_minutes': total_time,
+                'total_time_hours': round(total_time / 60, 2),
+                'total_attempts': total_attempts
+            },
+            'recent': {
+                'progress_last_7': progress_last_7,
+                'progress_last_30': progress_last_30,
+                'completed_last_7': completed_last_7,
+                'completed_last_30': completed_last_30,
+                'time_last_7_minutes': time_last_7,
+                'time_last_7_hours': round(time_last_7 / 60, 2),
+                'time_last_30_minutes': time_last_30,
+                'time_last_30_hours': round(time_last_30 / 60, 2),
+                'active_users_7': active_users_7,
+                'active_users_30': active_users_30
+            },
+            'lesson_type_distribution': list(lesson_type_dist),
+            'content_type_distribution': list(content_type_dist),
+            'score_distribution': score_distribution,
+            'daily_stats': daily_stats,
+            'top_lessons': list(top_lessons)
+        })
+    
+    except Exception as e:
+        logger.error(f"Admin progress stats error: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_progress_detail(request, progress_id):
+    """Get detailed information about a specific lesson progress"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        progress = LessonProgress.objects.select_related('user', 'lesson').get(id=progress_id)
+        serializer = LessonProgressSerializer(progress)
+        
+        result = serializer.data
+        result['user'] = {
+            'id': progress.user.id,
+            'username': progress.user.username,
+            'email': progress.user.email,
+            'name': f"{progress.user.first_name} {progress.user.last_name}".strip() or progress.user.username,
+            'first_name': progress.user.first_name,
+            'last_name': progress.user.last_name,
+            'date_joined': progress.user.date_joined.isoformat() if progress.user.date_joined else None
+        }
+        
+        if progress.lesson:
+            result['lesson'] = {
+                'id': progress.lesson.id,
+                'title': progress.lesson.title,
+                'slug': progress.lesson.slug,
+                'lesson_type': progress.lesson.lesson_type,
+                'content_type': progress.lesson.content_type,
+                'difficulty_level': progress.lesson.difficulty_level,
+                'duration_minutes': progress.lesson.duration_minutes,
+                'description': progress.lesson.description
+            }
+        
+        return Response(result)
+    
+    except LessonProgress.DoesNotExist:
+        return Response({
+            "message": "Lesson progress not found"
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        logger.error(f"Admin progress detail error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# ============= Admin Vocabulary Management =============
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_vocabulary_list(request):
+    """Get list of vocabulary words for admin"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        search = request.query_params.get('search', '')
+        page = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('page_size', 20))
+        user_id = request.query_params.get('user_id', '')
+        category = request.query_params.get('category', '')
+        difficulty = request.query_params.get('difficulty', '')
+        mastery_min = request.query_params.get('mastery_min', '')
+        mastery_max = request.query_params.get('mastery_max', '')
+        date_from = request.query_params.get('date_from', '')
+        date_to = request.query_params.get('date_to', '')
+        
+        queryset = VocabularyWord.objects.select_related('user').all()
+        
+        if search:
+            queryset = queryset.filter(
+                Q(word__icontains=search) |
+                Q(definition__icontains=search) |
+                Q(user__username__icontains=search) |
+                Q(user__email__icontains=search) |
+                Q(category__icontains=search)
+            )
+        
+        if user_id:
+            try:
+                queryset = queryset.filter(user_id=int(user_id))
+            except ValueError:
+                pass
+        
+        if category:
+            queryset = queryset.filter(category=category)
+        
+        if difficulty:
+            try:
+                queryset = queryset.filter(difficulty=int(difficulty))
+            except ValueError:
+                pass
+        
+        if mastery_min:
+            try:
+                queryset = queryset.filter(mastery_level__gte=float(mastery_min))
+            except ValueError:
+                pass
+        
+        if mastery_max:
+            try:
+                queryset = queryset.filter(mastery_level__lte=float(mastery_max))
+            except ValueError:
+                pass
+        
+        if date_from:
+            try:
+                from_date = datetime.fromisoformat(date_from.replace('Z', '+00:00'))
+                queryset = queryset.filter(last_practiced__gte=from_date)
+            except (ValueError, AttributeError):
+                pass
+        
+        if date_to:
+            try:
+                to_date = datetime.fromisoformat(date_to.replace('Z', '+00:00'))
+                queryset = queryset.filter(last_practiced__lte=to_date)
+            except (ValueError, AttributeError):
+                pass
+        
+        # Order by most recently practiced first
+        queryset = queryset.order_by('-last_practiced')
+        
+        # Pagination
+        total = queryset.count()
+        start = (page - 1) * page_size
+        end = start + page_size
+        words = queryset[start:end]
+        
+        serializer = VocabularyWordSerializer(words, many=True)
+        
+        # Add user info to each word
+        result_data = []
+        for word_data in serializer.data:
+            word_obj = next((w for w in words if w.id == word_data['id']), None)
+            if word_obj:
+                word_data['user'] = {
+                    'id': word_obj.user.id,
+                    'username': word_obj.user.username,
+                    'email': word_obj.user.email,
+                    'name': f"{word_obj.user.first_name} {word_obj.user.last_name}".strip() or word_obj.user.username
+                }
+            result_data.append(word_data)
+        
+        return Response({
+            'vocabulary': result_data,
+            'pagination': {
+                'page': page,
+                'page_size': page_size,
+                'total': total,
+                'pages': (total + page_size - 1) // page_size if total > 0 else 1
+            }
+        })
+    
+    except Exception as e:
+        logger.error(f"Admin vocabulary list error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_vocabulary_stats(request):
+    """Get vocabulary statistics for admin"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        today = timezone.now().date()
+        last7 = today - timedelta(days=7)
+        last30 = today - timedelta(days=30)
+        
+        # Overall stats
+        total_words = VocabularyWord.objects.count()
+        unique_users = VocabularyWord.objects.values('user_id').distinct().count()
+        avg_mastery = VocabularyWord.objects.aggregate(
+            avg=Avg('mastery_level')
+        )['avg'] or 0
+        total_practiced = VocabularyWord.objects.aggregate(
+            total=Sum('times_practiced')
+        )['total'] or 0
+        total_correct = VocabularyWord.objects.aggregate(
+            total=Sum('times_correct')
+        )['total'] or 0
+        
+        # Recent stats
+        words_last_7 = VocabularyWord.objects.filter(last_practiced__date__gte=last7).count()
+        words_last_30 = VocabularyWord.objects.filter(last_practiced__date__gte=last30).count()
+        new_words_7 = VocabularyWord.objects.filter(first_learned__date__gte=last7).count()
+        new_words_30 = VocabularyWord.objects.filter(first_learned__date__gte=last30).count()
+        
+        # Active users
+        active_users_7 = VocabularyWord.objects.filter(
+            last_practiced__date__gte=last7
+        ).values('user_id').distinct().count()
+        active_users_30 = VocabularyWord.objects.filter(
+            last_practiced__date__gte=last30
+        ).values('user_id').distinct().count()
+        
+        # Category distribution
+        category_distribution = VocabularyWord.objects.values('category').annotate(
+            count=Count('id'),
+            avg_mastery=Avg('mastery_level'),
+            total_practiced=Sum('times_practiced')
+        ).order_by('-count')[:10]
+        
+        # Difficulty distribution
+        difficulty_distribution = VocabularyWord.objects.values('difficulty').annotate(
+            count=Count('id'),
+            avg_mastery=Avg('mastery_level')
+        ).order_by('difficulty')
+        
+        # Mastery level distribution
+        mastery_distribution = [
+            {'range': '0-25%', 'count': VocabularyWord.objects.filter(mastery_level__lt=25).count()},
+            {'range': '25-50%', 'count': VocabularyWord.objects.filter(mastery_level__gte=25, mastery_level__lt=50).count()},
+            {'range': '50-75%', 'count': VocabularyWord.objects.filter(mastery_level__gte=50, mastery_level__lt=75).count()},
+            {'range': '75-100%', 'count': VocabularyWord.objects.filter(mastery_level__gte=75).count()},
+        ]
+        
+        # Top words by practice count
+        top_words = VocabularyWord.objects.order_by('-times_practiced')[:10]
+        top_words_data = [{
+            'id': word.id,
+            'word': word.word,
+            'user': word.user.username,
+            'times_practiced': word.times_practiced,
+            'mastery_level': word.mastery_level
+        } for word in top_words]
+        
+        # Daily stats for last 30 days
+        daily_stats = []
+        for i in range(30):
+            date = last30 + timedelta(days=i)
+            day_words = VocabularyWord.objects.filter(last_practiced__date=date)
+            daily_stats.append({
+                'date': date.isoformat(),
+                'words_practiced': day_words.count(),
+                'new_words': VocabularyWord.objects.filter(first_learned__date=date).count(),
+                'active_users': day_words.values('user_id').distinct().count()
+            })
+        
+        accuracy_rate = (total_correct / total_practiced * 100) if total_practiced > 0 else 0
+        
+        return Response({
+            'overall': {
+                'total_words': total_words,
+                'unique_users': unique_users,
+                'avg_mastery': round(avg_mastery, 2),
+                'total_practiced': total_practiced,
+                'total_correct': total_correct,
+                'accuracy_rate': round(accuracy_rate, 2)
+            },
+            'recent': {
+                'words_practiced_7': words_last_7,
+                'words_practiced_30': words_last_30,
+                'new_words_7': new_words_7,
+                'new_words_30': new_words_30,
+                'active_users_7': active_users_7,
+                'active_users_30': active_users_30
+            },
+            'category_distribution': list(category_distribution),
+            'difficulty_distribution': list(difficulty_distribution),
+            'mastery_distribution': mastery_distribution,
+            'top_words': top_words_data,
+            'daily_stats': daily_stats
+        })
+    
+    except Exception as e:
+        logger.error(f"Admin vocabulary stats error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_vocabulary_detail(request, word_id):
+    """Get detailed information about a specific vocabulary word"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        word = VocabularyWord.objects.select_related('user').get(id=word_id)
+        serializer = VocabularyWordSerializer(word)
+        
+        result = serializer.data
+        result['user'] = {
+            'id': word.user.id,
+            'username': word.user.username,
+            'email': word.user.email,
+            'name': f"{word.user.first_name} {word.user.last_name}".strip() or word.user.username,
+            'first_name': word.user.first_name,
+            'last_name': word.user.last_name,
+            'date_joined': word.user.date_joined.isoformat() if word.user.date_joined else None
+        }
+        
+        # Calculate accuracy
+        accuracy = (word.times_correct / word.times_practiced * 100) if word.times_practiced > 0 else 0
+        result['accuracy'] = round(accuracy, 2)
+        
+        return Response(result)
+    
+    except VocabularyWord.DoesNotExist:
+        return Response({
+            "message": "Vocabulary word not found"
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        logger.error(f"Admin vocabulary detail error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# ============= Admin Achievements Management =============
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_achievements_list(request):
+    """Get list of achievements for admin management"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        search = request.query_params.get('search', '')
+        page = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('page_size', 20))
+        category = request.query_params.get('category', '')
+        tier = request.query_params.get('tier', '')
+        is_active = request.query_params.get('is_active', '')
+        
+        queryset = Achievement.objects.all()
+        
+        if search:
+            queryset = queryset.filter(
+                Q(title__icontains=search) |
+                Q(description__icontains=search) |
+                Q(achievement_id__icontains=search)
+            )
+        
+        if category:
+            queryset = queryset.filter(category=category)
+        
+        if tier:
+            queryset = queryset.filter(tier=tier)
+        
+        if is_active:
+            if is_active.lower() == 'true':
+                queryset = queryset.filter(is_active=True)
+            elif is_active.lower() == 'false':
+                queryset = queryset.filter(is_active=False)
+        
+        # Count total before pagination
+        total = queryset.count()
+        
+        # Pagination
+        start = (page - 1) * page_size
+        end = start + page_size
+        achievements = queryset.order_by('-created_at')[start:end]
+        
+        serializer = AchievementSerializer(achievements, many=True)
+        
+        # Get user achievement counts for each achievement
+        achievements_data = []
+        serializer_data = serializer.data
+        for idx, achievement in enumerate(achievements):
+            ach_data = serializer_data[idx].copy()
+            
+            # Count users who unlocked this achievement
+            unlocked_count = UserAchievement.objects.filter(
+                achievement=achievement,
+                unlocked=True
+            ).count()
+            
+            # Count total users with this achievement (including in progress)
+            total_users = UserAchievement.objects.filter(
+                achievement=achievement
+            ).count()
+            
+            ach_data['unlocked_count'] = unlocked_count
+            ach_data['total_users'] = total_users
+            achievements_data.append(ach_data)
+        
+        return Response({
+            'achievements': achievements_data,
+            'pagination': {
+                'page': page,
+                'page_size': page_size,
+                'total': total,
+                'pages': (total + page_size - 1) // page_size
+            }
+        })
+    
+    except Exception as e:
+        logger.error(f"Admin achievements list error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_achievements_stats(request):
+    """Get achievement statistics for admin dashboard"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        total_achievements = Achievement.objects.count()
+        active_achievements = Achievement.objects.filter(is_active=True).count()
+        inactive_achievements = Achievement.objects.filter(is_active=False).count()
+        
+        # Category distribution
+        category_distribution = Achievement.objects.values('category').annotate(
+            count=Count('id')
+        ).order_by('category')
+        
+        # Tier distribution
+        tier_distribution = Achievement.objects.values('tier').annotate(
+            count=Count('id')
+        ).order_by('tier')
+        
+        # Total unlocked achievements across all users
+        total_unlocked = UserAchievement.objects.filter(unlocked=True).count()
+        
+        # Users who have unlocked at least one achievement
+        users_with_achievements = UserAchievement.objects.filter(unlocked=True).values('user_id').distinct().count()
+        total_users = User.objects.count()
+        
+        # Most unlocked achievements
+        top_achievements = UserAchievement.objects.filter(unlocked=True).values(
+            'achievement__id',
+            'achievement__title',
+            'achievement__category',
+            'achievement__tier'
+        ).annotate(
+            count=Count('id')
+        ).order_by('-count')[:10]
+        
+        # Recent unlocks (last 30 days)
+        last_30_days = timezone.now() - timedelta(days=30)
+        recent_unlocks = UserAchievement.objects.filter(
+            unlocked=True,
+            unlocked_at__gte=last_30_days
+        ).count()
+        
+        # Unlocks in last 7 days
+        last_7_days = timezone.now() - timedelta(days=7)
+        recent_unlocks_7 = UserAchievement.objects.filter(
+            unlocked=True,
+            unlocked_at__gte=last_7_days
+        ).count()
+        
+        return Response({
+            'total_achievements': total_achievements,
+            'active_achievements': active_achievements,
+            'inactive_achievements': inactive_achievements,
+            'total_unlocked': total_unlocked,
+            'users_with_achievements': users_with_achievements,
+            'total_users': total_users,
+            'engagement_rate': round((users_with_achievements / total_users * 100) if total_users > 0 else 0, 2),
+            'category_distribution': list(category_distribution),
+            'tier_distribution': list(tier_distribution),
+            'top_achievements': list(top_achievements),
+            'recent_unlocks_30': recent_unlocks,
+            'recent_unlocks_7': recent_unlocks_7
+        })
+    
+    except Exception as e:
+        logger.error(f"Admin achievements stats error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def admin_achievement_detail(request, achievement_id):
+    """Get, update, or delete a specific achievement"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        achievement = Achievement.objects.get(id=achievement_id)
+    except Achievement.DoesNotExist:
+        return Response({
+            "message": "Achievement not found"
+        }, status=status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'GET':
+        serializer = AchievementSerializer(achievement)
+        
+        # Get statistics for this achievement
+        unlocked_count = UserAchievement.objects.filter(
+            achievement=achievement,
+            unlocked=True
+        ).count()
+        total_users = UserAchievement.objects.filter(achievement=achievement).count()
+        
+        result = serializer.data
+        result['unlocked_count'] = unlocked_count
+        result['total_users'] = total_users
+        
+        return Response(result)
+    
+    elif request.method == 'PUT':
+        serializer = AchievementSerializer(achievement, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    elif request.method == 'DELETE':
+        # Soft delete - set is_active to False instead of actually deleting
+        achievement.is_active = False
+        achievement.save()
+        return Response({
+            "message": "Achievement deactivated successfully"
+        })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def admin_achievement_create(request):
+    """Create a new achievement"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        serializer = AchievementSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        logger.error(f"Admin achievement create error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_user_achievements(request):
+    """Get user achievements for admin (filterable by user or achievement)"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        search = request.query_params.get('search', '')
+        page = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('page_size', 20))
+        user_id = request.query_params.get('user_id', '')
+        achievement_id = request.query_params.get('achievement_id', '')
+        unlocked = request.query_params.get('unlocked', '')
+        
+        queryset = UserAchievement.objects.select_related('user', 'achievement').all()
+        
+        if search:
+            queryset = queryset.filter(
+                Q(user__username__icontains=search) |
+                Q(user__email__icontains=search) |
+                Q(achievement__title__icontains=search)
+            )
+        
+        if user_id:
+            queryset = queryset.filter(user_id=user_id)
+        
+        if achievement_id:
+            queryset = queryset.filter(achievement_id=achievement_id)
+        
+        if unlocked:
+            if unlocked.lower() == 'true':
+                queryset = queryset.filter(unlocked=True)
+            elif unlocked.lower() == 'false':
+                queryset = queryset.filter(unlocked=False)
+        
+        # Count total before pagination
+        total = queryset.count()
+        
+        # Pagination
+        start = (page - 1) * page_size
+        end = start + page_size
+        user_achievements = queryset.order_by('-unlocked_at', '-id')[start:end]
+        
+        serializer = UserAchievementSerializer(user_achievements, many=True)
+        
+        # Enhance with user and achievement details
+        results = []
+        serializer_data = serializer.data
+        for idx, ua in enumerate(user_achievements):
+            data = serializer_data[idx].copy()
+            data['user'] = {
+                'id': ua.user.id,
+                'username': ua.user.username,
+                'email': ua.user.email,
+                'name': f"{ua.user.first_name} {ua.user.last_name}".strip() or ua.user.username,
+            }
+            results.append(data)
+        
+        return Response({
+            'user_achievements': results,
+            'pagination': {
+                'page': page,
+                'page_size': page_size,
+                'total': total,
+                'pages': (total + page_size - 1) // page_size
+            }
+        })
+    
+    except Exception as e:
+        logger.error(f"Admin user achievements error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# ============= Admin Surveys =============
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_surveys_list(request):
+    """Get list of user surveys for admin"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        search = request.query_params.get('search', '')
+        page = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('page_size', 20))
+        completed_filter = request.query_params.get('completed', '')
+        age_range = request.query_params.get('age_range', '')
+        english_level = request.query_params.get('english_level', '')
+        native_language = request.query_params.get('native_language', '')
+        date_from = request.query_params.get('date_from', '')
+        date_to = request.query_params.get('date_to', '')
+        
+        # Get ALL users with profiles (including incomplete surveys)
+        # This ensures we show all users who have started or completed surveys
+        queryset = User.objects.select_related('profile').filter(profile__isnull=False)
+        
+        # Filter by completion status
+        if completed_filter.lower() == 'true':
+            queryset = queryset.filter(profile__survey_completed_at__isnull=False)
+        elif completed_filter.lower() == 'false':
+            queryset = queryset.filter(profile__survey_completed_at__isnull=True)
+        
+        # Search filter
+        if search:
+            queryset = queryset.filter(
+                Q(username__icontains=search) |
+                Q(email__icontains=search) |
+                Q(first_name__icontains=search) |
+                Q(last_name__icontains=search) |
+                Q(profile__native_language__icontains=search)
+            )
+        
+        # Age range filter
+        if age_range:
+            queryset = queryset.filter(profile__age_range=age_range)
+        
+        # English level filter
+        if english_level:
+            queryset = queryset.filter(profile__english_level=english_level)
+        
+        # Native language filter
+        if native_language:
+            queryset = queryset.filter(profile__native_language__icontains=native_language)
+        
+        # Date filters
+        if date_from:
+            try:
+                from_date = datetime.fromisoformat(date_from.replace('Z', '+00:00'))
+                queryset = queryset.filter(profile__survey_completed_at__gte=from_date)
+            except (ValueError, AttributeError):
+                pass
+        
+        if date_to:
+            try:
+                to_date = datetime.fromisoformat(date_to.replace('Z', '+00:00'))
+                queryset = queryset.filter(profile__survey_completed_at__lte=to_date)
+            except (ValueError, AttributeError):
+                pass
+        
+        # Order by completion date (completed first, then by join date)
+        queryset = queryset.order_by('-profile__survey_completed_at', '-date_joined')
+        
+        # Pagination
+        total = queryset.count()
+        start = (page - 1) * page_size
+        end = start + page_size
+        users = queryset[start:end]
+        
+        # Build response data
+        surveys = []
+        for user in users:
+            profile = user.profile
+            surveys.append({
+                'id': user.id,
+                'user': {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                    'name': f"{user.first_name} {user.last_name}".strip() or user.username,
+                    'date_joined': user.date_joined.isoformat() if user.date_joined else None,
+                },
+                'age_range': profile.age_range,
+                'native_language': profile.native_language,
+                'english_level': profile.english_level,
+                'learning_purpose': profile.learning_purpose if profile.learning_purpose else [],
+                'interests': profile.interests if profile.interests else [],
+                'completed': profile.survey_completed_at is not None,
+                'completed_at': profile.survey_completed_at.isoformat() if profile.survey_completed_at else None,
+                'created_at': profile.created_at.isoformat() if profile.created_at else None,
+            })
+        
+        return Response({
+            'surveys': surveys,
+            'pagination': {
+                'page': page,
+                'page_size': page_size,
+                'total': total,
+                'pages': (total + page_size - 1) // page_size if total > 0 else 1
+            }
+        })
+    
+    except Exception as e:
+        logger.error(f"Admin surveys list error: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_surveys_stats(request):
+    """Get survey statistics for admin"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        today = timezone.now().date()
+        last7 = today - timedelta(days=7)
+        last30 = today - timedelta(days=30)
+        
+        # Overall stats
+        total_profiles = UserProfile.objects.count()
+        completed_surveys = UserProfile.objects.filter(survey_completed_at__isnull=False).count()
+        incomplete_surveys = total_profiles - completed_surveys
+        completion_rate = round((completed_surveys / total_profiles * 100) if total_profiles > 0 else 0, 2)
+        
+        # Recent completions
+        completed_last_7 = UserProfile.objects.filter(
+            survey_completed_at__isnull=False,
+            survey_completed_at__date__gte=last7
+        ).count()
+        completed_last_30 = UserProfile.objects.filter(
+            survey_completed_at__isnull=False,
+            survey_completed_at__date__gte=last30
+        ).count()
+        
+        # Age range distribution
+        age_distribution = {}
+        for profile in UserProfile.objects.exclude(age_range__isnull=True).exclude(age_range=''):
+            age = profile.age_range
+            age_distribution[age] = age_distribution.get(age, 0) + 1
+        
+        # English level distribution
+        level_distribution = {}
+        for profile in UserProfile.objects.exclude(english_level__isnull=True).exclude(english_level=''):
+            level = profile.english_level
+            level_distribution[level] = level_distribution.get(level, 0) + 1
+        
+        # Native language distribution (top 10)
+        language_distribution = {}
+        for profile in UserProfile.objects.exclude(native_language__isnull=True).exclude(native_language=''):
+            lang = profile.native_language
+            language_distribution[lang] = language_distribution.get(lang, 0) + 1
+        top_languages = sorted(language_distribution.items(), key=lambda x: x[1], reverse=True)[:10]
+        
+        # Learning purpose distribution
+        purpose_distribution = {}
+        for profile in UserProfile.objects.exclude(learning_purpose__isnull=True):
+            purposes = profile.learning_purpose if profile.learning_purpose else []
+            if isinstance(purposes, list):
+                for purpose in purposes:
+                    purpose_distribution[purpose] = purpose_distribution.get(purpose, 0) + 1
+        
+        return Response({
+            'overall': {
+                'total_profiles': total_profiles,
+                'completed_surveys': completed_surveys,
+                'incomplete_surveys': incomplete_surveys,
+                'completion_rate': completion_rate,
+            },
+            'recent': {
+                'completed_last_7': completed_last_7,
+                'completed_last_30': completed_last_30,
+            },
+            'age_distribution': age_distribution,
+            'level_distribution': level_distribution,
+            'language_distribution': dict(top_languages),
+            'purpose_distribution': purpose_distribution,
+        })
+    
+    except Exception as e:
+        logger.error(f"Admin surveys stats error: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_survey_detail(request, user_id):
+    """Get detailed survey information for a specific user"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        user = User.objects.select_related('profile').get(id=user_id)
+        profile = user.profile
+        
+        return Response({
+            'id': user.id,
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'name': f"{user.first_name} {user.last_name}".strip() or user.username,
+                'date_joined': user.date_joined.isoformat() if user.date_joined else None,
+                'last_login': user.last_login.isoformat() if user.last_login else None,
+                'is_active': user.is_active,
+            },
+            'survey': {
+                'age_range': profile.age_range,
+                'native_language': profile.native_language,
+                'english_level': profile.english_level,
+                'learning_purpose': profile.learning_purpose if profile.learning_purpose else [],
+                'interests': profile.interests if profile.interests else [],
+                'completed': profile.survey_completed_at is not None,
+                'completed_at': profile.survey_completed_at.isoformat() if profile.survey_completed_at else None,
+            },
+            'profile': {
+                'level': profile.level,
+                'points': profile.points,
+                'current_streak': profile.current_streak,
+                'longest_streak': profile.longest_streak,
+                'created_at': profile.created_at.isoformat() if profile.created_at else None,
+                'updated_at': profile.updated_at.isoformat() if profile.updated_at else None,
+            }
+        })
+    
+    except User.DoesNotExist:
+        return Response({
+            "message": "User not found"
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        logger.error(f"Admin survey detail error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['PUT', 'PATCH'])
+@permission_classes([IsAuthenticated])
+def admin_survey_update(request, user_id):
+    """Update survey data for a specific user (admin only)"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        user = User.objects.select_related('profile').get(id=user_id)
+        profile = user.profile
+        
+        # Update survey fields
+        data = request.data
+        if 'age_range' in data:
+            profile.age_range = data['age_range'] or None
+        if 'native_language' in data:
+            profile.native_language = data['native_language'] or None
+        if 'english_level' in data:
+            profile.english_level = data['english_level'] or None
+        if 'learning_purpose' in data:
+            profile.learning_purpose = data['learning_purpose'] if isinstance(data['learning_purpose'], list) else []
+        if 'interests' in data:
+            profile.interests = data['interests'] if isinstance(data['interests'], list) else []
+        
+        # Handle survey completion status
+        if 'mark_complete' in data:
+            if data['mark_complete']:
+                # Only mark as complete if essential fields are present
+                has_required_fields = (
+                    profile.age_range or 
+                    profile.native_language or 
+                    profile.english_level or 
+                    (profile.learning_purpose and len(profile.learning_purpose) > 0)
+                )
+                if has_required_fields:
+                    profile.survey_completed_at = timezone.now()
+                else:
+                    return Response({
+                        "message": "Cannot mark as complete. Required survey fields are missing."
+                    }, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                profile.survey_completed_at = None
+        
+        # If survey_completed_at is explicitly set
+        if 'survey_completed_at' in data:
+            if data['survey_completed_at']:
+                profile.survey_completed_at = timezone.now()
+            else:
+                profile.survey_completed_at = None
+        
+        profile.save()
+        logger.info(f"Survey updated for user {user.username} by admin {request.user.username}")
+        
+        return Response({
+            "message": "Survey updated successfully",
+            "survey": {
+                'age_range': profile.age_range,
+                'native_language': profile.native_language,
+                'english_level': profile.english_level,
+                'learning_purpose': profile.learning_purpose if profile.learning_purpose else [],
+                'interests': profile.interests if profile.interests else [],
+                'completed': profile.survey_completed_at is not None,
+                'completed_at': profile.survey_completed_at.isoformat() if profile.survey_completed_at else None,
+            }
+        })
+    
+    except User.DoesNotExist:
+        return Response({
+            "message": "User not found"
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        logger.error(f"Admin survey update error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def admin_survey_delete(request, user_id):
+    """Delete/reset survey data for a specific user (admin only)"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        user = User.objects.select_related('profile').get(id=user_id)
+        profile = user.profile
+        
+        # Reset survey fields
+        profile.age_range = None
+        profile.native_language = None
+        profile.english_level = None
+        profile.learning_purpose = []
+        profile.interests = []
+        profile.survey_completed_at = None
+        profile.save()
+        
+        # Also delete individual survey step responses
+        from .models import SurveyStepResponse
+        SurveyStepResponse.objects.filter(user=user).delete()
+        
+        logger.info(f"Survey data deleted for user {user.username} by admin {request.user.username}")
+        
+        return Response({
+            "message": "Survey data deleted successfully"
+        })
+    
+    except User.DoesNotExist:
+        return Response({
+            "message": "User not found"
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        logger.error(f"Admin survey delete error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_survey_steps(request, user_id):
+    """Get all survey step responses for a specific user (admin only)"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        user = User.objects.get(id=user_id)
+        from .models import SurveyStepResponse
+        from .serializers import SurveyStepResponseSerializer
+        
+        step_responses = SurveyStepResponse.objects.filter(user=user).order_by('step_number', '-completed_at')
+        serializer = SurveyStepResponseSerializer(step_responses, many=True)
+        
+        return Response({
+            "steps": serializer.data,
+            "total_steps": len(serializer.data)
+        })
+    
+    except User.DoesNotExist:
+        return Response({
+            "message": "User not found"
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        logger.error(f"Admin survey steps error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 # ============= Health Check =============
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -3397,22 +5053,57 @@ def health_check(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def kids_analytics(request):
-    """Accept listening analytics sessions from client.
-    For now, this endpoint stores nothing persistently; it validates payload shape and returns 201.
-    """
+    """Save kids listening analytics to MySQL database"""
     try:
         data = request.data or {}
-        # Basic validation of expected keys
-        if 'user_id' not in data or 'session_data' not in data:
+        # Accept both user_id (for backward compat) and authenticated user
+        if 'user_id' not in data and 'session_data' not in data and 'stats' not in data:
             return Response({
                 "message": "user_id and session_data are required"
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Optionally, attach request.user for server-side correlation
-        _ = request.user.id  # touch to ensure auth path exercised
-
-        # In future, persist to a model or analytics store.
-        return Response({ "ok": True }, status=status.HTTP_201_CREATED)
+        user = request.user
+        
+        # Handle both old format (session_data) and new format (stats)
+        stats = data.get('stats') or {}
+        session_data = data.get('session_data')
+        
+        # If we have session_data, save it as a practice session
+        if session_data:
+            # Calculate duration from timestamps
+            duration_minutes = 0
+            if session_data.get('startTime') and session_data.get('endTime'):
+                duration_ms = session_data.get('endTime', 0) - session_data.get('startTime', 0)
+                duration_minutes = max(1, int(duration_ms / 1000 / 60))
+            
+            # Save listening session as PracticeSession to MySQL
+            PracticeSession.objects.create(
+                user=user,
+                session_type='listening',
+                duration_minutes=duration_minutes,
+                score=session_data.get('score', 0),
+                points_earned=session_data.get('starsEarned', 0),
+                words_practiced=session_data.get('totalQuestions', 0),
+                sentences_practiced=session_data.get('correctAnswers', 0),
+                mistakes_count=max(0, session_data.get('totalQuestions', 0) - session_data.get('correctAnswers', 0)),
+                details={
+                    'storyId': session_data.get('storyId'),
+                    'storyTitle': session_data.get('storyTitle'),
+                    'firstAttemptCorrect': session_data.get('firstAttemptCorrect', 0),
+                    'totalReplays': session_data.get('totalReplays', 0),
+                    'attempts': session_data.get('attempts', [])
+                }
+            )
+            logger.info(f"Kids listening session saved to MySQL for user {user.id}")
+        
+        # If we have aggregate stats, log them (aggregated from practice sessions)
+        if stats and stats.get('totalStoriesCompleted', 0) > 0:
+            logger.info(f"Kids listening analytics stats for user {user.id}: {stats.get('totalStoriesCompleted', 0)} stories completed")
+        
+        return Response({ 
+            "ok": True,
+            "message": "Analytics saved to MySQL"
+        }, status=status.HTTP_201_CREATED)
     except Exception as e:
         logger.error(f"Kids analytics error: {str(e)}")
         return Response({

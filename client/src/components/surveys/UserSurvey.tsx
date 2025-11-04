@@ -69,7 +69,8 @@ const UserSurvey: React.FC<UserSurveyProps> = ({ isOpen, onComplete, currentStep
       ageRange: ageId,
       completedAt: new Date().toISOString()
     };
-    updateUserSurveyData(surveyData);
+    // Save step 1 (user/age) response to MySQL
+    updateUserSurveyData(surveyData, 'user', 1);
     onComplete(surveyData);
   };
 

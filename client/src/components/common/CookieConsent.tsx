@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const COOKIE_CONSENT_KEY = 'elora_cookie_consent';
 const COOKIE_PREFERENCES_KEY = 'elora_cookie_preferences';
@@ -14,6 +15,7 @@ interface CookiePreferences {
 }
 
 const CookieConsent = () => {
+  const { user, isAuthenticated } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [viewingPolicy, setViewingPolicy] = useState<'cookie' | 'privacy' | null>(null);
@@ -24,9 +26,20 @@ const CookieConsent = () => {
   });
 
   useEffect(() => {
+    // Don't show cookie consent if user is authenticated/registered/logged in
+    if (user || isAuthenticated) {
+      setIsVisible(false);
+      return;
+    }
+
     // Check if user has already accepted cookies
     const consent = localStorage.getItem(COOKIE_CONSENT_KEY);
-    if (!consent || consent !== 'accepted') {
+    if (consent === 'accepted') {
+      // User has accepted - don't show
+      setIsVisible(false);
+    } else {
+      // User hasn't accepted yet - show the consent banner
+      // This will keep showing on every visit until they accept
       setIsVisible(true);
     }
 
@@ -40,7 +53,7 @@ const CookieConsent = () => {
         console.error('Error parsing cookie preferences:', e);
       }
     }
-  }, []);
+  }, [user, isAuthenticated]);
 
   const handleAccept = () => {
     localStorage.setItem(COOKIE_CONSENT_KEY, 'accepted');

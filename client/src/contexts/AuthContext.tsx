@@ -300,7 +300,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const updateUserSurveyData = async (surveyData: User['surveyData']) => {
+  const updateUserSurveyData = async (surveyData: User['surveyData'], stepName?: string, stepNumber?: number) => {
     if (user) {
       const mergedSurveyData = {
         ...(user.surveyData || {}),
@@ -333,22 +333,47 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         try {
           const token = localStorage.getItem('speakbee_auth_token');
           if (token && token !== 'local-token') {
+            // Save individual step response if step info provided
+            if (stepName && stepNumber !== undefined) {
+              try {
+                await API.auth.saveSurveyStep(stepName, stepNumber, surveyData);
+                console.log(`✅ Survey step ${stepNumber} (${stepName}) saved to MySQL`);
+              } catch (error) {
+                console.warn(`⚠️ Failed to save survey step ${stepNumber} to MySQL:`, error);
+              }
+            }
+            
             // Prepare survey data for backend (map frontend field names to backend field names)
+            // Only set survey_completed_at if this is a complete survey submission
+            // Check if all required fields are present
+            const hasRequiredFields = (
+              surveyData?.ageRange || 
+              surveyData?.nativeLanguage || 
+              surveyData?.englishLevel || 
+              (surveyData?.learningPurpose && surveyData.learningPurpose.length > 0)
+            );
+            
             const profileUpdateData: any = {
               age_range: surveyData?.ageRange || null,
               native_language: surveyData?.nativeLanguage || null,
               english_level: surveyData?.englishLevel || null,
               learning_purpose: surveyData?.learningPurpose || [],
               interests: surveyData?.interests || [],
-              survey_completed_at: new Date().toISOString()
             };
+            
+            // Only set survey_completed_at if we have required survey data
+            // This prevents marking incomplete surveys as completed
+            if (hasRequiredFields) {
+              profileUpdateData.survey_completed_at = new Date().toISOString();
+            }
 
             // Update profile via API
             const response = await API.auth.updateProfile(profileUpdateData);
             if (response.success) {
               console.log('✅ Survey data saved to backend');
             } else {
-              console.warn('⚠️ Failed to save survey data to backend:', response.message);
+              const errorMessage = (response as any).message || 'Unknown error';
+              console.warn('⚠️ Failed to save survey data to backend:', errorMessage);
             }
           }
         } catch (error) {

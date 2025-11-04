@@ -40,7 +40,8 @@ const LanguageSurvey: React.FC<LanguageSurveyProps> = ({ isOpen, onComplete, onB
       nativeLanguage: selectedLanguage,
       completedAt: new Date().toISOString()
     };
-    updateUserSurveyData(surveyData);
+    // Save step 2 (language) response to MySQL
+    updateUserSurveyData(surveyData, 'language', 2);
     onComplete(surveyData);
   };
 

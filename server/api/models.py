@@ -81,6 +81,26 @@ class UserProfile(models.Model):
         return f"Profile: {self.user.username} (Level: {self.level})"
 
 
+# ============= Survey Step Tracking =============
+class SurveyStepResponse(models.Model):
+    """Track individual survey step responses for each user"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='survey_step_responses')
+    step_name = models.CharField(max_length=50)  # 'user', 'language', 'learningPurpose', 'interests', etc.
+    step_number = models.IntegerField()  # Step order (1, 2, 3, etc.)
+    response_data = models.JSONField(default=dict)  # Store the actual response for this step
+    completed_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['user', 'step_number', '-completed_at']
+        indexes = [
+            models.Index(fields=['user', 'step_name']),
+            models.Index(fields=['user', 'step_number']),
+        ]
+    
+    def __str__(self):
+        return f"{self.user.username} - Step {self.step_number} ({self.step_name}) - {self.completed_at.date()}"
+
+
 # ============= Learning Content =============
 class Lesson(models.Model):
     """Generic lesson model for all learning paths"""

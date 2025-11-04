@@ -695,7 +695,572 @@ export const AdminAPI = {
         error: error
       };
     }
-  }
+  },
+
+  /**
+   * Get list of practice sessions for admin
+   */
+  getPracticeSessions: async (params?: {
+    search?: string;
+    page?: number;
+    page_size?: number;
+    session_type?: string;
+    user_id?: string;
+    date_from?: string;
+    date_to?: string;
+  }) => {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.search) queryParams.append('search', params.search);
+      if (params?.page) queryParams.append('page', params.page.toString());
+      if (params?.page_size) queryParams.append('page_size', params.page_size.toString());
+      if (params?.session_type) queryParams.append('session_type', params.session_type);
+      if (params?.user_id) queryParams.append('user_id', params.user_id);
+      if (params?.date_from) queryParams.append('date_from', params.date_from);
+      if (params?.date_to) queryParams.append('date_to', params.date_to);
+
+      const query = queryParams.toString() ? `?${queryParams.toString()}` : '';
+      const result = await fetchWithAuth(`admin/practice${query}`);
+      
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch practice sessions',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Get practice session statistics
+   */
+  getPracticeStats: async () => {
+    try {
+      const result = await fetchWithAuth('admin/practice/stats');
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch practice statistics',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Get detailed information about a specific practice session
+   */
+  getPracticeSession: async (sessionId: number) => {
+    try {
+      const result = await fetchWithAuth(`admin/practice/${sessionId}`);
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch practice session',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Get list of lesson progress for admin
+   */
+  getProgressRecords: async (params?: {
+    search?: string;
+    page?: number;
+    page_size?: number;
+    user_id?: string;
+    lesson_id?: string;
+    lesson_type?: string;
+    content_type?: string;
+    completed?: string;
+    date_from?: string;
+    date_to?: string;
+  }) => {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.search) queryParams.append('search', params.search);
+      if (params?.page) queryParams.append('page', params.page.toString());
+      if (params?.page_size) queryParams.append('page_size', params.page_size.toString());
+      if (params?.user_id) queryParams.append('user_id', params.user_id);
+      if (params?.lesson_id) queryParams.append('lesson_id', params.lesson_id);
+      if (params?.lesson_type) queryParams.append('lesson_type', params.lesson_type);
+      if (params?.content_type) queryParams.append('content_type', params.content_type);
+      if (params?.completed) queryParams.append('completed', params.completed);
+      if (params?.date_from) queryParams.append('date_from', params.date_from);
+      if (params?.date_to) queryParams.append('date_to', params.date_to);
+
+      const query = queryParams.toString() ? `?${queryParams.toString()}` : '';
+      const result = await fetchWithAuth(`admin/progress${query}`);
+      
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch progress records',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Get progress statistics
+   */
+  getProgressStats: async () => {
+    try {
+      const result = await fetchWithAuth('admin/progress/stats');
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch progress statistics',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Get detailed information about a specific progress record
+   */
+  getProgressRecord: async (progressId: number) => {
+    try {
+      const result = await fetchWithAuth(`admin/progress/${progressId}`);
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch progress record',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Get list of vocabulary words for admin
+   */
+  getVocabularyWords: async (params?: {
+    search?: string;
+    page?: number;
+    page_size?: number;
+    user_id?: string;
+    category?: string;
+    difficulty?: string;
+    mastery_min?: string;
+    mastery_max?: string;
+    date_from?: string;
+    date_to?: string;
+  }) => {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.search) queryParams.append('search', params.search);
+      if (params?.page) queryParams.append('page', params.page.toString());
+      if (params?.page_size) queryParams.append('page_size', params.page_size.toString());
+      if (params?.user_id) queryParams.append('user_id', params.user_id);
+      if (params?.category) queryParams.append('category', params.category);
+      if (params?.difficulty) queryParams.append('difficulty', params.difficulty);
+      if (params?.mastery_min) queryParams.append('mastery_min', params.mastery_min);
+      if (params?.mastery_max) queryParams.append('mastery_max', params.mastery_max);
+      if (params?.date_from) queryParams.append('date_from', params.date_from);
+      if (params?.date_to) queryParams.append('date_to', params.date_to);
+
+      const query = queryParams.toString() ? `?${queryParams.toString()}` : '';
+      const result = await fetchWithAuth(`admin/vocabulary${query}`);
+      
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch vocabulary words',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Get vocabulary statistics
+   */
+  getVocabularyStats: async () => {
+    try {
+      const result = await fetchWithAuth('admin/vocabulary/stats');
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch vocabulary statistics',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Get detailed information about a specific vocabulary word
+   */
+  getVocabularyWord: async (wordId: number) => {
+    try {
+      const result = await fetchWithAuth(`admin/vocabulary/${wordId}`);
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch vocabulary word',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Get list of achievements for admin
+   */
+  getAchievements: async (params?: {
+    search?: string;
+    page?: number;
+    page_size?: number;
+    category?: string;
+    tier?: string;
+    is_active?: string;
+  }) => {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.search) queryParams.append('search', params.search);
+      if (params?.page) queryParams.append('page', params.page.toString());
+      if (params?.page_size) queryParams.append('page_size', params.page_size.toString());
+      if (params?.category) queryParams.append('category', params.category);
+      if (params?.tier) queryParams.append('tier', params.tier);
+      if (params?.is_active) queryParams.append('is_active', params.is_active);
+
+      const query = queryParams.toString() ? `?${queryParams.toString()}` : '';
+      const result = await fetchWithAuth(`admin/achievements${query}`);
+      
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch achievements',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Get achievement statistics
+   */
+  getAchievementsStats: async () => {
+    try {
+      const result = await fetchWithAuth('admin/achievements/stats');
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch achievement statistics',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Get a specific achievement by ID
+   */
+  getAchievement: async (achievementId: number) => {
+    try {
+      const result = await fetchWithAuth(`admin/achievements/${achievementId}`);
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch achievement',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Create a new achievement
+   */
+  createAchievement: async (data: any) => {
+    try {
+      const result = await fetchWithAuth('admin/achievements/create', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to create achievement',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Update an achievement
+   */
+  updateAchievement: async (achievementId: number, data: any) => {
+    try {
+      const result = await fetchWithAuth(`admin/achievements/${achievementId}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to update achievement',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Delete (deactivate) an achievement
+   */
+  deleteAchievement: async (achievementId: number) => {
+    try {
+      const result = await fetchWithAuth(`admin/achievements/${achievementId}`, {
+        method: 'DELETE',
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to delete achievement',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Get user achievements for admin
+   */
+  getUserAchievements: async (params?: {
+    search?: string;
+    page?: number;
+    page_size?: number;
+    user_id?: string;
+    achievement_id?: string;
+    unlocked?: string;
+  }) => {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.search) queryParams.append('search', params.search);
+      if (params?.page) queryParams.append('page', params.page.toString());
+      if (params?.page_size) queryParams.append('page_size', params.page_size.toString());
+      if (params?.user_id) queryParams.append('user_id', params.user_id);
+      if (params?.achievement_id) queryParams.append('achievement_id', params.achievement_id);
+      if (params?.unlocked) queryParams.append('unlocked', params.unlocked);
+
+      const query = queryParams.toString() ? `?${queryParams.toString()}` : '';
+      const result = await fetchWithAuth(`admin/user-achievements${query}`);
+      
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch user achievements',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Get list of surveys for admin
+   */
+  getSurveys: async (params?: {
+    search?: string;
+    page?: number;
+    page_size?: number;
+    completed?: string;
+    age_range?: string;
+    english_level?: string;
+    native_language?: string;
+    date_from?: string;
+    date_to?: string;
+  }) => {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.search) queryParams.append('search', params.search);
+      if (params?.page) queryParams.append('page', params.page.toString());
+      if (params?.page_size) queryParams.append('page_size', params.page_size.toString());
+      if (params?.completed) queryParams.append('completed', params.completed);
+      if (params?.age_range) queryParams.append('age_range', params.age_range);
+      if (params?.english_level) queryParams.append('english_level', params.english_level);
+      if (params?.native_language) queryParams.append('native_language', params.native_language);
+      if (params?.date_from) queryParams.append('date_from', params.date_from);
+      if (params?.date_to) queryParams.append('date_to', params.date_to);
+
+      const query = queryParams.toString() ? `?${queryParams.toString()}` : '';
+      const result = await fetchWithAuth(`admin/surveys${query}`);
+      
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch surveys',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Get survey statistics
+   */
+  getSurveysStats: async () => {
+    try {
+      const result = await fetchWithAuth('admin/surveys/stats');
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch survey statistics',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Get detailed information about a specific survey
+   */
+  getSurveyDetail: async (userId: number) => {
+    try {
+      const result = await fetchWithAuth(`admin/surveys/${userId}`);
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch survey details',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Update survey data for a specific user
+   */
+  updateSurvey: async (userId: number, surveyData: {
+    age_range?: string | null;
+    native_language?: string | null;
+    english_level?: string | null;
+    learning_purpose?: string[];
+    interests?: string[];
+    mark_complete?: boolean;
+    survey_completed_at?: boolean | null;
+  }) => {
+    try {
+      const result = await fetchWithAuth(`admin/surveys/${userId}/update`, {
+        method: 'PUT',
+        body: JSON.stringify(surveyData),
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to update survey',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Delete/reset survey data for a specific user
+   */
+  deleteSurvey: async (userId: number) => {
+    try {
+      const result = await fetchWithAuth(`admin/surveys/${userId}/delete`, {
+        method: 'DELETE',
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to delete survey',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Get all survey step responses for a specific user
+   */
+  getSurveySteps: async (userId: number) => {
+    try {
+      const result = await fetchWithAuth(`admin/surveys/${userId}/steps`);
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch survey steps',
+        error: error
+      };
+    }
+  },
 };
 
 export default AdminAPI;
