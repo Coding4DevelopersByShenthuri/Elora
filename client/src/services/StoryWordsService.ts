@@ -136,6 +136,107 @@ export class StoryWordsService {
       { word: 'roar', hint: '🦁 Say: ROR', emoji: '🦁', storyId: 'jungle-explorer', storyTitle: 'Jungle Explorer Adventure', difficulty: 'easy', category: 'sounds' },
       { word: 'adventure', hint: '🗺️ Say: ad-VEN-chur', emoji: '🗺️', storyId: 'jungle-explorer', storyTitle: 'Jungle Explorer Adventure', difficulty: 'medium', category: 'actions' },
       { word: 'brave', hint: '🦅 Say: BRAVE', emoji: '🦅', storyId: 'jungle-explorer', storyTitle: 'Jungle Explorer Adventure', difficulty: 'easy', category: 'descriptions' }
+    ],
+    // Teen stories vocabulary
+    'mystery-detective': [
+      { word: 'investigate', hint: '🔍 Say: in-VES-ti-gate', emoji: '🔍', storyId: 'mystery-detective', storyTitle: 'Mystery Detective', difficulty: 'hard', category: 'actions' },
+      { word: 'evidence', hint: '📋 Say: EV-i-dens', emoji: '📋', storyId: 'mystery-detective', storyTitle: 'Mystery Detective', difficulty: 'hard', category: 'concepts' },
+      { word: 'detective', hint: '🕵️ Say: de-TEK-tiv', emoji: '🕵️', storyId: 'mystery-detective', storyTitle: 'Mystery Detective', difficulty: 'medium', category: 'professions' },
+      { word: 'mystery', hint: '❓ Say: MIS-ter-ee', emoji: '❓', storyId: 'mystery-detective', storyTitle: 'Mystery Detective', difficulty: 'medium', category: 'concepts' },
+      { word: 'analyze', hint: '🧠 Say: AN-a-lyz', emoji: '🧠', storyId: 'mystery-detective', storyTitle: 'Mystery Detective', difficulty: 'hard', category: 'actions' },
+      { word: 'clue', hint: '🔎 Say: KLOO', emoji: '🔎', storyId: 'mystery-detective', storyTitle: 'Mystery Detective', difficulty: 'easy', category: 'concepts' },
+      { word: 'suspect', hint: '👤 Say: sus-PEKT', emoji: '👤', storyId: 'mystery-detective', storyTitle: 'Mystery Detective', difficulty: 'medium', category: 'concepts' },
+      { word: 'deduction', hint: '💭 Say: de-DUK-shun', emoji: '💭', storyId: 'mystery-detective', storyTitle: 'Mystery Detective', difficulty: 'hard', category: 'concepts' }
+    ],
+    'space-explorer-teen': [
+      { word: 'astronaut', hint: '👨‍🚀 Say: AS-tro-not', emoji: '👨‍🚀', storyId: 'space-explorer-teen', storyTitle: 'Space Explorer', difficulty: 'medium', category: 'professions' },
+      { word: 'galaxy', hint: '🌌 Say: GAL-ax-ee', emoji: '🌌', storyId: 'space-explorer-teen', storyTitle: 'Space Explorer', difficulty: 'medium', category: 'space' },
+      { word: 'mission', hint: '🎯 Say: MISH-un', emoji: '🎯', storyId: 'space-explorer-teen', storyTitle: 'Space Explorer', difficulty: 'medium', category: 'concepts' },
+      { word: 'exploration', hint: '🔭 Say: eks-plor-AY-shun', emoji: '🔭', storyId: 'space-explorer-teen', storyTitle: 'Space Explorer', difficulty: 'hard', category: 'actions' },
+      { word: 'scientific', hint: '🔬 Say: sy-en-TIF-ik', emoji: '🔬', storyId: 'space-explorer-teen', storyTitle: 'Space Explorer', difficulty: 'hard', category: 'descriptions' },
+      { word: 'discovery', hint: '🌟 Say: dis-KUV-er-ee', emoji: '🌟', storyId: 'space-explorer-teen', storyTitle: 'Space Explorer', difficulty: 'medium', category: 'concepts' },
+      { word: 'research', hint: '📊 Say: re-SURCH', emoji: '📊', storyId: 'space-explorer-teen', storyTitle: 'Space Explorer', difficulty: 'medium', category: 'actions' },
+      { word: 'navigation', hint: '🧭 Say: nav-i-GAY-shun', emoji: '🧭', storyId: 'space-explorer-teen', storyTitle: 'Space Explorer', difficulty: 'hard', category: 'actions' }
+    ],
+    'environmental-hero': [
+      { word: 'environment', hint: '🌍 Say: en-VY-ron-ment', emoji: '🌍', storyId: 'environmental-hero', storyTitle: 'Environmental Hero', difficulty: 'medium', category: 'concepts' },
+      { word: 'sustainability', hint: '♻️ Say: sus-tain-a-BIL-i-ty', emoji: '♻️', storyId: 'environmental-hero', storyTitle: 'Environmental Hero', difficulty: 'hard', category: 'concepts' },
+      { word: 'climate', hint: '🌡️ Say: KLY-mit', emoji: '🌡️', storyId: 'environmental-hero', storyTitle: 'Environmental Hero', difficulty: 'medium', category: 'nature' },
+      { word: 'conservation', hint: '🌳 Say: kon-ser-VAY-shun', emoji: '🌳', storyId: 'environmental-hero', storyTitle: 'Environmental Hero', difficulty: 'hard', category: 'actions' },
+      { word: 'renewable', hint: '⚡ Say: re-NYOO-a-bul', emoji: '⚡', storyId: 'environmental-hero', storyTitle: 'Environmental Hero', difficulty: 'hard', category: 'descriptions' },
+      { word: 'ecosystem', hint: '🌿 Say: EE-ko-sis-tem', emoji: '🌿', storyId: 'environmental-hero', storyTitle: 'Environmental Hero', difficulty: 'hard', category: 'concepts' },
+      { word: 'pollution', hint: '🏭 Say: pol-LOO-shun', emoji: '🏭', storyId: 'environmental-hero', storyTitle: 'Environmental Hero', difficulty: 'medium', category: 'concepts' },
+      { word: 'recycling', hint: '♻️ Say: re-SY-kling', emoji: '♻️', storyId: 'environmental-hero', storyTitle: 'Environmental Hero', difficulty: 'medium', category: 'actions' }
+    ],
+    'tech-innovator': [
+      { word: 'technology', hint: '💻 Say: tek-NOL-o-gy', emoji: '💻', storyId: 'tech-innovator', storyTitle: 'Tech Innovator', difficulty: 'medium', category: 'concepts' },
+      { word: 'innovation', hint: '💡 Say: in-no-VAY-shun', emoji: '💡', storyId: 'tech-innovator', storyTitle: 'Tech Innovator', difficulty: 'hard', category: 'concepts' },
+      { word: 'software', hint: '📱 Say: SOFT-wair', emoji: '📱', storyId: 'tech-innovator', storyTitle: 'Tech Innovator', difficulty: 'medium', category: 'objects' },
+      { word: 'algorithm', hint: '⚙️ Say: AL-go-rith-um', emoji: '⚙️', storyId: 'tech-innovator', storyTitle: 'Tech Innovator', difficulty: 'hard', category: 'concepts' },
+      { word: 'digital', hint: '💾 Say: DIJ-i-tal', emoji: '💾', storyId: 'tech-innovator', storyTitle: 'Tech Innovator', difficulty: 'medium', category: 'descriptions' },
+      { word: 'programming', hint: '⌨️ Say: PRO-gram-ing', emoji: '⌨️', storyId: 'tech-innovator', storyTitle: 'Tech Innovator', difficulty: 'hard', category: 'actions' },
+      { word: 'application', hint: '📲 Say: ap-li-KAY-shun', emoji: '📲', storyId: 'tech-innovator', storyTitle: 'Tech Innovator', difficulty: 'hard', category: 'objects' },
+      { word: 'development', hint: '🚀 Say: de-VEL-op-ment', emoji: '🚀', storyId: 'tech-innovator', storyTitle: 'Tech Innovator', difficulty: 'hard', category: 'actions' }
+    ],
+    'global-citizen': [
+      { word: 'culture', hint: '🌍 Say: KUL-chur', emoji: '🌍', storyId: 'global-citizen', storyTitle: 'Global Citizen', difficulty: 'medium', category: 'concepts' },
+      { word: 'diversity', hint: '🌈 Say: di-VUR-si-ty', emoji: '🌈', storyId: 'global-citizen', storyTitle: 'Global Citizen', difficulty: 'hard', category: 'concepts' },
+      { word: 'communication', hint: '💬 Say: com-mu-ni-KAY-shun', emoji: '💬', storyId: 'global-citizen', storyTitle: 'Global Citizen', difficulty: 'hard', category: 'actions' },
+      { word: 'globalization', hint: '🌐 Say: glo-bal-i-ZAY-shun', emoji: '🌐', storyId: 'global-citizen', storyTitle: 'Global Citizen', difficulty: 'hard', category: 'concepts' },
+      { word: 'tolerance', hint: '🤝 Say: TOL-er-ans', emoji: '🤝', storyId: 'global-citizen', storyTitle: 'Global Citizen', difficulty: 'medium', category: 'values' },
+      { word: 'perspective', hint: '👁️ Say: per-SPEK-tiv', emoji: '👁️', storyId: 'global-citizen', storyTitle: 'Global Citizen', difficulty: 'hard', category: 'concepts' },
+      { word: 'international', hint: '🌎 Say: in-ter-NASH-un-al', emoji: '🌎', storyId: 'global-citizen', storyTitle: 'Global Citizen', difficulty: 'hard', category: 'descriptions' },
+      { word: 'cooperation', hint: '🤲 Say: co-op-er-AY-shun', emoji: '🤲', storyId: 'global-citizen', storyTitle: 'Global Citizen', difficulty: 'hard', category: 'actions' }
+    ],
+    'future-leader': [
+      { word: 'leadership', hint: '👑 Say: LEE-der-ship', emoji: '👑', storyId: 'future-leader', storyTitle: 'Future Leader', difficulty: 'medium', category: 'concepts' },
+      { word: 'responsibility', hint: '⚖️ Say: re-spon-si-BIL-i-ty', emoji: '⚖️', storyId: 'future-leader', storyTitle: 'Future Leader', difficulty: 'hard', category: 'values' },
+      { word: 'decision', hint: '🎯 Say: de-SIZH-un', emoji: '🎯', storyId: 'future-leader', storyTitle: 'Future Leader', difficulty: 'medium', category: 'concepts' },
+      { word: 'influence', hint: '💪 Say: IN-floo-ens', emoji: '💪', storyId: 'future-leader', storyTitle: 'Future Leader', difficulty: 'hard', category: 'actions' },
+      { word: 'vision', hint: '👁️ Say: VIZH-un', emoji: '👁️', storyId: 'future-leader', storyTitle: 'Future Leader', difficulty: 'medium', category: 'concepts' },
+      { word: 'strategy', hint: '📊 Say: STRAT-e-jee', emoji: '📊', storyId: 'future-leader', storyTitle: 'Future Leader', difficulty: 'hard', category: 'concepts' },
+      { word: 'motivation', hint: '🔥 Say: mo-ti-VAY-shun', emoji: '🔥', storyId: 'future-leader', storyTitle: 'Future Leader', difficulty: 'hard', category: 'concepts' },
+      { word: 'empowerment', hint: '⚡ Say: em-POW-er-ment', emoji: '⚡', storyId: 'future-leader', storyTitle: 'Future Leader', difficulty: 'hard', category: 'concepts' }
+    ],
+    'scientific-discovery': [
+      { word: 'scientific', hint: '🔬 Say: sy-en-TIF-ik', emoji: '🔬', storyId: 'scientific-discovery', storyTitle: 'Scientific Discovery', difficulty: 'hard', category: 'descriptions' },
+      { word: 'hypothesis', hint: '🧪 Say: hy-POTH-e-sis', emoji: '🧪', storyId: 'scientific-discovery', storyTitle: 'Scientific Discovery', difficulty: 'hard', category: 'concepts' },
+      { word: 'experiment', hint: '⚗️ Say: eks-PER-i-ment', emoji: '⚗️', storyId: 'scientific-discovery', storyTitle: 'Scientific Discovery', difficulty: 'hard', category: 'concepts' },
+      { word: 'analysis', hint: '📈 Say: a-NAL-i-sis', emoji: '📈', storyId: 'scientific-discovery', storyTitle: 'Scientific Discovery', difficulty: 'hard', category: 'actions' },
+      { word: 'methodology', hint: '📚 Say: meth-o-DOL-o-gy', emoji: '📚', storyId: 'scientific-discovery', storyTitle: 'Scientific Discovery', difficulty: 'hard', category: 'concepts' },
+      { word: 'observation', hint: '👀 Say: ob-ser-VAY-shun', emoji: '👀', storyId: 'scientific-discovery', storyTitle: 'Scientific Discovery', difficulty: 'hard', category: 'actions' },
+      { word: 'research', hint: '📊 Say: re-SURCH', emoji: '📊', storyId: 'scientific-discovery', storyTitle: 'Scientific Discovery', difficulty: 'medium', category: 'actions' },
+      { word: 'conclusion', hint: '✅ Say: kon-KLOO-zhun', emoji: '✅', storyId: 'scientific-discovery', storyTitle: 'Scientific Discovery', difficulty: 'hard', category: 'concepts' }
+    ],
+    'social-media-expert': [
+      { word: 'digital', hint: '📱 Say: DIJ-i-tal', emoji: '📱', storyId: 'social-media-expert', storyTitle: 'Social Media Expert', difficulty: 'medium', category: 'descriptions' },
+      { word: 'platform', hint: '💻 Say: PLAT-form', emoji: '💻', storyId: 'social-media-expert', storyTitle: 'Social Media Expert', difficulty: 'medium', category: 'concepts' },
+      { word: 'network', hint: '🌐 Say: NET-work', emoji: '🌐', storyId: 'social-media-expert', storyTitle: 'Social Media Expert', difficulty: 'medium', category: 'concepts' },
+      { word: 'privacy', hint: '🔒 Say: PRY-va-see', emoji: '🔒', storyId: 'social-media-expert', storyTitle: 'Social Media Expert', difficulty: 'medium', category: 'concepts' },
+      { word: 'security', hint: '🛡️ Say: se-KYUR-i-ty', emoji: '🛡️', storyId: 'social-media-expert', storyTitle: 'Social Media Expert', difficulty: 'medium', category: 'concepts' },
+      { word: 'content', hint: '📝 Say: KON-tent', emoji: '📝', storyId: 'social-media-expert', storyTitle: 'Social Media Expert', difficulty: 'medium', category: 'concepts' },
+      { word: 'engagement', hint: '💬 Say: en-GAYJ-ment', emoji: '💬', storyId: 'social-media-expert', storyTitle: 'Social Media Expert', difficulty: 'hard', category: 'concepts' },
+      { word: 'authentic', hint: '✨ Say: aw-THEN-tik', emoji: '✨', storyId: 'social-media-expert', storyTitle: 'Social Media Expert', difficulty: 'hard', category: 'descriptions' }
+    ],
+    'ai-ethics-explorer': [
+      { word: 'artificial', hint: '🤖 Say: ar-ti-FISH-al', emoji: '🤖', storyId: 'ai-ethics-explorer', storyTitle: 'AI Ethics Explorer', difficulty: 'hard', category: 'descriptions' },
+      { word: 'intelligence', hint: '🧠 Say: in-TEL-i-jens', emoji: '🧠', storyId: 'ai-ethics-explorer', storyTitle: 'AI Ethics Explorer', difficulty: 'hard', category: 'concepts' },
+      { word: 'ethics', hint: '⚖️ Say: ETH-iks', emoji: '⚖️', storyId: 'ai-ethics-explorer', storyTitle: 'AI Ethics Explorer', difficulty: 'medium', category: 'concepts' },
+      { word: 'algorithm', hint: '⚙️ Say: AL-go-rith-um', emoji: '⚙️', storyId: 'ai-ethics-explorer', storyTitle: 'AI Ethics Explorer', difficulty: 'hard', category: 'concepts' },
+      { word: 'bias', hint: '⚡ Say: BY-us', emoji: '⚡', storyId: 'ai-ethics-explorer', storyTitle: 'AI Ethics Explorer', difficulty: 'medium', category: 'concepts' },
+      { word: 'transparency', hint: '🔍 Say: trans-PAIR-en-see', emoji: '🔍', storyId: 'ai-ethics-explorer', storyTitle: 'AI Ethics Explorer', difficulty: 'hard', category: 'concepts' },
+      { word: 'accountability', hint: '📋 Say: a-kown-ta-BIL-i-ty', emoji: '📋', storyId: 'ai-ethics-explorer', storyTitle: 'AI Ethics Explorer', difficulty: 'hard', category: 'concepts' },
+      { word: 'machine', hint: '⚙️ Say: ma-SHEEN', emoji: '⚙️', storyId: 'ai-ethics-explorer', storyTitle: 'AI Ethics Explorer', difficulty: 'medium', category: 'concepts' }
+    ],
+    'digital-security-guardian': [
+      { word: 'security', hint: '🔒 Say: se-KYUR-i-ty', emoji: '🔒', storyId: 'digital-security-guardian', storyTitle: 'Digital Security Guardian', difficulty: 'medium', category: 'concepts' },
+      { word: 'encryption', hint: '🔐 Say: en-KRIP-shun', emoji: '🔐', storyId: 'digital-security-guardian', storyTitle: 'Digital Security Guardian', difficulty: 'hard', category: 'concepts' },
+      { word: 'password', hint: '🔑 Say: PAS-wurd', emoji: '🔑', storyId: 'digital-security-guardian', storyTitle: 'Digital Security Guardian', difficulty: 'medium', category: 'objects' },
+      { word: 'authentication', hint: '🛡️ Say: aw-then-ti-KAY-shun', emoji: '🛡️', storyId: 'digital-security-guardian', storyTitle: 'Digital Security Guardian', difficulty: 'hard', category: 'concepts' },
+      { word: 'vulnerability', hint: '⚠️ Say: vul-ner-a-BIL-i-ty', emoji: '⚠️', storyId: 'digital-security-guardian', storyTitle: 'Digital Security Guardian', difficulty: 'hard', category: 'concepts' },
+      { word: 'protection', hint: '🛡️ Say: pro-TEK-shun', emoji: '🛡️', storyId: 'digital-security-guardian', storyTitle: 'Digital Security Guardian', difficulty: 'medium', category: 'actions' },
+      { word: 'cybersecurity', hint: '🔐 Say: sy-ber-se-KYUR-i-ty', emoji: '🔐', storyId: 'digital-security-guardian', storyTitle: 'Digital Security Guardian', difficulty: 'hard', category: 'concepts' },
+      { word: 'firewall', hint: '🔥🧱 Say: FYR-wawl', emoji: '🔥🧱', storyId: 'digital-security-guardian', storyTitle: 'Digital Security Guardian', difficulty: 'hard', category: 'concepts' }
     ]
   };
   
@@ -237,6 +338,67 @@ export class StoryWordsService {
       { phrase: 'Water flows from the mountain top', phonemes: '💧🏔️ Say: WAH-tur FLOZ FRUM THE MOWN-tun TOP', emoji: '💧🏔️', storyId: 'jungle-explorer', storyTitle: 'Jungle Explorer Adventure', difficulty: 'medium' },
       { phrase: 'I have lived here for many years', phonemes: '🌳⏰ Say: I HAV LIVD HERE FOR MEN-ee YEARZ', emoji: '🌳⏰', storyId: 'jungle-explorer', storyTitle: 'Jungle Explorer Adventure', difficulty: 'medium' },
       { phrase: 'Nature teaches us to be patient', phonemes: '🔍⏳ Say: NAY-chur TEE-chez US TO BE PA-shunt', emoji: '🔍⏳', storyId: 'jungle-explorer', storyTitle: 'Jungle Explorer Adventure', difficulty: 'hard' }
+    ],
+    // Teen stories phrases
+    'mystery-detective': [
+      { phrase: 'Critical thinking skills', phonemes: '🧠 Say: KRIT-i-kal THINK-ing skilz', emoji: '🧠', storyId: 'mystery-detective', storyTitle: 'Mystery Detective', difficulty: 'hard' },
+      { phrase: 'Investigate the evidence', phonemes: '🔍 Say: in-VES-ti-gate THE EV-i-dens', emoji: '🔍', storyId: 'mystery-detective', storyTitle: 'Mystery Detective', difficulty: 'hard' },
+      { phrase: 'Analyze the clues carefully', phonemes: '📋 Say: AN-a-lyz THE KLOOZ KAYR-ful-ee', emoji: '📋', storyId: 'mystery-detective', storyTitle: 'Mystery Detective', difficulty: 'hard' },
+      { phrase: 'Logical deduction process', phonemes: '💭 Say: LOJ-i-kal de-DUK-shun PRO-ses', emoji: '💭', storyId: 'mystery-detective', storyTitle: 'Mystery Detective', difficulty: 'hard' }
+    ],
+    'space-explorer-teen': [
+      { phrase: 'Scientific methodology', phonemes: '🔬 Say: sy-en-TIF-ik meth-o-DOL-o-gy', emoji: '🔬', storyId: 'space-explorer-teen', storyTitle: 'Space Explorer', difficulty: 'hard' },
+      { phrase: 'Navigate through complex missions', phonemes: '🧭 Say: NAV-i-gate THROO KOM-pleks MISH-unz', emoji: '🧭', storyId: 'space-explorer-teen', storyTitle: 'Space Explorer', difficulty: 'hard' },
+      { phrase: 'Research and discovery', phonemes: '📊 Say: re-SURCH AND dis-KUV-er-ee', emoji: '📊', storyId: 'space-explorer-teen', storyTitle: 'Space Explorer', difficulty: 'hard' },
+      { phrase: 'Interstellar exploration', phonemes: '🌟 Say: in-ter-STEL-ar eks-plor-AY-shun', emoji: '🌟', storyId: 'space-explorer-teen', storyTitle: 'Space Explorer', difficulty: 'hard' }
+    ],
+    'environmental-hero': [
+      { phrase: 'Environmental protection', phonemes: '🌍 Say: en-vy-ron-MEN-tal pro-TEK-shun', emoji: '🌍', storyId: 'environmental-hero', storyTitle: 'Environmental Hero', difficulty: 'hard' },
+      { phrase: 'Sustainable development', phonemes: '♻️ Say: sus-TAIN-a-bul de-VEL-op-ment', emoji: '♻️', storyId: 'environmental-hero', storyTitle: 'Environmental Hero', difficulty: 'hard' },
+      { phrase: 'Climate change solutions', phonemes: '🌡️ Say: KLY-mit CHAYNJ so-LOO-shunz', emoji: '🌡️', storyId: 'environmental-hero', storyTitle: 'Environmental Hero', difficulty: 'hard' },
+      { phrase: 'Renewable energy sources', phonemes: '⚡ Say: re-NYOO-a-bul EN-er-jee SOR-sez', emoji: '⚡', storyId: 'environmental-hero', storyTitle: 'Environmental Hero', difficulty: 'hard' }
+    ],
+    'tech-innovator': [
+      { phrase: 'Technological advancement', phonemes: '💻 Say: tek-no-LOJ-i-kal ad-VANS-ment', emoji: '💻', storyId: 'tech-innovator', storyTitle: 'Tech Innovator', difficulty: 'hard' },
+      { phrase: 'Innovation and creativity', phonemes: '💡 Say: in-no-VAY-shun and cree-a-TIV-i-ty', emoji: '💡', storyId: 'tech-innovator', storyTitle: 'Tech Innovator', difficulty: 'hard' },
+      { phrase: 'Digital transformation', phonemes: '📱 Say: DIJ-i-tal trans-for-MAY-shun', emoji: '📱', storyId: 'tech-innovator', storyTitle: 'Tech Innovator', difficulty: 'hard' },
+      { phrase: 'Software development process', phonemes: '⌨️ Say: SOFT-wair de-VEL-op-ment PRO-ses', emoji: '⌨️', storyId: 'tech-innovator', storyTitle: 'Tech Innovator', difficulty: 'hard' }
+    ],
+    'global-citizen': [
+      { phrase: 'Global communication', phonemes: '🌐 Say: GLO-bal com-mu-ni-KAY-shun', emoji: '🌐', storyId: 'global-citizen', storyTitle: 'Global Citizen', difficulty: 'hard' },
+      { phrase: 'Cultural diversity', phonemes: '🌍 Say: KUL-chur-al di-VUR-si-ty', emoji: '🌍', storyId: 'global-citizen', storyTitle: 'Global Citizen', difficulty: 'hard' },
+      { phrase: 'Economic globalization', phonemes: '💰 Say: ee-ko-NOM-ik glo-bal-i-ZAY-shun', emoji: '💰', storyId: 'global-citizen', storyTitle: 'Global Citizen', difficulty: 'hard' },
+      { phrase: 'International cooperation', phonemes: '🤲 Say: in-ter-NASH-un-al co-op-er-AY-shun', emoji: '🤲', storyId: 'global-citizen', storyTitle: 'Global Citizen', difficulty: 'hard' }
+    ],
+    'future-leader': [
+      { phrase: 'Professional development', phonemes: '💼 Say: pro-FESH-un-al de-VEL-op-ment', emoji: '💼', storyId: 'future-leader', storyTitle: 'Future Leader', difficulty: 'hard' },
+      { phrase: 'Leadership and responsibility', phonemes: '👑 Say: LEE-der-ship AND re-spon-si-BIL-i-ty', emoji: '👑', storyId: 'future-leader', storyTitle: 'Future Leader', difficulty: 'hard' },
+      { phrase: 'Strategic decision making', phonemes: '📊 Say: stra-TEJ-ik de-SIZH-un MAK-ing', emoji: '📊', storyId: 'future-leader', storyTitle: 'Future Leader', difficulty: 'hard' },
+      { phrase: 'Empowerment and motivation', phonemes: '⚡ Say: em-POW-er-ment AND mo-ti-VAY-shun', emoji: '⚡', storyId: 'future-leader', storyTitle: 'Future Leader', difficulty: 'hard' }
+    ],
+    'scientific-discovery': [
+      { phrase: 'Scientific methodology', phonemes: '🔬 Say: sy-en-TIF-ik meth-o-DOL-o-gy', emoji: '🔬', storyId: 'scientific-discovery', storyTitle: 'Scientific Discovery', difficulty: 'hard' },
+      { phrase: 'Hypothesis and experiment', phonemes: '🧪 Say: hy-POTH-e-sis AND eks-PER-i-ment', emoji: '🧪', storyId: 'scientific-discovery', storyTitle: 'Scientific Discovery', difficulty: 'hard' },
+      { phrase: 'Research and analysis', phonemes: '📈 Say: re-SURCH AND a-NAL-i-sis', emoji: '📈', storyId: 'scientific-discovery', storyTitle: 'Scientific Discovery', difficulty: 'hard' },
+      { phrase: 'Observation and conclusion', phonemes: '👀 Say: ob-ser-VAY-shun AND kon-KLOO-zhun', emoji: '👀', storyId: 'scientific-discovery', storyTitle: 'Scientific Discovery', difficulty: 'hard' }
+    ],
+    'social-media-expert': [
+      { phrase: 'Digital platform management', phonemes: '💻 Say: DIJ-i-tal PLAT-form MAN-ij-ment', emoji: '💻', storyId: 'social-media-expert', storyTitle: 'Social Media Expert', difficulty: 'hard' },
+      { phrase: 'Privacy and security', phonemes: '🔒 Say: PRY-va-see AND se-KYUR-i-ty', emoji: '🔒', storyId: 'social-media-expert', storyTitle: 'Social Media Expert', difficulty: 'hard' },
+      { phrase: 'Content engagement strategy', phonemes: '📝 Say: KON-tent en-GAYJ-ment STRAT-e-jee', emoji: '📝', storyId: 'social-media-expert', storyTitle: 'Social Media Expert', difficulty: 'hard' },
+      { phrase: 'Authentic communication', phonemes: '✨ Say: aw-THEN-tik com-mu-ni-KAY-shun', emoji: '✨', storyId: 'social-media-expert', storyTitle: 'Social Media Expert', difficulty: 'hard' }
+    ],
+    'ai-ethics-explorer': [
+      { phrase: 'Artificial intelligence ethics', phonemes: '🤖 Say: ar-ti-FISH-al in-TEL-i-jens ETH-iks', emoji: '🤖', storyId: 'ai-ethics-explorer', storyTitle: 'AI Ethics Explorer', difficulty: 'hard' },
+      { phrase: 'Algorithm transparency', phonemes: '⚙️ Say: AL-go-rith-um trans-PAIR-en-see', emoji: '⚙️', storyId: 'ai-ethics-explorer', storyTitle: 'AI Ethics Explorer', difficulty: 'hard' },
+      { phrase: 'Machine learning accountability', phonemes: '🧠 Say: ma-SHEEN LURN-ing a-kown-ta-BIL-i-ty', emoji: '🧠', storyId: 'ai-ethics-explorer', storyTitle: 'AI Ethics Explorer', difficulty: 'hard' },
+      { phrase: 'Bias and fairness', phonemes: '⚡ Say: BY-us AND FAIR-ness', emoji: '⚡', storyId: 'ai-ethics-explorer', storyTitle: 'AI Ethics Explorer', difficulty: 'hard' }
+    ],
+    'digital-security-guardian': [
+      { phrase: 'Cybersecurity fundamentals', phonemes: '🔐 Say: sy-ber-se-KYUR-i-ty fun-da-MEN-talz', emoji: '🔐', storyId: 'digital-security-guardian', storyTitle: 'Digital Security Guardian', difficulty: 'hard' },
+      { phrase: 'Encryption and authentication', phonemes: '🔒 Say: en-KRIP-shun AND aw-then-ti-KAY-shun', emoji: '🔒', storyId: 'digital-security-guardian', storyTitle: 'Digital Security Guardian', difficulty: 'hard' },
+      { phrase: 'Password protection strategy', phonemes: '🔑 Say: PAS-wurd pro-TEK-shun STRAT-e-jee', emoji: '🔑', storyId: 'digital-security-guardian', storyTitle: 'Digital Security Guardian', difficulty: 'hard' },
+      { phrase: 'Firewall and vulnerability management', phonemes: '🔥🧱 Say: FYR-wawl AND vul-ner-a-BIL-i-ty MAN-ij-ment', emoji: '🔥🧱', storyId: 'digital-security-guardian', storyTitle: 'Digital Security Guardian', difficulty: 'hard' }
     ]
   };
 

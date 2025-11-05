@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -81,7 +81,8 @@ const formatAIResponse = (content: string): string => {
   return formatted.trim();
 };
 
-type GameType = 'tongue-twister' | 'word-chain' | 'story-telling' | 'pronunciation-challenge' | 'conversation-practice';
+type GameType = 'tongue-twister' | 'word-chain' | 'story-telling' | 'pronunciation-challenge' | 'conversation-practice' |
+                'debate-club' | 'critical-thinking' | 'research-challenge' | 'presentation-master' | 'ethics-discussion';
 
 interface ConversationMessage {
   role: 'user' | 'assistant';
@@ -91,7 +92,8 @@ interface ConversationMessage {
   hasErrors?: boolean;
 }
 
-const gameTitles: Record<GameType, { title: string; emoji: string; description: string }> = {
+// Young kids games (ages 4-10)
+const youngGameTitles: Record<string, { title: string; emoji: string; description: string }> = {
   'tongue-twister': { title: 'Tongue Twisters', emoji: '👅', description: 'Master tricky phrases to improve pronunciation!' },
   'word-chain': { title: 'Word Chain', emoji: '🔗', description: 'Connect words by speaking them in sequence!' },
   'story-telling': { title: 'Story Telling', emoji: '📖', description: 'Create and tell your own stories with AI!' },
@@ -99,8 +101,20 @@ const gameTitles: Record<GameType, { title: string; emoji: string; description: 
   'conversation-practice': { title: 'Chat Practice', emoji: '💬', description: 'Practice real conversations with AI!' }
 };
 
+// Teen games (ages 11-17)
+const teenGameTitles: Record<string, { title: string; emoji: string; description: string }> = {
+  'debate-club': { title: 'Debate Club', emoji: '⚖️', description: 'Engage in structured debates on real-world topics! Develop critical arguments and persuasive speaking skills.' },
+  'critical-thinking': { title: 'Critical Thinking Challenge', emoji: '🧠', description: 'Solve complex problems and analyze arguments! Strengthen your logical reasoning abilities.' },
+  'research-challenge': { title: 'Research Challenge', emoji: '🔬', description: 'Present findings on advanced topics with AI feedback! Practice academic research skills.' },
+  'presentation-master': { title: 'Presentation Master', emoji: '📊', description: 'Practice professional presentations and public speaking! Build confidence for real-world scenarios.' },
+  'ethics-discussion': { title: 'Ethics Discussion', emoji: '🤔', description: 'Explore ethical dilemmas and moral reasoning! Develop thoughtful perspectives on complex issues.' },
+  'pronunciation-challenge': { title: 'Advanced Pronunciation', emoji: '🎯', description: 'Master complex phrases and professional speech! Perfect your pronunciation for academic and professional contexts.' },
+  'conversation-practice': { title: 'Professional Conversation', emoji: '💼', description: 'Practice business and academic conversations! Build confidence in professional settings.' }
+};
+
 const KidsGamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [gameScore, setGameScore] = useState(0);
   const [gameContent, setGameContent] = useState<string>('');
@@ -120,15 +134,31 @@ const KidsGamePage = () => {
   const [currentDifficulty, setCurrentDifficulty] = useState<'beginner' | 'intermediate' | 'advanced'>('beginner');
   const [gameCompleted, setGameCompleted] = useState(false);
 
+  const isTeenContext = searchParams.get('teen') === 'true';
   const currentGame = gameId as GameType;
 
-  // Validate game ID
+  // Validate game ID based on context
   useEffect(() => {
-    const validGames: GameType[] = ['tongue-twister', 'word-chain', 'story-telling', 'pronunciation-challenge', 'conversation-practice'];
-    if (!gameId || !validGames.includes(currentGame)) {
-      navigate('/kids/young?section=games');
+    const youngGames: GameType[] = ['tongue-twister', 'word-chain', 'story-telling', 'pronunciation-challenge', 'conversation-practice'];
+    const teenGames: GameType[] = ['debate-club', 'critical-thinking', 'research-challenge', 'presentation-master', 'ethics-discussion', 'pronunciation-challenge', 'conversation-practice'];
+    
+    if (!gameId) {
+      navigate(isTeenContext ? '/kids/teen?section=games' : '/kids/young?section=games');
+      return;
     }
-  }, [gameId, currentGame, navigate]);
+    
+    if (isTeenContext) {
+      // For teen context, allow teen games and shared games (pronunciation-challenge, conversation-practice)
+      if (!teenGames.includes(currentGame)) {
+        navigate('/kids/teen?section=games');
+      }
+    } else {
+      // For young context, only allow young games
+      if (!youngGames.includes(currentGame)) {
+        navigate('/kids/young?section=games');
+      }
+    }
+  }, [gameId, currentGame, navigate, isTeenContext]);
 
   // Initialize Gemini Service
   useEffect(() => {
@@ -216,10 +246,13 @@ const KidsGamePage = () => {
     setGameScore(0); // Reset game score for new game
 
     try {
+      // Use age-appropriate settings: 14 for teens (middle of 11-17), 7 for young kids
+      const playerAge = isTeenContext ? 14 : 7;
+      
       const response = await GeminiService.generateGame({
         gameType: currentGame,
         context: {
-          age: 7,
+          age: playerAge,
           level: currentDifficulty,
           completedStories: []
         }
@@ -526,11 +559,13 @@ const KidsGamePage = () => {
     }
   };
 
-  if (!currentGame || !gameTitles[currentGame]) {
+  // Get game info based on context
+  const gameTitles = isTeenContext ? teenGameTitles : youngGameTitles;
+  const gameInfo = gameTitles[currentGame];
+  
+  if (!currentGame || !gameInfo) {
     return null;
   }
-
-  const gameInfo = gameTitles[currentGame];
 
   return (
     <div className="min-h-screen pb-16 sm:pb-20 pt-24 sm:pt-32 md:pt-40 relative overflow-hidden">
@@ -576,7 +611,7 @@ const KidsGamePage = () => {
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={() => navigate('/kids/young?section=games')} 
+                  onClick={() => navigate(isTeenContext ? '/kids/teen?section=games' : '/kids/young?section=games')} 
                   className="rounded-xl text-blue-600"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
@@ -838,7 +873,7 @@ const KidsGamePage = () => {
                     </Button>
                     <Button
                       variant="outline"
-                      onClick={() => navigate('/kids/young?section=games')}
+                      onClick={() => navigate(isTeenContext ? '/kids/teen?section=games' : '/kids/young?section=games')}
                     >
                       Back to Games
                     </Button>

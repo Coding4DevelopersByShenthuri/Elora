@@ -1855,7 +1855,7 @@ const YoungKidsPage = () => {
             {vocabularyWordsToUse.length === 0 ? (
               <Card className="border-2 border-yellow-300/50 bg-yellow-50/40 dark:bg-yellow-900/10 backdrop-blur-sm shadow-lg p-6 text-center">
                 <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-3">
-                  📚 No Words Yet!
+                  No Words Yet!
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
                   Complete a story first to unlock vocabulary words from that story!
@@ -1950,7 +1950,7 @@ const YoungKidsPage = () => {
             {enrolledPhrases.length === 0 ? (
               <Card className="border-2 border-orange-300/50 bg-orange-50/40 dark:bg-orange-900/10 backdrop-blur-sm shadow-lg p-6 text-center">
                 <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-3">
-                  🎤 No Phrases Yet!
+                  No Phrases Yet!
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
                   Complete a story first to unlock pronunciation phrases from that story!

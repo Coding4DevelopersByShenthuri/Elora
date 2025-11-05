@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Trophy } from 'lucide-react';
@@ -8,10 +8,36 @@ import { useAuth } from '@/contexts/AuthContext';
 import KidsApi from '@/services/KidsApi';
 import KidsProgressService from '@/services/KidsProgressService';
 import { GeminiService } from '@/services/GeminiService';
+import StoryWordsService from '@/services/StoryWordsService';
 
-type GameType = 'tongue-twister' | 'word-chain' | 'story-telling' | 'pronunciation-challenge' | 'conversation-practice';
+type GameType = 'tongue-twister' | 'word-chain' | 'story-telling' | 'pronunciation-challenge' | 'conversation-practice' | 
+  'debate-club' | 'critical-thinking' | 'research-challenge' | 'presentation-master' | 'ethics-discussion';
 
-const InteractiveGames = () => {
+interface InteractiveGamesProps {
+  isTeenKids?: boolean;
+}
+
+const InteractiveGames = ({ isTeenKids }: InteractiveGamesProps = {}) => {
+  const location = useLocation();
+  
+  // Auto-detect if we're in teen kids context
+  const isTeenContext = isTeenKids !== undefined ? isTeenKids : 
+    location.pathname.includes('/kids/teen') || 
+    document.referrer.includes('/kids/teen') ||
+    (() => {
+      try {
+        const userId = localStorage.getItem('speakbee_current_user') 
+          ? JSON.parse(localStorage.getItem('speakbee_current_user')!).id || 'anonymous'
+          : 'anonymous';
+        const enrolledStories = StoryWordsService.getEnrolledStories(userId);
+        const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
+          'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
+          'ai-ethics-explorer', 'digital-security-guardian'];
+        return enrolledStories.some(e => teenStoryIds.includes(e.storyId));
+      } catch {
+        return false;
+      }
+    })();
   const navigate = useNavigate();
   const [gameScore, setGameScore] = useState(0);
   const { user, isAuthenticated } = useAuth();
@@ -51,9 +77,13 @@ const InteractiveGames = () => {
     loadScore();
   }, [isAuthenticated, userId]);
 
-  // Start a new game - navigate to the game page
+  // Start a new game - navigate to the game page with context
   const startGame = (gameType: GameType) => {
-    navigate(`/kids/games/${gameType}`);
+    if (isTeenContext) {
+      navigate(`/kids/games/${gameType}?teen=true`);
+    } else {
+      navigate(`/kids/games/${gameType}`);
+    }
   };
 
 
@@ -63,6 +93,7 @@ const InteractiveGames = () => {
         onSelectGame={startGame}
         totalScore={gameScore} 
         isGeminiReady={GeminiService.isReady()}
+        isTeenKids={isTeenContext}
       />
     </div>
   );
@@ -72,13 +103,16 @@ const InteractiveGames = () => {
 const GameMenu = ({ 
   onSelectGame, 
   totalScore, 
-  isGeminiReady
+  isGeminiReady,
+  isTeenKids = false
 }: { 
   onSelectGame: (game: GameType) => void; 
   totalScore: number;
   isGeminiReady: boolean;
+  isTeenKids?: boolean;
 }) => {
-  const games = [
+  // Base games for young kids
+  const youngGames = [
     {
       id: 'tongue-twister' as GameType,
       title: 'Tongue Twisters',
@@ -116,6 +150,61 @@ const GameMenu = ({
     }
   ];
 
+  // Advanced games for teen kids
+  const teenGames = [
+    {
+      id: 'debate-club' as GameType,
+      title: 'Debate Club',
+      description: 'Engage in structured debates on real-world topics!',
+      emoji: '⚖️',
+      color: 'from-indigo-400 to-purple-400'
+    },
+    {
+      id: 'critical-thinking' as GameType,
+      title: 'Critical Thinking',
+      description: 'Solve complex problems and analyze arguments!',
+      emoji: '🧠',
+      color: 'from-violet-400 to-fuchsia-400'
+    },
+    {
+      id: 'research-challenge' as GameType,
+      title: 'Research Challenge',
+      description: 'Present findings on advanced topics with AI feedback!',
+      emoji: '🔬',
+      color: 'from-cyan-400 to-blue-400'
+    },
+    {
+      id: 'presentation-master' as GameType,
+      title: 'Presentation Master',
+      description: 'Practice professional presentations and public speaking!',
+      emoji: '📊',
+      color: 'from-emerald-400 to-teal-400'
+    },
+    {
+      id: 'ethics-discussion' as GameType,
+      title: 'Ethics Discussion',
+      description: 'Explore ethical dilemmas and moral reasoning!',
+      emoji: '🤔',
+      color: 'from-rose-400 to-pink-400'
+    },
+    {
+      id: 'pronunciation-challenge' as GameType,
+      title: 'Advanced Pronunciation',
+      description: 'Master complex phrases and professional speech!',
+      emoji: '🎯',
+      color: 'from-purple-400 to-indigo-400'
+    },
+    {
+      id: 'conversation-practice' as GameType,
+      title: 'Professional Conversation',
+      description: 'Practice business and academic conversations!',
+      emoji: '💼',
+      color: 'from-orange-400 to-yellow-400'
+    }
+  ];
+
+  const games = isTeenKids ? teenGames : youngGames;
+
   return (
     <div className="space-y-4 sm:space-y-6 w-full lg:max-w-7xl xl:max-w-[1400px] mx-auto">
 
@@ -138,10 +227,10 @@ const GameMenu = ({
       {/* Game Selection */}
       <div className="text-center mb-4 sm:mb-6 px-3 sm:px-4">
         <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#118AB2] bg-clip-text text-transparent mb-2 drop-shadow-sm">
-          Choose Your AI Game!
+          {isTeenKids ? 'Choose Your Advanced Challenge!' : 'Choose Your AI Game!'}
         </h2>
         <p className="text-sm sm:text-base md:text-lg text-gray-700 dark:text-gray-300 font-medium">
-          Pick a fun game powered by AI! 🎮
+          {isTeenKids ? 'Pick an advanced challenge powered by AI! 🚀' : 'Pick a fun game powered by AI! 🎮'}
         </p>
       </div>
 

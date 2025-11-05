@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   Volume2, Star, Trophy, Play, BookOpen, 
   Mic, Award, Zap, Heart, Sparkles,
@@ -60,7 +60,9 @@ const TeenKidsPage = () => {
   const [pronunciationAttempts, setPronunciationAttempts] = useState(0);
   const [vocabularyAttempts, setVocabularyAttempts] = useState(0);
   const [enrolledWords, setEnrolledWords] = useState<Array<{ word: string; hint: string }>>([]);
+  const [enrolledStoryWordsDetailed, setEnrolledStoryWordsDetailed] = useState<Array<{ word: string; hint: string; storyId: string; storyTitle: string }>>([]);
   const [enrolledPhrases, setEnrolledPhrases] = useState<Array<{ phrase: string; phonemes: string }>>([]);
+  const [enrolledStoryPhrasesDetailed, setEnrolledStoryPhrasesDetailed] = useState<Array<{ phrase: string; phonemes: string; storyId: string; storyTitle: string }>>([]);
   const storiesPerPage = 4;
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -104,7 +106,15 @@ const TeenKidsPage = () => {
   }, [showMysteryDetective, showSpaceExplorer, showEnvironmentalHero, 
       showTechInnovator, showGlobalCitizen, showFutureLeader, showScientificDiscovery, showSocialMediaExpert, showAIEthics]);
 
-  // Sync activeCategory with URL on mount or URL change
+  // Enrolled internal story IDs, derived from enrolled words/phrases (populated after completion)
+  const enrolledInternalStoryIds = useMemo(() => {
+    const ids = new Set<string>();
+    enrolledStoryWordsDetailed.forEach(w => ids.add(w.storyId));
+    enrolledStoryPhrasesDetailed.forEach(p => ids.add(p.storyId));
+    return ids;
+  }, [enrolledStoryWordsDetailed, enrolledStoryPhrasesDetailed]);
+
+  // Sync activeCategory with URL on mount or URL change - ensure persistence
   useEffect(() => {
     const urlCategory = searchParams.get('section') || 'stories';
     if (urlCategory !== activeCategory) {
@@ -112,6 +122,15 @@ const TeenKidsPage = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
+
+  // Persist category to URL on change
+  useEffect(() => {
+    const currentSection = searchParams.get('section') || 'stories';
+    if (activeCategory !== currentSection) {
+      setSearchParams({ section: activeCategory }, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeCategory]);
 
   // Check authentication and user existence on mount
   useEffect(() => {
@@ -221,64 +240,57 @@ const TeenKidsPage = () => {
     const loadProgress = async () => {
       try {
         const token = localStorage.getItem('speakbee_auth_token');
+        let serverProgress: any = null;
+        let localProgress: any = null;
+        
+        // Try to load from server first
         if (token && token !== 'local-token') {
           try {
-            const serverProgress = await KidsApi.getProgress(token);
-            setPoints(serverProgress.points ?? 0);
-            setStreak(serverProgress.streak ?? 0);
-            const fav = (serverProgress as any)?.details?.favorites ?? [];
-            // Convert old number-based favorites to new string-based format
-            const convertedFavorites = Array.isArray(fav) ? fav.map((f: any) => {
-              if (typeof f === 'number') {
-                return `teen-${f}`;
-              }
-              return f;
-            }) : [];
-            setFavorites(convertedFavorites);
-            
-            const details = (serverProgress as any)?.details || {};
-            const pronCount = Object.keys(details.pronunciation || {}).length;
-            const vocabCount = Object.keys(details.vocabulary || {}).length;
-            setPronunciationAttempts(pronCount);
-            setVocabularyAttempts(vocabCount);
+            serverProgress = await KidsApi.getProgress(token);
           } catch {
-            const localProgress = await KidsProgressService.get(userId);
-            setPoints(localProgress.points);
-            setStreak(localProgress.streak);
-            const fav = (localProgress as any).details?.favorites ?? [];
-            const convertedFavorites = Array.isArray(fav) ? fav.map((f: any) => {
-              if (typeof f === 'number') {
-                return `teen-${f}`;
-              }
-              return f;
-            }) : [];
-            setFavorites(convertedFavorites);
-            
-            const details = (localProgress as any).details || {};
-            const pronCount = Object.keys(details.pronunciation || {}).length;
-            const vocabCount = Object.keys(details.vocabulary || {}).length;
-            setPronunciationAttempts(pronCount);
-            setVocabularyAttempts(vocabCount);
+            // Fallback to local
           }
-        } else {
-          const localProgress = await KidsProgressService.get(userId);
-          setPoints(localProgress.points);
-          setStreak(localProgress.streak);
-          const fav = (localProgress as any).details?.favorites ?? [];
-          const convertedFavorites = Array.isArray(fav) ? fav.map((f: any) => {
-            if (typeof f === 'number') {
-              return `teen-${f}`;
-            }
-            return f;
-          }) : [];
-          setFavorites(convertedFavorites);
-          
-          const details = (localProgress as any).details || {};
-          const pronCount = Object.keys(details.pronunciation || {}).length;
-          const vocabCount = Object.keys(details.vocabulary || {}).length;
-          setPronunciationAttempts(pronCount);
-          setVocabularyAttempts(vocabCount);
         }
+        
+        // Always load local as fallback/merge source
+        try {
+          localProgress = await KidsProgressService.get(userId);
+        } catch {}
+        
+        // Merge server and local data - prefer server for points/streak, merge details
+        const mergedProgress = serverProgress || localProgress || { points: 0, streak: 0, details: {} };
+        const serverDetails = (serverProgress as any)?.details || {};
+        const localDetails = (localProgress as any)?.details || {};
+        
+        // Points: Use the maximum of server and local (to account for offline progress)
+        const serverPoints = (serverProgress as any)?.points ?? 0;
+        const localPoints = localProgress?.points ?? 0;
+        setPoints(Math.max(serverPoints, localPoints));
+        
+        // Streak: Use the maximum of server and local
+        const serverStreak = (serverProgress as any)?.streak ?? 0;
+        const localStreak = localProgress?.streak ?? 0;
+        setStreak(Math.max(serverStreak, localStreak));
+        
+        // Favorites: Merge and convert
+        const fav = (serverDetails.favorites || localDetails.favorites || []);
+        const convertedFavorites = Array.isArray(fav) ? fav.map((f: any) => {
+          if (typeof f === 'number') {
+            return `teen-${f}`;
+          }
+          return f;
+        }) : [];
+        setFavorites(convertedFavorites);
+        
+        // Merge pronunciation, vocabulary data
+        const mergedPron = { ...(localDetails.pronunciation || {}), ...(serverDetails.pronunciation || {}) };
+        const mergedVocab = { ...(localDetails.vocabulary || {}), ...(serverDetails.vocabulary || {}) };
+        
+        // Count attempts from merged data
+        const pronCount = Object.keys(mergedPron).length;
+        const vocabCount = Object.keys(mergedVocab).length;
+        setPronunciationAttempts(pronCount);
+        setVocabularyAttempts(vocabCount);
       } catch (error) {
         console.error('Error loading progress:', error);
       }
@@ -295,9 +307,62 @@ const TeenKidsPage = () => {
     }));
     setFloatingIcons(newFloatingIcons);
     
+    // Set up real-time polling for progress updates every 3 seconds
     const progressInterval = setInterval(loadProgress, 3000);
     
     return () => clearInterval(progressInterval);
+  }, [userId, isAuthenticated]);
+
+  // Load vocabulary words and phrases from enrolled TEEN stories only
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const loadVocabularyWordsAndPhrases = () => {
+      try {
+        // Define teen story IDs to filter
+        const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
+          'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
+          'ai-ethics-explorer', 'digital-security-guardian'];
+        
+        // Get words from enrolled stories and filter to only teen stories
+        const allStoryWords = StoryWordsService.getWordsFromEnrolledStories(userId);
+        const teenStoryWords = allStoryWords.filter(sw => teenStoryIds.includes(sw.storyId));
+        
+        // Save detailed for filtering
+        const detailed = teenStoryWords.map(sw => ({
+          word: sw.word,
+          hint: sw.hint,
+          storyId: sw.storyId,
+          storyTitle: sw.storyTitle
+        }));
+        setEnrolledStoryWordsDetailed(detailed);
+        const words = detailed.map(w => ({ word: w.word, hint: w.hint }));
+        console.log(`📚 Loaded ${words.length} words from enrolled teen stories (filtered from ${allStoryWords.length} total)`);
+        setEnrolledWords(words);
+
+        // Get phrases from enrolled stories and filter to only teen stories
+        const allStoryPhrases = StoryWordsService.getPhrasesFromEnrolledStories(userId);
+        const teenStoryPhrases = allStoryPhrases.filter(sp => teenStoryIds.includes(sp.storyId));
+        
+        // Save detailed for filtering
+        const detailedPhrases = teenStoryPhrases.map(sp => ({
+          phrase: sp.phrase,
+          phonemes: sp.phonemes,
+          storyId: sp.storyId,
+          storyTitle: sp.storyTitle
+        }));
+        setEnrolledStoryPhrasesDetailed(detailedPhrases);
+        const phrases = detailedPhrases.map(p => ({ phrase: p.phrase, phonemes: p.phonemes }));
+        console.log(`🎤 Loaded ${phrases.length} phrases from enrolled teen stories (filtered from ${allStoryPhrases.length} total)`);
+        setEnrolledPhrases(phrases);
+      } catch (error) {
+        console.error('Error loading vocabulary words and phrases:', error);
+        setEnrolledWords([]);
+        setEnrolledPhrases([]);
+      }
+    };
+
+    loadVocabularyWordsAndPhrases();
   }, [userId, isAuthenticated]);
 
   const categories = [
@@ -553,6 +618,23 @@ const TeenKidsPage = () => {
     { word: 'psychology', hint: '🧠 Say: sy-KOL-o-gy' }
   ];
 
+  // Helper function to map teen story type to internal StoryWordsService ID
+  const getInternalStoryId = (storyType: string): string => {
+    const mapping: Record<string, string> = {
+      'mystery': 'mystery-detective',
+      'space': 'space-explorer-teen',
+      'environment': 'environmental-hero',
+      'technology': 'tech-innovator',
+      'culture': 'global-citizen',
+      'leadership': 'future-leader',
+      'science': 'scientific-discovery',
+      'digital': 'social-media-expert',
+      'ai': 'ai-ethics-explorer',
+      'cybersecurity': 'digital-security-guardian'
+    };
+    return mapping[storyType] || storyType;
+  };
+
   const vocabularyWordsToUse = enrolledWords.length > 0 ? enrolledWords : vocabWords;
 
   const pronounceItems = [
@@ -571,6 +653,118 @@ const TeenKidsPage = () => {
     { phrase: 'Professional development', phonemes: '💼 Say: pro-FESH-un-al de-VEL-op-ment' },
     { phrase: 'Interdisciplinary approach', phonemes: '🔗 Say: in-ter-DIS-i-plin-ar-ee a-PROCH' }
   ];
+
+  const pronounceItemsToUse = enrolledPhrases.length > 0 ? enrolledPhrases : pronounceItems;
+
+  // Handle story completion - track enrollment, update points/streak, reload words/phrases
+  const handleAdventureComplete = async (storyId: string, score: number) => {
+    if (!isAuthenticated) return;
+
+    const storyIndex = allStories.findIndex(s => s.id === storyId);
+    if (storyIndex === -1) return;
+
+    // Calculate points based on score: base points from score + completion bonus
+    const basePoints = Math.round(score / 10);
+    const completionBonus = 50; // Bonus for completing the story
+    const pointsToAdd = basePoints + completionBonus;
+    
+    const newPoints = points + pointsToAdd;
+    setPoints(newPoints);
+    
+    // Update streak
+    const newStreak = streak + 1;
+    setStreak(newStreak);
+    
+    // Get story information for enrollment
+    const story = allStories[storyIndex];
+    const storyType = story.type;
+    const storyTitle = story.title;
+    
+    // Map the story type to internal StoryWordsService format
+    const internalStoryId = getInternalStoryId(storyType);
+    
+    try {
+      const token = localStorage.getItem('speakbee_auth_token');
+      const key = `story-${storyId}`;
+      
+      // Record story completion and enrollment using internal story ID
+      await KidsProgressService.recordStoryCompletion(
+        userId,
+        internalStoryId,
+        storyTitle,
+        storyType,
+        score
+      );
+      
+      // Reload vocabulary words and phrases to include data from this newly completed story
+      // Filter to only teen stories
+      const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
+        'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
+        'ai-ethics-explorer', 'digital-security-guardian'];
+      
+      const allStoryWords = StoryWordsService.getWordsFromEnrolledStories(userId);
+      const teenStoryWords = allStoryWords.filter(sw => teenStoryIds.includes(sw.storyId));
+      const detailedWords = teenStoryWords.map(sw => ({
+        word: sw.word,
+        hint: sw.hint,
+        storyId: sw.storyId,
+        storyTitle: sw.storyTitle
+      }));
+      setEnrolledStoryWordsDetailed(detailedWords);
+      const words = detailedWords.map(w => ({ word: w.word, hint: w.hint }));
+      console.log(`🎉 Story completed! Loaded ${words.length} teen words from enrolled stories (filtered from ${allStoryWords.length} total)`);
+      setEnrolledWords(words);
+
+      const allStoryPhrases = StoryWordsService.getPhrasesFromEnrolledStories(userId);
+      const teenStoryPhrases = allStoryPhrases.filter(sp => teenStoryIds.includes(sp.storyId));
+      const detailedPhrases = teenStoryPhrases.map(sp => ({
+        phrase: sp.phrase,
+        phonemes: sp.phonemes,
+        storyId: sp.storyId,
+        storyTitle: sp.storyTitle
+      }));
+      setEnrolledStoryPhrasesDetailed(detailedPhrases);
+      const phrases = detailedPhrases.map(p => ({ phrase: p.phrase, phonemes: p.phonemes }));
+      console.log(`🎉 Story completed! Loaded ${phrases.length} teen phrases from enrolled stories (filtered from ${allStoryPhrases.length} total)`);
+      setEnrolledPhrases(phrases);
+      
+      if (token && token !== 'local-token') {
+        const current = await KidsApi.getProgress(token);
+        const currentPoints = (current as any)?.points ?? 0;
+        const currentStreak = (current as any)?.streak ?? 0;
+        const details = { ...((current as any).details || {}) };
+        details.readAloud = details.readAloud || {};
+        const prev = details.readAloud[key] || { bestScore: 0, attempts: 0 };
+        details.readAloud[key] = { 
+          bestScore: Math.max(prev.bestScore, score), 
+          attempts: prev.attempts + 1 
+        };
+        await KidsApi.updateProgress(token, { 
+          points: currentPoints + pointsToAdd, 
+          streak: newStreak,
+          details 
+        });
+      } else {
+        await KidsProgressService.update(userId, (p) => {
+          const details = { ...(p as any).details };
+          details.readAloud = details.readAloud || {};
+          const prev = details.readAloud[key] || { bestScore: 0, attempts: 0 };
+          details.readAloud[key] = { 
+            bestScore: Math.max(prev.bestScore, score), 
+            attempts: prev.attempts + 1 
+          };
+          return { 
+            ...p, 
+            points: p.points + pointsToAdd, 
+            streak: newStreak,
+            details 
+          } as any;
+        });
+      }
+    } catch (error) {
+      console.error('Error updating adventure progress:', error);
+    }
+  };
 
   const handleStartLesson = async (storyId: string) => {
     if (!isAuthenticated) {
@@ -762,8 +956,7 @@ const TeenKidsPage = () => {
     
     setActiveCategory(categoryId);
     
-    // Update URL to persist the section on refresh
-    setSearchParams({ section: categoryId });
+    // Update URL to persist the section on refresh (already handled by useEffect above)
   };
 
   const handleAuthSuccess = () => {
@@ -1211,6 +1404,21 @@ const TeenKidsPage = () => {
                         "p-4 sm:p-6 md:p-8 relative overflow-hidden bg-gradient-to-br",
                         story.bgGradient
                       )}>
+                        {/* Enrolled Badge */}
+                        {(() => {
+                          const internalId = getInternalStoryId(story.type);
+                          const isEnrolled = enrolledInternalStoryIds.has(internalId);
+                          const storyEnrollments = StoryWordsService.getEnrolledStories(userId);
+                          const isCompleted = storyEnrollments.some(e => 
+                            e.storyId === internalId && e.completed === true && e.wordsExtracted === true
+                          );
+                          return (isEnrolled || isCompleted) ? (
+                            <div className="absolute top-2 right-2 z-20 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-lg">
+                              <CheckCircle className="w-3 h-3" />
+                              Enrolled
+                            </div>
+                          ) : null;
+                        })()}
                         <div className="absolute top-0 right-0 w-20 h-20 sm:w-32 sm:h-32 bg-white/20 dark:bg-black/20 rounded-full -mr-10 sm:-mr-16 -mt-10 sm:-mt-16"></div>
                         <div className="absolute bottom-0 left-0 w-16 h-16 sm:w-24 sm:h-24 bg-white/20 dark:bg-black/20 rounded-full -ml-8 sm:-ml-12 -mb-8 sm:-mb-12"></div>
                         <div className="relative z-10 text-center">
@@ -1349,59 +1557,107 @@ const TeenKidsPage = () => {
 
         {activeCategory === 'vocabulary' && (
           <div className="mb-8 sm:mb-10 md:mb-12 px-2 sm:px-0 mx-auto w-full lg:max-w-7xl xl:max-w-[1400px]">
-            <div>
-              <Card className="border-2 border-purple-300/50 bg-purple-50/40 dark:bg-purple-900/10 backdrop-blur-sm shadow-lg p-4 mb-4">
-                <div className="flex items-center gap-3">
-                  <Brain className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                  <div>
-                    <h3 className="font-bold text-gray-800 dark:text-white">
-                      Advanced Vocabulary Building
-                    </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                      {vocabularyWordsToUse.length} advanced words for real-world communication
-                    </p>
+            {enrolledWords.length > 0 ? (
+              <div>
+                <Card className="border-2 border-purple-300/50 bg-purple-50/40 dark:bg-purple-900/10 backdrop-blur-sm shadow-lg p-4 mb-4">
+                  <div className="flex items-center gap-3">
+                    <Brain className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                    <div>
+                      <h3 className="font-bold text-gray-800 dark:text-white">
+                        Advanced Vocabulary Building
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                        {vocabularyWordsToUse.length} advanced words from your enrolled teen stories
+                      </p>
+                    </div>
                   </div>
+                </Card>
+                <Vocabulary 
+                  words={vocabularyWordsToUse} 
+                  onWordPracticed={() => {
+                    setVocabularyAttempts(prev => prev + 1);
+                  }}
+                />
+              </div>
+            ) : (
+              <Card className="border-2 border-purple-300/50 bg-purple-50/40 dark:bg-purple-900/10 backdrop-blur-sm shadow-lg p-8 sm:p-12 text-center">
+                <div className="flex flex-col items-center gap-4">
+                  <Brain className="w-16 h-16 sm:w-20 sm:h-20 text-purple-600 dark:text-purple-400 animate-pulse" />
+                  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">
+                    No Vocabulary Words Yet
+                  </h3>
+                  <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-300 max-w-2xl">
+                    Complete teen adventure stories to unlock advanced vocabulary words from those stories! 📚
+                  </p>
+                  <Button
+                    onClick={() => {
+                      handleCategoryClick('stories');
+                      setSearchParams({ section: 'stories' }, { replace: true });
+                    }}
+                    className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white font-bold py-3 px-6 rounded-xl transition-all hover:scale-105 mt-4"
+                  >
+                    <BookOpen className="w-5 h-5 mr-2" />
+                    Explore Adventure Stories
+                  </Button>
                 </div>
               </Card>
-              <Vocabulary 
-                words={vocabularyWordsToUse} 
-                onWordPracticed={() => {
-                  setVocabularyAttempts(prev => prev + 1);
-                }}
-              />
-            </div>
+            )}
           </div>
         )}
         
         {activeCategory === 'pronunciation' && (
           <div className="mb-8 sm:mb-10 md:mb-12 px-2 sm:px-0 mx-auto w-full lg:max-w-7xl xl:max-w-[1400px]">
-            <div>
-              <Card className="border-2 border-green-300/50 bg-green-50/40 dark:bg-green-900/10 backdrop-blur-sm shadow-lg p-4 mb-4">
-                <div className="flex items-center gap-3">
-                  <Mic className="w-6 h-6 text-green-600 dark:text-green-400" />
-                  <div>
-                    <h3 className="font-bold text-gray-800 dark:text-white">
-                      Professional Speaking Practice
-                    </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                      {pronounceItems.length} advanced phrases for confident communication
-                    </p>
+            {enrolledPhrases.length > 0 ? (
+              <div>
+                <Card className="border-2 border-green-300/50 bg-green-50/40 dark:bg-green-900/10 backdrop-blur-sm shadow-lg p-4 mb-4">
+                  <div className="flex items-center gap-3">
+                    <Mic className="w-6 h-6 text-green-600 dark:text-green-400" />
+                    <div>
+                      <h3 className="font-bold text-gray-800 dark:text-white">
+                        Professional Speaking Practice
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                        {pronounceItemsToUse.length} advanced phrases from your enrolled teen stories
+                      </p>
+                    </div>
                   </div>
+                </Card>
+                <Pronunciation 
+                  items={pronounceItemsToUse}
+                  onPhrasePracticed={() => {
+                    setPronunciationAttempts(prev => prev + 1);
+                  }}
+                />
+              </div>
+            ) : (
+              <Card className="border-2 border-green-300/50 bg-green-50/40 dark:bg-green-900/10 backdrop-blur-sm shadow-lg p-8 sm:p-12 text-center">
+                <div className="flex flex-col items-center gap-4">
+                  <Mic className="w-16 h-16 sm:w-20 sm:h-20 text-green-600 dark:text-green-400 animate-pulse" />
+                  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">
+                    No Speaking Phrases Yet
+                  </h3>
+                  <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-300 max-w-2xl">
+                    Complete teen adventure stories to unlock advanced speaking phrases from those stories! 🎤
+                  </p>
+                  <Button
+                    onClick={() => {
+                      handleCategoryClick('stories');
+                      setSearchParams({ section: 'stories' }, { replace: true });
+                    }}
+                    className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white font-bold py-3 px-6 rounded-xl transition-all hover:scale-105 mt-4"
+                  >
+                    <BookOpen className="w-5 h-5 mr-2" />
+                    Explore Adventure Stories
+                  </Button>
                 </div>
               </Card>
-              <Pronunciation 
-                items={pronounceItems}
-                onPhrasePracticed={() => {
-                  setPronunciationAttempts(prev => prev + 1);
-                }}
-              />
-            </div>
+            )}
           </div>
         )}
         
         {activeCategory === 'games' && (
           <div className="mb-8 sm:mb-10 md:mb-12 px-2 sm:px-0">
-            <InteractiveGames />
+            <InteractiveGames isTeenKids={true} />
           </div>
         )}
 
@@ -1534,6 +1790,27 @@ const TeenKidsPage = () => {
             <Button 
               variant="outline" 
               className={cn(
+                "rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-3 sm:py-3 md:py-4 border-2 border-yellow-300 dark:border-yellow-600 hover:border-yellow-400 dark:hover:border-yellow-500 bg-yellow-50/40 dark:bg-yellow-900/10 hover:bg-yellow-100/60 dark:hover:bg-yellow-900/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 group text-sm sm:text-base w-full sm:w-auto sm:flex-1 sm:min-w-[160px] cursor-pointer",
+                hoveredElement === 'quick-certificates' && "scale-110 shadow-lg"
+              )}
+              onClick={() => {
+                handleElementClick('quick-certificates');
+                navigate('/certificates');
+              }}
+              onMouseEnter={() => handleElementHover('quick-certificates')}
+              onMouseLeave={() => setHoveredElement(null)}
+            >
+              <Award className={cn(
+                "w-4 h-4 sm:w-5 sm:h-5 mr-2 text-yellow-600 dark:text-yellow-400 group-hover:animate-bounce flex-shrink-0 transition-all duration-300",
+                hoveredElement === 'quick-certificates' && "animate-bounce"
+              )} />
+              <span className="font-semibold text-gray-800 dark:text-gray-500 whitespace-nowrap group-hover:text-yellow-600 dark:group-hover:text-yellow-400 transition-colors">
+                View Certificates 🏆
+              </span>
+            </Button>
+            <Button 
+              variant="outline" 
+              className={cn(
                 "rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-3 sm:py-3 md:py-4 border-2 border-purple-300 dark:border-purple-600 hover:border-purple-400 dark:hover:border-purple-500 bg-purple-50/40 dark:bg-purple-900/10 hover:bg-purple-100/60 dark:hover:bg-purple-900/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 group text-sm sm:text-base w-full sm:w-auto sm:flex-1 sm:min-w-[160px] cursor-pointer",
                 hoveredElement === 'quick-favorites' && "scale-110 shadow-lg"
               )}
@@ -1594,121 +1871,90 @@ const TeenKidsPage = () => {
       {showMysteryDetective && (
         <MysteryDetectiveAdventure 
           onClose={() => setShowMysteryDetective(false)} 
-          onComplete={(score) => {
+          onComplete={async (score) => {
             setShowMysteryDetective(false);
-            // Handle story completion - update progress, points, etc.
-            const newPoints = points + 100;
-            const newStreak = streak + 1;
-            setPoints(newPoints);
-            setStreak(newStreak);
+            await handleAdventureComplete('teen-0', score);
           }}
         />
       )}
       {showSpaceExplorer && (
         <SpaceExplorerAdventure 
           onClose={() => setShowSpaceExplorer(false)} 
-          onComplete={(score) => {
+          onComplete={async (score) => {
             setShowSpaceExplorer(false);
-            const newPoints = points + 100;
-            const newStreak = streak + 1;
-            setPoints(newPoints);
-            setStreak(newStreak);
+            await handleAdventureComplete('teen-1', score);
           }}
         />
       )}
       {showEnvironmentalHero && (
         <EnvironmentalHeroAdventure 
           onClose={() => setShowEnvironmentalHero(false)} 
-          onComplete={(score) => {
+          onComplete={async (score) => {
             setShowEnvironmentalHero(false);
-            const newPoints = points + 100;
-            const newStreak = streak + 1;
-            setPoints(newPoints);
-            setStreak(newStreak);
+            await handleAdventureComplete('teen-2', score);
           }}
         />
       )}
       {showTechInnovator && (
         <TechInnovatorAdventure 
           onClose={() => setShowTechInnovator(false)} 
-          onComplete={(score) => {
+          onComplete={async (score) => {
             setShowTechInnovator(false);
-            const newPoints = points + 100;
-            const newStreak = streak + 1;
-            setPoints(newPoints);
-            setStreak(newStreak);
+            await handleAdventureComplete('teen-3', score);
           }}
         />
       )}
       {showGlobalCitizen && (
         <GlobalCitizenAdventure 
           onClose={() => setShowGlobalCitizen(false)} 
-          onComplete={(score) => {
+          onComplete={async (score) => {
             setShowGlobalCitizen(false);
-            const newPoints = points + 100;
-            const newStreak = streak + 1;
-            setPoints(newPoints);
-            setStreak(newStreak);
+            await handleAdventureComplete('teen-4', score);
           }}
         />
       )}
       {showFutureLeader && (
         <FutureLeaderAdventure 
           onClose={() => setShowFutureLeader(false)} 
-          onComplete={(score) => {
+          onComplete={async (score) => {
             setShowFutureLeader(false);
-            const newPoints = points + 100;
-            const newStreak = streak + 1;
-            setPoints(newPoints);
-            setStreak(newStreak);
+            await handleAdventureComplete('teen-5', score);
           }}
         />
       )}
       {showScientificDiscovery && (
         <ScientificDiscoveryAdventure 
           onClose={() => setShowScientificDiscovery(false)} 
-          onComplete={(score) => {
+          onComplete={async (score) => {
             setShowScientificDiscovery(false);
-            const newPoints = points + 100;
-            const newStreak = streak + 1;
-            setPoints(newPoints);
-            setStreak(newStreak);
+            await handleAdventureComplete('teen-6', score);
           }}
         />
       )}
       {showSocialMediaExpert && (
         <SocialMediaExpertAdventure 
           onClose={() => setShowSocialMediaExpert(false)} 
-          onComplete={(score) => {
+          onComplete={async (score) => {
             setShowSocialMediaExpert(false);
-            const newPoints = points + 100;
-            const newStreak = streak + 1;
-            setPoints(newPoints);
-            setStreak(newStreak);
+            await handleAdventureComplete('teen-7', score);
           }}
         />
       )}
       {showAIEthics && (
         <AIEthicsExplorerAdventure 
           onClose={() => setShowAIEthics(false)} 
-          onComplete={(score) => {
+          onComplete={async (score) => {
             setShowAIEthics(false);
-            const newPoints = points + 100;
-            const newStreak = streak + 1;
-            setPoints(newPoints);
-            setStreak(newStreak);
+            await handleAdventureComplete('teen-8', score);
           }}
         />
       )}
       {showDigitalSecurity && (
         <DigitalSecurityGuardianAdventure 
           onClose={() => setShowDigitalSecurity(false)} 
-          onComplete={(score) => {
+          onComplete={async (score) => {
             setShowDigitalSecurity(false);
-            const newPoints = points + 100;
-            const newStreak = streak + 1;
-            setPoints(newPoints);
-            setStreak(newStreak);
+            await handleAdventureComplete('teen-9', score);
           }}
         />
       )}

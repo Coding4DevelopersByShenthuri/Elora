@@ -1,5 +1,6 @@
 interface GeminiGameRequest {
-  gameType: 'tongue-twister' | 'word-chain' | 'story-telling' | 'pronunciation-challenge' | 'conversation-practice';
+  gameType: 'tongue-twister' | 'word-chain' | 'story-telling' | 'pronunciation-challenge' | 'conversation-practice' |
+            'debate-club' | 'critical-thinking' | 'research-challenge' | 'presentation-master' | 'ethics-discussion';
   conversationHistory?: Array<{ role: 'user' | 'assistant'; content: string }>;
   userInput?: string;
   context?: {
@@ -17,6 +18,7 @@ interface GeminiResponse {
   feedback?: string;
   points?: number;
   nextStep?: string;
+  gameEnd?: boolean;
 }
 
 class GeminiServiceClass {

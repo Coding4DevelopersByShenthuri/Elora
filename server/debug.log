@@ -30993,3 +30993,272 @@ INFO 2025-11-05 21:02:04,296 basehttp 18448 21252 "GET /api/kids/progress HTTP/1
 INFO 2025-11-05 21:02:06,344 basehttp 18448 21252 "GET /api/kids/progress HTTP/1.1" 200 739
 INFO 2025-11-05 21:02:09,347 basehttp 18448 21252 "GET /api/kids/progress HTTP/1.1" 200 739
 INFO 2025-11-05 21:02:09,520 basehttp 18448 26268 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:02:12,550 basehttp 18448 26268 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:02:15,532 basehttp 18448 26268 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:02:18,530 basehttp 18448 26268 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:02:21,549 basehttp 18448 26268 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:02:24,551 basehttp 18448 26268 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:02:27,548 basehttp 18448 26268 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:02:30,513 basehttp 18448 26268 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:02:33,529 basehttp 18448 26268 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:02:36,537 basehttp 18448 26268 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:02:39,531 basehttp 18448 26268 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:02:42,529 basehttp 18448 26268 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:02:45,534 basehttp 18448 26268 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:02:49,297 basehttp 18448 26268 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:02:52,300 basehttp 18448 26384 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:02:55,287 basehttp 18448 26384 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:03:03,450 basehttp 18448 26384 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:03:06,571 basehttp 18448 4072 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:03:09,642 basehttp 18448 13616 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-05 21:03:10,886 basehttp 18448 4072 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:03:13,910 basehttp 18448 4072 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:03:17,294 basehttp 18448 4072 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:03:20,288 basehttp 18448 4072 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:03:23,294 basehttp 18448 4072 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:03:26,300 basehttp 18448 4072 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:03:29,294 basehttp 18448 4072 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:03:32,280 basehttp 18448 4072 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:03:35,295 basehttp 18448 4072 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:03:38,283 basehttp 18448 4072 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:03:41,297 basehttp 18448 4072 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:03:43,921 basehttp 18448 4072 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:03:47,294 basehttp 18448 4072 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:03:50,294 basehttp 18448 4072 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:03:53,296 basehttp 18448 4072 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:03:56,313 basehttp 18448 4072 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:03:59,299 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:04:02,289 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:04:04,914 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:04:08,289 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:04:11,296 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:04:14,284 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:04:17,285 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:04:20,300 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:04:23,295 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:04:26,311 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:04:29,305 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:04:32,288 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:04:35,294 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:04:38,282 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:04:41,292 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:04:44,302 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:04:47,293 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:04:50,287 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:04:53,284 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:04:56,298 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:04:59,292 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:05:02,304 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:05:05,296 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:05:08,306 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:05:11,286 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:05:14,293 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:05:17,284 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:05:20,292 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:05:23,302 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:05:40,281 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:06:40,298 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:07:40,320 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:08:40,322 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:09:40,316 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:10:40,367 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:10:48,360 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:10:52,308 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:10:55,299 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:10:58,306 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:11:01,320 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:11:04,303 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:11:33,370 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:11:37,326 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:11:40,313 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:11:43,301 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:11:46,301 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:11:49,306 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:11:51,404 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:11:55,312 basehttp 18448 21240 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:12:28,647 basehttp 18448 436 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-05 21:12:38,326 basehttp 18448 436 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-05 21:13:04,377 basehttp 18448 436 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-05 21:13:08,337 basehttp 18448 436 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-05 21:13:11,330 basehttp 18448 436 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-05 21:13:25,349 basehttp 18448 436 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-05 21:13:37,311 basehttp 18448 436 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-05 21:13:52,304 basehttp 18448 436 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-05 21:14:39,317 basehttp 18448 436 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-05 21:14:48,303 basehttp 18448 436 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-05 21:15:19,618 basehttp 18448 16124 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-05 21:15:21,869 basehttp 18448 21724 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:15:25,291 basehttp 18448 21724 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:15:28,306 basehttp 18448 21724 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:15:31,299 basehttp 18448 21724 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:15:34,306 basehttp 18448 21724 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:15:37,311 basehttp 18448 21724 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:15:40,314 basehttp 18448 21724 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:16:40,316 basehttp 18448 21224 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:17:12,360 basehttp 18448 2492 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:17:16,295 basehttp 18448 2492 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:17:19,295 basehttp 18448 2492 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:17:22,294 basehttp 18448 2492 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:17:25,296 basehttp 18448 2492 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:17:26,325 basehttp 18448 2492 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:17:30,287 basehttp 18448 2492 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:17:33,311 basehttp 18448 2492 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:17:36,310 basehttp 18448 2492 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:17:39,294 basehttp 18448 2492 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:17:42,327 basehttp 18448 25244 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:17:44,320 basehttp 18448 25244 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:17:48,285 basehttp 18448 25244 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:17:51,302 basehttp 18448 25244 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:17:54,295 basehttp 18448 25244 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:17:57,291 basehttp 18448 25244 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:18:00,295 basehttp 18448 25244 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:18:40,291 basehttp 18448 25244 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:18:41,386 basehttp 18448 25244 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:18:45,792 basehttp 18448 12316 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-05 21:18:47,076 basehttp 18448 9332 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:18:50,107 basehttp 18448 9332 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:18:53,108 basehttp 18448 9332 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:18:56,119 basehttp 18448 3972 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:18:59,123 basehttp 18448 3972 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:19:02,105 basehttp 18448 3972 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:19:02,931 basehttp 18448 3972 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:19:02,933 basehttp 18448 13808 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-05 21:19:02,951 basehttp 18448 11064 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-05 21:19:05,931 basehttp 18448 11064 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:19:08,939 basehttp 18448 7356 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:19:10,861 basehttp 18448 7356 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:19:13,865 basehttp 18448 7356 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:19:16,882 basehttp 18448 2992 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:19:19,837 basehttp 18448 2992 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:19:22,840 basehttp 18448 2992 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:19:25,853 basehttp 18448 2992 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-05 21:21:42,697 basehttp 18448 13688 "OPTIONS /api/auth/register HTTP/1.1" 200 0
+INFO 2025-11-05 21:21:42,863 views 18448 13688 Registration request received for email: elora.toinfo@gmail.com
+WARNING 2025-11-05 21:21:43,144 views 18448 13688 Registration attempt with already active email: elora.toinfo@gmail.com
+WARNING 2025-11-05 21:21:43,217 log 18448 13688 Bad Request: /api/auth/register
+WARNING 2025-11-05 21:21:43,234 basehttp 18448 13688 "POST /api/auth/register HTTP/1.1" 400 122
+INFO 2025-11-05 21:21:50,559 basehttp 18448 9852 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+INFO 2025-11-05 21:21:52,416 basehttp 18448 9852 "POST /api/auth/login HTTP/1.1" 200 1144
+INFO 2025-11-05 21:22:02,853 basehttp 18448 15924 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-05 21:35:49,843 basehttp 18448 21072 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-05 21:35:49,941 basehttp 18448 25464 "OPTIONS /api/kids/gemini/game HTTP/1.1" 200 0
+INFO 2025-11-05 21:35:49,962 views 18448 25464 Gemini API key found, generating game for type: debate-club
+INFO 2025-11-05 21:35:49,965 views 18448 25464 DEBUG: user_input = ''
+INFO 2025-11-05 21:35:49,969 views 18448 25464 DEBUG: conversation_history length = 0
+INFO 2025-11-05 21:35:49,970 views 18448 25464 DEBUG: Adding user_input to payload: 'Let's play a fun English learning game together!...'
+INFO 2025-11-05 21:35:49,970 views 18448 25464 DEBUG: Total contents count: 1
+INFO 2025-11-05 21:35:49,970 views 18448 25464 DEBUG: Contents[0]: role=user, text=You are a friendly and encouraging AI teacher playing fun educational games with a 7-year-old child ...
+INFO 2025-11-05 21:35:49,978 views 18448 25464 Calling Gemini API: v1/models/gemini-2.5-flash
+INFO 2025-11-05 21:35:54,163 views 18448 18388 Gemini API key found, generating game for type: word-chain
+INFO 2025-11-05 21:35:54,163 views 18448 18388 DEBUG: user_input = ''
+INFO 2025-11-05 21:35:54,166 views 18448 18388 DEBUG: conversation_history length = 0
+INFO 2025-11-05 21:35:54,166 views 18448 18388 DEBUG: Adding user_input to payload: 'Hi! Let's play word chain! Give me a simple word to start the chain....'
+INFO 2025-11-05 21:35:54,167 views 18448 18388 DEBUG: Total contents count: 1
+INFO 2025-11-05 21:35:54,169 views 18448 18388 DEBUG: Contents[0]: role=user, text=You are a friendly and encouraging AI teacher playing fun educational games with a 7-year-old child ...
+INFO 2025-11-05 21:35:54,171 views 18448 18388 Calling Gemini API: v1/models/gemini-2.5-flash
+INFO 2025-11-05 21:35:54,946 views 18448 25464 Success with v1/models/gemini-2.5-flash
+INFO 2025-11-05 21:35:54,956 basehttp 18448 25464 "POST /api/kids/gemini/game HTTP/1.1" 200 738
+INFO 2025-11-05 21:35:59,592 views 18448 18388 Success with v1/models/gemini-2.5-flash
+INFO 2025-11-05 21:35:59,608 basehttp 18448 18388 "POST /api/kids/gemini/game HTTP/1.1" 200 365
+INFO 2025-11-05 21:36:02,496 basehttp 18448 21072 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-05 21:36:10,855 basehttp 18448 21072 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-05 21:36:24,004 views 18448 18388 Gemini API key found, generating game for type: debate-club
+INFO 2025-11-05 21:36:24,006 views 18448 18388 DEBUG: user_input = ''
+INFO 2025-11-05 21:36:24,011 views 18448 18388 DEBUG: conversation_history length = 0
+INFO 2025-11-05 21:36:24,014 views 18448 18388 DEBUG: Adding user_input to payload: 'Let's play a fun English learning game together!...'
+INFO 2025-11-05 21:36:24,018 views 18448 18388 DEBUG: Total contents count: 1
+INFO 2025-11-05 21:36:24,018 views 18448 18388 DEBUG: Contents[0]: role=user, text=You are a friendly and encouraging AI teacher playing fun educational games with a 7-year-old child ...
+INFO 2025-11-05 21:36:24,020 views 18448 18388 Calling Gemini API: v1/models/gemini-2.5-flash
+INFO 2025-11-05 21:36:24,120 basehttp 18448 21072 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-05 21:36:27,628 views 18448 18388 Success with v1/models/gemini-2.5-flash
+INFO 2025-11-05 21:36:27,633 basehttp 18448 18388 "POST /api/kids/gemini/game HTTP/1.1" 200 476
+INFO 2025-11-05 21:39:28,715 basehttp 18448 21072 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-05 21:45:28,886 basehttp 18448 25296 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-05 21:45:29,052 views 18448 20192 Gemini API key found, generating game for type: debate-club
+INFO 2025-11-05 21:45:29,058 views 18448 20192 DEBUG: user_input = ''
+INFO 2025-11-05 21:45:29,058 views 18448 20192 DEBUG: conversation_history length = 0
+INFO 2025-11-05 21:45:29,060 views 18448 20192 DEBUG: Adding user_input to payload: 'Let's play a fun English learning game together!...'
+INFO 2025-11-05 21:45:29,060 views 18448 20192 DEBUG: Total contents count: 1
+INFO 2025-11-05 21:45:29,062 views 18448 20192 DEBUG: Contents[0]: role=user, text=You are a friendly and encouraging AI teacher playing fun educational games with a 7-year-old child ...
+INFO 2025-11-05 21:45:29,063 views 18448 20192 Calling Gemini API: v1/models/gemini-2.5-flash
+INFO 2025-11-05 21:45:33,726 views 18448 20192 Success with v1/models/gemini-2.5-flash
+INFO 2025-11-05 21:45:33,735 basehttp 18448 20192 "POST /api/kids/gemini/game HTTP/1.1" 200 628
+INFO 2025-11-05 21:45:41,806 views 18448 20192 Gemini API key found, generating game for type: debate-club
+INFO 2025-11-05 21:45:41,806 views 18448 20192 DEBUG: user_input = ''
+INFO 2025-11-05 21:45:41,808 views 18448 20192 DEBUG: conversation_history length = 0
+INFO 2025-11-05 21:45:41,808 views 18448 20192 DEBUG: Adding user_input to payload: 'Let's play a fun English learning game together!...'
+INFO 2025-11-05 21:45:41,808 views 18448 20192 DEBUG: Total contents count: 1
+INFO 2025-11-05 21:45:41,808 views 18448 20192 DEBUG: Contents[0]: role=user, text=You are a friendly and encouraging AI teacher playing fun educational games with a 7-year-old child ...
+INFO 2025-11-05 21:45:41,808 views 18448 20192 Calling Gemini API: v1/models/gemini-2.5-flash
+INFO 2025-11-05 21:45:41,936 basehttp 18448 25296 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-05 21:45:46,011 basehttp 18448 25296 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-05 21:45:47,484 views 18448 20192 Success with v1/models/gemini-2.5-flash
+INFO 2025-11-05 21:45:47,497 basehttp 18448 20192 - Broken pipe from ('127.0.0.1', 53798)
+INFO 2025-11-05 21:45:54,951 views 18448 1476 Gemini API key found, generating game for type: debate-club
+INFO 2025-11-05 21:45:54,951 views 18448 1476 DEBUG: user_input = ''
+INFO 2025-11-05 21:45:54,953 views 18448 1476 DEBUG: conversation_history length = 0
+INFO 2025-11-05 21:45:54,957 views 18448 1476 DEBUG: Adding user_input to payload: 'Let's play a fun English learning game together!...'
+INFO 2025-11-05 21:45:54,958 views 18448 1476 DEBUG: Total contents count: 1
+INFO 2025-11-05 21:45:54,958 views 18448 1476 DEBUG: Contents[0]: role=user, text=You are a friendly and encouraging AI teacher playing fun educational games with a 7-year-old child ...
+INFO 2025-11-05 21:45:54,959 views 18448 1476 Calling Gemini API: v1/models/gemini-2.5-flash
+INFO 2025-11-05 21:45:55,047 basehttp 18448 25296 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-05 21:45:59,936 views 18448 1476 Success with v1/models/gemini-2.5-flash
+INFO 2025-11-05 21:45:59,946 basehttp 18448 1476 "POST /api/kids/gemini/game HTTP/1.1" 200 565
+INFO 2025-11-05 21:50:18,779 basehttp 18448 22816 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-05 21:50:18,987 views 18448 12196 Gemini API key found, generating game for type: debate-club
+INFO 2025-11-05 21:50:18,987 views 18448 12196 DEBUG: user_input = ''
+INFO 2025-11-05 21:50:18,987 views 18448 12196 DEBUG: conversation_history length = 0
+INFO 2025-11-05 21:50:18,987 views 18448 12196 DEBUG: Adding user_input to payload: 'Let's play a fun English learning game together!...'
+INFO 2025-11-05 21:50:18,987 views 18448 12196 DEBUG: Total contents count: 1
+INFO 2025-11-05 21:50:18,995 views 18448 12196 DEBUG: Contents[0]: role=user, text=You are a friendly and encouraging AI teacher playing fun educational games with a 7-year-old child ...
+INFO 2025-11-05 21:50:18,995 views 18448 12196 Calling Gemini API: v1/models/gemini-2.5-flash
+ERROR 2025-11-05 21:50:22,056 views 18448 12196 Gemini API error: 503 - {'error': {'code': 503, 'message': 'The model is overloaded. Please try again later.', 'status': 'UNAVAILABLE'}}
+ERROR 2025-11-05 21:50:22,057 views 18448 12196 Gemini API error: 503 - Unknown error
+ERROR 2025-11-05 21:50:22,057 log 18448 12196 Bad Gateway: /api/kids/gemini/game
+ERROR 2025-11-05 21:50:22,057 basehttp 18448 12196 "POST /api/kids/gemini/game HTTP/1.1" 502 118
+INFO 2025-11-05 21:50:28,351 views 18448 12196 Gemini API key found, generating game for type: debate-club
+INFO 2025-11-05 21:50:28,353 views 18448 12196 DEBUG: user_input = ''
+INFO 2025-11-05 21:50:28,353 views 18448 12196 DEBUG: conversation_history length = 0
+INFO 2025-11-05 21:50:28,355 views 18448 12196 DEBUG: Adding user_input to payload: 'Let's play a fun English learning game together!...'
+INFO 2025-11-05 21:50:28,356 views 18448 12196 DEBUG: Total contents count: 1
+INFO 2025-11-05 21:50:28,356 views 18448 12196 DEBUG: Contents[0]: role=user, text=You are a friendly and encouraging AI teacher playing fun educational games with a 7-year-old child ...
+INFO 2025-11-05 21:50:28,356 views 18448 12196 Calling Gemini API: v1/models/gemini-2.5-flash
+INFO 2025-11-05 21:50:28,471 basehttp 18448 22816 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-05 21:50:32,314 views 18448 12196 Success with v1/models/gemini-2.5-flash
+INFO 2025-11-05 21:50:32,314 basehttp 18448 12196 "POST /api/kids/gemini/game HTTP/1.1" 200 709
+INFO 2025-11-05 21:51:02,733 basehttp 18448 7572 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-05 21:51:02,969 views 18448 7400 Gemini API key found, generating game for type: critical-thinking
+INFO 2025-11-05 21:51:02,971 views 18448 7400 DEBUG: user_input = ''
+INFO 2025-11-05 21:51:02,971 views 18448 7400 DEBUG: conversation_history length = 0
+INFO 2025-11-05 21:51:02,973 views 18448 7400 DEBUG: Adding user_input to payload: 'Let's play a fun English learning game together!...'
+INFO 2025-11-05 21:51:02,973 views 18448 7400 DEBUG: Total contents count: 1
+INFO 2025-11-05 21:51:02,973 views 18448 7400 DEBUG: Contents[0]: role=user, text=You are a friendly and encouraging AI teacher playing fun educational games with a 7-year-old child ...
+INFO 2025-11-05 21:51:02,976 views 18448 7400 Calling Gemini API: v1/models/gemini-2.5-flash
+INFO 2025-11-05 21:51:07,658 views 18448 7400 Success with v1/models/gemini-2.5-flash
+INFO 2025-11-05 21:51:07,663 basehttp 18448 7400 "POST /api/kids/gemini/game HTTP/1.1" 200 600
+INFO 2025-11-05 21:52:01,849 basehttp 18448 11772 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-05 21:52:08,509 basehttp 18448 11772 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-05 21:53:00,653 basehttp 18448 11772 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-05 21:53:14,734 basehttp 18448 11772 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-05 21:53:14,972 views 18448 4440 Gemini API key found, generating game for type: research-challenge
+INFO 2025-11-05 21:53:14,972 views 18448 4440 DEBUG: user_input = ''
+INFO 2025-11-05 21:53:14,974 views 18448 4440 DEBUG: conversation_history length = 0
+INFO 2025-11-05 21:53:14,974 views 18448 4440 DEBUG: Adding user_input to payload: 'Let's play a fun English learning game together!...'
+INFO 2025-11-05 21:53:14,974 views 18448 4440 DEBUG: Total contents count: 1
+INFO 2025-11-05 21:53:14,974 views 18448 4440 DEBUG: Contents[0]: role=user, text=You are a friendly and encouraging AI teacher playing fun educational games with a 7-year-old child ...
+INFO 2025-11-05 21:53:14,974 views 18448 4440 Calling Gemini API: v1/models/gemini-2.5-flash
+INFO 2025-11-05 21:53:17,526 views 18448 10872 Gemini API key found, generating game for type: research-challenge
+INFO 2025-11-05 21:53:17,526 views 18448 10872 DEBUG: user_input = ''
+INFO 2025-11-05 21:53:17,527 views 18448 10872 DEBUG: conversation_history length = 0
+INFO 2025-11-05 21:53:17,527 views 18448 10872 DEBUG: Adding user_input to payload: 'Let's play a fun English learning game together!...'
+INFO 2025-11-05 21:53:17,528 views 18448 10872 DEBUG: Total contents count: 1
+INFO 2025-11-05 21:53:17,528 views 18448 10872 DEBUG: Contents[0]: role=user, text=You are a friendly and encouraging AI teacher playing fun educational games with a 7-year-old child ...
+INFO 2025-11-05 21:53:17,528 views 18448 10872 Calling Gemini API: v1/models/gemini-2.5-flash
+INFO 2025-11-05 21:53:17,578 basehttp 18448 11772 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-05 21:53:19,177 views 18448 4440 Success with v1/models/gemini-2.5-flash
+INFO 2025-11-05 21:53:19,178 basehttp 18448 4440 "POST /api/kids/gemini/game HTTP/1.1" 200 619
+INFO 2025-11-05 21:53:21,500 views 18448 10872 Success with v1/models/gemini-2.5-flash
+INFO 2025-11-05 21:53:21,505 basehttp 18448 10872 - Broken pipe from ('127.0.0.1', 62248)
+INFO 2025-11-05 21:56:57,087 basehttp 18448 14340 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-05 21:57:15,000 basehttp 18448 14340 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-05 21:57:34,578 basehttp 18448 19564 "GET /api/kids/lessons HTTP/1.1" 200 2

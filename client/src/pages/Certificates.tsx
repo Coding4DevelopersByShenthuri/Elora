@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Crown, Award, ArrowLeft, Download, Loader2, Share2, Printer } from 'lucide-react';
@@ -23,6 +23,30 @@ type CertificateSpec = {
 const CertificatesPage = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Detect if user is from teen kids page or has teen story enrollments
+  const isTeenKids = useMemo(() => {
+    // Check URL path
+    if (location.pathname.includes('/teen') || document.referrer.includes('/kids/teen')) {
+      return true;
+    }
+    
+    // Check if user has teen story enrollments
+    try {
+      const userId = localStorage.getItem('speakbee_current_user') 
+        ? JSON.parse(localStorage.getItem('speakbee_current_user')!).id || 'anonymous'
+        : 'anonymous';
+      const enrolledStories = StoryWordsService.getEnrolledStories(userId);
+      const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
+        'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
+        'ai-ethics-explorer', 'digital-security-guardian'];
+      const hasTeenStories = enrolledStories.some(e => teenStoryIds.includes(e.storyId));
+      return hasTeenStories;
+    } catch {
+      return false;
+    }
+  }, [location.pathname]);
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState<any>(null);
   const [localKidsProgress, setLocalKidsProgress] = useState<any>(null);
@@ -105,16 +129,34 @@ const CertificatesPage = () => {
   const certificates: CertificateSpec[] = [
     {
       id: 'story-time-champion',
-      title: 'Story Time Champion',
+      title: isTeenKids ? 'Advanced Story Champion' : 'Story Time Champion',
       emoji: '📚',
       badgeSrc: '/story-time-champion-badge.png',
-      description: 'Completed 10 stories',
+      description: isTeenKids ? 'Completed 10 advanced teen stories' : 'Completed 10 stories',
       criteria: (c) => {
         // Only count fully completed stories from storyEnrollments
         const storyEnrollments = (c.details?.storyEnrollments || []) as any[];
-        const completedStories = storyEnrollments.filter((s: any) => 
+        
+        // Filter by story type (teen vs young)
+        const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
+          'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
+          'ai-ethics-explorer', 'digital-security-guardian'];
+        const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
+          'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
+          'rainbow-castle', 'jungle-explorer'];
+        
+        let completedStories = storyEnrollments.filter((s: any) => 
           s.completed === true && s.wordsExtracted === true
-        ).length;
+        );
+        
+        // Filter by story type if needed
+        if (isTeenKids) {
+          completedStories = completedStories.filter((s: any) => teenStoryIds.includes(s.storyId));
+        } else {
+          completedStories = completedStories.filter((s: any) => youngStoryIds.includes(s.storyId));
+        }
+        
+        const completedCount = completedStories.length;
 
         // Also check StoryWordsService for enrolled stories (more reliable source)
         try {
@@ -122,11 +164,19 @@ const CertificatesPage = () => {
             ? JSON.parse(localStorage.getItem('speakbee_current_user')!).id || 'anonymous'
             : 'anonymous';
           const enrolledStories = StoryWordsService.getEnrolledStories(userId);
-          const fullyCompleted = enrolledStories.filter(e => 
+          let fullyCompleted = enrolledStories.filter(e => 
             e.completed === true && e.wordsExtracted === true
-          ).length;
+          );
+          
+          // Filter by story type
+          if (isTeenKids) {
+            fullyCompleted = fullyCompleted.filter(e => teenStoryIds.includes(e.storyId));
+          } else {
+            fullyCompleted = fullyCompleted.filter(e => youngStoryIds.includes(e.storyId));
+          }
+          
           // Use the maximum of both sources
-          const total = Math.max(completedStories, fullyCompleted);
+          const total = Math.max(completedCount, fullyCompleted.length);
           
           const progress = Math.min(100, Math.round((Math.min(total, 10) / 10) * 100));
           const eligible = total >= 10;
@@ -134,7 +184,7 @@ const CertificatesPage = () => {
           return { progress, eligible, hint };
         } catch {
           // Fallback to details only
-          const total = completedStories;
+          const total = completedCount;
           const progress = Math.min(100, Math.round((Math.min(total, 10) / 10) * 100));
           const eligible = total >= 10;
           const hint = eligible ? 'Ready to download!' : `Stories: ${Math.min(total, 10)}/10 completed`;
@@ -144,10 +194,10 @@ const CertificatesPage = () => {
     },
     {
       id: 'speaking-star',
-      title: 'Speaking Star',
+      title: isTeenKids ? 'Professional Speaking Star' : 'Speaking Star',
       emoji: '🎤',
       badgeSrc: '/Speaking_star_badge.png',
-      description: '50 Speak & Repeat sessions with average ≥ 75',
+      description: isTeenKids ? '50 Advanced Speaking sessions with average ≥ 75' : '50 Speak & Repeat sessions with average ≥ 75',
       criteria: (c) => {
         const pron = c.details?.pronunciation || {};
         const sessions = Object.values(pron) as any[];
@@ -161,10 +211,10 @@ const CertificatesPage = () => {
     },
     {
       id: 'word-wizard',
-      title: 'Word Wizard',
+      title: isTeenKids ? 'Advanced Vocabulary Master' : 'Word Wizard',
       emoji: '🪄',
       badgeSrc: '/Word_wizard_badge.png',
-      description: 'Master 100 unique words (≥ 2 practices each)',
+      description: isTeenKids ? 'Master 100 advanced words (≥ 2 practices each)' : 'Master 100 unique words (≥ 2 practices each)',
       criteria: (c) => {
         const vocab = c.details?.vocabulary || {};
         const practiced = Object.values(vocab) as any[];
@@ -769,7 +819,7 @@ const CertificatesPage = () => {
                   <Button
                     variant="outline"
                     className="rounded-xl w-full sm:w-auto"
-                    onClick={() => navigate('/kids/young')}
+                    onClick={() => navigate(isTeenKids ? '/kids/teen' : '/kids/young')}
                   >
                      Improve Progress
                   </Button>
@@ -806,7 +856,7 @@ const CertificatesPage = () => {
                     <div className="text-[10px] tracking-widest font-bold text-[#FF6B6B] dark:text-[#FF8A8A] uppercase mb-1.5">Badge Earned</div>
                     <div
                       className={`text-sm sm:text-base md:text-lg font-bold text-gray-800 dark:text-white leading-snug line-clamp-2 mb-2 ${(b.title || b.name) === 'Story Time Champion' ? 'cursor-pointer hover:underline hover:text-[#FF6B6B]' : ''}`}
-                      onClick={(b.title || b.name) === 'Story Time Champion' ? () => navigate('/kids/young') : undefined}
+                      onClick={(b.title || b.name) === 'Story Time Champion' || (b.title || b.name) === 'Advanced Story Champion' ? () => navigate(isTeenKids ? '/kids/teen' : '/kids/young') : undefined}
                     >
                       {b.title || b.name || 'Badge'}
                     </div>
@@ -882,7 +932,7 @@ const CertificatesPage = () => {
                   Start learning to unlock your first badge!
                 </p>
                 <Button
-                  onClick={() => navigate('/kids/young')}
+                  onClick={() => navigate(isTeenKids ? '/kids/teen' : '/kids/young')}
                   className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white font-bold py-3 px-6 rounded-xl"
                 >
                   Go to Learning Zone →
