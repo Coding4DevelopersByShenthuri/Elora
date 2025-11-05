@@ -31262,3 +31262,21 @@ INFO 2025-11-05 21:53:21,505 basehttp 18448 10872 - Broken pipe from ('127.0.0.1
 INFO 2025-11-05 21:56:57,087 basehttp 18448 14340 "GET /api/kids/lessons HTTP/1.1" 200 2
 INFO 2025-11-05 21:57:15,000 basehttp 18448 14340 "GET /api/kids/lessons HTTP/1.1" 200 2
 INFO 2025-11-05 21:57:34,578 basehttp 18448 19564 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-05 22:10:16,568 views 18448 19372 Gemini API key found, generating game for type: debate-club
+INFO 2025-11-05 22:10:16,579 views 18448 19372 DEBUG: user_input = ''
+INFO 2025-11-05 22:10:16,579 views 18448 19372 DEBUG: conversation_history length = 0
+INFO 2025-11-05 22:10:16,582 views 18448 19372 DEBUG: Adding user_input to payload: 'Let's play a fun English learning game together!...'
+INFO 2025-11-05 22:10:16,584 views 18448 19372 DEBUG: Total contents count: 1
+INFO 2025-11-05 22:10:16,585 views 18448 19372 DEBUG: Contents[0]: role=user, text=You are a friendly and encouraging AI teacher playing fun educational games with a 14-year-old child...
+INFO 2025-11-05 22:10:16,587 views 18448 19372 Calling Gemini API: v1/models/gemini-2.5-flash
+INFO 2025-11-05 22:10:22,090 views 18448 19372 Success with v1/models/gemini-2.5-flash
+INFO 2025-11-05 22:10:22,104 basehttp 18448 19372 "POST /api/kids/gemini/game HTTP/1.1" 200 886
+INFO 2025-11-05 22:10:39,919 views 18448 4224 Gemini API key found, generating game for type: research-challenge
+INFO 2025-11-05 22:10:39,919 views 18448 4224 DEBUG: user_input = ''
+INFO 2025-11-05 22:10:39,919 views 18448 4224 DEBUG: conversation_history length = 0
+INFO 2025-11-05 22:10:39,919 views 18448 4224 DEBUG: Adding user_input to payload: 'Let's play a fun English learning game together!...'
+INFO 2025-11-05 22:10:39,925 views 18448 4224 DEBUG: Total contents count: 1
+INFO 2025-11-05 22:10:39,925 views 18448 4224 DEBUG: Contents[0]: role=user, text=You are a friendly and encouraging AI teacher playing fun educational games with a 14-year-old child...
+INFO 2025-11-05 22:10:39,925 views 18448 4224 Calling Gemini API: v1/models/gemini-2.5-flash
+INFO 2025-11-05 22:10:45,427 views 18448 4224 Success with v1/models/gemini-2.5-flash
+INFO 2025-11-05 22:10:45,443 basehttp 18448 4224 "POST /api/kids/gemini/game HTTP/1.1" 200 812
