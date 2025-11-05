@@ -118,6 +118,7 @@ const KidsGamePage = () => {
   const [currentRound, setCurrentRound] = useState(0);
   const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
   const [currentDifficulty, setCurrentDifficulty] = useState<'beginner' | 'intermediate' | 'advanced'>('beginner');
+  const [gameCompleted, setGameCompleted] = useState(false);
 
   const currentGame = gameId as GameType;
 
@@ -211,6 +212,8 @@ const KidsGamePage = () => {
     setConsecutiveCorrect(0);
     setShowCelebration(false);
     setCurrentDifficulty('beginner');
+    setGameCompleted(false);
+    setGameScore(0); // Reset game score for new game
 
     try {
       const response = await GeminiService.generateGame({
@@ -335,14 +338,60 @@ const KidsGamePage = () => {
         setGameInstruction(response.gameInstruction);
       }
 
+      // Always award points when AI responds (even if no explicit points in response)
+      // Award based on correctness and round number
+      let pointsToAward = 0;
       if (response.points && response.points > 0) {
-        handleScoreUpdate(response.points, currentGame);
+        pointsToAward = response.points;
+      } else {
+        // Award default points based on round and difficulty
+        const basePoints = currentDifficulty === 'beginner' ? 5 : currentDifficulty === 'intermediate' ? 10 : 15;
+        pointsToAward = basePoints + consecutiveCorrect;
+      }
+      
+      if (pointsToAward > 0) {
+        handleScoreUpdate(pointsToAward, currentGame);
         
         // Show celebration for points
         setShowCelebration(true);
         setConsecutiveCorrect(prev => prev + 1);
         setCurrentRound(prev => prev + 1);
         setTimeout(() => setShowCelebration(false), 3000);
+      }
+      
+      // Check if game should end (max rounds or explicit end signal)
+      const shouldEndGame = response.gameEnd || currentRound >= 20 || 
+        (formattedContent.toLowerCase().includes('great job') && formattedContent.toLowerCase().includes('completed')) ||
+        (formattedContent.toLowerCase().includes('excellent') && formattedContent.toLowerCase().includes('finished'));
+      
+      if (shouldEndGame && !gameCompleted) {
+        // Award completion bonus first
+        const completionBonus = Math.max(50, currentRound * 3);
+        if (completionBonus > 0) {
+          await handleScoreUpdate(completionBonus, currentGame);
+        }
+        
+        setGameCompleted(true);
+        
+        // Show final celebration
+        setShowCelebration(true);
+        
+        // Play completion message with updated score
+        setTimeout(() => {
+          const finalScore = gameScore + completionBonus;
+          if (isSoundEnabled) {
+            const completionMessage = `Congratulations! You completed the game with ${finalScore} points! Great job!`;
+            EnhancedTTS.speak(completionMessage, { 
+              voice: findFemaleVoiceId(),
+              rate: 0.9, 
+              emotion: 'excited' 
+            }).catch(() => {});
+          }
+        }, 500);
+        
+        setTimeout(() => {
+          setShowCelebration(false);
+        }, 5000);
       }
 
       if (isSoundEnabled && formattedContent) {
@@ -379,6 +428,11 @@ const KidsGamePage = () => {
       
       if (transcript && transcript.length >= 2) { // Accept transcripts with at least 2 characters
         console.log('✅ Game voice input received:', transcript);
+        
+        // Award points for speaking (engagement bonus)
+        const engagementPoints = 2;
+        handleScoreUpdate(engagementPoints, currentGame);
+        
         const userMessage: ConversationMessage = {
           role: 'user',
           content: transcript,
@@ -388,7 +442,7 @@ const KidsGamePage = () => {
         };
         setConversationHistory(prev => [...prev, userMessage]);
         
-        // Process immediately - AI will respond right away
+        // Process immediately - AI will respond right away and award more points
         await handleUserInput(transcript, userMessage);
       } else {
         // If transcript is too short or empty, give user a chance to try again
@@ -761,7 +815,40 @@ const KidsGamePage = () => {
               </div>
             )}
 
+            {/* Game Completion Message */}
+            {gameCompleted && (
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-6 border-2 border-green-300 dark:border-green-700">
+                <div className="text-center space-y-4">
+                  <div className="text-4xl mb-2">🎉</div>
+                  <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+                    Game Completed!
+                  </h3>
+                  <p className="text-gray-700 dark:text-gray-300">
+                    You earned <span className="font-bold text-green-600 dark:text-green-400">{gameScore} points</span> in this game! 🎉
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Points have been saved to your total score!
+                  </p>
+                  <div className="flex gap-3 justify-center">
+                    <Button
+                      onClick={startGame}
+                      className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white"
+                    >
+                      Play Again
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => navigate('/kids/young?section=games')}
+                    >
+                      Back to Games
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Voice Input */}
+            {!gameCompleted && (
             <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-6 border-2 border-purple-200 dark:border-purple-700">
               <div className="text-center space-y-4">
                 <div>
@@ -778,10 +865,11 @@ const KidsGamePage = () => {
                   maxDuration={30}
                   autoAnalyze={false}
                   skipPronunciationCheck={true}
-                  disabled={isLoading}
+                  disabled={isLoading || gameCompleted}
                 />
               </div>
             </div>
+            )}
           </CardContent>
         </Card>
       </div>

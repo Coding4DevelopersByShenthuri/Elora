@@ -104,7 +104,7 @@ const YoungKidsPage = () => {
   const [isInitializing, setIsInitializing] = useState(true);
   
 
-  // Sync activeCategory with URL on mount or URL change
+  // Sync activeCategory with URL on mount or URL change - ensure persistence
   useEffect(() => {
     const urlCategory = searchParams.get('section') || 'stories';
     if (urlCategory !== activeCategory) {
@@ -112,6 +112,15 @@ const YoungKidsPage = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
+
+  // Persist category to URL on change
+  useEffect(() => {
+    const currentSection = searchParams.get('section') || 'stories';
+    if (activeCategory !== currentSection) {
+      setSearchParams({ section: activeCategory }, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeCategory]);
 
   // Check authentication and user existence on mount
   useEffect(() => {
@@ -233,83 +242,80 @@ const YoungKidsPage = () => {
     const loadProgress = async () => {
       try {
         const token = localStorage.getItem('speakbee_auth_token');
+        let serverProgress: any = null;
+        let localProgress: any = null;
+        
+        // Try to load from server first
         if (token && token !== 'local-token') {
           try {
-            const serverProgress = await KidsApi.getProgress(token);
-            setPoints(serverProgress.points ?? 0);
-            setStreak(serverProgress.streak ?? 0);
-            const fav = (serverProgress as any)?.details?.favorites ?? [];
-            // Convert old number-based favorites to new string-based format
-            const convertedFavorites = Array.isArray(fav) ? fav.map((f: any) => {
-              if (typeof f === 'number') {
-                return `young-${f}`;
-              }
-              return f;
-            }) : [];
-            setFavorites(convertedFavorites);
-            
-            // Load pronunciation, vocabulary, and games attempts
-            const details = (serverProgress as any)?.details || {};
-            const pronCount = Object.keys(details.pronunciation || {}).length;
-            const vocabCount = Object.keys(details.vocabulary || {}).length;
-            // Track game attempts: use actual attempts count if available, otherwise estimate from points
-            const gamesAttemptsCount = Number(details.games?.attempts || 0);
-            const gamesPoints = Number(details.games?.points || 0);
-            // Calculate game attempts: prefer actual count, fallback to estimation from points (average 15 points per attempt)
-            const estimatedGamesAttempts = gamesAttemptsCount > 0 
-              ? gamesAttemptsCount 
-              : Math.floor(gamesPoints / 15);
-            setPronunciationAttempts(pronCount);
-            setVocabularyAttempts(vocabCount);
-            setGamesAttempts(estimatedGamesAttempts);
+            serverProgress = await KidsApi.getProgress(token);
           } catch {
-            const localProgress = await KidsProgressService.get(userId);
-            setPoints(localProgress.points);
-            setStreak(localProgress.streak);
-            const fav = (localProgress as any).details?.favorites ?? [];
-            const convertedFavorites = Array.isArray(fav) ? fav.map((f: any) => {
-              if (typeof f === 'number') {
-                return `young-${f}`;
-              }
-              return f;
-            }) : [];
-            setFavorites(convertedFavorites);
-            
-            const details = (localProgress as any).details || {};
-            const pronCount = Object.keys(details.pronunciation || {}).length;
-            const vocabCount = Object.keys(details.vocabulary || {}).length;
-            const gamesCount = Array.isArray(details.games?.types) ? details.games.types.length : 0;
-            const gamesPoints = Number(details.games?.points || 0);
-            const estimatedGamesAttempts = gamesCount > 0 
-              ? Math.max(gamesCount, Math.floor(gamesPoints / 15)) 
-              : Math.floor(gamesPoints / 15);
-            setPronunciationAttempts(pronCount);
-            setVocabularyAttempts(vocabCount);
-            setGamesAttempts(estimatedGamesAttempts);
+            // Fallback to local
           }
-        } else {
-          const localProgress = await KidsProgressService.get(userId);
-          setPoints(localProgress.points);
-          setStreak(localProgress.streak);
-          const fav = (localProgress as any).details?.favorites ?? [];
-          const convertedFavorites = Array.isArray(fav) ? fav.map((f: any) => {
-            if (typeof f === 'number') {
-              return `young-${f}`;
-            }
-            return f;
-          }) : [];
-          setFavorites(convertedFavorites);
-          
-          const details = (localProgress as any).details || {};
-          const pronCount = Object.keys(details.pronunciation || {}).length;
-          const vocabCount = Object.keys(details.vocabulary || {}).length;
-          const gamesCount = Array.isArray(details.games?.types) ? details.games.types.length : 0;
-          const gamesPoints = Number(details.games?.points || 0);
-          const estimatedGamesAttempts = gamesCount > 0 ? Math.max(gamesCount, Math.floor(gamesPoints / 10)) : 0;
-          setPronunciationAttempts(pronCount);
-          setVocabularyAttempts(vocabCount);
-          setGamesAttempts(estimatedGamesAttempts);
         }
+        
+        // Always load local as fallback/merge source
+        try {
+          localProgress = await KidsProgressService.get(userId);
+        } catch {}
+        
+        // Merge server and local data - prefer server for points/streak, merge details
+        const mergedProgress = serverProgress || localProgress || { points: 0, streak: 0, details: {} };
+        const serverDetails = (serverProgress as any)?.details || {};
+        const localDetails = (localProgress as any)?.details || {};
+        
+        // Points: Use the maximum of server and local (to account for offline progress)
+        const serverPoints = (serverProgress as any)?.points ?? 0;
+        const localPoints = localProgress?.points ?? 0;
+        setPoints(Math.max(serverPoints, localPoints));
+        
+        // Streak: Use the maximum of server and local
+        const serverStreak = (serverProgress as any)?.streak ?? 0;
+        const localStreak = localProgress?.streak ?? 0;
+        setStreak(Math.max(serverStreak, localStreak));
+        
+        // Favorites: Merge and convert
+        const fav = (serverDetails.favorites || localDetails.favorites || []);
+        const convertedFavorites = Array.isArray(fav) ? fav.map((f: any) => {
+          if (typeof f === 'number') {
+            return `young-${f}`;
+          }
+          return f;
+        }) : [];
+        setFavorites(convertedFavorites);
+        
+        // Merge pronunciation, vocabulary, and games data
+        const mergedPron = { ...(localDetails.pronunciation || {}), ...(serverDetails.pronunciation || {}) };
+        const mergedVocab = { ...(localDetails.vocabulary || {}), ...(serverDetails.vocabulary || {}) };
+        const mergedGames = {
+          ...(localDetails.games || {}),
+          ...(serverDetails.games || {}),
+          points: Math.max(
+            Number(localDetails.games?.points || 0),
+            Number(serverDetails.games?.points || 0)
+          ),
+          attempts: Math.max(
+            Number(localDetails.games?.attempts || 0),
+            Number(serverDetails.games?.attempts || 0)
+          ),
+          types: Array.from(new Set([
+            ...(Array.isArray(localDetails.games?.types) ? localDetails.games.types : []),
+            ...(Array.isArray(serverDetails.games?.types) ? serverDetails.games.types : [])
+          ]))
+        };
+        
+        // Count attempts from merged data
+        const pronCount = Object.keys(mergedPron).length;
+        const vocabCount = Object.keys(mergedVocab).length;
+        const gamesAttemptsCount = Number(mergedGames.attempts || 0);
+        const gamesPoints = Number(mergedGames.points || 0);
+        const estimatedGamesAttempts = gamesAttemptsCount > 0 
+          ? gamesAttemptsCount 
+          : Math.max(mergedGames.types.length, Math.floor(gamesPoints / 15));
+        
+        setPronunciationAttempts(pronCount);
+        setVocabularyAttempts(vocabCount);
+        setGamesAttempts(estimatedGamesAttempts);
       } catch (error) {
         console.error('Error loading progress:', error);
       }
@@ -1693,12 +1699,21 @@ const YoungKidsPage = () => {
                         "p-4 sm:p-6 md:p-8 relative overflow-hidden bg-gradient-to-br",
                         story.bgGradient
                       )}>
-                        {enrolledInternalStoryIds.has(getInternalStoryId(story.type)) && (
-                          <div className="absolute top-2 left-2 bg-white/85 dark:bg-gray-900/60 border border-indigo-400/70 text-indigo-700 dark:text-indigo-300 text-[10px] sm:text-xs font-semibold px-2.5 py-0.5 sm:py-1 rounded-full shadow-sm backdrop-blur-sm inline-flex items-center gap-1">
-                            <CheckCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                            Enrolled
-                          </div>
-                        )}
+                                        {(() => {
+                          const internalId = getInternalStoryId(story.type);
+                          const isEnrolled = enrolledInternalStoryIds.has(internalId);
+                          // Also check if story is completed via StoryWordsService
+                          const storyEnrollments = StoryWordsService.getEnrolledStories(userId);
+                          const isCompleted = storyEnrollments.some(e => 
+                            e.storyId === internalId && e.completed === true
+                          );
+                          return (isEnrolled || isCompleted) ? (
+                            <div className="absolute top-2 left-2 bg-white/85 dark:bg-gray-900/60 border border-indigo-400/70 text-indigo-700 dark:text-indigo-300 text-[10px] sm:text-xs font-semibold px-2.5 py-0.5 sm:py-1 rounded-full shadow-sm backdrop-blur-sm inline-flex items-center gap-1 z-20">
+                              <CheckCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                              Enrolled
+                            </div>
+                          ) : null;
+                        })()}
                         <div className="absolute top-0 right-0 w-20 h-20 sm:w-32 sm:h-32 bg-white/20 dark:bg-black/20 rounded-full -mr-10 sm:-mr-16 -mt-10 sm:-mt-16"></div>
                         <div className="absolute bottom-0 left-0 w-16 h-16 sm:w-24 sm:h-24 bg-white/20 dark:bg-black/20 rounded-full -ml-8 sm:-ml-12 -mb-8 sm:-mb-12"></div>
                         <div className="relative z-10 text-center">
@@ -2031,7 +2046,8 @@ const YoungKidsPage = () => {
           </div>
         )}
 
-        {/* Achievements Section */}
+        {/* Achievements Section - Common across all sections */}
+        {(activeCategory === 'stories' || activeCategory === 'vocabulary' || activeCategory === 'pronunciation' || activeCategory === 'games') && (
         <Card className="bg-purple-100/50 dark:bg-purple-950/30 backdrop-blur-sm border-2 border-purple-300 dark:border-purple-600 rounded-xl sm:rounded-2xl lg:rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl mb-6 sm:mb-8 mx-2 sm:mx-auto w-full lg:max-w-7xl xl:max-w-[1400px] relative">
           {/* Decorative elements - Green and Orange */}
           <div className="absolute -top-4 -left-4 w-12 h-12 text-green-500 opacity-60 hidden md:block animate-bounce">
@@ -2126,6 +2142,7 @@ const YoungKidsPage = () => {
             })}
           </div>
         </Card>
+        )}
 
         {/* Quick Actions */}
         <div className="text-center px-4 sm:px-6">

@@ -125,22 +125,39 @@ class WhisperServiceClass {
     // The prompt contains context like "The child is trying to say the word: 'word'"
     let targetWord: string | undefined;
     if (options.prompt) {
-      const match = options.prompt.match(/word:\s*"([^"]+)"/i);
-      if (match) {
-        targetWord = match[1].toLowerCase();
+      // Try multiple patterns to extract target word
+      const patterns = [
+        /word:\s*"([^"]+)"/i,
+        /trying to say the word:\s*"([^"]+)"/i,
+        /target word is\s*"([^"]+)"/i,
+        /say:\s*"([^"]+)"/i
+      ];
+      
+      for (const pattern of patterns) {
+        const match = options.prompt.match(pattern);
+        if (match) {
+          targetWord = match[1].toLowerCase();
+          break;
+        }
       }
     }
 
-    // Use longer timeout for kids (30 seconds), enable interim results for immediate detection
-    // Extended silence timeout for kids who may pause more
+    // Enhanced settings for kids' speech recognition
+    // Kids speak slower, have higher pitch, may pause more
     const result = await SpeechService.startRecognition({
       lang: options.language || 'en-US',
-      timeoutMs: 30000, // 30 seconds for kids
+      timeoutMs: 30000, // 30 seconds for kids (longer than default)
       interimResults: true, // Enable for real-time detection
       continuous: false, // Single utterance mode
       autoStopOnSilence: true, // Auto-stop after silence
-      silenceTimeoutMs: targetWord ? 2000 : 1500 // Longer silence timeout when we know the target word
-    });
+      silenceTimeoutMs: targetWord ? 3000 : 2500, // Longer silence timeout for kids (they pause more)
+      // Additional options for better kid recognition
+      maxAlternatives: 3, // Get multiple alternatives in case first is wrong
+      grammars: targetWord ? [{
+        src: `#JSGF V1.0; grammar words; public <word> = ${targetWord} | ${targetWord} ${targetWord} | ${targetWord.split('').join(' ')};`,
+        weight: 1.0
+      }] : undefined
+    } as any);
 
     // Normalize transcript for better matching
     let transcript = result.transcript.trim().toLowerCase()
@@ -150,12 +167,33 @@ class WhisperServiceClass {
 
     // If we have a target word and the transcript is similar, boost confidence
     let confidence = result.confidence || 0.8;
+    
     if (targetWord && transcript) {
-      // Calculate similarity to target word
+      const words = transcript.split(/\s+/);
+      const targetWords = targetWord.split(/\s+/);
+      
+      // For multi-word phrases, check if all words are present
+      if (targetWords.length > 1) {
+        const allWordsPresent = targetWords.every(tw => 
+          words.some(w => {
+            const similarity = this.calculateWordSimilarity(tw, w);
+            return similarity > 0.7 || w.includes(tw) || tw.includes(w);
+          })
+        );
+        if (allWordsPresent) {
+          console.log(`✅ All target words found in transcript`);
+          confidence = Math.min(0.95, confidence + 0.15);
+        }
+      }
+      
+      // Calculate similarity to target word for single words or overall phrase
       const similarity = this.calculateWordSimilarity(targetWord, transcript);
-      if (similarity > 0.7) {
+      if (similarity > 0.6) {
         // Boost confidence if transcript is similar to target word
-        confidence = Math.min(0.95, confidence + 0.1);
+        confidence = Math.min(0.95, confidence + (similarity - 0.6) * 0.3);
+        console.log(`📊 Transcript similarity to "${targetWord}": ${similarity.toFixed(2)}, boosted confidence to ${confidence.toFixed(2)}`);
+      } else {
+        console.log(`⚠️ Low similarity to "${targetWord}": ${similarity.toFixed(2)}`);
       }
     }
 

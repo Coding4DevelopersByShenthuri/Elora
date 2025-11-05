@@ -35,6 +35,7 @@ const KidsVoiceRecorder = ({
   const [recordingTime, setRecordingTime] = useState(0);
   const [feedbackMessage, setFeedbackMessage] = useState<string>('');
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isTtsCooldown, setIsTtsCooldown] = useState(false);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -42,12 +43,64 @@ const KidsVoiceRecorder = ({
   const analysisIntervalRef = useRef<number | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const skipFinalAnalysisRef = useRef<boolean>(false);
+  const ttsCooldownRef = useRef<boolean>(false);
 
   useEffect(() => {
     return () => {
       cleanup();
     };
   }, []);
+
+  // Stop recording immediately when TTS starts speaking (disabledWhileSpeaking becomes true)
+  useEffect(() => {
+    if (disabledWhileSpeaking && isRecording) {
+      console.log('🛑 TTS started - stopping recording to prevent TTS audio capture');
+      // Clear any chunks collected - we don't want to analyze TTS audio
+      chunksRef.current = [];
+      skipFinalAnalysisRef.current = true; // Skip final analysis to prevent processing TTS audio
+      
+      // Stop recording immediately
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+        try {
+          mediaRecorderRef.current.stop();
+        } catch (e) {
+          console.warn('Error stopping recorder:', e);
+        }
+      }
+      setIsRecording(false);
+      
+      // Clear timers
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      if (analysisIntervalRef.current) {
+        clearInterval(analysisIntervalRef.current);
+        analysisIntervalRef.current = null;
+      }
+      
+      // Set cooldown to prevent immediate re-recording
+      ttsCooldownRef.current = true;
+      setIsTtsCooldown(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disabledWhileSpeaking, isRecording]);
+
+  // Handle cooldown period when TTS finishes
+  useEffect(() => {
+    if (!disabledWhileSpeaking && ttsCooldownRef.current) {
+      // TTS finished - maintain cooldown for additional safety
+      // The parent component (Vocabulary/Pronunciation) already waits 1.5 seconds
+      // We'll add an additional buffer to be safe
+      const cooldownTimer = setTimeout(() => {
+        ttsCooldownRef.current = false;
+        setIsTtsCooldown(false);
+        console.log('✅ Cooldown period ended - recording can now start');
+      }, 2000); // 2 seconds after TTS ends (additional safety buffer)
+      
+      return () => clearTimeout(cooldownTimer);
+    }
+  }, [disabledWhileSpeaking]);
 
   // Auto-start recording if enabled
   useEffect(() => {
@@ -96,35 +149,77 @@ const KidsVoiceRecorder = ({
     try {
       setIsAnalyzing(true);
       
-      // Transcribe with Whisper - use longer timeout for kids and enhanced prompts
+      // Transcribe with Whisper - optimized for kids' voices with enhanced prompts
       let transcript = '';
       try {
-        // Create enhanced prompt with context about the target word
-        // This helps Whisper better recognize what the kid is trying to say
+        // Create enhanced prompt specifically for kids' speech recognition
+        // Kids have higher-pitched voices, may speak slower, and have different pronunciation patterns
+        const targetLower = targetWord.toLowerCase();
         const enhancedPrompt = skipPronunciationCheck 
-          ? undefined 
-          : `The child is trying to say the word: "${targetWord}". ` +
-            `The target word is "${targetWord.toLowerCase()}". ` +
-            `Listen carefully for variations like "${targetWord.toLowerCase()}" or similar pronunciations.`;
+          ? `A young child is speaking. Expect a child's voice with higher pitch. ` +
+            `The child may say: "${targetLower}" or similar variations. ` +
+            `Listen carefully for child speech patterns.`
+          : `A young child is trying to say the word: "${targetWord}". ` +
+            `The target word is "${targetLower}". ` +
+            `This is a child's voice - expect higher pitch, slower speech, and possible pronunciation variations. ` +
+            `Listen carefully for: "${targetLower}" or similar pronunciations like "${targetLower.replace(/[aeiou]/gi, m => m + m)}". ` +
+            `Common child variations: adding extra syllables, simplified consonants, or extended vowels.`;
         
+        // Use longer timeout for kids (they may speak slower)
         const result = await WhisperService.transcribe(audioBlob, {
           language: 'en',
-          prompt: enhancedPrompt // Enhanced prompt with target word context
-        });
+          prompt: enhancedPrompt,
+          // Pass additional options for kids' speech
+          timeout: 15000, // 15 seconds for kids (longer than default)
+          sampleRate: 48000 // Higher sample rate for better quality
+        } as any);
         
         // Normalize transcript: lowercase and remove punctuation for better matching
         transcript = result.transcript.trim().toLowerCase()
           .replace(/[.,!?;:'"]/g, '')
           .replace(/\s+/g, ' ')
           .trim();
-        console.log('🎤 Child said:', transcript, isImmediate ? '(immediate)' : '(final)', `[target: "${targetWord}"]`);
-      } catch (error) {
+        
+        console.log('🎤 Child said:', transcript, isImmediate ? '(immediate)' : '(final)', `[target: "${targetWord}"]`, `[confidence: ${result.confidence || 'N/A'}]`);
+        
+        // If transcript is empty or too short, try again with a longer wait
+        if (!transcript || transcript.length < 2) {
+          // For kids, sometimes they need more time to speak
+          if (audioBlob.size < 5000 && !isImmediate) {
+            console.log('⚠️ Transcript too short, waiting for more audio...');
+            return false; // Wait for more audio
+          }
+        }
+      } catch (error: any) {
         console.warn('Whisper transcription failed:', error);
+        
         // For games/conversations, even if transcription fails, try with what we have
-        if (skipPronunciationCheck && audioBlob.size > 1000) {
-          // If we have audio but transcription failed, still proceed (might be noise issue)
-          console.log('⚠️ Transcription failed but continuing with audio blob for games');
-        } else {
+        if (skipPronunciationCheck && audioBlob.size > 2000) {
+          // If we have audio but transcription failed, try Web Speech API fallback
+          console.log('⚠️ Trying Web Speech API fallback...');
+          try {
+            const { SpeechService } = await import('@/services/SpeechService');
+            if (SpeechService.isSTTSupported()) {
+              const speechResult = await SpeechService.startRecognition({
+                lang: 'en-US',
+                timeoutMs: 10000,
+                interimResults: true,
+                continuous: false,
+                autoStopOnSilence: true,
+                silenceTimeoutMs: 2500
+              });
+              transcript = speechResult.transcript.trim().toLowerCase()
+                .replace(/[.,!?;:'"]/g, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+              console.log('✅ Web Speech API transcript:', transcript);
+            }
+          } catch (fallbackError) {
+            console.warn('Web Speech API fallback also failed:', fallbackError);
+          }
+        }
+        
+        if (!transcript || transcript.length < 2) {
           return false;
         }
       }
@@ -194,35 +289,54 @@ const KidsVoiceRecorder = ({
   };
 
   const startRecording = async () => {
+    // Prevent starting if TTS is speaking or if we're in cooldown period after TTS
+    if (disabledWhileSpeaking || isTtsCooldown) {
+      console.log('⏸️ Cannot start recording - TTS is speaking or cooldown active');
+      setFeedbackMessage('⏸️ Please wait for the audio to finish...');
+      return;
+    }
+    
     try {
       setFeedbackMessage('');
       setShowSuccess(false);
       skipFinalAnalysisRef.current = false;
       
       // Audio constraints optimized for kids' voices with enhanced quality settings
-      // Cast to any to allow Google-specific constraints (non-standard but widely supported in Chrome)
+      // Kids have higher-pitched voices, so we need higher sample rate and better sensitivity
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
-          autoGainControl: true,
-          // Optimize for kids' voices (higher frequency, higher quality)
-          sampleRate: 48000,
+          autoGainControl: true, // Important for kids who may speak quieter
+          // Optimize for kids' voices (higher frequency range, higher quality)
+          sampleRate: 48000, // Higher sample rate captures more detail
           channelCount: 1, // Mono for better processing
+          // Sensitivity settings for kids (they may speak at different volumes)
+          volume: 1.0,
           // Google-specific constraints for better quality (may be ignored in non-Chrome browsers)
           googEchoCancellation: true,
-          googAutoGainControl: true,
+          googAutoGainControl: true, // Critical for kids - adjusts volume automatically
           googNoiseSuppression: true,
-          googHighpassFilter: true,
-          googTypingNoiseDetection: true
+          googHighpassFilter: true, // Filters out low-frequency noise
+          googTypingNoiseDetection: true,
+          googAudioMirroring: false
         } as any
       });
       
       streamRef.current = stream;
       
+      // Try to get the best available codec for kids' voices
+      let mimeType = 'audio/webm;codecs=opus';
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = 'audio/webm';
+      }
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = 'audio/mp4';
+      }
+      
       const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus',
-        audioBitsPerSecond: 192000 // Increased from 128k to 192k for better quality
+        mimeType,
+        audioBitsPerSecond: 192000 // Higher bitrate for better quality (captures kids' voices better)
       });
       
       mediaRecorderRef.current = mediaRecorder;
@@ -291,33 +405,35 @@ const KidsVoiceRecorder = ({
         setRecordingTime(0);
       }
       
-      // Start continuous analysis if enabled
+      // Start continuous analysis if enabled - more frequent for kids
       if (autoAnalyze) {
         let analysisCycleCount = 0;
         let lastAnalysisTime = Date.now();
         analysisIntervalRef.current = window.setInterval(async () => {
           analysisCycleCount++;
           
-          // For games/conversations (skipPronunciationCheck), analyze more frequently for immediate detection
-          const analysisInterval = skipPronunciationCheck ? 800 : 1500; // 800ms for games, 1.5s for pronunciation
+          // For kids: analyze more frequently for better real-time detection
+          // Games/conversations: very frequent, Pronunciation/Vocabulary: frequent but balanced
+          const analysisInterval = skipPronunciationCheck ? 600 : 1200; // 600ms for games, 1.2s for pronunciation
           const minChunks = skipPronunciationCheck ? 1 : 2; // Start analyzing sooner for games
           
-          // Analyze more frequently for immediate detection
+          // Analyze more frequently for immediate detection (especially important for kids)
           if (chunksRef.current.length >= minChunks) {
-            const currentBlob = new Blob(chunksRef.current, { type: 'audio/webm;codecs=opus' });
+            const currentBlob = new Blob(chunksRef.current, { type: mimeType });
             const timeSinceLastAnalysis = Date.now() - lastAnalysisTime;
             
-            // For games: analyze immediately, for pronunciation: every 1.5s
+            // For games: analyze immediately, for pronunciation: every 1.2s (more frequent for kids)
             if (skipPronunciationCheck || timeSinceLastAnalysis >= analysisInterval) {
               lastAnalysisTime = Date.now();
               
               // Analyze in background with immediate flag for games
+              // Don't wait for result - let it run in parallel
               analyzeAudio(currentBlob, skipPronunciationCheck).catch(err => {
                 console.warn('Background analysis error:', err);
               });
             }
           }
-        }, skipPronunciationCheck ? 500 : 800); // Check every 500ms for games, 800ms for pronunciation
+        }, skipPronunciationCheck ? 400 : 700); // Check every 400ms for games, 700ms for pronunciation (faster for kids)
       }
       
     } catch (error) {
@@ -382,7 +498,7 @@ const KidsVoiceRecorder = ({
                 : "bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B]"
           )}
           onClick={showSuccess ? undefined : (isRecording ? () => stopRecording(false) : startRecording)}
-          disabled={disabled || disabledWhileSpeaking}
+          disabled={disabled || disabledWhileSpeaking || isTtsCooldown}
         >
           {showSuccess ? (
             <CheckCircle className="w-12 h-12 sm:w-14 sm:h-14 text-white animate-bounce" />
@@ -445,16 +561,39 @@ const KidsVoiceRecorder = ({
 
       {/* Feedback Message */}
       {feedbackMessage && !showSuccess && (
-        <p className="text-sm sm:text-base text-center text-gray-600 dark:text-gray-400 font-semibold max-w-xs px-4">
-          {feedbackMessage}
-        </p>
+        <div className="space-y-2">
+          <p className="text-sm sm:text-base text-center text-gray-600 dark:text-gray-400 font-semibold max-w-xs px-4">
+            {feedbackMessage}
+          </p>
+          {(feedbackMessage.includes('Could not') || feedbackMessage.includes('hear')) && (
+            <div className="text-xs text-center text-gray-500 dark:text-gray-500 max-w-xs px-4 space-y-1">
+              <p>💡 Tips for better recognition:</p>
+              <ul className="list-disc list-inside text-left space-y-0.5">
+                <li>Speak clearly and at a normal volume</li>
+                <li>Make sure your microphone isn't muted</li>
+                <li>Try moving closer to the microphone</li>
+                <li>Reduce background noise</li>
+              </ul>
+            </div>
+          )}
+        </div>
       )}
 
       {/* Instructions */}
       {!isRecording && !showSuccess && !feedbackMessage && (
-        <p className="text-sm sm:text-base text-center text-gray-600 dark:text-gray-500 max-w-xs px-4">
-          🎤 Click to start! Say "<span className="font-bold text-purple-600 dark:text-purple-400">{targetWord}</span>" clearly
-        </p>
+        <div className="space-y-2">
+          <p className="text-sm sm:text-base text-center text-gray-600 dark:text-gray-500 max-w-xs px-4">
+            🎤 Click to start! Say "<span className="font-bold text-purple-600 dark:text-purple-400">{targetWord}</span>" clearly
+          </p>
+          <p className="text-xs text-center text-gray-500 dark:text-gray-500 max-w-xs px-4">
+            💡 Speak clearly and at a normal volume. The AI will listen carefully!
+          </p>
+          {(disabledWhileSpeaking || isTtsCooldown) && (
+            <p className="text-xs text-center text-orange-600 dark:text-orange-400 max-w-xs px-4 font-semibold">
+              ⏸️ Please wait for the audio to finish before recording...
+            </p>
+          )}
+        </div>
       )}
     </div>
   );

@@ -86,6 +86,8 @@ export default function Pronunciation({ items, onPhrasePracticed }: Pronunciatio
   }, [items, masteredPhrases, hasInitialized, current]);
 
   const speak = async () => {
+    // Stop any active recording immediately when TTS starts
+    // This prevents TTS audio from being captured by the microphone
     setIsSpeaking(true);
     try {
       await EnhancedTTS.speak(phrase.phrase, { rate: 0.85, pitch: 1.0 });
@@ -102,6 +104,9 @@ export default function Pronunciation({ items, onPhrasePracticed }: Pronunciatio
       console.error('Error speaking phrase:', error);
     } finally {
       setIsSpeaking(false);
+      // Add a cooldown period after TTS finishes to ensure microphone doesn't pick up any residual audio
+      // Wait 1.5 seconds after TTS ends before allowing recording to start
+      await new Promise(resolve => setTimeout(resolve, 1500));
     }
   };
 
@@ -270,12 +275,13 @@ export default function Pronunciation({ items, onPhrasePracticed }: Pronunciatio
               🎤 Now you say it!
             </p>
             <KidsVoiceRecorder
-              key={`recorder-${current}-${phrase.phrase}`}
+              key={`recorder-${current}-${phrase.phrase}-${showSuccess}`}
               targetWord={phrase.phrase}
               onCorrectPronunciation={handleCorrectPronunciation}
               maxDuration={15}
               autoAnalyze={true}
               disabledWhileSpeaking={isSpeaking}
+              autoStart={false} // User must click to start
             />
             <p className="text-xs sm:text-sm text-center text-gray-500 dark:text-gray-400 mt-3 px-4">
               💡 Tip: The recorder will automatically stop when you pronounce it correctly!

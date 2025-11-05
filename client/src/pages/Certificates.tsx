@@ -9,6 +9,7 @@ import KidsApi from '@/services/KidsApi';
 import KidsProgressService from '@/services/KidsProgressService';
 import CertificatesService, { type CertificateLayout } from '@/services/CertificatesService';
 import StorageService from '@/services/StorageService';
+import StoryWordsService from '@/services/StoryWordsService';
 
 type CertificateSpec = {
   id: string;
@@ -109,21 +110,36 @@ const CertificatesPage = () => {
       badgeSrc: '/story-time-champion-badge.png',
       description: 'Completed 10 stories',
       criteria: (c) => {
-        // Count from readAloud attempts
-        const readAloud = c.details?.readAloud || {};
-        const readAloudCount = Object.keys(readAloud).length;
-
-        // Count from storyEnrollments (completed stories)
+        // Only count fully completed stories from storyEnrollments
         const storyEnrollments = (c.details?.storyEnrollments || []) as any[];
-        const completedStories = storyEnrollments.filter((s: any) => s.completed === true).length;
+        const completedStories = storyEnrollments.filter((s: any) => 
+          s.completed === true && s.wordsExtracted === true
+        ).length;
 
-        // Use the maximum count from either source
-        const total = Math.max(readAloudCount, completedStories);
-
-        const progress = Math.min(100, Math.round((Math.min(total, 10) / 10) * 100));
-        const eligible = total >= 10;
-        const hint = eligible ? 'Ready to download!' : `Stories: ${Math.min(total, 10)}/10 (${completedStories} completed)`;
-        return { progress, eligible, hint };
+        // Also check StoryWordsService for enrolled stories (more reliable source)
+        try {
+          const userId = localStorage.getItem('speakbee_current_user') 
+            ? JSON.parse(localStorage.getItem('speakbee_current_user')!).id || 'anonymous'
+            : 'anonymous';
+          const enrolledStories = StoryWordsService.getEnrolledStories(userId);
+          const fullyCompleted = enrolledStories.filter(e => 
+            e.completed === true && e.wordsExtracted === true
+          ).length;
+          // Use the maximum of both sources
+          const total = Math.max(completedStories, fullyCompleted);
+          
+          const progress = Math.min(100, Math.round((Math.min(total, 10) / 10) * 100));
+          const eligible = total >= 10;
+          const hint = eligible ? 'Ready to download!' : `Stories: ${Math.min(total, 10)}/10 completed`;
+          return { progress, eligible, hint };
+        } catch {
+          // Fallback to details only
+          const total = completedStories;
+          const progress = Math.min(100, Math.round((Math.min(total, 10) / 10) * 100));
+          const eligible = total >= 10;
+          const hint = eligible ? 'Ready to download!' : `Stories: ${Math.min(total, 10)}/10 completed`;
+          return { progress, eligible, hint };
+        }
       }
     },
     {

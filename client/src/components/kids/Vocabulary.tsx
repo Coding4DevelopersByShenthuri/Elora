@@ -86,6 +86,8 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
   }, [words, masteredWords, hasInitialized, current]);
 
   const speak = async () => {
+    // Stop any active recording immediately when TTS starts
+    // This prevents TTS audio from being captured by the microphone
     setIsSpeaking(true);
     try {
       await EnhancedTTS.speak(card.word, { rate: 0.85, pitch: 1.0 });
@@ -98,6 +100,9 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
       console.error('Error speaking word:', error);
     } finally {
       setIsSpeaking(false);
+      // Add a cooldown period after TTS finishes to ensure microphone doesn't pick up any residual audio
+      // Wait 1.5 seconds after TTS ends before allowing recording to start
+      await new Promise(resolve => setTimeout(resolve, 1500));
     }
   };
 
