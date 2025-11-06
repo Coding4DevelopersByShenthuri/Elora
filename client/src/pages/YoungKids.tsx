@@ -52,6 +52,7 @@ const YoungKidsPage = () => {
   const [streak, setStreak] = useState(0);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [floatingIcons, setFloatingIcons] = useState<Array<{id: number; type: string; x: number; y: number}>>([]);
+  const [sparklesStopped, setSparklesStopped] = useState(false); // Track if sparkles should be stopped
   const [bounceAnimation, setBounceAnimation] = useState(false);
   const [showMagicForest, setShowMagicForest] = useState(false);
   const [showSpaceAdventure, setShowSpaceAdventure] = useState(false);
@@ -235,6 +236,27 @@ const YoungKidsPage = () => {
     }
   }, [isAuthenticated, isSoundEnabled, isOpeningFromFavorites]);
 
+  // Stop sparkles when in games section or when game speech is detected
+  useEffect(() => {
+    const handleGameSpeechDetected = () => {
+      console.log('🎤 Game speech detected - stopping sparkles');
+      setFloatingIcons([]); // Clear all floating icons/sparkles
+      setSparklesStopped(true); // Mark sparkles as stopped
+    };
+
+    window.addEventListener('game-speech-detected', handleGameSpeechDetected);
+    
+    // Stop sparkles immediately when entering games section
+    if (activeCategory === 'games') {
+      setFloatingIcons([]);
+      setSparklesStopped(true);
+    }
+    
+    return () => {
+      window.removeEventListener('game-speech-detected', handleGameSpeechDetected);
+    };
+  }, [activeCategory]);
+
   // Load progress and generate floating icons only if authenticated
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -342,14 +364,20 @@ const YoungKidsPage = () => {
       }
     })();
 
-    const icons = ['star', 'heart', 'sparkles', 'zap'];
-    const newFloatingIcons = Array.from({ length: 8 }, (_, i) => ({
-      id: i,
-      type: icons[Math.floor(Math.random() * icons.length)],
-      x: Math.random() * 80 + 10,
-      y: Math.random() * 80 + 10,
-    }));
-    setFloatingIcons(newFloatingIcons);
+    // Only generate floating icons if not in games section and sparkles haven't been stopped
+    if (activeCategory !== 'games' && !sparklesStopped) {
+      const icons = ['star', 'heart', 'sparkles', 'zap'];
+      const newFloatingIcons = Array.from({ length: 8 }, (_, i) => ({
+        id: i,
+        type: icons[Math.floor(Math.random() * icons.length)],
+        x: Math.random() * 80 + 10,
+        y: Math.random() * 80 + 10,
+      }));
+      setFloatingIcons(newFloatingIcons);
+    } else if (activeCategory === 'games') {
+      // Clear sparkles when in games section
+      setFloatingIcons([]);
+    }
     
     // Set up real-time polling for progress updates every 3 seconds
     const progressInterval = setInterval(loadProgress, 3000);
@@ -796,19 +824,21 @@ const YoungKidsPage = () => {
     // Reset bounce animation
     setTimeout(() => setBounceAnimation(false), 1000);
     
-    // Add floating particles
-    const newParticles = Array.from({ length: 12 }, (_, i) => ({
-      id: Date.now() + i,
-      type: ['star', 'heart', 'sparkles'][Math.floor(Math.random() * 3)],
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-    }));
-    setFloatingIcons(prev => [...prev, ...newParticles]);
-    
-    // Remove particles after animation
-    setTimeout(() => {
-      setFloatingIcons(prev => prev.filter(icon => !newParticles.find(p => p.id === icon.id)));
-    }, 2000);
+    // Add floating particles only if not in games section and sparkles haven't been stopped
+    if (activeCategory !== 'games' && !sparklesStopped) {
+      const newParticles = Array.from({ length: 12 }, (_, i) => ({
+        id: Date.now() + i,
+        type: ['star', 'heart', 'sparkles'][Math.floor(Math.random() * 3)],
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+      }));
+      setFloatingIcons(prev => [...prev, ...newParticles]);
+      
+      // Remove particles after animation
+      setTimeout(() => {
+        setFloatingIcons(prev => prev.filter(icon => !newParticles.find(p => p.id === icon.id)));
+      }, 2000);
+    }
 
     // Story intro voice disabled - only story content should be read by unique voices
     // The story title and description are now silent to avoid confusion with character voices
@@ -1279,8 +1309,8 @@ const YoungKidsPage = () => {
         </div>
       )}
 
-      {/* Floating Icons */}
-      {floatingIcons.map((icon) => {
+      {/* Floating Icons - Hidden in games section */}
+      {activeCategory !== 'games' && floatingIcons.map((icon) => {
         const IconComponent = getIconComponent(icon.type);
         return (
           <div
@@ -1298,8 +1328,8 @@ const YoungKidsPage = () => {
         );
       })}
 
-      {/* Celebration Effects */}
-      {celebrating && (
+      {/* Celebration Effects - Hidden in games section */}
+      {celebrating && activeCategory !== 'games' && (
         <div className="fixed inset-0 pointer-events-none z-50">
           {Array.from({ length: 20 }, (_, i) => (
             <div

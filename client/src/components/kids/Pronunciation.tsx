@@ -112,9 +112,10 @@ export default function Pronunciation({ items, onPhrasePracticed }: Pronunciatio
 
   const handleCorrectPronunciation = async (_blob: Blob, score: number) => {
     // Mark as mastered immediately (by phrase string, not index)
+    const updatedMasteredPhrases = new Set([...masteredPhrases, phrase.phrase]);
     setLastScore(score);
     setCurrentAttempts(prev => prev + 1);
-    setMasteredPhrases(prev => new Set([...prev, phrase.phrase]));
+    setMasteredPhrases(updatedMasteredPhrases);
     setShowSuccess(true);
     
     // Notify parent component
@@ -143,14 +144,45 @@ export default function Pronunciation({ items, onPhrasePracticed }: Pronunciatio
       console.warn('TTS celebration failed:', error);
     }
 
-    // Auto-advance to next phrase after celebration (fresh start)
+    // Auto-advance to next unmastered phrase after celebration
     setTimeout(() => {
-      next();
-    }, 2000);
+      // Find next unmastered phrase using updated mastered phrases set
+      let nextIndex = (current + 1) % items.length;
+      let attempts = 0;
+      const maxAttempts = items.length;
+      
+      // Skip all mastered phrases
+      while (updatedMasteredPhrases.has(items[nextIndex].phrase) && attempts < maxAttempts) {
+        nextIndex = (nextIndex + 1) % items.length;
+        attempts++;
+      }
+      
+      // If all phrases are mastered, stay on current or go to first
+      if (updatedMasteredPhrases.size >= items.length) {
+        console.log('🎉 All phrases mastered!');
+        // Optionally go to first phrase or stay on current
+        nextIndex = 0;
+      }
+      
+      setCurrent(nextIndex);
+      setCurrentAttempts(0);
+      setLastScore(null);
+      setShowSuccess(false);
+    }, 2000); // Same delay for consistency
   };
 
   const next = () => {
-    setCurrent((c) => (c + 1) % items.length);
+    // Find next unmastered phrase
+    let nextIndex = (current + 1) % items.length;
+    let attempts = 0;
+    const maxAttempts = items.length;
+    
+    while (masteredPhrases.has(items[nextIndex].phrase) && attempts < maxAttempts) {
+      nextIndex = (nextIndex + 1) % items.length;
+      attempts++;
+    }
+    
+    setCurrent(nextIndex);
     setCurrentAttempts(0);
     setLastScore(null);
     setShowSuccess(false);
@@ -209,9 +241,9 @@ export default function Pronunciation({ items, onPhrasePracticed }: Pronunciatio
       <Card 
         key={`phrase-card-${current}`}
         className={cn(
-          "border-2 transition-all duration-300 animate-in fade-in slide-in-from-right-4 backdrop-blur-sm shadow-lg",
+          "border-2 transition-all duration-500 animate-in fade-in slide-in-from-right-4 backdrop-blur-sm shadow-lg",
           masteredPhrases.has(phrase.phrase) 
-            ? "border-green-300/50 bg-green-100/20 dark:bg-green-900/5" 
+            ? "border-green-500 bg-green-200/80 dark:bg-green-800/70 shadow-green-300 dark:shadow-green-800" 
             : "border-orange-300/50 bg-orange-50/40 dark:bg-orange-900/10"
         )}
       >
@@ -232,10 +264,11 @@ export default function Pronunciation({ items, onPhrasePracticed }: Pronunciatio
           {/* Phrase Display */}
           <div className="text-center space-y-3 sm:space-y-4">
             <div className={cn(
-              "text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold transition-all duration-500",
+              "text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold transition-all duration-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 backdrop-blur-sm border",
               showSuccess && "animate-bounce scale-110",
-              masteredPhrases.has(phrase.phrase) && "text-green-700 dark:text-green-500",
-              "text-gray-800 dark:text-white bg-gradient-to-br from-orange-100/40 to-red-100/40 dark:from-orange-900/15 dark:to-red-900/15 rounded-xl sm:rounded-2xl p-4 sm:p-6 backdrop-blur-sm border border-orange-200/30 dark:border-orange-700/30"
+              masteredPhrases.has(phrase.phrase) 
+                ? "text-green-800 dark:text-green-200 bg-green-100/60 dark:bg-green-900/40 border-green-300 dark:border-green-700"
+                : "text-gray-800 dark:text-white bg-gradient-to-br from-orange-100/40 to-red-100/40 dark:from-orange-900/15 dark:to-red-900/15 border-orange-200/30 dark:border-orange-700/30"
             )}>
               {phrase.phrase}
               {showSuccess && ' 🎉'}

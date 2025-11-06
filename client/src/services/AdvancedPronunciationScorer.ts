@@ -798,178 +798,187 @@ class AdvancedPronunciationScorerClass {
   }
 
   /**
-   * Score pronunciation for kids with more lenient thresholds
-   * Kids' voices are higher pitched and they may pronounce words slightly differently
+   * Score pronunciation for kids - SIMPLIFIED
+   * Just returns a simple score based on string matching, no complex analysis
    */
   async scoreForKids(
     expectedText: string,
     spokenText: string,
-    audioData?: Blob
+    _audioData?: Blob
   ): Promise<DetailedPronunciationScore> {
-    // Get base score
-    const baseScore = await this.scoreDetailed(expectedText, spokenText, audioData);
-    
-    // Apply kid-friendly adjustments
-    // Kids often have:
-    // 1. Higher pitch (accounted for in acoustic analysis)
-    // 2. Less consistent articulation (more forgiving on clarity)
-    // 3. Faster or slower speech rate (more forgiving on timing)
-    
-    // Determine boost based on phrase length
+    // Simplified scoring for kids - just use string similarity
     const expectedWords = this.tokenize(expectedText);
-    const isLongPhrase = expectedWords.length > 3;
+    const spokenWords = this.tokenize(spokenText);
+    const isSingleWord = expectedWords.length === 1;
     
-    // Boost scores to be more encouraging (more boost for longer phrases)
-    const kidsBoost = isLongPhrase ? 10 : 5; // 10% for long phrases, 5% for short
+    let overallScore = 0;
     
-    const adjustedScore: DetailedPronunciationScore = {
-      ...baseScore,
-      overall: Math.min(100, baseScore.overall + kidsBoost),
-      accuracy: Math.min(100, baseScore.accuracy + kidsBoost),
-      fluency: Math.min(100, baseScore.fluency + kidsBoost),
-      clarity: Math.min(100, baseScore.clarity + kidsBoost),
-      recommendations: this.generateKidFriendlyRecommendations(baseScore)
-    };
-    
-    return adjustedScore;
-  }
-
-  /**
-   * Generate kid-friendly recommendations
-   */
-  private generateKidFriendlyRecommendations(score: DetailedPronunciationScore): string[] {
-    const recommendations: string[] = [];
-    
-    if (score.overall >= 90) {
-      recommendations.push('🌟 Wow! Amazing job! You sound fantastic!');
-      recommendations.push('🎉 Keep practicing and you\'ll be a pronunciation superstar!');
-    } else if (score.overall >= 75) {
-      recommendations.push('😊 Great effort! You\'re doing really well!');
-      recommendations.push('💪 Keep practicing and you\'ll master this word!');
-    } else if (score.overall >= 60) {
-      recommendations.push('👍 Good try! Let\'s practice together again!');
-      recommendations.push('🎤 Listen carefully and try to copy the sounds!');
+    // Calculate simple similarity score
+    if (isSingleWord && spokenWords.length > 0) {
+      const expectedWord = expectedWords[0].toLowerCase().trim();
+      const spokenWord = spokenWords[0].toLowerCase().trim();
+      
+      if (expectedWord === spokenWord) {
+        overallScore = 100;
+      } else {
+        const similarity = this.calculateStringSimilarity(expectedWord, spokenWord);
+        overallScore = Math.round(similarity * 100);
+      }
     } else {
-      recommendations.push('🤗 Don\'t worry! Learning is all about practice!');
-      recommendations.push('👂 Listen to the word again and say it slowly!');
-      recommendations.push('💝 Remember, every great speaker started just like you!');
+      // For phrases, check word matching
+      const matchingWords = expectedWords.filter(ew => {
+        const ewLower = ew.toLowerCase();
+        return spokenText.toLowerCase().includes(ewLower) ||
+               spokenWords.some(sw => this.calculateStringSimilarity(ewLower, sw.toLowerCase()) >= 0.60);
+      });
+      const matchRatio = matchingWords.length / expectedWords.length;
+      overallScore = Math.round(matchRatio * 100);
     }
     
-    return recommendations;
+    // If similarity check passed, give high score
+    const fullSimilarity = this.calculateStringSimilarity(
+      expectedText.toLowerCase().trim(),
+      spokenText.toLowerCase().trim()
+    );
+    if (fullSimilarity > 0.60) {
+      overallScore = Math.max(overallScore, Math.round(fullSimilarity * 100));
+    }
+    
+    // Return simplified score structure
+    return {
+      overall: Math.min(100, overallScore),
+      accuracy: overallScore,
+      fluency: 80, // Default good fluency for kids
+      prosody: 80, // Default good prosody
+      clarity: 80, // Default good clarity
+      timing: 80, // Default good timing
+      wordScores: [],
+      problemPhonemes: [],
+      recommendations: overallScore >= 80 
+        ? ['🌟 Great job! You said it correctly!'] 
+        : ['👍 Good try! Keep practicing!'],
+      metrics: {
+        speechRate: 120,
+        pauseCount: 0,
+        averagePauseDuration: 0,
+        speechDuration: 1,
+        totalDuration: 1
+      }
+    };
   }
+
 
   /**
    * Quick check if pronunciation is correct for kids (used for auto-stop)
-   * Returns true if the child pronounced it well enough (lower threshold for kids and longer phrases)
-   * Enhanced with better matching for single words (Word Games)
+   * VERY LENIENT for kids - accepts even partial matches
    */
-  async isCorrectForKids(expectedText: string, spokenText: string, audioData?: Blob): Promise<boolean> {
-    // Normalize inputs for better matching
+  async isCorrectForKids(expectedText: string, spokenText: string, _audioData?: Blob): Promise<boolean> {
+    // Normalize inputs
     const expectedWords = this.tokenize(expectedText);
     const spokenWords = this.tokenize(spokenText);
     const isSingleWord = expectedWords.length === 1;
     
     // If no transcript, we can't determine correctness
     if (!spokenText || spokenText.trim().length === 0) {
-      console.log('⚠️ No transcript received');
+      console.log('⚠️ No transcript provided for matching');
       return false;
     }
     
-    // For single words, check direct string similarity first (fuzzy matching)
+    const expectedLower = expectedText.toLowerCase().trim();
+    const spokenLower = spokenText.toLowerCase().trim();
+    
+    console.log(`🔍 Matching: expected="${expectedText}" vs spoken="${spokenText}"`);
+    
+    // 1. Check exact match (case-insensitive)
+    if (expectedLower === spokenLower) {
+      console.log(`✅ Exact match: "${spokenText}" matches "${expectedText}"`);
+      return true;
+    }
+    
+    // 2. Check if transcript contains the target word/phrase (or vice versa)
+    if (spokenLower.includes(expectedLower) || expectedLower.includes(spokenLower)) {
+      console.log(`✅ Contains match: "${expectedText}" found in "${spokenText}"`);
+      return true;
+    }
+    
+    // 3. For single words, check direct string similarity (VERY lenient - 50% threshold)
     if (isSingleWord && spokenWords.length > 0) {
       const expectedWord = expectedWords[0].toLowerCase().trim();
       const spokenWord = spokenWords[0].toLowerCase().trim();
       
-      // Check exact match first (case-insensitive)
-      if (expectedWord === spokenWord) {
-        console.log(`✅ Exact match: "${spokenWord}" matches "${expectedWord}"`);
-        return true;
-      }
-      
-      // Check if transcript contains the target word (for cases where kid says extra words)
-      if (spokenText.toLowerCase().includes(expectedWord)) {
-        console.log(`✅ Transcript contains target word: "${expectedWord}" found in "${spokenText}"`);
-        return true;
-      }
-      
-      // Quick string similarity check (more lenient for kids)
+      // Quick string similarity check - VERY lenient for kids (50% threshold)
       const stringSimilarity = this.calculateStringSimilarity(expectedWord, spokenWord);
+      console.log(`📊 Similarity: "${spokenWord}" vs "${expectedWord}" = ${(stringSimilarity * 100).toFixed(1)}%`);
       
-      // More lenient thresholds for kids - accept at 70% similarity (was 85%)
-      if (stringSimilarity > 0.70) {
-        console.log(`✅ Quick match: "${spokenWord}" matches "${expectedWord}" (${(stringSimilarity * 100).toFixed(1)}% similarity)`);
+      if (stringSimilarity >= 0.50) {
+        console.log(`✅ Similarity match: "${spokenWord}" matches "${expectedWord}" (${(stringSimilarity * 100).toFixed(1)}%)`);
         return true;
       }
       
-      // Check if any spoken word is similar enough (more lenient)
-      let bestSimilarity = stringSimilarity;
-      let bestWord = spokenWord;
+      // Check if any spoken word is similar enough
       for (const word of spokenWords) {
-        const sim = this.calculateStringSimilarity(expectedWord, word.toLowerCase().trim());
-        if (sim > bestSimilarity) {
-          bestSimilarity = sim;
-          bestWord = word.toLowerCase().trim();
+        const wordLower = word.toLowerCase().trim();
+        const sim = this.calculateStringSimilarity(expectedWord, wordLower);
+        if (sim >= 0.50) {
+          console.log(`✅ Word match: "${word}" matches "${expectedWord}" (${(sim * 100).toFixed(1)}%)`);
+          return true;
         }
       }
       
-      // More lenient: accept at 70% similarity (was 85%)
-      if (bestSimilarity > 0.70) {
-        console.log(`✅ Fuzzy match found: "${bestWord}" matches "${expectedWord}" (similarity=${(bestSimilarity * 100).toFixed(1)}%)`);
-        return true;
+      // Check first 2-3 characters match (for partial words - VERY lenient for kids)
+      if (expectedWord.length >= 2 && spokenWord.length >= 2) {
+        const firstChars = Math.min(2, Math.min(expectedWord.length, spokenWord.length));
+        const expectedPrefix = expectedWord.substring(0, firstChars);
+        const spokenPrefix = spokenWord.substring(0, firstChars);
+        if (expectedPrefix === spokenPrefix) {
+          console.log(`✅ Prefix match: "${spokenWord}" starts with "${expectedPrefix}"`);
+          return true;
+        }
       }
       
-      // Even more lenient: check if first 3-4 characters match (for partial words)
-      if (expectedWord.length >= 3 && bestWord.length >= 3) {
-        const firstChars = Math.min(3, Math.min(expectedWord.length, bestWord.length));
-        const prefixMatch = expectedWord.substring(0, firstChars) === bestWord.substring(0, firstChars);
-        if (prefixMatch && bestSimilarity > 0.55) {
-          console.log(`✅ Prefix match: "${bestWord}" starts with "${expectedWord.substring(0, firstChars)}" (similarity=${(bestSimilarity * 100).toFixed(1)}%)`);
-          return true;
+      // Check if any part of the word matches (even more lenient)
+      if (expectedWord.length >= 3) {
+        for (let i = 0; i <= expectedWord.length - 2; i++) {
+          const substring = expectedWord.substring(i, i + 2);
+          if (spokenWord.includes(substring)) {
+            console.log(`✅ Substring match: "${spokenWord}" contains "${substring}" from "${expectedWord}"`);
+            return true;
+          }
         }
       }
     }
     
-    // For phrases, check if all key words are present
+    // 4. For phrases, check if most key words are present (VERY lenient - 50% threshold)
     if (expectedWords.length > 1) {
-      const spokenLower = spokenText.toLowerCase();
+      const matchingWords = expectedWords.filter(ew => {
+        const ewLower = ew.toLowerCase();
+        return spokenLower.includes(ewLower) || 
+               spokenWords.some(sw => {
+                 const swLower = sw.toLowerCase();
+                 return swLower.includes(ewLower) || 
+                        this.calculateStringSimilarity(ewLower, swLower) >= 0.50;
+               });
+      });
       
-      // Check if transcript contains most of the expected words
-      const matchingWords = expectedWords.filter(ew => 
-        spokenLower.includes(ew.toLowerCase()) || 
-        spokenWords.some(sw => this.calculateStringSimilarity(ew.toLowerCase(), sw.toLowerCase()) > 0.7)
-      );
-      
-      // If 70% of words match, consider it correct
+      // If 50% of words match, consider it correct (VERY lenient for kids)
       const matchRatio = matchingWords.length / expectedWords.length;
-      if (matchRatio >= 0.7) {
+      console.log(`📊 Phrase match ratio: ${matchingWords.length}/${expectedWords.length} = ${(matchRatio * 100).toFixed(1)}%`);
+      if (matchRatio >= 0.50) {
         console.log(`✅ Phrase match: ${matchingWords.length}/${expectedWords.length} words matched (${(matchRatio * 100).toFixed(1)}%)`);
         return true;
       }
     }
     
-    // Do full scoring with phoneme analysis (fallback)
-    try {
-      const score = await this.scoreForKids(expectedText, spokenText, audioData);
-      
-      // Determine threshold based on phrase length - MORE LENIENT for kids
-      const isLongPhrase = expectedWords.length > 3;
-      
-      // Lower thresholds for kids - they're learning!
-      // Single words: 55% (was 65%), Short phrases: 60% (was 70%), Long phrases: 55% (was 60%)
-      const threshold = isSingleWord ? 55 : (isLongPhrase ? 55 : 60);
-      
-      console.log(`🎯 Full scoring: score=${score.overall.toFixed(1)}%, threshold=${threshold}%, phrase="${expectedText}" (${expectedWords.length} words, isSingle=${isSingleWord})`);
-      
-      return score.overall >= threshold;
-    } catch (error) {
-      console.warn('Error in full scoring, falling back to string similarity:', error);
-      // If scoring fails, use string similarity as fallback
-      const fallbackSimilarity = this.calculateStringSimilarity(
-        expectedText.toLowerCase().trim(),
-        spokenText.toLowerCase().trim()
-      );
-      return fallbackSimilarity > 0.65; // Even more lenient fallback
+    // 5. Final fallback: simple string similarity on full text (VERY lenient - 50% threshold)
+    const fullSimilarity = this.calculateStringSimilarity(expectedLower, spokenLower);
+    console.log(`📊 Full text similarity: ${(fullSimilarity * 100).toFixed(1)}%`);
+    if (fullSimilarity >= 0.50) {
+      console.log(`✅ Full text similarity match: ${(fullSimilarity * 100).toFixed(1)}%`);
+      return true;
     }
+    
+    console.log(`❌ No match found: expected="${expectedText}" vs spoken="${spokenText}"`);
+    return false;
   }
 }
 

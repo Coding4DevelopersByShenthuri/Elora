@@ -108,9 +108,10 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
 
   const handleCorrectPronunciation = async (_blob: Blob, score: number) => {
     // Mark as mastered immediately (by word string, not index)
+    const updatedMasteredWords = new Set([...masteredWords, card.word]);
     setLastScore(score);
     setCurrentAttempts(prev => prev + 1);
-    setMasteredWords(prev => new Set([...prev, card.word]));
+    setMasteredWords(updatedMasteredWords);
     setShowSuccess(true);
     
     // Notify parent component
@@ -141,22 +142,43 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
 
     // Auto-advance to next unmastered word after celebration
     setTimeout(() => {
-      // Find next unmastered word
+      // Find next unmastered word using updated mastered words set
       let nextIndex = (current + 1) % words.length;
       let attempts = 0;
-      while (masteredWords.has(words[nextIndex].word) && attempts < words.length) {
+      const maxAttempts = words.length;
+      
+      // Skip all mastered words
+      while (updatedMasteredWords.has(words[nextIndex].word) && attempts < maxAttempts) {
         nextIndex = (nextIndex + 1) % words.length;
         attempts++;
       }
+      
+      // If all words are mastered, stay on current or go to first
+      if (updatedMasteredWords.size >= words.length) {
+        console.log('🎉 All words mastered!');
+        // Optionally go to first word or stay on current
+        nextIndex = 0;
+      }
+      
       setCurrent(nextIndex);
       setCurrentAttempts(0);
       setLastScore(null);
       setShowSuccess(false);
-    }, 2500);
+    }, 2000); // Reduced delay for faster transition
   };
 
   const next = () => {
-    setCurrent((c) => (c + 1) % words.length);
+    // Find next unmastered word
+    let nextIndex = (current + 1) % words.length;
+    let attempts = 0;
+    const maxAttempts = words.length;
+    
+    while (masteredWords.has(words[nextIndex].word) && attempts < maxAttempts) {
+      nextIndex = (nextIndex + 1) % words.length;
+      attempts++;
+    }
+    
+    setCurrent(nextIndex);
     setCurrentAttempts(0);
     setLastScore(null);
     setShowSuccess(false);
@@ -215,9 +237,9 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
           <Card 
         key={`word-card-${current}`}
         className={cn(
-          "border-2 transition-all duration-300 animate-in fade-in slide-in-from-right-4 backdrop-blur-sm shadow-lg",
+          "border-2 transition-all duration-500 animate-in fade-in slide-in-from-right-4 backdrop-blur-sm shadow-lg",
           masteredWords.has(card.word) 
-            ? "border-green-300/50 bg-green-100/20 dark:bg-green-900/5" 
+            ? "border-green-500 bg-green-200/80 dark:bg-green-800/70 shadow-green-300 dark:shadow-green-800" 
             : "border-blue-300/50 bg-blue-50/40 dark:bg-blue-900/10"
         )}
       >
@@ -238,9 +260,11 @@ export default function Vocabulary({ words, onWordPracticed }: VocabularyProps) 
           {/* Word Display */}
           <div className="text-center space-y-3 sm:space-y-4">
                          <div className={cn(
-               "text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold transition-all duration-500",
+               "text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold transition-all duration-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 backdrop-blur-sm border",
                showSuccess && "animate-bounce scale-110",
-               masteredWords.has(card.word) && "text-green-700 dark:text-green-500"
+               masteredWords.has(card.word) 
+                 ? "text-green-800 dark:text-green-200 bg-green-100/60 dark:bg-green-900/40 border-green-300 dark:border-green-700"
+                 : "text-gray-800 dark:text-white border-transparent"
              )}>
 
                {card.word}

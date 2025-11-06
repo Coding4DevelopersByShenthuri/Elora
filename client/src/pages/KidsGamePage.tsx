@@ -462,6 +462,11 @@ const KidsGamePage = () => {
       if (transcript && transcript.length >= 2) { // Accept transcripts with at least 2 characters
         console.log('✅ Game voice input received:', transcript);
         
+        // Stop sparkles/floating icons when speech is detected correctly
+        window.dispatchEvent(new CustomEvent('game-speech-detected', { 
+          detail: { transcript, gameType: currentGame } 
+        }));
+        
         // Award points for speaking (engagement bonus)
         const engagementPoints = 2;
         handleScoreUpdate(engagementPoints, currentGame);
@@ -569,8 +574,8 @@ const KidsGamePage = () => {
 
   return (
     <div className="min-h-screen pb-16 sm:pb-20 pt-24 sm:pt-32 md:pt-40 relative overflow-hidden">
-      {/* Celebration Overlay */}
-      {showCelebration && (
+      {/* Celebration Overlay - Sparkles removed per user request */}
+      {/* {showCelebration && (
         <div className="fixed inset-0 pointer-events-none z-50">
           {Array.from({ length: 20 }, (_, i) => (
             <div
@@ -587,7 +592,7 @@ const KidsGamePage = () => {
             </div>
           ))}
         </div>
-      )}
+      )} */}
 
       <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative z-10">
         <Card className="border-2 border-purple-300/50 bg-purple-50/40 dark:bg-purple-900/10 backdrop-blur-sm">
