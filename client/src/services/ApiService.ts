@@ -710,6 +710,188 @@ export const KidsAPI = {
     } catch (error) {
       return handleApiError(error);
     }
+  },
+
+  /**
+   * Get story enrollments
+   */
+  getStoryEnrollments: async () => {
+    try {
+      const result = await fetchWithAuth('kids/stories/enrollments');
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Enroll in a story
+   */
+  enrollInStory: async (data: {
+    story_id: string;
+    story_title: string;
+    story_type: string;
+    score?: number;
+  }) => {
+    try {
+      const result = await fetchWithAuth('kids/stories/enroll', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get story words
+   */
+  getStoryWords: async (storyId?: string) => {
+    try {
+      const query = storyId ? `?story_id=${storyId}` : '';
+      const result = await fetchWithAuth(`kids/stories/words${query}`);
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get story phrases
+   */
+  getStoryPhrases: async (storyId?: string) => {
+    try {
+      const query = storyId ? `?story_id=${storyId}` : '';
+      const result = await fetchWithAuth(`kids/stories/phrases${query}`);
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Add/remove favorite story
+   */
+  toggleFavorite: async (storyId: string, isFavorite: boolean) => {
+    try {
+      if (isFavorite) {
+        const result = await fetchWithAuth('kids/favorites', {
+          method: 'POST',
+          body: JSON.stringify({ story_id: storyId }),
+        });
+        return {
+          success: true,
+          data: result
+        };
+      } else {
+        const result = await fetchWithAuth('kids/favorites', {
+          method: 'DELETE',
+          body: JSON.stringify({ story_id: storyId }),
+        });
+        return {
+          success: true,
+          data: result
+        };
+      }
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get favorites
+   */
+  getFavorites: async () => {
+    try {
+      const result = await fetchWithAuth('kids/favorites');
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Record vocabulary practice
+   */
+  recordVocabularyPractice: async (data: {
+    word: string;
+    story_id?: string;
+    score?: number;
+  }) => {
+    try {
+      const result = await fetchWithAuth('kids/vocabulary/practice', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Record pronunciation practice
+   */
+  recordPronunciationPractice: async (data: {
+    phrase: string;
+    story_id?: string;
+    score?: number;
+  }) => {
+    try {
+      const result = await fetchWithAuth('kids/pronunciation/practice', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Record game session
+   */
+  recordGameSession: async (data: {
+    game_type: string;
+    score?: number;
+    points_earned?: number;
+    duration_seconds?: number;
+    details?: any;
+  }) => {
+    try {
+      const result = await fetchWithAuth('kids/games/session', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
   }
 };
 

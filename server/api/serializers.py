@@ -4,7 +4,9 @@ from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
     VocabularyWord, Achievement, UserAchievement,
     KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, WaitlistEntry,
-    AdminNotification, SurveyStepResponse, PlatformSettings
+    AdminNotification, SurveyStepResponse, PlatformSettings,
+    StoryEnrollment, StoryWord, StoryPhrase, KidsFavorite,
+    KidsVocabularyPractice, KidsPronunciationPractice, KidsGameSession
 )
 from django.contrib.auth.password_validation import validate_password
 
@@ -236,6 +238,85 @@ class KidsCertificateSerializer(serializers.ModelSerializer):
     class Meta:
         model = KidsCertificate
         fields = ["user_id", "cert_id", "title", "file_url", "issued_at"]
+
+
+# ============= Kids Story Management Serializers =============
+class StoryEnrollmentSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+
+    class Meta:
+        model = StoryEnrollment
+        fields = [
+            "id", "user_id", "story_id", "story_title", "story_type",
+            "completed", "completed_at", "score", "words_extracted",
+            "created_at", "updated_at"
+        ]
+        read_only_fields = ["created_at", "updated_at"]
+
+
+class StoryWordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StoryWord
+        fields = [
+            "id", "story_id", "story_title", "word", "hint", "emoji",
+            "difficulty", "category", "created_at"
+        ]
+        read_only_fields = ["created_at"]
+
+
+class StoryPhraseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StoryPhrase
+        fields = [
+            "id", "story_id", "story_title", "phrase", "phonemes", "emoji",
+            "difficulty", "created_at"
+        ]
+        read_only_fields = ["created_at"]
+
+
+class KidsFavoriteSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+
+    class Meta:
+        model = KidsFavorite
+        fields = ["id", "user_id", "story_id", "created_at"]
+        read_only_fields = ["created_at"]
+
+
+class KidsVocabularyPracticeSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+
+    class Meta:
+        model = KidsVocabularyPractice
+        fields = [
+            "id", "user_id", "word", "story_id", "best_score", "attempts",
+            "last_practiced", "created_at"
+        ]
+        read_only_fields = ["last_practiced", "created_at"]
+
+
+class KidsPronunciationPracticeSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+
+    class Meta:
+        model = KidsPronunciationPractice
+        fields = [
+            "id", "user_id", "phrase", "story_id", "best_score", "attempts",
+            "last_practiced", "created_at"
+        ]
+        read_only_fields = ["last_practiced", "created_at"]
+
+
+class KidsGameSessionSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+
+    class Meta:
+        model = KidsGameSession
+        fields = [
+            "id", "user_id", "game_type", "score", "points_earned",
+            "duration_seconds", "details", "created_at"
+        ]
+        read_only_fields = ["created_at"]
 
 
 # ============= Waitlist Serializer =============

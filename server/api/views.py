@@ -28,13 +28,17 @@ from .serializers import (
     VocabularyWordSerializer, AchievementSerializer, UserAchievementSerializer,
     KidsLessonSerializer, KidsProgressSerializer, KidsAchievementSerializer, KidsCertificateSerializer,
     WaitlistSerializer, DailyProgressSerializer, WeeklyStatsSerializer, UserStatsSerializer,
-    AdminNotificationSerializer, SurveyStepResponseSerializer, PlatformSettingsSerializer
+    AdminNotificationSerializer, SurveyStepResponseSerializer, PlatformSettingsSerializer,
+    StoryEnrollmentSerializer, StoryWordSerializer, StoryPhraseSerializer, KidsFavoriteSerializer,
+    KidsVocabularyPracticeSerializer, KidsPronunciationPracticeSerializer, KidsGameSessionSerializer
 )
 from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
     VocabularyWord, Achievement, UserAchievement,
     KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, WaitlistEntry,
-    EmailVerificationToken, AdminNotification, SurveyStepResponse, PlatformSettings
+    EmailVerificationToken, AdminNotification, SurveyStepResponse, PlatformSettings,
+    StoryEnrollment, StoryWord, StoryPhrase, KidsFavorite,
+    KidsVocabularyPractice, KidsPronunciationPractice, KidsGameSession
 )
 
 logger = logging.getLogger(__name__)
@@ -1125,6 +1129,235 @@ def kids_issue_certificate(request):
 def kids_my_certificates(request):
     qs = KidsCertificate.objects.filter(user=request.user).order_by('-issued_at')
     return Response(KidsCertificateSerializer(qs, many=True).data)
+
+
+# ============= Kids Story Management Endpoints =============
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def kids_story_enrollments(request):
+    """Get all story enrollments for the user"""
+    enrollments = StoryEnrollment.objects.filter(user=request.user).order_by('-completed_at', '-created_at')
+    serializer = StoryEnrollmentSerializer(enrollments, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def kids_story_enroll(request):
+    """Enroll user in a story (mark as completed)"""
+    story_id = request.data.get('story_id')
+    story_title = request.data.get('story_title')
+    story_type = request.data.get('story_type')
+    score = request.data.get('score', 0)
+    
+    if not all([story_id, story_title, story_type]):
+        return Response(
+            {"message": "story_id, story_title, and story_type are required"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    enrollment, created = StoryEnrollment.objects.get_or_create(
+        user=request.user,
+        story_id=story_id,
+        defaults={
+            'story_title': story_title,
+            'story_type': story_type,
+            'completed': True,
+            'completed_at': timezone.now(),
+            'score': score,
+            'words_extracted': True
+        }
+    )
+    
+    if not created:
+        enrollment.completed = True
+        enrollment.completed_at = timezone.now()
+        enrollment.score = max(enrollment.score, score)
+        enrollment.words_extracted = True
+        enrollment.save()
+    
+    serializer = StoryEnrollmentSerializer(enrollment)
+    return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def kids_story_words(request):
+    """Get vocabulary words from enrolled stories"""
+    story_id = request.query_params.get('story_id', None)
+    
+    # Get enrolled story IDs for the user
+    enrollments = StoryEnrollment.objects.filter(
+        user=request.user,
+        completed=True,
+        words_extracted=True
+    )
+    
+    if story_id and story_id != 'all':
+        enrolled_story_ids = [story_id]
+    else:
+        enrolled_story_ids = list(enrollments.values_list('story_id', flat=True))
+    
+    words = StoryWord.objects.filter(story_id__in=enrolled_story_ids).order_by('story_id', 'word')
+    serializer = StoryWordSerializer(words, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def kids_story_phrases(request):
+    """Get phrases from enrolled stories for pronunciation practice"""
+    story_id = request.query_params.get('story_id', None)
+    
+    # Get enrolled story IDs for the user
+    enrollments = StoryEnrollment.objects.filter(
+        user=request.user,
+        completed=True,
+        words_extracted=True
+    )
+    
+    if story_id and story_id != 'all':
+        enrolled_story_ids = [story_id]
+    else:
+        enrolled_story_ids = list(enrollments.values_list('story_id', flat=True))
+    
+    phrases = StoryPhrase.objects.filter(story_id__in=enrolled_story_ids).order_by('story_id', 'phrase')
+    serializer = StoryPhraseSerializer(phrases, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET', 'POST', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def kids_favorites(request):
+    """Get, add, or remove favorite stories"""
+    if request.method == 'GET':
+        favorites = KidsFavorite.objects.filter(user=request.user).order_by('-created_at')
+        serializer = KidsFavoriteSerializer(favorites, many=True)
+        return Response(serializer.data)
+    
+    elif request.method == 'POST':
+        story_id = request.data.get('story_id')
+        if not story_id:
+            return Response(
+                {"message": "story_id is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        favorite, created = KidsFavorite.objects.get_or_create(
+            user=request.user,
+            story_id=story_id
+        )
+        serializer = KidsFavoriteSerializer(favorite)
+        return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+    
+    elif request.method == 'DELETE':
+        story_id = request.data.get('story_id')
+        if not story_id:
+            return Response(
+                {"message": "story_id is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        deleted = KidsFavorite.objects.filter(user=request.user, story_id=story_id).delete()
+        return Response(
+            {"message": "Favorite removed", "deleted": deleted[0]},
+            status=status.HTTP_200_OK
+        )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def kids_vocabulary_practice(request):
+    """Record vocabulary word practice"""
+    word = request.data.get('word')
+    story_id = request.data.get('story_id', '')
+    score = request.data.get('score', 100)
+    
+    if not word:
+        return Response(
+            {"message": "word is required"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    practice, created = KidsVocabularyPractice.objects.get_or_create(
+        user=request.user,
+        word=word,
+        defaults={
+            'story_id': story_id,
+            'best_score': score,
+            'attempts': 1
+        }
+    )
+    
+    if not created:
+        practice.best_score = max(practice.best_score, score)
+        practice.attempts += 1
+        practice.save()
+    
+    serializer = KidsVocabularyPracticeSerializer(practice)
+    return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def kids_pronunciation_practice(request):
+    """Record pronunciation phrase practice"""
+    phrase = request.data.get('phrase')
+    story_id = request.data.get('story_id', '')
+    score = request.data.get('score', 100)
+    
+    if not phrase:
+        return Response(
+            {"message": "phrase is required"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    practice, created = KidsPronunciationPractice.objects.get_or_create(
+        user=request.user,
+        phrase=phrase,
+        defaults={
+            'story_id': story_id,
+            'best_score': score,
+            'attempts': 1
+        }
+    )
+    
+    if not created:
+        practice.best_score = max(practice.best_score, score)
+        practice.attempts += 1
+        practice.save()
+    
+    serializer = KidsPronunciationPracticeSerializer(practice)
+    return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def kids_game_session(request):
+    """Record a game session"""
+    game_type = request.data.get('game_type')
+    score = request.data.get('score', 0)
+    points_earned = request.data.get('points_earned', 0)
+    duration_seconds = request.data.get('duration_seconds', 0)
+    details = request.data.get('details', {})
+    
+    if not game_type:
+        return Response(
+            {"message": "game_type is required"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    session = KidsGameSession.objects.create(
+        user=request.user,
+        game_type=game_type,
+        score=score,
+        points_earned=points_earned,
+        duration_seconds=duration_seconds,
+        details=details
+    )
+    
+    serializer = KidsGameSessionSerializer(session)
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 # ============= Gemini AI Games =============

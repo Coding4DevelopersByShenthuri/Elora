@@ -50,6 +50,16 @@ urlpatterns = [
     path('kids/analytics', views.kids_analytics, name='kids-analytics'),
     path('kids/gemini/game', views.kids_gemini_game, name='kids-gemini-game'),
     
+    # ============= Kids Story Management =============
+    path('kids/stories/enrollments', views.kids_story_enrollments, name='kids-story-enrollments'),
+    path('kids/stories/enroll', views.kids_story_enroll, name='kids-story-enroll'),
+    path('kids/stories/words', views.kids_story_words, name='kids-story-words'),
+    path('kids/stories/phrases', views.kids_story_phrases, name='kids-story-phrases'),
+    path('kids/favorites', views.kids_favorites, name='kids-favorites'),
+    path('kids/vocabulary/practice', views.kids_vocabulary_practice, name='kids-vocabulary-practice'),
+    path('kids/pronunciation/practice', views.kids_pronunciation_practice, name='kids-pronunciation-practice'),
+    path('kids/games/session', views.kids_game_session, name='kids-game-session'),
+    
     # ============= Waitlist =============
     path('waitlist/signup', views.waitlist_signup, name='waitlist-signup'),
     

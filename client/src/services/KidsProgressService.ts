@@ -45,8 +45,8 @@ export class KidsProgressService {
     storyType: string, 
     score: number
   ): Promise<void> {
-    // Enroll in story using StoryWordsService
-    StoryWordsService.enrollInStory(userId, storyId, storyTitle, storyType, score);
+    // Enroll in story using StoryWordsService (saves to both localStorage and MySQL)
+    await StoryWordsService.enrollInStory(userId, storyId, storyTitle, storyType, score);
     
     // Update progress with story completion
     await this.update(userId, (progress) => {

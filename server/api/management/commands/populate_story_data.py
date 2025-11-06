@@ -1,0 +1,265 @@
+"""
+Management command to populate StoryWord and StoryPhrase tables with initial data.
+Run with: python manage.py populate_story_data
+"""
+from django.core.management.base import BaseCommand
+from api.models import StoryWord, StoryPhrase
+
+# Story vocabulary data - extracted from StoryWordsService.ts
+STORY_VOCABULARY = {
+    'magic-forest': [
+        {'word': 'rabbit', 'hint': '🐰 Say: RAB-it', 'emoji': '🐰', 'story_title': 'Magic Forest Adventure', 'difficulty': 'easy', 'category': 'animals'},
+        {'word': 'forest', 'hint': '🌲 Say: FOR-est', 'emoji': '🌲', 'story_title': 'Magic Forest Adventure', 'difficulty': 'easy', 'category': 'nature'},
+        {'word': 'magic', 'hint': '✨ Say: MAJ-ik', 'emoji': '✨', 'story_title': 'Magic Forest Adventure', 'difficulty': 'easy', 'category': 'fantasy'},
+        {'word': 'whisper', 'hint': '🤫 Say: WIS-per', 'emoji': '🤫', 'story_title': 'Magic Forest Adventure', 'difficulty': 'medium', 'category': 'actions'},
+        {'word': 'butterfly', 'hint': '🦋 Say: BUT-er-fly', 'emoji': '🦋', 'story_title': 'Magic Forest Adventure', 'difficulty': 'easy', 'category': 'animals'},
+        {'word': 'river', 'hint': '🌊 Say: RIV-er', 'emoji': '🌊', 'story_title': 'Magic Forest Adventure', 'difficulty': 'easy', 'category': 'nature'},
+        {'word': 'stars', 'hint': '⭐ Say: STARZ', 'emoji': '⭐', 'story_title': 'Magic Forest Adventure', 'difficulty': 'easy', 'category': 'nature'},
+        {'word': 'kindness', 'hint': '💝 Say: KIND-ness', 'emoji': '💝', 'story_title': 'Magic Forest Adventure', 'difficulty': 'medium', 'category': 'emotions'},
+    ],
+    'space-adventure': [
+        {'word': 'planet', 'hint': '🪐 Say: PLAN-it', 'emoji': '🪐', 'story_title': 'Space Adventure', 'difficulty': 'easy', 'category': 'space'},
+        {'word': 'astronaut', 'hint': '👨‍🚀 Say: AS-tro-not', 'emoji': '👨‍🚀', 'story_title': 'Space Adventure', 'difficulty': 'medium', 'category': 'space'},
+        {'word': 'rocket', 'hint': '🚀 Say: ROCK-it', 'emoji': '🚀', 'story_title': 'Space Adventure', 'difficulty': 'easy', 'category': 'space'},
+        {'word': 'alien', 'hint': '👽 Say: AY-lee-en', 'emoji': '👽', 'story_title': 'Space Adventure', 'difficulty': 'easy', 'category': 'space'},
+        {'word': 'explore', 'hint': '🔍 Say: ex-PLOR', 'emoji': '🔍', 'story_title': 'Space Adventure', 'difficulty': 'medium', 'category': 'actions'},
+        {'word': 'teamwork', 'hint': '🤝 Say: TEAM-work', 'emoji': '🤝', 'story_title': 'Space Adventure', 'difficulty': 'medium', 'category': 'values'},
+        {'word': 'galaxy', 'hint': '🌌 Say: GAL-ax-ee', 'emoji': '🌌', 'story_title': 'Space Adventure', 'difficulty': 'medium', 'category': 'space'},
+        {'word': 'adventure', 'hint': '🗺️ Say: ad-VEN-chur', 'emoji': '🗺️', 'story_title': 'Space Adventure', 'difficulty': 'medium', 'category': 'actions'},
+    ],
+    'underwater-world': [
+        {'word': 'fish', 'hint': '🐠 Say: FISH', 'emoji': '🐠', 'story_title': 'Underwater World', 'difficulty': 'easy', 'category': 'animals'},
+        {'word': 'ocean', 'hint': '🌊 Say: O-shun', 'emoji': '🌊', 'story_title': 'Underwater World', 'difficulty': 'easy', 'category': 'nature'},
+        {'word': 'coral', 'hint': '🪸 Say: KOR-al', 'emoji': '🪸', 'story_title': 'Underwater World', 'difficulty': 'easy', 'category': 'nature'},
+        {'word': 'swim', 'hint': '🏊 Say: SWIM', 'emoji': '🏊', 'story_title': 'Underwater World', 'difficulty': 'easy', 'category': 'actions'},
+        {'word': 'friendship', 'hint': '👫 Say: FREND-ship', 'emoji': '👫', 'story_title': 'Underwater World', 'difficulty': 'medium', 'category': 'values'},
+        {'word': 'protect', 'hint': '🛡️ Say: pro-TEKT', 'emoji': '🛡️', 'story_title': 'Underwater World', 'difficulty': 'medium', 'category': 'actions'},
+        {'word': 'beautiful', 'hint': '💎 Say: BYOO-ti-ful', 'emoji': '💎', 'story_title': 'Underwater World', 'difficulty': 'medium', 'category': 'descriptions'},
+        {'word': 'treasure', 'hint': '💎 Say: TREZH-er', 'emoji': '💎', 'story_title': 'Underwater World', 'difficulty': 'easy', 'category': 'objects'},
+    ],
+    'dinosaur-discovery': [
+        {'word': 'dinosaur', 'hint': '🦖 Say: DY-no-sawr', 'emoji': '🦖', 'story_title': 'Dinosaur Discovery', 'difficulty': 'easy', 'category': 'animals'},
+        {'word': 'fossil', 'hint': '🦴 Say: FOS-il', 'emoji': '🦴', 'story_title': 'Dinosaur Discovery', 'difficulty': 'medium', 'category': 'science'},
+        {'word': 'discover', 'hint': '🔍 Say: dis-KUV-er', 'emoji': '🔍', 'story_title': 'Dinosaur Discovery', 'difficulty': 'medium', 'category': 'actions'},
+        {'word': 'museum', 'hint': '🏛️ Say: myoo-ZEE-um', 'emoji': '🏛️', 'story_title': 'Dinosaur Discovery', 'difficulty': 'medium', 'category': 'places'},
+        {'word': 'scientist', 'hint': '👩‍🔬 Say: SY-en-tist', 'emoji': '👩‍🔬', 'story_title': 'Dinosaur Discovery', 'difficulty': 'hard', 'category': 'professions'},
+        {'word': 'ancient', 'hint': '🏺 Say: AYN-shent', 'emoji': '🏺', 'story_title': 'Dinosaur Discovery', 'difficulty': 'hard', 'category': 'descriptions'},
+        {'word': 'excavate', 'hint': '⛏️ Say: EKS-ka-vate', 'emoji': '⛏️', 'story_title': 'Dinosaur Discovery', 'difficulty': 'hard', 'category': 'actions'},
+        {'word': 'prehistoric', 'hint': '🦕 Say: pree-his-TOR-ik', 'emoji': '🦕', 'story_title': 'Dinosaur Discovery', 'difficulty': 'hard', 'category': 'descriptions'},
+    ],
+    'unicorn-magic': [
+        {'word': 'unicorn', 'hint': '🦄 Say: YOU-ni-corn', 'emoji': '🦄', 'story_title': 'Unicorn Magic Adventure', 'difficulty': 'easy', 'category': 'fantasy'},
+        {'word': 'rainbow', 'hint': '🌈 Say: RAIN-bow', 'emoji': '🌈', 'story_title': 'Unicorn Magic Adventure', 'difficulty': 'easy', 'category': 'nature'},
+        {'word': 'sparkle', 'hint': '✨ Say: SPAR-kul', 'emoji': '✨', 'story_title': 'Unicorn Magic Adventure', 'difficulty': 'easy', 'category': 'fantasy'},
+        {'word': 'magical', 'hint': '🪄 Say: MAJ-i-kal', 'emoji': '🪄', 'story_title': 'Unicorn Magic Adventure', 'difficulty': 'medium', 'category': 'descriptions'},
+        {'word': 'dream', 'hint': '💭 Say: DREEM', 'emoji': '💭', 'story_title': 'Unicorn Magic Adventure', 'difficulty': 'easy', 'category': 'concepts'},
+        {'word': 'wish', 'hint': '🌟 Say: WISH', 'emoji': '🌟', 'story_title': 'Unicorn Magic Adventure', 'difficulty': 'easy', 'category': 'actions'},
+        {'word': 'wonderful', 'hint': '😍 Say: WUN-der-ful', 'emoji': '😍', 'story_title': 'Unicorn Magic Adventure', 'difficulty': 'medium', 'category': 'descriptions'},
+        {'word': 'imagination', 'hint': '🎭 Say: i-maj-i-NAY-shun', 'emoji': '🎭', 'story_title': 'Unicorn Magic Adventure', 'difficulty': 'hard', 'category': 'concepts'},
+    ],
+    'pirate-treasure': [
+        {'word': 'pirate', 'hint': '🏴‍☠️ Say: PY-rate', 'emoji': '🏴‍☠️', 'story_title': 'Pirate Treasure Adventure', 'difficulty': 'easy', 'category': 'characters'},
+        {'word': 'treasure', 'hint': '💎 Say: TREZH-er', 'emoji': '💎', 'story_title': 'Pirate Treasure Adventure', 'difficulty': 'easy', 'category': 'objects'},
+        {'word': 'ship', 'hint': '🚢 Say: SHIP', 'emoji': '🚢', 'story_title': 'Pirate Treasure Adventure', 'difficulty': 'easy', 'category': 'transport'},
+        {'word': 'map', 'hint': '🗺️ Say: MAP', 'emoji': '🗺️', 'story_title': 'Pirate Treasure Adventure', 'difficulty': 'easy', 'category': 'objects'},
+        {'word': 'captain', 'hint': '⚓ Say: CAP-tin', 'emoji': '⚓', 'story_title': 'Pirate Treasure Adventure', 'difficulty': 'medium', 'category': 'professions'},
+        {'word': 'adventure', 'hint': '🗺️ Say: ad-VEN-chur', 'emoji': '🗺️', 'story_title': 'Pirate Treasure Adventure', 'difficulty': 'medium', 'category': 'actions'},
+        {'word': 'island', 'hint': '🏝️ Say: I-land', 'emoji': '🏝️', 'story_title': 'Pirate Treasure Adventure', 'difficulty': 'easy', 'category': 'places'},
+        {'word': 'parrot', 'hint': '🦜 Say: PAIR-ut', 'emoji': '🦜', 'story_title': 'Pirate Treasure Adventure', 'difficulty': 'easy', 'category': 'animals'},
+    ],
+    'superhero-school': [
+        {'word': 'superhero', 'hint': '🦸 Say: SOO-per-hero', 'emoji': '🦸', 'story_title': 'Superhero School Adventure', 'difficulty': 'easy', 'category': 'characters'},
+        {'word': 'rescue', 'hint': '🚁 Say: RES-kyoo', 'emoji': '🚁', 'story_title': 'Superhero School Adventure', 'difficulty': 'medium', 'category': 'actions'},
+        {'word': 'training', 'hint': '💪 Say: TRAIN-ing', 'emoji': '💪', 'story_title': 'Superhero School Adventure', 'difficulty': 'medium', 'category': 'actions'},
+        {'word': 'courage', 'hint': '🦁 Say: KUR-ij', 'emoji': '🦁', 'story_title': 'Superhero School Adventure', 'difficulty': 'medium', 'category': 'values'},
+        {'word': 'mission', 'hint': '🎯 Say: MISH-un', 'emoji': '🎯', 'story_title': 'Superhero School Adventure', 'difficulty': 'medium', 'category': 'concepts'},
+        {'word': 'protect', 'hint': '🛡️ Say: pro-TEKT', 'emoji': '🛡️', 'story_title': 'Superhero School Adventure', 'difficulty': 'medium', 'category': 'actions'},
+        {'word': 'brave', 'hint': '🦅 Say: BRAVE', 'emoji': '🦅', 'story_title': 'Superhero School Adventure', 'difficulty': 'easy', 'category': 'descriptions'},
+        {'word': 'teamwork', 'hint': '🤝 Say: TEAM-work', 'emoji': '🤝', 'story_title': 'Superhero School Adventure', 'difficulty': 'medium', 'category': 'values'},
+    ],
+    'fairy-garden': [
+        {'word': 'fairy', 'hint': '🧚 Say: FAIR-ee', 'emoji': '🧚', 'story_title': 'Fairy Garden Adventure', 'difficulty': 'easy', 'category': 'fantasy'},
+        {'word': 'garden', 'hint': '🌺 Say: GAR-den', 'emoji': '🌺', 'story_title': 'Fairy Garden Adventure', 'difficulty': 'easy', 'category': 'places'},
+        {'word': 'magic', 'hint': '✨ Say: MAJ-ik', 'emoji': '✨', 'story_title': 'Fairy Garden Adventure', 'difficulty': 'easy', 'category': 'fantasy'},
+        {'word': 'flower', 'hint': '🌸 Say: FLOW-er', 'emoji': '🌸', 'story_title': 'Fairy Garden Adventure', 'difficulty': 'easy', 'category': 'nature'},
+        {'word': 'wings', 'hint': '🦋 Say: WINGZ', 'emoji': '🦋', 'story_title': 'Fairy Garden Adventure', 'difficulty': 'easy', 'category': 'body'},
+        {'word': 'dust', 'hint': '✨ Say: DUST', 'emoji': '✨', 'story_title': 'Fairy Garden Adventure', 'difficulty': 'easy', 'category': 'objects'},
+        {'word': 'tiny', 'hint': '🔍 Say: TY-nee', 'emoji': '🔍', 'story_title': 'Fairy Garden Adventure', 'difficulty': 'easy', 'category': 'descriptions'},
+        {'word': 'moonflower', 'hint': '🌙🌸 Say: MOON-flow-er', 'emoji': '🌙🌸', 'story_title': 'Fairy Garden Adventure', 'difficulty': 'medium', 'category': 'nature'},
+    ],
+    'rainbow-castle': [
+        {'word': 'princess', 'hint': '👸 Say: PRIN-sess', 'emoji': '👸', 'story_title': 'Rainbow Castle Adventure', 'difficulty': 'easy', 'category': 'characters'},
+        {'word': 'castle', 'hint': '🏰 Say: KAS-ul', 'emoji': '🏰', 'story_title': 'Rainbow Castle Adventure', 'difficulty': 'easy', 'category': 'places'},
+        {'word': 'rainbow', 'hint': '🌈 Say: RAIN-bow', 'emoji': '🌈', 'story_title': 'Rainbow Castle Adventure', 'difficulty': 'easy', 'category': 'nature'},
+        {'word': 'crown', 'hint': '👑 Say: KROWN', 'emoji': '👑', 'story_title': 'Rainbow Castle Adventure', 'difficulty': 'easy', 'category': 'objects'},
+        {'word': 'dance', 'hint': '💃 Say: DANS', 'emoji': '💃', 'story_title': 'Rainbow Castle Adventure', 'difficulty': 'easy', 'category': 'actions'},
+        {'word': 'sing', 'hint': '🎵 Say: SING', 'emoji': '🎵', 'story_title': 'Rainbow Castle Adventure', 'difficulty': 'easy', 'category': 'actions'},
+        {'word': 'celebration', 'hint': '🎉 Say: sel-eh-BRAY-shun', 'emoji': '🎉', 'story_title': 'Rainbow Castle Adventure', 'difficulty': 'medium', 'category': 'concepts'},
+        {'word': 'friendship', 'hint': '👫 Say: FREND-ship', 'emoji': '👫', 'story_title': 'Rainbow Castle Adventure', 'difficulty': 'medium', 'category': 'values'},
+    ],
+    'jungle-explorer': [
+        {'word': 'jungle', 'hint': '🌴 Say: JUNG-ul', 'emoji': '🌴', 'story_title': 'Jungle Explorer Adventure', 'difficulty': 'easy', 'category': 'places'},
+        {'word': 'explorer', 'hint': '🗺️ Say: ex-PLOR-er', 'emoji': '🗺️', 'story_title': 'Jungle Explorer Adventure', 'difficulty': 'medium', 'category': 'professions'},
+        {'word': 'tiger', 'hint': '🐅 Say: TY-ger', 'emoji': '🐅', 'story_title': 'Jungle Explorer Adventure', 'difficulty': 'easy', 'category': 'animals'},
+        {'word': 'monkey', 'hint': '🐵 Say: MUN-kee', 'emoji': '🐵', 'story_title': 'Jungle Explorer Adventure', 'difficulty': 'easy', 'category': 'animals'},
+        {'word': 'vine', 'hint': '🌿 Say: VINE', 'emoji': '🌿', 'story_title': 'Jungle Explorer Adventure', 'difficulty': 'easy', 'category': 'nature'},
+        {'word': 'roar', 'hint': '🦁 Say: ROR', 'emoji': '🦁', 'story_title': 'Jungle Explorer Adventure', 'difficulty': 'easy', 'category': 'sounds'},
+        {'word': 'adventure', 'hint': '🗺️ Say: ad-VEN-chur', 'emoji': '🗺️', 'story_title': 'Jungle Explorer Adventure', 'difficulty': 'medium', 'category': 'actions'},
+        {'word': 'brave', 'hint': '🦅 Say: BRAVE', 'emoji': '🦅', 'story_title': 'Jungle Explorer Adventure', 'difficulty': 'easy', 'category': 'descriptions'},
+    ],
+}
+
+# Story phrases data - extracted from StoryWordsService.ts
+STORY_PHRASES = {
+    'magic-forest': [
+        {'phrase': 'Hello Luna', 'phonemes': '👋 Say: heh-LOW LOO-nah', 'emoji': '👋🐰', 'story_title': 'Magic Forest Adventure', 'difficulty': 'easy'},
+        {'phrase': 'Magic forest', 'phonemes': '✨🌲 Say: MAJ-ik FOR-est', 'emoji': '✨🌲', 'story_title': 'Magic Forest Adventure', 'difficulty': 'easy'},
+        {'phrase': 'Happy rabbit', 'phonemes': '😊🐰 Say: HAP-ee RAB-it', 'emoji': '😊🐰', 'story_title': 'Magic Forest Adventure', 'difficulty': 'easy'},
+        {'phrase': 'Welcome to our forest', 'phonemes': '🌲 Say: WEL-kum TO OUR FOR-est', 'emoji': '🌲', 'story_title': 'Magic Forest Adventure', 'difficulty': 'medium'},
+        {'phrase': 'I love this sunny day', 'phonemes': '🦋☀️ Say: I LUV THIS SUN-ee DAY', 'emoji': '🦋☀️', 'story_title': 'Magic Forest Adventure', 'difficulty': 'medium'},
+        {'phrase': 'Flow so free', 'phonemes': '💧 Say: FLO SO FRE', 'emoji': '💧', 'story_title': 'Magic Forest Adventure', 'difficulty': 'easy'},
+        {'phrase': 'Being kind makes everyone smile', 'phonemes': '🌸😊 Say: BE-ing KIND MAKS EV-ree-wun SMILE', 'emoji': '🌸😊', 'story_title': 'Magic Forest Adventure', 'difficulty': 'hard'},
+        {'phrase': 'Stars shine brightly at night', 'phonemes': '⭐ Say: STARZ SHIYN BRYT-lee AT NIYT', 'emoji': '⭐', 'story_title': 'Magic Forest Adventure', 'difficulty': 'medium'},
+        {'phrase': 'Collecting makes me happy', 'phonemes': '🌰 Say: kol-EK-ting MAKS ME HAP-ee', 'emoji': '🌰', 'story_title': 'Magic Forest Adventure', 'difficulty': 'medium'},
+        {'phrase': 'The most important thing is kindness', 'phonemes': '💝 Say: THE MOST im-POR-tant THING IS KIND-ness', 'emoji': '💝', 'story_title': 'Magic Forest Adventure', 'difficulty': 'hard'},
+    ],
+    'space-adventure': [
+        {'phrase': 'We are flying to the stars', 'phonemes': '🚀✨ Say: WE ARE FLY-ing TO THE STARZ', 'emoji': '🚀✨', 'story_title': 'Space Adventure', 'difficulty': 'easy'},
+        {'phrase': 'Hello Cosmo', 'phonemes': '👋 Say: heh-LOW KOZ-mo', 'emoji': '👋👨‍🚀', 'story_title': 'Space Adventure', 'difficulty': 'easy'},
+        {'phrase': 'Blast off', 'phonemes': '🚀 Say: BLAST OFF', 'emoji': '🚀', 'story_title': 'Space Adventure', 'difficulty': 'easy'},
+        {'phrase': 'Hello new friend from Earth', 'phonemes': '👽👋 Say: heh-LOW NYOO FREND FRUM UHRS', 'emoji': '👽👋', 'story_title': 'Space Adventure', 'difficulty': 'medium'},
+        {'phrase': 'My rings make me special', 'phonemes': '🪐💍 Say: MY RINGZ MAK ME SPE-shul', 'emoji': '🪐💍', 'story_title': 'Space Adventure', 'difficulty': 'medium'},
+        {'phrase': 'Stars twinkle in the night sky', 'phonemes': '⭐ Say: STARZ TWIN-kul IN THE NIYT SKY', 'emoji': '⭐', 'story_title': 'Space Adventure', 'difficulty': 'medium'},
+        {'phrase': 'I can jump so high here', 'phonemes': '🌙 Say: I KAN JUMP SO HY HERE', 'emoji': '🌙', 'story_title': 'Space Adventure', 'difficulty': 'medium'},
+        {'phrase': 'Teamwork makes our mission succeed', 'phonemes': '🤝 Say: TEAM-work MAKS OUR MISH-un suk-SEED', 'emoji': '🤝', 'story_title': 'Space Adventure', 'difficulty': 'hard'},
+    ],
+    'underwater-world': [
+        {'phrase': 'Hello Finn', 'phonemes': '👋 Say: heh-LOW FIN', 'emoji': '👋🐠', 'story_title': 'Underwater World', 'difficulty': 'easy'},
+        {'phrase': 'Swimming is so much fun', 'phonemes': '🏊 Say: SWIM-ing IS SO MUCH FUN', 'emoji': '🏊🐠', 'story_title': 'Underwater World', 'difficulty': 'medium'},
+        {'phrase': 'Beautiful ocean', 'phonemes': '🌊 Say: BYOO-ti-ful O-shun', 'emoji': '🌊', 'story_title': 'Underwater World', 'difficulty': 'easy'},
+        {'phrase': 'Come see my beautiful colors', 'phonemes': '🪸🌈 Say: KUM SEE MY BYOO-ti-ful KUL-urz', 'emoji': '🪸🌈', 'story_title': 'Underwater World', 'difficulty': 'medium'},
+        {'phrase': 'Let us play and jump high', 'phonemes': '🐬 Say: LET US PLA AND JUMP HY', 'emoji': '🐬', 'story_title': 'Underwater World', 'difficulty': 'medium'},
+        {'phrase': 'Fish swim in the water', 'phonemes': '🐠 Say: FISH SWIM IN THE WAH-tur', 'emoji': '🐠', 'story_title': 'Underwater World', 'difficulty': 'easy'},
+        {'phrase': 'My song travels far and wide', 'phonemes': '🐋🎵 Say: MY SONG TRA-vulz FAR AND WYD', 'emoji': '🐋🎵', 'story_title': 'Underwater World', 'difficulty': 'medium'},
+        {'phrase': 'The ocean is happy when we keep it clean', 'phonemes': '🌊 Say: THE O-shun IS HAP-ee WEN WE KEEP IT KLEN', 'emoji': '🌊', 'story_title': 'Underwater World', 'difficulty': 'hard'},
+    ],
+    'dinosaur-discovery': [
+        {'phrase': 'Hello Dina', 'phonemes': '👋 Say: heh-LOW DEE-nah', 'emoji': '👋🦕', 'story_title': 'Dinosaur Discovery', 'difficulty': 'easy'},
+        {'phrase': 'Big dinosaur', 'phonemes': '🦖 Say: BIG DY-no-sawr', 'emoji': '🦖', 'story_title': 'Dinosaur Discovery', 'difficulty': 'easy'},
+        {'phrase': 'Ancient fossil', 'phonemes': '🦴 Say: AYN-shent FOS-il', 'emoji': '🦴', 'story_title': 'Dinosaur Discovery', 'difficulty': 'medium'},
+        {'phrase': 'Dig carefully to find bones', 'phonemes': '⛏️ Say: DIG KAYR-ful-ee TO FYND BONZ', 'emoji': '⛏️🦴', 'story_title': 'Dinosaur Discovery', 'difficulty': 'medium'},
+        {'phrase': 'Fossils show us ancient creatures', 'phonemes': '🦴 Say: FOS-ulz SHO US AYN-shent KREE-churz', 'emoji': '🦴', 'story_title': 'Dinosaur Discovery', 'difficulty': 'hard'},
+        {'phrase': 'I love discovering new things', 'phonemes': '🔍 Say: I LUV dis-KUV-er-ing NYOO THINGZ', 'emoji': '🔍', 'story_title': 'Dinosaur Discovery', 'difficulty': 'medium'},
+    ],
+    'unicorn-magic': [
+        {'phrase': 'Hello Stardust', 'phonemes': '👋 Say: heh-LOW STAR-dust', 'emoji': '👋🦄', 'story_title': 'Unicorn Magic Adventure', 'difficulty': 'easy'},
+        {'phrase': 'Rainbow unicorn', 'phonemes': '🌈🦄 Say: RAIN-bow YOU-ni-corn', 'emoji': '🌈🦄', 'story_title': 'Unicorn Magic Adventure', 'difficulty': 'easy'},
+        {'phrase': 'Magic sparkles', 'phonemes': '✨⭐ Say: MAJ-ik SPAR-kulz', 'emoji': '✨⭐', 'story_title': 'Unicorn Magic Adventure', 'difficulty': 'medium'},
+        {'phrase': 'My horn makes wishes come true', 'phonemes': '🦄 Say: MY HORN MAKS WISH-uz KUM TROO', 'emoji': '🦄✨', 'story_title': 'Unicorn Magic Adventure', 'difficulty': 'hard'},
+        {'phrase': 'Dreams can come true', 'phonemes': '💭 Say: DREEMZ KAN KUM TROO', 'emoji': '💭⭐', 'story_title': 'Unicorn Magic Adventure', 'difficulty': 'easy'},
+    ],
+    'pirate-treasure': [
+        {'phrase': 'Hello Captain Finn', 'phonemes': '👋⚓ Say: heh-LOW CAP-tin FIN', 'emoji': '👋⚓', 'story_title': 'Pirate Treasure Adventure', 'difficulty': 'easy'},
+        {'phrase': 'Pirate treasure', 'phonemes': '🏴‍☠️💎 Say: PY-rate TREZH-er', 'emoji': '🏴‍☠️💎', 'story_title': 'Pirate Treasure Adventure', 'difficulty': 'easy'},
+        {'phrase': 'Buried treasure', 'phonemes': '🏝️💰 Say: BER-eed TREZH-er', 'emoji': '🏝️💰', 'story_title': 'Pirate Treasure Adventure', 'difficulty': 'medium'},
+        {'phrase': 'Hoist the sails and catch the wind', 'phonemes': '⛵💨 Say: HOYST THE SAILZ AND KACH THE WIND', 'emoji': '⛵💨', 'story_title': 'Pirate Treasure Adventure', 'difficulty': 'medium'},
+        {'phrase': 'X marks the spot where treasure hides', 'phonemes': '🗺️💰 Say: EKS MARKS THE SPOT WHERE TREZH-er HYDS', 'emoji': '🗺️💰', 'story_title': 'Pirate Treasure Adventure', 'difficulty': 'hard'},
+        {'phrase': 'Follow me to the treasure', 'phonemes': '🦜💎 Say: FOL-ow ME TO THE TREZH-er', 'emoji': '🦜💎', 'story_title': 'Pirate Treasure Adventure', 'difficulty': 'medium'},
+        {'phrase': 'Stay brave through the storm', 'phonemes': '⛈️💪 Say: STA BRAV THROO THE STORM', 'emoji': '⛈️💪', 'story_title': 'Pirate Treasure Adventure', 'difficulty': 'medium'},
+        {'phrase': 'The best treasure is friendship', 'phonemes': '💝 Say: THE BEST TREZH-er IS FREND-ship', 'emoji': '💝', 'story_title': 'Pirate Treasure Adventure', 'difficulty': 'medium'},
+    ],
+    'superhero-school': [
+        {'phrase': 'Hello Captain Courage', 'phonemes': '👋🛡️ Say: heh-LOW CAP-tin KUR-ij', 'emoji': '👋🛡️', 'story_title': 'Superhero School Adventure', 'difficulty': 'easy'},
+        {'phrase': 'Superhero training', 'phonemes': '🦸‍♂️💪 Say: SOO-per-hero TRAIN-ing', 'emoji': '🦸‍♂️💪', 'story_title': 'Superhero School Adventure', 'difficulty': 'medium'},
+        {'phrase': 'Rescue mission', 'phonemes': '🚁🆘 Say: RES-kyoo MISH-un', 'emoji': '🚁🆘', 'story_title': 'Superhero School Adventure', 'difficulty': 'medium'},
+        {'phrase': 'With great power comes great responsibility', 'phonemes': '💪🛡️ Say: WITH GRAT POW-er KUMZ GRAT ri-spon-suh-BIL-i-tee', 'emoji': '💪🛡️', 'story_title': 'Superhero School Adventure', 'difficulty': 'hard'},
+        {'phrase': 'True heroes help people in need', 'phonemes': '❤️🤝 Say: TROO HE-roes HELP PEE-pul IN NEED', 'emoji': '❤️🤝', 'story_title': 'Superhero School Adventure', 'difficulty': 'hard'},
+        {'phrase': 'Bravery means facing your fears', 'phonemes': '🛡️💪 Say: BRAV-ree MEENZ FAS-ing YOR FEERZ', 'emoji': '🛡️💪', 'story_title': 'Superhero School Adventure', 'difficulty': 'hard'},
+        {'phrase': 'Together we are stronger', 'phonemes': '🤝💪 Say: tuh-GETH-er WE ARE STRONG-er', 'emoji': '🤝💪', 'story_title': 'Superhero School Adventure', 'difficulty': 'medium'},
+        {'phrase': 'Kindness is the greatest superpower', 'phonemes': '✨❤️ Say: KIND-ness IS THE GRAT-est SOO-per-pow-er', 'emoji': '✨❤️', 'story_title': 'Superhero School Adventure', 'difficulty': 'hard'},
+    ],
+    'fairy-garden': [
+        {'phrase': 'Hello Twinkle', 'phonemes': '👋 Say: heh-LOW TWIN-kul', 'emoji': '👋🧚', 'story_title': 'Fairy Garden Adventure', 'difficulty': 'easy'},
+        {'phrase': 'Fairy dust', 'phonemes': '🧚✨ Say: FAIR-ee DUST', 'emoji': '🧚✨', 'story_title': 'Fairy Garden Adventure', 'difficulty': 'easy'},
+        {'phrase': 'Magic sparkles', 'phonemes': '✨⭐ Say: MAJ-ik SPAR-kulz', 'emoji': '✨⭐', 'story_title': 'Fairy Garden Adventure', 'difficulty': 'medium'},
+        {'phrase': 'Dewdrops shine like tiny diamonds', 'phonemes': '💧💎 Say: DYOO-drops SHIYN LYK TY-nee DY-mundz', 'emoji': '💧💎', 'story_title': 'Fairy Garden Adventure', 'difficulty': 'hard'},
+        {'phrase': 'Hello little fairy friend', 'phonemes': '🐞👋 Say: heh-LOW LIT-ul FAIR-ee FREND', 'emoji': '🐞👋', 'story_title': 'Fairy Garden Adventure', 'difficulty': 'medium'},
+        {'phrase': 'We grow with love and sunshine', 'phonemes': '🌸☀️ Say: WE GRO WITH LUV AND SUN-shiyn', 'emoji': '🌸☀️', 'story_title': 'Fairy Garden Adventure', 'difficulty': 'medium'},
+        {'phrase': 'Dancing makes my heart happy', 'phonemes': '🦋💃 Say: DANS-ing MAKS MY HART HAP-ee', 'emoji': '🦋💃', 'story_title': 'Fairy Garden Adventure', 'difficulty': 'medium'},
+        {'phrase': 'Small things can be very special', 'phonemes': '✨💝 Say: SMAL THINGZ KAN BE VER-ee SPE-shul', 'emoji': '✨💝', 'story_title': 'Fairy Garden Adventure', 'difficulty': 'hard'},
+    ],
+    'rainbow-castle': [
+        {'phrase': 'Hello Princess Aurora', 'phonemes': '👋👸 Say: heh-LOW PRIN-sess aw-ROR-ah', 'emoji': '👋👸', 'story_title': 'Rainbow Castle Adventure', 'difficulty': 'easy'},
+        {'phrase': 'Rainbow castle', 'phonemes': '🌈🏰 Say: RAIN-bow KAS-ul', 'emoji': '🌈🏰', 'story_title': 'Rainbow Castle Adventure', 'difficulty': 'easy'},
+        {'phrase': 'Beautiful crown', 'phonemes': '👑 Say: BYOO-ti-ful KROWN', 'emoji': '👑', 'story_title': 'Rainbow Castle Adventure', 'difficulty': 'medium'},
+        {'phrase': 'Welcome to our royal castle', 'phonemes': '🚪👑 Say: WEL-kum TO OUR ROY-ul KAS-ul', 'emoji': '🚪👑', 'story_title': 'Rainbow Castle Adventure', 'difficulty': 'medium'},
+        {'phrase': 'I protect the castle with love', 'phonemes': '🐉💚 Say: I pro-TEKT THE KAS-ul WITH LUV', 'emoji': '🐉💚', 'story_title': 'Rainbow Castle Adventure', 'difficulty': 'medium'},
+        {'phrase': 'Wishes come true here', 'phonemes': '⛲✨ Say: WISH-uz KUM TROO HERE', 'emoji': '⛲✨', 'story_title': 'Rainbow Castle Adventure', 'difficulty': 'medium'},
+        {'phrase': 'Colors make everything beautiful', 'phonemes': '🌈🎨 Say: KUL-urz MAK EV-ree-thing BYOO-ti-ful', 'emoji': '🌈🎨', 'story_title': 'Rainbow Castle Adventure', 'difficulty': 'hard'},
+        {'phrase': 'Kindness is the greatest magic', 'phonemes': '✨💝 Say: KIND-ness IS THE GRAT-est MAJ-ik', 'emoji': '✨💝', 'story_title': 'Rainbow Castle Adventure', 'difficulty': 'hard'},
+    ],
+    'jungle-explorer': [
+        {'phrase': 'Hello Captain Leo', 'phonemes': '👋 Say: heh-LOW CAP-tin LEE-oh', 'emoji': '👋🦁', 'story_title': 'Jungle Explorer Adventure', 'difficulty': 'easy'},
+        {'phrase': 'Jungle adventure', 'phonemes': '🌴🗺️ Say: JUNG-ul ad-VEN-chur', 'emoji': '🌴🗺️', 'story_title': 'Jungle Explorer Adventure', 'difficulty': 'medium'},
+        {'phrase': 'Talking bunnies', 'phonemes': '🐰💬 Say: TAWK-ing BUN-eez', 'emoji': '🐰💬', 'story_title': 'Jungle Explorer Adventure', 'difficulty': 'easy'},
+        {'phrase': 'Follow the winding jungle path', 'phonemes': '🛤️🌿 Say: FOL-ow THE WYND-ing JUNG-ul PATH', 'emoji': '🛤️🌿', 'story_title': 'Jungle Explorer Adventure', 'difficulty': 'medium'},
+        {'phrase': 'I will help you explore safely', 'phonemes': '🐒🤝 Say: I WIL HELP YOO ex-PLOR SAF-lee', 'emoji': '🐒🤝', 'story_title': 'Jungle Explorer Adventure', 'difficulty': 'hard'},
+        {'phrase': 'Water flows from the mountain top', 'phonemes': '💧🏔️ Say: WAH-tur FLOZ FRUM THE MOWN-tun TOP', 'emoji': '💧🏔️', 'story_title': 'Jungle Explorer Adventure', 'difficulty': 'medium'},
+        {'phrase': 'I have lived here for many years', 'phonemes': '🌳⏰ Say: I HAV LIVD HERE FOR MEN-ee YEARZ', 'emoji': '🌳⏰', 'story_title': 'Jungle Explorer Adventure', 'difficulty': 'medium'},
+        {'phrase': 'Nature teaches us to be patient', 'phonemes': '🔍⏳ Say: NAY-chur TEE-chez US TO BE PA-shunt', 'emoji': '🔍⏳', 'story_title': 'Jungle Explorer Adventure', 'difficulty': 'hard'},
+    ],
+}
+
+
+class Command(BaseCommand):
+    help = 'Populate StoryWord and StoryPhrase tables with initial data'
+
+    def handle(self, *args, **options):
+        self.stdout.write(self.style.SUCCESS('Starting to populate story data...'))
+        
+        # Populate StoryWord table
+        words_created = 0
+        words_updated = 0
+        for story_id, words in STORY_VOCABULARY.items():
+            for word_data in words:
+                word_obj, created = StoryWord.objects.get_or_create(
+                    story_id=story_id,
+                    word=word_data['word'],
+                    defaults={
+                        'story_title': word_data['story_title'],
+                        'hint': word_data['hint'],
+                        'emoji': word_data.get('emoji', ''),
+                        'difficulty': word_data['difficulty'],
+                        'category': word_data['category'],
+                    }
+                )
+                if created:
+                    words_created += 1
+                else:
+                    words_updated += 1
+        
+        self.stdout.write(self.style.SUCCESS(f'Created {words_created} story words, updated {words_updated}'))
+        
+        # Populate StoryPhrase table
+        phrases_created = 0
+        phrases_updated = 0
+        for story_id, phrases in STORY_PHRASES.items():
+            for phrase_data in phrases:
+                phrase_obj, created = StoryPhrase.objects.get_or_create(
+                    story_id=story_id,
+                    phrase=phrase_data['phrase'],
+                    defaults={
+                        'story_title': phrase_data['story_title'],
+                        'phonemes': phrase_data['phonemes'],
+                        'emoji': phrase_data.get('emoji', ''),
+                        'difficulty': phrase_data['difficulty'],
+                    }
+                )
+                if created:
+                    phrases_created += 1
+                else:
+                    phrases_updated += 1
+        
+        self.stdout.write(self.style.SUCCESS(f'Created {phrases_created} story phrases, updated {phrases_updated}'))
+        self.stdout.write(self.style.SUCCESS('Successfully populated story data!'))
+

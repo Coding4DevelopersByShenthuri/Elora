@@ -831,6 +831,11 @@ const YoungKidsPage = () => {
       const token = localStorage.getItem('speakbee_auth_token');
       if (token && token !== 'local-token') {
         try {
+          // Use the new API endpoint for favorites (saves to MySQL)
+          const { API } = await import('@/services/ApiService');
+          await API.kids.toggleFavorite(storyId, !favorites.includes(storyId));
+          
+          // Also update progress for backward compatibility
           const current = await KidsApi.getProgress(token);
           const details = { ...((current as any).details || {}), favorites: next };
           await KidsApi.updateProgress(token, { details });
@@ -1905,10 +1910,25 @@ const YoungKidsPage = () => {
                     const newAttempts = vocabularyAttempts + 1;
                     setVocabularyAttempts(newAttempts);
                     
-                    // Save to progress details
+                    // Find the story ID for this word
+                    const wordDetail = enrolledStoryWordsDetailed.find(w => w.word === word);
+                    const storyId = wordDetail?.storyId;
+                    
+                    // Save to MySQL database via API
                     try {
                       const token = localStorage.getItem('speakbee_auth_token');
                       if (token && token !== 'local-token') {
+                        const { API } = await import('@/services/ApiService');
+                        // Save to MySQL via API
+                        await API.kids.recordVocabularyPractice({
+                          word: word,
+                          story_id: storyId || '',
+                          score: 100
+                        }).catch(error => {
+                          console.warn('Failed to save vocabulary practice to server:', error);
+                        });
+                        
+                        // Also save to progress details for backward compatibility
                         const current = await KidsApi.getProgress(token);
                         const details = { ...((current as any).details || {}) };
                         details.vocabulary = details.vocabulary || {};
@@ -2000,10 +2020,25 @@ const YoungKidsPage = () => {
                     const newAttempts = pronunciationAttempts + 1;
                     setPronunciationAttempts(newAttempts);
                     
-                    // Save to progress details
+                    // Find the story ID for this phrase
+                    const phraseDetail = enrolledStoryPhrasesDetailed.find(p => p.phrase === phrase);
+                    const storyId = phraseDetail?.storyId;
+                    
+                    // Save to MySQL database via API
                     try {
                       const token = localStorage.getItem('speakbee_auth_token');
                       if (token && token !== 'local-token') {
+                        const { API } = await import('@/services/ApiService');
+                        // Save to MySQL via API
+                        await API.kids.recordPronunciationPractice({
+                          phrase: phrase,
+                          story_id: storyId || '',
+                          score: 100
+                        }).catch(error => {
+                          console.warn('Failed to save pronunciation practice to server:', error);
+                        });
+                        
+                        // Also save to progress details for backward compatibility
                         const current = await KidsApi.getProgress(token);
                         const details = { ...((current as any).details || {}) };
                         details.pronunciation = details.pronunciation || {};

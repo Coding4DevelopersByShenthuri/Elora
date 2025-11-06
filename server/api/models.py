@@ -374,6 +374,168 @@ class KidsCertificate(models.Model):
     class Meta:
         unique_together = ("user", "cert_id")
 
+
+# ============= Kids Story Management =============
+class StoryEnrollment(models.Model):
+    """Track which stories a user has completed/enrolled in"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='story_enrollments')
+    story_id = models.CharField(max_length=100)  # e.g., 'magic-forest', 'space-adventure'
+    story_title = models.CharField(max_length=255)
+    story_type = models.CharField(max_length=50)  # e.g., 'forest', 'space', 'ocean'
+    completed = models.BooleanField(default=False)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    score = models.FloatField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    words_extracted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("user", "story_id")
+        indexes = [
+            models.Index(fields=['user', 'completed']),
+            models.Index(fields=['story_id']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.story_title} ({'Completed' if self.completed else 'In Progress'})"
+
+
+class StoryWord(models.Model):
+    """Vocabulary words extracted from stories"""
+    story_id = models.CharField(max_length=100, db_index=True)  # e.g., 'magic-forest'
+    story_title = models.CharField(max_length=255)
+    word = models.CharField(max_length=100)
+    hint = models.TextField()
+    emoji = models.CharField(max_length=10, blank=True)
+    difficulty = models.CharField(max_length=20, choices=[
+        ('easy', 'Easy'),
+        ('medium', 'Medium'),
+        ('hard', 'Hard'),
+    ], default='easy')
+    category = models.CharField(max_length=50)  # e.g., 'animals', 'nature', 'actions'
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("story_id", "word")
+        indexes = [
+            models.Index(fields=['story_id', 'difficulty']),
+            models.Index(fields=['category']),
+        ]
+
+    def __str__(self):
+        return f"{self.story_title} - {self.word}"
+
+
+class StoryPhrase(models.Model):
+    """Phrases extracted from stories for pronunciation practice"""
+    story_id = models.CharField(max_length=100, db_index=True)  # e.g., 'magic-forest'
+    story_title = models.CharField(max_length=255)
+    phrase = models.CharField(max_length=500)  # Changed from TextField to CharField for MySQL compatibility
+    phonemes = models.TextField()  # Phonetic representation
+    emoji = models.CharField(max_length=20, blank=True)
+    difficulty = models.CharField(max_length=20, choices=[
+        ('easy', 'Easy'),
+        ('medium', 'Medium'),
+        ('hard', 'Hard'),
+    ], default='easy')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("story_id", "phrase")
+        indexes = [
+            models.Index(fields=['story_id', 'difficulty']),
+        ]
+
+    def __str__(self):
+        return f"{self.story_title} - {self.phrase[:50]}"
+
+
+class KidsFavorite(models.Model):
+    """User's favorite stories"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='kids_favorites')
+    story_id = models.CharField(max_length=100)  # e.g., 'young-0', 'young-1'
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "story_id")
+        indexes = [
+            models.Index(fields=['user']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.story_id}"
+
+
+class KidsVocabularyPractice(models.Model):
+    """Track vocabulary word practice sessions"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='kids_vocabulary_practice')
+    word = models.CharField(max_length=100)
+    story_id = models.CharField(max_length=100, blank=True)
+    best_score = models.FloatField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    attempts = models.IntegerField(default=0)
+    last_practiced = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "word")
+        indexes = [
+            models.Index(fields=['user', 'last_practiced']),
+            models.Index(fields=['story_id']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.word} ({self.best_score}%)"
+
+
+class KidsPronunciationPractice(models.Model):
+    """Track pronunciation phrase practice sessions"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='kids_pronunciation_practice')
+    phrase = models.CharField(max_length=500)  # Changed from TextField to CharField for MySQL compatibility
+    story_id = models.CharField(max_length=100, blank=True)
+    best_score = models.FloatField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    attempts = models.IntegerField(default=0)
+    last_practiced = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "phrase")
+        indexes = [
+            models.Index(fields=['user', 'last_practiced']),
+            models.Index(fields=['story_id']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.phrase[:50]} ({self.best_score}%)"
+
+
+class KidsGameSession(models.Model):
+    """Track game sessions and scores"""
+    GAME_TYPES = [
+        ('rhyme', 'Rhyme Game'),
+        ('sentence', 'Sentence Builder'),
+        ('echo', 'Echo Challenge'),
+        ('memory', 'Memory Game'),
+        ('word_match', 'Word Match'),
+        ('other', 'Other'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='kids_game_sessions')
+    game_type = models.CharField(max_length=50, choices=GAME_TYPES)
+    score = models.FloatField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    points_earned = models.IntegerField(default=0)
+    duration_seconds = models.IntegerField(default=0)
+    details = models.JSONField(default=dict)  # Additional game-specific data
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['user', 'created_at']),
+            models.Index(fields=['game_type']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.game_type} ({self.score}%) - {self.created_at.date()}"
+
 # ============= Waitlist =============
 class WaitlistEntry(models.Model):
     """Track waitlist signups"""

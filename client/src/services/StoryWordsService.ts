@@ -417,8 +417,9 @@ export class StoryWordsService {
 
   /**
    * Enroll a user in a story (mark as completed)
+   * Saves to both localStorage and MySQL database
    */
-  static enrollInStory(userId: string, storyId: string, storyTitle: string, storyType: string, score: number = 0): void {
+  static async enrollInStory(userId: string, storyId: string, storyTitle: string, storyType: string, score: number = 0): Promise<void> {
     try {
       const enrollments = this.getEnrolledStories(userId);
       const existingIndex = enrollments.findIndex(e => e.storyId === storyId);
@@ -439,7 +440,26 @@ export class StoryWordsService {
         enrollments.push(enrollment);
       }
 
+      // Save to localStorage
       localStorage.setItem(`${this.STORAGE_KEY}_${userId}`, JSON.stringify(enrollments));
+
+      // Save to MySQL database via API
+      try {
+        const token = localStorage.getItem('speakbee_auth_token');
+        if (token && token !== 'local-token') {
+          const { API } = await import('./ApiService');
+          await API.kids.enrollInStory({
+            story_id: storyId,
+            story_title: storyTitle,
+            story_type: storyType,
+            score: score
+          }).catch(error => {
+            console.warn('Failed to save story enrollment to server:', error);
+          });
+        }
+      } catch (apiError) {
+        console.warn('Error saving story enrollment to server (will retry later):', apiError);
+      }
     } catch (error) {
       console.error('Error enrolling in story:', error);
     }

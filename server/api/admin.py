@@ -3,8 +3,9 @@ from django.utils import timezone
 from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
     VocabularyWord, Achievement, UserAchievement,
-    KidsLesson, KidsProgress, KidsAchievement, WaitlistEntry,
-    AdminNotification
+    KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, WaitlistEntry,
+    AdminNotification, StoryEnrollment, StoryWord, StoryPhrase, KidsFavorite,
+    KidsVocabularyPractice, KidsPronunciationPractice, KidsGameSession
 )
 
 
@@ -148,6 +149,78 @@ class KidsAchievementAdmin(admin.ModelAdmin):
     list_display = ['user', 'name', 'progress', 'unlocked', 'updated_at']
     list_filter = ['unlocked']
     search_fields = ['user__username', 'name']
+
+
+@admin.register(KidsCertificate)
+class KidsCertificateAdmin(admin.ModelAdmin):
+    list_display = ['user', 'cert_id', 'title', 'issued_at']
+    list_filter = ['issued_at']
+    search_fields = ['user__username', 'cert_id', 'title']
+    readonly_fields = ['issued_at']
+    date_hierarchy = 'issued_at'
+
+
+# ============= Kids Story Management Admin =============
+@admin.register(StoryEnrollment)
+class StoryEnrollmentAdmin(admin.ModelAdmin):
+    list_display = ['user', 'story_title', 'story_id', 'completed', 'score', 'completed_at']
+    list_filter = ['completed', 'story_type', 'words_extracted', 'completed_at']
+    search_fields = ['user__username', 'story_id', 'story_title']
+    readonly_fields = ['created_at', 'updated_at']
+    date_hierarchy = 'completed_at'
+
+
+@admin.register(StoryWord)
+class StoryWordAdmin(admin.ModelAdmin):
+    list_display = ['word', 'story_title', 'story_id', 'difficulty', 'category', 'created_at']
+    list_filter = ['difficulty', 'category', 'story_id']
+    search_fields = ['word', 'story_title', 'hint']
+    readonly_fields = ['created_at']
+
+
+@admin.register(StoryPhrase)
+class StoryPhraseAdmin(admin.ModelAdmin):
+    list_display = ['phrase', 'story_title', 'story_id', 'difficulty', 'created_at']
+    list_filter = ['difficulty', 'story_id']
+    search_fields = ['phrase', 'story_title', 'phonemes']
+    readonly_fields = ['created_at']
+
+
+@admin.register(KidsFavorite)
+class KidsFavoriteAdmin(admin.ModelAdmin):
+    list_display = ['user', 'story_id', 'created_at']
+    list_filter = ['created_at']
+    search_fields = ['user__username', 'story_id']
+    readonly_fields = ['created_at']
+    date_hierarchy = 'created_at'
+
+
+@admin.register(KidsVocabularyPractice)
+class KidsVocabularyPracticeAdmin(admin.ModelAdmin):
+    list_display = ['user', 'word', 'story_id', 'best_score', 'attempts', 'last_practiced']
+    list_filter = ['story_id', 'last_practiced']
+    search_fields = ['user__username', 'word']
+    readonly_fields = ['last_practiced', 'created_at']
+    date_hierarchy = 'last_practiced'
+
+
+@admin.register(KidsPronunciationPractice)
+class KidsPronunciationPracticeAdmin(admin.ModelAdmin):
+    list_display = ['user', 'phrase', 'story_id', 'best_score', 'attempts', 'last_practiced']
+    list_filter = ['story_id', 'last_practiced']
+    search_fields = ['user__username', 'phrase']
+    readonly_fields = ['last_practiced', 'created_at']
+    date_hierarchy = 'last_practiced'
+
+
+@admin.register(KidsGameSession)
+class KidsGameSessionAdmin(admin.ModelAdmin):
+    list_display = ['user', 'game_type', 'score', 'points_earned', 'duration_seconds', 'created_at']
+    list_filter = ['game_type', 'created_at']
+    search_fields = ['user__username']
+    readonly_fields = ['created_at']
+    date_hierarchy = 'created_at'
+    ordering = ['-created_at']
 
 
 # ============= Waitlist Admin =============
