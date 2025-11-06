@@ -298,18 +298,47 @@ const CertificatesPage = () => {
     { id: 'explorer', title: 'Explorer Trophy', emoji: '🗺️', desc: 'Try all games + 300 pts' }
   ];
 
+  // Get userId for StoryWordsService (used in trophy calculations)
+  const userData = localStorage.getItem('speakbee_current_user');
+  const userId = userData ? (JSON.parse(userData)?.id || 'anonymous') : 'anonymous';
+  
   const computeTrophyProgress = (t: { id: string }) => {
     const d = ctx.details || {};
+    
     if (t.id === 'consistency-hero') {
       const streak = ctx.streak || 0;
       return Math.round((Math.min(streak, 21) / 21) * 100);
     }
     if (t.id === 'story-master') {
-      const readAloud = d.readAloud || {};
-      const keys = Object.keys(readAloud);
-      const scores80 = keys.filter(k => (readAloud[k]?.bestScore || 0) >= 80);
-      const completed10 = Math.min(scores80.length, 10);
-      return Math.round((completed10 / 10) * 100);
+      // Use actual completed stories from StoryWordsService
+      try {
+        const enrolledStories = StoryWordsService.getEnrolledStories(userId);
+        // Filter by story type (young vs teen)
+        const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
+          'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
+          'rainbow-castle', 'jungle-explorer'];
+        const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
+          'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
+          'ai-ethics-explorer', 'digital-security-guardian'];
+        
+        // Count only fully completed stories (completed=true AND wordsExtracted=true AND score>=80)
+        const completedStories = enrolledStories.filter(e => 
+          e.completed === true && 
+          e.wordsExtracted === true && 
+          (e.score || 0) >= 80
+        );
+        
+        // Filter by story type based on isTeenKids
+        const filteredStories = isTeenKids
+          ? completedStories.filter(e => teenStoryIds.includes(e.storyId))
+          : completedStories.filter(e => youngStoryIds.includes(e.storyId));
+        
+        const completedCount = Math.min(filteredStories.length, 10);
+        return Math.round((completedCount / 10) * 100);
+      } catch (error) {
+        console.error('Error computing story-master trophy:', error);
+        return 0;
+      }
     }
     if (t.id === 'pronunciation-pro') {
       const pron = d.pronunciation || {};
@@ -322,9 +351,15 @@ const CertificatesPage = () => {
       return Math.round(Math.min(attemptsPct, avgTo80Pct) * 100);
     }
     if (t.id === 'vocab-builder') {
-      const vocab = d.vocabulary || {};
-      const unique = Object.keys(vocab).length;
-      return Math.round((Math.min(unique, 150) / 150) * 100);
+      // Use actual words from completed stories only
+      try {
+        const words = StoryWordsService.getWordsFromEnrolledStories(userId);
+        const uniqueWords = new Set(words.map(w => w.word.toLowerCase())).size;
+        return Math.round((Math.min(uniqueWords, 150) / 150) * 100);
+      } catch (error) {
+        console.error('Error computing vocab-builder trophy:', error);
+        return 0;
+      }
     }
     if (t.id === 'super-learner') {
       const earned = earnedCount;
@@ -343,16 +378,38 @@ const CertificatesPage = () => {
 
   const getTrophyHint = (t: { id: string }) => {
     const d = ctx.details || {};
+    
     if (t.id === 'consistency-hero') {
       const streak = ctx.streak || 0;
       return `Streak: ${Math.min(streak, 21)}/21 days`;
     }
     if (t.id === 'story-master') {
-      const readAloud = d.readAloud || {};
-      const keys = Object.keys(readAloud);
-      const scores80 = keys.filter(k => (readAloud[k]?.bestScore || 0) >= 80);
-      const completed10 = Math.min(scores80.length, 10);
-      return `Stories ≥80: ${completed10}/10`;
+      // Use actual completed stories from StoryWordsService
+      try {
+        const enrolledStories = StoryWordsService.getEnrolledStories(userId);
+        const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
+          'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
+          'rainbow-castle', 'jungle-explorer'];
+        const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
+          'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
+          'ai-ethics-explorer', 'digital-security-guardian'];
+        
+        const completedStories = enrolledStories.filter(e => 
+          e.completed === true && 
+          e.wordsExtracted === true && 
+          (e.score || 0) >= 80
+        );
+        
+        const filteredStories = isTeenKids
+          ? completedStories.filter(e => teenStoryIds.includes(e.storyId))
+          : completedStories.filter(e => youngStoryIds.includes(e.storyId));
+        
+        const completedCount = Math.min(filteredStories.length, 10);
+        return `Stories ≥80: ${completedCount}/10`;
+      } catch (error) {
+        console.error('Error getting story-master hint:', error);
+        return `Stories ≥80: 0/10`;
+      }
     }
     if (t.id === 'pronunciation-pro') {
       const pron = d.pronunciation || {};
@@ -362,9 +419,15 @@ const CertificatesPage = () => {
       return `Attempts: ${Math.min(attempts, 100)}/100, Avg: ${avg.toFixed(0)}%`;
     }
     if (t.id === 'vocab-builder') {
-      const vocab = d.vocabulary || {};
-      const unique = Object.keys(vocab).length;
-      return `Words: ${Math.min(unique, 150)}/150`;
+      // Use actual words from completed stories only
+      try {
+        const words = StoryWordsService.getWordsFromEnrolledStories(userId);
+        const uniqueWords = new Set(words.map(w => w.word.toLowerCase())).size;
+        return `Words: ${Math.min(uniqueWords, 150)}/150`;
+      } catch (error) {
+        console.error('Error getting vocab-builder hint:', error);
+        return `Words: 0/150`;
+      }
     }
     if (t.id === 'super-learner') {
       return `Certificates: ${Math.min(earnedCount, 3)}/3`;
@@ -386,7 +449,7 @@ const CertificatesPage = () => {
     }
     return map;
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ctx.streak, ctx.points, mergedDetails, earnedCount, trophySpecs.map(t => t.id).join('|')]);
+  }, [ctx.streak, ctx.points, mergedDetails, earnedCount, userId, isTeenKids, trophySpecs.map(t => t.id).join('|')]);
   const trophyHintMap = useMemo(() => {
     const map: Record<string, string> = {};
     for (const t of trophySpecs) {
@@ -394,7 +457,7 @@ const CertificatesPage = () => {
     }
     return map;
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ctx.streak, ctx.points, mergedDetails, earnedCount, trophySpecs.map(t => t.id).join('|')]);
+  }, [ctx.streak, ctx.points, mergedDetails, earnedCount, userId, isTeenKids, trophySpecs.map(t => t.id).join('|')]);
 
   const defaultLayout: CertificateLayout = {
     // No templatePath needed; styled backgrounds are drawn in code
