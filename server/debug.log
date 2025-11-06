@@ -31333,3 +31333,25 @@ INFO 2025-11-06 16:40:35,714 basehttp 21512 14176 "GET /api/admin/notifications?
 INFO 2025-11-06 16:43:55,262 autoreload 14464 12724 Watching for file changes with StatReloader
 INFO 2025-11-06 16:55:09,305 autoreload 21120 25124 Watching for file changes with StatReloader
 INFO 2025-11-06 16:55:09,716 basehttp 21120 8088 "GET /api/admin/notifications/unread-count HTTP/1.1" 200 18
+INFO 2025-11-06 16:55:10,395 basehttp 21120 18372 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-06 16:55:12,473 basehttp 21120 18372 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-06 16:55:15,343 basehttp 21120 8088 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-06 16:55:17,013 basehttp 21120 14520 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-06 16:55:17,013 basehttp 21120 4252 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-06 16:55:17,021 basehttp 21120 15996 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-06 16:55:20,051 basehttp 21120 15996 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-06 16:55:23,052 basehttp 21120 15996 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-06 16:55:24,141 basehttp 21120 15996 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-06 16:55:24,182 basehttp 21120 15996 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-06 16:55:24,226 basehttp 21120 15996 "OPTIONS /api/kids/progress/update HTTP/1.1" 200 0
+INFO 2025-11-06 16:55:24,375 basehttp 21120 15996 "POST /api/kids/progress/update HTTP/1.1" 200 739
+INFO 2025-11-06 16:55:24,378 basehttp 21120 4252 "POST /api/kids/progress/update HTTP/1.1" 200 739
+INFO 2025-11-06 16:55:24,397 basehttp 21120 14520 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-06 16:55:24,448 basehttp 21120 14520 "OPTIONS /api/achievements/check HTTP/1.1" 200 0
+INFO 2025-11-06 16:55:24,509 basehttp 21120 14520 "POST /api/achievements/check HTTP/1.1" 200 58
+INFO 2025-11-06 16:55:24,532 basehttp 21120 14520 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-06 16:55:26,674 basehttp 21120 7156 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-06 16:55:26,674 basehttp 21120 12588 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-06 16:55:26,682 basehttp 21120 7836 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-06 16:55:28,547 basehttp 21120 7836 "GET /api/kids/progress HTTP/1.1" 200 739
+INFO 2025-11-06 16:55:28,547 basehttp 21120 12588 "GET /api/kids/achievements HTTP/1.1" 200 2
