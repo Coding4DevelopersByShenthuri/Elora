@@ -38,6 +38,7 @@ import YoungKidsFavoritesPage from "@/pages/YoungKidsFavorites";
 import TeenKidsFavoritesPage from "@/pages/TeenKidsFavorites";
 import ParentalControlsPage from "@/pages/ParentalControlsPage";
 import KidsGamePage from "@/pages/KidsGamePage";
+import GameHistoryPage from "@/pages/GameHistoryPage";
 import Adults from "@/pages/adults/adults";
 import Beginners from "@/pages/adults/Beginners";
 import Intermediates from "@/pages/adults/Intermediates";
@@ -244,6 +245,7 @@ const AppRoutes = () => {
         <Route path="/kids/teen" element={<PageTransition><TeenKidsPage /></PageTransition>} />
         <Route path="/kids/certificates" element={<PageTransition><CertificatesPage /></PageTransition>} />
         <Route path="/kids/games/:gameId" element={<PageTransition><KidsGamePage /></PageTransition>} />
+        <Route path="/kids/games/history" element={<PageTransition><GameHistoryPage /></PageTransition>} />
         <Route path="/favorites/young" element={<PageTransition><YoungKidsFavoritesPage /></PageTransition>} />
         <Route path="/favorites/teen" element={<PageTransition><TeenKidsFavoritesPage /></PageTransition>} />
         <Route path="/parental-controls" element={<PageTransition><ParentalControlsPage /></PageTransition>} />

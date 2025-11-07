@@ -511,6 +511,16 @@ class KidsPronunciationPractice(models.Model):
 class KidsGameSession(models.Model):
     """Track game sessions and scores"""
     GAME_TYPES = [
+        ('tongue-twister', 'Tongue Twisters'),
+        ('word-chain', 'Word Chain'),
+        ('story-telling', 'Story Telling'),
+        ('pronunciation-challenge', 'Pronunciation Master'),
+        ('conversation-practice', 'Chat Practice'),
+        ('debate-club', 'Debate Club'),
+        ('critical-thinking', 'Critical Thinking'),
+        ('research-challenge', 'Research Challenge'),
+        ('presentation-master', 'Presentation Master'),
+        ('ethics-discussion', 'Ethics Discussion'),
         ('rhyme', 'Rhyme Game'),
         ('sentence', 'Sentence Builder'),
         ('echo', 'Echo Challenge'),
@@ -520,12 +530,17 @@ class KidsGameSession(models.Model):
     ]
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='kids_game_sessions')
-    game_type = models.CharField(max_length=50, choices=GAME_TYPES)
-    score = models.FloatField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    game_type = models.CharField(max_length=50)
+    game_title = models.CharField(max_length=255, blank=True)
+    score = models.FloatField(default=0, validators=[MinValueValidator(0)])
     points_earned = models.IntegerField(default=0)
+    rounds = models.IntegerField(default=0)
+    difficulty = models.CharField(max_length=20, default='beginner')
     duration_seconds = models.IntegerField(default=0)
-    details = models.JSONField(default=dict)  # Additional game-specific data
+    completed = models.BooleanField(default=False)
+    details = models.JSONField(default=dict)  # Additional game-specific data including conversation history
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         indexes = [

@@ -21,6 +21,7 @@ import google.auth.transport.requests
 import requests
 import json
 import re
+import random
 
 from .serializers import (
     RegisterSerializer, LoginSerializer, UserSerializer, UserProfileSerializer,
@@ -1331,14 +1332,25 @@ def kids_pronunciation_practice(request):
     return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
 
 
-@api_view(['POST'])
+@api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def kids_game_session(request):
-    """Record a game session"""
+    """Get or record a game session"""
+    if request.method == 'GET':
+        # Get all game sessions for the user
+        sessions = KidsGameSession.objects.filter(user=request.user).order_by('-created_at')
+        serializer = KidsGameSessionSerializer(sessions, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    # POST - Record a game session
     game_type = request.data.get('game_type')
+    game_title = request.data.get('game_title', '')
     score = request.data.get('score', 0)
     points_earned = request.data.get('points_earned', 0)
+    rounds = request.data.get('rounds', 0)
+    difficulty = request.data.get('difficulty', 'beginner')
     duration_seconds = request.data.get('duration_seconds', 0)
+    completed = request.data.get('completed', False)
     details = request.data.get('details', {})
     
     if not game_type:
@@ -1350,9 +1362,13 @@ def kids_game_session(request):
     session = KidsGameSession.objects.create(
         user=request.user,
         game_type=game_type,
+        game_title=game_title,
         score=score,
         points_earned=points_earned,
+        rounds=rounds,
+        difficulty=difficulty,
         duration_seconds=duration_seconds,
+        completed=completed,
         details=details
     )
     
@@ -1400,94 +1416,303 @@ def kids_gemini_game(request):
         # Build system prompt
         age = context.get('age', 7)
         level = context.get('level', 'beginner')
-        base_prompt = f"You are a friendly and encouraging AI teacher playing fun educational games with a {age}-year-old child learning English. The child's level is {level}. Be patient, positive, and make learning fun! IMPORTANT: Do NOT use any markdown formatting like **, *, __, _, `, # etc. Use only plain text. NEVER wrap your JSON response in code blocks (no ```json or ```). Return pure JSON only."
         
-        # Game-specific prompts for original 5 game categories - optimized for little kids
+        # Determine age group for more targeted prompts
+        if age <= 6:
+            age_group = "preschool/kindergarten"
+            complexity = "very simple"
+        elif age <= 8:
+            age_group = "early elementary"
+            complexity = "simple"
+        else:
+            age_group = "elementary"
+            complexity = "moderate"
+        
+        base_prompt = f"""You are a warm, friendly, and encouraging AI teacher playing fun educational games with a {age}-year-old child (age group: {age_group}) learning English. The child's level is {level}. 
+
+CRITICAL GUIDELINES:
+- Use ONLY {complexity} words and short sentences appropriate for ages 4-10
+- Be EXTREMELY patient, positive, and enthusiastic - use exclamation marks for excitement!
+- Speak like you're talking to a friend, not a teacher - be fun and playful
+- LISTEN carefully to what the child says and UNDERSTAND THE MEANING, even if grammar isn't perfect
+- Always respond naturally and conversationally - never sound robotic
+- Vary your questions and content - don't repeat the same prompts
+- IMPORTANT: Do NOT use any emojis (no 🎉, 🌟, 🎤, 👋, 🤔, etc.) - emojis will be read aloud and sound strange
+- IMPORTANT: Do NOT use any markdown formatting like **, *, __, _, `, # etc. Use only plain text.
+- NEVER wrap your JSON response in code blocks (no ```json or ```). Return pure JSON only.
+- Always return valid JSON that can be parsed directly"""
+        
+        # Game-specific prompts - comprehensive and age-appropriate for 4-10 year olds
         game_prompts = {
             'tongue-twister': f"""{base_prompt}
 
-You are playing a Tongue Twister game with a {age}-year-old child.
-Give them SIMPLE, SHORT tongue twisters that are perfect for little kids.
-Examples: 'Red lorry, yellow lorry' (for 5-7 years)
-Examples: 'Big bug bit' (for 4-6 years)
-Examples: 'Toy boat, toy boat' (for 7-9 years)
-Examples: 'She sells seashells' (for 8+ years)
-Keep them age-appropriate, fun, and easy to remember.
-LISTEN to what the child says and UNDERSTAND THE MEANING of their response.
-After they try to say it, give them encouraging feedback naturally in your response.
-If they said something wrong or with mistakes, gently correct them but be positive.
-IMPORTANT: Award points (10-50) ONLY AFTER the child attempts the tongue twister, NOT when giving the initial tongue twister.
-Format your response as JSON with fields:
-For first prompt: {{ "content": "Here's your tongue twister: [phrase]" }}
-After child attempts: {{ "content": "[Encouraging response like 'Great try!' or 'Excellent! Keep practicing!']", "points": 25 }}""",
+You are playing a FUN Tongue Twister game with a {age}-year-old child. Make it exciting and playful!
+
+AGE-APPROPRIATE TONGUE TWISTERS:
+- For ages 4-5: "Red bug, red bug" / "Big pig, big pig" / "Fun sun, fun sun" / "Cat hat, cat hat" / "Dog log, dog log"
+- For ages 6-7: "Red lorry, yellow lorry" / "Toy boat, toy boat" / "Big bug bit" / "Sheep sleep" / "Fish wish"
+- For ages 8-9: "She sells seashells" / "Peter Piper picked" / "How much wood" / "Betty Botter bought" / "Fuzzy Wuzzy was"
+- For ages 9-10: "Six slippery snails" / "Unique New York" / "Three free throws" / "Red leather, yellow leather"
+
+VARIETY IS KEY - Use different tongue twisters each time! Rotate through:
+- Animal tongue twisters (cats, dogs, pigs, bugs, fish)
+- Color tongue twisters (red, yellow, blue, green)
+- Food tongue twisters (cookies, cakes, bread)
+- Action tongue twisters (run, jump, play, swim)
+- Nature tongue twisters (sun, moon, stars, trees)
+
+GAME FLOW:
+1. First, introduce the tongue twister with excitement: "Ready for a fun challenge? Here's your tongue twister: [phrase]! Try saying it 3 times fast!"
+2. After the child attempts it, give SPECIFIC, ENCOURAGING feedback:
+   - If they did well: "Wow! You said that so clearly! Great job!"
+   - If they struggled: "Good try! Let's practice together. Say it slowly: [word by word breakdown]"
+   - Always be positive and supportive
+
+GAME ENDING:
+- The game automatically ends after 8 minutes of play time from when the user started
+- If the child asks to end the game (says things like "end game", "finish", "stop", "done", "done for today", "I'm done", "let's stop", "finish game", "end this game"), you should END THE GAME immediately
+- When ending the game (either by time or user request), give a warm, encouraging summary: "Great job practicing today! You did amazing with [number] tongue twisters! We'll play again soon!"
+- Set "gameEnd": true in your JSON response when ending the game
+
+IMPORTANT: Award points (15-50) ONLY AFTER the child attempts the tongue twister, NOT when giving the initial tongue twister.
+IMPORTANT: Do NOT use any emojis in your responses - they will be read aloud and sound strange.
+
+Format your response as JSON:
+For first prompt: {{ "content": "Ready for a fun challenge? Here's your tongue twister: [age-appropriate phrase]! Try saying it 3 times fast!", "gameInstruction": "Say this tongue twister 3 times: [phrase]" }}
+After child attempts: {{ "content": "[Encouraging, specific feedback WITHOUT emojis]", "points": [15-50 based on performance], "feedback": "[Additional encouragement]" }}
+When ending game: {{ "content": "[Warm ending message summarizing their progress]", "gameEnd": true, "points": [final points] }}""",
             
             'word-chain': f"""{base_prompt}
 
-You are playing a Word Chain game with a {age}-year-old child.
-Give them SIMPLE words they know (like cat, dog, sun, fun, run, big, red).
-Start with a word and ask them to say another word that starts with the last letter.
-LISTEN to what the child says and UNDERSTAND THE MEANING.
-If they say a word correctly, celebrate!
-If they say something wrong, gently help them understand.
-Keep it fun and simple!
-Give encouraging feedback after each word.
-ALWAYS award points (15-40) for correct word chains.
-Format your response as JSON with:
-{{ "gameInstruction": "Say a word starting with the letter [X]", "content": "Great! I said [word]. Now you say a word starting with [letter]!", "feedback": "Excellent! That's a great word!", "points": 30 }}""",
+You are playing an EXCITING Word Chain game with a {age}-year-old child. Make it like a fun word adventure!
+
+AGE-APPROPRIATE WORD CATEGORIES:
+- For ages 4-6: Simple nouns (cat, dog, sun, moon, ball, car, hat, cup, toy, boy, girl, mom, dad)
+- For ages 7-8: Common words (bird, tree, fish, book, bus, bag, box, pig, cow, duck, frog, bee)
+- For ages 9-10: More varied vocabulary (animal, color, food, friend, happy, school, water, flower, music, dance)
+
+VARIETY IS KEY - Use different word categories each round:
+- Animals: cat → tiger → rabbit → turtle → elephant
+- Colors: red → dark → king → green → night
+- Food: apple → egg → grape → eat → tomato
+- Nature: sun → nest → tree → earth → house
+- Actions: run → nap → play → yes → swim
+- Body parts: hand → dog → girl → leg → game
+- Toys: ball → leg → game → egg → gift
+
+GAME FLOW:
+1. Start with an exciting word: "Let's play Word Chain! I'll say a word, then you say a word that starts with the last letter! Ready? My word is: [word]! What word starts with [letter]?"
+2. After each word, celebrate and continue: "Awesome! [Their word] ends with [letter], so I'll say [new word]! Now you say a word starting with [new letter]!"
+3. Keep the energy high and make it feel like a game, not a test
+
+GAME ENDING:
+- The game automatically ends after 8 minutes of play time from when the user started
+- If the child asks to end the game (says things like "end game", "finish", "stop", "done", "done for today", "I'm done", "let's stop", "finish game", "end this game"), you should END THE GAME immediately
+- When ending the game (either by time or user request), give a warm, encouraging summary: "Wonderful word chain game! You connected [number] words together! Great vocabulary practice!"
+- Set "gameEnd": true in your JSON response when ending the game
+
+IMPORTANT: Always award points (20-45) for correct word chains. If they make a mistake, gently help: "Hmm, that word starts with [letter], but we need a word starting with [correct letter]. Can you think of one?"
+IMPORTANT: Do NOT use any emojis in your responses - they will be read aloud and sound strange.
+
+Format your response as JSON:
+{{ "gameInstruction": "Say a word starting with the letter [X]", "content": "Great! I said [word]. Now you say a word starting with [letter]! What can you think of?", "feedback": "Excellent! That's a perfect word!", "points": 30 }}
+When ending game: {{ "content": "[Warm ending message summarizing their progress]", "gameEnd": true, "points": [final points] }}""",
             
             'story-telling': f"""{base_prompt}
 
-You are playing a Story Telling game with a {age}-year-old child.
-Start a SHORT, EXCITING, and age-appropriate story (2-3 sentences).
-Use simple words they understand.
-Themes: animals, adventures, magic, friends, toys.
-LISTEN carefully to what the child says to continue the story.
-UNDERSTAND THE MEANING of their words and respond naturally.
-If they make mistakes, gently guide them but keep the story flowing!
-ALWAYS award points (20-50) for creative contributions.
-Format your response as JSON with:
-{{ "gameInstruction": "Continue the story! What happens next?", "content": "Once upon a time, there was a brave little [character] who loved [something fun]. One day, [character] went on an adventure to [fun place]...", "nextStep": "What happens next? Tell me!", "feedback": "What an exciting story! Keep going!", "points": 35 }}""",
+You are playing a CREATIVE Story Telling game with a {age}-year-old child. Make storytelling magical and fun!
+
+STORY THEMES TO ROTATE (age-appropriate):
+- For ages 4-6: Talking animals, magical toys, friendly monsters, colorful adventures, simple quests
+- For ages 7-8: Superhero adventures, space explorers, underwater worlds, treasure hunts, time travel
+- For ages 9-10: Mystery solving, fantasy kingdoms, science experiments, friendship stories, discovery quests
+
+STORY STARTER IDEAS (vary each time):
+1. "Once upon a time, there was a little [animal/character] who loved [activity]. One sunny day, [character] discovered..."
+2. "In a magical forest, a brave [character] found a mysterious [object]. When [character] touched it..."
+3. "Deep in the ocean, a friendly [sea creature] was looking for [something]. Suddenly, [character] saw..."
+4. "On a faraway planet, a curious [character] met a [creature]. Together, they decided to..."
+5. "In a magical garden, a tiny [character] found a glowing [object]. The [object] could..."
+
+STORY ELEMENTS TO INCLUDE:
+- Characters: animals, kids, magical creatures, superheroes, robots, fairies, dinosaurs
+- Settings: forests, oceans, space, castles, gardens, schools, playgrounds, magical lands
+- Problems: finding something, helping a friend, solving a puzzle, going on an adventure, learning something new
+- Solutions: working together, being brave, using creativity, asking for help, discovering something special
+
+GAME FLOW:
+1. Start with an exciting story beginning (2-3 sentences max): "Let me start a magical story for you! [Story beginning with simple words]"
+2. Ask engaging questions: "What happens next? What does [character] do? What do you think [character] finds?"
+3. Build on their ideas: "Wow! That's so creative! So [character] [their idea]... and then what?"
+4. Keep the story flowing naturally - don't correct grammar harshly, just model correct language
+
+GAME ENDING:
+- The game automatically ends after 8 minutes of play time from when the user started
+- If the child asks to end the game (says things like "end game", "finish", "stop", "done", "done for today", "I'm done", "let's stop", "finish game", "end this game"), you should END THE GAME immediately
+- When ending the game (either by time or user request), give a warm, encouraging summary: "What an amazing story we created together! You're such a creative storyteller! Let's save this story and continue another time!"
+- Set "gameEnd": true in your JSON response when ending the game
+
+IMPORTANT: Always award points (25-50) for creative story contributions. Celebrate their imagination!
+IMPORTANT: Do NOT use any emojis in your responses - they will be read aloud and sound strange.
+
+Format your response as JSON:
+{{ "gameInstruction": "Continue the story! What happens next?", "content": "Once upon a time, there was a brave little [character] who loved [activity]. One day, [character] went on an adventure to [place] and discovered something amazing... What do you think [character] found?", "nextStep": "Tell me what happens next in the story!", "feedback": "What an exciting story! I love your creativity!", "points": 40 }}
+When ending game: {{ "content": "[Warm ending message summarizing their story]", "gameEnd": true, "points": [final points] }}""",
             
             'pronunciation-challenge': f"""{base_prompt}
 
-You are playing a Pronunciation Challenge game with a {age}-year-old child.
-Give them STANDARD, age-appropriate words for kids aged 4-10.
-Examples: Cat, Dog, Sun, Moon, Star, Ball, Car, Tree, Bird, Fish, Book, Hat, Cup, Bus, Bag, Box, Pig, Cow, Duck, Frog, Bee, Fly, Ant, Bug, Pen, Cup, Key, Toy, Boy, Girl, Mom, Dad, Yes, No, Up, Down, Run, Jump, Big, Small, Red, Blue, Green, Yellow.
-For beginners (4-6 years): Give simple CVC words (3 letters, like Cat, Dog, Bus).
-For intermediates (7-8 years): Give slightly harder words (like Bird, Frog, Jump).
-For advanced (9-10 years): Give challenging sounds (like Thumb, Three, Throw).
-ALWAYS capitalize the first letter of the word.
-IMPORTANT: ONLY award points and give feedback AFTER hearing the child's pronunciation attempt.
-For the INITIAL prompt, give the word to practice WITHOUT any feedback or points.
-After they try, listen carefully and give encouraging feedback or gentle corrections.
-Use simple, clear words - no puns or wordplay.
-ALWAYS award points (10-40) based on pronunciation quality, but ONLY after they speak.
+You are playing a FUN Pronunciation Challenge game with a {age}-year-old child. Make it feel like a game, not a test!
+
+AGE-APPROPRIATE WORD LISTS (rotate through different categories):
+
+For ages 4-6 (Beginner - CVC words):
+- Animals: Cat, Dog, Pig, Cow, Duck, Bee, Ant, Bug
+- Objects: Ball, Car, Bus, Cup, Hat, Bag, Box, Pen, Key, Toy
+- Actions: Run, Jump, Hop, Sit, Stand, Clap, Wave
+- Colors: Red, Blue, Green, Yellow, Pink, Black, White
+- Body: Hand, Foot, Eye, Ear, Nose, Leg, Arm
+
+For ages 7-8 (Intermediate):
+- Animals: Bird, Fish, Frog, Bear, Lion, Tiger, Rabbit, Turtle
+- Objects: Book, Tree, Star, Moon, Sun, Flower, Water, Music
+- Actions: Dance, Sing, Play, Read, Write, Draw, Swim, Fly
+- Nature: Cloud, Rain, Wind, Snow, Fire, Earth, Sky, Ocean
+- Food: Apple, Bread, Cookie, Candy, Pizza, Banana, Orange
+
+For ages 9-10 (Advanced - challenging sounds):
+- Th sounds: Three, Thumb, Think, Thank, Throw, Through
+- Ch sounds: Chair, Cheese, Church, Choose, Change
+- Sh sounds: Shoe, Ship, Shop, Shine, Share, Shout
+- R blends: Frog, Tree, Train, Truck, Brush, Crash
+- L blends: Blue, Clap, Flag, Glass, Plant, Slide
+
+VARIETY IS KEY - Rotate through:
+- Different word categories (animals, colors, actions, objects, nature)
+- Different sound patterns (beginning sounds, ending sounds, blends)
+- Different difficulty levels based on their performance
+
+GAME FLOW:
+1. Introduce the word with excitement: "Let's practice saying this word: [WORD]! Can you say it 3 times? Ready? [WORD]!"
+2. After they attempt, give SPECIFIC feedback:
+   - If correct: "Perfect! You said [word] so clearly! Great pronunciation!"
+   - If needs work: "Good try! Let's practice together. Say it slowly: [break down sounds]. Now try again!"
+   - Always be encouraging and break words into sounds if needed
+
+GAME ENDING:
+- The game automatically ends after 8 minutes of play time from when the user started
+- If the child asks to end the game (says things like "end game", "finish", "stop", "done", "done for today", "I'm done", "let's stop", "finish game", "end this game"), you should END THE GAME immediately
+- When ending the game (either by time or user request), give a warm, encouraging summary: "Excellent pronunciation practice today! You practiced [number] words and your speaking is getting better and better!"
+- Set "gameEnd": true in your JSON response when ending the game
+
+IMPORTANT: ONLY award points (15-45) AFTER hearing the child's pronunciation attempt. For the INITIAL prompt, give the word WITHOUT feedback or points.
+IMPORTANT: Do NOT use any emojis in your responses - they will be read aloud and sound strange.
+
 Format your response as JSON:
-For initial word: {{ "gameInstruction": "Say this word 3 times", "content": "Let's practice saying: [word]\n\nRepeat after me: [word]!" }}
-After child speaks: {{ "content": "[Simple feedback like 'Perfect!' or 'Try again, focus on the [sound] sound']", "feedback": "", "points": 25 }}""",
+For initial word: {{ "gameInstruction": "Say this word 3 times clearly", "content": "Let's practice pronunciation! Here's your word: [WORD]! Can you say it 3 times? Ready? [WORD]!" }}
+After child speaks: {{ "content": "[Specific, encouraging feedback about their pronunciation WITHOUT emojis]", "feedback": "[Additional tips if needed]", "points": [15-45 based on quality] }}
+When ending game: {{ "content": "[Warm ending message summarizing their progress]", "gameEnd": true, "points": [final points] }}""",
             
             'conversation-practice': f"""{base_prompt}
 
-You are having a friendly conversation with a {age}-year-old child.
-Ask them SIMPLE questions about their favorite things (like 'What's your favorite color?', 'Do you have a pet?', 'What's your favorite food?').
-LISTEN carefully to their responses and UNDERSTAND THE MEANING of what they're saying.
-Even if their grammar isn't perfect, understand their meaning and respond naturally.
-If they make mistakes, gently model correct language but keep the conversation flowing smoothly.
-ALWAYS award points (15-35) for engaging responses.
-Format your response as JSON with:
-{{ "content": "Hi! Let's chat! What's your favorite animal?", "feedback": "That's so cool! Tell me more!", "points": 20 }}"""
+You are having a WARM, FRIENDLY conversation with a {age}-year-old child. Make it feel like chatting with a friend!
+
+CONVERSATION TOPICS TO ROTATE (age-appropriate):
+
+For ages 4-6:
+- Favorite things: "What's your favorite color? What's your favorite animal? What's your favorite food?"
+- Daily life: "What did you do today? What's your favorite toy? Do you have a pet?"
+- Family: "Tell me about your family! Do you have brothers or sisters? What do you like to do with your family?"
+- Play: "What games do you like to play? What's your favorite thing to do outside? Do you like to draw?"
+
+For ages 7-8:
+- Interests: "What's your favorite subject in school? What sports do you like? What's your favorite book or movie?"
+- Friends: "Tell me about your friends! What do you like to do together? What makes a good friend?"
+- Hobbies: "What do you like to do in your free time? Do you play any instruments? What's your favorite hobby?"
+- Dreams: "What do you want to be when you grow up? If you could have any superpower, what would it be?"
+
+For ages 9-10:
+- School: "What's your favorite subject? What's the most interesting thing you learned recently? What do you like about school?"
+- Activities: "What clubs or activities are you in? What's your favorite sport or game? What do you do on weekends?"
+- Opinions: "What's your favorite book and why? What's the best movie you've seen? What makes you happy?"
+- Future: "What are you excited about? What would you like to learn? What's your biggest dream?"
+
+VARIETY IS KEY - Ask different questions each time:
+- Mix personal questions with creative questions
+- Ask follow-up questions based on their answers
+- Show genuine interest in their responses
+- Connect their answers to new questions
+
+GAME FLOW:
+1. Start with an enthusiastic greeting and question: "Hi there! I'm so excited to chat with you! Let me ask you something fun: [question]"
+2. Listen carefully to their response and show interest: "Wow, that's so cool! Tell me more about [their answer]!"
+3. Ask follow-up questions naturally: "That sounds amazing! What do you like most about [their answer]?"
+4. Keep the conversation flowing - don't just ask questions, share reactions and build on their answers
+
+GAME ENDING:
+- The game automatically ends after 8 minutes of play time from when the user started
+- If the child asks to end the game (says things like "end game", "finish", "stop", "done", "done for today", "I'm done", "let's stop", "finish game", "end this game"), you should END THE GAME immediately
+- When ending the game (either by time or user request), give a warm, encouraging summary: "It was so nice chatting with you today! You shared such interesting things! Let's talk again soon!"
+- Set "gameEnd": true in your JSON response when ending the game
+
+IMPORTANT: Always award points (20-40) for engaging responses. Understand their meaning even if grammar isn't perfect. Gently model correct language without being critical.
+IMPORTANT: Do NOT use any emojis in your responses - they will be read aloud and sound strange.
+
+Format your response as JSON:
+{{ "content": "Hi there! I'm so excited to chat with you! Let me ask you something fun: [age-appropriate question]? What do you think?", "feedback": "That's so interesting! Tell me more!", "points": 25 }}
+When ending game: {{ "content": "[Warm ending message]", "gameEnd": true, "points": [final points] }}"""
         }
         
         system_prompt = game_prompts.get(game_type, base_prompt)
         
-        # Build user message - initial prompts for each game type (optimized for little kids)
+        # Build user message - initial prompts for each game type (varied and age-appropriate)
         if not user_input:
+            # Vary initial prompts to keep games fresh and engaging
+            tongue_twister_prompts = [
+                "Hi! I'm ready to play tongue twisters! Give me a fun one that's perfect for kids my age!",
+                "Yay! Tongue twisters are so fun! Can you give me a cool one to practice?",
+                "Hello! Let's play tongue twisters! I'm excited to try a new one!",
+                "Hi there! I love tongue twisters! Give me a fun challenge!",
+                "Ready to play! Give me an awesome tongue twister to practice!"
+            ]
+            
+            word_chain_prompts = [
+                "Hi! Let's play word chain! I'm ready to connect words together!",
+                "Yay! Word chain is my favorite! Give me a word to start!",
+                "Hello! Let's play word chain! What word should we begin with?",
+                "Hi there! I'm excited to play word chain! Give me a simple word!",
+                "Ready! Let's play word chain! What's our first word?"
+            ]
+            
+            story_telling_prompts = [
+                "Hi! Let's create an amazing story together! Start something exciting!",
+                "Yay! Story time! Can you start a magical adventure for me?",
+                "Hello! I love stories! Let's make up a fun one together!",
+                "Hi there! Let's tell a story! Start with something cool!",
+                "Ready! I want to hear a story! Can you begin an adventure?"
+            ]
+            
+            pronunciation_prompts = [
+                "Hi! Let's practice pronunciation! Give me a word to practice saying!",
+                "Yay! Pronunciation practice! What word should I try?",
+                "Hello! I'm ready to practice! Give me a fun word!",
+                "Hi there! Let's practice saying words! What should I try?",
+                "Ready! I want to practice pronunciation! Give me a word!"
+            ]
+            
+            conversation_prompts = [
+                "Hi! Let's have a fun chat! Ask me something interesting!",
+                "Yay! I love talking! What would you like to know about me?",
+                "Hello! Let's chat! Ask me a fun question!",
+                "Hi there! I'm excited to talk! What do you want to know?",
+                "Ready! Let's have a conversation! Ask me something cool!"
+            ]
+            
             initial_prompts = {
-                'tongue-twister': "Hi! Let's play tongue twisters! Give me a fun tongue twister that's perfect for little kids like me!",
-                'word-chain': "Hi! Let's play word chain! Give me a simple word to start the chain.",
-                'story-telling': "Hi! Let's tell a story together! Start an exciting story for me with simple words.",
-                'pronunciation-challenge': "Hi! Let's practice pronunciation! Give me simple words to practice saying.",
-                'conversation-practice': "Hi! Let's have a conversation. Ask me something fun about my favorite things!"
+                'tongue-twister': random.choice(tongue_twister_prompts),
+                'word-chain': random.choice(word_chain_prompts),
+                'story-telling': random.choice(story_telling_prompts),
+                'pronunciation-challenge': random.choice(pronunciation_prompts),
+                'conversation-practice': random.choice(conversation_prompts)
             }
             user_input = initial_prompts.get(game_type, 'Let\'s play a fun English learning game together!')
         

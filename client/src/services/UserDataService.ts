@@ -148,6 +148,44 @@ class UserDataService {
     });
   }
 
+  // Get user learning data synchronously (for quick reads)
+  getUserLearningDataSync(userId: string): UserLearningData | null {
+    if (!this.db) {
+      // Try to open synchronously - this will fail if DB isn't initialized
+      // Fallback to localStorage
+      try {
+        const stored = localStorage.getItem(`elora_user_data_${userId}`);
+        if (stored) {
+          return JSON.parse(stored);
+        }
+      } catch {
+        return null;
+      }
+      return null;
+    }
+
+    try {
+      const transaction = this.db.transaction(['userLearningData'], 'readonly');
+      const store = transaction.objectStore('userLearningData');
+      const request = store.get(userId);
+      
+      // This is a synchronous read attempt - may not work in all browsers
+      // Fallback to async if needed
+      return request.result || null;
+    } catch {
+      // Fallback to localStorage
+      try {
+        const stored = localStorage.getItem(`elora_user_data_${userId}`);
+        if (stored) {
+          return JSON.parse(stored);
+        }
+      } catch {
+        return null;
+      }
+      return null;
+    }
+  }
+
   // Save practice session
   async savePracticeSession(session: Omit<PracticeSession, 'id'> & { userId: string }): Promise<number> {
     if (!this.db) await this.initDB();

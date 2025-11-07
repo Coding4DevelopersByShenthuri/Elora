@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Trophy, Loader2, AlertCircle, ArrowLeft, Volume2, Sparkles, RotateCcw, Star, Award } from 'lucide-react';
+import { Trophy, Loader2, AlertCircle, ArrowLeft, Volume2, RotateCcw, Star, Award } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import EnhancedTTS from '@/services/EnhancedTTS';
 import { WhisperService } from '@/services/WhisperService';
@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import KidsApi from '@/services/KidsApi';
 import KidsProgressService from '@/services/KidsProgressService';
 import { GeminiService } from '@/services/GeminiService';
+import GameHistoryService, { type GameSession } from '@/services/GameHistoryService';
 
 // Helper function to find a female voice ID for TTS
 const findFemaleVoiceId = (): string | undefined => {
@@ -128,11 +129,16 @@ const KidsGamePage = () => {
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState<string>('');
-  const [showCelebration, setShowCelebration] = useState(false);
   const [currentRound, setCurrentRound] = useState(0);
   const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
   const [currentDifficulty, setCurrentDifficulty] = useState<'beginner' | 'intermediate' | 'advanced'>('beginner');
   const [gameCompleted, setGameCompleted] = useState(false);
+  const [currentSessionId, setCurrentSessionId] = useState<string>('');
+  const [sessionStartTime, setSessionStartTime] = useState<number>(0);
+  const [sessionAge, setSessionAge] = useState<number | null>(null); // Store age for consistency during session
+  const [gameTimeLimit] = useState<number>(8 * 60 * 1000); // 8 minutes in milliseconds
+  const conversationEndRef = useRef<HTMLDivElement>(null);
+  const conversationContainerRef = useRef<HTMLDivElement>(null);
 
   const isTeenContext = searchParams.get('teen') === 'true';
   const currentGame = gameId as GameType;
@@ -173,15 +179,14 @@ const KidsGamePage = () => {
     initGemini();
   }, []);
 
-  // Start game automatically when component mounts
+  // Auto-scroll conversation history when new messages are added
   useEffect(() => {
-    if (currentGame && GeminiService.isReady()) {
-      startGame();
+    if (conversationEndRef.current) {
+      conversationEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentGame]);
+  }, [conversationHistory]);
 
-  // Handle score updates with backend sync
+  // Handle score updates with backend sync (defined early for use in other functions)
   const handleScoreUpdate = async (points: number, gameType: string) => {
     setGameScore(prev => prev + points);
     
@@ -225,6 +230,146 @@ const KidsGamePage = () => {
     }
   };
 
+  // Handle time-based game ending (defined early for use in useEffect)
+  const handleTimeBasedGameEnd = async () => {
+    if (gameCompleted) return;
+    
+    setGameCompleted(true);
+    
+    // Award completion bonus
+    const completionBonus = Math.max(50, currentRound * 3);
+    if (completionBonus > 0) {
+      await handleScoreUpdate(completionBonus, currentGame);
+    }
+    
+    // Save completed game history
+    if (isAuthenticated && currentSessionId) {
+      const gameTitles = isTeenContext ? teenGameTitles : youngGameTitles;
+      const gameInfo = gameTitles[currentGame];
+      
+      const finalScore = gameScore + completionBonus;
+      const session: GameSession = {
+        id: currentSessionId,
+        gameType: currentGame,
+        gameTitle: gameInfo?.title || currentGame,
+        startTime: sessionStartTime || Date.now() - (currentRound * 30000),
+        endTime: Date.now(),
+        score: finalScore,
+        rounds: currentRound,
+        difficulty: currentDifficulty,
+        conversationHistory: conversationHistory,
+        completed: true
+      };
+      
+      try {
+        await GameHistoryService.saveGameSession(userId, session);
+        console.log('✅ Time-based game end - session saved:', session.id);
+      } catch (error) {
+        console.error('Error saving time-based game end:', error);
+      }
+    }
+    
+    // Add ending message to conversation
+    const endingMessage: ConversationMessage = {
+      role: 'assistant',
+      content: `Great job playing today! You practiced for 8 minutes and earned ${gameScore + completionBonus} points! Let's play again soon!`,
+      timestamp: Date.now()
+    };
+    setConversationHistory(prev => [...prev, endingMessage]);
+    
+    // Play completion message
+    if (isSoundEnabled) {
+      const finalScore = gameScore + completionBonus;
+      const completionMessage = `Time's up! Great job! You earned ${finalScore} points today!`;
+      EnhancedTTS.speak(completionMessage, { 
+        voice: findFemaleVoiceId(),
+        rate: 0.9, 
+        emotion: 'excited' 
+      }).catch(() => {});
+    }
+  };
+
+  // Start game automatically when component mounts
+  useEffect(() => {
+    if (currentGame && GeminiService.isReady()) {
+      startGame();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentGame]);
+
+  // Time-based game ending - automatically end game after 8 minutes
+  useEffect(() => {
+    if (!sessionStartTime || gameCompleted) return;
+
+    const timeElapsed = Date.now() - sessionStartTime;
+    const timeRemaining = gameTimeLimit - timeElapsed;
+
+    if (timeRemaining <= 0) {
+      // Time limit reached - end the game
+      handleTimeBasedGameEnd();
+      return;
+    }
+
+    // Set up timer to end game when time limit is reached
+    const timer = setTimeout(() => {
+      if (!gameCompleted) {
+        handleTimeBasedGameEnd();
+      }
+    }, timeRemaining);
+
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionStartTime, gameCompleted, gameTimeLimit]);
+
+  // Save game session periodically and on unmount
+  useEffect(() => {
+    // Function to save current game session
+    const saveCurrentSession = async () => {
+      if (isAuthenticated && currentSessionId && conversationHistory.length > 0) {
+        const gameTitles = isTeenContext ? teenGameTitles : youngGameTitles;
+        const gameInfo = gameTitles[currentGame];
+        
+        const session: GameSession = {
+          id: currentSessionId,
+          gameType: currentGame,
+          gameTitle: gameInfo?.title || currentGame,
+          startTime: sessionStartTime || Date.now() - (currentRound * 30000),
+          endTime: gameCompleted ? Date.now() : undefined,
+          score: gameScore,
+          rounds: currentRound,
+          difficulty: currentDifficulty,
+          conversationHistory: conversationHistory,
+          completed: gameCompleted
+        };
+        
+        try {
+          await GameHistoryService.saveGameSession(userId, session);
+          console.log('✅ Game session saved:', session.id, gameCompleted ? 'completed' : 'in progress');
+        } catch (error) {
+          console.error('Error saving game session:', error);
+        }
+      }
+    };
+
+    // Save session every 30 seconds during active play
+    const saveInterval = setInterval(() => {
+      if (!gameCompleted && conversationHistory.length > 0) {
+        saveCurrentSession();
+      }
+    }, 30000); // Save every 30 seconds
+
+    // Cleanup: save on unmount
+    return () => {
+      clearInterval(saveInterval);
+      // Save final state on unmount
+      if (isAuthenticated && currentSessionId && conversationHistory.length > 0) {
+        saveCurrentSession();
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, currentSessionId, conversationHistory, gameScore, currentRound, currentDifficulty, gameCompleted, sessionStartTime]);
+
+
   // Start a new game
   const startGame = async () => {
     if (!GeminiService.isReady()) {
@@ -240,21 +385,32 @@ const KidsGamePage = () => {
     setConversationHistory([]);
     setCurrentRound(0);
     setConsecutiveCorrect(0);
-    setShowCelebration(false);
     setCurrentDifficulty('beginner');
     setGameCompleted(false);
     setGameScore(0); // Reset game score for new game
+    setSessionAge(null); // Reset age for new game session
+    
+    // Create new session ID and track start time
+    const sessionId = `game-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    setCurrentSessionId(sessionId);
+    setSessionStartTime(Date.now());
 
     try {
-      // Use age-appropriate settings: 14 for teens (middle of 11-17), 7 for young kids
-      const playerAge = isTeenContext ? 14 : 7;
+      // Use age-appropriate settings: 14 for teens (middle of 11-17), random age 4-10 for young kids to add variety
+      // This ensures games are tailored for the 4-10 age range with varied content
+      // Age is randomized per session to add variety, but stays consistent during the session
+      const playerAge = isTeenContext ? 14 : (sessionAge || Math.floor(Math.random() * 7) + 4); // Random age between 4-10, consistent per session
+      if (!sessionAge && !isTeenContext) {
+        setSessionAge(playerAge); // Store age for this session
+      }
       
       const response = await GeminiService.generateGame({
         gameType: currentGame,
         context: {
           age: playerAge,
           level: currentDifficulty,
-          completedStories: []
+          completedStories: [],
+          interests: [] // Can be expanded later with user interests
         }
       });
 
@@ -268,11 +424,36 @@ const KidsGamePage = () => {
         setQuestions(response.questions);
       }
 
-      setConversationHistory([{
-        role: 'assistant',
+      const initialHistory: ConversationMessage[] = [{
+        role: 'assistant' as const,
         content: formattedContent,
         timestamp: Date.now()
-      }]);
+      }];
+      setConversationHistory(initialHistory);
+      
+      // Save initial game session when game starts
+      if (isAuthenticated && currentSessionId) {
+        const gameTitles = isTeenContext ? teenGameTitles : youngGameTitles;
+        const gameInfo = gameTitles[currentGame];
+        
+        const session: GameSession = {
+          id: currentSessionId,
+          gameType: currentGame,
+          gameTitle: gameInfo?.title || currentGame,
+          startTime: sessionStartTime,
+          endTime: undefined,
+          score: 0,
+          rounds: 0,
+          difficulty: currentDifficulty,
+          conversationHistory: initialHistory,
+          completed: false
+        };
+        
+        // Save initial session
+        GameHistoryService.saveGameSession(userId, session).catch(error => {
+          console.warn('Error saving initial game session:', error);
+        });
+      }
 
       if (isSoundEnabled && formattedContent) {
         const femaleVoiceId = findFemaleVoiceId();
@@ -320,11 +501,19 @@ const KidsGamePage = () => {
         content: msg.content
       }));
 
-      const response = await GeminiService.continueGame(
-        currentGame,
-        input,
-        history
-      );
+      // Use same age context for consistency during the game session
+      const playerAge = isTeenContext ? 14 : (sessionAge || 7); // Use stored session age or default
+      
+      const response = await GeminiService.generateGame({
+        gameType: currentGame,
+        userInput: input,
+        conversationHistory: history,
+        context: {
+          age: playerAge,
+          level: currentDifficulty,
+          completedStories: []
+        }
+      });
       
       // Auto-advance difficulty based on performance
       if (currentRound >= 5 && currentDifficulty === 'beginner') {
@@ -340,7 +529,32 @@ const KidsGamePage = () => {
         content: formattedContent,
         timestamp: Date.now()
       };
-      setConversationHistory(prev => [...prev, assistantMessage]);
+      const newHistory: ConversationMessage[] = [...conversationHistory, assistantMessage];
+      setConversationHistory(newHistory);
+      
+      // Auto-save game session after each AI response (to ensure progress is saved)
+      if (isAuthenticated && currentSessionId && newHistory.length > 0) {
+        const gameTitles = isTeenContext ? teenGameTitles : youngGameTitles;
+        const gameInfo = gameTitles[currentGame];
+        
+        const session: GameSession = {
+          id: currentSessionId,
+          gameType: currentGame,
+          gameTitle: gameInfo?.title || currentGame,
+          startTime: sessionStartTime || Date.now() - (currentRound * 30000),
+          endTime: gameCompleted ? Date.now() : undefined,
+          score: gameScore,
+          rounds: currentRound,
+          difficulty: currentDifficulty,
+          conversationHistory: newHistory,
+          completed: gameCompleted
+        };
+        
+        // Save asynchronously without blocking UI
+        GameHistoryService.saveGameSession(userId, session).catch(error => {
+          console.warn('Background save failed (will retry):', error);
+        });
+      }
 
       const errorKeywords = ['wrong', 'incorrect', 'mistake', 'try again', 'not quite', 'almost', 'better', 'correction'];
       const hasErrors = errorKeywords.some(keyword => 
@@ -385,15 +599,17 @@ const KidsGamePage = () => {
       if (pointsToAward > 0) {
         handleScoreUpdate(pointsToAward, currentGame);
         
-        // Show celebration for points
-        setShowCelebration(true);
+        // Update stats
         setConsecutiveCorrect(prev => prev + 1);
         setCurrentRound(prev => prev + 1);
-        setTimeout(() => setShowCelebration(false), 3000);
       }
       
-      // Check if game should end (max rounds or explicit end signal)
-      const shouldEndGame = response.gameEnd || currentRound >= 20 || 
+      // Check if user requested to end the game
+      const endGamePhrases = ['end game', 'finish', 'stop', 'done', 'done for today', "i'm done", "let's stop", 'finish game', 'end this game', 'i want to stop', 'can we stop'];
+      const userRequestedEnd = endGamePhrases.some(phrase => input.toLowerCase().includes(phrase));
+      
+      // Check if game should end (max rounds, explicit end signal, or user request)
+      const shouldEndGame = response.gameEnd || userRequestedEnd || currentRound >= 20 || 
         (formattedContent.toLowerCase().includes('great job') && formattedContent.toLowerCase().includes('completed')) ||
         (formattedContent.toLowerCase().includes('excellent') && formattedContent.toLowerCase().includes('finished'));
       
@@ -406,8 +622,32 @@ const KidsGamePage = () => {
         
         setGameCompleted(true);
         
-        // Show final celebration
-        setShowCelebration(true);
+        // Save completed game history
+        if (isAuthenticated && currentSessionId) {
+          const gameTitles = isTeenContext ? teenGameTitles : youngGameTitles;
+          const gameInfo = gameTitles[currentGame];
+          
+          const finalScore = gameScore + completionBonus;
+          const session: GameSession = {
+            id: currentSessionId,
+            gameType: currentGame,
+            gameTitle: gameInfo?.title || currentGame,
+            startTime: sessionStartTime || Date.now() - (currentRound * 30000),
+            endTime: Date.now(),
+            score: finalScore,
+            rounds: currentRound,
+            difficulty: currentDifficulty,
+            conversationHistory: [...conversationHistory, assistantMessage],
+            completed: true
+          };
+          
+          try {
+            await GameHistoryService.saveGameSession(userId, session);
+            console.log('✅ Completed game session saved:', session.id);
+          } catch (error) {
+            console.error('Error saving completed game history:', error);
+          }
+        }
         
         // Play completion message with updated score
         setTimeout(() => {
@@ -421,10 +661,6 @@ const KidsGamePage = () => {
             }).catch(() => {});
           }
         }, 500);
-        
-        setTimeout(() => {
-          setShowCelebration(false);
-        }, 5000);
       }
 
       if (isSoundEnabled && formattedContent) {
@@ -597,36 +833,38 @@ const KidsGamePage = () => {
       <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative z-10">
         <Card className="border-2 border-purple-300/50 bg-purple-50/40 dark:bg-purple-900/10 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle className="flex items-center justify-between text-gray-900 dark:text-white">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">{gameInfo.emoji}</span>
-                <span>{gameInfo.title}</span>
+            <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-2 text-gray-900 dark:text-white">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <span className="text-xl sm:text-2xl">{gameInfo.emoji}</span>
+                <span className="text-base sm:text-lg md:text-xl">{gameInfo.title}</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto flex-wrap">
                 <Button 
                   variant="outline" 
                   size="sm" 
                   onClick={startGame}
-                  className="rounded-xl text-green-600 hover:bg-green-50"
+                  className="rounded-xl text-green-600 hover:bg-green-50 text-xs sm:text-sm flex-1 sm:flex-initial"
                   disabled={isLoading}
                 >
-                  <RotateCcw className="w-4 h-4 mr-2" />
-                  Restart
+                  <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Restart</span>
                 </Button>
                 <Button 
                   variant="outline" 
                   size="sm" 
                   onClick={() => navigate(isTeenContext ? '/kids/teen?section=games' : '/kids/young?section=games')} 
-                  className="rounded-xl text-blue-600"
+                  className="rounded-xl text-blue-600 text-xs sm:text-sm flex-1 sm:flex-initial"
                 >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Games
+                  <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Back to Games</span>
+                  <span className="sm:hidden">Back</span>
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setIsSoundEnabled(!isSoundEnabled)}
-                  className="rounded-xl"
+                  className="rounded-xl text-xs sm:text-sm flex-shrink-0"
+                  title={isSoundEnabled ? 'Sound On' : 'Sound Off'}
                 >
                   {isSoundEnabled ? '🔊' : '🔇'}
                 </Button>
@@ -635,32 +873,32 @@ const KidsGamePage = () => {
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Score Display */}
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl p-4 border-2 border-yellow-200">
-              <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl p-3 sm:p-4 border-2 border-yellow-200">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
                 <div className="flex items-center gap-2">
-                  <Trophy className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
-                  <span className="text-xl font-bold text-yellow-700 dark:text-yellow-300">
+                  <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
+                  <span className="text-lg sm:text-xl font-bold text-yellow-700 dark:text-yellow-300">
                     {gameScore} Points
                   </span>
                 </div>
                 {currentRound > 0 && (
-                  <div className="flex items-center gap-4 flex-wrap">
+                  <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
                     <div className="flex items-center gap-1">
-                      <Star className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                      <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      <Star className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                      <span className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">
                         Round {currentRound}
                       </span>
                     </div>
                     {consecutiveCorrect > 0 && (
                       <div className="flex items-center gap-1">
-                        <Award className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        <Award className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 dark:text-purple-400 flex-shrink-0" />
+                        <span className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">
                           {consecutiveCorrect} in a row! 🔥
                         </span>
                       </div>
                     )}
                     <div className={cn(
-                      "px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap",
+                      "px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs font-bold whitespace-nowrap",
                       currentDifficulty === 'beginner' && "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
                       currentDifficulty === 'intermediate' && "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
                       currentDifficulty === 'advanced' && "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
@@ -674,60 +912,60 @@ const KidsGamePage = () => {
 
             {/* Error Display */}
             {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-300 rounded-lg p-4">
-                <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
+              <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-300 rounded-lg p-3 sm:p-4">
+                <p className="text-red-700 dark:text-red-300 text-xs sm:text-sm">{error}</p>
               </div>
             )}
 
             {/* Loading Indicator */}
             {isLoading && (
               <div className="flex items-center justify-center gap-2 text-blue-600">
-                <Loader2 className="w-5 h-5 animate-spin" />
-                <span className="text-sm">AI is thinking...</span>
+                <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+                <span className="text-xs sm:text-sm">AI is thinking...</span>
               </div>
             )}
 
             {/* Game Instruction */}
             {gameInstruction && (
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border-2 border-blue-200">
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <p className="text-sm font-bold text-gray-700 dark:text-gray-300">
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3 sm:p-4 border-2 border-blue-200">
+                <div className="flex items-start justify-between gap-2 mb-1 sm:mb-2">
+                  <p className="text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300">
                     AI Teacher
                   </p>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => replayAIMessage(gameInstruction)}
-                    className="h-6 w-6 p-0 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                    className="h-5 w-5 sm:h-6 sm:w-6 p-0 hover:bg-blue-100 dark:hover:bg-blue-900/30 flex-shrink-0"
                     disabled={!isSoundEnabled}
                     title="Replay instruction"
                   >
-                    <Volume2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 dark:text-blue-400" />
                   </Button>
                 </div>
-                <p className="text-gray-700 dark:text-gray-300 font-semibold">{gameInstruction}</p>
+                <p className="text-xs sm:text-sm md:text-base text-gray-700 dark:text-gray-300 font-semibold">{gameInstruction}</p>
               </div>
             )}
 
             {/* Game Content */}
             {gameContent && conversationHistory.length === 0 && (
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border-2 border-gray-200 dark:border-gray-700">
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <p className="text-sm font-bold text-gray-700 dark:text-gray-300">
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-3 sm:p-4 border-2 border-gray-200 dark:border-gray-700">
+                <div className="flex items-start justify-between gap-2 mb-1 sm:mb-2">
+                  <p className="text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300">
                     AI Teacher
                   </p>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => replayAIMessage(gameContent)}
-                    className="h-6 w-6 p-0 hover:bg-gray-200 dark:hover:bg-gray-700"
+                    className="h-5 w-5 sm:h-6 sm:w-6 p-0 hover:bg-gray-200 dark:hover:bg-gray-700 flex-shrink-0"
                     disabled={!isSoundEnabled}
                     title="Replay message"
                   >
-                    <Volume2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 dark:text-blue-400" />
                   </Button>
                 </div>
-                <p className="text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-relaxed">
+                <p className="text-xs sm:text-sm md:text-base text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-relaxed">
                   {gameContent}
                 </p>
               </div>
@@ -735,17 +973,17 @@ const KidsGamePage = () => {
 
             {/* Questions */}
             {questions.length > 0 && (
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {questions.map((q, idx) => (
-                  <div key={idx} className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl p-4 border-2 border-yellow-200">
-                    <h4 className="font-bold text-lg mb-2">{q.question}</h4>
+                  <div key={idx} className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl p-3 sm:p-4 border-2 border-yellow-200">
+                    <h4 className="font-bold text-base sm:text-lg mb-2">{q.question}</h4>
                     {q.options && (
-                      <div className="space-y-2 mt-3">
+                      <div className="space-y-2 mt-2 sm:mt-3">
                         {q.options.map((opt, optIdx) => (
                           <Button 
                             key={optIdx}
                             variant="outline"
-                            className="w-full text-left justify-start"
+                            className="w-full text-left justify-start text-xs sm:text-sm"
                             onClick={() => handleUserInput(opt)}
                           >
                             {opt}
@@ -760,22 +998,26 @@ const KidsGamePage = () => {
 
             {/* Conversation History */}
             {conversationHistory.length > 0 && (
-              <div className="space-y-4 max-h-96 overflow-y-auto">
+              <div 
+                ref={conversationContainerRef}
+                className="space-y-3 sm:space-y-4 max-h-[calc(100vh-400px)] sm:max-h-[calc(100vh-500px)] overflow-y-auto pb-4"
+                style={{ scrollBehavior: 'smooth' }}
+              >
                 {conversationHistory.map((msg, idx) => (
                   <div
                     key={idx}
                     className={cn(
-                      "rounded-lg p-4 transition-all",
+                      "rounded-lg p-3 sm:p-4 transition-all",
                       msg.role === 'user'
-                        ? "bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-700 ml-auto max-w-[85%]"
-                        : "bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 mr-auto max-w-[85%]"
+                        ? "bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-700 ml-auto max-w-[90%] sm:max-w-[85%]"
+                        : "bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 mr-auto max-w-[90%] sm:max-w-[85%]"
                     )}
                   >
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <p className="text-sm font-bold">
+                    <div className="flex items-start justify-between gap-2 mb-1 sm:mb-2">
+                      <p className="text-xs sm:text-sm font-bold">
                         {msg.role === 'user' ? 'You' : 'AI Teacher'}
                       </p>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1 sm:gap-2">
                         {msg.role === 'assistant' && (
                           <Button
                             variant="ghost"
@@ -793,7 +1035,7 @@ const KidsGamePage = () => {
                             variant="ghost"
                             size="sm"
                             onClick={() => startEditing(idx, msg.content)}
-                            className="h-6 px-2 text-xs"
+                            className="h-5 sm:h-6 px-1.5 sm:px-2 text-xs flex-shrink-0"
                             disabled={editingIndex === idx}
                           >
                             {editingIndex === idx ? 'Editing...' : '✏️ Edit'}
@@ -809,14 +1051,14 @@ const KidsGamePage = () => {
                           value={editValue}
                           onChange={(e) => setEditValue(e.target.value)}
                           onKeyPress={(e) => e.key === 'Enter' && saveEdit(idx)}
-                          className="w-full text-sm"
+                          className="w-full text-xs sm:text-sm"
                           autoFocus
                         />
                         <div className="flex gap-2">
                           <Button
                             size="sm"
                             onClick={() => saveEdit(idx)}
-                            className="bg-green-600 hover:bg-green-700"
+                            className="bg-green-600 hover:bg-green-700 text-xs sm:text-sm"
                             disabled={!editValue.trim()}
                           >
                             Save
@@ -825,6 +1067,7 @@ const KidsGamePage = () => {
                             size="sm"
                             variant="outline"
                             onClick={cancelEdit}
+                            className="text-xs sm:text-sm"
                           >
                             Cancel
                           </Button>
@@ -833,7 +1076,7 @@ const KidsGamePage = () => {
                     ) : (
                       <div className="space-y-2">
                         <p className={cn(
-                          "text-sm whitespace-pre-wrap leading-relaxed",
+                          "text-xs sm:text-sm whitespace-pre-wrap leading-relaxed",
                           msg.role === 'user' 
                             ? "text-blue-900 dark:text-blue-100" 
                             : "text-gray-800 dark:text-gray-200"
@@ -841,8 +1084,8 @@ const KidsGamePage = () => {
                           {msg.content}
                         </p>
                         {msg.hasErrors && (
-                          <div className="flex items-center gap-2 mt-2">
-                            <AlertCircle className="w-4 h-4 text-orange-500" />
+                          <div className="flex items-center gap-1.5 sm:gap-2 mt-1 sm:mt-2">
+                            <AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-500 flex-shrink-0" />
                             <p className="text-xs text-orange-600 dark:text-orange-400 italic">
                               AI detected some mistakes. Click Edit to correct!
                             </p>
@@ -852,33 +1095,35 @@ const KidsGamePage = () => {
                     )}
                   </div>
                 ))}
+                <div ref={conversationEndRef} />
               </div>
             )}
 
             {/* Game Completion Message */}
             {gameCompleted && (
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-6 border-2 border-green-300 dark:border-green-700">
-                <div className="text-center space-y-4">
-                  <div className="text-4xl mb-2">🎉</div>
-                  <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-4 sm:p-6 border-2 border-green-300 dark:border-green-700">
+                <div className="text-center space-y-3 sm:space-y-4">
+                  <div className="text-3xl sm:text-4xl mb-2">🎉</div>
+                  <h3 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-200">
                     Game Completed!
                   </h3>
-                  <p className="text-gray-700 dark:text-gray-300">
+                  <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300">
                     You earned <span className="font-bold text-green-600 dark:text-green-400">{gameScore} points</span> in this game! 🎉
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                     Points have been saved to your total score!
                   </p>
-                  <div className="flex gap-3 justify-center">
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
                     <Button
                       onClick={startGame}
-                      className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white"
+                      className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white text-xs sm:text-sm"
                     >
                       Play Again
                     </Button>
                     <Button
                       variant="outline"
                       onClick={() => navigate(isTeenContext ? '/kids/teen?section=games' : '/kids/young?section=games')}
+                      className="text-xs sm:text-sm"
                     >
                       Back to Games
                     </Button>
@@ -887,29 +1132,27 @@ const KidsGamePage = () => {
               </div>
             )}
 
-            {/* Voice Input */}
+            {/* Voice Input at Bottom of Game Container */}
             {!gameCompleted && (
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-6 border-2 border-purple-200 dark:border-purple-700">
-              <div className="text-center space-y-4">
-                <div>
-                  <p className="text-base font-bold text-gray-800 dark:text-gray-200 mb-2">
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-2 sm:p-3 md:p-4 border-2 border-purple-200 dark:border-purple-700 shadow-lg mt-3 sm:mt-4">
+                <div className="text-center space-y-2">
+                  <p className="text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200">
                     🎤 Speak Your Response
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Click the microphone and speak! The AI will listen and understand what you say.
-                  </p>
+                  <div className="flex justify-center">
+                    <KidsVoiceRecorder
+                      targetWord="response"
+                      onCorrectPronunciation={handleVoiceInput}
+                      maxDuration={30}
+                      autoAnalyze={false}
+                      skipPronunciationCheck={true}
+                      disabled={isLoading || gameCompleted}
+                    />
+                  </div>
                 </div>
-                <KidsVoiceRecorder
-                  targetWord="response"
-                  onCorrectPronunciation={handleVoiceInput}
-                  maxDuration={30}
-                  autoAnalyze={false}
-                  skipPronunciationCheck={true}
-                  disabled={isLoading || gameCompleted}
-                />
               </div>
-            </div>
             )}
+
           </CardContent>
         </Card>
       </div>

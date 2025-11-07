@@ -875,15 +875,36 @@ export const KidsAPI = {
    */
   recordGameSession: async (data: {
     game_type: string;
+    game_title?: string;
     score?: number;
     points_earned?: number;
+    rounds?: number;
+    difficulty?: string;
     duration_seconds?: number;
+    completed?: boolean;
     details?: any;
   }) => {
     try {
       const result = await fetchWithAuth('kids/games/session', {
         method: 'POST',
         body: JSON.stringify(data),
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get all game sessions
+   */
+  getGameSessions: async () => {
+    try {
+      const result = await fetchWithAuth('kids/games/session', {
+        method: 'GET',
       });
       return {
         success: true,

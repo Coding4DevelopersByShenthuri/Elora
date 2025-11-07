@@ -313,10 +313,11 @@ class KidsGameSessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = KidsGameSession
         fields = [
-            "id", "user_id", "game_type", "score", "points_earned",
-            "duration_seconds", "details", "created_at"
+            "id", "user_id", "game_type", "game_title", "score", "points_earned",
+            "rounds", "difficulty", "duration_seconds", "completed", "details", 
+            "created_at", "updated_at"
         ]
-        read_only_fields = ["created_at"]
+        read_only_fields = ["created_at", "updated_at"]
 
 
 # ============= Waitlist Serializer =============

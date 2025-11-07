@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Trophy } from 'lucide-react';
+import { Trophy, History } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import KidsApi from '@/services/KidsApi';
@@ -111,6 +111,7 @@ const GameMenu = ({
   isGeminiReady: boolean;
   isTeenKids?: boolean;
 }) => {
+  const navigate = useNavigate();
   // Base games for young kids
   const youngGames = [
     {
@@ -224,14 +225,23 @@ const GameMenu = ({
         </CardContent>
       </Card>
 
-      {/* Game Selection */}
+      {/* Game Selection with History Button */}
       <div className="text-center mb-4 sm:mb-6 px-3 sm:px-4">
         <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#118AB2] bg-clip-text text-transparent mb-2 drop-shadow-sm">
           {isTeenKids ? 'Choose Your Advanced Challenge!' : 'Choose Your AI Game!'}
         </h2>
-        <p className="text-sm sm:text-base md:text-lg text-gray-700 dark:text-gray-300 font-medium">
+        <p className="text-sm sm:text-base md:text-lg text-gray-700 dark:text-gray-300 font-medium mb-4">
           {isTeenKids ? 'Pick an advanced challenge powered by AI! 🚀' : 'Pick a fun game powered by AI! 🎮'}
         </p>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate('/kids/games/history')}
+          className="rounded-xl border-2 border-purple-300 dark:border-purple-600 hover:border-purple-400 dark:hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 bg-purple-50/40 dark:bg-purple-900/10"
+        >
+          <History className="w-4 h-4 mr-2" />
+          View All Game History
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-5 md:gap-6">
@@ -255,12 +265,11 @@ const GameMenu = ({
             <Card
               key={game.id}
               className={cn(
-                "border-2 hover:border-[#FF6B6B] dark:hover:border-[#FF6B6B] transition-all duration-300 hover:scale-105 cursor-pointer group backdrop-blur-sm",
+                "border-2 hover:border-[#FF6B6B] dark:hover:border-[#FF6B6B] transition-all duration-300 hover:scale-105 group backdrop-blur-sm",
                 cardBgColors[index],
                 cardBorders[index],
                 !isGeminiReady && "opacity-60"
               )}
-              onClick={() => isGeminiReady && onSelectGame(game.id)}
             >
               <CardContent className="p-4 sm:p-5 md:p-6 text-center space-y-3 sm:space-y-4">
                 <div className={cn(
@@ -276,12 +285,30 @@ const GameMenu = ({
                 <p className="text-xs sm:text-sm md:text-base text-gray-800 dark:text-gray-300 font-medium">
                   {game.description}
                 </p>
-                <Button 
-                  className="w-full rounded-lg sm:rounded-xl px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-sm sm:text-base font-bold transition-all hover:scale-105"
-                  disabled={!isGeminiReady}
-                >
-                  {isGeminiReady ? 'Play Now!' : 'Setup Required'}
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    className="flex-1 rounded-lg sm:rounded-xl px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-sm sm:text-base font-bold transition-all hover:scale-105"
+                    disabled={!isGeminiReady}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectGame(game.id);
+                    }}
+                  >
+                    {isGeminiReady ? 'Play Now!' : 'Setup Required'}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-lg sm:rounded-xl px-3 py-2.5 sm:py-3 border-2 hover:border-purple-400 dark:hover:border-purple-500"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/kids/games/history?game=${game.id}`);
+                    }}
+                    title="View this game's history"
+                  >
+                    <History className="w-4 h-4" />
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           );
