@@ -34028,3 +34028,7 @@ WARNING 2025-11-07 21:46:07,988 log 18632 18668 Unauthorized: /api/auth/user
 WARNING 2025-11-07 21:46:07,991 basehttp 18632 18668 "GET /api/auth/user HTTP/1.1" 401 172
 WARNING 2025-11-07 21:46:09,239 log 18632 18668 Unauthorized: /api/kids/gemini/game
 WARNING 2025-11-07 21:46:09,244 basehttp 18632 18668 "POST /api/kids/gemini/game HTTP/1.1" 401 172
+WARNING 2025-11-07 21:46:42,638 log 18632 9528 Unauthorized: /api/kids/gemini/game
+WARNING 2025-11-07 21:46:42,642 log 18632 19388 Unauthorized: /api/auth/user
+WARNING 2025-11-07 21:46:42,643 basehttp 18632 9528 "POST /api/kids/gemini/game HTTP/1.1" 401 172
+WARNING 2025-11-07 21:46:42,644 basehttp 18632 19388 "GET /api/auth/user HTTP/1.1" 401 172
