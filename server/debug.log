@@ -39155,3 +39155,135 @@ INFO 2025-11-08 21:37:34,574 basehttp 5768 21696 "GET /api/kids/progress HTTP/1.
 INFO 2025-11-08 21:37:37,146 autoreload 5768 23964 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
 INFO 2025-11-08 21:37:37,974 autoreload 19448 9516 Watching for file changes with StatReloader
 INFO 2025-11-08 21:37:38,323 basehttp 19448 2596 "GET /api/kids/progress HTTP/1.1" 200 2283
+ERROR 2025-11-08 21:37:39,271 views 19448 15708 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:37:39,271 log 19448 15708 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:37:39,271 basehttp 19448 15708 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:37:40,934 basehttp 19448 24652 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:37:43,925 basehttp 19448 24652 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:37:46,929 basehttp 19448 24652 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:37:49,914 basehttp 19448 24652 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:37:52,935 basehttp 19448 24652 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:37:55,927 basehttp 19448 24652 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:37:58,613 basehttp 19448 24652 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:38:01,826 basehttp 19448 15708 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 21:38:03,470 basehttp 19448 24652 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:38:03,477 basehttp 19448 22080 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 21:38:03,487 basehttp 19448 6960 "GET /api/kids/lessons HTTP/1.1" 200 2
+ERROR 2025-11-08 21:38:03,608 views 19448 15708 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:38:03,611 log 19448 15708 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:38:03,613 basehttp 19448 15708 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:38:06,460 basehttp 19448 17144 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:38:09,472 basehttp 19448 17144 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:38:12,578 basehttp 19448 17144 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:38:14,014 basehttp 19448 17144 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:38:15,503 basehttp 19448 16068 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:38:18,471 basehttp 19448 16068 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:38:21,485 basehttp 19448 16068 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:38:24,489 basehttp 19448 8756 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:38:27,471 basehttp 19448 8756 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:38:30,441 basehttp 19448 8756 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:38:33,567 basehttp 19448 8756 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:38:36,503 basehttp 19448 15468 "GET /api/kids/progress HTTP/1.1" 200 2283
+ERROR 2025-11-08 21:38:39,783 views 19448 10188 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:38:39,790 log 19448 10188 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:38:39,792 basehttp 19448 10188 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:38:39,837 views 19448 10188 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:38:39,839 log 19448 10188 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:38:39,851 basehttp 19448 10188 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:38:48,778 views 19448 14484 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:38:48,782 log 19448 14484 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:38:48,787 basehttp 19448 14484 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:39:33,793 views 19448 1980 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:39:33,797 log 19448 1980 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:39:33,804 basehttp 19448 1980 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:39:40,136 views 19448 10560 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:39:40,146 log 19448 10560 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:39:40,158 basehttp 19448 10560 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:40:18,801 views 19448 13908 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:40:18,805 log 19448 13908 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:40:18,817 basehttp 19448 13908 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:40:40,098 views 19448 20968 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:40:40,104 log 19448 20968 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:40:40,107 basehttp 19448 20968 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:41:03,754 views 19448 12776 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:41:03,761 log 19448 12776 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:41:03,761 basehttp 19448 12776 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:41:34,830 views 19448 7244 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:41:34,835 log 19448 7244 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:41:34,838 basehttp 19448 7244 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:41:39,957 views 19448 7244 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:41:39,960 log 19448 7244 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:41:39,962 basehttp 19448 7244 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:41:41,962 views 19448 7244 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:41:41,962 log 19448 7244 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:41:41,962 basehttp 19448 7244 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:41:42,558 views 19448 7244 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:41:42,612 log 19448 7244 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:41:42,700 basehttp 19448 7244 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:41:48,441 views 19448 7244 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:41:48,441 log 19448 7244 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:41:48,452 basehttp 19448 7244 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:41:57,949 basehttp 19448 13656 "GET /api/kids/progress HTTP/1.1" 200 2283
+ERROR 2025-11-08 21:41:58,283 views 19448 23384 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:41:58,283 log 19448 23384 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:41:58,288 basehttp 19448 23384 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:41:59,036 views 19448 23384 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:41:59,046 log 19448 23384 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:41:59,060 basehttp 19448 23384 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:42:11,988 basehttp 19448 13656 "GET /api/kids/progress HTTP/1.1" 200 2283
+ERROR 2025-11-08 21:42:12,178 views 19448 23384 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:42:12,179 log 19448 23384 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:42:12,181 basehttp 19448 23384 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:42:22,977 basehttp 19448 13656 "GET /api/kids/progress HTTP/1.1" 200 2283
+ERROR 2025-11-08 21:42:23,057 views 19448 23384 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:42:23,058 log 19448 23384 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:42:23,060 basehttp 19448 23384 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:42:34,244 views 19448 23648 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:42:34,244 log 19448 23648 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:42:34,244 basehttp 19448 23648 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:43:00,250 views 19448 9376 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:43:00,252 log 19448 9376 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:43:00,253 basehttp 19448 9376 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:43:18,952 views 19448 200 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:43:18,954 log 19448 200 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:43:18,961 basehttp 19448 200 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:43:18,992 basehttp 19448 20904 "GET /api/kids/progress HTTP/1.1" 200 2283
+ERROR 2025-11-08 21:43:19,099 views 19448 200 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:43:19,099 log 19448 200 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:43:19,115 basehttp 19448 200 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:43:35,597 basehttp 19448 26436 "GET /api/kids/progress HTTP/1.1" 200 2283
+ERROR 2025-11-08 21:43:35,925 views 19448 23180 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:43:35,925 log 19448 23180 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:43:35,925 basehttp 19448 23180 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:43:56,022 basehttp 19448 1544 "GET /api/kids/progress HTTP/1.1" 200 2283
+ERROR 2025-11-08 21:43:56,413 views 19448 21524 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:43:56,417 log 19448 21524 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:43:56,441 basehttp 19448 21524 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:43:56,595 views 19448 21524 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:43:56,597 log 19448 21524 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:43:56,597 basehttp 19448 21524 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:44:03,799 views 19448 26512 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:44:03,806 log 19448 26512 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:44:03,812 basehttp 19448 26512 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:44:10,855 basehttp 19448 16444 "GET /api/kids/progress HTTP/1.1" 200 2283
+ERROR 2025-11-08 21:44:11,328 views 19448 4332 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:44:11,330 log 19448 4332 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:44:11,334 basehttp 19448 4332 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:44:21,016 basehttp 19448 24440 "GET /api/kids/progress HTTP/1.1" 200 2283
+ERROR 2025-11-08 21:44:21,403 views 19448 21732 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:44:21,403 log 19448 21732 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:44:21,419 basehttp 19448 21732 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:44:49,259 views 19448 25068 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:44:49,260 log 19448 25068 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:44:49,261 basehttp 19448 25068 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:44:49,963 basehttp 19448 1424 "GET /api/kids/progress HTTP/1.1" 200 2283
+ERROR 2025-11-08 21:44:50,344 views 19448 20436 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:44:50,344 log 19448 20436 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:44:50,346 basehttp 19448 20436 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:44:55,975 basehttp 19448 1424 "GET /api/kids/progress HTTP/1.1" 200 2283
+ERROR 2025-11-08 21:44:56,018 views 19448 20436 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:44:56,018 log 19448 20436 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:44:56,026 basehttp 19448 20436 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:44:56,951 views 19448 20436 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:44:56,951 log 19448 20436 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:44:56,952 basehttp 19448 20436 "GET /api/notifications HTTP/1.1" 500 102
