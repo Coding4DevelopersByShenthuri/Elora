@@ -39287,3 +39287,6 @@ ERROR 2025-11-08 21:44:56,026 basehttp 19448 20436 "GET /api/notifications HTTP/
 ERROR 2025-11-08 21:44:56,951 views 19448 20436 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
 ERROR 2025-11-08 21:44:56,951 log 19448 20436 Internal Server Error: /api/notifications
 ERROR 2025-11-08 21:44:56,952 basehttp 19448 20436 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:45:34,246 views 19448 15960 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:45:34,247 log 19448 15960 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:45:34,247 basehttp 19448 15960 "GET /api/notifications HTTP/1.1" 500 102
