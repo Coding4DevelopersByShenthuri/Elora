@@ -113,6 +113,15 @@ const GameHistoryPage = () => {
   };
 
   const uniqueGameTypes = Array.from(new Set(allSessions.map(s => s.gameType)));
+  const totalSessions = allSessions.length;
+  const completedSessions = allSessions.filter(s => s.completed).length;
+  const totalPoints = allSessions.reduce((sum, session) => sum + (session.score || 0), 0);
+  const favoriteGameType = allSessions.reduce<Record<string, number>>((acc, session) => {
+    acc[session.gameType] = (acc[session.gameType] || 0) + 1;
+    return acc;
+  }, {});
+  const topGameType = Object.entries(favoriteGameType).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+  const topGameInfo = topGameType ? (gameTitles[topGameType] || { title: topGameType, emoji: '🎮' }) : null;
 
   if (!isAuthenticated) {
     return (
@@ -125,77 +134,122 @@ const GameHistoryPage = () => {
   }
 
   return (
-    <div className="min-h-screen pb-16 sm:pb-20 pt-24 sm:pt-32 md:pt-40 relative overflow-hidden">
-      <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-6 sm:mb-8">
-          <div className="flex items-center justify-center mb-4 sm:mb-6 relative px-10 sm:px-0">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate(-1)}
-              className="rounded-xl absolute left-0 sm:left-0"
-            >
-              <ArrowLeft className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">Back</span>
-            </Button>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#118AB2] bg-clip-text text-transparent text-center">
-              Game History
-            </h1>
-          </div>
+    <div className="min-h-screen bg-muted/20 pb-20 pt-24">
+      <main className="container mx-auto max-w-6xl space-y-8 px-4">
+        <section>
+          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-[#1B4332] via-[#2D6A4F] to-[#74C69D] text-white shadow-xl">
+            <span className="absolute -right-28 -top-24 h-56 w-56 rounded-full bg-white/10 blur-3xl" aria-hidden />
+            <span className="absolute -left-24 bottom-0 h-48 w-48 rounded-full bg-white/10 blur-3xl" aria-hidden />
+            <CardContent className="relative z-10 space-y-6 p-6 md:p-10">
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+                <div className="space-y-4 lg:max-w-3xl">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={() => navigate(-1)}
+                      className="rounded-full border-white/40 bg-white/15 px-4 py-2 text-white transition hover:bg-white/25"
+                    >
+                      <ArrowLeft className="mr-2 h-4 w-4" />
+                      Back
+                    </Button>
+                    <span className="rounded-full bg-white/20 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-white/80">
+                      Game progress
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    <h1 className="text-3xl font-semibold leading-tight text-white md:text-4xl">
+                      Game History
+                    </h1>
+                    <p className="text-base text-white/85 md:text-lg">
+                      Review your recent adventures, track points, and revisit completed AI-powered games.
+                    </p>
+                  </div>
+                </div>
+                <div className="grid w-full gap-3 text-sm sm:grid-cols-3 lg:w-auto">
+                  <div className="rounded-2xl bg-white/15 px-4 py-3 text-white shadow-sm backdrop-blur">
+                    <p className="text-xs uppercase tracking-wide text-white/70">Sessions</p>
+                    <p className="text-2xl font-semibold">{totalSessions}</p>
+                  </div>
+                  <div className="rounded-2xl bg-white/15 px-4 py-3 text-white shadow-sm backdrop-blur">
+                    <p className="text-xs uppercase tracking-wide text-white/70">Total points</p>
+                    <p className="text-2xl font-semibold">{totalPoints}</p>
+                  </div>
+                  <div className="rounded-2xl bg-white/15 px-4 py-3 text-white shadow-sm backdrop-blur">
+                    <p className="text-xs uppercase tracking-wide text-white/70">Completed</p>
+                    <p className="text-2xl font-semibold">{completedSessions}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-wrap items-center gap-3 rounded-3xl bg-white/10 p-3 backdrop-blur">
+                <div className="inline-flex items-center gap-2 text-sm font-semibold text-white">
+                  <Filter className="h-4 w-4" />
+                  Filter by game
+                </div>
+                <div className="flex flex-1 flex-wrap gap-2">
+                  <Button
+                    variant={filter === 'all' ? 'default' : 'ghost'}
+                    onClick={() => setFilter('all')}
+                    className={`rounded-full px-4 py-2 text-xs sm:text-sm ${filter === 'all' ? 'bg-white text-sky-600 shadow-sm hover:bg-white/90' : 'text-white hover:bg-white/10'}`}
+                  >
+                    All ({totalSessions})
+                  </Button>
+                  {uniqueGameTypes.map((gameType) => {
+                    const count = allSessions.filter(s => s.gameType === gameType).length;
+                    const info = gameTitles[gameType] || { title: gameType, emoji: '🎮' };
+                    const isActive = filter === gameType;
+                    return (
+                      <Button
+                        key={gameType}
+                        variant={isActive ? 'default' : 'ghost'}
+                        onClick={() => setFilter(gameType)}
+                        className={`rounded-full px-4 py-2 text-xs sm:text-sm ${isActive ? 'bg-white text-sky-600 shadow-sm hover:bg-white/90' : 'text-white hover:bg-white/10'}`}
+                      >
+                        <span className="mr-1">{info.emoji}</span>
+                        {info.title} ({count})
+                      </Button>
+                    );
+                  })}
+                </div>
+              </div>
+              {topGameInfo && (
+                <div className="rounded-2xl bg-white/15 px-4 py-3 text-sm text-white shadow-sm backdrop-blur">
+                  <p className="font-semibold">
+                    Top game: <span className="ml-1">{topGameInfo.emoji} {topGameInfo.title}</span>
+                  </p>
+                  <p className="text-xs text-white/75">Most sessions played in the last records.</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </section>
 
-          {/* Filter */}
-          <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-center sm:justify-start">
-            <Filter className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 flex-shrink-0" />
-            <select
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              className="text-xs sm:text-sm rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-2 sm:px-4 py-1.5 sm:py-2 focus:outline-none focus:ring-2 focus:ring-purple-400 w-full sm:w-auto min-w-[200px]"
-            >
-              <option value="all" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">All Games ({allSessions.length})</option>
-              {uniqueGameTypes.map((gameType) => {
-                const count = allSessions.filter(s => s.gameType === gameType).length;
-                const gameInfo = gameTitles[gameType] || { title: gameType, emoji: '🎮' };
-                return (
-                  <option key={gameType} value={gameType} className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">
-                    {gameInfo.emoji} {gameInfo.title} ({count})
-                  </option>
-                );
-              })}
-            </select>
-          </div>
-        </div>
-
-        {/* Loading State */}
         {loading && (
-          <Card className="p-8 sm:p-12 text-center">
-            <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 animate-spin mx-auto mb-3 sm:mb-4 text-purple-600" />
-            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Loading game history...</p>
+          <Card className="border border-dashed border-muted p-8 text-center shadow-sm">
+            <Loader2 className="mx-auto mb-3 h-8 w-8 animate-spin text-sky-600" />
+            <p className="text-sm text-muted-foreground">Loading your game adventures…</p>
           </Card>
         )}
 
-        {/* Empty State */}
         {!loading && filteredSessions.length === 0 && (
-          <Card className="p-8 sm:p-12 text-center border-2 border-purple-200 dark:border-purple-700">
-            <History className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 dark:text-gray-600 mx-auto mb-3 sm:mb-4" />
-            <h3 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-2">
+          <Card className="border border-dashed border-muted p-10 text-center shadow-sm">
+            <History className="mx-auto mb-4 h-12 w-12 text-sky-500" />
+            <h3 className="mb-2 text-lg font-semibold text-foreground">
               No game history yet
             </h3>
-            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-4">
+            <p className="mb-4 text-sm text-muted-foreground">
               {filter === 'all'
-                ? "Complete some games to see your progress here!"
-                : "No sessions found for this game type."}
+                ? 'Complete some games to see your progress here!'
+                : 'No sessions found for this game type.'}
             </p>
             <Button
               onClick={() => navigate('/kids/young?section=games')}
-              className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white text-xs sm:text-sm"
+              className="rounded-full bg-gradient-to-r from-[#1B4332] to-[#74C69D] px-6 py-2 text-sm text-white transition hover:from-[#74C69D] hover:to-[#1B4332]"
             >
-              Play Games Now
+              Play games now
             </Button>
           </Card>
         )}
 
-        {/* Sessions List */}
         {!loading && filteredSessions.length > 0 && (
           <div className="space-y-4">
             {filteredSessions.map((session) => {
@@ -203,49 +257,43 @@ const GameHistoryPage = () => {
               return (
                 <Card
                   key={session.id}
-                  className="border-2 border-gray-200 dark:border-gray-700 hover:border-purple-400 dark:hover:border-purple-600 transition-all cursor-pointer"
+                  className="border border-muted bg-card/70 shadow-sm transition hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg cursor-pointer"
                   onClick={() => setSelectedSession(session)}
                 >
                   <CardContent className="p-3 sm:p-4 md:p-6">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-                      <div className="flex-1 w-full sm:w-auto">
-                        <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-                          <span className="text-2xl sm:text-3xl flex-shrink-0">{gameInfo.emoji}</span>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 dark:text-white truncate">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex-1">
+                        <div className="mb-3 flex items-center gap-3">
+                          <span className="text-2xl sm:text-3xl">{gameInfo.emoji}</span>
+                          <div className="min-w-0 flex-1">
+                            <h3 className="truncate text-base font-semibold text-foreground sm:text-lg md:text-xl">
                               {session.gameTitle || gameInfo.title}
                             </h3>
-                            <div className="flex items-center gap-1.5 sm:gap-2 mt-1 flex-wrap">
-                              <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500 flex-shrink-0" />
-                              <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                                {formatDate(session.startTime)}
-                              </span>
+                            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground sm:text-sm">
+                              <Clock className="h-4 w-4" />
+                              <span>{formatDate(session.startTime)}</span>
                               {session.completed && (
-                                <span className="px-1.5 sm:px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-semibold rounded-full whitespace-nowrap">
+                                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">
                                   Completed
                                 </span>
                               )}
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
-                          <div className="flex items-center gap-1">
-                            <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600 flex-shrink-0" />
-                            <span className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">
-                              {session.score} points
-                            </span>
+                        <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm">
+                          <div className="inline-flex items-center gap-1 font-semibold text-foreground">
+                            <Trophy className="h-4 w-4 text-amber-500" />
+                            {session.score} points
                           </div>
-                          <div className="flex items-center gap-1">
-                            <Award className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0" />
-                            <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                              Round {session.rounds}
-                            </span>
+                          <div className="inline-flex items-center gap-1 text-muted-foreground">
+                            <Award className="h-4 w-4 text-sky-500" />
+                            Round {session.rounds}
                           </div>
-                          <span className="text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 capitalize whitespace-nowrap">
+                          <span className="rounded-full bg-muted px-2 py-1 text-xs font-semibold capitalize text-foreground">
                             {session.difficulty}
                           </span>
                           {session.endTime && (
-                            <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                            <span className="text-muted-foreground">
                               {getDuration(session.startTime, session.endTime)}
                             </span>
                           )}
@@ -258,10 +306,10 @@ const GameHistoryPage = () => {
                           e.stopPropagation();
                           setSelectedSession(session);
                         }}
-                        className="flex-shrink-0 w-full sm:w-auto"
+                        className="w-full rounded-full sm:w-auto"
                       >
-                        <Eye className="w-4 h-4 sm:mr-1" />
-                        <span className="hidden sm:inline">View</span>
+                        <Eye className="mr-2 h-4 w-4" />
+                        View details
                       </Button>
                     </div>
                   </CardContent>
@@ -271,98 +319,83 @@ const GameHistoryPage = () => {
           </div>
         )}
 
-        {/* Session Detail Modal */}
         {selectedSession && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-2 sm:p-4 z-50" onClick={() => setSelectedSession(null)}>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2 sm:p-4" onClick={() => setSelectedSession(null)}>
             <Card
-              className="w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto border-2 border-purple-300 dark:border-purple-700"
+              className="w-full max-w-4xl max-h-[95vh] overflow-y-auto border border-primary/30"
               onClick={(e) => e.stopPropagation()}
             >
-              <CardContent className="p-3 sm:p-4 md:p-6">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4">
-                  <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 dark:text-white">
-                    Game Session Details
+              <CardContent className="space-y-4 p-4 sm:p-6">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
+                    Game session details
                   </h2>
                   <Button variant="outline" size="sm" onClick={() => setSelectedSession(null)} className="w-full sm:w-auto">
                     Close
                   </Button>
                 </div>
-
-                <div className="space-y-4">
-                  {/* Session Info */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
-                    <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-2 sm:p-3 border-2 border-yellow-200">
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Score</div>
-                      <div className="text-base sm:text-lg font-bold text-yellow-600">{selectedSession.score}</div>
-                    </div>
-                    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 sm:p-3 border-2 border-blue-200">
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Rounds</div>
-                      <div className="text-base sm:text-lg font-bold text-blue-600">{selectedSession.rounds}</div>
-                    </div>
-                    <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-2 sm:p-3 border-2 border-purple-200">
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Difficulty</div>
-                      <div className="text-base sm:text-lg font-bold text-purple-600 capitalize">{selectedSession.difficulty}</div>
-                    </div>
-                    <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-2 sm:p-3 border-2 border-green-200">
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Status</div>
-                      <div className={`text-base sm:text-lg font-bold ${selectedSession.completed ? 'text-green-600' : 'text-orange-600'}`}>
-                        {selectedSession.completed ? 'Completed' : 'Incomplete'}
-                      </div>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
+                    <div className="text-xs text-muted-foreground">Score</div>
+                    <div className="text-base font-semibold text-amber-600">{selectedSession.score}</div>
+                  </div>
+                  <div className="rounded-lg border border-sky-200 bg-sky-50 px-3 py-2">
+                    <div className="text-xs text-muted-foreground">Rounds</div>
+                    <div className="text-base font-semibold text-sky-600">{selectedSession.rounds}</div>
+                  </div>
+                  <div className="rounded-lg border border-purple-200 bg-purple-50 px-3 py-2">
+                    <div className="text-xs text-muted-foreground">Difficulty</div>
+                    <div className="text-base font-semibold capitalize text-purple-600">{selectedSession.difficulty}</div>
+                  </div>
+                  <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2">
+                    <div className="text-xs text-muted-foreground">Status</div>
+                    <div className={`text-base font-semibold ${selectedSession.completed ? 'text-emerald-600' : 'text-orange-600'}`}>
+                      {selectedSession.completed ? 'Completed' : 'Incomplete'}
                     </div>
                   </div>
-
-                  {/* Date Info */}
-                  <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 sm:p-3 border-2 border-gray-200">
-                    <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                      <div><strong>Started:</strong> {formatDate(selectedSession.startTime)}</div>
-                      {selectedSession.endTime && (
-                        <div><strong>Ended:</strong> {formatDate(selectedSession.endTime)}</div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Conversation History */}
-                  {selectedSession.conversationHistory && selectedSession.conversationHistory.length > 0 && (
-                    <div className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 border-2 border-gray-200 max-h-[300px] sm:max-h-[400px] overflow-y-auto">
-                      <h4 className="font-bold text-sm sm:text-base text-gray-800 dark:text-white mb-2 sm:mb-3">Conversation Flow</h4>
-                      <div className="space-y-2 sm:space-y-3">
-                        {selectedSession.conversationHistory.map((msg, idx) => (
-                          <div
-                            key={idx}
-                            className={cn(
-                              "rounded-lg p-2 sm:p-3",
-                              msg.role === 'user'
-                                ? "bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 ml-auto max-w-[90%] sm:max-w-[85%]"
-                                : "bg-gray-50 dark:bg-gray-700 border-2 border-gray-200 mr-auto max-w-[90%] sm:max-w-[85%]"
-                            )}
-                          >
-                            <div className="text-xs font-bold mb-1 text-gray-600 dark:text-gray-400">
-                              {msg.role === 'user' ? 'You' : 'AI Teacher'}
-                            </div>
-                            <p className={cn(
-                              "text-xs sm:text-sm whitespace-pre-wrap",
-                              msg.role === 'user'
-                                ? "text-blue-900 dark:text-blue-100"
-                                : "text-gray-800 dark:text-gray-200"
-                            )}>
-                              {msg.content}
-                            </p>
-                            {msg.hasErrors && (
-                              <div className="mt-1 sm:mt-2 text-xs text-orange-600 dark:text-orange-400">
-                                ⚠️ AI detected some mistakes
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
+                <div className="rounded-lg border border-muted bg-card/70 px-3 py-2 text-sm text-muted-foreground sm:px-4 sm:py-3">
+                  <div><strong>Started:</strong> {formatDate(selectedSession.startTime)}</div>
+                  {selectedSession.endTime && <div><strong>Ended:</strong> {formatDate(selectedSession.endTime)}</div>}
+                </div>
+                {selectedSession.conversationHistory && selectedSession.conversationHistory.length > 0 && (
+                  <div className="max-h-[320px] overflow-y-auto rounded-lg border border-muted bg-card/60 p-3 sm:p-4">
+                    <h4 className="mb-3 text-sm font-semibold text-foreground sm:text-base">Conversation flow</h4>
+                    <div className="space-y-2 sm:space-y-3">
+                      {selectedSession.conversationHistory.map((msg, idx) => (
+                        <div
+                          key={idx}
+                          className={cn(
+                            'rounded-lg border p-3 text-xs sm:text-sm',
+                            msg.role === 'user'
+                              ? 'ml-auto max-w-[85%] border-sky-200 bg-sky-50'
+                              : 'mr-auto max-w-[85%] border-muted bg-card'
+                          )}
+                        >
+                          <div className="mb-1 text-xs font-semibold text-muted-foreground">
+                            {msg.role === 'user' ? 'You' : 'AI Teacher'}
+                          </div>
+                          <p className={cn(
+                            'whitespace-pre-wrap leading-relaxed',
+                            msg.role === 'user' ? 'text-sky-900' : 'text-foreground'
+                          )}>
+                            {msg.content}
+                          </p>
+                          {msg.hasErrors && (
+                            <div className="mt-2 text-xs text-orange-500">
+                              ⚠️ AI detected some mistakes
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 };

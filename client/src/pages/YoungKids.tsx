@@ -69,10 +69,8 @@ const YoungKidsPage = () => {
   const [pronunciationAttempts, setPronunciationAttempts] = useState(0);
   const [vocabularyAttempts, setVocabularyAttempts] = useState(0);
   const [gamesAttempts, setGamesAttempts] = useState(0);
-  const [enrolledWords, setEnrolledWords] = useState<Array<{ word: string; hint: string }>>([]);
   const [enrolledStoryWordsDetailed, setEnrolledStoryWordsDetailed] = useState<Array<{ word: string; hint: string; storyId: string; storyTitle: string }>>([]);
   const [selectedStoryFilter, setSelectedStoryFilter] = useState<string>('all');
-  const [enrolledPhrases, setEnrolledPhrases] = useState<Array<{ phrase: string; phonemes: string }>>([]);
   const [enrolledStoryPhrasesDetailed, setEnrolledStoryPhrasesDetailed] = useState<Array<{ phrase: string; phonemes: string; storyId: string; storyTitle: string }>>([]);
   const [selectedPhraseFilter, setSelectedPhraseFilter] = useState<string>('all');
   const storiesPerPage = 6;
@@ -102,6 +100,30 @@ const YoungKidsPage = () => {
       return new Set<string>();
     }
   }, [userId, enrolledStoryWordsDetailed, enrolledStoryPhrasesDetailed]);
+
+  const filteredStoryWords = useMemo(() => {
+    if (selectedStoryFilter === 'all') {
+      return enrolledStoryWordsDetailed;
+    }
+    return enrolledStoryWordsDetailed.filter(w => w.storyId === selectedStoryFilter);
+  }, [enrolledStoryWordsDetailed, selectedStoryFilter]);
+
+  const vocabularyWordsToUse = useMemo(
+    () => filteredStoryWords.map(w => ({ word: w.word, hint: w.hint })),
+    [filteredStoryWords]
+  );
+
+  const filteredStoryPhrases = useMemo(() => {
+    if (selectedPhraseFilter === 'all') {
+      return enrolledStoryPhrasesDetailed;
+    }
+    return enrolledStoryPhrasesDetailed.filter(p => p.storyId === selectedPhraseFilter);
+  }, [enrolledStoryPhrasesDetailed, selectedPhraseFilter]);
+
+  const pronunciationItems = useMemo(
+    () => filteredStoryPhrases.map(p => ({ phrase: p.phrase, phonemes: p.phonemes })),
+    [filteredStoryPhrases]
+  );
 
   // Interactive features state
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
@@ -371,13 +393,10 @@ const YoungKidsPage = () => {
           storyTitle: sw.storyTitle
         }));
         setEnrolledStoryWordsDetailed(detailed);
-        // Apply current filter immediately
         const filtered = selectedStoryFilter === 'all' 
           ? detailed
           : detailed.filter(w => w.storyId === selectedStoryFilter);
-        const words = filtered.map(w => ({ word: w.word, hint: w.hint }));
-        console.log(`📚 Loaded ${words.length} words from enrolled stories${selectedStoryFilter !== 'all' ? ' (filtered)' : ''}`);
-        setEnrolledWords(words);
+        console.log(`📚 Loaded ${filtered.length} words from enrolled stories${selectedStoryFilter !== 'all' ? ' (filtered)' : ''}`);
 
         // Get phrases from enrolled stories
         const storyPhrases = StoryWordsService.getPhrasesFromEnrolledStories(userId);
@@ -389,18 +408,15 @@ const YoungKidsPage = () => {
           storyTitle: sp.storyTitle
         }));
         setEnrolledStoryPhrasesDetailed(detailedPhrases);
-        // Apply current filter immediately
         const filteredPhrases = selectedPhraseFilter === 'all' 
           ? detailedPhrases
           : detailedPhrases.filter(p => p.storyId === selectedPhraseFilter);
-        const phrases = filteredPhrases.map(p => ({ phrase: p.phrase, phonemes: p.phonemes }));
-        console.log(`🎤 Loaded ${phrases.length} phrases from enrolled stories${selectedPhraseFilter !== 'all' ? ' (filtered)' : ''}`);
-        setEnrolledPhrases(phrases);
+        console.log(`🎤 Loaded ${filteredPhrases.length} phrases from enrolled stories${selectedPhraseFilter !== 'all' ? ' (filtered)' : ''}`);
       } catch (error) {
         console.error('Error loading vocabulary words and phrases:', error);
         // For Word Games and Speak & Repeat, do not fallback to defaults; show empty state
-        setEnrolledWords([]);
-        setEnrolledPhrases([]);
+        setEnrolledStoryWordsDetailed([]);
+        setEnrolledStoryPhrasesDetailed([]);
       }
     };
 
@@ -681,9 +697,6 @@ const YoungKidsPage = () => {
     ? serverAchievements.filter((a: any) => a.unlocked === true).length
     : achievements.filter(a => a.progress === 100).length;
 
-  // Use enrolled words only for Word Games (no fallback to defaults)
-  const vocabularyWordsToUse = enrolledWords;
-
   const handleStartLesson = async (storyId: string) => {
     if (!isAuthenticated) {
       setShowAuthModal(true);
@@ -890,12 +903,10 @@ const YoungKidsPage = () => {
         storyTitle: sw.storyTitle
       }));
       setEnrolledStoryWordsDetailed(detailedWords);
-      const filteredWords = selectedStoryFilter === 'all' 
+      const relevantWords = selectedStoryFilter === 'all' 
         ? detailedWords
         : detailedWords.filter(w => w.storyId === selectedStoryFilter);
-      const words = filteredWords.map(w => ({ word: w.word, hint: w.hint }));
-      console.log(`🎉 Story completed! Loaded ${words.length} total words from enrolled stories`);
-      setEnrolledWords(words);
+      console.log(`🎉 Story completed! Loaded ${relevantWords.length} total words from enrolled stories${selectedStoryFilter !== 'all' ? ' (filtered)' : ''}`);
 
       const storyPhrases = StoryWordsService.getPhrasesFromEnrolledStories(userId);
       const detailedPhrases = storyPhrases.map(sp => ({
@@ -905,12 +916,10 @@ const YoungKidsPage = () => {
         storyTitle: sp.storyTitle
       }));
       setEnrolledStoryPhrasesDetailed(detailedPhrases);
-      const filteredPhrases = selectedPhraseFilter === 'all' 
+      const relevantPhrases = selectedPhraseFilter === 'all' 
         ? detailedPhrases
         : detailedPhrases.filter(p => p.storyId === selectedPhraseFilter);
-      const phrases = filteredPhrases.map(p => ({ phrase: p.phrase, phonemes: p.phonemes }));
-      console.log(`🎉 Story completed! Loaded ${phrases.length} total phrases from enrolled stories`);
-      setEnrolledPhrases(phrases);
+      console.log(`🎉 Story completed! Loaded ${relevantPhrases.length} total phrases from enrolled stories${selectedPhraseFilter !== 'all' ? ' (filtered)' : ''}`);
       
       if (token && token !== 'local-token') {
         const current = await KidsApi.getProgress(token);
@@ -1130,7 +1139,7 @@ const YoungKidsPage = () => {
       />
       <main className="container mx-auto max-w-6xl px-4 pt-24 pb-16 space-y-10">
         <section>
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-sky-500 via-indigo-500 to-purple-500 text-white shadow-xl">
+          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-[#1B4332] via-[#2D6A4F] to-[#74C69D] text-white shadow-xl">
             <CardHeader className="space-y-6">
               <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                 <div className="space-y-3 max-w-2xl">
@@ -1415,6 +1424,7 @@ const YoungKidsPage = () => {
                     </div>
                   </div>
                   <Vocabulary
+                    key={`${selectedStoryFilter}-${vocabularyWordsToUse.length}`}
                     words={vocabularyWordsToUse}
                     onWordPracticed={async (word: string) => {
                       const newAttempts = vocabularyAttempts + 1;
@@ -1468,7 +1478,7 @@ const YoungKidsPage = () => {
             </TabsContent>
 
             <TabsContent value="pronunciation" className="mt-0 space-y-4">
-              {enrolledPhrases.length === 0 ? (
+              {pronunciationItems.length === 0 ? (
                 <Card className="border-dashed">
                   <CardHeader>
                     <CardTitle className="text-lg font-semibold text-foreground">Unlock speak & repeat</CardTitle>
@@ -1495,7 +1505,7 @@ const YoungKidsPage = () => {
                           Speak & repeat studio
                         </h3>
                         <p className="text-sm text-muted-foreground">
-                          {enrolledPhrases.length} phrases ready for practice
+                          {pronunciationItems.length} phrases ready for practice
                         </p>
                       </div>
                     </div>
@@ -1516,7 +1526,8 @@ const YoungKidsPage = () => {
                     </div>
                   </div>
                   <Pronunciation
-                    items={enrolledPhrases}
+                    key={`${selectedPhraseFilter}-${pronunciationItems.length}`}
+                    items={pronunciationItems}
                     onPhrasePracticed={async (phrase: string) => {
                       const newAttempts = pronunciationAttempts + 1;
                       setPronunciationAttempts(newAttempts);

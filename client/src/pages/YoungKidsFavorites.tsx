@@ -291,7 +291,7 @@ const YoungKidsFavorites = () => {
     <div className="min-h-screen bg-muted/20 pb-20">
       <main className="container mx-auto max-w-6xl px-4 pt-24 space-y-10">
         <section>
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-sky-500 via-indigo-500 to-purple-500 text-white shadow-xl">
+          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-[#1B4332] via-[#2D6A4F] to-[#74C69D] text-white shadow-xl">
             <span className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-white/10 blur-3xl" aria-hidden />
             <span className="absolute -left-24 bottom-0 h-48 w-48 rounded-full bg-white/10 blur-3xl" aria-hidden />
             <CardContent className="relative z-10 space-y-6 p-6 md:p-10">
@@ -309,7 +309,7 @@ const YoungKidsFavorites = () => {
                     <Badge className="rounded-full bg-white/20 text-white">Favourites hub</Badge>
                   </div>
                   <div className="space-y-3">
-                    <h1 className="text-3xl font-semibold leading-tight md:text-4xl">
+                    <h1 className="text-3xl font-semibold leading-tight text-white md:text-4xl">
                       Your Favourite Stories
                     </h1>
                     <p className="text-base text-white/85 md:text-lg">
@@ -351,7 +351,7 @@ const YoungKidsFavorites = () => {
                 <Button
                   size="lg"
                   onClick={() => navigate('/kids/young')}
-                  className="mx-auto inline-flex items-center rounded-full bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:from-[#4ECDC4] hover:to-[#118AB2] hover:shadow-lg"
+                  className="mx-auto inline-flex items-center rounded-full bg-gradient-to-r from-[#1B4332] to-[#74C69D] px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:from-[#74C69D] hover:to-[#1B4332] hover:shadow-lg"
                 >
                   <BookOpen className="mr-2 h-4 w-4" />
                   Explore story library
@@ -432,7 +432,7 @@ const YoungKidsFavorites = () => {
                             <HeartOff className="h-4 w-4" />
                           </Button>
                           <Button
-                            className="flex-1 rounded-full bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-sm font-semibold text-white shadow-sm transition hover:from-[#4ECDC4] hover:to-[#118AB2] hover:shadow-lg"
+                            className="flex-1 rounded-full bg-gradient-to-r from-[#1B4332] to-[#74C69D] text-sm font-semibold text-white shadow-sm transition hover:from-[#74C69D] hover:to-[#1B4332] hover:shadow-lg"
                             onClick={() => handleStartStory(story.id)}
                           >
                             <Play className="mr-2 h-4 w-4" />
