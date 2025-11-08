@@ -7,8 +7,8 @@
     <!-- Primary Meta Tags -->
     <title>Elora - English Language Learning App</title>
     <meta name="title" content="Elora - English Language Learning" />
-    <meta name="description" content="Master English with our offline-first language learning app. Practice pronunciation, vocabulary, and conversation skills for kids and adults. Works 100% offline!" />
-    <meta name="keywords" content="english learning, language app, pronunciation, speech recognition, offline learning, kids education, IELTS, PTE, vocabulary" />
+    <meta name="description" content="Master English with our online language learning app. Practice pronunciation, vocabulary, and conversation skills for kids and adults with real-time feedback." />
+    <meta name="keywords" content="english learning, online language app, pronunciation, speech recognition, kids education, IELTS, PTE, vocabulary" />
     <meta name="author" content="Elora" />
     <meta name="robots" content="index, follow" />
     
@@ -38,14 +38,14 @@
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://speakbee.com/" />
     <meta property="og:title" content="Elora - English Language Learning" />
-    <meta property="og:description" content="Master English with our offline-first language learning app. Practice pronunciation, vocabulary, and conversation skills." />
+    <meta property="og:description" content="Master English with our online language learning app. Practice pronunciation, vocabulary, and conversation skills." />
     <meta property="og:image" content="/logo01.png" />
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content="https://speakbee.com/" />
     <meta property="twitter:title" content="Elora - English Language Learning" />
-    <meta property="twitter:description" content="Master English with our offline-first language learning app. Practice pronunciation, vocabulary, and conversation skills." />
+    <meta property="twitter:description" content="Master English with our online language learning app. Practice pronunciation, vocabulary, and conversation skills." />
     <meta property="twitter:image" content="/logo01.png" />
     
     <!-- Performance Hints -->
@@ -55,24 +55,5 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script>
-      // Register Service Worker for offline support
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then((registration) => {
-              console.log('Service Worker registered successfully:', registration.scope);
-              
-              // Check for updates periodically
-              setInterval(() => {
-                registration.update();
-              }, 60000); // Check every minute
-            })
-            .catch((error) => {
-              console.error('Service Worker registration failed:', error);
-            });
-        });
-      }
-    </script>
   </body>
 </html>

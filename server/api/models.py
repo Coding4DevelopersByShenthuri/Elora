@@ -488,6 +488,32 @@ class KidsVocabularyPractice(models.Model):
         return f"{self.user.username} - {self.word} ({self.best_score}%)"
 
 
+class ParentalControlSettings(models.Model):
+    """Per-parent controls configuration for kids experiences."""
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='parental_controls')
+    pin_hash = models.CharField(max_length=128, blank=True, default="")
+    daily_limit_minutes = models.IntegerField(
+        default=30,
+        validators=[MinValueValidator(5), MaxValueValidator(600)],
+        help_text="Daily time allowance in minutes for kids mode sessions",
+    )
+    last_pin_update = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Parental Control Settings"
+        verbose_name_plural = "Parental Control Settings"
+
+    def __str__(self):
+        status = "secured" if self.pin_hash else "open"
+        return f"ParentalControls(user={self.user_id}, status={status})"
+
+    @property
+    def has_pin(self) -> bool:
+        return bool(self.pin_hash)
+
+
 class KidsPronunciationPractice(models.Model):
     """Track pronunciation phrase practice sessions"""
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='kids_pronunciation_practice')

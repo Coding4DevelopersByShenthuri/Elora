@@ -9,7 +9,6 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import { prefetchAppShell } from "@/services/OfflinePrefetch";
 
 // ✅ Global Components
 import Navbar from "@/components/common/Navbar";
@@ -258,7 +257,6 @@ const AppRoutes = () => {
         <Route path="/kids" element={<PageTransition><KidsPage /></PageTransition>} />
         <Route path="/kids/young" element={<PageTransition><YoungKidsPage /></PageTransition>} />
         <Route path="/kids/teen" element={<PageTransition><TeenKidsPage /></PageTransition>} />
-        <Route path="/kids/certificates" element={<PageTransition><CertificatesPage /></PageTransition>} />
         <Route path="/kids/games/:gameId" element={<PageTransition><KidsGamePage /></PageTransition>} />
         <Route path="/kids/games/history" element={<PageTransition><GameHistoryPage /></PageTransition>} />
         <Route path="/favorites/young" element={<PageTransition><YoungKidsFavoritesPage /></PageTransition>} />
@@ -272,6 +270,7 @@ const AppRoutes = () => {
         <Route path="/pricing" element={<PageTransition><PricingPage /></PageTransition>} />
         <Route path="/verify-email/:token" element={<PageTransition><VerifyEmail /></PageTransition>} />
         <Route path="/terms-and-conditions" element={<PageTransition><TermsAndConditionsPage /></PageTransition>} />
+        <Route path="/certificates" element={<PageTransition><CertificatesPage /></PageTransition>} />
         
         {/* Admin Routes - Must come before catch-all route */}
         <Route path="/admin/login" element={<AdminLogin />} />
@@ -653,16 +652,6 @@ const App = () => {
   useEffect(() => {
     const timer = window.setTimeout(() => setIsInitialLoading(false), 1500);
     return () => window.clearTimeout(timer);
-  }, []);
-
-  // Ask service worker to pre-cache key routes shortly after mount
-  useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      const id = window.setTimeout(() => {
-        prefetchAppShell();
-      }, 1200);
-      return () => window.clearTimeout(id);
-    }
   }, []);
 
   // Get Google Client ID from environment variables

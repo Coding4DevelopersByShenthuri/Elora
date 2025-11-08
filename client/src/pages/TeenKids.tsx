@@ -1795,7 +1795,10 @@ const TeenKidsPage = () => {
               )}
               onClick={() => {
                 handleElementClick('quick-certificates');
-                navigate('/certificates');
+                try {
+                  sessionStorage.setItem('speakbee_certificates_audience', 'teen');
+                } catch {}
+                navigate('/certificates', { state: { audience: 'teen' } });
               }}
               onMouseEnter={() => handleElementHover('quick-certificates')}
               onMouseLeave={() => setHoveredElement(null)}

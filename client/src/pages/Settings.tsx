@@ -5,29 +5,36 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from 'react';
-import { prefetchAppShell } from "@/services/OfflinePrefetch";
+import { useState } from 'react';
+import { verifyOnlineOnlyMode } from "@/services/OfflinePrefetch";
 import { useNavigate } from 'react-router-dom';
 import { Lock, ChevronRight } from 'lucide-react';
 
 const Settings = () => {
   const showContent = useAnimateIn(false, 300);
-  const [useLocalModel, setUseLocalModel] = useState<boolean>(true);
+  const [isCheckingConnection, setIsCheckingConnection] = useState(false);
+  const [connectivityMessage, setConnectivityMessage] = useState<string | null>(null);
+  const [connectionResult, setConnectionResult] = useState<'healthy' | 'error' | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const stored = localStorage.getItem('speakbee_use_local_model');
-    if (stored === null) {
-      localStorage.setItem('speakbee_use_local_model', 'true');
-      setUseLocalModel(true);
-    } else {
-      setUseLocalModel(stored === 'true');
+  const handleConnectivityCheck = async () => {
+    setConnectivityMessage(null);
+    setConnectionResult(null);
+    setIsCheckingConnection(true);
+    try {
+      await verifyOnlineOnlyMode();
+      setConnectivityMessage('Connection looks good! The backend responded successfully.');
+      setConnectionResult('healthy');
+    } catch (error) {
+      setConnectivityMessage(
+        error instanceof Error
+          ? error.message
+          : 'Unable to verify the connection. Please ensure the backend is reachable.'
+      );
+      setConnectionResult('error');
+    } finally {
+      setIsCheckingConnection(false);
     }
-  }, []);
-
-  const toggleLocalModel = (next: boolean) => {
-    setUseLocalModel(next);
-    localStorage.setItem('speakbee_use_local_model', String(next));
   };
   
   return (
@@ -91,25 +98,31 @@ const Settings = () => {
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label htmlFor="local-llm" className="text-base">Use Local Model</Label>
+                      <Label className="text-base">Connectivity Health Check</Label>
                       <p className="text-sm text-muted-foreground">
-                        Generate feedback entirely on-device for offline privacy
+                        Verify that Elora can reach the online services required for real-time learning
                       </p>
                     </div>
-                    <Switch id="local-llm" checked={useLocalModel} onCheckedChange={toggleLocalModel} />
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label className="text-base">Prefetch Offline Content</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Cache core pages now so they work without internet
-                      </p>
-                    </div>
-                    <Button variant="secondary" onClick={() => prefetchAppShell()}>
-                      Prefetch
+                    <Button
+                      variant="secondary"
+                      onClick={handleConnectivityCheck}
+                      disabled={isCheckingConnection}
+                    >
+                      {isCheckingConnection ? 'Checking…' : 'Run Check'}
                     </Button>
                   </div>
+
+                  {connectivityMessage && (
+                    <div
+                      className={`rounded-lg border px-4 py-3 text-sm ${
+                        connectionResult === 'healthy'
+                          ? 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
+                          : 'border-red-300 bg-red-50 text-red-700 dark:border-red-700 dark:bg-red-900/30 dark:text-red-300'
+                      }`}
+                    >
+                      {connectivityMessage}
+                    </div>
+                  )}
 
                   <div className="h-px bg-border" />
 

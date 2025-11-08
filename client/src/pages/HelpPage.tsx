@@ -69,10 +69,10 @@ const HelpPage = () => {
                         content={
                             <>
                                 <p><strong>Q: Do I need the internet to use this app?</strong></p>
-                                <p>A: No! Elora works fully offline. You can learn, practice, and improve anywhere, anytime.</p>
+                                <p>A: Yes. Elora delivers live courses, assessments, and AI feedback through our secure online platform.</p>
 
                                 <p className="mt-6"><strong>Q: Is my data being tracked?</strong></p>
-                                <p>A: Absolutely not. We value your privacy. Everything stays on your device—nothing is sent to the cloud.</p>
+                                <p>A: We safeguard your information with encrypted, server-side storage and never sell your data. Review or delete your profile anytime from the Settings page.</p>
 
                                 <p className="mt-6"><strong>Q: How do I reset the app or my progress?</strong></p>
                                 <p>A: You can reset from the Settings page. Tap on 'Reset Progress' under the profile tab.</p>

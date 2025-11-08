@@ -16,32 +16,23 @@ const ParentalControlsPage = () => {
   };
 
   return (
-    <div className="min-h-screen pt-16 sm:pt-20">
-      <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8 lg:p-10 pb-20">
-        {/* Header with Back Button and Title */}
-        <div className="flex items-center justify-between mb-3 sm:mb-4">
+    <div className="min-h-screen pt-24 sm:pt-28">
+      <div className="mx-auto max-w-7xl space-y-6 px-4 pb-20 sm:px-6 md:px-8 lg:px-10">
+        <div className="mb-6 flex items-center justify-between">
           <Button
-            variant="outline"
-            size="sm"
-            onClick={(e) => handleBack(e)}
-            className="rounded-full flex-shrink-0 hover:bg-gray-200 dark:hover:bg-gray-700 border-2 border-transparent dark:border-gray-600 bg-transparent hover:border-gray-300 dark:hover:border-gray-500 h-10 w-10 sm:h-12 sm:w-12 p-0 transition-all hover:scale-110"
-            type="button"
+            variant="ghost"
+            onClick={handleBack}
+            className="group inline-flex items-center gap-2 rounded-full border border-primary/20 bg-white/60 px-4 py-2 text-sm font-semibold text-primary shadow-sm backdrop-blur-sm transition hover:border-primary/40 hover:bg-white/80 hover:text-primary-foreground dark:border-emerald-500/30 dark:bg-slate-900/70 dark:text-emerald-200 dark:hover:border-emerald-500/60 dark:hover:bg-slate-900/60"
           >
-            <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-gray-900 dark:text-gray-100" />
+            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
+            Back to kids hub
           </Button>
-          
-          <h1 className="text-2xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] bg-clip-text text-transparent px-2">
-            Parental Controls
-          </h1>
-          
-          <div className="w-10 sm:w-12"></div> {/* Spacer for alignment */}
+          <div className="hidden sm:block text-sm font-semibold uppercase tracking-[0.3em] text-primary/70 dark:text-emerald-200/60">
+            Parental controls
+          </div>
         </div>
-        
-        {/* Parental Controls Component */}
-        <ParentalControls
-          userId={userId}
-          onClose={() => navigate('/kids')}
-        />
+
+        <ParentalControls userId={userId} onClose={() => navigate('/kids')} />
       </div>
     </div>
   );

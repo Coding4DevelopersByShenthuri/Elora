@@ -251,14 +251,14 @@ const HowPage = () => {
               {
                 number: 2,
                 title: "Learn & Practice",
-                description: "Engage in interactive lessons offline with AI-powered conversation simulations and pronunciation feedback.",
+                description: "Engage in interactive lessons online with AI-powered conversation simulations and pronunciation feedback.",
                 icon: <BookOpen className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" />,
                 color: "from-primary to-primary/80"
               },
               {
                 number: 3,
                 title: "Track Progress",
-                description: "Monitor your improvements with offline progress tracking, achievement badges, and scores.",
+                description: "Monitor your improvements with live progress tracking, achievement badges, and scores.",
                 icon: <BarChart className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" />,
                 color: "from-primary to-primary/80"
               },
@@ -335,11 +335,11 @@ const HowPage = () => {
                 Real-Time Pronunciation & Conversation.
               </span>
             }
-            description="Practice speaking and get instant feedback with our offline Small Language Model, improving your fluency and confidence."
+            description="Practice speaking and get instant feedback with our cloud-hosted Small Language Model, improving your fluency and confidence."
             image="./image5.png"
             features={[
               { icon: <CheckCircle size={24} />, text: "Speech-to-text with pronunciation scoring" },
-              { icon: <CheckCircle size={24} />, text: "AI conversation simulator for offline practice" },
+              { icon: <CheckCircle size={24} />, text: "AI conversation simulator for live guided practice" },
               { icon: <CheckCircle size={24} />, text: "Grammar and vocabulary exercises integrated into lessons" },
               { icon: <CheckCircle size={24} />, text: "Gamified learning with badges, streaks, and progress tracking" },
             ]}
@@ -358,7 +358,7 @@ const HowPage = () => {
             image="./image7.png"
             features={[
               { icon: <CheckCircle size={24} />, text: "Instant access to Kids, Adults, and IELTS/PTE modules" },
-              { icon: <CheckCircle size={24} />, text: "Search lessons, exercises, and conversation practice offline" },
+              { icon: <CheckCircle size={24} />, text: "Search lessons, exercises, and conversation practice instantly online" },
               { icon: <CheckCircle size={24} />, text: "Quickly revisit saved progress, scores, and achievements" },
               { icon: <CheckCircle size={24} />, text: "AI-powered suggestions to guide your next practice session" },
             ]}
@@ -390,7 +390,7 @@ const HowPage = () => {
                 Your Private Learning Hub.
               </span>
             }
-            description="Elora keeps your learning progress and data completely private. All exercises, lessons, and feedback are stored locally, giving you full control and offline access."
+            description="Elora keeps your learning progress and data completely private. All exercises, lessons, and feedback are securely synced so you can pick up where you left off from any device."
             image="./image9.png"
             features={[
               { icon: <CheckCircle size={24} />, text: "All learning data stored locally on your device" },
@@ -411,7 +411,7 @@ const HowPage = () => {
             description="Elora acts as an extension of your learning journey, guiding you through interactive lessons, practice exercises, and real-time feedback across all your devices."
             image="./image10.png"
             features={[
-              { icon: <CheckCircle size={24} />, text: "Works offline on all your devices: Android, iOS, Windows, and macOS" },
+              { icon: <CheckCircle size={24} />, text: "Works seamlessly online across Android, iOS, Windows, and macOS" },
               { icon: <CheckCircle size={24} />, text: "Interactive speech-to-text and conversation practice with AI feedback" },
               { icon: <CheckCircle size={24} />, text: "Category-based modules for Kids, Adults, and IELTS/PTE learners" },
               { icon: <CheckCircle size={24} />, text: "Track your progress with gamified achievements, scores, and streaks" },

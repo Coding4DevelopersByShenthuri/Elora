@@ -31,7 +31,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (userData: User) => void;
+  login: (userData: User, options?: { token?: string }) => void;
   loginWithServer: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
   loginWithGoogle: (token: string) => Promise<{ success: boolean; message?: string }>;
   registerWithServer: (data: { name: string; email: string; password: string; confirm_password: string }) => Promise<{ success: boolean; message?: string }>;
@@ -68,7 +68,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const token = localStorage.getItem('speakbee_auth_token');
     const userData = localStorage.getItem('speakbee_current_user');
     
-    if (token && userData) {
+    if (token && token !== 'local-token' && userData) {
       try {
         const parsedUser = JSON.parse(userData);
         setUser(parsedUser);
@@ -83,16 +83,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         console.error('Error parsing user data:', error);
         // Don't logout on parse error - could be temporary issue
       }
+    } else if (token === 'local-token') {
+      localStorage.removeItem('speakbee_auth_token');
+      localStorage.removeItem('speakbee_current_user');
+      setUser(null);
     }
   }, [isOnline]);
 
-  const login = (userData: User) => {
+  const login = (userData: User, options?: { token?: string }) => {
     const updatedUser = {
       ...userData,
       lastLogin: new Date().toISOString()
     };
     setUser(updatedUser);
-    localStorage.setItem('speakbee_auth_token', 'local-token');
+
+    let tokenToStore = options?.token;
+    if (!tokenToStore) {
+      tokenToStore = localStorage.getItem('speakbee_auth_token') || 'local-token';
+    }
+
+    localStorage.setItem('speakbee_auth_token', tokenToStore);
     localStorage.setItem('speakbee_current_user', JSON.stringify(updatedUser));
   };
 
@@ -102,6 +112,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       
       if (response.success && 'data' in response && response.data) {
         const userData = response.data.user;
+        const authToken = response.data.token || localStorage.getItem('speakbee_auth_token') || '';
         
         // Check if survey is completed (has survey_completed_at)
         const hasSurveyData = userData.profile?.survey_completed_at;
@@ -134,7 +145,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         };
         
         // transformedUser is already used in login() above, no need to reference it here
-        login(transformedUser);
+        login(transformedUser, { token: authToken || undefined });
         return { success: true, message: response.message };
       }
       
@@ -151,6 +162,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       
       if (response.success && 'data' in response && response.data) {
         const userData = response.data.user;
+        const authToken = response.data.token || localStorage.getItem('speakbee_auth_token') || '';
         const transformedUser: User = {
           id: userData.id.toString(),
           username: userData.username,
@@ -173,7 +185,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           } : undefined
         };
         
-        login(transformedUser);
+        login(transformedUser, { token: authToken || undefined });
         return { success: true, message: response.message || 'Google authentication successful' };
       }
       

@@ -11,8 +11,8 @@ interface SyncStatusIndicatorProps {
 
 const SyncStatusIndicator = ({ className, showDetails = true }: SyncStatusIndicatorProps) => {
   const [syncStatus, setSyncStatus] = useState({
-    mode: 'hybrid' as 'offline' | 'online' | 'hybrid',
-    online: false,
+    mode: 'online' as 'offline' | 'online' | 'hybrid',
+    online: navigator.onLine,
     pendingSessions: 0,
     autoSyncEnabled: false
   });
@@ -89,7 +89,7 @@ const SyncStatusIndicator = ({ className, showDetails = true }: SyncStatusIndica
     }
     
     if (!syncStatus.online) {
-      return 'Offline Mode';
+      return 'Connection required';
     }
     
     if (syncStatus.pendingSessions > 0) {
@@ -101,7 +101,7 @@ const SyncStatusIndicator = ({ className, showDetails = true }: SyncStatusIndica
 
   const getStatusColor = () => {
     if (isSyncing) return 'border-blue-200 bg-blue-50 dark:bg-blue-900/20';
-    if (!syncStatus.online) return 'border-gray-200 bg-gray-50 dark:bg-gray-800';
+    if (!syncStatus.online) return 'border-red-200 bg-red-50 dark:bg-red-900/20';
     if (syncStatus.pendingSessions > 0) return 'border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20';
     return 'border-green-200 bg-green-50 dark:bg-green-900/20';
   };
@@ -156,8 +156,8 @@ const SyncStatusIndicator = ({ className, showDetails = true }: SyncStatusIndica
               </p>
             )}
             {!syncStatus.online && (
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Your progress is saved locally
+              <p className="text-xs text-red-500 dark:text-red-300">
+                Reconnect to continue learning
               </p>
             )}
           </div>
@@ -189,22 +189,9 @@ const SyncStatusIndicator = ({ className, showDetails = true }: SyncStatusIndica
 
       {/* Mode Badge */}
       <div className="mt-3 flex items-center gap-2">
-        <span className={cn(
-          "text-xs px-2 py-1 rounded-full font-semibold",
-          syncStatus.mode === 'offline' && "bg-gray-200 text-gray-700",
-          syncStatus.mode === 'online' && "bg-blue-200 text-blue-700",
-          syncStatus.mode === 'hybrid' && "bg-purple-200 text-purple-700"
-        )}>
-          {syncStatus.mode === 'offline' && '📴 Offline Only'}
-          {syncStatus.mode === 'online' && '🌐 Online Only'}
-          {syncStatus.mode === 'hybrid' && '🔄 Hybrid Mode'}
+        <span className="text-xs px-2 py-1 rounded-full font-semibold bg-blue-200 text-blue-700">
+          🌐 Online Experience
         </span>
-        
-        {syncStatus.autoSyncEnabled && (
-          <span className="text-xs px-2 py-1 rounded-full bg-green-200 text-green-700 font-semibold">
-            ⚡ Auto-sync ON
-          </span>
-        )}
       </div>
     </div>
   );

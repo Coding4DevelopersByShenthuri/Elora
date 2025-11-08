@@ -41,7 +41,7 @@ const Index = () => {
     {
       icon: <BookOpen className="w-8 h-8" />,
       title: "Comprehensive Learning Modules",
-      description: "Structured lessons for kids, adults, and exam candidates with offline access to all content.",
+      description: "Structured lessons for kids, adults, and exam candidates with live online access to every module.",
       color: "from-teal-500 to-cyan-600"
     },
     {
@@ -98,7 +98,7 @@ const Index = () => {
                 
                 <p className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed">
                   Practice speaking, listening, and conversation skills with our advanced AI technology. 
-                  Works completely offline, respects your privacy, and adapts to your learning pace.
+                  Delivers real-time online guidance, respects your privacy, and adapts to your learning pace.
                 </p>
               </div>
 
@@ -391,7 +391,7 @@ const Index = () => {
                 name: "James Hown",
                 role: "English Teacher",
                 location: "Texas",
-                content: "Elora has revolutionized how my students learn English. The offline AI features work perfectly even in areas with poor internet connectivity.",
+                content: "Elora has revolutionized how my students learn English. The real-time AI support keeps them engaged and improving in every session.",
                 rating: 5,
                 image: "👨‍🏫"
               },

@@ -47,6 +47,10 @@ urlpatterns = [
     path('kids/achievements', views.kids_achievements_list, name='kids-achievements'),
     path('kids/certificates/issue', views.kids_issue_certificate, name='kids-issue-certificate'),
     path('kids/certificates/my', views.kids_my_certificates, name='kids-my-certificates'),
+    path('kids/parental-controls', views.kids_parental_controls_overview, name='kids-parental-controls-overview'),
+    path('kids/parental-controls/unlock', views.kids_parental_controls_unlock, name='kids-parental-controls-unlock'),
+    path('kids/parental-controls/settings', views.kids_parental_controls_settings, name='kids-parental-controls-settings'),
+    path('kids/parental-controls/pin', views.kids_parental_controls_pin, name='kids-parental-controls-pin'),
     path('kids/analytics', views.kids_analytics, name='kids-analytics'),
     path('kids/gemini/game', views.kids_gemini_game, name='kids-gemini-game'),
     

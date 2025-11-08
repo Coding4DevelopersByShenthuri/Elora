@@ -25,12 +25,47 @@ const CertificatesPage = () => {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  type AudiencePreference = 'young' | 'teen';
+  const locationState = location.state as { audience?: AudiencePreference } | null;
+  const explicitAudience = locationState?.audience;
+  const queryAudience = useMemo<AudiencePreference | undefined>(() => {
+    try {
+      const params = new URLSearchParams(location.search);
+      const value = params.get('audience');
+      if (value === 'teen' || value === 'young') {
+        return value;
+      }
+    } catch {
+      // ignore
+    }
+    return undefined;
+  }, [location.search]);
   
   // Detect if user is from teen kids page or has teen story enrollments
   const isTeenKids = useMemo(() => {
-    // Check URL path
-    if (location.pathname.includes('/teen') || document.referrer.includes('/kids/teen')) {
+    if (explicitAudience === 'teen' || queryAudience === 'teen') {
       return true;
+    }
+    if (explicitAudience === 'young' || queryAudience === 'young') {
+      return false;
+    }
+
+    try {
+      const storedPreference = sessionStorage.getItem('speakbee_certificates_audience');
+      if (storedPreference === 'teen') return true;
+      if (storedPreference === 'young') return false;
+    } catch {
+      // ignore sessionStorage errors (e.g. privacy mode)
+    }
+
+    try {
+      if (typeof document !== 'undefined') {
+        if (document.referrer.includes('/kids/teen')) return true;
+        if (document.referrer.includes('/kids/young')) return false;
+      }
+    } catch {
+      // ignore referrer access issues
     }
     
     // Check if user has teen story enrollments
@@ -43,11 +78,22 @@ const CertificatesPage = () => {
         'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
         'ai-ethics-explorer', 'digital-security-guardian'];
       const hasTeenStories = enrolledStories.some(e => teenStoryIds.includes(e.storyId));
-      return hasTeenStories;
+      if (hasTeenStories) {
+        return true;
+      }
     } catch {
-      return false;
+      // ignore story enrolment lookup errors
     }
-  }, [location.pathname]);
+    return false;
+  }, [explicitAudience, queryAudience]);
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem('speakbee_certificates_audience', isTeenKids ? 'teen' : 'young');
+    } catch {
+      // ignore sessionStorage errors
+    }
+  }, [isTeenKids]);
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState<any>(null);
   const [localKidsProgress, setLocalKidsProgress] = useState<any>(null);

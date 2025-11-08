@@ -10,8 +10,8 @@ export const DeploySection = ({ show }: DeploySectionProps) => {
   const learningFeatures = [
     {
       icon: <Activity size={32} className="text-primary" />,
-      title: "Offline Practice",
-      description: "Train your spoken English entirely offline without needing an internet connection."
+      title: "Live Practice",
+      description: "Train your spoken English with on-demand sessions that leverage our always-online AI services."
     },
     {
       icon: <TrendingUp size={32} className="text-primary" />,
@@ -21,12 +21,12 @@ export const DeploySection = ({ show }: DeploySectionProps) => {
     {
       icon: <Layout size={32} className="text-primary" />,
       title: "AI Assistance",
-      description: "Get real-time feedback on pronunciation, grammar, and sentence structure using a small local language model."
+      description: "Get real-time feedback on pronunciation, grammar, and sentence structure delivered from our cloud AI."
     },
     {
       icon: <Maximize size={32} className="text-primary" />,
       title: "Comprehensive Training",
-      description: "Practice speaking, listening, reading, and writing in one complete offline solution."
+      description: "Practice speaking, listening, reading, and writing in one connected learning environment."
     }
   ];
 
@@ -46,7 +46,7 @@ export const DeploySection = ({ show }: DeploySectionProps) => {
             </span>
           </h2>
           <p className="text-foreground max-w-3xl text-base sm:text-lg md:text-xl mt-2 px-4">
-            Experience offline AI-powered English training designed to enhance your speaking and comprehension skills.
+            Experience always-online AI-powered English training designed to enhance your speaking and comprehension skills.
           </p>
         </div>
 

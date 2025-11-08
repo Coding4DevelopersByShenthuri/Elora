@@ -1,4 +1,4 @@
-/* Using system fonts for offline support */
+/* Using system fonts for consistent cross-platform rendering */
 
 /* Scope all styles to the auth modal only */
 .auth-modal-wrapper * {

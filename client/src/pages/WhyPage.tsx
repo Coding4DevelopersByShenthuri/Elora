@@ -18,7 +18,7 @@ const WhyPage = () => {
     {
       icon: <ShieldCheck className="w-6 h-6 text-teal-700" />,
       title: "Privacy First",
-      description: "Your data never leaves your device. Complete offline functionality with zero data collection."
+      description: "Your progress stays protected with secure online storage and zero data resale."
     },
     {
       icon: <Brain className="w-6 h-6 text-teal-700" />,
@@ -118,7 +118,7 @@ const WhyPage = () => {
             {
               icon: <Lightbulb className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-teal-800" />,
               title: "Because learning should be <span className='text-orange-500 font-bold'>accessible</span> to everyone",
-              description: "We believe that quality English education shouldn't be limited by internet connectivity, expensive subscriptions, or privacy concerns. Our offline-first approach ensures that anyone, anywhere can learn English effectively.",
+              description: "We believe that quality English education should be delivered through reliable, connected experiences—without expensive subscriptions or privacy compromises.",
               color: "from-primary to-primary/80"
             },
             {

@@ -1,7 +1,7 @@
 {
   "name": "Elora - English Language Learning",
   "short_name": "SpeakBee",
-  "description": "Offline-first English language learning app with speech recognition for kids and adults. Learn pronunciation, vocabulary, and conversation skills.",
+  "description": "Online English language learning app with speech recognition for kids and adults. Learn pronunciation, vocabulary, and conversation skills with live services.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",

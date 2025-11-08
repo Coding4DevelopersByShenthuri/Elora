@@ -61,25 +61,8 @@ const handleApiError = (error: any) => {
   }
 };
 
-// Check if server integration is enabled and available
-const isServerEnabled = (): boolean => {
-  // Server is optional - only use if explicitly enabled and online
-  const enabled = import.meta.env.VITE_ENABLE_SERVER_AUTH !== 'false';
-  return enabled && navigator.onLine;
-};
-
 // Helper function for fetch requests
 const fetchWithAuth = async (endpoint: string, options: RequestInit = {}, timeoutMs: number = 15000) => {
-  // Check if we should even try server connection
-  if (!isServerEnabled()) {
-    throw { 
-      response: { 
-        data: { message: 'Server not available - using offline mode' }, 
-        status: 0 
-      } 
-    };
-  }
-
   const token = getAuthToken();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -117,7 +100,7 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}, timeou
     if (error.name === 'TypeError') {
       throw {
         response: {
-          data: { message: 'Server not reachable - using offline mode' },
+          data: { message: 'Server not reachable. Please verify your internet connection and that the Elora backend is running.' },
           status: 0
         }
       };
@@ -1023,6 +1006,84 @@ export const KidsAPI = {
 };
 
 
+// ============= Parental Controls API =============
+export const ParentalControlsAPI = {
+  /**
+   * Fetch parental control settings and usage stats
+   */
+  getOverview: async () => {
+    try {
+      const result = await fetchWithAuth('kids/parental-controls');
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Attempt to unlock parental controls with a PIN
+   */
+  unlock: async (pin: string) => {
+    try {
+      const result = await fetchWithAuth('kids/parental-controls/unlock', {
+        method: 'POST',
+        body: JSON.stringify({ pin })
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Update parental control settings (daily limit, etc.)
+   */
+  updateSettings: async (data: { daily_limit_minutes: number }) => {
+    try {
+      const result = await fetchWithAuth('kids/parental-controls/settings', {
+        method: 'PATCH',
+        body: JSON.stringify(data)
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Create, update, or reset the parental control PIN
+   */
+  updatePin: async (data: {
+    current_pin?: string;
+    new_pin?: string;
+    confirm_pin?: string;
+    action?: 'set' | 'reset';
+  }) => {
+    try {
+      const result = await fetchWithAuth('kids/parental-controls/pin', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  }
+};
+
+
 // ============= Waitlist API =============
 export const WaitlistAPI = {
   /**
@@ -1062,6 +1123,7 @@ export const API = {
   achievements: AchievementsAPI,
   stats: StatsAPI,
   kids: KidsAPI,
+  parentalControls: ParentalControlsAPI,
   waitlist: WaitlistAPI
 };
 

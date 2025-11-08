@@ -2,7 +2,8 @@ from pathlib import Path
 from datetime import timedelta
 import os
 import logging
-from decouple import config
+from decouple import config, UndefinedValueError
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -78,40 +79,34 @@ WSGI_APPLICATION = 'crud.wsgi.application'
 # - Production: Set these in your production environment:
 #   DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_PORT
 
-# Check if MySQL is configured
-db_name = config('DATABASE_NAME', default=None)
-db_user = config('DATABASE_USER', default=None)
+try:
+    db_name = config('DATABASE_NAME')
+    db_user = config('DATABASE_USER')
+except UndefinedValueError as exc:
+    raise ImproperlyConfigured(
+        'DATABASE_NAME and DATABASE_USER must be defined to use the required MySQL database.'
+    ) from exc
+
 db_password = config('DATABASE_PASSWORD', default='')
 db_host = config('DATABASE_HOST', default='localhost')
 db_port = config('DATABASE_PORT', default='3306')
 
-if db_name and db_user:
-    # MySQL database configuration
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': db_name,
-            'USER': db_user,
-            'PASSWORD': db_password if db_password else '',
-            'HOST': db_host,
-            'PORT': db_port,
-            'OPTIONS': {
-                'charset': 'utf8mb4',
-                'collation': 'utf8mb4_unicode_ci',
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-            },
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': db_name,
+        'USER': db_user,
+        'PASSWORD': db_password if db_password else '',
+        'HOST': db_host,
+        'PORT': db_port,
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'collation': 'utf8mb4_unicode_ci',
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
-    logger.info(f"Using MySQL database: {db_name} on {db_host}")
-else:
-    # Development: SQLite database
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
-    logger.info("Using SQLite database (development mode)")
+}
+logger.info(f"Using MySQL database: {db_name} on {db_host}:{db_port}")
 
 
 # Password validation

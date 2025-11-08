@@ -19,7 +19,7 @@ const AboutPage = () => {
     {
       icon: <Lightbulb className="w-6 h-6 text-teal-800" />,
       title: "Innovation",
-      description: "Pioneering offline AI technology to make language learning accessible everywhere."
+      description: "Pioneering real-time AI technology to make language learning accessible anywhere with the power of the cloud."
     },
     {
       icon: <Heart className="w-6 h-6 text-teal-800" />,
@@ -42,7 +42,7 @@ const AboutPage = () => {
     {
       year: "2025",
       title: "Elora Launch",
-      description: "Released the world's first fully offline AI-powered English trainer for all platforms."
+      description: "Launched Elora’s always-online AI-powered English trainer with seamless access across devices."
     },
     {
       year: "2026",
@@ -57,7 +57,7 @@ const AboutPage = () => {
     {
       year: "Future",
       title: "Vision Ahead",
-      description: "Expanding to more languages and advanced AI capabilities while staying offline-first."
+      description: "Expanding to more languages and advanced AI capabilities with a globally connected learning network."
     }
   ];
 
@@ -159,7 +159,7 @@ const AboutPage = () => {
                 </div>
               </div>
               <p className="text-sm md:text-base lg:text-lg text-muted-foreground leading-relaxed">
-                To democratize English language learning by providing a powerful, AI-driven platform that works completely offline. 
+                To democratize English language learning by providing a powerful, AI-driven platform that stays connected for live insights.
                 We're committed to breaking down barriers and making quality English education available to learners worldwide.
               </p>
             </CardContent>
@@ -254,7 +254,7 @@ const AboutPage = () => {
           <div className="max-w-4xl mx-auto space-y-3 md:space-y-4 text-muted-foreground text-sm sm:text-base md:text-lg leading-relaxed">
             <p>
               Elora was born from a simple observation: millions of people worldwide want to learn English, 
-              but traditional methods and apps create unnecessary barriers. Expensive subscriptions, mandatory internet connections, 
+              but traditional methods and apps create unnecessary barriers. Expensive subscriptions, unreliable tools, 
               privacy concerns, and one-size-fits-all approaches leave many learners behind.
             </p>
             
@@ -265,13 +265,13 @@ const AboutPage = () => {
             
             <p>
               Our team of educators, linguists, and AI engineers came together to create something different. 
-              We developed cutting-edge offline AI technology that brings the power of personalized learning to your device—no internet required. 
+              We engineered cloud-native AI technology that delivers personalized learning through reliable online experiences. 
               We designed modules for kids, adults at every level, and exam candidates preparing for IELTS and PTE.
             </p>
             
             <p>
               But most importantly, we built Elora with <strong className="text-primary">privacy, accessibility, and effectiveness</strong> at its core. 
-              Your data never leaves your device. You can learn anywhere—on a plane, in remote areas, during your commute. 
+              Your data is protected with enterprise-grade encryption while our services keep everything in sync automatically. 
               And our AI provides real-time feedback that actually helps you improve.
             </p>
             

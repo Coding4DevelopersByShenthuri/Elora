@@ -41,7 +41,7 @@ You are responsible for maintaining the confidentiality of your login credential
 
 Product/Service Details
 
-Elora offers the following services through its offline-first English language learning application:
+Elora offers the following services through its online English language learning application:
 
 - Speech Recognition & Pronunciation Feedback: Real-time speech analysis and corrective feedback
 - Interactive Learning Modules: Structured lessons for different proficiency levels

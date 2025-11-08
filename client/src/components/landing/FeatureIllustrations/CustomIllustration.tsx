@@ -36,14 +36,14 @@ export const CustomIllustration: React.FC<CustomIllustrationProps> = ({
   ];
 
   const titles = [
-    "Offline First", "Voice Recognition", "AI Coaching", "Learning Levels", "Intelligence",
+    "Online First", "Voice Recognition", "AI Coaching", "Learning Levels", "Intelligence",
     "Interactive Dialogues", "Progress Tracking", "Search", "Contextual Learning",
     "Private & Secure", "Gamified Practice", "D/L mode", "Multi-Mode Practice",
-    "Offline Dictionary", "Roleplay Modes", "Flashcards"
+    "Online Dictionary", "Roleplay Modes", "Flashcards"
   ];
 
   const descriptions = [
-    "Practice anywhere—our AI coach runs fully on your device without internet.",
+    "Practice anywhere with an AI coach powered by always-on cloud intelligence.",
     "Speak naturally and get instant feedback on pronunciation and fluency.",
     "Personalized guidance on grammar, vocabulary, and sentence structure.",
     "Beginner, intermediate, and advanced modes tailored to your journey.",
@@ -56,7 +56,7 @@ export const CustomIllustration: React.FC<CustomIllustrationProps> = ({
     "Share thoughts and ideas to collaborate seamlessly.",
     "Toggle between dark and simplified interface with custom color modes for focus.",
     "Switch between multiple learning modes for better practice.",
-    "Access an offline dictionary anytime for quick reference.",
+    "Access a live dictionary anytime for quick reference.",
     "Engage in roleplay scenarios to boost conversational skills.",
     "Use flashcards to memorize and revise vocabulary effectively."
   ];
@@ -67,7 +67,7 @@ export const CustomIllustration: React.FC<CustomIllustrationProps> = ({
 
   const renderDiagram = (index: number) => {
     switch (index) {
-      case 0: // Offline First
+      case 0: // Online First
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-center">
 
@@ -102,7 +102,7 @@ export const CustomIllustration: React.FC<CustomIllustrationProps> = ({
 
       {/* Footer Note */}
       <div className="absolute bottom-10 right-10 text-xs bg-primary/10 p-2 rounded animate-pulse">
-        Work offline seamlessly
+        Always connected experience
       </div>
 
       {/* Shimmer CSS */}
@@ -760,7 +760,7 @@ export const CustomIllustration: React.FC<CustomIllustrationProps> = ({
 
       {/* Footer Note */}
       <div className="absolute bottom-10 right-10 text-xs bg-primary/10 p-2 rounded animate-pulse">
-        Access words offline anytime
+        Access words instantly online
       </div>
 
       {/* Shimmer CSS */}

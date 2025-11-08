@@ -39290,3 +39290,1469 @@ ERROR 2025-11-08 21:44:56,952 basehttp 19448 20436 "GET /api/notifications HTTP/
 ERROR 2025-11-08 21:45:34,246 views 19448 15960 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
 ERROR 2025-11-08 21:45:34,247 log 19448 15960 Internal Server Error: /api/notifications
 ERROR 2025-11-08 21:45:34,247 basehttp 19448 15960 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 23:52:45,771 autoreload 22324 3428 Watching for file changes with StatReloader
+INFO 2025-11-08 23:54:09,376 autoreload 22352 24620 Watching for file changes with StatReloader
+INFO 2025-11-08 23:54:32,289 basehttp 22352 12568 "OPTIONS /api/auth/user HTTP/1.1" 200 0
+WARNING 2025-11-08 23:54:32,506 log 22352 12568 Unauthorized: /api/auth/user
+WARNING 2025-11-08 23:54:32,510 basehttp 22352 12568 "GET /api/auth/user HTTP/1.1" 401 172
+INFO 2025-11-08 23:54:33,675 basehttp 22352 12568 "OPTIONS /api/notifications HTTP/1.1" 200 0
+WARNING 2025-11-08 23:54:33,675 log 22352 12568 Unauthorized: /api/notifications
+WARNING 2025-11-08 23:54:33,685 basehttp 22352 12568 "GET /api/notifications HTTP/1.1" 401 172
+INFO 2025-11-08 23:54:36,737 basehttp 22352 21064 "OPTIONS /api/kids/progress HTTP/1.1" 200 0
+WARNING 2025-11-08 23:54:36,755 log 22352 21064 Unauthorized: /api/kids/progress
+WARNING 2025-11-08 23:54:36,763 basehttp 22352 21064 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-08 23:54:36,801 log 22352 12568 Unauthorized: /api/notifications
+WARNING 2025-11-08 23:54:36,804 basehttp 22352 12568 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-08 23:54:37,080 log 22352 12568 Unauthorized: /api/notifications
+WARNING 2025-11-08 23:54:37,088 basehttp 22352 12568 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-08 23:54:40,408 log 22352 12568 Unauthorized: /api/auth/user
+WARNING 2025-11-08 23:54:40,410 basehttp 22352 12568 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-08 23:54:41,968 log 22352 21064 Unauthorized: /api/kids/progress
+WARNING 2025-11-08 23:54:41,969 basehttp 22352 21064 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-08 23:54:42,000 log 22352 12568 Unauthorized: /api/notifications
+WARNING 2025-11-08 23:54:42,002 basehttp 22352 12568 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-08 23:54:42,007 log 22352 12568 Unauthorized: /api/notifications
+WARNING 2025-11-08 23:54:42,009 basehttp 22352 12568 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-08 23:54:42,306 log 22352 12568 Unauthorized: /api/notifications
+WARNING 2025-11-08 23:54:42,306 basehttp 22352 12568 "GET /api/notifications HTTP/1.1" 401 172
+INFO 2025-11-08 23:55:40,774 autoreload 24764 22740 Watching for file changes with StatReloader
+WARNING 2025-11-08 23:55:43,261 log 24764 3092 Unauthorized: /api/notifications
+WARNING 2025-11-08 23:55:43,266 basehttp 24764 3092 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-08 23:56:11,990 log 24764 3092 Unauthorized: /api/notifications
+WARNING 2025-11-08 23:56:11,995 basehttp 24764 3092 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-08 23:56:42,913 log 24764 3092 Unauthorized: /api/notifications
+WARNING 2025-11-08 23:56:42,913 basehttp 24764 3092 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-08 23:56:57,925 log 24764 3092 Unauthorized: /api/notifications
+WARNING 2025-11-08 23:56:57,925 basehttp 24764 3092 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-08 23:57:32,363 log 24764 3092 Unauthorized: /api/auth/user
+WARNING 2025-11-08 23:57:32,366 basehttp 24764 3092 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-08 23:57:33,919 log 24764 23640 Unauthorized: /api/kids/progress
+WARNING 2025-11-08 23:57:33,920 basehttp 24764 23640 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-08 23:57:33,948 log 24764 3092 Unauthorized: /api/notifications
+WARNING 2025-11-08 23:57:33,951 basehttp 24764 3092 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-08 23:57:33,956 log 24764 3092 Unauthorized: /api/notifications
+WARNING 2025-11-08 23:57:33,956 basehttp 24764 3092 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-08 23:57:34,243 log 24764 3092 Unauthorized: /api/notifications
+WARNING 2025-11-08 23:57:34,243 basehttp 24764 3092 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-08 23:58:20,237 log 24764 24188 Unauthorized: /api/notifications
+WARNING 2025-11-08 23:58:20,237 basehttp 24764 24188 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-08 23:58:34,563 log 24764 14056 Unauthorized: /api/notifications
+WARNING 2025-11-08 23:58:34,563 basehttp 24764 14056 "GET /api/notifications HTTP/1.1" 401 172
+INFO 2025-11-08 23:58:48,175 autoreload 24764 22740 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-11-08 23:58:49,193 autoreload 22100 4528 Watching for file changes with StatReloader
+INFO 2025-11-08 23:58:55,901 autoreload 22100 4528 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-11-08 23:58:56,885 autoreload 20876 964 Watching for file changes with StatReloader
+INFO 2025-11-08 23:59:04,939 autoreload 20876 964 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-11-08 23:59:05,722 autoreload 9476 21848 Watching for file changes with StatReloader
+WARNING 2025-11-08 23:59:06,258 log 9476 8452 Unauthorized: /api/notifications
+WARNING 2025-11-08 23:59:06,258 basehttp 9476 8452 "GET /api/notifications HTTP/1.1" 401 172
+INFO 2025-11-08 23:59:18,415 autoreload 9476 21848 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-11-08 23:59:19,653 autoreload 5784 26052 Watching for file changes with StatReloader
+WARNING 2025-11-08 23:59:31,359 log 5784 20356 Unauthorized: /api/auth/user
+WARNING 2025-11-08 23:59:31,359 basehttp 5784 20356 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-08 23:59:33,127 log 5784 1808 Unauthorized: /api/kids/progress
+WARNING 2025-11-08 23:59:33,127 basehttp 5784 1808 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-08 23:59:33,540 log 5784 3384 Unauthorized: /api/notifications
+WARNING 2025-11-08 23:59:33,540 basehttp 5784 3384 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-08 23:59:33,540 log 5784 3384 Unauthorized: /api/notifications
+WARNING 2025-11-08 23:59:33,540 basehttp 5784 3384 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-08 23:59:33,973 log 5784 3384 Unauthorized: /api/notifications
+WARNING 2025-11-08 23:59:33,973 basehttp 5784 3384 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:00:19,232 log 5784 9072 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:00:19,232 basehttp 5784 9072 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:00:34,922 log 5784 9072 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:00:34,922 basehttp 5784 9072 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:01:03,915 log 5784 9072 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:01:03,915 basehttp 5784 9072 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:01:34,923 log 5784 9072 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:01:34,923 basehttp 5784 9072 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:01:48,933 log 5784 9072 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:01:48,933 basehttp 5784 9072 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:02:33,923 log 5784 9072 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:02:33,923 basehttp 5784 9072 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:02:34,936 log 5784 9072 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:02:34,938 basehttp 5784 9072 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:02:54,220 log 5784 9072 Unauthorized: /api/auth/user
+WARNING 2025-11-09 00:02:54,221 basehttp 5784 9072 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 00:02:55,787 log 5784 24352 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:02:55,789 basehttp 5784 24352 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:02:55,859 log 5784 9072 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:02:55,861 basehttp 5784 9072 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:02:55,874 log 5784 9072 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:02:55,880 basehttp 5784 9072 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:02:56,138 log 5784 9072 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:02:56,138 basehttp 5784 9072 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:03:28,954 log 5784 9072 Unauthorized: /api/auth/user
+WARNING 2025-11-09 00:03:28,956 basehttp 5784 9072 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 00:03:30,532 log 5784 9072 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:03:30,548 basehttp 5784 9072 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:03:35,160 log 5784 24352 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:03:35,160 basehttp 5784 24352 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:03:35,167 log 5784 9072 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:03:35,167 basehttp 5784 9072 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:03:35,532 log 5784 9072 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:03:35,532 basehttp 5784 9072 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:03:37,156 log 5784 9072 Unauthorized: /api/auth/user
+WARNING 2025-11-09 00:03:37,159 basehttp 5784 9072 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 00:03:38,706 log 5784 24352 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:03:38,707 basehttp 5784 24352 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:03:38,757 log 5784 9072 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:03:38,758 basehttp 5784 9072 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:03:38,763 log 5784 9072 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:03:38,763 basehttp 5784 9072 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:03:39,029 log 5784 9072 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:03:39,031 basehttp 5784 9072 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:03:42,573 log 5784 5824 Unauthorized: /api/auth/user
+WARNING 2025-11-09 00:03:42,573 basehttp 5784 5824 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 00:03:43,816 log 5784 19072 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:03:43,818 basehttp 5784 19072 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:03:43,891 log 5784 5824 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:03:43,897 basehttp 5784 5824 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:03:43,908 log 5784 5824 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:03:43,908 basehttp 5784 5824 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:03:44,233 log 5784 5824 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:03:44,235 basehttp 5784 5824 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:04:19,202 log 5784 19072 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:04:19,203 basehttp 5784 19072 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:04:19,212 log 5784 5824 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:04:19,212 basehttp 5784 5824 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:04:19,523 log 5784 5824 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:04:19,524 basehttp 5784 5824 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:04:25,996 log 5784 24504 Unauthorized: /api/kids/progress
+INFO 2025-11-09 00:04:26,018 basehttp 5784 19072 "OPTIONS /api/kids/achievements HTTP/1.1" 200 0
+WARNING 2025-11-09 00:04:26,019 basehttp 5784 24504 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:04:26,044 log 5784 19072 Unauthorized: /api/kids/achievements
+WARNING 2025-11-09 00:04:26,055 basehttp 5784 19072 "GET /api/kids/achievements HTTP/1.1" 401 172
+INFO 2025-11-09 00:04:26,101 basehttp 5784 200 "GET /api/kids/lessons HTTP/1.1" 200 2
+WARNING 2025-11-09 00:04:28,837 log 5784 5824 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:04:28,840 basehttp 5784 5824 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:04:29,004 log 5784 200 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:04:29,007 basehttp 5784 200 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:04:29,761 log 5784 200 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:04:29,768 log 5784 19072 Unauthorized: /api/kids/achievements
+WARNING 2025-11-09 00:04:29,768 basehttp 5784 200 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:04:29,773 log 5784 5824 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:04:29,776 basehttp 5784 19072 "GET /api/kids/achievements HTTP/1.1" 401 172
+WARNING 2025-11-09 00:04:29,778 basehttp 5784 5824 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:05:13,926 log 5784 5824 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:05:13,927 basehttp 5784 5824 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:05:58,919 log 5784 5824 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:05:58,919 basehttp 5784 5824 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:06:19,714 log 5784 5824 Unauthorized: /api/auth/user
+WARNING 2025-11-09 00:06:19,720 basehttp 5784 5824 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 00:06:21,375 log 5784 19072 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:06:21,387 log 5784 200 Unauthorized: /api/kids/achievements
+WARNING 2025-11-09 00:06:21,389 basehttp 5784 19072 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:06:21,389 basehttp 5784 200 "GET /api/kids/achievements HTTP/1.1" 401 172
+INFO 2025-11-09 00:06:21,408 basehttp 5784 24504 "GET /api/kids/lessons HTTP/1.1" 200 2
+WARNING 2025-11-09 00:06:21,462 log 5784 5824 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:06:21,468 basehttp 5784 5824 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:06:25,448 log 5784 5824 Unauthorized: /api/auth/user
+WARNING 2025-11-09 00:06:25,451 basehttp 5784 5824 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 00:06:27,122 log 5784 24504 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:06:27,130 log 5784 200 Unauthorized: /api/kids/achievements
+WARNING 2025-11-09 00:06:27,140 basehttp 5784 24504 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:06:27,151 basehttp 5784 200 "GET /api/kids/achievements HTTP/1.1" 401 172
+INFO 2025-11-09 00:06:27,171 basehttp 5784 19072 "GET /api/kids/lessons HTTP/1.1" 200 2
+WARNING 2025-11-09 00:06:27,252 log 5784 5824 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:06:27,255 basehttp 5784 5824 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:06:30,138 log 5784 19072 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:06:30,142 basehttp 5784 19072 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:06:33,138 log 5784 19072 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:06:33,157 basehttp 5784 19072 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:06:36,129 log 5784 19072 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:06:36,133 basehttp 5784 19072 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:06:39,174 log 5784 2988 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:06:39,178 basehttp 5784 2988 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:06:42,127 log 5784 2988 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:06:42,137 basehttp 5784 2988 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:06:45,139 log 5784 2988 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:06:45,141 basehttp 5784 2988 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:06:48,150 log 5784 2988 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:06:48,156 basehttp 5784 2988 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:06:55,082 log 5784 21456 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:06:55,085 basehttp 5784 21456 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:06:55,094 log 5784 21456 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:06:55,096 basehttp 5784 21456 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:06:57,261 log 5784 788 Unauthorized: /api/auth/user
+WARNING 2025-11-09 00:06:57,262 basehttp 5784 788 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 00:06:59,476 log 5784 21456 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:06:59,478 log 5784 15196 Unauthorized: /api/kids/achievements
+WARNING 2025-11-09 00:06:59,479 basehttp 5784 21456 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:06:59,479 basehttp 5784 15196 "GET /api/kids/achievements HTTP/1.1" 401 172
+INFO 2025-11-09 00:06:59,507 basehttp 5784 900 "GET /api/kids/lessons HTTP/1.1" 200 2
+WARNING 2025-11-09 00:06:59,755 log 5784 788 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:06:59,755 basehttp 5784 788 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:07:02,927 log 5784 24296 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:07:02,927 basehttp 5784 24296 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:07:05,921 log 5784 24296 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:07:05,921 basehttp 5784 24296 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:07:08,927 log 5784 24296 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:07:08,928 basehttp 5784 24296 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:07:11,929 log 5784 24296 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:07:11,929 basehttp 5784 24296 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:07:14,914 log 5784 11280 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:07:14,914 basehttp 5784 11280 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:07:17,925 log 5784 11280 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:07:17,925 basehttp 5784 11280 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:07:20,924 log 5784 11280 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:07:20,924 basehttp 5784 11280 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:07:23,928 log 5784 11280 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:07:23,928 basehttp 5784 11280 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:07:26,921 log 5784 11280 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:07:26,921 basehttp 5784 11280 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:07:29,932 log 5784 11280 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:07:29,932 basehttp 5784 11280 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:07:32,935 log 5784 11280 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:07:32,937 basehttp 5784 11280 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:07:35,930 log 5784 11280 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:07:35,935 basehttp 5784 11280 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:07:38,923 log 5784 11280 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:07:38,923 basehttp 5784 11280 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:07:41,921 log 5784 11280 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:07:41,921 basehttp 5784 11280 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:07:44,921 log 5784 11280 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:07:44,921 basehttp 5784 11280 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:07:45,235 log 5784 12196 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:07:45,235 basehttp 5784 12196 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:07:47,918 log 5784 11280 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:07:47,918 basehttp 5784 11280 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:07:50,932 log 5784 11280 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:07:50,932 basehttp 5784 11280 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:07:53,928 log 5784 11280 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:07:53,928 basehttp 5784 11280 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:07:56,929 log 5784 11280 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:07:56,929 basehttp 5784 11280 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:07:59,940 log 5784 11280 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:07:59,940 basehttp 5784 11280 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:08:02,925 log 5784 11280 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:08:02,925 basehttp 5784 11280 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:08:05,922 log 5784 11280 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:08:05,922 basehttp 5784 11280 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:08:08,922 log 5784 11280 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:08:08,922 basehttp 5784 11280 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:08:11,940 log 5784 11280 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:08:11,946 basehttp 5784 11280 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:08:14,942 log 5784 16544 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:08:14,945 basehttp 5784 16544 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:08:17,924 log 5784 16544 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:08:17,925 basehttp 5784 16544 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:08:20,924 log 5784 16544 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:08:20,924 basehttp 5784 16544 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:08:23,932 log 5784 11956 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:08:23,932 basehttp 5784 11956 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:08:26,929 log 5784 11956 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:08:26,929 basehttp 5784 11956 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:08:29,061 log 5784 11956 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:08:29,069 log 5784 18992 Unauthorized: /api/kids/achievements
+WARNING 2025-11-09 00:08:29,070 basehttp 5784 11956 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:08:29,079 basehttp 5784 18992 "GET /api/kids/achievements HTTP/1.1" 401 172
+INFO 2025-11-09 00:08:29,106 basehttp 5784 432 "GET /api/kids/lessons HTTP/1.1" 200 2
+WARNING 2025-11-09 00:08:30,239 log 5784 15204 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:08:30,241 basehttp 5784 15204 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:08:32,923 log 5784 18092 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:08:32,928 basehttp 5784 18092 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:08:35,929 log 5784 18092 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:08:35,929 basehttp 5784 18092 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:08:38,920 log 5784 18092 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:08:38,922 basehttp 5784 18092 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:08:41,930 log 5784 18092 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:08:41,930 basehttp 5784 18092 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:08:44,929 log 5784 26452 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:08:44,929 basehttp 5784 26452 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:08:47,924 log 5784 26452 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:08:47,924 basehttp 5784 26452 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:08:50,925 log 5784 26452 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:08:50,925 basehttp 5784 26452 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:08:53,920 log 5784 5060 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:08:53,932 basehttp 5784 5060 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:08:56,921 log 5784 5060 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:08:56,921 basehttp 5784 5060 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:08:59,936 log 5784 5060 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:08:59,936 basehttp 5784 5060 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:09:02,924 log 5784 12000 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:09:02,924 basehttp 5784 12000 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:09:05,928 log 5784 12000 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:09:05,928 basehttp 5784 12000 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:09:08,925 log 5784 12000 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:09:08,925 basehttp 5784 12000 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:09:11,923 log 5784 12000 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:09:11,923 basehttp 5784 12000 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:09:14,931 log 5784 13856 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:09:14,944 basehttp 5784 13856 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:09:15,252 log 5784 17360 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:09:15,252 basehttp 5784 17360 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:09:17,945 log 5784 13856 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:09:17,947 basehttp 5784 13856 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:09:20,932 log 5784 13856 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:09:20,932 basehttp 5784 13856 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:09:23,929 log 5784 9976 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:09:23,940 basehttp 5784 9976 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:09:26,932 log 5784 9976 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:09:26,938 basehttp 5784 9976 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:09:29,922 log 5784 9976 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:09:29,922 basehttp 5784 9976 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:09:32,916 log 5784 3900 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:09:32,916 basehttp 5784 3900 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:09:35,940 log 5784 3900 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:09:35,944 basehttp 5784 3900 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:09:38,913 log 5784 3900 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:09:38,913 basehttp 5784 3900 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:09:41,928 log 5784 3900 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:09:41,928 basehttp 5784 3900 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:09:44,932 log 5784 7280 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:09:44,932 basehttp 5784 7280 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:09:47,916 log 5784 7280 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:09:47,916 basehttp 5784 7280 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:09:50,928 log 5784 7280 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:09:50,930 basehttp 5784 7280 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:09:53,925 log 5784 17552 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:09:53,925 basehttp 5784 17552 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:09:56,930 log 5784 17552 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:09:56,930 basehttp 5784 17552 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:09:59,923 log 5784 17552 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:09:59,927 basehttp 5784 17552 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:10:00,240 log 5784 5532 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:10:00,240 basehttp 5784 5532 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:10:02,922 log 5784 15620 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:10:02,935 basehttp 5784 15620 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:10:05,925 log 5784 15620 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:10:05,925 basehttp 5784 15620 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:10:08,921 log 5784 15620 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:10:08,922 basehttp 5784 15620 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:10:11,931 log 5784 15620 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:10:11,931 basehttp 5784 15620 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:10:14,938 log 5784 26528 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:10:14,938 basehttp 5784 26528 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:10:16,026 log 5784 26528 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:10:16,030 log 5784 13132 Unauthorized: /api/kids/achievements
+WARNING 2025-11-09 00:10:16,041 basehttp 5784 26528 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:10:16,043 basehttp 5784 13132 "GET /api/kids/achievements HTTP/1.1" 401 172
+INFO 2025-11-09 00:10:16,097 basehttp 5784 20684 "GET /api/kids/lessons HTTP/1.1" 200 2
+WARNING 2025-11-09 00:10:19,928 log 5784 20684 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:10:19,932 basehttp 5784 20684 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:10:22,918 log 5784 21044 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:10:22,918 basehttp 5784 21044 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:10:25,921 log 5784 21044 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:10:25,923 basehttp 5784 21044 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:10:28,931 log 5784 21044 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:10:28,933 basehttp 5784 21044 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:10:31,914 log 5784 21044 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:10:31,914 basehttp 5784 21044 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:10:34,927 log 5784 6236 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:10:34,927 basehttp 5784 6236 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:10:37,922 log 5784 6236 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:10:37,922 basehttp 5784 6236 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:10:40,924 log 5784 6236 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:10:40,924 basehttp 5784 6236 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:10:43,924 log 5784 19256 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:10:43,924 basehttp 5784 19256 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:10:45,237 log 5784 15988 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:10:45,237 basehttp 5784 15988 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:10:46,922 log 5784 19256 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:10:46,922 basehttp 5784 19256 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:10:49,919 log 5784 19256 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:10:49,919 basehttp 5784 19256 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:10:52,931 log 5784 22792 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:10:52,933 basehttp 5784 22792 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:10:55,921 log 5784 22792 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:10:55,922 basehttp 5784 22792 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:10:58,921 log 5784 22792 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:10:58,921 basehttp 5784 22792 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:10:58,999 log 5784 22792 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:10:59,013 log 5784 4488 Unauthorized: /api/kids/achievements
+WARNING 2025-11-09 00:10:59,013 basehttp 5784 22792 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:10:59,024 basehttp 5784 4488 "GET /api/kids/achievements HTTP/1.1" 401 172
+INFO 2025-11-09 00:10:59,065 basehttp 5784 14508 "GET /api/kids/lessons HTTP/1.1" 200 2
+WARNING 2025-11-09 00:11:02,922 log 5784 1692 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:11:02,922 basehttp 5784 1692 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:11:05,379 log 5784 1692 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:11:05,381 basehttp 5784 1692 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:11:07,774 log 5784 23024 Unauthorized: /api/auth/user
+WARNING 2025-11-09 00:11:07,774 basehttp 5784 23024 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 00:11:10,394 log 5784 1692 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:11:10,398 log 5784 18204 Unauthorized: /api/kids/achievements
+WARNING 2025-11-09 00:11:10,398 basehttp 5784 1692 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:11:10,403 basehttp 5784 18204 "GET /api/kids/achievements HTTP/1.1" 401 172
+INFO 2025-11-09 00:11:10,410 basehttp 5784 2916 "GET /api/kids/lessons HTTP/1.1" 200 2
+WARNING 2025-11-09 00:11:10,627 log 5784 23024 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:11:10,627 basehttp 5784 23024 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:11:13,418 log 5784 22536 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:11:13,422 basehttp 5784 22536 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:11:16,400 log 5784 22536 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:11:16,404 basehttp 5784 22536 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:11:19,402 log 5784 22536 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:11:19,411 basehttp 5784 22536 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:11:21,747 log 5784 22536 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:11:21,753 log 5784 25856 Unauthorized: /api/kids/achievements
+WARNING 2025-11-09 00:11:21,755 basehttp 5784 22536 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:11:21,758 basehttp 5784 25856 "GET /api/kids/achievements HTTP/1.1" 401 172
+WARNING 2025-11-09 00:11:22,056 log 5784 16376 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:11:22,064 basehttp 5784 16376 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:11:28,561 log 5784 25856 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:11:28,568 basehttp 5784 25856 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:11:28,580 log 5784 16376 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:11:28,580 basehttp 5784 16376 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:11:28,917 log 5784 16376 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:11:28,917 basehttp 5784 16376 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:11:36,065 log 5784 25856 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:11:36,070 log 5784 22536 Unauthorized: /api/kids/achievements
+WARNING 2025-11-09 00:11:36,072 basehttp 5784 22536 "GET /api/kids/achievements HTTP/1.1" 401 172
+WARNING 2025-11-09 00:11:36,072 basehttp 5784 25856 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:11:36,079 log 5784 16376 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:11:36,081 basehttp 5784 16376 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:11:38,758 log 5784 25856 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:11:38,758 basehttp 5784 25856 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:11:38,765 log 5784 16376 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:11:38,767 basehttp 5784 16376 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:11:39,088 log 5784 16376 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:11:39,091 basehttp 5784 16376 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:11:55,382 log 5784 16376 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:11:55,386 basehttp 5784 16376 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:12:39,390 log 5784 24100 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:12:39,390 basehttp 5784 24100 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:12:40,376 log 5784 24100 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:12:40,376 basehttp 5784 24100 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:13:25,671 log 5784 3964 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:13:25,671 basehttp 5784 3964 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:14:10,687 log 5784 3764 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:14:10,698 basehttp 5784 3764 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:14:55,375 log 5784 3764 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:14:55,375 basehttp 5784 3764 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:15:40,381 log 5784 3764 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:15:40,383 basehttp 5784 3764 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:16:25,377 log 5784 3764 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:16:25,377 basehttp 5784 3764 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:17:10,373 log 5784 3764 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:17:10,376 basehttp 5784 3764 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:17:55,374 log 5784 3764 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:17:55,374 basehttp 5784 3764 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:18:40,372 log 5784 3764 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:18:40,372 basehttp 5784 3764 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:19:25,369 log 5784 3764 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:19:25,369 basehttp 5784 3764 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:20:10,379 log 5784 3764 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:20:10,379 basehttp 5784 3764 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:20:55,380 log 5784 3764 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:20:55,380 basehttp 5784 3764 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:21:40,369 log 5784 3764 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:21:40,369 basehttp 5784 3764 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:22:25,385 log 5784 3764 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:22:25,385 basehttp 5784 3764 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:23:10,369 log 5784 3764 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:23:10,369 basehttp 5784 3764 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:23:55,695 log 5784 18640 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:23:55,704 basehttp 5784 18640 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:24:40,673 log 5784 16560 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:24:40,673 basehttp 5784 16560 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:25:25,364 log 5784 16560 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:25:25,364 basehttp 5784 16560 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:26:10,371 log 5784 16560 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:26:10,371 basehttp 5784 16560 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:26:55,381 log 5784 16560 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:26:55,381 basehttp 5784 16560 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:27:40,372 log 5784 16560 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:27:40,372 basehttp 5784 16560 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:28:25,369 log 5784 16560 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:28:25,373 basehttp 5784 16560 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:29:10,379 log 5784 16560 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:29:10,385 basehttp 5784 16560 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:29:39,763 log 5784 16560 Unauthorized: /api/auth/user
+WARNING 2025-11-09 00:29:39,763 basehttp 5784 16560 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 00:29:41,417 log 5784 16560 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:29:41,417 basehttp 5784 16560 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:29:43,418 log 5784 5824 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:29:43,420 basehttp 5784 5824 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:29:43,461 log 5784 16560 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:29:43,472 basehttp 5784 16560 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:29:43,787 log 5784 16560 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:29:43,790 basehttp 5784 16560 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:29:56,239 log 5784 16292 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:29:56,239 basehttp 5784 16292 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:30:20,078 log 5784 16292 Unauthorized: /api/auth/user
+WARNING 2025-11-09 00:30:20,078 basehttp 5784 16292 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 00:30:22,171 log 5784 16292 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:30:22,171 basehttp 5784 16292 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:30:24,953 log 5784 15800 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:30:24,972 log 5784 3388 Unauthorized: /api/kids/achievements
+WARNING 2025-11-09 00:30:25,001 basehttp 5784 15800 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:30:25,082 basehttp 5784 3388 "GET /api/kids/achievements HTTP/1.1" 401 172
+INFO 2025-11-09 00:30:25,186 basehttp 5784 20908 "GET /api/kids/lessons HTTP/1.1" 200 2
+WARNING 2025-11-09 00:30:26,929 log 5784 16292 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:30:26,929 basehttp 5784 16292 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:30:27,953 log 5784 20908 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:30:27,953 basehttp 5784 20908 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:30:30,960 log 5784 20908 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 00:30:30,962 basehttp 5784 20908 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 00:30:43,741 log 5784 16292 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:30:43,741 basehttp 5784 16292 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:31:11,346 log 5784 16292 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:31:11,351 basehttp 5784 16292 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:31:35,928 log 5784 16292 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:31:35,943 basehttp 5784 16292 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:31:43,752 log 5784 16292 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:31:43,769 basehttp 5784 16292 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:31:56,341 log 5784 16292 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:31:56,341 basehttp 5784 16292 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:32:36,246 log 5784 18760 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:32:36,246 basehttp 5784 18760 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:32:41,346 log 5784 18760 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:32:41,348 basehttp 5784 18760 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:32:43,746 log 5784 18760 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:32:43,746 basehttp 5784 18760 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:32:55,746 log 5784 18760 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:32:55,748 basehttp 5784 18760 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:33:26,931 log 5784 18760 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:33:26,931 basehttp 5784 18760 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:33:40,917 log 5784 18760 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:33:40,917 basehttp 5784 18760 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:33:43,935 log 5784 18760 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:33:43,935 basehttp 5784 18760 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:34:11,930 log 5784 18760 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:34:11,930 basehttp 5784 18760 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:34:35,944 log 5784 18760 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:34:35,950 basehttp 5784 18760 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:34:43,790 log 5784 18760 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:34:43,794 basehttp 5784 18760 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:34:56,660 log 5784 20128 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:34:56,677 basehttp 5784 20128 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:35:35,960 log 5784 20128 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:35:35,965 basehttp 5784 20128 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:35:41,680 log 5784 14884 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:35:41,680 basehttp 5784 14884 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:35:43,754 log 5784 14884 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:35:43,759 basehttp 5784 14884 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:36:27,241 log 5784 8464 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:36:27,241 basehttp 5784 8464 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:36:35,918 log 5784 8464 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:36:35,918 basehttp 5784 8464 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:36:43,943 log 5784 8464 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:36:43,943 basehttp 5784 8464 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:37:11,919 log 5784 8464 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:37:11,919 basehttp 5784 8464 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:37:35,942 log 5784 8464 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:37:35,943 basehttp 5784 8464 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:38:35,931 log 5784 8464 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:38:35,933 basehttp 5784 8464 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:38:35,957 log 5784 8464 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:38:35,958 basehttp 5784 8464 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:38:35,967 log 5784 8464 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:38:35,970 basehttp 5784 8464 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:39:35,940 log 5784 8464 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:39:35,941 basehttp 5784 8464 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:39:35,958 log 5784 8464 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:39:35,959 basehttp 5784 8464 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:39:35,962 log 5784 8464 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:39:35,962 basehttp 5784 8464 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:40:36,236 log 5784 20836 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:40:36,236 basehttp 5784 20836 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:40:36,240 log 5784 20836 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:40:36,240 basehttp 5784 20836 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:40:36,243 log 5784 20836 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:40:36,244 basehttp 5784 20836 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:41:36,230 log 5784 2440 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:41:36,230 basehttp 5784 2440 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:41:36,230 log 5784 2440 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:41:36,230 basehttp 5784 2440 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:41:36,230 log 5784 2440 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:41:36,230 basehttp 5784 2440 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:42:35,929 log 5784 2440 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:42:35,931 basehttp 5784 2440 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:42:35,944 log 5784 2440 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:42:35,944 basehttp 5784 2440 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:42:35,948 log 5784 2440 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:42:35,948 basehttp 5784 2440 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:43:13,271 log 5784 2440 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:43:13,271 basehttp 5784 2440 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:43:13,271 log 5784 2440 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:43:13,271 basehttp 5784 2440 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:43:35,922 log 5784 2440 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:43:35,922 basehttp 5784 2440 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:43:56,352 log 5784 2440 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:43:56,352 basehttp 5784 2440 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:44:35,939 log 5784 2440 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:44:35,940 basehttp 5784 2440 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:44:41,361 log 5784 2440 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:44:41,361 basehttp 5784 2440 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:45:26,361 log 5784 2440 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:45:26,366 basehttp 5784 2440 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:45:35,936 log 5784 2440 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:45:35,941 basehttp 5784 2440 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:45:43,295 log 5784 2440 Unauthorized: /api/auth/user
+WARNING 2025-11-09 00:45:43,296 basehttp 5784 2440 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 00:45:44,903 log 5784 2440 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:45:44,903 basehttp 5784 2440 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:46:29,892 log 5784 2440 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:46:29,896 basehttp 5784 2440 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:46:35,930 log 5784 2440 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:46:35,931 basehttp 5784 2440 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:47:14,916 log 5784 2440 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:47:14,916 basehttp 5784 2440 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:47:35,927 log 5784 2440 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:47:35,927 basehttp 5784 2440 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:47:59,905 log 5784 2440 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:47:59,923 basehttp 5784 2440 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:48:35,918 log 5784 2440 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:48:35,918 basehttp 5784 2440 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:48:44,920 log 5784 2440 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:48:44,920 basehttp 5784 2440 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:49:29,924 log 5784 2440 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:49:29,924 basehttp 5784 2440 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:49:36,242 log 5784 10236 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:49:36,242 basehttp 5784 10236 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:50:15,242 log 5784 7288 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:50:15,242 basehttp 5784 7288 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:50:35,940 log 5784 7288 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:50:35,940 basehttp 5784 7288 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:51:35,923 log 5784 7288 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:51:35,923 basehttp 5784 7288 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:51:35,925 log 5784 7288 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:51:35,925 basehttp 5784 7288 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:51:55,664 log 5784 7288 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:51:55,666 basehttp 5784 7288 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:52:29,927 log 5784 7288 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:52:29,928 basehttp 5784 7288 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:52:35,936 log 5784 7288 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:52:35,936 basehttp 5784 7288 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:53:14,926 log 5784 7288 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:53:14,929 basehttp 5784 7288 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:53:35,946 log 5784 7288 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:53:35,949 basehttp 5784 7288 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:53:59,924 log 5784 7288 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:53:59,924 basehttp 5784 7288 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:54:36,244 log 5784 23456 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:54:36,244 basehttp 5784 23456 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:55:16,932 log 5784 23456 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:55:16,932 basehttp 5784 23456 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:55:35,933 log 5784 23456 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:55:35,934 basehttp 5784 23456 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:55:35,943 log 5784 23456 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:55:35,943 basehttp 5784 23456 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:56:36,249 log 5784 13272 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:56:36,249 basehttp 5784 13272 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:56:36,249 log 5784 13272 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:56:36,249 basehttp 5784 13272 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:57:36,240 log 5784 6744 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:57:36,240 basehttp 5784 6744 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:57:36,256 log 5784 6744 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:57:36,259 basehttp 5784 6744 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:57:49,850 log 5784 8456 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:57:49,857 basehttp 5784 8456 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:58:30,189 log 5784 5268 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:58:30,189 basehttp 5784 5268 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:58:35,920 log 5784 5268 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:58:35,932 basehttp 5784 5268 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:59:15,233 log 5784 4720 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:59:15,234 basehttp 5784 4720 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 00:59:36,243 log 5784 25096 Unauthorized: /api/notifications
+WARNING 2025-11-09 00:59:36,245 basehttp 5784 25096 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:00:00,194 log 5784 23844 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:00:00,196 basehttp 5784 23844 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:00:36,238 log 5784 19740 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:00:36,238 basehttp 5784 19740 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:00:45,205 log 5784 1724 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:00:45,207 basehttp 5784 1724 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:01:30,229 log 5784 18760 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:01:30,229 basehttp 5784 18760 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:01:35,925 log 5784 18760 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:01:35,928 basehttp 5784 18760 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:02:14,930 log 5784 18760 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:02:14,932 basehttp 5784 18760 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:02:35,925 log 5784 18760 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:02:35,925 basehttp 5784 18760 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:03:36,236 log 5784 25552 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:03:36,236 basehttp 5784 25552 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:03:36,236 log 5784 25552 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:03:36,236 basehttp 5784 25552 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:04:35,933 log 5784 25552 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:04:35,933 basehttp 5784 25552 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:04:35,937 log 5784 25552 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:04:35,937 basehttp 5784 25552 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:05:35,924 log 5784 25552 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:05:35,924 basehttp 5784 25552 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:05:35,944 log 5784 25552 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:05:35,944 basehttp 5784 25552 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:06:35,949 log 5784 25552 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:06:35,952 basehttp 5784 25552 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:06:35,959 log 5784 25552 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:06:35,959 basehttp 5784 25552 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:07:35,949 log 5784 25552 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:07:35,949 basehttp 5784 25552 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:07:35,962 log 5784 25552 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:07:35,963 basehttp 5784 25552 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:08:22,341 log 5784 25552 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:08:22,344 basehttp 5784 25552 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:08:31,651 log 5784 25552 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:08:31,667 basehttp 5784 25552 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:08:34,872 log 5784 25552 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:08:34,887 basehttp 5784 25552 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:08:35,947 log 5784 25552 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:08:35,947 basehttp 5784 25552 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:09:19,931 log 5784 25552 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:09:19,931 basehttp 5784 25552 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:09:35,915 log 5784 25552 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:09:35,930 basehttp 5784 25552 "GET /api/notifications HTTP/1.1" 401 172
+INFO 2025-11-09 01:09:41,929 basehttp 5784 25552 "OPTIONS /api/stats/user HTTP/1.1" 200 0
+INFO 2025-11-09 01:09:41,944 basehttp 5784 25552 "OPTIONS /api/stats/daily?days=14 HTTP/1.1" 200 0
+INFO 2025-11-09 01:09:41,947 basehttp 5784 25552 "OPTIONS /api/kids/progress HTTP/1.1" 200 0
+INFO 2025-11-09 01:09:41,951 basehttp 5784 25552 "OPTIONS /api/kids/stories/enrollments HTTP/1.1" 200 0
+INFO 2025-11-09 01:09:41,955 basehttp 5784 25552 "OPTIONS /api/kids/games/session HTTP/1.1" 200 0
+INFO 2025-11-09 01:09:41,959 basehttp 5784 25552 "OPTIONS /api/stats/user HTTP/1.1" 200 0
+INFO 2025-11-09 01:09:41,962 basehttp 5784 25552 "OPTIONS /api/stats/daily?days=14 HTTP/1.1" 200 0
+WARNING 2025-11-09 01:09:41,980 log 5784 25552 Unauthorized: /api/stats/user
+WARNING 2025-11-09 01:09:41,981 basehttp 5784 25552 "GET /api/stats/user HTTP/1.1" 401 172
+INFO 2025-11-09 01:09:41,985 basehttp 5784 25552 "OPTIONS /api/kids/progress HTTP/1.1" 200 0
+INFO 2025-11-09 01:09:41,990 basehttp 5784 25552 "OPTIONS /api/kids/stories/enrollments HTTP/1.1" 200 0
+INFO 2025-11-09 01:09:41,995 basehttp 5784 25552 "OPTIONS /api/kids/games/session HTTP/1.1" 200 0
+WARNING 2025-11-09 01:09:42,010 log 5784 25552 Unauthorized: /api/stats/daily
+WARNING 2025-11-09 01:09:42,011 basehttp 5784 25552 "GET /api/stats/daily?days=14 HTTP/1.1" 401 172
+WARNING 2025-11-09 01:09:42,019 log 5784 25552 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 01:09:42,021 basehttp 5784 25552 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 01:09:42,031 log 5784 25552 Unauthorized: /api/kids/stories/enrollments
+WARNING 2025-11-09 01:09:42,032 basehttp 5784 25552 "GET /api/kids/stories/enrollments HTTP/1.1" 401 172
+WARNING 2025-11-09 01:09:42,037 log 5784 25552 Unauthorized: /api/kids/games/session
+WARNING 2025-11-09 01:09:42,040 basehttp 5784 25552 "GET /api/kids/games/session HTTP/1.1" 401 172
+WARNING 2025-11-09 01:09:42,046 log 5784 25552 Unauthorized: /api/stats/user
+WARNING 2025-11-09 01:09:42,046 basehttp 5784 25552 "GET /api/stats/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:09:42,060 log 5784 25552 Unauthorized: /api/stats/daily
+WARNING 2025-11-09 01:09:42,061 basehttp 5784 25552 "GET /api/stats/daily?days=14 HTTP/1.1" 401 172
+WARNING 2025-11-09 01:09:42,065 log 5784 25552 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 01:09:42,069 basehttp 5784 25552 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 01:09:42,075 log 5784 25552 Unauthorized: /api/kids/stories/enrollments
+WARNING 2025-11-09 01:09:42,078 basehttp 5784 25552 "GET /api/kids/stories/enrollments HTTP/1.1" 401 172
+WARNING 2025-11-09 01:09:42,084 log 5784 25552 Unauthorized: /api/kids/games/session
+WARNING 2025-11-09 01:09:42,085 basehttp 5784 25552 "GET /api/kids/games/session HTTP/1.1" 401 172
+WARNING 2025-11-09 01:09:56,106 log 5784 25552 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:09:56,119 basehttp 5784 25552 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:09:57,738 log 5784 25552 Unauthorized: /api/stats/user
+WARNING 2025-11-09 01:09:57,741 log 5784 17536 Unauthorized: /api/stats/daily
+WARNING 2025-11-09 01:09:57,745 log 5784 7596 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 01:09:57,749 log 5784 20724 Unauthorized: /api/kids/stories/enrollments
+WARNING 2025-11-09 01:09:57,753 log 5784 17504 Unauthorized: /api/kids/games/session
+WARNING 2025-11-09 01:09:57,756 basehttp 5784 7596 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 01:09:57,757 basehttp 5784 25552 "GET /api/stats/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:09:57,758 basehttp 5784 17536 "GET /api/stats/daily?days=14 HTTP/1.1" 401 172
+WARNING 2025-11-09 01:09:57,766 basehttp 5784 20724 "GET /api/kids/stories/enrollments HTTP/1.1" 401 172
+WARNING 2025-11-09 01:09:57,769 basehttp 5784 17504 "GET /api/kids/games/session HTTP/1.1" 401 172
+WARNING 2025-11-09 01:09:57,836 log 5784 17504 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:09:57,840 basehttp 5784 17504 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:10:31,842 log 5784 24512 Unauthorized: /api/stats/user
+WARNING 2025-11-09 01:10:31,871 log 5784 25012 Unauthorized: /api/stats/daily
+WARNING 2025-11-09 01:10:31,873 basehttp 5784 24512 "GET /api/stats/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:10:31,889 log 5784 3232 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 01:10:31,895 basehttp 5784 25012 "GET /api/stats/daily?days=14 HTTP/1.1" 401 172
+WARNING 2025-11-09 01:10:31,903 log 5784 12392 Unauthorized: /api/kids/stories/enrollments
+WARNING 2025-11-09 01:10:31,919 basehttp 5784 3232 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 01:10:31,932 log 5784 19320 Unauthorized: /api/kids/games/session
+WARNING 2025-11-09 01:10:31,934 basehttp 5784 12392 "GET /api/kids/stories/enrollments HTTP/1.1" 401 172
+WARNING 2025-11-09 01:10:31,934 basehttp 5784 19320 "GET /api/kids/games/session HTTP/1.1" 401 172
+WARNING 2025-11-09 01:10:31,999 log 5784 19320 Unauthorized: /api/stats/user
+WARNING 2025-11-09 01:10:32,007 log 5784 12392 Unauthorized: /api/stats/daily
+WARNING 2025-11-09 01:10:32,015 log 5784 3232 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 01:10:32,018 log 5784 25012 Unauthorized: /api/kids/stories/enrollments
+WARNING 2025-11-09 01:10:32,034 log 5784 24512 Unauthorized: /api/kids/games/session
+WARNING 2025-11-09 01:10:32,036 basehttp 5784 12392 "GET /api/stats/daily?days=14 HTTP/1.1" 401 172
+WARNING 2025-11-09 01:10:32,038 basehttp 5784 19320 "GET /api/stats/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:10:32,041 basehttp 5784 3232 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 01:10:32,043 basehttp 5784 24512 "GET /api/kids/games/session HTTP/1.1" 401 172
+WARNING 2025-11-09 01:10:32,048 basehttp 5784 25012 "GET /api/kids/stories/enrollments HTTP/1.1" 401 172
+WARNING 2025-11-09 01:10:35,971 log 5784 25012 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:10:35,973 basehttp 5784 25012 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:10:42,753 log 5784 25012 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:10:42,758 basehttp 5784 25012 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:10:52,509 log 5784 25012 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:10:52,518 basehttp 5784 25012 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:10:55,645 log 5784 6796 Unauthorized: /api/stats/user
+WARNING 2025-11-09 01:10:55,680 log 5784 5372 Unauthorized: /api/stats/daily
+WARNING 2025-11-09 01:10:55,708 log 5784 26372 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 01:10:55,710 basehttp 5784 6796 "GET /api/stats/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:10:55,723 basehttp 5784 5372 "GET /api/stats/daily?days=14 HTTP/1.1" 401 172
+WARNING 2025-11-09 01:10:55,725 basehttp 5784 26372 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 01:10:55,728 log 5784 2412 Unauthorized: /api/kids/stories/enrollments
+WARNING 2025-11-09 01:10:55,730 log 5784 6796 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:10:55,734 log 5784 3256 Unauthorized: /api/kids/games/session
+WARNING 2025-11-09 01:10:55,749 basehttp 5784 6796 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:10:55,749 basehttp 5784 3256 "GET /api/kids/games/session HTTP/1.1" 401 172
+WARNING 2025-11-09 01:10:55,744 basehttp 5784 2412 "GET /api/kids/stories/enrollments HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:02,974 log 5784 16116 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 01:11:02,979 basehttp 5784 16116 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:03,040 log 5784 3256 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:11:03,049 basehttp 5784 3256 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:03,361 log 5784 3256 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:11:03,365 basehttp 5784 3256 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:15,268 log 5784 19256 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 01:11:15,269 log 5784 25448 Unauthorized: /api/stats/user
+WARNING 2025-11-09 01:11:15,273 log 5784 24560 Unauthorized: /api/stats/daily
+WARNING 2025-11-09 01:11:15,278 log 5784 14824 Unauthorized: /api/kids/stories/enrollments
+WARNING 2025-11-09 01:11:15,279 basehttp 5784 19256 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:15,282 log 5784 13272 Unauthorized: /api/kids/games/session
+WARNING 2025-11-09 01:11:15,283 basehttp 5784 25448 "GET /api/stats/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:15,284 basehttp 5784 14824 "GET /api/kids/stories/enrollments HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:15,284 basehttp 5784 24560 "GET /api/stats/daily?days=14 HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:15,286 basehttp 5784 13272 "GET /api/kids/games/session HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:25,896 log 5784 19220 Unauthorized: /api/kids/games/session
+WARNING 2025-11-09 01:11:25,900 basehttp 5784 19220 "GET /api/kids/games/session HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:25,906 log 5784 22992 Unauthorized: /api/kids/stories/enrollments
+WARNING 2025-11-09 01:11:25,914 basehttp 5784 22992 "GET /api/kids/stories/enrollments HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:25,920 log 5784 23252 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 01:11:25,931 log 5784 15928 Unauthorized: /api/stats/daily
+WARNING 2025-11-09 01:11:25,931 basehttp 5784 23252 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:25,938 log 5784 24924 Unauthorized: /api/stats/user
+WARNING 2025-11-09 01:11:25,940 basehttp 5784 15928 "GET /api/stats/daily?days=14 HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:25,942 basehttp 5784 24924 "GET /api/stats/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:26,793 log 5784 24924 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:11:26,802 basehttp 5784 24924 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:26,985 log 5784 24924 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:11:26,985 basehttp 5784 24924 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:28,347 log 5784 24924 Unauthorized: /api/stats/user
+WARNING 2025-11-09 01:11:28,350 log 5784 15928 Unauthorized: /api/stats/daily
+WARNING 2025-11-09 01:11:28,353 log 5784 22992 Unauthorized: /api/kids/stories/enrollments
+WARNING 2025-11-09 01:11:28,356 log 5784 19220 Unauthorized: /api/kids/games/session
+WARNING 2025-11-09 01:11:28,360 log 5784 23252 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 01:11:28,365 log 5784 24856 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:11:28,367 basehttp 5784 22992 "GET /api/kids/stories/enrollments HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:28,367 basehttp 5784 24924 "GET /api/stats/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:28,367 basehttp 5784 19220 "GET /api/kids/games/session HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:28,369 basehttp 5784 15928 "GET /api/stats/daily?days=14 HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:28,369 basehttp 5784 23252 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:28,372 basehttp 5784 24856 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:29,261 log 5784 24856 Unauthorized: /api/stats/user
+WARNING 2025-11-09 01:11:29,280 log 5784 15928 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 01:11:29,280 log 5784 23252 Unauthorized: /api/stats/daily
+WARNING 2025-11-09 01:11:29,280 log 5784 19220 Unauthorized: /api/kids/stories/enrollments
+WARNING 2025-11-09 01:11:29,280 log 5784 22992 Unauthorized: /api/kids/games/session
+WARNING 2025-11-09 01:11:29,280 basehttp 5784 24856 "GET /api/stats/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:29,280 basehttp 5784 15928 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:29,292 basehttp 5784 23252 "GET /api/stats/daily?days=14 HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:29,294 basehttp 5784 22992 "GET /api/kids/games/session HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:29,295 basehttp 5784 19220 "GET /api/kids/stories/enrollments HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:29,411 log 5784 22992 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:11:29,411 basehttp 5784 22992 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:42,209 log 5784 22992 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:11:42,226 basehttp 5784 22992 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:43,893 log 5784 22992 Unauthorized: /api/stats/user
+WARNING 2025-11-09 01:11:43,898 log 5784 23252 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 01:11:43,904 log 5784 15928 Unauthorized: /api/kids/stories/enrollments
+WARNING 2025-11-09 01:11:43,920 log 5784 19220 Unauthorized: /api/stats/daily
+WARNING 2025-11-09 01:11:43,934 basehttp 5784 23252 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:43,928 basehttp 5784 22992 "GET /api/stats/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:43,932 basehttp 5784 15928 "GET /api/kids/stories/enrollments HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:43,922 log 5784 24856 Unauthorized: /api/kids/games/session
+WARNING 2025-11-09 01:11:43,942 basehttp 5784 19220 "GET /api/stats/daily?days=14 HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:43,954 basehttp 5784 24856 "GET /api/kids/games/session HTTP/1.1" 401 172
+WARNING 2025-11-09 01:11:43,965 log 5784 19220 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:11:43,969 basehttp 5784 19220 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:12:20,108 log 5784 5012 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:12:20,114 basehttp 5784 5012 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:12:22,392 log 5784 5012 Unauthorized: /api/stats/user
+WARNING 2025-11-09 01:12:22,395 log 5784 16392 Unauthorized: /api/stats/daily
+WARNING 2025-11-09 01:12:22,397 basehttp 5784 5012 "GET /api/stats/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:12:22,399 basehttp 5784 16392 "GET /api/stats/daily?days=14 HTTP/1.1" 401 172
+WARNING 2025-11-09 01:12:22,403 log 5784 5012 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 01:12:22,416 log 5784 16392 Unauthorized: /api/kids/stories/enrollments
+WARNING 2025-11-09 01:12:22,422 basehttp 5784 5012 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 01:12:22,423 basehttp 5784 16392 "GET /api/kids/stories/enrollments HTTP/1.1" 401 172
+WARNING 2025-11-09 01:12:22,436 log 5784 5012 Unauthorized: /api/kids/games/session
+WARNING 2025-11-09 01:12:22,438 basehttp 5784 5012 "GET /api/kids/games/session HTTP/1.1" 401 172
+WARNING 2025-11-09 01:12:22,461 log 5784 5012 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:12:22,483 basehttp 5784 5012 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:13:43,237 log 5784 15708 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:13:43,238 basehttp 5784 15708 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:13:43,242 log 5784 15708 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:13:43,243 basehttp 5784 15708 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:13:44,985 log 5784 16868 Unauthorized: /api/stats/user
+WARNING 2025-11-09 01:13:44,995 log 5784 21684 Unauthorized: /api/stats/daily
+WARNING 2025-11-09 01:13:44,998 basehttp 5784 16868 "GET /api/stats/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:13:45,000 basehttp 5784 21684 "GET /api/stats/daily?days=14 HTTP/1.1" 401 172
+WARNING 2025-11-09 01:13:45,027 log 5784 16868 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:13:45,027 log 5784 10752 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 01:13:45,042 basehttp 5784 16868 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:13:45,083 log 5784 23336 Unauthorized: /api/kids/stories/enrollments
+WARNING 2025-11-09 01:13:45,085 basehttp 5784 10752 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 01:13:45,116 log 5784 15816 Unauthorized: /api/kids/games/session
+WARNING 2025-11-09 01:13:45,123 basehttp 5784 23336 "GET /api/kids/stories/enrollments HTTP/1.1" 401 172
+WARNING 2025-11-09 01:13:45,141 basehttp 5784 15816 "GET /api/kids/games/session HTTP/1.1" 401 172
+WARNING 2025-11-09 01:13:45,599 log 5784 10752 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 01:13:45,601 log 5784 23336 Unauthorized: /api/stats/daily
+WARNING 2025-11-09 01:13:45,601 log 5784 16868 Unauthorized: /api/kids/stories/enrollments
+WARNING 2025-11-09 01:13:45,607 log 5784 21684 Unauthorized: /api/kids/games/session
+WARNING 2025-11-09 01:13:45,607 log 5784 15816 Unauthorized: /api/stats/user
+WARNING 2025-11-09 01:13:45,607 basehttp 5784 10752 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 01:13:45,612 basehttp 5784 23336 "GET /api/stats/daily?days=14 HTTP/1.1" 401 172
+WARNING 2025-11-09 01:13:45,612 basehttp 5784 16868 "GET /api/kids/stories/enrollments HTTP/1.1" 401 172
+WARNING 2025-11-09 01:13:45,613 basehttp 5784 21684 "GET /api/kids/games/session HTTP/1.1" 401 172
+WARNING 2025-11-09 01:13:45,616 basehttp 5784 15816 "GET /api/stats/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:13:45,835 log 5784 15816 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:13:45,839 basehttp 5784 15816 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:14:23,269 log 5784 24040 Unauthorized: /api/stats/user
+WARNING 2025-11-09 01:14:23,270 log 5784 25464 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 01:14:23,273 log 5784 444 Unauthorized: /api/kids/stories/enrollments
+WARNING 2025-11-09 01:14:23,274 log 5784 25548 Unauthorized: /api/stats/daily
+WARNING 2025-11-09 01:14:23,275 log 5784 13028 Unauthorized: /api/kids/games/session
+WARNING 2025-11-09 01:14:23,276 basehttp 5784 25464 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 01:14:23,276 basehttp 5784 24040 "GET /api/stats/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:14:23,277 basehttp 5784 25548 "GET /api/stats/daily?days=14 HTTP/1.1" 401 172
+WARNING 2025-11-09 01:14:23,278 basehttp 5784 444 "GET /api/kids/stories/enrollments HTTP/1.1" 401 172
+WARNING 2025-11-09 01:14:23,279 basehttp 5784 13028 "GET /api/kids/games/session HTTP/1.1" 401 172
+WARNING 2025-11-09 01:14:23,282 log 5784 25464 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 01:14:23,288 log 5784 24040 Unauthorized: /api/stats/user
+WARNING 2025-11-09 01:14:23,292 log 5784 25548 Unauthorized: /api/stats/daily
+WARNING 2025-11-09 01:14:23,292 log 5784 444 Unauthorized: /api/kids/stories/enrollments
+WARNING 2025-11-09 01:14:23,297 log 5784 13028 Unauthorized: /api/kids/games/session
+WARNING 2025-11-09 01:14:23,298 basehttp 5784 25464 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 01:14:23,299 basehttp 5784 24040 "GET /api/stats/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:14:23,304 basehttp 5784 444 "GET /api/kids/stories/enrollments HTTP/1.1" 401 172
+WARNING 2025-11-09 01:14:23,305 basehttp 5784 25548 "GET /api/stats/daily?days=14 HTTP/1.1" 401 172
+WARNING 2025-11-09 01:14:23,306 basehttp 5784 13028 "GET /api/kids/games/session HTTP/1.1" 401 172
+WARNING 2025-11-09 01:14:30,242 log 5784 17920 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:14:30,242 basehttp 5784 17920 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:14:30,931 log 5784 17920 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:14:30,931 basehttp 5784 17920 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:15:15,237 log 5784 18944 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:15:15,237 basehttp 5784 18944 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:15:15,920 log 5784 18944 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:15:15,920 basehttp 5784 18944 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:15:40,257 log 5784 8448 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:15:40,257 basehttp 5784 8448 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:15:41,521 log 5784 8448 Unauthorized: /api/stats/user
+WARNING 2025-11-09 01:15:41,526 log 5784 11928 Unauthorized: /api/stats/daily
+WARNING 2025-11-09 01:15:41,527 basehttp 5784 8448 "GET /api/stats/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:15:41,528 basehttp 5784 11928 "GET /api/stats/daily?days=14 HTTP/1.1" 401 172
+WARNING 2025-11-09 01:15:41,531 log 5784 8448 Unauthorized: /api/kids/progress
+WARNING 2025-11-09 01:15:41,540 log 5784 11928 Unauthorized: /api/kids/stories/enrollments
+WARNING 2025-11-09 01:15:41,541 basehttp 5784 8448 "GET /api/kids/progress HTTP/1.1" 401 172
+WARNING 2025-11-09 01:15:41,546 log 5784 8448 Unauthorized: /api/kids/games/session
+WARNING 2025-11-09 01:15:41,547 basehttp 5784 11928 "GET /api/kids/stories/enrollments HTTP/1.1" 401 172
+WARNING 2025-11-09 01:15:41,549 basehttp 5784 8448 "GET /api/kids/games/session HTTP/1.1" 401 172
+WARNING 2025-11-09 01:15:41,559 log 5784 8448 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:15:41,571 basehttp 5784 8448 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:16:01,304 log 5784 5268 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:16:01,305 basehttp 5784 5268 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:16:05,925 log 5784 1592 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:16:05,927 basehttp 5784 1592 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:16:07,260 log 5784 1592 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:16:07,260 basehttp 5784 1592 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:16:46,241 log 5784 17336 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:16:46,241 basehttp 5784 17336 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:16:52,928 log 5784 17336 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:16:52,930 basehttp 5784 17336 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:17:30,926 log 5784 17336 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:17:30,926 basehttp 5784 17336 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:17:37,926 log 5784 17336 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:17:37,926 basehttp 5784 17336 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:18:15,916 log 5784 17336 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:18:15,922 basehttp 5784 17336 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:18:22,244 log 5784 17336 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:18:22,255 basehttp 5784 17336 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:19:07,925 log 5784 17336 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:19:07,925 basehttp 5784 17336 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:19:35,932 log 5784 17336 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:19:35,937 basehttp 5784 17336 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:19:52,940 log 5784 17336 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:19:52,953 basehttp 5784 17336 "GET /api/notifications HTTP/1.1" 401 172
+INFO 2025-11-09 01:20:08,263 autoreload 5784 26052 C:\Users\shent\OneDrive\Desktop\Elora\server\api\models.py changed, reloading.
+INFO 2025-11-09 01:20:10,449 autoreload 7244 11284 Watching for file changes with StatReloader
+INFO 2025-11-09 01:20:15,341 autoreload 7244 11284 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
+INFO 2025-11-09 01:20:16,533 autoreload 9160 23676 Watching for file changes with StatReloader
+INFO 2025-11-09 01:20:30,032 autoreload 9160 23676 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-09 01:20:31,336 autoreload 2832 11188 Watching for file changes with StatReloader
+WARNING 2025-11-09 01:20:36,300 log 2832 9484 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:20:36,304 basehttp 2832 9484 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:20:37,930 log 2832 9484 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:20:37,930 basehttp 2832 9484 "GET /api/notifications HTTP/1.1" 401 172
+INFO 2025-11-09 01:20:39,361 autoreload 2832 11188 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-09 01:20:40,592 autoreload 10144 21060 Watching for file changes with StatReloader
+INFO 2025-11-09 01:20:55,809 autoreload 10144 21060 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-09 01:20:56,784 autoreload 23912 7844 Watching for file changes with StatReloader
+INFO 2025-11-09 01:21:09,740 autoreload 23912 7844 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-09 01:21:10,984 autoreload 13716 24652 Watching for file changes with StatReloader
+WARNING 2025-11-09 01:21:36,252 log 13716 25876 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:21:36,252 basehttp 13716 25876 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:21:36,252 log 13716 25876 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:21:36,252 basehttp 13716 25876 "GET /api/notifications HTTP/1.1" 401 172
+INFO 2025-11-09 01:21:43,628 autoreload 13716 24652 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-09 01:21:44,671 autoreload 23060 14484 Watching for file changes with StatReloader
+INFO 2025-11-09 01:21:52,235 autoreload 23060 14484 C:\Users\shent\OneDrive\Desktop\Elora\server\api\urls.py changed, reloading.
+INFO 2025-11-09 01:21:53,868 autoreload 2836 20060 Watching for file changes with StatReloader
+WARNING 2025-11-09 01:22:36,274 log 2836 16056 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:22:36,274 basehttp 2836 16056 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:22:36,292 log 2836 16056 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:22:36,297 basehttp 2836 16056 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:22:53,280 log 2836 23916 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:22:53,281 basehttp 2836 23916 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:22:53,287 log 2836 23916 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:22:53,290 basehttp 2836 23916 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:22:53,522 log 2836 23916 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:22:53,524 basehttp 2836 23916 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:22:55,491 log 2836 23916 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:22:55,493 basehttp 2836 23916 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:23:39,254 log 2836 15156 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:23:39,256 basehttp 2836 15156 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:23:40,926 log 2836 15156 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:23:40,930 basehttp 2836 15156 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:24:24,242 log 2836 25452 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:24:24,244 basehttp 2836 25452 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:24:25,936 log 2836 25452 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:24:25,941 basehttp 2836 25452 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:25:09,233 log 2836 17804 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:25:09,233 basehttp 2836 17804 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:25:10,927 log 2836 17804 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:25:10,930 basehttp 2836 17804 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:25:46,252 log 2836 26384 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:25:46,252 basehttp 2836 26384 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:25:46,254 log 2836 26384 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:25:46,254 basehttp 2836 26384 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:26:28,244 log 2836 13372 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:26:28,246 basehttp 2836 13372 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:26:28,248 log 2836 13372 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:26:28,248 basehttp 2836 13372 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:26:39,945 log 2836 13372 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:26:39,949 basehttp 2836 13372 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:26:39,953 log 2836 13372 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:26:39,953 basehttp 2836 13372 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:26:49,934 log 2836 13372 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:26:49,937 basehttp 2836 13372 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:26:49,941 log 2836 13372 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:26:49,941 basehttp 2836 13372 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:27:01,939 log 2836 13372 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:27:01,941 basehttp 2836 13372 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:27:01,948 log 2836 13372 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:27:01,948 basehttp 2836 13372 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:27:29,287 log 2836 13184 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:27:29,288 basehttp 2836 13184 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:27:29,291 log 2836 13184 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:27:29,292 basehttp 2836 13184 "GET /api/auth/user HTTP/1.1" 401 172
+INFO 2025-11-09 01:27:31,148 basehttp 2836 13184 "OPTIONS /api/kids/parental-controls HTTP/1.1" 200 0
+WARNING 2025-11-09 01:27:31,148 log 2836 13184 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:27:31,148 basehttp 2836 13184 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:27:31,173 log 2836 13184 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:27:31,174 basehttp 2836 13184 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:27:31,186 log 2836 13184 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:27:31,186 basehttp 2836 13184 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:27:31,215 log 2836 13184 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:27:31,215 basehttp 2836 13184 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:28:15,947 log 2836 13184 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:28:15,947 basehttp 2836 13184 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:28:15,958 log 2836 13184 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:28:15,960 basehttp 2836 13184 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:28:18,145 log 2836 13184 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:28:18,145 basehttp 2836 13184 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:28:18,157 log 2836 13184 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:28:18,157 basehttp 2836 13184 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:28:18,182 log 2836 13184 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:28:18,185 basehttp 2836 13184 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:28:18,196 log 2836 13184 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:28:18,197 basehttp 2836 13184 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:28:40,970 log 2836 13184 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:28:40,972 basehttp 2836 13184 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:28:40,978 log 2836 13184 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:28:40,981 basehttp 2836 13184 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:28:43,142 log 2836 13184 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:28:43,146 basehttp 2836 13184 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:28:43,153 log 2836 13184 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:28:43,155 basehttp 2836 13184 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:28:43,194 log 2836 13184 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:28:43,198 basehttp 2836 13184 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:28:43,205 log 2836 13184 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:28:43,207 basehttp 2836 13184 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:29:16,955 log 2836 13184 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:29:16,956 basehttp 2836 13184 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:29:16,965 log 2836 13184 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:29:16,969 basehttp 2836 13184 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:29:19,243 log 2836 13184 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:29:19,244 basehttp 2836 13184 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:29:19,253 log 2836 13184 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:29:19,253 basehttp 2836 13184 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:29:19,300 log 2836 13184 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:29:19,302 basehttp 2836 13184 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:29:19,315 log 2836 13184 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:29:19,317 basehttp 2836 13184 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:29:47,945 log 2836 13184 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:29:47,945 basehttp 2836 13184 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:29:47,960 log 2836 13184 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:29:47,961 basehttp 2836 13184 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:30:05,233 log 2836 14932 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:30:05,233 basehttp 2836 14932 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:30:05,240 log 2836 14932 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:30:05,240 basehttp 2836 14932 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:30:16,015 log 2836 14932 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:30:16,017 basehttp 2836 14932 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:30:16,027 log 2836 14932 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:30:16,032 basehttp 2836 14932 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:30:35,277 log 2836 19424 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:30:35,278 basehttp 2836 19424 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:30:35,281 log 2836 19424 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:30:35,281 basehttp 2836 19424 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:30:50,242 log 2836 16056 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:30:50,242 basehttp 2836 16056 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:30:50,242 log 2836 16056 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:30:50,255 basehttp 2836 16056 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:31:09,246 log 2836 24940 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:31:09,247 basehttp 2836 24940 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:31:09,249 log 2836 24940 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:31:09,250 basehttp 2836 24940 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:31:35,249 log 2836 19140 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:31:35,252 basehttp 2836 19140 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:31:35,260 log 2836 19140 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:31:35,261 basehttp 2836 19140 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:31:57,512 log 2836 696 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:31:57,512 basehttp 2836 696 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:32:00,594 log 2836 696 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:32:00,605 basehttp 2836 696 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:32:00,734 log 2836 696 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:32:00,750 basehttp 2836 696 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:32:09,962 log 2836 11928 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:32:09,971 basehttp 2836 11928 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:32:19,621 log 2836 11924 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:32:19,629 basehttp 2836 11924 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:32:34,590 log 2836 25836 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:32:34,598 basehttp 2836 25836 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:32:36,552 log 2836 21108 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:32:36,558 basehttp 2836 21108 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:32:55,532 log 2836 24852 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:32:55,542 basehttp 2836 24852 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:33:19,513 log 2836 18960 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:33:19,519 basehttp 2836 18960 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:33:19,552 log 2836 18960 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:33:19,561 basehttp 2836 18960 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:33:21,184 log 2836 18960 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:33:21,200 basehttp 2836 18960 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:33:43,269 log 2836 15808 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:33:43,270 basehttp 2836 15808 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:33:54,259 log 2836 3284 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:33:54,260 basehttp 2836 3284 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:34:07,250 log 2836 23312 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:34:07,251 basehttp 2836 23312 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:34:52,239 log 2836 8220 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:34:52,239 basehttp 2836 8220 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:35:36,495 log 2836 11240 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:35:36,507 basehttp 2836 11240 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:36:21,455 log 2836 10644 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:36:21,472 basehttp 2836 10644 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:37:06,464 log 2836 18204 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:37:06,470 basehttp 2836 18204 "GET /api/notifications HTTP/1.1" 401 172
+INFO 2025-11-09 01:37:18,749 autoreload 2836 20060 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
+INFO 2025-11-09 01:37:30,954 autoreload 19128 23516 Watching for file changes with StatReloader
+WARNING 2025-11-09 01:37:33,154 log 19128 20116 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:37:33,154 log 19128 1532 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:37:33,154 basehttp 19128 20116 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:37:33,165 basehttp 19128 1532 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:37:33,172 log 19128 20116 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:37:33,172 basehttp 19128 20116 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:38:16,416 log 19128 10208 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:38:16,446 basehttp 19128 10208 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:39:02,237 log 19128 22860 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:39:02,237 basehttp 19128 22860 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:39:47,245 log 19128 2896 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:39:47,246 basehttp 19128 2896 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:40:15,251 log 19128 24204 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:40:15,252 basehttp 19128 24204 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:40:32,258 log 19128 24784 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:40:32,259 basehttp 19128 24784 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:40:38,309 log 19128 22632 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:40:38,309 basehttp 19128 22632 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:41:16,362 log 19128 13948 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:41:16,364 basehttp 19128 13948 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:42:02,252 log 19128 15712 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:42:02,253 basehttp 19128 15712 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:42:10,561 log 19128 15712 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:42:10,581 basehttp 19128 15712 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:42:12,531 log 19128 16808 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:42:12,539 basehttp 19128 16808 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:42:12,569 log 19128 16808 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:42:12,581 basehttp 19128 16808 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:42:28,356 log 19128 7476 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:42:28,360 basehttp 19128 7476 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:42:29,775 log 19128 7476 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:42:29,781 basehttp 19128 7476 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:42:29,879 log 19128 7476 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:42:29,883 basehttp 19128 7476 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:43:00,921 log 19128 24140 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:43:00,937 basehttp 19128 24140 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:43:00,976 log 19128 24140 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:43:00,995 basehttp 19128 24140 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:43:15,253 log 19128 1724 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:43:15,254 basehttp 19128 1724 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:43:20,967 log 19128 1724 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:43:20,970 basehttp 19128 1724 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:43:28,281 log 19128 18324 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:43:28,291 basehttp 19128 18324 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:43:29,647 log 19128 18324 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:43:29,657 basehttp 19128 18324 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:43:29,775 log 19128 18324 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:43:29,782 basehttp 19128 18324 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:44:15,249 log 19128 11124 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:44:15,251 basehttp 19128 11124 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:45:00,234 log 19128 21400 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:45:00,234 basehttp 19128 21400 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:45:45,239 log 19128 18092 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:45:45,239 basehttp 19128 18092 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:45:48,931 log 19128 18092 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:45:48,933 basehttp 19128 18092 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:46:29,988 log 19128 3788 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:46:29,993 basehttp 19128 3788 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:47:14,929 log 19128 3788 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:47:14,929 basehttp 19128 3788 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:47:59,669 log 19128 3788 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:47:59,673 basehttp 19128 3788 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:48:10,954 log 19128 3788 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:48:10,957 basehttp 19128 3788 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:48:23,142 log 19128 10656 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:48:23,142 basehttp 19128 10656 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:48:24,539 log 19128 10656 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:48:24,542 basehttp 19128 10656 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:48:24,627 log 19128 10656 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:48:24,631 basehttp 19128 10656 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:48:50,560 log 19128 26576 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:48:50,567 basehttp 19128 26576 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:48:51,899 log 19128 26576 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:48:51,905 basehttp 19128 26576 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:48:51,995 log 19128 26576 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:48:51,997 basehttp 19128 26576 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:49:02,658 log 19128 26576 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:49:02,662 basehttp 19128 26576 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:49:32,607 log 19128 21720 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:49:32,617 basehttp 19128 21720 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:49:33,641 log 19128 21720 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:49:33,646 basehttp 19128 21720 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:49:36,931 log 19128 21720 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:49:36,931 basehttp 19128 21720 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:50:01,277 log 19128 22040 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:50:01,278 basehttp 19128 22040 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+INFO 2025-11-09 01:50:03,427 autoreload 19128 23516 C:\Users\shent\OneDrive\Desktop\Elora\server\api\models.py changed, reloading.
+INFO 2025-11-09 01:50:06,529 autoreload 15528 18652 Watching for file changes with StatReloader
+INFO 2025-11-09 01:50:10,276 autoreload 15528 18652 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-09 01:50:11,903 autoreload 3184 15088 Watching for file changes with StatReloader
+WARNING 2025-11-09 01:50:13,347 log 3184 25960 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:50:13,348 basehttp 3184 25960 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:50:15,952 log 3184 25960 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:50:15,956 basehttp 3184 25960 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:50:18,376 log 3184 15884 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:50:18,376 basehttp 3184 15884 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:50:18,376 log 3184 15884 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:50:18,376 basehttp 3184 15884 "GET /api/notifications HTTP/1.1" 401 172
+INFO 2025-11-09 01:50:28,371 autoreload 4332 13928 Watching for file changes with StatReloader
+WARNING 2025-11-09 01:50:34,619 log 4332 24620 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:50:34,619 basehttp 4332 24620 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:50:36,170 log 4332 24620 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:50:36,172 basehttp 4332 24620 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:50:36,347 log 4332 24620 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:50:36,368 basehttp 4332 24620 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:51:20,681 log 4332 3916 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:51:20,681 basehttp 4332 3916 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:51:21,937 log 4332 3916 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:51:21,938 basehttp 4332 3916 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:51:22,001 log 4332 3916 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:51:22,003 basehttp 4332 3916 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:52:07,263 log 4332 3480 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:52:07,269 basehttp 4332 3480 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:52:08,389 log 4332 3480 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:52:08,392 basehttp 4332 3480 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:52:15,976 log 4332 3480 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:52:15,977 basehttp 4332 3480 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:52:18,358 log 4332 3480 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:52:18,358 basehttp 4332 3480 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:52:18,612 log 4332 3480 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:52:18,614 basehttp 4332 3480 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:52:27,247 log 4332 22216 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:52:27,247 basehttp 4332 22216 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:52:37,254 log 4332 15324 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:52:37,254 basehttp 4332 15324 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:53:00,468 log 4332 15324 Unauthorized: /api/auth/user
+WARNING 2025-11-09 01:53:00,469 basehttp 4332 15324 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 01:53:02,027 log 4332 15324 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:53:02,029 basehttp 4332 15324 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:53:02,105 log 4332 15324 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:53:02,110 basehttp 4332 15324 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:53:47,023 log 4332 15324 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:53:47,037 basehttp 4332 15324 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:54:32,355 log 4332 21444 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:54:32,355 basehttp 4332 21444 "GET /api/notifications HTTP/1.1" 401 172
+INFO 2025-11-09 01:55:17,054 basehttp 4332 21444 "OPTIONS /api/notifications HTTP/1.1" 200 0
+WARNING 2025-11-09 01:55:17,056 log 4332 21444 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:55:17,056 basehttp 4332 21444 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:56:02,039 log 4332 21444 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:56:02,043 basehttp 4332 21444 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:56:47,043 log 4332 21444 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:56:47,043 basehttp 4332 21444 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:57:32,042 log 4332 21444 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:57:32,042 basehttp 4332 21444 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:57:49,963 log 4332 21444 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:57:49,967 basehttp 4332 21444 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:57:58,929 log 4332 21444 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:57:58,929 basehttp 4332 21444 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:58:17,925 log 4332 21444 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:58:17,926 basehttp 4332 21444 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:59:23,056 log 4332 21444 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:59:23,058 basehttp 4332 21444 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 01:59:45,946 log 4332 21444 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 01:59:45,946 basehttp 4332 21444 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 01:59:47,935 log 4332 21444 Unauthorized: /api/notifications
+WARNING 2025-11-09 01:59:47,935 basehttp 4332 21444 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 02:00:35,925 log 4332 21444 Unauthorized: /api/notifications
+WARNING 2025-11-09 02:00:35,925 basehttp 4332 21444 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 02:00:38,943 log 4332 21444 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 02:00:38,943 basehttp 4332 21444 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 02:00:51,953 log 4332 21444 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 02:00:51,955 basehttp 4332 21444 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 02:00:57,954 log 4332 21444 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 02:00:57,955 basehttp 4332 21444 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+INFO 2025-11-09 02:01:04,528 basehttp 4332 23064 "OPTIONS /api/auth/user HTTP/1.1" 200 0
+WARNING 2025-11-09 02:01:04,528 log 4332 23064 Unauthorized: /api/auth/user
+WARNING 2025-11-09 02:01:04,528 basehttp 4332 23064 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 02:01:05,800 log 4332 23064 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 02:01:05,802 basehttp 4332 23064 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 02:01:05,880 log 4332 23064 Unauthorized: /api/notifications
+WARNING 2025-11-09 02:01:05,882 basehttp 4332 23064 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 02:01:51,231 log 4332 932 Unauthorized: /api/notifications
+WARNING 2025-11-09 02:01:51,231 basehttp 4332 932 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 02:02:35,936 log 4332 932 Unauthorized: /api/notifications
+WARNING 2025-11-09 02:02:35,936 basehttp 4332 932 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 02:03:20,938 log 4332 932 Unauthorized: /api/notifications
+WARNING 2025-11-09 02:03:20,942 basehttp 4332 932 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 02:04:05,932 log 4332 932 Unauthorized: /api/notifications
+WARNING 2025-11-09 02:04:05,932 basehttp 4332 932 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 02:04:39,617 log 4332 3936 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 02:04:39,618 basehttp 4332 3936 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 02:04:39,621 log 4332 19944 Unauthorized: /api/auth/user
+WARNING 2025-11-09 02:04:39,624 log 4332 3936 Unauthorized: /api/notifications
+WARNING 2025-11-09 02:04:39,624 basehttp 4332 3936 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 02:04:39,624 basehttp 4332 19944 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 02:04:46,185 log 4332 19944 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 02:04:46,186 basehttp 4332 19944 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 02:04:46,193 log 4332 19944 Unauthorized: /api/auth/user
+WARNING 2025-11-09 02:04:46,194 basehttp 4332 19944 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 02:04:46,294 log 4332 19944 Unauthorized: /api/notifications
+WARNING 2025-11-09 02:04:46,294 basehttp 4332 19944 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 02:05:32,248 log 4332 11188 Unauthorized: /api/notifications
+WARNING 2025-11-09 02:05:32,250 basehttp 4332 11188 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 02:05:38,941 log 4332 11188 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 02:05:38,942 basehttp 4332 11188 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 02:05:56,936 log 4332 11188 Unauthorized: /api/auth/user
+WARNING 2025-11-09 02:05:56,936 basehttp 4332 11188 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 02:05:59,088 log 4332 11188 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 02:05:59,088 basehttp 4332 11188 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 02:05:59,124 log 4332 11188 Unauthorized: /api/notifications
+WARNING 2025-11-09 02:05:59,125 basehttp 4332 11188 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 02:06:45,249 log 4332 17972 Unauthorized: /api/notifications
+WARNING 2025-11-09 02:06:45,249 basehttp 4332 17972 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 02:06:57,940 log 4332 17972 Unauthorized: /api/auth/user
+WARNING 2025-11-09 02:06:57,941 basehttp 4332 17972 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 02:06:59,915 log 4332 25020 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 02:06:59,915 basehttp 4332 25020 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 02:06:59,940 log 4332 25020 Unauthorized: /api/notifications
+WARNING 2025-11-09 02:06:59,942 basehttp 4332 25020 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 02:07:44,922 log 4332 25020 Unauthorized: /api/notifications
+WARNING 2025-11-09 02:07:44,922 basehttp 4332 25020 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 02:08:29,924 log 4332 25020 Unauthorized: /api/notifications
+WARNING 2025-11-09 02:08:29,924 basehttp 4332 25020 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 02:09:14,930 log 4332 25020 Unauthorized: /api/notifications
+WARNING 2025-11-09 02:09:14,930 basehttp 4332 25020 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 02:09:59,924 log 4332 25020 Unauthorized: /api/notifications
+WARNING 2025-11-09 02:09:59,924 basehttp 4332 25020 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 02:10:44,938 log 4332 25020 Unauthorized: /api/notifications
+WARNING 2025-11-09 02:10:44,940 basehttp 4332 25020 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 02:11:12,204 log 4332 25020 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 02:11:12,211 basehttp 4332 25020 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 02:11:12,214 log 4332 25020 Unauthorized: /api/auth/user
+WARNING 2025-11-09 02:11:12,215 basehttp 4332 25020 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 02:11:12,349 log 4332 25020 Unauthorized: /api/notifications
+WARNING 2025-11-09 02:11:12,350 basehttp 4332 25020 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 02:11:58,234 log 4332 17232 Unauthorized: /api/notifications
+WARNING 2025-11-09 02:11:58,236 basehttp 4332 17232 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 02:11:59,246 log 4332 17232 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 02:11:59,248 log 4332 17324 Unauthorized: /api/auth/user
+WARNING 2025-11-09 02:11:59,248 basehttp 4332 17232 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 02:11:59,249 basehttp 4332 17324 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 02:11:59,388 log 4332 17324 Unauthorized: /api/notifications
+WARNING 2025-11-09 02:11:59,388 basehttp 4332 17324 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 02:12:27,458 log 4332 22960 Unauthorized: /api/kids/parental-controls
+WARNING 2025-11-09 02:12:27,458 log 4332 15196 Unauthorized: /api/auth/user
+WARNING 2025-11-09 02:12:27,458 basehttp 4332 15196 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-09 02:12:27,458 basehttp 4332 22960 "GET /api/kids/parental-controls HTTP/1.1" 401 172
+WARNING 2025-11-09 02:12:27,475 log 4332 15196 Unauthorized: /api/notifications
+WARNING 2025-11-09 02:12:27,477 basehttp 4332 15196 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-09 02:13:12,933 log 4332 15196 Unauthorized: /api/notifications
+WARNING 2025-11-09 02:13:12,933 basehttp 4332 15196 "GET /api/notifications HTTP/1.1" 401 172
+INFO 2025-11-09 02:14:06,644 basehttp 4332 13872 "OPTIONS /api/auth/login HTTP/1.1" 200 0
+INFO 2025-11-09 02:14:08,379 basehttp 4332 13872 "POST /api/auth/login HTTP/1.1" 200 1144
+INFO 2025-11-09 02:14:08,730 basehttp 4332 9156 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:14:08,835 basehttp 4332 13872 "GET /api/kids/parental-controls HTTP/1.1" 200 254
+INFO 2025-11-09 02:14:36,796 basehttp 4332 7328 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-09 02:14:38,080 basehttp 4332 7328 "GET /api/kids/parental-controls HTTP/1.1" 200 254
+INFO 2025-11-09 02:14:38,089 basehttp 4332 3384 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:16:34,438 basehttp 4332 14292 "OPTIONS /api/auth/google HTTP/1.1" 200 0
+INFO 2025-11-09 02:16:35,335 basehttp 4332 14292 "POST /api/auth/google HTTP/1.1" 200 1175
+INFO 2025-11-09 02:16:35,477 basehttp 4332 14292 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:16:43,037 basehttp 4332 14292 "GET /api/kids/parental-controls HTTP/1.1" 200 254
+INFO 2025-11-09 02:16:50,305 basehttp 4332 14292 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-09 02:16:52,389 basehttp 4332 14292 "GET /api/kids/parental-controls HTTP/1.1" 200 254
+INFO 2025-11-09 02:16:52,460 basehttp 4332 17352 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:17:37,972 basehttp 4332 17352 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:18:22,963 basehttp 4332 17352 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:19:08,284 basehttp 4332 14412 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:19:53,325 basehttp 4332 23452 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:20:37,971 basehttp 4332 23452 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:20:51,353 basehttp 4332 23452 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-09 02:20:53,495 basehttp 4332 23452 "GET /api/kids/parental-controls HTTP/1.1" 200 254
+INFO 2025-11-09 02:20:53,593 basehttp 4332 23452 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:20:57,946 basehttp 4332 23452 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-09 02:21:00,150 basehttp 4332 23452 "GET /api/kids/parental-controls HTTP/1.1" 200 254
+INFO 2025-11-09 02:21:00,209 basehttp 4332 23452 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:21:45,959 basehttp 4332 23452 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:22:01,009 basehttp 4332 23452 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-09 02:22:03,261 basehttp 4332 23452 "GET /api/kids/parental-controls HTTP/1.1" 200 254
+INFO 2025-11-09 02:22:03,314 basehttp 4332 23452 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:22:48,267 basehttp 4332 23452 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:23:33,232 basehttp 4332 23452 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:24:19,383 basehttp 4332 19620 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:25:04,265 basehttp 4332 20980 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:25:48,932 basehttp 4332 20980 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:26:33,607 basehttp 4332 25504 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:27:11,222 autoreload 4332 13928 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-11-09 02:27:13,870 autoreload 24632 8500 Watching for file changes with StatReloader
+INFO 2025-11-09 02:27:19,327 basehttp 24632 11444 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:28:03,260 basehttp 24632 11444 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:28:48,941 basehttp 24632 11444 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:29:36,270 basehttp 24632 2232 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:30:34,502 basehttp 24632 2232 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:30:38,663 basehttp 24632 2232 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-09 02:30:41,898 basehttp 24632 13972 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:31:26,532 basehttp 24632 13972 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:32:12,293 basehttp 24632 5812 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:32:56,573 basehttp 24632 5812 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:33:41,959 basehttp 24632 5812 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:34:26,948 basehttp 24632 5812 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:34:57,336 autoreload 24632 8500 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-11-09 02:34:58,906 autoreload 24788 25096 Watching for file changes with StatReloader
+INFO 2025-11-09 02:35:00,264 basehttp 24788 16096 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-09 02:35:02,217 basehttp 24788 16096 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:35:47,974 basehttp 24788 16096 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:35:49,801 basehttp 24788 16096 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-09 02:35:52,226 basehttp 24788 16096 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:36:06,306 autoreload 24788 25096 C:\Users\shent\OneDrive\Desktop\Elora\server\crud\settings.py changed, reloading.
+INFO 2025-11-09 02:36:06,964 autoreload 21828 19448 Watching for file changes with StatReloader
+INFO 2025-11-09 02:36:38,264 basehttp 21828 4244 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:37:23,296 basehttp 21828 17492 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:38:08,278 basehttp 21828 16200 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:38:53,005 basehttp 21828 16200 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:39:37,970 basehttp 21828 16200 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:40:22,984 basehttp 21828 16200 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:41:36,253 basehttp 21828 12360 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:42:36,282 basehttp 21828 18720 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:43:36,291 basehttp 21828 19128 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:44:36,289 basehttp 21828 20684 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:45:35,787 basehttp 21828 18516 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:46:23,279 basehttp 21828 15280 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:48:56,721 basehttp 21828 16300 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-09 02:48:58,219 basehttp 21828 16300 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:49:43,415 basehttp 21828 19804 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:50:28,998 basehttp 21828 19804 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:51:13,956 basehttp 21828 19804 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:51:58,987 basehttp 21828 19804 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:52:43,955 basehttp 21828 19804 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:53:17,867 basehttp 21828 19972 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-09 02:53:19,248 basehttp 21828 19972 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:53:43,084 basehttp 21828 14748 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-09 02:53:44,876 basehttp 21828 17588 "GET /api/notifications HTTP/1.1" 200 47
+INFO 2025-11-09 02:54:29,753 basehttp 21828 9612 "GET /api/notifications HTTP/1.1" 200 47

@@ -1,8 +1,9 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import check_password, make_password
 from django.utils import timezone
 from django.db import transaction
-from django.db.models import Avg, Sum, Count, Q, F
+from django.db.models import Avg, Sum, Count, Q, F, Max
 from django.utils.text import slugify
 from collections import defaultdict
 from rest_framework.response import Response
@@ -11,6 +12,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
 from datetime import datetime, timedelta
+from math import ceil
 import logging
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.conf import settings
@@ -33,7 +35,8 @@ from .serializers import (
     WaitlistSerializer, DailyProgressSerializer, WeeklyStatsSerializer, UserStatsSerializer,
     UserNotificationSerializer, AdminNotificationSerializer, SurveyStepResponseSerializer, PlatformSettingsSerializer,
     StoryEnrollmentSerializer, StoryWordSerializer, StoryPhraseSerializer, KidsFavoriteSerializer,
-    KidsVocabularyPracticeSerializer, KidsPronunciationPracticeSerializer, KidsGameSessionSerializer
+    KidsVocabularyPracticeSerializer, KidsPronunciationPracticeSerializer, KidsGameSessionSerializer,
+    ParentalControlSettingsSerializer
 )
 from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
@@ -41,7 +44,8 @@ from .models import (
     KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, WaitlistEntry,
     EmailVerificationToken, UserNotification, AdminNotification, SurveyStepResponse, PlatformSettings,
     StoryEnrollment, StoryWord, StoryPhrase, KidsFavorite,
-    KidsVocabularyPractice, KidsPronunciationPractice, KidsGameSession
+    KidsVocabularyPractice, KidsPronunciationPractice, KidsGameSession,
+    ParentalControlSettings
 )
 
 logger = logging.getLogger(__name__)
@@ -1153,6 +1157,190 @@ def daily_progress(request):
     return Response({
             "message": "An error occurred"
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# ============= Parental Controls Helpers =============
+def _get_parental_settings(user):
+    settings_obj, _ = ParentalControlSettings.objects.get_or_create(user=user)
+    return settings_obj
+
+
+def _build_parental_usage_stats(user):
+    now = timezone.now()
+    start_of_today = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    start_of_week = (now - timedelta(days=6)).replace(hour=0, minute=0, second=0, microsecond=0)
+
+    daily_seconds = KidsGameSession.objects.filter(
+        user=user,
+        created_at__gte=start_of_today,
+    ).aggregate(total=Sum('duration_seconds'))['total'] or 0
+
+    weekly_seconds = KidsGameSession.objects.filter(
+        user=user,
+        created_at__gte=start_of_week,
+    ).aggregate(total=Sum('duration_seconds'))['total'] or 0
+
+    words_learned = KidsVocabularyPractice.objects.filter(user=user).count()
+    stories_completed = StoryEnrollment.objects.filter(user=user, completed=True).count()
+    games_played = KidsGameSession.objects.filter(user=user, created_at__gte=start_of_week).count()
+
+    last_activity_candidates = [
+        KidsGameSession.objects.filter(user=user).aggregate(last_seen=Max('updated_at'))['last_seen'],
+        KidsVocabularyPractice.objects.filter(user=user).aggregate(last_seen=Max('last_practiced'))['last_seen'],
+        KidsPronunciationPractice.objects.filter(user=user).aggregate(last_seen=Max('last_practiced'))['last_seen'],
+        StoryEnrollment.objects.filter(user=user).aggregate(last_seen=Max('updated_at'))['last_seen'],
+        KidsProgress.objects.filter(user=user).aggregate(last_seen=Max('updated_at'))['last_seen'],
+    ]
+
+    fallback_last_active = user.last_login or user.date_joined
+    last_active = max([ts for ts in last_activity_candidates if ts] or [fallback_last_active])
+
+    return {
+        "totalMinutesToday": int(ceil(daily_seconds / 60)) if daily_seconds else 0,
+        "totalMinutesWeek": int(ceil(weekly_seconds / 60)) if weekly_seconds else 0,
+        "wordsLearned": words_learned,
+        "storiesCompleted": stories_completed,
+        "gamesPlayed": games_played,
+        "lastActive": last_active.isoformat(),
+    }
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def kids_parental_controls_overview(request):
+    settings_obj = _get_parental_settings(request.user)
+    settings_data = ParentalControlSettingsSerializer(settings_obj).data
+    stats_data = _build_parental_usage_stats(request.user)
+    return Response({
+        "settings": settings_data,
+        "stats": stats_data,
+    })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def kids_parental_controls_unlock(request):
+    settings_obj = _get_parental_settings(request.user)
+    if not settings_obj.has_pin:
+        return Response({
+            "success": True,
+            "unlocked": True,
+            "message": "PIN not configured; controls are open.",
+        })
+
+    provided_pin = (request.data.get('pin') or "").strip()
+    if not provided_pin:
+        return Response({
+            "success": False,
+            "unlocked": False,
+            "message": "PIN is required.",
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    if check_password(provided_pin, settings_obj.pin_hash):
+        return Response({
+            "success": True,
+            "unlocked": True,
+        })
+
+    return Response({
+        "success": False,
+        "unlocked": False,
+        "message": "Incorrect PIN. Please try again.",
+    }, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def kids_parental_controls_settings(request):
+    settings_obj = _get_parental_settings(request.user)
+    new_limit = request.data.get('daily_limit_minutes')
+
+    try:
+        if new_limit is None:
+            raise ValueError("daily_limit_minutes is required")
+        new_limit = int(new_limit)
+    except (TypeError, ValueError):
+        return Response({
+            "success": False,
+            "message": "daily_limit_minutes must be a valid number.",
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    if new_limit < 5 or new_limit > 600:
+        return Response({
+            "success": False,
+            "message": "Daily limit must be between 5 and 600 minutes.",
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    settings_obj.daily_limit_minutes = new_limit
+    settings_obj.save(update_fields=['daily_limit_minutes', 'updated_at'])
+
+    serializer = ParentalControlSettingsSerializer(settings_obj)
+    return Response({
+        "success": True,
+        "settings": serializer.data,
+    })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def kids_parental_controls_pin(request):
+    settings_obj = _get_parental_settings(request.user)
+    action = (request.data.get('action') or 'set').lower()
+
+    if action == 'reset':
+        current_pin = (request.data.get('current_pin') or "").strip()
+        if settings_obj.has_pin and not current_pin:
+            return Response({
+                "success": False,
+                "message": "Current PIN is required to reset.",
+            }, status=status.HTTP_400_BAD_REQUEST)
+        if settings_obj.has_pin and not check_password(current_pin, settings_obj.pin_hash):
+            return Response({
+                "success": False,
+                "message": "Current PIN is incorrect.",
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        settings_obj.pin_hash = ""
+        settings_obj.last_pin_update = timezone.now()
+        settings_obj.save(update_fields=['pin_hash', 'last_pin_update', 'updated_at'])
+        serializer = ParentalControlSettingsSerializer(settings_obj)
+        return Response({
+            "success": True,
+            "settings": serializer.data,
+            "message": "PIN has been cleared.",
+        })
+
+    new_pin = (request.data.get('new_pin') or "").strip()
+    confirm_pin = (request.data.get('confirm_pin') or "").strip()
+    current_pin = (request.data.get('current_pin') or "").strip()
+
+    if settings_obj.has_pin and (not current_pin or not check_password(current_pin, settings_obj.pin_hash)):
+        return Response({
+            "success": False,
+            "message": "Current PIN is incorrect.",
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    if len(new_pin) < 4 or len(new_pin) > 6 or not new_pin.isdigit():
+        return Response({
+            "success": False,
+            "message": "PIN must be 4-6 digits.",
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    if new_pin != confirm_pin:
+        return Response({
+            "success": False,
+            "message": "PINs do not match.",
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    settings_obj.pin_hash = make_password(new_pin)
+    settings_obj.last_pin_update = timezone.now()
+    settings_obj.save(update_fields=['pin_hash', 'last_pin_update', 'updated_at'])
+    serializer = ParentalControlSettingsSerializer(settings_obj)
+    return Response({
+        "success": True,
+        "settings": serializer.data,
+        "message": "PIN saved successfully.",
+    })
 
 
 # ============= Kids Endpoints (Keep existing) =============

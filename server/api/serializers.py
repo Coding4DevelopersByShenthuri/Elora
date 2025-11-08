@@ -6,7 +6,8 @@ from .models import (
     KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, WaitlistEntry,
     UserNotification, AdminNotification, SurveyStepResponse, PlatformSettings,
     StoryEnrollment, StoryWord, StoryPhrase, KidsFavorite,
-    KidsVocabularyPractice, KidsPronunciationPractice, KidsGameSession
+    KidsVocabularyPractice, KidsPronunciationPractice, KidsGameSession,
+    ParentalControlSettings
 )
 from django.contrib.auth.password_validation import validate_password
 
@@ -318,6 +319,18 @@ class KidsGameSessionSerializer(serializers.ModelSerializer):
             "created_at", "updated_at"
         ]
         read_only_fields = ["created_at", "updated_at"]
+
+
+class ParentalControlSettingsSerializer(serializers.ModelSerializer):
+    has_pin = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ParentalControlSettings
+        fields = ["daily_limit_minutes", "has_pin", "updated_at"]
+        read_only_fields = ["has_pin", "updated_at"]
+
+    def get_has_pin(self, obj):
+        return bool(obj.pin_hash)
 
 
 # ============= Waitlist Serializer =============

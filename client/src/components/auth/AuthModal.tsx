@@ -59,6 +59,8 @@ const simpleDecrypt = (text: string): string => {
 };
 
 // Offline-only authentication service
+const SUPPORT_EMAIL = 'elora.toinfo@gmail.com';
+
 const authService = {
   // Generate unique ID for users
   generateId(): string {
@@ -404,13 +406,8 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
 
-  // Forgot password states
+  // Forgot password email (used for support hand-off)
   const [email, setEmail] = useState("");
-  const [user, setUser] = useState<User | null>(null);
-  const [securityAnswer, setSecurityAnswer] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmNewPassword, setConfirmNewPassword] = useState("");
-  const [forgotPasswordStep, setForgotPasswordStep] = useState(1);
 
   // Registration states
   const [formData, setFormData] = useState({
@@ -592,101 +589,8 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
     return true;
   };
 
-  // Forgot Password Functions
-  const handleEmailSubmit = async () => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email.trim())) {
-      setError('Please enter a valid email address');
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      setError('');
-      const foundUser = await authService.getUserByEmail(email);
-      if (foundUser) {
-        setUser(foundUser as User);
-        setForgotPasswordStep(2);
-      } else {
-        setError("No account found with this email address. Please check your email or register for a new account.");
-      }
-    } catch (error) {
-      setError("Error finding user account");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleAnswerSubmit = async () => {
-    if (!user) return;
-
-    try {
-      setIsLoading(true);
-      setError('');
-      const isValid = await authService.verifySecurityAnswer(user.email, securityAnswer);
-      if (isValid) {
-        setForgotPasswordStep(3);
-      } else {
-        setError('Incorrect security answer. Please try again.');
-      }
-    } catch (error) {
-      setError('Error verifying security answer. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handlePasswordReset = async () => {
-    if (!user) return;
-
-    if (newPassword.trim() === "") {
-      setError("Password cannot be empty!");
-      return;
-    }
-
-    if (newPassword.length < 8) {
-      setError("Password must be at least 8 characters long");
-      return;
-    }
-
-    if (newPassword !== confirmNewPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      setError('');
-
-      // For legacy users without security question, allow reset without answer
-      const needsAnswer = !!user.securityQuestion && user.securityQuestion !== 'What is your favorite color?';
-
-      await authService.resetPassword(
-        user.email,
-        needsAnswer ? securityAnswer : '',
-        newPassword
-      );
-
-      setSuccess("Password reset successfully! You can now log in with your new password.");
-
-      setTimeout(() => {
-        setAuthMode('login');
-        resetForgotPasswordFlow();
-      }, 3000);
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "Password reset failed");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const resetForgotPasswordFlow = () => {
-    setForgotPasswordStep(1);
-    setUser(null);
     setEmail("");
-    setSecurityAnswer("");
-    setNewPassword("");
-    setConfirmNewPassword("");
     setError('');
     setIsLoading(false);
     // Ensure we're not stuck in forgot password mode when resetting
@@ -1463,7 +1367,6 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
                           setEmail(formData.email || '');
                           setError('');
                           setSuccess('');
-                          setForgotPasswordStep(1);
                           setIsRightPanelActive(true); // Add this line
                           setAuthMode('forgot-password');
                         }}
@@ -1481,190 +1384,68 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', redirectFromKids = 
           {/* Forgot Password Form */}
           {!isTermsMode && isForgotPasswordMode && (
             <div className="auth-form-container auth-forgot-password-container">
-              <div className="h-full bg-[#143C3D] p-4 md:p-8 flex flex-col justify-center">
-                {/* Back Button */}
-                <div className="mb-3 md:mb-4">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAuthMode('login');
-                      setIsRightPanelActive(false); // Add this line
-                      resetForgotPasswordFlow();
-                    }}
-                    className="flex items-center text-[#4BB6B7] hover:text-[#28CACD] transition-colors text-xs md:text-sm"
+              <div className="h-full bg-[#143C3D] p-4 md:p-8 flex flex-col justify-center space-y-6 text-white/80 text-sm">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode('login');
+                    setIsRightPanelActive(false);
+                    resetForgotPasswordFlow();
+                  }}
+                  className="flex items-center text-[#4BB6B7] hover:text-[#28CACD] transition-colors text-xs md:text-sm w-fit"
+                >
+                  <ArrowLeft className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+                  Back to Login
+                </button>
+
+                <div>
+                  <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Need a password reset?</h2>
+                  <p>
+                    Elora now operates entirely online. To protect your account, our support team handles password
+                    resets manually. Send us an email from the address linked to your account and we&apos;ll guide you
+                    through the secure reset process.
+                  </p>
+                </div>
+
+                <div className="rounded-lg border border-white/15 bg-white/5 p-4 space-y-2">
+                  <div className="flex items-center gap-2 text-white">
+                    <Mail className="h-4 w-4" />
+                    <span className="font-semibold">Email Support</span>
+                  </div>
+                  <a
+                    href={`mailto:${SUPPORT_EMAIL}?subject=Password%20reset%20request&body=Hello%20Elora%20team%2C%0D%0A%0D%0APlease%20help%20me%20reset%20my%20password.%20My%20account%20email%20is%3A%20${encodeURIComponent(email || '')}`}
+                    className="inline-flex items-center gap-2 text-[#4BB6B7] hover:text-[#28CACD] transition-colors"
                   >
-                    <ArrowLeft className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-                    Back to Login
-                  </button>
+                    {SUPPORT_EMAIL}
+                  </a>
                 </div>
 
-                <div className="text-center mb-4 md:mb-6">
-                  <h1 className="text-2xl md:text-3xl font-bold text-white mb-1 md:mb-1">Elora</h1>
-                  <p className="text-[#4BB6B7] text-sm md:text-base">Reset Your Password</p>
+                <p className="text-xs text-white/60">
+                  Tip: include your account email and any recent activity to help us verify ownership quickly.
+                </p>
+
+                <div className="flex flex-col gap-3">
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    placeholder="Your account email"
+                    className="bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400"
+                  />
+                  <Button
+                    className="bg-[#022A2D] hover:bg-[#28CACD] text-white"
+                    onClick={() =>
+                      window.open(
+                        `mailto:${SUPPORT_EMAIL}?subject=Password%20reset%20request&body=Hello%20Elora%20team%2C%0D%0A%0D%0APlease%20help%20me%20reset%20my%20password.%20My%20account%20email%20is%3A%20${encodeURIComponent(
+                          email || ''
+                        )}`,
+                        '_blank'
+                      )
+                    }
+                  >
+                    Email Support
+                  </Button>
                 </div>
-
-                {/* Error Message */}
-                {error && (
-                  <div className="mb-3 md:mb-4 p-2 md:p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center">
-                    <AlertCircle className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-                    <span className="text-xs md:text-sm">{error}</span>
-                  </div>
-                )}
-
-                {/* Success Message */}
-                {success && (
-                  <div className="mb-3 md:mb-4 p-3 md:p-4 bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 text-green-800 dark:text-green-200 rounded-lg flex items-start gap-2">
-                    <Check className="w-5 h-5 mt-0.5 flex-shrink-0 text-green-500 dark:text-green-400" />
-                    <span className="text-xs md:text-sm leading-relaxed">{success}</span>
-                  </div>
-                )}
-
-                {/* Step 1: Email Verification */}
-                {forgotPasswordStep === 1 && (
-                  <div>
-                    <div className="auth-input-container mb-3 md:mb-4">
-                      <div className="auth-input-wrapper">
-                        <Mail className="auth-input-icon" />
-                        <Input
-                          type="email"
-                          placeholder="Enter your email address"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          className="h-10 md:h-12 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-10 text-sm md:text-base"
-                          required
-                          disabled={isLoading}
-                        />
-                      </div>
-                    </div>
-                    <Button
-                      onClick={handleEmailSubmit}
-                      className="w-full h-10 md:h-12 bg-[#022A2D] hover:bg-[#28CACD] text-white font-semibold rounded-2xl transition-all duration-300 hover:tracking-widest text-sm md:text-base"
-                      disabled={!email || isLoading}
-                    >
-                      {isLoading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                          Checking...
-                        </>
-                      ) : (
-                        'Next'
-                      )}
-                    </Button>
-                  </div>
-                )}
-
-                {/* Step 2: Security Question */}
-                {forgotPasswordStep === 2 && user && (
-                  <div>
-                    <h2 className="text-lg md:text-xl font-medium mb-2 md:mb-3 text-center text-white">
-                      Security Question
-                    </h2>
-                    {user.securityQuestion ? (
-                      <p className="text-base md:text-lg text-white text-center mb-3 md:mb-4 font-semibold">
-                        {user.securityQuestion}
-                      </p>
-                    ) : (
-                      <p className="text-sm md:text-base text-[#4BB6B7] text-center mb-3 md:mb-4">
-                        This account has no security question set. You can reset your password directly.
-                      </p>
-                    )}
-                    <div className="auth-input-container mb-3 md:mb-4">
-                      <div className="auth-input-wrapper">
-                        <Input
-                          type="text"
-                          placeholder="Enter your answer"
-                          value={securityAnswer}
-                          onChange={(e) => setSecurityAnswer(e.target.value)}
-                          className="h-10 md:h-12 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-4 text-sm md:text-base"
-                          required={!!user.securityQuestion}
-                          disabled={isLoading}
-                        />
-                      </div>
-                    </div>
-                    <Button
-                      onClick={user.securityQuestion ? handleAnswerSubmit : () => setForgotPasswordStep(3)}
-                      className="w-full h-10 md:h-12 bg-[#022A2D] hover:bg-[#28CACD] text-white font-semibold rounded-2xl transition-all duration-300 hover:tracking-widest text-sm md:text-base"
-                      disabled={(!!user.securityQuestion && !securityAnswer) || isLoading}
-                    >
-                      {isLoading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                          {user.securityQuestion ? 'Verifying...' : 'Continuing...'}
-                        </>
-                      ) : (
-                        user.securityQuestion ? 'Verify Answer' : 'Continue'
-                      )}
-                    </Button>
-                  </div>
-                )}
-
-                {/* Step 3: Reset Password */}
-                {forgotPasswordStep === 3 && (
-                  <div>
-                    <div className="auth-password-container mb-3 md:mb-4">
-                      <div className="auth-input-wrapper">
-                        <Lock className="auth-input-icon" />
-                        <Input
-                          type={showPassword ? 'text' : 'password'}
-                          placeholder="Enter new password (min. 8 characters)"
-                          value={newPassword}
-                          onChange={(e) => setNewPassword(e.target.value)}
-                          className="h-10 md:h-12 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-10 pr-9 md:pr-10 text-sm md:text-base"
-                          required
-                          minLength={8}
-                          disabled={isLoading}
-                        />
-                        <button
-                          type="button"
-                          className="auth-password-toggle"
-                          onClick={togglePasswordVisibility}
-                          disabled={isLoading}
-                        >
-                          {showPassword ? <EyeOff className="h-3 w-3 md:h-4 md:w-4" /> : <Eye className="h-3 w-3 md:h-4 md:w-4" />}
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="auth-password-container mb-3 md:mb-4">
-                      <div className="auth-input-wrapper">
-                        <Lock className="auth-input-icon" />
-                        <Input
-                          type={showPassword ? 'text' : 'password'}
-                          placeholder="Confirm new password"
-                          value={confirmNewPassword}
-                          onChange={(e) => setConfirmNewPassword(e.target.value)}
-                          className="h-10 md:h-12 bg-[#022A2D] border-[#022A2D] text-white placeholder-gray-400 pl-10 pr-9 md:pr-10 text-sm md:text-base"
-                          required
-                          minLength={8}
-                          disabled={isLoading}
-                        />
-                        <button
-                          type="button"
-                          className="auth-password-toggle"
-                          onClick={togglePasswordVisibility}
-                          disabled={isLoading}
-                        >
-                          {showPassword ? <EyeOff className="h-3 w-3 md:h-4 md:w-4" /> : <Eye className="h-3 w-3 md:h-4 md:w-4" />}
-                        </button>
-                      </div>
-                    </div>
-
-                    <Button
-                      onClick={handlePasswordReset}
-                      className="w-full h-10 md:h-12 bg-[#022A2D] hover:bg-[#28CACD] text-white font-semibold rounded-2xl transition-all duration-300 hover:tracking-widest text-sm md:text-base"
-                      disabled={!newPassword || newPassword.length < 8 || newPassword !== confirmNewPassword || isLoading}
-                    >
-                      {isLoading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                          Resetting...
-                        </>
-                      ) : (
-                        'Reset Password'
-                      )}
-                    </Button>
-                  </div>
-                )}
               </div>
             </div>
           )}

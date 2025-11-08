@@ -1726,7 +1726,12 @@ const YoungKidsPage = () => {
                 </div>
                 <Button
                   variant="secondary"
-                  onClick={() => navigate('/kids/certificates')}
+                  onClick={() => {
+                    try {
+                      sessionStorage.setItem('speakbee_certificates_audience', 'young');
+                    } catch {}
+                    navigate('/certificates', { state: { audience: 'young' } });
+                  }}
                 >
                   Open certificates
                 </Button>
