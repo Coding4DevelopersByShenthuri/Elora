@@ -5,6 +5,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { useRouteLoading } from '@/contexts/RouteLoadingContext';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import KidsProgressService from '@/services/KidsProgressService';
@@ -12,6 +14,7 @@ import KidsApi from '@/services/KidsApi';
 
 const YoungKidsFavorites = () => {
   const navigate = useNavigate();
+  const { stopLoading } = useRouteLoading();
   const { user, isAuthenticated } = useAuth();
   const userId = user?.id ? String(user.id) : 'local-user';
   const [favorites, setFavorites] = useState<string[]>([]);
@@ -208,12 +211,26 @@ const YoungKidsFavorites = () => {
       } catch (error) {
         console.error('Error loading favorites:', error);
       } finally {
-        setIsLoading(false);
+        const offline = !navigator.onLine;
+        setIsLoading(offline);
+        if (!offline) {
+          stopLoading();
+        }
       }
     };
 
     loadFavorites();
-  }, [isAuthenticated, userId, navigate]);
+  }, [isAuthenticated, userId, navigate, stopLoading]);
+
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsLoading(false);
+      stopLoading();
+    };
+
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
+  }, [stopLoading]);
 
   const toggleFavorite = async (storyId: string) => {
     const next = favorites.includes(storyId)
@@ -261,181 +278,204 @@ const YoungKidsFavorites = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center pt-24 pb-16">
-        <div className="text-center">
-          <Sparkles className="w-12 h-12 text-[#4ECDC4] animate-spin mx-auto mb-4" />
-          <p className="text-lg text-gray-600 dark:text-gray-400">Loading your favorites...</p>
+      <div className="min-h-screen flex items-center justify-center bg-muted/30 pt-24 pb-16">
+        <div className="text-center space-y-3">
+          
+          <p className="text-base font-semibold text-muted-foreground">Loading your favourites…</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pb-12 sm:pb-16 md:pb-20 pt-20 sm:pt-24 md:pt-28 lg:pt-32 relative overflow-hidden">
-      <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 xl:max-w-7xl relative z-10">
-        {/* Back Button */}
-        <Button
-          variant="outline"
-          onClick={() => navigate('/kids')}
-          className="mb-1 sm:mb-1.5 md:mb-2 rounded-lg sm:rounded-xl px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base border-2 border-[#4ECDC4] hover:bg-[#4ECDC4]/10 text-[#118AB2] dark:text-[#4ECDC4] font-semibold transition-all hover:scale-105"
-        >
-          <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-          <span className="hidden xs:inline">Back to Kids Zone</span>
-          <span className="xs:hidden">Back</span>
-        </Button>
-
-        {/* Header */}
-        <div className="text-center mb-3 sm:mb-4 md:mb-6 relative">
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#118AB2] bg-clip-text text-transparent mb-1 sm:mb-1.5 md:mb-2 px-2 mt-12">
-            My Favorite Stories
-          </h1>
-          <p className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-gray-500 dark:text-gray-300 max-w-xs sm:max-w-md md:max-w-xl lg:max-w-2xl mx-auto px-3 sm:px-4">
-            {favoriteStories.length === 0 
-              ? "You haven't added any favorites yet. Start exploring amazing stories!"
-              : `You have ${favoriteStories.length} treasured ${favoriteStories.length === 1 ? 'story' : 'stories'} in your collection!`
-            }
-          </p>
-        </div>
-
-        {/* Content */}
-        {favoriteStories.length === 0 ? (
-          <div className="text-center py-3 sm:py-4 md:py-6 lg:py-8 px-2 sm:px-4">
-            <div className="mb-2 sm:mb-3 md:mb-4">
-              <div className="relative inline-block">
-                <div className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl animate-bounce">💔</div>
-                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#4ECDC4] absolute -top-1 sm:-top-2 -right-1 sm:-right-2 animate-pulse" />
+    <div className="min-h-screen bg-muted/20 pb-20">
+      <main className="container mx-auto max-w-6xl px-4 pt-24 space-y-10">
+        <section>
+          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-sky-500 via-indigo-500 to-purple-500 text-white shadow-xl">
+            <span className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-white/10 blur-3xl" aria-hidden />
+            <span className="absolute -left-24 bottom-0 h-48 w-48 rounded-full bg-white/10 blur-3xl" aria-hidden />
+            <CardContent className="relative z-10 space-y-6 p-6 md:p-10">
+              <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+                <div className="space-y-4 md:max-w-2xl">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={() => navigate('/kids')}
+                      className="rounded-full border-white/40 bg-white/10 px-4 py-2 text-white shadow-sm transition hover:bg-white/20 hover:text-white"
+                    >
+                      <ArrowLeft className="mr-2 h-4 w-4" />
+                      Back to Kids Zone
+                    </Button>
+                    <Badge className="rounded-full bg-white/20 text-white">Favourites hub</Badge>
+                  </div>
+                  <div className="space-y-3">
+                    <h1 className="text-3xl font-semibold leading-tight md:text-4xl">
+                      Your Favourite Stories
+                    </h1>
+                    <p className="text-base text-white/85 md:text-lg">
+                      {favoriteStories.length === 0
+                        ? 'Save the adventures you love most and launch them in a single tap.'
+                        : `You have ${favoriteStories.length} treasured ${favoriteStories.length === 1 ? 'story' : 'stories'} ready to replay anytime.`}
+                    </p>
+                  </div>
+                </div>
+                <div className="grid gap-3 text-sm">
+                  <div className="rounded-2xl bg-white/15 px-4 py-3 text-white shadow-sm backdrop-blur">
+                    <p className="text-xs uppercase tracking-wide text-white/70">Saved adventures</p>
+                    <p className="text-2xl font-semibold">{favoriteStories.length}</p>
+                  </div>
+                  <div className="rounded-2xl bg-white/15 px-4 py-3 text-white shadow-sm backdrop-blur">
+                    <p className="text-xs uppercase tracking-wide text-white/70">Quick launch</p>
+                    <p className="text-sm">Tap a card to jump straight into story time.</p>
+                  </div>
+                </div>
               </div>
-            </div>
-            <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-800 dark:text-white mb-1.5 sm:mb-2">
-              No Favorites Yet
-            </h2>
-            <Button
-              onClick={() => navigate('/kids/young')}
-              className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#118AB2] text-white font-bold py-2.5 sm:py-3 md:py-4 px-5 sm:px-6 md:px-8 lg:px-10 rounded-lg sm:rounded-xl md:rounded-2xl text-xs sm:text-sm md:text-base lg:text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 w-full sm:w-auto"
-            >
-              <BookOpen className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 mr-1.5 sm:mr-2" />
-              Explore Stories
-            </Button>
-          </div>
-        ) : (
-          <div className="mb-3 sm:mb-4 md:mb-6 lg:mb-8 px-1 sm:px-2 md:px-0">
-            <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6 xl:gap-8">
-              {favoriteStories.map((story) => {
-                return (
-                  <Card 
+            </CardContent>
+          </Card>
+        </section>
+
+        <section>
+          {favoriteStories.length === 0 ? (
+            <Card className="border-dashed border-primary/30 bg-background/60 text-center shadow-sm">
+              <CardContent className="space-y-6 py-12">
+                <div className="relative inline-flex">
+                  <div className="text-6xl animate-bounce" aria-hidden>💔</div>
+                  <Sparkles className="absolute -right-2 -top-2 h-6 w-6 text-primary animate-pulse" aria-hidden />
+                </div>
+                <div className="space-y-2">
+                  <h2 className="text-2xl font-semibold text-foreground">No favourites yet</h2>
+                  <p className="mx-auto max-w-md text-sm text-muted-foreground md:text-base">
+                    Complete a story and tap the heart icon to pin it here for quick replay.
+                  </p>
+                </div>
+                <Button
+                  size="lg"
+                  onClick={() => navigate('/kids/young')}
+                  className="mx-auto inline-flex items-center rounded-full bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:from-[#4ECDC4] hover:to-[#118AB2] hover:shadow-lg"
+                >
+                  <BookOpen className="mr-2 h-4 w-4" />
+                  Explore story library
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-6">
+              <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                <h2 className="text-lg font-semibold text-foreground">Favourite adventures</h2>
+                <p className="text-sm text-muted-foreground">
+                  Curated from the stories you heart in the kids learning zone.
+                </p>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {favoriteStories.map((story) => (
+                  <Card
                     key={story.id}
-                    className="group hover:shadow-2xl transition-all duration-300 border-2 border-gray-200 dark:border-gray-700 hover:border-[#4ECDC4] dark:hover:border-[#4ECDC4] overflow-hidden bg-white dark:bg-gray-800 hover:scale-[1.02] transform rounded-xl sm:rounded-2xl w-full"
+                    className="group flex h-full flex-col overflow-hidden border border-muted bg-card/60 transition hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl"
                   >
-                    <CardContent className="p-0">
-                      {/* Story Header with Gradient */}
-                      <div className={cn(
-                        "p-4 sm:p-5 md:p-6 relative overflow-hidden bg-gradient-to-br",
-                        story.bgGradient
-                      )}>
-                        {/* Decorative Elements */}
-                        <div className="absolute top-0 right-0 w-16 sm:w-20 md:w-24 h-16 sm:h-20 md:h-24 bg-white/20 dark:bg-black/20 rounded-full -mr-8 sm:-mr-10 md:-mr-12 -mt-8 sm:-mt-10 md:-mt-12"></div>
-                        <div className="absolute bottom-0 left-0 w-14 sm:w-16 md:w-20 h-14 sm:h-16 md:h-20 bg-white/20 dark:bg-black/20 rounded-full -ml-7 sm:-ml-8 md:-ml-10 -mb-7 sm:-mb-8 md:-mb-10"></div>
-                        
-                        {/* Story Content */}
-                        <div className="relative z-10 text-center">
-                          {/* Age Group Badge */}
-                          <div className={cn(
-                            "absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-bold",
-                            story.ageGroup === 'young' 
-                              ? "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400" 
-                              : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-                          )}>
-                            {story.ageGroup === 'young' ? 'Ages 4-10' : 'Ages 11-17'}
-                          </div>
-                          
-                          <div className={cn("text-4xl sm:text-5xl md:text-6xl mb-2 sm:mb-3 transform transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6", story.animation)}>
+                    <CardContent className="flex flex-1 flex-col p-0">
+                      <div
+                        className={cn(
+                          'relative overflow-hidden bg-gradient-to-br p-5 text-white',
+                          story.bgGradient
+                        )}
+                      >
+                        <div className="absolute right-4 top-4 flex items-center gap-2 text-xs font-semibold">
+                          <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur">
+                            Ages 4-10
+                          </span>
+                        </div>
+                        <div className="absolute -right-10 -top-10 h-36 w-36 rounded-full bg-white/20 blur-2xl" aria-hidden />
+                        <div className="absolute -bottom-12 -left-12 h-40 w-40 rounded-full bg-white/20 blur-2xl" aria-hidden />
+                        <div className="relative z-10 space-y-3 text-center">
+                          <div className={cn('text-6xl transition-transform duration-300 group-hover:scale-110', story.animation)} aria-hidden>
                             {story.image}
                           </div>
-                          <h3 className="text-base sm:text-lg md:text-xl font-bold mb-1.5 sm:mb-2 text-gray-900 dark:text-white leading-tight px-1">
+                          <h3 className="text-lg font-semibold leading-tight md:text-xl">
                             {story.title}
                           </h3>
-                          <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed line-clamp-2 px-1">
+                          <p className="text-xs text-white/85 md:text-sm">
                             {story.description}
                           </p>
                         </div>
                       </div>
-                      
-                      {/* Story Details */}
-                      <div className="p-3 sm:p-4 md:p-5 bg-white dark:bg-gray-800">
-                        {/* Stats */}
-                        <div className="flex justify-between items-center text-xs text-gray-600 dark:text-gray-400 mb-3 sm:mb-4 pb-2 sm:pb-3 border-b border-gray-200 dark:border-gray-700">
-                          <span className="flex items-center gap-0.5 sm:gap-1 font-semibold">
-                            <BookOpen className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                            <span className="hidden xs:inline">{story.words}</span>
-                            <span className="xs:hidden">{story.words}w</span>
+
+                      <div className="flex flex-1 flex-col justify-between space-y-4 p-4">
+                        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+                          <span className="inline-flex items-center gap-1 font-semibold">
+                            <BookOpen className="h-3 w-3" />
+                            {story.words} words
                           </span>
-                          <span className="flex items-center gap-0.5 sm:gap-1 font-semibold">
-                            <span className="hidden xs:inline">⏱️</span>
-                            {story.duration}
+                          <span className="inline-flex items-center gap-1 font-semibold">
+                            ⏱ {story.duration}
                           </span>
-                          <span className={cn(
-                            "font-bold px-1.5 sm:px-2 py-0.5 rounded-full text-xs",
-                            story.difficulty === 'Easy' && "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-                            story.difficulty === 'Medium' && "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
-                            story.difficulty === 'Hard' && "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                          )}>
-                            {story.difficulty}
+                          <span
+                            className={cn(
+                              'inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold',
+                              story.difficulty === 'Easy' && 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300',
+                              story.difficulty === 'Medium' && 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
+                              story.difficulty === 'Hard' && 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300'
+                            )}
+                          >
+                            🎯 {story.difficulty}
                           </span>
                         </div>
-                        
-                        {/* Action Buttons */}
-                        <div className="flex gap-1.5 sm:gap-2">
+                        <div className="flex items-center gap-2">
                           <Button
-                            size="sm"
                             variant="outline"
+                            size="icon"
                             onClick={(e) => {
                               e.stopPropagation();
                               toggleFavorite(story.id);
                             }}
-                            className="flex-shrink-0 border-2 border-red-300 dark:border-red-600 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 hover:scale-110 transition-all duration-200 rounded-lg w-9 h-9 sm:w-10 sm:h-10 p-0 flex items-center justify-center"
-                            aria-label="Remove from favorites"
+                            className="h-10 w-10 rounded-full border-2 border-rose-300 text-rose-500 transition hover:bg-rose-100 dark:border-rose-600 dark:text-rose-400 dark:hover:bg-rose-900/30"
                           >
-                            <HeartOff className="w-4 h-4 sm:w-5 sm:h-5" />
+                            <HeartOff className="h-4 w-4" />
                           </Button>
                           <Button
-                            className="flex-1 bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#118AB2] text-white font-bold py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
+                            className="flex-1 rounded-full bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-sm font-semibold text-white shadow-sm transition hover:from-[#4ECDC4] hover:to-[#118AB2] hover:shadow-lg"
                             onClick={() => handleStartStory(story.id)}
                           >
-                            <Play className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 flex-shrink-0" />
-                            <span className="hidden xs:inline">Start Adventure</span>
-                            <span className="xs:hidden">Start</span>
+                            <Play className="mr-2 h-4 w-4" />
+                            Start adventure
                           </Button>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Bottom Actions */}
-        {favoriteStories.length > 0 && (
-          <div className="text-center px-2 sm:px-4 md:px-6">
-            <Card className="inline-block w-full sm:w-auto bg-gradient-to-r from-[#FF6B6B]/10 via-[#4ECDC4]/10 to-[#118AB2]/10 border-2 border-[#4ECDC4]/30 p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl">
-              <p className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-300 font-semibold mb-3 sm:mb-4">
-                {favoriteStories.length} {favoriteStories.length === 1 ? 'story' : 'stories'} in your collection
-              </p>
-              <div className="flex gap-3 sm:gap-4">
-                <Button
-                  variant="outline"
-                  onClick={() => navigate('/kids/young')}
-                  className="flex-1 sm:w-auto border-2 border-[#4ECDC4] hover:bg-[#4ECDC4]/10 text-[#118AB2] dark:text-[#4ECDC4] rounded-lg sm:rounded-xl px-4 sm:px-6 py-2 text-sm sm:text-base font-semibold transition-all hover:scale-105"
-                >
-                  <BookOpen className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-                  Browse More Stories
-                </Button>
+                ))}
               </div>
+            </div>
+          )}
+        </section>
+
+        {favoriteStories.length > 0 && (
+          <section>
+            <Card className="border border-primary/20 bg-primary/5 shadow-sm">
+              <CardContent className="flex flex-col gap-4 p-6 text-center md:flex-row md:items-center md:justify-between md:text-left">
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold text-primary">
+                    {favoriteStories.length} {favoriteStories.length === 1 ? 'story saved' : 'stories saved'}
+                  </p>
+                  <p className="text-sm text-muted-foreground md:max-w-lg">
+                    Keep exploring to unlock new adventures and enrich your word decks automatically.
+                  </p>
+                </div>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => navigate('/kids/young')}
+                    className="rounded-full border-primary/40 text-primary hover:bg-primary/10 hover:text-primary"
+                  >
+                    <BookOpen className="mr-2 h-4 w-4" />
+                    Browse more stories
+                  </Button>
+                </div>
+              </CardContent>
             </Card>
-          </div>
+          </section>
         )}
-      </div>
+      </main>
     </div>
   );
 };

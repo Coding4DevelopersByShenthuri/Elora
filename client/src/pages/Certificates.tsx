@@ -608,92 +608,104 @@ const CertificatesPage = () => {
   }, [pendingUnlocks]);
 
   return (
-    <div className="min-h-screen pt-20 sm:pt-24 md:pt-28 pb-16 sm:pb-20 container mx-auto px-3 sm:px-4 md:px-6 max-w-7xl">
-      <div className="flex items-center justify-between mb-4 sm:mb-6">
-        <Button 
-          variant="outline" 
-          className="rounded-full flex-shrink-0 hover:bg-gray-200 dark:hover:bg-gray-700 border-2 border-transparent dark:border-gray-600 bg-transparent hover:border-gray-300 dark:hover:border-gray-500 h-10 w-10 sm:h-12 sm:w-12 p-0 transition-all hover:scale-110" 
-          onClick={() => navigate(-1)}
-          type="button"
-        >
-          <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-gray-900 dark:text-gray-100" />
-        </Button>
-        <div className="flex-1"></div> {/* Spacer for alignment */}
-      </div>
+    <div className="min-h-screen bg-muted/20 pb-24">
+      <main className="container mx-auto max-w-7xl px-4 pt-24 space-y-10">
+        <section>
+          <Card className="relative mx-auto w-full max-w-lg overflow-hidden border-none bg-gradient-to-br from-sky-500 via-indigo-500 to-purple-500 text-white shadow-xl md:max-w-none">
+            <span className="absolute -right-24 -top-24 h-56 w-56 rounded-full bg-white/10 blur-3xl" aria-hidden />
+            <span className="absolute -left-28 bottom-0 h-48 w-48 rounded-full bg-white/10 blur-3xl" aria-hidden />
+            <CardContent className="relative z-10 space-y-6 p-5 sm:space-y-8 sm:p-6 md:p-10">
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+                <div className="space-y-5 sm:space-y-6 lg:max-w-3xl">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={() => navigate(-1)}
+                      className="rounded-full border-white/40 bg-white/15 px-4 py-2 text-white transition hover:bg-white/25"
+                      type="button"
+                    >
+                      <ArrowLeft className="mr-2 h-4 w-4" />
+                      Back
+                    </Button>
+                    <span className="rounded-full bg-white/20 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-white/80">
+                      Celebrate progress
+                    </span>
+                  </div>
+                  <div className="space-y-3">
+                    <h1 className="text-3xl font-semibold leading-tight md:text-4xl">
+                      {activeTab === 'badges'
+                        ? 'Your badge showcase'
+                        : activeTab === 'trophies'
+                        ? 'Your trophy cabinet'
+                        : 'Your certificates centre'}
+                    </h1>
+                    <p className="text-base text-white/85 md:text-lg">
+                      {activeTab === 'badges'
+                        ? 'Keep learning to unlock fresh badges and share them with friends and family.'
+                        : activeTab === 'trophies'
+                        ? 'Track high-impact milestones and celebrate mastery across skills.'
+                        : 'Unlock beautifully designed certificates as you reach key learning achievements.'}
+                    </p>
+                  </div>
+                </div>
+                <div className="grid gap-3 text-sm sm:grid-cols-3 sm:gap-4">
+                  <div className="rounded-2xl bg-white/15 px-4 py-3 text-white shadow-sm backdrop-blur sm:text-left">
+                    <p className="text-xs uppercase tracking-wide text-white/70">Badges</p>
+                    <p className="text-2xl font-semibold">{unlockedBadges.length}</p>
+                  </div>
+                  <div className="rounded-2xl bg-white/15 px-4 py-3 text-white shadow-sm backdrop-blur sm:text-left">
+                    <p className="text-xs uppercase tracking-wide text-white/70">Trophies</p>
+                    <p className="text-2xl font-semibold">
+                      {trophySpecs.filter((t: any) => (trophyProgressMap[t.id] ?? 0) === 100).length}
+                    </p>
+                  </div>
+                  <div className="rounded-2xl bg-white/15 px-4 py-3 text-white shadow-sm backdrop-blur sm:text-left">
+                    <p className="text-xs uppercase tracking-wide text-white/70">Learner level</p>
+                    <p className="text-2xl font-semibold">{Math.max(1, Math.floor((ctx.points || 0) / 5000))}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex w-full flex-wrap items-center justify-center gap-2 rounded-3xl bg-white/10 p-2 backdrop-blur">
+                <Button
+                  variant={activeTab === 'certs' ? 'default' : 'ghost'}
+                  className={`w-full rounded-full px-6 py-2 text-sm font-semibold transition sm:w-auto ${
+                    activeTab === 'certs'
+                      ? 'bg-white text-sky-600 shadow-sm hover:bg-white/90'
+                      : 'text-white hover:bg-white/10'
+                  }`}
+                  onClick={() => setActiveTab('certs')}
+                >
+                  Certificates
+                </Button>
+                <Button
+                  variant={activeTab === 'badges' ? 'default' : 'ghost'}
+                  className={`w-full rounded-full px-6 py-2 text-sm font-semibold transition sm:w-auto ${
+                    activeTab === 'badges'
+                      ? 'bg-white text-sky-600 shadow-sm hover:bg-white/90'
+                      : 'text-white hover:bg-white/10'
+                  }`}
+                  onClick={() => setActiveTab('badges')}
+                >
+                  Badges
+                </Button>
+                <Button
+                  variant={activeTab === 'trophies' ? 'default' : 'ghost'}
+                  className={`w-full rounded-full px-6 py-2 text-sm font-semibold transition sm:w-auto ${
+                    activeTab === 'trophies'
+                      ? 'bg-white text-sky-600 shadow-sm hover:bg-white/90'
+                      : 'text-white hover:bg-white/10'
+                  }`}
+                  onClick={() => setActiveTab('trophies')}
+                >
+                  Trophies
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
 
-      <div className="text-center mb-6 sm:mb-8">
-        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#118AB2] bg-clip-text text-transparent mb-3 sm:mb-4 px-2">
-          {activeTab === 'badges' 
-            ? 'Your Badges' 
-            : activeTab === 'trophies' 
-            ? 'Your Trophies' 
-            : 'Your Certificates'}
-        </h1>
-        <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-300 px-2">
-          {activeTab === 'badges'
-            ? 'Keep learning to unlock and earn more badges!'
-            : activeTab === 'trophies'
-            ? 'Master skills to unlock special trophies!'
-            : 'Keep learning to unlock and download your certificates!'}
-        </p>
-      </div>
-
-      {/* Top stats cards - standardized layout */}
-      <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-8">
-        <Card className="px-4 sm:px-5 py-3 sm:py-4 rounded-xl bg-white/80 dark:bg-gray-900/40 border-2 border-purple-200 dark:border-purple-700 hover:shadow-lg transition-all">
-          <div className="text-xs sm:text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">Badges</div>
-          <div className="text-xl sm:text-2xl font-extrabold text-black dark:text-black">{unlockedBadges.length}</div>
-        </Card>
-        <Card className="px-4 sm:px-5 py-3 sm:py-4 rounded-xl bg-white/80 dark:bg-gray-900/40 border-2 border-yellow-200 dark:border-yellow-700 hover:shadow-lg transition-all">
-          <div className="text-xs sm:text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">Trophies</div>
-          <div className="text-xl sm:text-2xl font-extrabold text-black dark:text-black">
-            {trophySpecs.filter((t: any) => (trophyProgressMap[t.id] ?? 0) === 100).length}
-          </div>
-        </Card>
-        <Card className="px-4 sm:px-5 py-3 sm:py-4 rounded-xl bg-white/80 dark:bg-gray-900/40 border-2 border-blue-200 dark:border-blue-700 hover:shadow-lg transition-all">
-          <div className="text-xs sm:text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">Level</div>
-          <div className="text-xl sm:text-2xl font-extrabold text-black dark:text-black">{Math.max(1, Math.floor((ctx.points || 0) / 5000))}</div>
-        </Card>
-      </div>
-
-      {/* Tabs - standardized styling */}
-      <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-6 sm:mb-8">
-        <Button 
-          variant={activeTab==='certs'?'default':'outline'} 
-          className={`rounded-xl sm:rounded-2xl px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-bold transition-all hover:scale-105 ${
-            activeTab === 'certs' 
-              ? 'bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white shadow-lg' 
-              : ''
-          }`} 
-          onClick={() => setActiveTab('certs')}
-        >
-          Certificates
-        </Button>
-        <Button 
-          variant={activeTab==='badges'?'default':'outline'} 
-          className={`rounded-xl sm:rounded-2xl px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-bold transition-all hover:scale-105 ${
-            activeTab === 'badges' 
-              ? 'bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white shadow-lg' 
-              : ''
-          }`} 
-          onClick={() => setActiveTab('badges')}
-        >
-          Badges
-        </Button>
-        <Button 
-          variant={activeTab==='trophies'?'default':'outline'} 
-          className={`rounded-xl sm:rounded-2xl px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-bold transition-all hover:scale-105 ${
-            activeTab === 'trophies' 
-              ? 'bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white shadow-lg' 
-              : ''
-          }`} 
-          onClick={() => setActiveTab('trophies')}
-        >
-          Trophies
-        </Button>
-      </div>
-
-      {activeTab === 'certs' && (
+        <section>
+          {activeTab === 'certs' && (
         <div className="space-y-4 sm:space-y-6">
           {/* Certificates Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
@@ -892,9 +904,11 @@ const CertificatesPage = () => {
           ))}
           </div>
         </div>
-      )}
+          )}
+        </section>
 
-      {activeTab === 'badges' && (
+        <section>
+          {activeTab === 'badges' && (
         <div className="space-y-4 sm:space-y-6">
           {/* Badges Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -1005,9 +1019,11 @@ const CertificatesPage = () => {
           )}
           </div>
         </div>
-      )}
+          )}
 
-      {activeTab === 'trophies' && (
+        </section>
+        <section>
+          {activeTab === 'trophies' && (
         <div className="space-y-4 sm:space-y-6">
           {/* Trophies Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
@@ -1121,7 +1137,9 @@ const CertificatesPage = () => {
             })}
           </div>
         </div>
-      )}
+          )}
+        </section>
+      </main>
     </div>
   );
 };

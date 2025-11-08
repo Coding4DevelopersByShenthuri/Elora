@@ -100,18 +100,19 @@ const InteractiveGames = ({ isTeenKids }: InteractiveGamesProps = {}) => {
 };
 
 // Game Menu Component
-const GameMenu = ({ 
-  onSelectGame, 
-  totalScore, 
+const GameMenu = ({
+  onSelectGame,
+  totalScore,
   isGeminiReady,
   isTeenKids = false
-}: { 
+}: {
   onSelectGame: (game: GameType) => void; 
   totalScore: number;
   isGeminiReady: boolean;
   isTeenKids?: boolean;
 }) => {
   const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
   // Base games for young kids
   const youngGames = [
     {
@@ -205,6 +206,14 @@ const GameMenu = ({
   ];
 
   const games = isTeenKids ? teenGames : youngGames;
+  const cardsPerPage = 6;
+  const totalPages = Math.ceil(games.length / cardsPerPage);
+  const startIndex = (currentPage - 1) * cardsPerPage;
+  const paginatedGames = games.slice(startIndex, startIndex + cardsPerPage);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [isTeenKids]);
 
   return (
     <div className="space-y-4 sm:space-y-6 w-full lg:max-w-7xl xl:max-w-[1400px] mx-auto">
@@ -244,8 +253,8 @@ const GameMenu = ({
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-5 md:gap-6">
-        {games.map((game, index) => {
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {paginatedGames.map((game, index) => {
           const cardBgColors = [
             'bg-red-50/60 dark:bg-red-900/10',
             'bg-blue-50/60 dark:bg-blue-900/10',
@@ -261,17 +270,18 @@ const GameMenu = ({
             'border-orange-200 dark:border-orange-600'
           ];
           
+          const colorIndex = startIndex + index;
           return (
             <Card
               key={game.id}
               className={cn(
-                "border-2 hover:border-[#FF6B6B] dark:hover:border-[#FF6B6B] transition-all duration-300 hover:scale-105 group backdrop-blur-sm",
-                cardBgColors[index],
-                cardBorders[index],
+                "h-full border-2 hover:border-[#FF6B6B] dark:hover:border-[#FF6B6B] transition-all duration-300 group backdrop-blur-sm",
+                cardBgColors[colorIndex % cardBgColors.length],
+                cardBorders[colorIndex % cardBorders.length],
                 !isGeminiReady && "opacity-60"
               )}
             >
-              <CardContent className="p-4 sm:p-5 md:p-6 text-center space-y-3 sm:space-y-4">
+              <CardContent className="flex h-full flex-col justify-between gap-5 p-6 text-center">
                 <div className={cn(
                   "w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto rounded-full flex items-center justify-center text-3xl sm:text-4xl md:text-5xl bg-gradient-to-br",
                   game.color,
@@ -279,15 +289,17 @@ const GameMenu = ({
                 )}>
                   {game.emoji}
                 </div>
-                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-                  {game.title}
-                </h3>
-                <p className="text-xs sm:text-sm md:text-base text-gray-800 dark:text-gray-300 font-medium">
-                  {game.description}
-                </p>
-                <div className="flex gap-2">
+                <div className="space-y-3">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                    {game.title}
+                  </h3>
+                  <p className="text-sm text-gray-800 dark:text-gray-300 font-medium leading-relaxed">
+                    {game.description}
+                  </p>
+                </div>
+                <div className="flex flex-col gap-3 sm:flex-row">
                   <Button 
-                    className="flex-1 rounded-lg sm:rounded-xl px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-sm sm:text-base font-bold transition-all hover:scale-105"
+                    className="flex-1 rounded-lg px-4 py-3 bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-sm font-bold transition-all"
                     disabled={!isGeminiReady}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -299,7 +311,7 @@ const GameMenu = ({
                   <Button
                     variant="outline"
                     size="sm"
-                    className="rounded-lg sm:rounded-xl px-3 py-2.5 sm:py-3 border-2 hover:border-purple-400 dark:hover:border-purple-500"
+                    className="rounded-lg px-3 py-3 border-2 hover:border-purple-400 dark:hover:border-purple-500"
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate(`/kids/games/history?game=${game.id}`);
@@ -314,6 +326,30 @@ const GameMenu = ({
           );
         })}
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between gap-4 rounded-lg border border-dashed border-purple-200 bg-purple-50/40 p-4 dark:border-purple-700 dark:bg-purple-900/10">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </Button>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </Button>
+        </div>
+      )}
 
         </div>
   );

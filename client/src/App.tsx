@@ -18,6 +18,7 @@ import FloatingIconsLayer from "@/components/common/FloatingIconsLayer";
 import { LoadingScreen } from "@/components/landing/LoadingScreen";
 import OfflineIndicator from "@/components/common/OfflineIndicator";
 import CookieConsent from "@/components/common/CookieConsent";
+import PageLoadingOverlay from "@/components/common/PageLoadingOverlay";
 
 // ✅ Pages
 import Index from "@/pages/Index";
@@ -84,6 +85,7 @@ import IntermediateVocabularySurvey from "@/components/surveys/IntermediateVocab
 import AdvancedVocabularySurvey from "@/components/surveys/AdvancedVocabularySurvey";
 import InterestsSurvey from "@/components/surveys/InterestsSurvey";
 import SurveyManager from "@/components/surveys/SurveyManager";
+import { RouteLoadingProvider, useRouteLoading } from "@/contexts/RouteLoadingContext";
 
 const queryClient = new QueryClient();
 
@@ -96,6 +98,7 @@ const ConditionalLayout = ({ children }: { children: ReactNode }) => {
     // Admin pages (including login) get minimal layout (no Navbar, Footer, FloatingIcons, etc.)
     return (
       <div className="min-h-screen flex flex-col relative bg-background">
+        <PageLoadingOverlay />
         <OfflineIndicator />
         <main className="flex-1">
           {children}
@@ -108,6 +111,7 @@ const ConditionalLayout = ({ children }: { children: ReactNode }) => {
   // Regular pages get full layout with Navbar and Footer
   return (
     <div className="min-h-screen flex flex-col relative">
+      <PageLoadingOverlay />
       <FloatingIconsLayer />
       <OfflineIndicator />
       <Navbar />
@@ -124,10 +128,19 @@ const ConditionalLayout = ({ children }: { children: ReactNode }) => {
 // ✅ Smooth Page Transition Wrapper
 const PageTransition = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
+  const { startLoading, stopLoading, isOffline } = useRouteLoading();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (isOffline) {
+      startLoading({ stickUntilOnline: true });
+    } else {
+      stopLoading();
+    }
+  }, [isOffline, location.pathname, startLoading, stopLoading]);
 
   return (
     <div
@@ -662,14 +675,16 @@ const App = () => {
               <Toaster />
               <Sonner />
               <BrowserRouter>
-              {isInitialLoading ? (
-                <LoadingScreen />
-              ) : (
-                <ConditionalLayout>
-                  <AppRoutes />
-                </ConditionalLayout>
-              )}
-            </BrowserRouter>
+                {isInitialLoading ? (
+                  <LoadingScreen />
+                ) : (
+                  <RouteLoadingProvider>
+                    <ConditionalLayout>
+                      <AppRoutes />
+                    </ConditionalLayout>
+                  </RouteLoadingProvider>
+                )}
+              </BrowserRouter>
           </TooltipProvider>
         </AuthProvider>
       </ThemeProvider>
