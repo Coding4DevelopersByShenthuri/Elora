@@ -63,6 +63,13 @@ urlpatterns = [
     # ============= Waitlist =============
     path('waitlist/signup', views.waitlist_signup, name='waitlist-signup'),
     
+    # ============= User Notifications =============
+    path('notifications', views.user_notifications, name='user-notifications'),
+    path('notifications/unread-count', views.user_notifications_unread_count, name='user-notifications-unread-count'),
+    path('notifications/<int:notification_id>/read', views.user_notification_mark_read, name='user-notification-mark-read'),
+    path('notifications/<int:notification_id>/delete', views.user_notification_delete, name='user-notification-delete'),
+    path('notifications/mark-all-read', views.user_notifications_mark_all_read, name='user-notifications-mark-all-read'),
+    
     # ============= Sync & Offline Support =============
     path('sync/changes', views.sync_changes, name='sync-changes'),
     path('sync/upsert', views.idempotent_upsert, name='sync-upsert'),

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import KidsProgressService from '@/services/KidsProgressService';
 import CertificatesService, { type CertificateLayout } from '@/services/CertificatesService';
 import StorageService from '@/services/StorageService';
 import StoryWordsService from '@/services/StoryWordsService';
+import UserNotificationsService from '@/services/UserNotificationsService';
 
 type CertificateSpec = {
   id: string;
@@ -21,7 +22,7 @@ type CertificateSpec = {
 };
 
 const CertificatesPage = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -75,6 +76,9 @@ const CertificatesPage = () => {
     } catch { return []; }
   });
   const unlockDebounceRef = useState<{ timer: any | null }>({ timer: null })[0];
+  const notificationKeysRef = useRef<Set<string>>(new Set());
+  const previousEligibilityRef = useRef<Record<string, boolean>>({});
+  const [notificationsHydrated, setNotificationsHydrated] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -101,6 +105,33 @@ const CertificatesPage = () => {
     };
     load();
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    setNotificationsHydrated(false);
+    let cancelled = false;
+    const hydrate = async () => {
+      try {
+        const existing = await UserNotificationsService.getAll(String(user.id));
+        if (cancelled) return;
+        existing.forEach((notification) => {
+          if (notification.eventKey) {
+            notificationKeysRef.current.add(notification.eventKey);
+          }
+        });
+      } catch {
+        // Non-blocking; offline mode will handle notifications lazily.
+      } finally {
+        if (!cancelled) {
+          setNotificationsHydrated(true);
+        }
+      }
+    };
+    hydrate();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
 
   const mergedDetails = (() => {
     const serverDetails = (progress as any)?.details || {};
@@ -269,6 +300,51 @@ const CertificatesPage = () => {
 
   // Derive badges and trophies lists similar to Microsoft Learn layout
   // If Story Time Champion is eligible, surface its badge in Badges section
+  const notifyUnlock = useCallback(
+    async (
+      type: 'certificate' | 'badge' | 'trophy',
+      eventKey: string,
+      title: string,
+      message: string,
+      icon: string
+    ) => {
+      if (!user?.id) return;
+      if (notificationKeysRef.current.has(eventKey)) return;
+      notificationKeysRef.current.add(eventKey);
+      try {
+        await UserNotificationsService.create(String(user.id), {
+          type,
+          title,
+          message,
+          icon,
+          eventKey,
+        });
+      } catch (error) {
+        console.warn('Notification dispatch skipped:', error);
+      }
+    },
+    [user?.id]
+  );
+
+  useEffect(() => {
+    if (!isAuthenticated || !user?.id || !notificationsHydrated) return;
+    certificates.forEach((spec, index) => {
+      const isEligible = computed[index]?.eligible ?? false;
+      const eventKey = `certificate:${spec.id}`;
+      const wasEligible = previousEligibilityRef.current[spec.id];
+      if (isEligible && !wasEligible) {
+        notifyUnlock(
+          'certificate',
+          eventKey,
+          `${spec.title} certificate unlocked`,
+          `Your ${spec.title} certificate is now ready to download and share.`,
+          '📜'
+        );
+      }
+      previousEligibilityRef.current[spec.id] = isEligible;
+    });
+  }, [certificates, computed, isAuthenticated, notificationsHydrated, notifyUnlock, user?.id]);
+
   const unlockedBadges = useMemo(() => {
     const base = (achievements || []).filter((a: any) => a.unlocked);
     try {
@@ -288,6 +364,26 @@ const CertificatesPage = () => {
     return base;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [achievements, computed.map(c => c.eligible).join('|')]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !user?.id || !notificationsHydrated) return;
+    unlockedBadges.forEach((badge, index) => {
+      const rawIdentifier = (
+        badge.id ||
+        badge.title ||
+        badge.name ||
+        `badge-${index}`
+      ).toString();
+      const slug = rawIdentifier.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      notifyUnlock(
+        'badge',
+        `badge:${slug}`,
+        `${badge.title || badge.name || 'New badge'} unlocked`,
+        'A new badge has been added to your certificates collection.',
+        '🎖️'
+      );
+    });
+  }, [isAuthenticated, notificationsHydrated, notifyUnlock, unlockedBadges, user?.id]);
   const lockedBadges = useMemo(() => (achievements || []).filter((a: any) => !a.unlocked), [achievements]);
   const trophySpecs = [
     { id: 'consistency-hero', title: 'Consistency Hero', emoji: '🔥', desc: 'Maintain a 21-day learning streak', badgeSrc: '/Consistency_badge.png' },
@@ -369,9 +465,11 @@ const CertificatesPage = () => {
       const games = d.games || {};
       const tried = Array.isArray(games.types) ? new Set(games.types).size : 0; // expect ['tongue-twister','word-chain',...]
       const points = Number(games.points || 0);
-      const aPart = Math.min(tried, 5) / 5; // assume 5 game types
-      const bPart = Math.min(points, 300) / 300;
-      return Math.round((aPart * 50 + bPart * 50) * 100);
+      const requiredGameTypes = isTeenKids ? 7 : 5;
+      const cappedGameTypes = requiredGameTypes > 0 ? Math.min(tried, requiredGameTypes) / requiredGameTypes : 0;
+      const cappedPoints = Math.min(points, 300) / 300;
+      const combinedProgress = (cappedGameTypes + cappedPoints) / 2; // average the two goals
+      return Math.round(combinedProgress * 100);
     }
     return 0;
   };
@@ -436,7 +534,8 @@ const CertificatesPage = () => {
       const games = d.games || {};
       const tried = Array.isArray(games.types) ? new Set(games.types).size : 0;
       const points = Number(games.points || 0);
-      return `Games tried: ${Math.min(tried, 5)}/5, Points: ${Math.min(points, 300)}/300`;
+      const requiredGameTypes = isTeenKids ? 7 : 5;
+      return `Games tried: ${Math.min(tried, requiredGameTypes)}/${requiredGameTypes}, Points: ${Math.min(points, 300)}/300`;
     }
     return '';
   };
@@ -537,7 +636,7 @@ const CertificatesPage = () => {
   // Persist newly unlocked trophies (once per trophy)
   // Process trophy unlocks with debounce + offline queue
   useEffect(() => {
-    if (activeTab !== 'trophies') return;
+    if (activeTab !== 'trophies' || !notificationsHydrated) return;
     if (unlockDebounceRef.timer) clearTimeout(unlockDebounceRef.timer);
     unlockDebounceRef.timer = setTimeout(() => {
       try {
@@ -549,6 +648,13 @@ const CertificatesPage = () => {
           const progressPct = trophyProgressMap[t.id] ?? 0;
           if (progressPct === 100 && !reportedTrophies[t.id]) {
             newlyUnlocked.push({ id: t.id, title: t.title, date: new Date().toISOString() });
+            notifyUnlock(
+              'trophy',
+              `trophy:${t.id}`,
+              `${t.title} trophy unlocked`,
+              `You just earned the ${t.title}. Keep the momentum going!`,
+              t.emoji || '🏆'
+            );
           }
         }
 
@@ -580,7 +686,7 @@ const CertificatesPage = () => {
       } catch {}
     }, 1000);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, trophyProgressMap, trophySpecs.map(t => t.id).join('|')]);
+  }, [activeTab, notificationsHydrated, notifyUnlock, trophyProgressMap, trophySpecs.map(t => t.id).join('|')]);
 
   // Retry pending unlocks when coming online or when tab visible
   useEffect(() => {

@@ -393,7 +393,7 @@ export const Navbar = () => {
                         >
                           {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
                         </Button>
-                        
+
                         {/* Only show Logout Button when authenticated */}
                         {isAuthenticated && (
                           <Button

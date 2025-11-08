@@ -4,7 +4,7 @@ from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
     VocabularyWord, Achievement, UserAchievement,
     KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, WaitlistEntry,
-    AdminNotification, SurveyStepResponse, PlatformSettings,
+    UserNotification, AdminNotification, SurveyStepResponse, PlatformSettings,
     StoryEnrollment, StoryWord, StoryPhrase, KidsFavorite,
     KidsVocabularyPractice, KidsPronunciationPractice, KidsGameSession
 )
@@ -327,6 +327,21 @@ class WaitlistSerializer(serializers.ModelSerializer):
         model = WaitlistEntry
         fields = ['id', 'email', 'name', 'interest', 'source', 'notes', 'created_at']
         read_only_fields = ['id', 'created_at']
+
+
+# ============= User Notification Serializers =============
+class UserNotificationSerializer(serializers.ModelSerializer):
+    """Serializer for end-user notifications."""
+    type_display = serializers.CharField(source='get_notification_type_display', read_only=True)
+
+    class Meta:
+        model = UserNotification
+        fields = [
+            'id', 'notification_type', 'type_display', 'title', 'message', 'icon',
+            'action_url', 'is_read', 'read_at', 'event_key', 'metadata',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at', 'read_at']
 
 
 # ============= Admin Notification Serializer =============

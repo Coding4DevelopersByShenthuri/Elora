@@ -37550,3 +37550,1608 @@ INFO 2025-11-08 18:50:50,059 basehttp 10012 3904 "GET /api/kids/achievements HTT
 INFO 2025-11-08 18:50:50,081 basehttp 10012 22960 "GET /api/kids/lessons HTTP/1.1" 200 2
 INFO 2025-11-08 18:50:50,081 basehttp 10012 20228 "GET /api/kids/progress HTTP/1.1" 200 1827
 INFO 2025-11-08 18:50:52,990 basehttp 10012 22960 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 18:56:06,611 basehttp 10012 14500 "OPTIONS /api/auth/user HTTP/1.1" 200 0
+INFO 2025-11-08 18:56:06,655 basehttp 10012 14500 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 18:57:25,842 basehttp 10012 24116 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 18:57:25,858 basehttp 10012 4060 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 18:57:25,876 basehttp 10012 16780 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 18:57:30,106 basehttp 10012 10436 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 18:57:31,472 basehttp 10012 18496 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 18:57:31,472 basehttp 10012 25512 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 18:57:31,477 basehttp 10012 692 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 18:57:34,489 basehttp 10012 692 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 18:57:49,343 basehttp 10012 20612 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 18:58:58,495 basehttp 10012 24252 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 18:59:30,459 basehttp 10012 25764 "OPTIONS /api/auth/user HTTP/1.1" 200 0
+WARNING 2025-11-08 18:59:30,506 log 10012 25764 Unauthorized: /api/auth/user
+WARNING 2025-11-08 18:59:30,508 basehttp 10012 25764 "GET /api/auth/user HTTP/1.1" 401 172
+INFO 2025-11-08 19:00:49,334 basehttp 10012 14432 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:00:52,355 basehttp 10012 14432 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:00:52,906 basehttp 10012 6768 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:00:52,908 basehttp 10012 14432 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:00:52,915 basehttp 10012 12628 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 19:00:55,964 basehttp 10012 12628 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:02:13,493 basehttp 10012 5716 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 19:02:53,148 basehttp 10012 5716 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 19:04:30,311 basehttp 10012 11236 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:04:30,316 basehttp 10012 11220 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:04:30,319 basehttp 10012 14292 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 19:04:33,341 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:07:00,779 basehttp 10012 25028 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 19:08:35,367 basehttp 10012 21296 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:08:35,367 basehttp 10012 14000 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:08:35,367 basehttp 10012 2812 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 19:08:37,152 basehttp 10012 2812 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:08:38,907 basehttp 10012 21296 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:08:38,916 basehttp 10012 2812 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:08:38,924 basehttp 10012 14000 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 19:08:41,932 basehttp 10012 7608 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:08:49,092 basehttp 10012 6392 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:08:49,092 basehttp 10012 7608 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:08:49,096 basehttp 10012 1428 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 19:08:52,136 basehttp 10012 1428 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:08:55,145 basehttp 10012 1428 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:08:58,178 basehttp 10012 1428 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:09:01,125 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:09:04,121 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:09:07,115 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:09:10,100 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:09:13,096 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:09:16,118 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:09:19,118 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:09:22,113 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:09:25,138 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:09:28,112 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:09:31,088 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:09:34,121 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:09:37,102 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:09:40,098 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:09:43,123 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:09:46,114 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:09:49,105 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:09:52,123 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:09:55,104 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:09:58,122 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:10:01,111 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:10:04,091 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:10:07,097 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:10:10,103 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:10:13,103 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:10:16,122 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:10:19,111 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:10:22,125 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:10:25,123 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:10:28,100 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:10:31,125 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:10:34,106 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:10:37,110 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:10:40,130 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:10:43,091 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:10:46,105 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:10:49,122 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:10:52,112 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:10:55,127 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:10:58,111 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:11:01,118 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:11:04,103 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:11:07,121 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:11:10,101 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:11:13,111 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:11:16,084 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:11:19,123 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:11:22,085 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:11:25,105 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:11:28,128 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:11:31,097 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:11:34,095 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:11:37,100 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:11:40,109 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:11:43,127 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:11:46,119 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:11:49,135 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:11:52,109 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:11:55,106 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:11:58,116 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:12:01,120 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:12:04,108 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:12:07,107 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:12:10,111 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:12:13,112 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:12:16,102 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:12:19,124 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:12:22,134 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:12:25,108 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:12:28,111 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:12:31,132 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:12:34,113 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:12:37,113 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:12:40,114 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:12:43,128 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:12:46,102 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:12:49,104 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:12:52,097 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:12:55,116 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:12:58,118 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:13:01,104 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:13:04,093 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:13:07,097 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:13:10,124 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:13:13,113 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:13:16,103 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:13:19,112 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:13:22,128 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:13:25,103 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:13:28,117 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:13:31,114 basehttp 10012 11320 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:13:34,111 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:13:37,106 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:13:40,126 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:13:43,086 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:13:46,129 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:13:49,102 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:13:52,113 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:13:55,090 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:13:58,121 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:14:01,091 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:14:04,110 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:14:07,104 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:14:10,117 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:14:13,130 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:14:16,109 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:14:19,106 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:14:22,114 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:14:25,119 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:14:28,112 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:14:31,108 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:14:34,110 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:14:37,102 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:14:40,128 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:14:43,097 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:14:46,113 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:14:49,115 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:14:52,109 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:14:55,105 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:14:58,106 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:15:01,109 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:15:04,098 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:15:07,114 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:15:10,095 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:15:13,106 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:15:16,116 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:15:19,103 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:15:22,110 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:15:25,098 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:15:28,087 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:15:31,087 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:15:34,119 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:15:37,099 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:15:40,092 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:15:43,116 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:15:46,099 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:15:49,088 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:15:52,115 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:15:55,086 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:15:58,098 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:16:01,093 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:16:04,119 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:16:07,096 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:16:10,103 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:16:13,099 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:16:16,109 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:16:19,112 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:16:22,092 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:16:25,092 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:16:28,114 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:16:31,121 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:16:34,108 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:16:37,094 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:16:40,092 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:16:43,106 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:16:46,084 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:16:49,132 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:16:52,101 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:16:55,118 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:16:58,097 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:17:01,104 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:17:04,098 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:17:07,095 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:17:10,091 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:17:13,096 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:17:16,111 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:17:19,106 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:17:22,113 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:17:25,102 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:17:28,096 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:17:31,092 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:17:34,108 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:17:37,112 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:17:40,098 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:17:43,096 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:17:46,099 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:17:49,094 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:17:52,115 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:17:55,110 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:17:58,111 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:18:01,098 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:18:04,108 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:18:07,096 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:18:10,090 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:18:13,089 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:18:16,120 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:18:19,096 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:18:22,095 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:18:25,105 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:18:28,092 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:18:31,101 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:18:34,095 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:18:37,100 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:18:40,100 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:18:43,096 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:18:46,104 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:18:49,097 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:18:52,098 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:18:55,093 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:18:58,094 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:19:01,106 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:19:04,091 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:19:07,134 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:19:10,087 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:19:13,102 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:19:16,110 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:19:19,088 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:19:22,087 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:19:25,105 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:19:28,105 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:19:31,114 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:19:34,115 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:19:37,100 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:19:40,092 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:19:43,106 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:19:46,108 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:19:49,925 basehttp 10012 26460 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:19:52,128 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:19:55,101 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:19:58,131 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:20:01,108 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:20:04,156 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:20:07,114 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:20:10,111 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:20:13,109 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:20:16,125 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:20:19,114 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:20:22,102 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:20:25,117 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:20:28,125 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:20:31,107 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:20:34,109 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:20:37,087 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:20:40,139 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:20:43,117 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:20:46,114 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:20:49,132 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:20:52,104 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:20:55,127 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:20:58,115 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:21:01,102 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:21:04,091 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:21:07,107 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:21:10,103 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:21:13,139 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:21:16,112 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:21:19,115 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:21:22,111 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:21:25,117 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:21:28,108 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:21:31,128 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:21:34,123 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:21:37,150 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:21:40,122 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:21:43,108 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:21:46,107 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:21:49,103 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:21:52,136 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:21:55,110 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:21:58,135 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:22:01,132 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:22:15,160 basehttp 10012 10468 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:22:15,162 basehttp 10012 9808 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:22:15,170 basehttp 10012 19728 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 19:22:18,174 basehttp 10012 19728 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:22:21,157 basehttp 10012 19728 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:22:24,193 basehttp 10012 19728 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:26:03,743 basehttp 10012 25764 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:26:03,745 basehttp 10012 24220 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:26:03,749 basehttp 10012 11144 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 19:26:06,740 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:26:09,758 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:26:12,753 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:26:15,788 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:26:18,763 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:26:21,759 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:26:24,747 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:26:27,772 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:26:30,763 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:26:33,751 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:26:36,750 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:26:39,747 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:26:42,782 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:26:45,782 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:26:48,759 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:26:51,749 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:26:54,781 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:26:57,759 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:27:00,745 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:27:03,786 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:27:06,751 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:27:09,775 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:27:12,750 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:27:15,753 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:27:18,739 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:27:21,756 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:27:24,749 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:27:27,744 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:27:30,765 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:27:33,768 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:27:36,739 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:27:39,781 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:27:42,758 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:27:45,768 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:27:48,756 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:27:51,745 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:27:54,759 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:27:57,771 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:28:00,758 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:28:03,777 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:28:06,758 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:28:09,773 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:28:12,748 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:28:15,759 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:28:18,760 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:28:21,780 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:28:24,738 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:28:27,761 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:28:30,743 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:28:33,760 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:28:36,766 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:28:39,755 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:28:42,752 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:28:45,747 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:28:48,764 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:28:51,766 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:28:54,751 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:28:57,776 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:29:00,765 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:29:03,793 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:29:06,742 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:29:09,753 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:29:12,774 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:29:15,756 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:29:18,741 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:29:21,757 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:29:24,772 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:29:27,751 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:29:30,771 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:29:33,728 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:29:36,745 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:29:39,747 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:29:42,786 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:29:45,743 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:29:48,751 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:29:51,749 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:29:54,763 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:29:57,730 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:30:00,750 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:30:03,812 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:30:06,758 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:30:09,757 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:30:12,757 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:30:15,756 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:30:18,730 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:30:21,753 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:30:24,759 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:30:27,752 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:30:30,750 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:30:32,787 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:30:32,935 basehttp 10012 11144 "OPTIONS /api/kids/progress/update HTTP/1.1" 200 0
+INFO 2025-11-08 19:30:33,045 basehttp 10012 11144 "POST /api/kids/progress/update HTTP/1.1" 200 1827
+INFO 2025-11-08 19:30:33,082 basehttp 10012 11144 "OPTIONS /api/achievements/check HTTP/1.1" 200 0
+INFO 2025-11-08 19:30:33,208 basehttp 10012 11144 "POST /api/achievements/check HTTP/1.1" 200 58
+INFO 2025-11-08 19:30:33,266 basehttp 10012 11144 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:30:33,792 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:30:36,795 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:30:39,765 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:30:42,783 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:30:45,759 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:30:48,775 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:30:51,767 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:30:54,777 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:30:57,785 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:31:00,783 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:31:03,785 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:31:06,792 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:31:09,777 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:31:12,772 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:31:15,779 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:31:18,769 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:31:21,777 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:31:24,776 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:31:27,770 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:31:30,772 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:31:33,777 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:31:36,797 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:31:39,800 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:31:42,773 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:31:45,767 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:31:48,768 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:31:51,771 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:31:54,779 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:31:57,776 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:32:00,781 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:32:03,841 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:32:06,762 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:32:09,752 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:32:12,779 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:32:15,768 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:32:18,771 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:32:21,751 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:32:24,787 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:32:27,766 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:32:30,772 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:32:33,795 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:32:36,792 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:32:39,783 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:32:42,750 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:32:45,753 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:32:48,782 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:32:51,776 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:32:54,767 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:32:57,789 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:33:00,763 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:33:03,790 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:33:06,764 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:33:09,789 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:33:12,778 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:33:15,782 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:33:18,773 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:33:21,756 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:33:24,780 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:33:27,780 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:33:30,793 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:33:33,769 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:33:36,769 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:33:39,770 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:33:42,755 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:33:45,753 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:33:48,771 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:33:51,765 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:33:54,781 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:33:57,790 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:34:00,766 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:34:03,785 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:34:06,776 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:34:09,766 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:34:12,742 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:34:15,776 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:34:18,777 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:34:21,784 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:34:24,793 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:34:27,782 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:34:30,775 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:34:33,776 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:34:36,790 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:34:39,780 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:34:42,775 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:34:45,786 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:34:48,780 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:34:51,782 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:34:54,808 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:34:57,788 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:35:00,746 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:35:03,774 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:35:06,773 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:35:09,762 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:35:12,755 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:35:15,782 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:35:18,764 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:35:21,782 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:35:24,776 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:35:27,785 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:35:30,770 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:35:33,764 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:35:36,763 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:35:39,780 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:35:42,770 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:35:45,779 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:35:48,782 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:35:51,771 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:35:54,785 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:35:57,783 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:36:00,781 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:36:03,756 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:36:06,757 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:36:09,794 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:36:11,029 basehttp 10012 9384 "OPTIONS /api/kids/analytics HTTP/1.1" 200 0
+INFO 2025-11-08 19:36:11,029 basehttp 10012 13364 "OPTIONS /api/kids/analytics HTTP/1.1" 200 0
+INFO 2025-11-08 19:36:11,029 basehttp 10012 9384 "OPTIONS /api/kids/stories/enroll HTTP/1.1" 200 0
+WARNING 2025-11-08 19:36:11,046 log 10012 9384 Unauthorized: /api/kids/analytics
+WARNING 2025-11-08 19:36:11,061 basehttp 10012 9384 "POST /api/kids/analytics HTTP/1.1" 401 58
+INFO 2025-11-08 19:36:11,085 views 10012 13364 Kids listening analytics stats for user 6: 2 stories completed
+INFO 2025-11-08 19:36:11,090 basehttp 10012 13364 "POST /api/kids/analytics HTTP/1.1" 201 48
+INFO 2025-11-08 19:36:11,210 basehttp 10012 9384 "POST /api/kids/stories/enroll HTTP/1.1" 201 287
+INFO 2025-11-08 19:36:11,247 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:36:11,297 basehttp 10012 11144 "POST /api/kids/progress/update HTTP/1.1" 200 1827
+INFO 2025-11-08 19:36:11,342 basehttp 10012 11144 "POST /api/achievements/check HTTP/1.1" 200 58
+INFO 2025-11-08 19:36:11,384 basehttp 10012 11144 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:36:12,745 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:36:15,773 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:36:18,762 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:36:19,998 basehttp 10012 11144 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:36:20,009 basehttp 10012 13612 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:36:27,457 basehttp 10012 13612 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:36:27,461 basehttp 10012 11144 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:36:27,469 basehttp 10012 13064 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 19:36:30,470 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:36:33,460 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:36:36,447 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:36:39,465 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:36:42,466 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:36:45,474 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:36:48,482 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:36:51,460 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:36:54,485 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:37:00,581 basehttp 10012 9384 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 19:37:02,181 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:37:02,183 basehttp 10012 11144 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:37:02,184 basehttp 10012 13612 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 19:37:05,202 basehttp 10012 13612 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:37:08,230 basehttp 10012 13612 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:37:12,273 basehttp 10012 9384 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 19:37:13,830 basehttp 10012 11144 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:37:13,831 basehttp 10012 13612 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:37:13,835 basehttp 10012 13064 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 19:37:16,883 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:37:19,887 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:37:22,859 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:37:25,953 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:37:28,936 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:37:31,939 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:37:34,930 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:37:37,943 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:37:40,946 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:37:43,937 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:37:46,965 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:37:49,916 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:37:52,937 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:37:56,021 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:37:58,880 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:38:01,899 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:38:04,869 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:38:07,920 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:38:10,924 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:38:13,942 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:38:16,935 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:38:19,917 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:38:22,945 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:38:25,984 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:38:28,910 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:38:31,931 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:38:34,913 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:38:37,924 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:38:40,915 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:38:43,935 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:38:46,929 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:38:49,942 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:38:53,133 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:38:56,137 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:38:59,057 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:39:02,000 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:39:04,941 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:39:07,868 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:39:10,914 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:39:13,948 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:39:16,920 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:39:19,900 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:39:22,915 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:39:25,963 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:39:28,927 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:39:31,939 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:39:34,903 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:39:37,917 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:39:40,906 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:39:43,936 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:39:46,908 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:39:49,913 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:39:52,940 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:39:55,915 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:39:58,923 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:40:01,906 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:40:04,886 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:40:07,906 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:40:10,918 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:40:13,898 basehttp 10012 13064 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:40:18,312 basehttp 10012 6888 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 19:40:19,796 basehttp 10012 18272 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:40:19,806 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:40:19,806 basehttp 10012 20952 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 19:40:22,827 basehttp 10012 20952 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:40:25,850 basehttp 10012 20952 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:40:30,685 basehttp 10012 6888 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 19:40:32,237 basehttp 10012 18272 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 19:40:32,238 basehttp 10012 20952 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:40:32,239 basehttp 10012 14292 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:40:35,261 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:40:38,956 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:40:41,984 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:40:44,208 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:40:47,265 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:40:50,272 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:40:53,255 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:40:56,285 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:40:59,288 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:41:02,215 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:41:05,259 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:41:08,935 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:41:11,947 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:41:14,981 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:41:17,942 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:41:20,943 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:41:23,957 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:41:26,932 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:41:29,956 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:41:32,949 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:41:35,946 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:41:38,938 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:41:41,937 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:41:44,973 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:41:47,953 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:41:50,946 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:41:53,944 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:41:56,939 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:41:59,969 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:42:02,951 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:42:05,947 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:42:36,009 basehttp 10012 14292 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:43:35,962 basehttp 10012 1424 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:44:35,958 basehttp 10012 1424 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:45:55,321 basehttp 10012 10324 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 19:46:04,946 basehttp 10012 10324 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 19:46:07,555 basehttp 10012 10656 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:46:07,555 basehttp 10012 24816 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:46:07,566 basehttp 10012 23108 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 19:46:10,561 basehttp 10012 23108 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:46:11,867 basehttp 10012 24816 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:46:11,877 basehttp 10012 23108 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:46:11,881 basehttp 10012 10656 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 19:46:14,871 basehttp 10012 17076 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:46:17,865 basehttp 10012 17076 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:46:20,883 basehttp 10012 17076 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:46:23,856 basehttp 10012 17076 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:46:26,857 basehttp 10012 17076 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:46:29,851 basehttp 10012 17076 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:46:32,844 basehttp 10012 17076 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:46:35,847 basehttp 10012 17076 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:46:38,896 basehttp 10012 17076 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:46:41,858 basehttp 10012 17076 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:46:44,861 basehttp 10012 17076 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:46:47,859 basehttp 10012 17076 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:46:50,949 basehttp 10012 17076 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:46:53,929 basehttp 10012 17076 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:46:56,966 basehttp 10012 17076 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:47:10,984 basehttp 10012 20660 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:47:10,984 basehttp 10012 17076 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:47:10,992 basehttp 10012 17332 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 19:47:13,995 basehttp 10012 17332 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:47:16,990 basehttp 10012 17332 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:47:19,991 basehttp 10012 17332 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:47:22,986 basehttp 10012 17332 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:47:25,987 basehttp 10012 17332 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:47:28,986 basehttp 10012 17332 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:47:31,970 basehttp 10012 17332 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:47:34,992 basehttp 10012 17332 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:47:37,982 basehttp 10012 17332 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:47:40,515 basehttp 10012 22432 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 19:47:41,779 basehttp 10012 17076 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:47:41,780 basehttp 10012 17332 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:47:41,782 basehttp 10012 20660 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 19:47:44,821 basehttp 10012 20660 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:47:47,814 basehttp 10012 20660 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:47:50,806 basehttp 10012 20660 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:47:53,802 basehttp 10012 22788 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:47:56,797 basehttp 10012 22788 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:47:59,814 basehttp 10012 22788 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:48:02,820 basehttp 10012 22788 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:48:05,845 basehttp 10012 22808 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:48:08,823 basehttp 10012 22808 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:48:11,826 basehttp 10012 22808 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:48:14,801 basehttp 10012 22808 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:48:17,815 basehttp 10012 22808 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:48:20,812 basehttp 10012 22808 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:48:23,819 basehttp 10012 25800 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:48:26,820 basehttp 10012 25800 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:48:29,821 basehttp 10012 25800 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:48:32,816 basehttp 10012 25800 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:48:35,839 basehttp 10012 16980 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:48:38,819 basehttp 10012 16980 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:48:41,625 basehttp 10012 7676 "OPTIONS /api/vocabulary/ HTTP/1.1" 200 0
+INFO 2025-11-08 19:48:41,632 basehttp 10012 7676 "OPTIONS /api/kids/vocabulary/practice HTTP/1.1" 200 0
+INFO 2025-11-08 19:48:41,741 basehttp 10012 7676 "POST /api/vocabulary/ HTTP/1.1" 200 281
+INFO 2025-11-08 19:48:41,815 basehttp 10012 7676 "POST /api/kids/vocabulary/practice HTTP/1.1" 201 187
+INFO 2025-11-08 19:48:41,819 basehttp 10012 16980 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:48:41,858 basehttp 10012 16980 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:48:41,947 basehttp 10012 16980 "POST /api/kids/progress/update HTTP/1.1" 200 1827
+INFO 2025-11-08 19:48:41,991 basehttp 10012 16980 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:48:42,049 basehttp 10012 16980 "POST /api/kids/progress/update HTTP/1.1" 200 1827
+INFO 2025-11-08 19:48:42,133 basehttp 10012 16980 "POST /api/achievements/check HTTP/1.1" 200 58
+INFO 2025-11-08 19:48:42,167 basehttp 10012 16980 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:48:44,828 basehttp 10012 19728 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:48:47,836 basehttp 10012 19728 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:48:50,814 basehttp 10012 19728 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:48:53,817 basehttp 10012 22020 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:48:56,818 basehttp 10012 22020 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:48:59,822 basehttp 10012 22020 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:49:02,828 basehttp 10012 22020 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:49:05,834 basehttp 10012 5816 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:49:06,850 basehttp 10012 11844 "POST /api/vocabulary/ HTTP/1.1" 200 294
+INFO 2025-11-08 19:49:06,901 basehttp 10012 11844 "POST /api/kids/vocabulary/practice HTTP/1.1" 201 191
+INFO 2025-11-08 19:49:06,961 basehttp 10012 5816 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:49:07,038 basehttp 10012 5816 "POST /api/kids/progress/update HTTP/1.1" 200 1827
+INFO 2025-11-08 19:49:07,087 basehttp 10012 5816 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:49:07,150 basehttp 10012 5816 "POST /api/kids/progress/update HTTP/1.1" 200 1827
+INFO 2025-11-08 19:49:07,204 basehttp 10012 5816 "POST /api/achievements/check HTTP/1.1" 200 58
+INFO 2025-11-08 19:49:07,255 basehttp 10012 5816 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:49:08,822 basehttp 10012 5816 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:49:11,831 basehttp 10012 5816 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:49:14,842 basehttp 10012 12800 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:49:17,821 basehttp 10012 12800 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:49:20,820 basehttp 10012 12800 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:49:23,823 basehttp 10012 12800 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:49:26,830 basehttp 10012 12800 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:49:29,816 basehttp 10012 12800 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:49:32,819 basehttp 10012 12800 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:49:35,823 basehttp 10012 6872 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:49:38,825 basehttp 10012 6872 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:49:41,821 basehttp 10012 6872 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:49:44,848 basehttp 10012 4024 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:49:48,045 basehttp 10012 9604 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 19:49:49,321 basehttp 10012 4024 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:49:49,324 basehttp 10012 2556 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:49:49,326 basehttp 10012 24452 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 19:49:52,359 basehttp 10012 24452 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:49:55,373 basehttp 10012 2924 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:49:58,358 basehttp 10012 2924 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:01,358 basehttp 10012 2924 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:04,378 basehttp 10012 2496 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:07,354 basehttp 10012 2496 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:10,364 basehttp 10012 2496 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:13,448 basehttp 10012 2496 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:16,368 basehttp 10012 7552 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:19,350 basehttp 10012 7552 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:19,465 basehttp 10012 13064 "POST /api/vocabulary/ HTTP/1.1" 200 281
+INFO 2025-11-08 19:50:19,511 basehttp 10012 13064 "POST /api/kids/vocabulary/practice HTTP/1.1" 201 188
+INFO 2025-11-08 19:50:19,550 basehttp 10012 7552 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:19,634 basehttp 10012 7552 "POST /api/kids/progress/update HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:19,677 basehttp 10012 7552 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:19,731 basehttp 10012 7552 "POST /api/kids/progress/update HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:19,783 basehttp 10012 7552 "POST /api/achievements/check HTTP/1.1" 200 58
+INFO 2025-11-08 19:50:19,822 basehttp 10012 7552 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:50:22,365 basehttp 10012 7552 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:25,368 basehttp 10012 7552 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:28,356 basehttp 10012 7552 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:31,082 basehttp 10012 13064 "POST /api/vocabulary/ HTTP/1.1" 200 282
+INFO 2025-11-08 19:50:31,188 basehttp 10012 13064 "POST /api/kids/vocabulary/practice HTTP/1.1" 201 187
+INFO 2025-11-08 19:50:31,236 basehttp 10012 7552 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:31,298 basehttp 10012 7552 "POST /api/kids/progress/update HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:31,354 basehttp 10012 7552 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:31,389 basehttp 10012 7552 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:31,455 basehttp 10012 7552 "POST /api/kids/progress/update HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:31,519 basehttp 10012 7552 "POST /api/achievements/check HTTP/1.1" 200 58
+INFO 2025-11-08 19:50:31,547 basehttp 10012 7552 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:50:34,370 basehttp 10012 7552 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:37,364 basehttp 10012 7552 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:40,369 basehttp 10012 7552 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:43,366 basehttp 10012 7552 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:46,370 basehttp 10012 7552 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:49,347 basehttp 10012 7552 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:52,362 basehttp 10012 7552 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:55,352 basehttp 10012 7552 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:50:58,353 basehttp 10012 7552 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:01,366 basehttp 10012 7552 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:06,087 basehttp 10012 7072 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:07,358 basehttp 10012 7072 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:10,440 basehttp 10012 20116 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:13,384 basehttp 10012 26188 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:16,367 basehttp 10012 26188 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:19,382 basehttp 10012 13644 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:22,356 basehttp 10012 13644 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:26,586 basehttp 10012 18240 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 19:51:27,862 basehttp 10012 13644 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:27,868 basehttp 10012 13616 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:51:27,868 basehttp 10012 2208 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 19:51:30,895 basehttp 10012 15104 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:33,890 basehttp 10012 15104 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:36,900 basehttp 10012 15104 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:37,607 basehttp 10012 20304 "POST /api/vocabulary/ HTTP/1.1" 200 282
+INFO 2025-11-08 19:51:37,661 basehttp 10012 20304 "POST /api/kids/vocabulary/practice HTTP/1.1" 201 189
+INFO 2025-11-08 19:51:37,710 basehttp 10012 15104 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:37,760 basehttp 10012 15104 "POST /api/kids/progress/update HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:37,825 basehttp 10012 15104 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:37,909 basehttp 10012 15104 "POST /api/kids/progress/update HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:37,943 basehttp 10012 15104 "POST /api/achievements/check HTTP/1.1" 200 58
+INFO 2025-11-08 19:51:38,015 basehttp 10012 15104 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:51:39,914 basehttp 10012 5356 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:42,910 basehttp 10012 5356 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:45,905 basehttp 10012 5356 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:48,906 basehttp 10012 5356 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:49,993 basehttp 10012 4904 "POST /api/vocabulary/ HTTP/1.1" 200 285
+INFO 2025-11-08 19:51:50,045 basehttp 10012 4904 "POST /api/kids/vocabulary/practice HTTP/1.1" 201 190
+INFO 2025-11-08 19:51:50,101 basehttp 10012 14844 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:50,195 basehttp 10012 14844 "POST /api/kids/progress/update HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:50,253 basehttp 10012 14844 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:50,338 basehttp 10012 14844 "POST /api/kids/progress/update HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:50,411 basehttp 10012 14844 "POST /api/achievements/check HTTP/1.1" 200 58
+INFO 2025-11-08 19:51:50,475 basehttp 10012 14844 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:51:51,903 basehttp 10012 14844 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:54,907 basehttp 10012 14844 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:51:57,905 basehttp 10012 14844 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:00,908 basehttp 10012 4568 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:02,254 basehttp 10012 16152 "POST /api/vocabulary/ HTTP/1.1" 200 283
+INFO 2025-11-08 19:52:02,313 basehttp 10012 16152 "POST /api/kids/vocabulary/practice HTTP/1.1" 201 188
+INFO 2025-11-08 19:52:02,364 basehttp 10012 4568 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:02,416 basehttp 10012 4568 "POST /api/kids/progress/update HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:02,454 basehttp 10012 4568 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:02,544 basehttp 10012 4568 "POST /api/kids/progress/update HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:02,601 basehttp 10012 4568 "POST /api/achievements/check HTTP/1.1" 200 58
+INFO 2025-11-08 19:52:02,663 basehttp 10012 4568 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:52:03,908 basehttp 10012 4568 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:06,917 basehttp 10012 4568 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:09,917 basehttp 10012 14980 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:12,889 basehttp 10012 14980 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:15,904 basehttp 10012 14980 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:18,901 basehttp 10012 14980 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:21,911 basehttp 10012 19972 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:24,901 basehttp 10012 19972 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:27,906 basehttp 10012 19972 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:30,897 basehttp 10012 19900 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:33,894 basehttp 10012 19900 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:35,013 basehttp 10012 20768 "POST /api/vocabulary/ HTTP/1.1" 200 291
+INFO 2025-11-08 19:52:35,073 basehttp 10012 20768 "POST /api/kids/vocabulary/practice HTTP/1.1" 201 191
+INFO 2025-11-08 19:52:35,119 basehttp 10012 19900 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:35,175 basehttp 10012 19900 "POST /api/kids/progress/update HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:35,206 basehttp 10012 19900 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:35,278 basehttp 10012 19900 "POST /api/kids/progress/update HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:35,349 basehttp 10012 19900 "POST /api/achievements/check HTTP/1.1" 200 58
+INFO 2025-11-08 19:52:35,400 basehttp 10012 19900 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:52:36,898 basehttp 10012 19900 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:39,894 basehttp 10012 19992 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:42,882 basehttp 10012 19992 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:45,912 basehttp 10012 19992 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:48,893 basehttp 10012 19992 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:51,906 basehttp 10012 19992 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:54,921 basehttp 10012 21356 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:56,610 basehttp 10012 13476 "POST /api/vocabulary/ HTTP/1.1" 201 323
+INFO 2025-11-08 19:52:56,615 basehttp 10012 13476 "OPTIONS /api/kids/pronunciation/practice HTTP/1.1" 200 0
+INFO 2025-11-08 19:52:56,679 basehttp 10012 13476 "POST /api/kids/pronunciation/practice HTTP/1.1" 201 210
+INFO 2025-11-08 19:52:56,729 basehttp 10012 21356 "GET /api/kids/progress HTTP/1.1" 200 1827
+INFO 2025-11-08 19:52:56,795 basehttp 10012 21356 "POST /api/kids/progress/update HTTP/1.1" 200 1887
+INFO 2025-11-08 19:52:56,851 basehttp 10012 21356 "GET /api/kids/progress HTTP/1.1" 200 1887
+INFO 2025-11-08 19:52:56,926 basehttp 10012 21356 "POST /api/kids/progress/update HTTP/1.1" 200 1887
+INFO 2025-11-08 19:52:56,993 basehttp 10012 21356 "POST /api/achievements/check HTTP/1.1" 200 58
+INFO 2025-11-08 19:52:57,041 basehttp 10012 21356 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:52:57,904 basehttp 10012 21356 "GET /api/kids/progress HTTP/1.1" 200 1887
+INFO 2025-11-08 19:52:59,397 basehttp 10012 13476 "POST /api/vocabulary/ HTTP/1.1" 200 325
+INFO 2025-11-08 19:52:59,414 basehttp 10012 24804 "POST /api/kids/pronunciation/practice HTTP/1.1" 200 210
+INFO 2025-11-08 19:52:59,469 basehttp 10012 21356 "GET /api/kids/progress HTTP/1.1" 200 1887
+INFO 2025-11-08 19:52:59,663 basehttp 10012 21356 "POST /api/kids/progress/update HTTP/1.1" 200 1887
+INFO 2025-11-08 19:52:59,724 basehttp 10012 21356 "GET /api/kids/progress HTTP/1.1" 200 1887
+INFO 2025-11-08 19:52:59,785 basehttp 10012 21356 "POST /api/kids/progress/update HTTP/1.1" 200 1887
+INFO 2025-11-08 19:52:59,829 basehttp 10012 21356 "POST /api/achievements/check HTTP/1.1" 200 58
+INFO 2025-11-08 19:52:59,850 basehttp 10012 21356 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:53:00,918 basehttp 10012 21356 "GET /api/kids/progress HTTP/1.1" 200 1887
+INFO 2025-11-08 19:53:03,913 basehttp 10012 21356 "GET /api/kids/progress HTTP/1.1" 200 1887
+INFO 2025-11-08 19:53:06,895 basehttp 10012 21356 "GET /api/kids/progress HTTP/1.1" 200 1887
+INFO 2025-11-08 19:53:08,738 basehttp 10012 24804 "POST /api/vocabulary/ HTTP/1.1" 201 292
+INFO 2025-11-08 19:53:08,841 basehttp 10012 24804 "POST /api/kids/pronunciation/practice HTTP/1.1" 201 195
+INFO 2025-11-08 19:53:08,891 basehttp 10012 21356 "GET /api/kids/progress HTTP/1.1" 200 1887
+INFO 2025-11-08 19:53:08,958 basehttp 10012 21356 "POST /api/kids/progress/update HTTP/1.1" 200 1932
+INFO 2025-11-08 19:53:09,015 basehttp 10012 21356 "GET /api/kids/progress HTTP/1.1" 200 1932
+INFO 2025-11-08 19:53:09,067 basehttp 10012 21356 "POST /api/kids/progress/update HTTP/1.1" 200 1932
+INFO 2025-11-08 19:53:09,133 basehttp 10012 21356 "POST /api/achievements/check HTTP/1.1" 200 58
+INFO 2025-11-08 19:53:09,188 basehttp 10012 21356 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:53:09,900 basehttp 10012 21356 "GET /api/kids/progress HTTP/1.1" 200 1932
+INFO 2025-11-08 19:53:12,889 basehttp 10012 21356 "GET /api/kids/progress HTTP/1.1" 200 1932
+INFO 2025-11-08 19:53:15,900 basehttp 10012 21356 "GET /api/kids/progress HTTP/1.1" 200 1932
+INFO 2025-11-08 19:53:18,911 basehttp 10012 21356 "GET /api/kids/progress HTTP/1.1" 200 1932
+INFO 2025-11-08 19:53:21,892 basehttp 10012 15328 "GET /api/kids/progress HTTP/1.1" 200 1932
+INFO 2025-11-08 19:53:24,905 basehttp 10012 15328 "GET /api/kids/progress HTTP/1.1" 200 1932
+INFO 2025-11-08 19:53:27,901 basehttp 10012 15328 "GET /api/kids/progress HTTP/1.1" 200 1932
+INFO 2025-11-08 19:53:29,172 basehttp 10012 21460 "POST /api/vocabulary/ HTTP/1.1" 201 285
+INFO 2025-11-08 19:53:29,220 basehttp 10012 21460 "POST /api/kids/pronunciation/practice HTTP/1.1" 201 193
+INFO 2025-11-08 19:53:29,278 basehttp 10012 15328 "GET /api/kids/progress HTTP/1.1" 200 1932
+INFO 2025-11-08 19:53:29,315 basehttp 10012 15328 "POST /api/kids/progress/update HTTP/1.1" 200 1975
+INFO 2025-11-08 19:53:29,339 basehttp 10012 15328 "GET /api/kids/progress HTTP/1.1" 200 1975
+INFO 2025-11-08 19:53:29,388 basehttp 10012 15328 "POST /api/kids/progress/update HTTP/1.1" 200 1975
+INFO 2025-11-08 19:53:29,441 basehttp 10012 15328 "POST /api/achievements/check HTTP/1.1" 200 58
+INFO 2025-11-08 19:53:29,489 basehttp 10012 15328 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:53:30,904 basehttp 10012 15328 "GET /api/kids/progress HTTP/1.1" 200 1975
+INFO 2025-11-08 19:53:31,877 basehttp 10012 21460 "POST /api/vocabulary/ HTTP/1.1" 200 287
+INFO 2025-11-08 19:53:31,905 basehttp 10012 8456 "POST /api/kids/pronunciation/practice HTTP/1.1" 200 193
+INFO 2025-11-08 19:53:31,986 basehttp 10012 15328 "GET /api/kids/progress HTTP/1.1" 200 1975
+INFO 2025-11-08 19:53:32,083 basehttp 10012 15328 "POST /api/kids/progress/update HTTP/1.1" 200 1975
+INFO 2025-11-08 19:53:32,143 basehttp 10012 15328 "GET /api/kids/progress HTTP/1.1" 200 1975
+INFO 2025-11-08 19:53:32,219 basehttp 10012 15328 "POST /api/kids/progress/update HTTP/1.1" 200 1975
+INFO 2025-11-08 19:53:32,275 basehttp 10012 15328 "POST /api/achievements/check HTTP/1.1" 200 58
+INFO 2025-11-08 19:53:32,321 basehttp 10012 15328 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:53:33,892 basehttp 10012 15328 "GET /api/kids/progress HTTP/1.1" 200 1975
+INFO 2025-11-08 19:53:36,923 basehttp 10012 17260 "GET /api/kids/progress HTTP/1.1" 200 1975
+INFO 2025-11-08 19:53:39,906 basehttp 10012 17260 "GET /api/kids/progress HTTP/1.1" 200 1975
+INFO 2025-11-08 19:53:41,963 basehttp 10012 26156 "POST /api/vocabulary/ HTTP/1.1" 201 326
+INFO 2025-11-08 19:53:42,007 basehttp 10012 26156 "POST /api/kids/pronunciation/practice HTTP/1.1" 201 211
+INFO 2025-11-08 19:53:42,047 basehttp 10012 17260 "GET /api/kids/progress HTTP/1.1" 200 1975
+INFO 2025-11-08 19:53:42,118 basehttp 10012 17260 "POST /api/kids/progress/update HTTP/1.1" 200 2036
+INFO 2025-11-08 19:53:42,159 basehttp 10012 17260 "GET /api/kids/progress HTTP/1.1" 200 2036
+INFO 2025-11-08 19:53:42,222 basehttp 10012 17260 "POST /api/kids/progress/update HTTP/1.1" 200 2036
+INFO 2025-11-08 19:53:42,283 basehttp 10012 17260 "POST /api/achievements/check HTTP/1.1" 200 58
+INFO 2025-11-08 19:53:42,318 basehttp 10012 17260 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:53:42,896 basehttp 10012 17260 "GET /api/kids/progress HTTP/1.1" 200 2036
+INFO 2025-11-08 19:53:44,966 basehttp 10012 15040 "POST /api/vocabulary/ HTTP/1.1" 200 328
+INFO 2025-11-08 19:53:44,986 basehttp 10012 23876 "POST /api/kids/pronunciation/practice HTTP/1.1" 200 211
+INFO 2025-11-08 19:53:45,050 basehttp 10012 19444 "GET /api/kids/progress HTTP/1.1" 200 2036
+INFO 2025-11-08 19:53:45,121 basehttp 10012 19444 "POST /api/kids/progress/update HTTP/1.1" 200 2036
+INFO 2025-11-08 19:53:45,190 basehttp 10012 19444 "GET /api/kids/progress HTTP/1.1" 200 2036
+INFO 2025-11-08 19:53:45,263 basehttp 10012 19444 "POST /api/kids/progress/update HTTP/1.1" 200 2036
+INFO 2025-11-08 19:53:45,326 basehttp 10012 19444 "POST /api/achievements/check HTTP/1.1" 200 58
+INFO 2025-11-08 19:53:45,365 basehttp 10012 19444 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:53:45,905 basehttp 10012 19444 "GET /api/kids/progress HTTP/1.1" 200 2036
+INFO 2025-11-08 19:53:48,916 basehttp 10012 19444 "GET /api/kids/progress HTTP/1.1" 200 2036
+INFO 2025-11-08 19:53:51,910 basehttp 10012 19444 "GET /api/kids/progress HTTP/1.1" 200 2036
+INFO 2025-11-08 19:53:54,889 basehttp 10012 19444 "GET /api/kids/progress HTTP/1.1" 200 2036
+INFO 2025-11-08 19:53:56,086 basehttp 10012 23876 "POST /api/vocabulary/ HTTP/1.1" 201 319
+INFO 2025-11-08 19:53:56,207 basehttp 10012 23876 "POST /api/kids/pronunciation/practice HTTP/1.1" 201 208
+INFO 2025-11-08 19:53:56,254 basehttp 10012 19444 "GET /api/kids/progress HTTP/1.1" 200 2036
+INFO 2025-11-08 19:53:56,314 basehttp 10012 19444 "POST /api/kids/progress/update HTTP/1.1" 200 2094
+INFO 2025-11-08 19:53:56,365 basehttp 10012 19444 "GET /api/kids/progress HTTP/1.1" 200 2094
+INFO 2025-11-08 19:53:56,415 basehttp 10012 19444 "POST /api/kids/progress/update HTTP/1.1" 200 2094
+INFO 2025-11-08 19:53:56,463 basehttp 10012 19444 "POST /api/achievements/check HTTP/1.1" 200 58
+INFO 2025-11-08 19:53:56,514 basehttp 10012 19444 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:53:57,908 basehttp 10012 19444 "GET /api/kids/progress HTTP/1.1" 200 2094
+INFO 2025-11-08 19:54:00,911 basehttp 10012 13936 "GET /api/kids/progress HTTP/1.1" 200 2094
+INFO 2025-11-08 19:54:03,917 basehttp 10012 13936 "GET /api/kids/progress HTTP/1.1" 200 2094
+INFO 2025-11-08 19:54:06,903 basehttp 10012 13936 "GET /api/kids/progress HTTP/1.1" 200 2094
+INFO 2025-11-08 19:54:08,003 basehttp 10012 21816 "POST /api/vocabulary/ HTTP/1.1" 201 326
+INFO 2025-11-08 19:54:08,064 basehttp 10012 21816 "POST /api/kids/pronunciation/practice HTTP/1.1" 201 214
+INFO 2025-11-08 19:54:08,134 basehttp 10012 13936 "GET /api/kids/progress HTTP/1.1" 200 2094
+INFO 2025-11-08 19:54:08,207 basehttp 10012 13936 "POST /api/kids/progress/update HTTP/1.1" 200 2158
+INFO 2025-11-08 19:54:08,249 basehttp 10012 13936 "GET /api/kids/progress HTTP/1.1" 200 2158
+INFO 2025-11-08 19:54:08,319 basehttp 10012 13936 "POST /api/kids/progress/update HTTP/1.1" 200 2158
+INFO 2025-11-08 19:54:08,404 basehttp 10012 13936 "POST /api/achievements/check HTTP/1.1" 200 58
+INFO 2025-11-08 19:54:08,448 basehttp 10012 13936 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:54:09,911 basehttp 10012 12392 "GET /api/kids/progress HTTP/1.1" 200 2158
+INFO 2025-11-08 19:54:12,905 basehttp 10012 12392 "GET /api/kids/progress HTTP/1.1" 200 2158
+INFO 2025-11-08 19:54:15,893 basehttp 10012 12392 "GET /api/kids/progress HTTP/1.1" 200 2158
+INFO 2025-11-08 19:54:18,889 basehttp 10012 12392 "GET /api/kids/progress HTTP/1.1" 200 2158
+INFO 2025-11-08 19:54:21,916 basehttp 10012 12024 "GET /api/kids/progress HTTP/1.1" 200 2158
+INFO 2025-11-08 19:54:24,919 basehttp 10012 12024 "GET /api/kids/progress HTTP/1.1" 200 2158
+INFO 2025-11-08 19:54:27,886 basehttp 10012 12024 "GET /api/kids/progress HTTP/1.1" 200 2158
+INFO 2025-11-08 19:54:28,483 basehttp 10012 12748 "POST /api/vocabulary/ HTTP/1.1" 201 311
+INFO 2025-11-08 19:54:28,548 basehttp 10012 12748 "POST /api/kids/pronunciation/practice HTTP/1.1" 201 207
+INFO 2025-11-08 19:54:28,600 basehttp 10012 12024 "GET /api/kids/progress HTTP/1.1" 200 2158
+INFO 2025-11-08 19:54:28,683 basehttp 10012 12024 "POST /api/kids/progress/update HTTP/1.1" 200 2215
+INFO 2025-11-08 19:54:28,732 basehttp 10012 12024 "GET /api/kids/progress HTTP/1.1" 200 2215
+INFO 2025-11-08 19:54:28,798 basehttp 10012 12024 "POST /api/kids/progress/update HTTP/1.1" 200 2215
+INFO 2025-11-08 19:54:28,863 basehttp 10012 12024 "POST /api/achievements/check HTTP/1.1" 200 58
+INFO 2025-11-08 19:54:28,907 basehttp 10012 12024 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:54:30,906 basehttp 10012 1796 "GET /api/kids/progress HTTP/1.1" 200 2215
+INFO 2025-11-08 19:54:31,571 basehttp 10012 9484 "POST /api/vocabulary/ HTTP/1.1" 200 313
+INFO 2025-11-08 19:54:31,611 basehttp 10012 15668 "POST /api/kids/pronunciation/practice HTTP/1.1" 200 207
+INFO 2025-11-08 19:54:31,676 basehttp 10012 1796 "GET /api/kids/progress HTTP/1.1" 200 2215
+INFO 2025-11-08 19:54:31,757 basehttp 10012 1796 "POST /api/kids/progress/update HTTP/1.1" 200 2215
+INFO 2025-11-08 19:54:31,799 basehttp 10012 1796 "GET /api/kids/progress HTTP/1.1" 200 2215
+INFO 2025-11-08 19:54:31,869 basehttp 10012 1796 "POST /api/kids/progress/update HTTP/1.1" 200 2215
+INFO 2025-11-08 19:54:31,916 basehttp 10012 1796 "POST /api/achievements/check HTTP/1.1" 200 58
+INFO 2025-11-08 19:54:31,948 basehttp 10012 1796 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:54:33,901 basehttp 10012 1796 "GET /api/kids/progress HTTP/1.1" 200 2215
+INFO 2025-11-08 19:54:36,912 basehttp 10012 1796 "GET /api/kids/progress HTTP/1.1" 200 2215
+INFO 2025-11-08 19:54:39,896 basehttp 10012 21444 "GET /api/kids/progress HTTP/1.1" 200 2215
+INFO 2025-11-08 19:54:41,113 basehttp 10012 23600 "POST /api/vocabulary/ HTTP/1.1" 201 336
+INFO 2025-11-08 19:54:41,155 basehttp 10012 23600 "POST /api/kids/pronunciation/practice HTTP/1.1" 201 218
+INFO 2025-11-08 19:54:41,221 basehttp 10012 21444 "GET /api/kids/progress HTTP/1.1" 200 2215
+INFO 2025-11-08 19:54:41,300 basehttp 10012 21444 "POST /api/kids/progress/update HTTP/1.1" 200 2283
+INFO 2025-11-08 19:54:41,348 basehttp 10012 21444 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 19:54:41,419 basehttp 10012 21444 "POST /api/kids/progress/update HTTP/1.1" 200 2283
+INFO 2025-11-08 19:54:41,481 basehttp 10012 21444 "POST /api/achievements/check HTTP/1.1" 200 58
+INFO 2025-11-08 19:54:41,518 basehttp 10012 21444 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:54:42,900 basehttp 10012 21444 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 19:54:43,686 basehttp 10012 23600 "POST /api/vocabulary/ HTTP/1.1" 200 338
+INFO 2025-11-08 19:54:43,718 basehttp 10012 23536 "POST /api/kids/pronunciation/practice HTTP/1.1" 200 218
+INFO 2025-11-08 19:54:43,775 basehttp 10012 21444 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 19:54:43,837 basehttp 10012 21444 "POST /api/kids/progress/update HTTP/1.1" 200 2283
+INFO 2025-11-08 19:54:43,882 basehttp 10012 21444 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 19:54:43,972 basehttp 10012 21444 "POST /api/kids/progress/update HTTP/1.1" 200 2283
+INFO 2025-11-08 19:54:44,027 basehttp 10012 21444 "POST /api/achievements/check HTTP/1.1" 200 58
+INFO 2025-11-08 19:54:44,069 basehttp 10012 21444 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 19:54:45,906 basehttp 10012 21444 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 19:54:48,882 basehttp 10012 21444 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 19:54:51,885 basehttp 10012 21444 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 19:54:54,883 basehttp 10012 21444 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 19:54:56,011 basehttp 10012 21444 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 19:54:56,029 basehttp 10012 16236 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 20:01:00,175 basehttp 10012 19200 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:01:03,202 basehttp 10012 19200 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:01:06,242 basehttp 10012 19200 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:03:51,805 basehttp 10012 19200 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:03:51,805 basehttp 10012 13944 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 20:03:51,809 basehttp 10012 26264 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 20:03:54,881 basehttp 10012 26264 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:03:56,347 basehttp 10012 26264 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:03:56,354 basehttp 10012 13944 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 20:04:08,026 basehttp 10012 18016 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:04:08,026 basehttp 10012 12740 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 20:04:52,750 basehttp 10012 16888 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 20:04:54,100 basehttp 10012 12740 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:04:54,101 basehttp 10012 18016 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 20:10:16,977 basehttp 10012 25988 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:10:16,977 basehttp 10012 12048 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 20:14:49,425 basehttp 10012 23600 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:14:49,425 basehttp 10012 2284 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 20:14:49,425 basehttp 10012 21916 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 20:14:52,450 basehttp 10012 1284 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:14:52,927 basehttp 10012 1284 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:14:55,446 basehttp 10012 1284 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:14:58,306 basehttp 10012 1284 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:15:01,256 basehttp 10012 1284 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:15:01,320 basehttp 10012 1284 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:15:04,328 basehttp 10012 1284 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:15:07,311 basehttp 10012 1284 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:15:10,319 basehttp 10012 1284 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:15:13,310 basehttp 10012 1284 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:15:16,327 basehttp 10012 1284 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:17:07,387 basehttp 10012 1284 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:17:07,388 basehttp 10012 2836 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 20:17:07,390 basehttp 10012 25228 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 20:17:10,403 basehttp 10012 25228 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:17:13,410 basehttp 10012 25228 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:17:13,909 basehttp 10012 25228 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:17:13,920 basehttp 10012 2836 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 20:24:52,072 autoreload 10012 8552 C:\Users\shent\OneDrive\Desktop\Elora\server\api\models.py changed, reloading.
+INFO 2025-11-08 20:25:04,268 autoreload 15948 21736 Watching for file changes with StatReloader
+INFO 2025-11-08 20:25:14,032 autoreload 15948 21736 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
+INFO 2025-11-08 20:25:14,777 autoreload 1912 10172 Watching for file changes with StatReloader
+INFO 2025-11-08 20:25:24,406 autoreload 1912 10172 C:\Users\shent\OneDrive\Desktop\Elora\server\api\serializers.py changed, reloading.
+INFO 2025-11-08 20:25:25,270 autoreload 16900 8928 Watching for file changes with StatReloader
+INFO 2025-11-08 20:25:36,927 autoreload 16900 8928 C:\Users\shent\OneDrive\Desktop\Elora\server\api\admin.py changed, reloading.
+INFO 2025-11-08 20:25:37,831 autoreload 5936 15600 Watching for file changes with StatReloader
+INFO 2025-11-08 20:26:08,738 autoreload 5936 15600 C:\Users\shent\OneDrive\Desktop\Elora\server\api\admin.py changed, reloading.
+INFO 2025-11-08 20:26:09,796 autoreload 22816 2896 Watching for file changes with StatReloader
+INFO 2025-11-08 20:26:23,015 basehttp 22816 18504 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 20:26:29,950 autoreload 22816 2896 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-08 20:26:31,929 autoreload 7068 21336 Watching for file changes with StatReloader
+INFO 2025-11-08 20:26:56,986 autoreload 7068 21336 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-08 20:26:58,751 autoreload 3520 3100 Watching for file changes with StatReloader
+INFO 2025-11-08 20:28:47,915 autoreload 3520 3100 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-08 20:28:49,060 autoreload 25408 13752 Watching for file changes with StatReloader
+INFO 2025-11-08 20:29:06,513 autoreload 25408 13752 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-08 20:29:08,195 autoreload 16576 3272 Watching for file changes with StatReloader
+INFO 2025-11-08 20:30:08,721 basehttp 16576 14128 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 20:35:55,365 basehttp 16576 12908 "OPTIONS /api/notifications HTTP/1.1" 200 0
+ERROR 2025-11-08 20:35:55,428 views 16576 12908 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:35:55,432 log 16576 12908 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:35:55,432 basehttp 16576 12908 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:36:56,322 views 16576 25504 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:36:56,322 log 16576 25504 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:36:56,332 basehttp 16576 25504 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:37:55,440 views 16576 14944 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:37:55,444 log 16576 14944 Internal Server Error: /api/notifications
+INFO 2025-11-08 20:37:55,451 basehttp 16576 14944 - Broken pipe from ('127.0.0.1', 49154)
+INFO 2025-11-08 20:37:58,355 basehttp 16576 10724 "GET /api/auth/user HTTP/1.1" 200 619
+ERROR 2025-11-08 20:38:00,175 views 16576 10724 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:38:00,191 log 16576 10724 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:38:00,191 basehttp 16576 10724 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 20:38:08,685 basehttp 16576 24372 "GET /api/auth/user HTTP/1.1" 200 619
+ERROR 2025-11-08 20:38:10,024 views 16576 24372 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:38:10,041 log 16576 24372 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:38:10,045 basehttp 16576 24372 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:39:10,331 views 16576 22300 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:39:10,335 log 16576 22300 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:39:10,348 basehttp 16576 22300 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:40:10,265 views 16576 20244 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:40:10,271 log 16576 20244 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:40:10,271 basehttp 16576 20244 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:41:10,279 views 16576 9792 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:41:10,279 log 16576 9792 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:41:10,279 basehttp 16576 9792 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:41:22,225 views 16576 9792 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:41:22,226 log 16576 9792 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:41:22,228 basehttp 16576 9792 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:41:40,411 views 16576 23960 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:41:40,411 log 16576 23960 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:41:40,411 basehttp 16576 23960 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 20:42:06,215 basehttp 16576 11116 "GET /api/auth/user HTTP/1.1" 200 619
+ERROR 2025-11-08 20:42:07,604 views 16576 11116 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:42:07,608 log 16576 11116 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:42:07,612 basehttp 16576 11116 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:42:07,712 views 16576 11116 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:42:07,712 log 16576 11116 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:42:07,726 basehttp 16576 11116 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:42:22,963 views 16576 11116 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:42:22,970 log 16576 11116 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:42:22,970 basehttp 16576 11116 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 20:42:25,235 basehttp 16576 1968 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 20:42:25,236 basehttp 16576 22624 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:42:25,253 basehttp 16576 17552 "GET /api/kids/lessons HTTP/1.1" 200 2
+ERROR 2025-11-08 20:42:28,736 views 16576 7140 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:42:28,738 log 16576 7140 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:42:28,747 basehttp 16576 7140 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:42:59,673 views 16576 11844 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:42:59,678 log 16576 11844 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:42:59,686 basehttp 16576 11844 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:43:07,936 views 16576 24792 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:43:07,947 log 16576 24792 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:43:07,967 basehttp 16576 24792 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:43:19,237 views 16576 5732 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:43:19,241 log 16576 5732 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:43:19,245 basehttp 16576 5732 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:43:25,817 views 16576 26208 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:43:25,824 log 16576 26208 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:43:25,831 basehttp 16576 26208 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:44:07,907 views 16576 12584 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:44:07,911 log 16576 12584 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:44:07,922 basehttp 16576 12584 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 20:45:08,859 basehttp 16576 13564 "GET /api/auth/user HTTP/1.1" 200 619
+ERROR 2025-11-08 20:45:10,170 views 16576 21048 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:45:10,170 log 16576 21048 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:45:10,170 basehttp 16576 21048 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:45:10,203 views 16576 21048 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:45:10,210 log 16576 21048 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:45:10,212 basehttp 16576 21048 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:46:11,299 views 16576 8336 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:46:11,302 log 16576 8336 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:46:11,305 basehttp 16576 8336 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:47:10,519 views 16576 22604 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:47:10,524 log 16576 22604 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:47:10,532 basehttp 16576 22604 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:47:55,125 views 16576 18492 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:47:55,131 log 16576 18492 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:47:55,135 basehttp 16576 18492 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 20:47:57,624 basehttp 16576 18492 "GET /api/auth/user HTTP/1.1" 200 619
+ERROR 2025-11-08 20:47:59,519 views 16576 16280 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:47:59,523 log 16576 16280 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:47:59,525 basehttp 16576 16280 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:47:59,568 views 16576 16280 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:47:59,572 log 16576 16280 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:47:59,574 basehttp 16576 16280 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 20:48:01,923 basehttp 16576 25764 "OPTIONS /api/kids/progress HTTP/1.1" 200 0
+INFO 2025-11-08 20:48:01,944 basehttp 16576 192 "OPTIONS /api/kids/achievements HTTP/1.1" 200 0
+INFO 2025-11-08 20:48:01,961 basehttp 16576 25764 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 20:48:01,985 basehttp 16576 9612 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:48:01,985 basehttp 16576 192 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 20:48:04,977 basehttp 16576 192 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 20:48:06,677 basehttp 16576 9612 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 20:48:06,678 basehttp 16576 192 "GET /api/kids/progress HTTP/1.1" 200 2283
+ERROR 2025-11-08 20:48:06,689 views 16576 16280 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:48:06,698 log 16576 16280 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:48:06,703 basehttp 16576 16280 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:48:13,827 views 16576 16616 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:48:13,831 log 16576 16616 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:48:13,835 basehttp 16576 16616 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:49:00,304 views 16576 12276 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:49:00,304 log 16576 12276 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:49:00,304 basehttp 16576 12276 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 20:49:41,215 autoreload 16576 3272 C:\Users\shent\OneDrive\Desktop\Elora\server\api\admin.py changed, reloading.
+INFO 2025-11-08 20:49:42,586 autoreload 17952 21680 Watching for file changes with StatReloader
+INFO 2025-11-08 20:49:43,272 basehttp 17952 15072 "GET /api/auth/user HTTP/1.1" 200 619
+ERROR 2025-11-08 20:49:45,581 views 17952 22948 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:49:45,581 log 17952 22948 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:49:45,581 basehttp 17952 22948 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:49:45,600 views 17952 22948 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:49:45,601 log 17952 22948 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:49:45,602 basehttp 17952 22948 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 20:50:02,783 basehttp 17952 23720 "GET /api/auth/user HTTP/1.1" 200 619
+ERROR 2025-11-08 20:50:04,123 views 17952 23720 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:50:04,123 log 17952 23720 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:50:04,135 basehttp 17952 23720 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:50:04,163 views 17952 23720 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:50:04,163 log 17952 23720 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:50:04,163 basehttp 17952 23720 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:51:04,444 views 17952 4568 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:51:04,447 log 17952 4568 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:51:04,449 basehttp 17952 4568 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:51:13,702 views 17952 4568 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:51:13,705 log 17952 4568 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:51:13,708 basehttp 17952 4568 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:52:05,279 views 17952 4704 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:52:05,279 log 17952 4704 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:52:05,279 basehttp 17952 4704 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 20:52:46,274 basehttp 17952 10612 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 20:53:02,947 basehttp 17952 10612 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 20:53:09,956 basehttp 17952 10612 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 20:53:15,636 basehttp 17952 14132 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 20:53:19,030 basehttp 17952 14132 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 20:53:31,925 basehttp 17952 13872 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 20:53:37,095 basehttp 17952 12264 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 20:53:40,974 basehttp 17952 12264 "GET /api/auth/user HTTP/1.1" 200 619
+INFO 2025-11-08 20:56:20,241 basehttp 17952 9960 "OPTIONS /api/auth/user HTTP/1.1" 200 0
+INFO 2025-11-08 20:56:20,262 basehttp 17952 9960 "GET /api/auth/user HTTP/1.1" 200 619
+ERROR 2025-11-08 20:56:26,939 views 17952 9960 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:56:26,939 log 17952 9960 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:56:26,942 basehttp 17952 9960 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:56:27,011 views 17952 9960 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:56:27,019 log 17952 9960 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:56:27,023 basehttp 17952 9960 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 20:56:36,432 autoreload 17952 21680 C:\Users\shent\OneDrive\Desktop\Elora\server\api\models.py changed, reloading.
+INFO 2025-11-08 20:56:37,901 autoreload 13444 15172 Watching for file changes with StatReloader
+INFO 2025-11-08 20:56:40,868 autoreload 13444 15172 C:\Users\shent\OneDrive\Desktop\Elora\server\api\admin.py changed, reloading.
+INFO 2025-11-08 20:56:41,803 autoreload 14392 23600 Watching for file changes with StatReloader
+INFO 2025-11-08 20:56:43,830 autoreload 14392 23600 C:\Users\shent\OneDrive\Desktop\Elora\server\api\urls.py changed, reloading.
+INFO 2025-11-08 20:56:44,691 autoreload 18536 19724 Watching for file changes with StatReloader
+INFO 2025-11-08 20:56:46,915 autoreload 18536 19724 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-08 20:56:48,929 autoreload 22928 21916 Watching for file changes with StatReloader
+INFO 2025-11-08 20:56:52,369 basehttp 22928 19840 "GET /api/auth/user HTTP/1.1" 200 619
+ERROR 2025-11-08 20:56:54,335 views 22928 19840 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:56:54,343 log 22928 19840 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:56:54,344 basehttp 22928 19840 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:56:54,379 views 22928 19840 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:56:54,385 log 22928 19840 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:56:54,396 basehttp 22928 19840 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:56:58,000 views 22928 19840 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:56:58,002 log 22928 19840 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:56:58,003 basehttp 22928 19840 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:56:58,027 views 22928 19840 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:56:58,031 log 22928 19840 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:56:58,033 basehttp 22928 19840 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:56:59,951 views 22928 19840 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:56:59,951 log 22928 19840 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:56:59,955 basehttp 22928 19840 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:57:06,312 views 22928 18492 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:57:06,313 log 22928 18492 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:57:06,314 basehttp 22928 18492 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 20:57:47,884 basehttp 22928 14872 "GET /api/auth/user HTTP/1.1" 200 619
+ERROR 2025-11-08 20:57:49,202 views 22928 14872 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:57:49,216 log 22928 14872 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:57:49,216 basehttp 22928 14872 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:57:49,241 views 22928 14872 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:57:49,241 log 22928 14872 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:57:49,241 basehttp 22928 14872 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:58:50,255 views 22928 20216 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:58:50,255 log 22928 20216 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:58:50,255 basehttp 22928 20216 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:59:27,475 views 22928 19200 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:59:27,479 log 22928 19200 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:59:27,484 basehttp 22928 19200 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 20:59:27,558 views 22928 19200 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 20:59:27,560 log 22928 19200 Internal Server Error: /api/notifications
+ERROR 2025-11-08 20:59:27,566 basehttp 22928 19200 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:00:18,583 views 22928 19152 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:00:18,583 log 22928 19152 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:00:18,595 basehttp 22928 19152 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:00:23,030 views 22928 23804 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:00:23,030 log 22928 23804 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:00:23,042 basehttp 22928 23804 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:00:23,097 views 22928 23804 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:00:23,100 log 22928 23804 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:00:23,107 basehttp 22928 23804 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:00:44,288 views 22928 26352 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:00:44,288 log 22928 26352 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:00:44,288 basehttp 22928 26352 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:00:45,024 views 22928 26352 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:00:45,024 log 22928 26352 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:00:45,024 basehttp 22928 26352 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:00:51,591 views 22928 19568 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:00:51,591 log 22928 19568 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:00:51,591 basehttp 22928 19568 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:00:51,622 views 22928 19568 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:00:51,622 log 22928 19568 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:00:51,630 basehttp 22928 19568 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:00:53,560 views 22928 19568 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:00:53,566 log 22928 19568 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:00:53,572 basehttp 22928 19568 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:00:55,985 views 22928 19568 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:00:55,985 log 22928 19568 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:00:55,985 basehttp 22928 19568 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:00:56,280 views 22928 19568 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:00:56,280 log 22928 19568 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:00:56,280 basehttp 22928 19568 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:01:00,017 views 22928 19568 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:01:00,017 log 22928 19568 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:01:00,017 basehttp 22928 19568 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:01:56,603 views 22928 3784 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:01:56,604 log 22928 3784 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:01:56,604 basehttp 22928 3784 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:02:57,245 views 22928 11708 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:02:57,245 log 22928 11708 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:02:57,245 basehttp 22928 11708 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:03:56,940 views 22928 11708 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:03:56,940 log 22928 11708 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:03:56,940 basehttp 22928 11708 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:04:47,921 views 22928 23716 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:04:47,921 log 22928 23716 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:04:47,927 basehttp 22928 23716 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:04:55,270 views 22928 23716 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:04:55,282 log 22928 23716 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:04:55,287 basehttp 22928 23716 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:04:56,631 views 22928 24260 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:04:56,634 log 22928 24260 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:04:56,638 basehttp 22928 24260 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:05:20,353 views 22928 25876 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:05:20,353 log 22928 25876 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:05:20,353 basehttp 22928 25876 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:05:57,242 views 22928 18720 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:05:57,242 log 22928 18720 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:05:57,242 basehttp 22928 18720 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:06:56,326 views 22928 18720 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:06:56,331 log 22928 18720 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:06:56,336 basehttp 22928 18720 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:07:53,771 views 22928 18720 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:07:53,773 log 22928 18720 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:07:53,778 basehttp 22928 18720 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:07:53,824 views 22928 18720 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:07:53,828 log 22928 18720 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:07:53,835 basehttp 22928 18720 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:08:30,637 views 22928 18720 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:08:30,640 log 22928 18720 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:08:30,652 basehttp 22928 18720 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:08:49,546 views 22928 9288 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:08:49,549 log 22928 9288 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:08:49,551 basehttp 22928 9288 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:08:53,724 views 22928 9288 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:08:53,727 log 22928 9288 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:08:53,728 basehttp 22928 9288 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:09:13,547 views 22928 7012 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:09:13,549 log 22928 7012 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:09:13,552 basehttp 22928 7012 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:09:19,036 views 22928 7012 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:09:19,037 log 22928 7012 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:09:19,039 basehttp 22928 7012 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:09:24,005 basehttp 22928 7012 "GET /api/auth/user HTTP/1.1" 200 619
+ERROR 2025-11-08 21:09:25,588 views 22928 7012 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:09:25,588 log 22928 7012 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:09:25,600 basehttp 22928 7012 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:09:25,902 views 22928 7012 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:09:25,906 log 22928 7012 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:09:25,909 basehttp 22928 7012 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:10:26,222 views 22928 6832 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:10:26,222 log 22928 6832 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:10:26,222 basehttp 22928 6832 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:11:25,904 views 22928 6832 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:11:25,904 log 22928 6832 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:11:25,904 basehttp 22928 6832 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:12:25,917 views 22928 6832 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:12:25,917 log 22928 6832 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:12:25,925 basehttp 22928 6832 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:13:25,903 views 22928 6832 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:13:25,903 log 22928 6832 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:13:25,903 basehttp 22928 6832 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:14:24,374 basehttp 22928 24784 "OPTIONS /api/auth/user HTTP/1.1" 200 0
+WARNING 2025-11-08 21:14:24,378 log 22928 24784 Unauthorized: /api/auth/user
+WARNING 2025-11-08 21:14:24,378 basehttp 22928 24784 "GET /api/auth/user HTTP/1.1" 401 172
+INFO 2025-11-08 21:14:25,787 basehttp 22928 24784 "OPTIONS /api/notifications HTTP/1.1" 200 0
+WARNING 2025-11-08 21:14:25,790 log 22928 24784 Unauthorized: /api/notifications
+WARNING 2025-11-08 21:14:25,792 basehttp 22928 24784 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-08 21:14:26,038 log 22928 24784 Unauthorized: /api/notifications
+WARNING 2025-11-08 21:14:26,038 basehttp 22928 24784 "GET /api/notifications HTTP/1.1" 401 172
+ERROR 2025-11-08 21:14:26,287 views 22928 17588 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:14:26,289 log 22928 17588 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:14:26,292 basehttp 22928 17588 "GET /api/notifications HTTP/1.1" 500 102
+WARNING 2025-11-08 21:14:40,459 log 22928 2584 Unauthorized: /api/auth/user
+WARNING 2025-11-08 21:14:40,459 basehttp 22928 2584 "GET /api/auth/user HTTP/1.1" 401 172
+WARNING 2025-11-08 21:14:41,759 log 22928 2584 Unauthorized: /api/notifications
+WARNING 2025-11-08 21:14:41,762 basehttp 22928 2584 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-08 21:14:42,359 log 22928 15212 Unauthorized: /api/notifications
+WARNING 2025-11-08 21:14:42,359 basehttp 22928 15212 "GET /api/notifications HTTP/1.1" 401 172
+INFO 2025-11-08 21:14:59,592 basehttp 22928 20360 "OPTIONS /api/auth/user HTTP/1.1" 200 0
+WARNING 2025-11-08 21:14:59,600 log 22928 20360 Unauthorized: /api/auth/user
+WARNING 2025-11-08 21:14:59,602 basehttp 22928 20360 "GET /api/auth/user HTTP/1.1" 401 172
+INFO 2025-11-08 21:15:01,243 basehttp 22928 20360 "OPTIONS /api/notifications HTTP/1.1" 200 0
+WARNING 2025-11-08 21:15:01,249 log 22928 20360 Unauthorized: /api/notifications
+WARNING 2025-11-08 21:15:01,249 basehttp 22928 20360 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-08 21:15:01,574 log 22928 20360 Unauthorized: /api/notifications
+WARNING 2025-11-08 21:15:01,574 basehttp 22928 20360 "GET /api/notifications HTTP/1.1" 401 172
+ERROR 2025-11-08 21:15:26,265 views 22928 24352 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:15:26,265 log 22928 24352 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:15:26,265 basehttp 22928 24352 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:16:35,975 views 22928 24352 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:16:35,975 log 22928 24352 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:16:35,975 basehttp 22928 24352 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:17:21,273 views 22928 24352 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:17:21,283 log 22928 24352 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:17:21,295 basehttp 22928 24352 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:17:25,918 views 22928 24352 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:17:25,923 log 22928 24352 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:17:25,929 basehttp 22928 24352 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:17:33,217 views 22928 24352 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:17:33,226 log 22928 24352 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:17:33,234 basehttp 22928 24352 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:17:33,745 views 22928 24352 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:17:33,745 log 22928 24352 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:17:33,745 basehttp 22928 24352 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:17:57,359 basehttp 22928 24352 "GET /api/auth/user HTTP/1.1" 200 619
+ERROR 2025-11-08 21:17:58,960 views 22928 24352 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:17:58,960 log 22928 24352 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:17:58,960 basehttp 22928 24352 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:17:59,288 views 22928 24352 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:17:59,288 log 22928 24352 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:17:59,288 basehttp 22928 24352 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:18:22,074 views 22928 24352 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:18:22,075 log 22928 24352 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:18:22,076 basehttp 22928 24352 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:18:59,205 views 22928 24352 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:18:59,205 log 22928 24352 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:18:59,205 basehttp 22928 24352 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:18:59,292 views 22928 24352 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:18:59,292 log 22928 24352 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:18:59,292 basehttp 22928 24352 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:19:12,925 views 22928 24352 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:19:12,929 log 22928 24352 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:19:12,929 basehttp 22928 24352 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:19:21,088 views 22928 24352 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:19:21,089 log 22928 24352 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:19:21,090 basehttp 22928 24352 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:19:26,545 basehttp 22928 24352 "GET /api/auth/user HTTP/1.1" 200 619
+ERROR 2025-11-08 21:19:28,121 views 22928 24352 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:19:28,121 log 22928 24352 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:19:28,121 basehttp 22928 24352 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:19:28,436 views 22928 24352 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:19:28,439 log 22928 24352 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:19:28,441 basehttp 22928 24352 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:20:27,349 basehttp 22928 25528 "OPTIONS /api/auth/user HTTP/1.1" 200 0
+WARNING 2025-11-08 21:20:27,356 log 22928 25528 Unauthorized: /api/auth/user
+WARNING 2025-11-08 21:20:27,358 basehttp 22928 25528 "GET /api/auth/user HTTP/1.1" 401 172
+INFO 2025-11-08 21:20:28,658 basehttp 22928 2168 "OPTIONS /api/notifications HTTP/1.1" 200 0
+WARNING 2025-11-08 21:20:28,664 log 22928 2168 Unauthorized: /api/notifications
+WARNING 2025-11-08 21:20:28,664 basehttp 22928 2168 "GET /api/notifications HTTP/1.1" 401 172
+WARNING 2025-11-08 21:20:28,982 log 22928 2168 Unauthorized: /api/notifications
+WARNING 2025-11-08 21:20:28,982 basehttp 22928 2168 "GET /api/notifications HTTP/1.1" 401 172
+ERROR 2025-11-08 21:20:29,266 views 22928 25372 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:20:29,266 log 22928 25372 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:20:29,280 basehttp 22928 25372 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:21:29,254 views 22928 24992 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:21:29,254 log 22928 24992 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:21:29,254 basehttp 22928 24992 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:22:17,267 views 22928 24992 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:22:17,273 log 22928 24992 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:22:17,274 basehttp 22928 24992 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:22:17,292 views 22928 24992 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:22:17,308 log 22928 24992 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:22:17,308 basehttp 22928 24992 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:22:23,058 views 22928 24992 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:22:23,058 log 22928 24992 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:22:23,058 basehttp 22928 24992 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:23:18,119 views 22928 24992 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:23:18,120 log 22928 24992 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:23:18,121 basehttp 22928 24992 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:23:18,137 views 22928 24992 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:23:18,138 log 22928 24992 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:23:18,139 basehttp 22928 24992 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:23:35,641 views 22928 24992 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:23:35,641 log 22928 24992 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:23:35,641 basehttp 22928 24992 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:23:53,049 views 22928 24992 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:23:53,050 log 22928 24992 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:23:53,052 basehttp 22928 24992 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:23:53,092 views 22928 24992 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:23:53,092 log 22928 24992 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:23:53,092 basehttp 22928 24992 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:24:28,540 views 22928 24992 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:24:28,552 log 22928 24992 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:24:28,560 basehttp 22928 24992 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:24:37,097 views 22928 24992 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:24:37,097 log 22928 24992 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:24:37,097 basehttp 22928 24992 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:24:41,080 views 22928 24992 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:24:41,080 log 22928 24992 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:24:41,080 basehttp 22928 24992 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:24:53,034 views 22928 24992 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:24:53,034 log 22928 24992 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:24:53,034 basehttp 22928 24992 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:25:53,932 views 22928 24992 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:25:53,932 log 22928 24992 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:25:53,934 basehttp 22928 24992 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:26:53,943 views 22928 24992 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:26:53,943 log 22928 24992 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:26:53,943 basehttp 22928 24992 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:27:53,956 views 22928 24992 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:27:53,956 log 22928 24992 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:27:53,959 basehttp 22928 24992 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:28:53,946 views 22928 24992 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:28:53,946 log 22928 24992 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:28:53,946 basehttp 22928 24992 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:30:30,971 views 22928 24992 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:30:30,971 log 22928 24992 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:30:30,971 basehttp 22928 24992 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:30:48,598 autoreload 22928 21916 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-08 21:30:50,930 autoreload 25196 880 Watching for file changes with StatReloader
+ERROR 2025-11-08 21:30:55,620 views 25196 23904 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:30:55,630 log 25196 23904 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:30:55,634 basehttp 25196 23904 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:30:58,751 basehttp 25196 23904 "GET /api/auth/user HTTP/1.1" 200 619
+ERROR 2025-11-08 21:31:00,411 views 25196 23904 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:31:00,411 log 25196 23904 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:31:00,443 basehttp 25196 23904 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:31:00,791 views 25196 23904 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:31:00,803 log 25196 23904 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:31:00,806 basehttp 25196 23904 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:31:04,229 autoreload 25196 880 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-08 21:31:12,986 autoreload 22988 11240 Watching for file changes with StatReloader
+INFO 2025-11-08 21:31:18,095 basehttp 22988 9148 "GET /api/kids/progress HTTP/1.1" 200 2283
+ERROR 2025-11-08 21:31:18,595 views 22988 14440 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:31:18,605 log 22988 14440 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:31:18,605 basehttp 22988 14440 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:31:18,677 views 22988 14440 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:31:18,677 log 22988 14440 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:31:18,694 basehttp 22988 14440 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:31:33,447 autoreload 22988 11240 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-08 21:31:37,246 autoreload 19300 19200 Watching for file changes with StatReloader
+INFO 2025-11-08 21:32:02,981 basehttp 19300 5344 "GET /api/auth/user HTTP/1.1" 200 619
+ERROR 2025-11-08 21:32:04,214 views 19300 5344 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:32:04,217 log 19300 5344 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:32:04,221 basehttp 19300 5344 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:32:04,548 views 19300 5344 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:32:04,548 log 19300 5344 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:32:04,548 basehttp 19300 5344 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:32:57,209 autoreload 19300 19200 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-08 21:32:58,321 autoreload 4440 11592 Watching for file changes with StatReloader
+ERROR 2025-11-08 21:33:05,012 views 4440 16392 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:33:05,028 log 4440 16392 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:33:05,028 basehttp 4440 16392 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:33:16,190 views 4440 16392 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:33:16,190 log 4440 16392 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:33:16,195 basehttp 4440 16392 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:33:40,097 views 4440 16392 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:33:40,097 log 4440 16392 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:33:40,097 basehttp 4440 16392 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:33:57,093 views 4440 16392 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:33:57,097 log 4440 16392 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:33:57,099 basehttp 4440 16392 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:34:05,279 views 4440 18044 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:34:05,279 log 4440 18044 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:34:05,284 basehttp 4440 18044 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:34:13,363 views 4440 26448 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:34:13,365 log 4440 26448 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:34:13,365 basehttp 4440 26448 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:34:45,108 views 4440 10832 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:34:45,116 log 4440 10832 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:34:45,124 basehttp 4440 10832 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:34:45,185 views 4440 10832 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:34:45,190 log 4440 10832 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:34:45,193 basehttp 4440 10832 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:35:22,883 autoreload 4440 11592 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-08 21:35:30,381 autoreload 13276 14212 Watching for file changes with StatReloader
+ERROR 2025-11-08 21:35:45,562 views 13276 19944 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:35:45,580 log 13276 19944 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:35:45,586 basehttp 13276 19944 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:35:54,358 views 13276 19944 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:35:54,359 log 13276 19944 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:35:54,361 basehttp 13276 19944 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:35:54,385 views 13276 19944 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:35:54,387 log 13276 19944 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:35:54,392 basehttp 13276 19944 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:35:55,007 views 13276 19944 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:35:55,015 log 13276 19944 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:35:55,017 basehttp 13276 19944 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:36:03,522 autoreload 13276 14212 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-08 21:36:05,705 autoreload 5768 23964 Watching for file changes with StatReloader
+ERROR 2025-11-08 21:36:09,343 views 5768 2464 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:36:09,357 log 5768 2464 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:36:09,359 basehttp 5768 2464 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:36:55,266 views 5768 3888 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:36:55,266 log 5768 3888 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:36:55,266 basehttp 5768 3888 "GET /api/notifications HTTP/1.1" 500 102
+ERROR 2025-11-08 21:36:55,960 views 5768 3888 User notifications error: (1146, "Table 'elora.api_usernotification' doesn't exist")
+ERROR 2025-11-08 21:36:55,960 log 5768 3888 Internal Server Error: /api/notifications
+ERROR 2025-11-08 21:36:55,960 basehttp 5768 3888 "GET /api/notifications HTTP/1.1" 500 102
+INFO 2025-11-08 21:37:01,597 basehttp 5768 2892 "GET /api/kids/achievements HTTP/1.1" 200 2
+INFO 2025-11-08 21:37:01,597 basehttp 5768 20036 "GET /api/kids/lessons HTTP/1.1" 200 2
+INFO 2025-11-08 21:37:01,615 basehttp 5768 14236 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:37:04,620 basehttp 5768 23824 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:37:07,557 basehttp 5768 23824 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:37:10,562 basehttp 5768 23824 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:37:13,541 basehttp 5768 23824 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:37:16,560 basehttp 5768 23824 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:37:19,575 basehttp 5768 23824 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:37:22,569 basehttp 5768 23824 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:37:25,576 basehttp 5768 23824 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:37:28,592 basehttp 5768 23824 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:37:31,584 basehttp 5768 21696 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:37:34,574 basehttp 5768 21696 "GET /api/kids/progress HTTP/1.1" 200 2283
+INFO 2025-11-08 21:37:37,146 autoreload 5768 23964 C:\Users\shent\OneDrive\Desktop\Elora\server\api\views.py changed, reloading.
+INFO 2025-11-08 21:37:37,974 autoreload 19448 9516 Watching for file changes with StatReloader
+INFO 2025-11-08 21:37:38,323 basehttp 19448 2596 "GET /api/kids/progress HTTP/1.1" 200 2283

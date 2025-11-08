@@ -4,7 +4,7 @@ from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
     VocabularyWord, Achievement, UserAchievement,
     KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, WaitlistEntry,
-    AdminNotification, StoryEnrollment, StoryWord, StoryPhrase, KidsFavorite,
+    UserNotification, AdminNotification, StoryEnrollment, StoryWord, StoryPhrase, KidsFavorite,
     KidsVocabularyPractice, KidsPronunciationPractice, KidsGameSession
 )
 
@@ -243,6 +243,43 @@ class WaitlistEntryAdmin(admin.ModelAdmin):
         updated = queryset.update(notified=False)
         self.message_user(request, f'{updated} entries marked as not notified.')
     mark_as_not_notified.short_description = "Mark selected as not notified"
+
+
+@admin.register(UserNotification)
+class UserNotificationAdmin(admin.ModelAdmin):
+    list_display = ['user', 'title', 'notification_type', 'is_read', 'created_at']
+    list_filter = ['notification_type', 'is_read', 'created_at']
+    search_fields = ['user__username', 'user__email', 'title', 'message']
+    readonly_fields = ['created_at', 'updated_at', 'read_at']
+    date_hierarchy = 'created_at'
+    ordering = ['-created_at']
+
+    fieldsets = (
+        ('Notification', {
+            'fields': ('user', 'notification_type', 'title', 'message', 'icon', 'action_url')
+        }),
+        ('Status', {
+            'fields': ('is_read', 'read_at')
+        }),
+        ('Metadata', {
+            'fields': ('event_key', 'metadata')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
+
+    actions = ['mark_as_read', 'mark_as_unread']
+
+    def mark_as_read(self, request, queryset):
+        updated = queryset.filter(is_read=False).update(is_read=True, read_at=timezone.now())
+        self.message_user(request, f'{updated} notifications marked as read.')
+    mark_as_read.short_description = "Mark selected as read"
+
+    def mark_as_unread(self, request, queryset):
+        updated = queryset.filter(is_read=True).update(is_read=False, read_at=None)
+        self.message_user(request, f'{updated} notifications marked as unread.')
+    mark_as_unread.short_description = "Mark selected as unread"
 
 
 # ============= Admin Notification Admin =============

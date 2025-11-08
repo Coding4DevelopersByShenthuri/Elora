@@ -86,6 +86,7 @@ import AdvancedVocabularySurvey from "@/components/surveys/AdvancedVocabularySur
 import InterestsSurvey from "@/components/surveys/InterestsSurvey";
 import SurveyManager from "@/components/surveys/SurveyManager";
 import { RouteLoadingProvider, useRouteLoading } from "@/contexts/RouteLoadingContext";
+import NotificationObserver from "@/components/common/NotificationObserver";
 
 const queryClient = new QueryClient();
 
@@ -241,6 +242,7 @@ const AppRoutes = () => {
 
   return (
     <>
+      <NotificationObserver />
       <Routes>
         <Route path="/" element={<PageTransition><Index /></PageTransition>} />
         <Route path="/why" element={<PageTransition><WhyPage /></PageTransition>} />

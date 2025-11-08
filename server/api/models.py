@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.conf import settings
@@ -550,6 +551,62 @@ class KidsGameSession(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.game_type} ({self.score}%) - {self.created_at.date()}"
+
+
+class UserNotification(models.Model):
+    """Notifications for end users."""
+    TYPE_CHOICES = [
+        ('system', 'System'),
+        ('certificate', 'Certificate'),
+        ('badge', 'Badge'),
+        ('trophy', 'Trophy'),
+        ('achievement', 'Achievement'),
+    ]
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='user_notifications'
+    )
+    notification_type = models.CharField(max_length=32, choices=TYPE_CHOICES, default='system')
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    icon = models.CharField(max_length=64, blank=True, default="")
+    action_url = models.URLField(blank=True, null=True)
+
+    is_read = models.BooleanField(default=False)
+    read_at = models.DateTimeField(null=True, blank=True)
+
+    event_key = models.CharField(
+        max_length=150,
+        blank=True,
+        default="",
+        help_text="Unique key used to deduplicate notifications (e.g. certificate ID)"
+    )
+
+    metadata = models.JSONField(default=dict, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'is_read', 'created_at']),
+            models.Index(fields=['user', 'created_at']),
+            models.Index(fields=['event_key']),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'event_key'],
+                condition=Q(event_key__gt=''),
+                name='unique_user_event_key'
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.title} ({self.notification_type})"
+
 
 # ============= Waitlist =============
 class WaitlistEntry(models.Model):

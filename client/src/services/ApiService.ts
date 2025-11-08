@@ -321,6 +321,112 @@ export const AdminAPI = {
   },
 };
 
+// ============= User Notifications API =============
+export const NotificationsAPI = {
+  /**
+   * Fetch notifications for authenticated user
+   */
+  list: async (params?: { unreadOnly?: boolean; limit?: number }) => {
+    try {
+      const usp = new URLSearchParams();
+      if (params?.unreadOnly) usp.append('unread_only', 'true');
+      if (params?.limit !== undefined) usp.append('limit', String(params.limit));
+      const query = usp.toString() ? `?${usp.toString()}` : '';
+      const result = await fetchWithAuth(`notifications${query}`);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Create a user notification (client-triggered event)
+   */
+  create: async (data: {
+    notification_type?: string;
+    title: string;
+    message: string;
+    icon?: string;
+    action_url?: string;
+    event_key?: string;
+    metadata?: Record<string, unknown>;
+  }) => {
+    try {
+      const payload = {
+        notification_type: data.notification_type || 'system',
+        title: data.title,
+        message: data.message,
+        icon: data.icon,
+        action_url: data.action_url,
+        event_key: data.event_key,
+        metadata: data.metadata ?? {},
+      };
+      const result = await fetchWithAuth('notifications', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get unread count
+   */
+  unreadCount: async () => {
+    try {
+      const result = await fetchWithAuth('notifications/unread-count');
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Mark notification read/unread
+   */
+  markRead: async (notificationId: number, isRead: boolean = true) => {
+    try {
+      const result = await fetchWithAuth(`notifications/${notificationId}/read`, {
+        method: 'POST',
+        body: JSON.stringify({ is_read: isRead }),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Mark all notifications as read
+   */
+  markAllRead: async () => {
+    try {
+      const result = await fetchWithAuth('notifications/mark-all-read', {
+        method: 'POST',
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Delete notification
+   */
+  delete: async (notificationId: number) => {
+    try {
+      await fetchWithAuth(`notifications/${notificationId}/delete`, {
+        method: 'DELETE',
+      });
+      return { success: true };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+};
+
 
 // ============= Lessons API =============
 export const LessonsAPI = {

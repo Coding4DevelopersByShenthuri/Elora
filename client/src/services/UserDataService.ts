@@ -19,21 +19,6 @@ export interface PracticeSession {
   details: any;
 }
 
-export interface UserLearningData {
-  userId: string;
-  currentLevel: 'beginner' | 'intermediate' | 'advanced';
-  totalPoints: number;
-  currentStreak: number;
-  longestStreak: number;
-  totalPracticeTime: number;
-  lessonsCompleted: number;
-  lessons: LessonProgress[];
-  practiceSessions: PracticeSession[];
-  vocabulary: LearnedWord[];
-  achievements: string[];
-  settings: UserSettings;
-}
-
 export interface LearnedWord {
   word: string;
   mastery: number;
@@ -47,6 +32,40 @@ export interface UserSettings {
   notifications: boolean;
   autoPlay: boolean;
   theme: 'light' | 'dark' | 'auto';
+}
+
+export type StoredNotification = {
+  id: string;
+  serverId?: number;
+  eventKey?: string;
+  type: 'system' | 'certificate' | 'badge' | 'trophy' | 'achievement';
+  title: string;
+  message: string;
+  icon?: string;
+  actionUrl?: string;
+  metadata?: Record<string, unknown>;
+  isRead: boolean;
+  createdAt: number;
+  readAt?: number;
+  source: 'local' | 'server';
+  pendingSync?: boolean;
+  lastSyncedAt?: number;
+};
+
+export interface UserLearningData {
+  userId: string;
+  currentLevel: 'beginner' | 'intermediate' | 'advanced';
+  totalPoints: number;
+  currentStreak: number;
+  longestStreak: number;
+  totalPracticeTime: number;
+  lessonsCompleted: number;
+  lessons: LessonProgress[];
+  practiceSessions: PracticeSession[];
+  vocabulary: LearnedWord[];
+  achievements: string[];
+  settings: UserSettings;
+  notifications?: StoredNotification[];
 }
 
 export interface OutboxItem {

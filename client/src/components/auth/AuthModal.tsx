@@ -212,7 +212,8 @@ const authService = {
           notifications: true,
           autoPlay: true,
           theme: 'auto'
-        }
+        },
+        notifications: []
       });
     } catch (error) {
       console.error('Error initializing user learning data:', error);

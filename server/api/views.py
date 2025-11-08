@@ -1,7 +1,9 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.utils import timezone
+from django.db import transaction
 from django.db.models import Avg, Sum, Count, Q, F
+from django.utils.text import slugify
 from collections import defaultdict
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -29,7 +31,7 @@ from .serializers import (
     VocabularyWordSerializer, AchievementSerializer, UserAchievementSerializer,
     KidsLessonSerializer, KidsProgressSerializer, KidsAchievementSerializer, KidsCertificateSerializer,
     WaitlistSerializer, DailyProgressSerializer, WeeklyStatsSerializer, UserStatsSerializer,
-    AdminNotificationSerializer, SurveyStepResponseSerializer, PlatformSettingsSerializer,
+    UserNotificationSerializer, AdminNotificationSerializer, SurveyStepResponseSerializer, PlatformSettingsSerializer,
     StoryEnrollmentSerializer, StoryWordSerializer, StoryPhraseSerializer, KidsFavoriteSerializer,
     KidsVocabularyPracticeSerializer, KidsPronunciationPracticeSerializer, KidsGameSessionSerializer
 )
@@ -37,7 +39,7 @@ from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
     VocabularyWord, Achievement, UserAchievement,
     KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, WaitlistEntry,
-    EmailVerificationToken, AdminNotification, SurveyStepResponse, PlatformSettings,
+    EmailVerificationToken, UserNotification, AdminNotification, SurveyStepResponse, PlatformSettings,
     StoryEnrollment, StoryWord, StoryPhrase, KidsFavorite,
     KidsVocabularyPractice, KidsPronunciationPractice, KidsGameSession
 )
@@ -59,6 +61,96 @@ def calculate_level(points):
     """Calculate user level from points"""
     import math
     return math.floor(math.sqrt(points / 100)) + 1
+
+
+def create_or_update_user_notification(
+    user,
+    *,
+    notification_type='system',
+    title='',
+    message='',
+    icon='',
+    action_url='',
+    event_key='',
+    metadata=None,
+):
+    """
+    Create or update a user notification while respecting event deduplication.
+    Returns a tuple of (notification, created_or_updated_flag).
+    """
+    if not title or not message:
+        logger.warning("Skipping notification with missing title or message (event_key=%s)", event_key)
+        return None, False
+
+    metadata = metadata or {}
+
+    try:
+        with transaction.atomic():
+            if event_key:
+                notification, created = UserNotification.objects.get_or_create(
+                    user=user,
+                    event_key=event_key,
+                    defaults={
+                        'notification_type': notification_type,
+                        'title': title,
+                        'message': message,
+                        'icon': icon or '',
+                        'action_url': action_url or '',
+                        'metadata': metadata,
+                    }
+                )
+
+                if created:
+                    return notification, True
+
+                updated_fields = []
+
+                if notification.notification_type != notification_type:
+                    notification.notification_type = notification_type
+                    updated_fields.append('notification_type')
+
+                if notification.title != title:
+                    notification.title = title
+                    updated_fields.append('title')
+
+                if notification.message != message:
+                    notification.message = message
+                    updated_fields.append('message')
+
+                if icon is not None and notification.icon != (icon or ''):
+                    notification.icon = icon or ''
+                    updated_fields.append('icon')
+
+                if action_url is not None and notification.action_url != (action_url or ''):
+                    notification.action_url = action_url or ''
+                    updated_fields.append('action_url')
+
+                if metadata and notification.metadata != metadata:
+                    notification.metadata = metadata
+                    updated_fields.append('metadata')
+
+                if updated_fields:
+                    notification.save(update_fields=updated_fields + ['updated_at'])
+                    return notification, True
+
+                return notification, False
+
+            notification = UserNotification.objects.create(
+                user=user,
+                notification_type=notification_type,
+                title=title,
+                message=message,
+                icon=icon or '',
+                action_url=action_url or '',
+                event_key='',
+                metadata=metadata,
+            )
+            return notification, True
+
+    except Exception as exc:
+        logger.error("Failed to create/update user notification (event_key=%s): %s", event_key, exc)
+
+    return None, False
 
 
 # ============= Authentication Views =============
@@ -1122,6 +1214,26 @@ def kids_issue_certificate(request):
         updated = True
     if updated:
         obj.save()
+
+    frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:5173').rstrip('/')
+    action_url = f"{frontend_url}/kids/certificates"
+    notification_title = f"{obj.title} certificate unlocked"
+    notification_message = "Your certificate is ready to download and celebrate. Keep exploring new stories!"
+    create_or_update_user_notification(
+        request.user,
+        notification_type='certificate',
+        title=notification_title,
+        message=notification_message,
+        icon='📜',
+        action_url=action_url,
+        event_key=f"certificate:{obj.cert_id}",
+        metadata={
+            'cert_id': obj.cert_id,
+            'title': obj.title,
+            'file_url': obj.file_url,
+        }
+    )
+
     return Response(KidsCertificateSerializer(obj).data, status=status.HTTP_201_CREATED)
 
 
@@ -2247,15 +2359,38 @@ def idempotent_upsert(request):
                     user=request.user,
                     name=name
                 )
+                was_unlocked = ach.unlocked
                 serializer = KidsAchievementSerializer(ach, data=data, partial=True)
                 if serializer.is_valid():
-                    serializer.save()
+                    updated_achievement = serializer.save()
                     result = {
                         'entity': 'KidsAchievement',
                         'entity_id': ach.id,
                         'operation': 'created' if created else 'updated',
                         'data': serializer.data
                     }
+                    target = updated_achievement if isinstance(updated_achievement, KidsAchievement) else ach
+                    is_now_unlocked = bool(target.unlocked)
+                    if not was_unlocked and is_now_unlocked:
+                        slug = slugify(target.name or 'achievement')
+                        frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:5173').rstrip('/')
+                        action_url = f"{frontend_url}/profile#overview"
+                        notification_title = f"{target.name} achievement unlocked"
+                        notification_message = "Fantastic progress! You've just unlocked a new achievement — keep the momentum going."
+                        create_or_update_user_notification(
+                            request.user,
+                            notification_type='achievement',
+                            title=notification_title,
+                            message=notification_message,
+                            icon=target.icon or '🌟',
+                            action_url=action_url,
+                            event_key=f"achievement:{slug}",
+                            metadata={
+                                'name': target.name,
+                                'progress': target.progress,
+                                'icon': target.icon,
+                            }
+                        )
         
         if result:
             # Cache the response for 24 hours
@@ -3269,6 +3404,182 @@ def admin_activity_detail(request, activity_id):
         logger.error(traceback.format_exc())
         return Response({
             "message": "An error occurred while loading activity details",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def user_notifications(request):
+    """List notifications for the authenticated user or create a new one."""
+    try:
+        if request.method == 'GET':
+            unread_only = request.query_params.get('unread_only', 'false').lower() == 'true'
+            limit = int(request.query_params.get('limit', 50))
+
+            queryset = UserNotification.objects.filter(user=request.user)
+            if unread_only:
+                queryset = queryset.filter(is_read=False)
+
+            notifications = queryset.order_by('-created_at')[:limit]
+            serializer = UserNotificationSerializer(notifications, many=True)
+
+            unread_count = UserNotification.objects.filter(
+                user=request.user,
+                is_read=False
+            ).count()
+
+            return Response({
+                'notifications': serializer.data,
+                'unread_count': unread_count,
+                'total': queryset.count()
+            })
+
+        elif request.method == 'POST':
+            serializer = UserNotificationSerializer(data=request.data)
+            if serializer.is_valid():
+                event_key = serializer.validated_data.get('event_key', '')
+                if event_key:
+                    existing = UserNotification.objects.filter(
+                        user=request.user,
+                        event_key=event_key
+                    ).first()
+                    if existing:
+                        updated = False
+                        for field in ['title', 'message', 'icon', 'action_url', 'metadata', 'notification_type']:
+                            new_value = serializer.validated_data.get(field)
+                            if new_value is not None and getattr(existing, field) != new_value:
+                                setattr(existing, field, new_value)
+                                updated = True
+                        if updated:
+                            existing.save(update_fields=['title', 'message', 'icon', 'action_url', 'metadata', 'notification_type', 'updated_at'])
+                        return Response(
+                            UserNotificationSerializer(existing).data,
+                            status=status.HTTP_200_OK
+                        )
+
+                notification = UserNotification.objects.create(
+                    user=request.user,
+                    **serializer.validated_data
+                )
+                return Response(
+                    UserNotificationSerializer(notification).data,
+                    status=status.HTTP_201_CREATED
+                )
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    except Exception as e:
+        logger.error(f"User notifications error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_notifications_unread_count(request):
+    """Return unread notification count for the current user."""
+    try:
+        unread_count = UserNotification.objects.filter(
+            user=request.user,
+            is_read=False
+        ).count()
+        return Response({'unread_count': unread_count})
+    except Exception as e:
+        logger.error(f"Unread notifications count error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def user_notification_mark_read(request, notification_id):
+    """Mark or unmark a notification as read."""
+    try:
+        mark_as_read = request.data.get('is_read', True)
+        notification = UserNotification.objects.filter(
+            id=notification_id,
+            user=request.user
+        ).first()
+
+        if not notification:
+            return Response({
+                "message": "Notification not found"
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        if mark_as_read and not notification.is_read:
+            notification.is_read = True
+            notification.read_at = timezone.now()
+            notification.save(update_fields=['is_read', 'read_at', 'updated_at'])
+        elif not mark_as_read and notification.is_read:
+            notification.is_read = False
+            notification.read_at = None
+            notification.save(update_fields=['is_read', 'read_at', 'updated_at'])
+
+        return Response({
+            "message": "Notification updated",
+            "notification": UserNotificationSerializer(notification).data
+        })
+
+    except Exception as e:
+        logger.error(f"Mark user notification read error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def user_notifications_mark_all_read(request):
+    """Mark all notifications as read for the current user."""
+    try:
+        updated = UserNotification.objects.filter(
+            user=request.user,
+            is_read=False
+        ).update(
+            is_read=True,
+            read_at=timezone.now(),
+            updated_at=timezone.now()
+        )
+        return Response({
+            "message": f"{updated} notifications marked as read",
+            "count": updated
+        })
+    except Exception as e:
+        logger.error(f"Mark all user notifications read error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def user_notification_delete(request, notification_id):
+    """Delete a user notification."""
+    try:
+        notification = UserNotification.objects.filter(
+            id=notification_id,
+            user=request.user
+        ).first()
+
+        if not notification:
+            return Response({
+                "message": "Notification not found"
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        notification.delete()
+        return Response({
+            "message": "Notification deleted successfully"
+        }, status=status.HTTP_204_NO_CONTENT)
+    except Exception as e:
+        logger.error(f"Delete user notification error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
             "error": str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

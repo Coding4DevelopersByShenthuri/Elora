@@ -48,12 +48,12 @@ const KidsPage = () => {
       id: 'young-kids',
       title: 'Little Learners',
       subtitle: 'Ages 4-10',
-      description: 'Build confidence with structured storytelling, purposeful games, and friendly practice sessions.',
+      description: 'Everything inside Little Learners mirrors the Young Kids hub: guided stories, Speak & Repeat, Word Games, and sparkly progress tracking.',
       features: [
-        'Guided story-based lessons with narration support',
-        'Foundational vocabulary activities and spaced review',
-        'Pronunciation practice with simple call-and-response',
-        'Progress dashboards for parents and guardians'
+        'Story Time adventures with voice narration and enrollment badges',
+        'Word Games that unlock vocabulary straight from completed stories',
+        'Speak & Repeat studio powered by AI pronunciation scoring',
+        'Fun Games with session history, points, and streak tracking'
       ],
       icon: Baby,
       route: '/kids/young',
@@ -75,16 +75,16 @@ const KidsPage = () => {
       id: 'teen-kids',
       title: 'Teen Explorers',
       subtitle: 'Ages 11-17',
-      description: 'Strengthen academic English, critical thinking, and real-world communication with focused challenges.',
+      description: 'Teen Explorers matches the teen learning experience: advanced stories, vocabulary drills, speaking labs, and challenge games with AI feedback.',
       features: [
-        'Case-study storytelling with branching decisions',
-        'Advanced vocabulary with contextual explanations',
-        'Conversation prompts and scenario walkthroughs',
-        'Portfolio view of achievements and certifications'
+        'Adventure Stories that award points, enrollments, and certificates',
+        'Advanced Vocabulary decks sourced from completed teen narratives',
+        'Professional Speaking practice with phoneme coaching and attempts tracking',
+        'Challenge Games with Gemini-powered conversations and history tabs'
       ],
       icon: GraduationCap,
       route: '/kids/teen',
-      stats: { stories: 8, games: 7, words: 500 },
+      stats: { stories: 10, games: 7, words: 500 },
       difficulty: 'Independent • Advanced',
       duration: '9-15 minutes per session',
       accent: {
