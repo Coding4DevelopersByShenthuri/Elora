@@ -270,12 +270,12 @@ const AboutPage = () => {
             </p>
             
             <p>
-              But most importantly, we built Elora with <strong className="text-primary">privacy, accessibility, and effectiveness</strong> at its core. 
+              But most importantly, we built Elora with <strong className="text-teal-600">privacy, accessibility, and effectiveness</strong> at its core. 
               Your data is protected with enterprise-grade encryption while our services keep everything in sync automatically. 
               And our AI provides real-time feedback that actually helps you improve.
             </p>
             
-            <p className="font-semibold text-primary">
+            <p className="font-semibold text-teal-600">
               Today, Elora is helping thousands of learners around the world speak English with confidence. And we're just getting started.
             </p>
           </div>

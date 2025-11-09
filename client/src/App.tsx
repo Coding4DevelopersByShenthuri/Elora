@@ -86,6 +86,7 @@ import InterestsSurvey from "@/components/surveys/InterestsSurvey";
 import SurveyManager from "@/components/surveys/SurveyManager";
 import { RouteLoadingProvider, useRouteLoading } from "@/contexts/RouteLoadingContext";
 import NotificationObserver from "@/components/common/NotificationObserver";
+import FavoritesPage from "@/pages/Favorites";
 
 const queryClient = new QueryClient();
 
@@ -259,6 +260,7 @@ const AppRoutes = () => {
         <Route path="/kids/teen" element={<PageTransition><TeenKidsPage /></PageTransition>} />
         <Route path="/kids/games/:gameId" element={<PageTransition><KidsGamePage /></PageTransition>} />
         <Route path="/kids/games/history" element={<PageTransition><GameHistoryPage /></PageTransition>} />
+        <Route path="/favorites" element={<PageTransition><FavoritesPage /></PageTransition>} />
         <Route path="/favorites/young" element={<PageTransition><YoungKidsFavoritesPage /></PageTransition>} />
         <Route path="/favorites/teen" element={<PageTransition><TeenKidsFavoritesPage /></PageTransition>} />
         <Route path="/parental-controls" element={<PageTransition><ParentalControlsPage /></PageTransition>} />

@@ -1,25 +1,50 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { 
-  Volume2, Star, Trophy, Play, BookOpen, 
-  Mic, Award, Zap, Heart, Sparkles,
-  Globe, Users, MessageSquare, Brain,
-  ChevronLeft, ChevronRight, Target,
-  Shield, Loader2, Crown, Compass,
-  Music, VolumeX, HelpCircle,
-  TrendingUp, Clock, CheckCircle, Cpu, Lock
+  Volume2,
+  VolumeX,
+  Trophy,
+  BookOpen,
+  Mic,
+  Award,
+  Star,
+  Heart,
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
+  Brain,
+  Target,
+  Globe,
+  MessageSquare,
+  Cpu,
+  Lock,
+  Crown,
+  CheckCircle,
+  Play,
+  Headphones,
 } from 'lucide-react';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
-import KidsProgressService from '@/services/KidsProgressService';
-import KidsApi from '@/services/KidsApi';
-import StoryWordsService from '@/services/StoryWordsService';
+import AuthModal from '@/components/auth/AuthModal';
 import Vocabulary from '@/components/kids/Vocabulary';
 import Pronunciation from '@/components/kids/Pronunciation';
 import InteractiveGames from '@/components/kids/InteractiveGames';
 import SyncStatusIndicator from '@/components/kids/SyncStatusIndicator';
+import KidsProgressService from '@/services/KidsProgressService';
+import KidsApi from '@/services/KidsApi';
+import StoryWordsService from '@/services/StoryWordsService';
+import HybridServiceManager from '@/services/HybridServiceManager';
+import { ModelManager } from '@/services/ModelManager';
+import { WhisperService } from '@/services/WhisperService';
+import { TransformersService } from '@/services/TransformersService';
+import { TimeTracker } from '@/services/TimeTracker';
+import EnhancedTTS from '@/services/EnhancedTTS';
+import { API } from '@/services/ApiService';
 import MysteryDetectiveAdventure from '@/components/kids/stories/MysteryDetectiveAdventure';
 import SpaceExplorerAdventure from '@/components/kids/stories/SpaceExplorerAdventure';
 import EnvironmentalHeroAdventure from '@/components/kids/stories/EnvironmentalHeroAdventure';
@@ -30,57 +55,635 @@ import FutureLeaderAdventure from '@/components/kids/stories/FutureLeaderAdventu
 import ScientificDiscoveryAdventure from '@/components/kids/stories/ScientificDiscoveryAdventure';
 import AIEthicsExplorerAdventure from '@/components/kids/stories/AIEthicsExplorerAdventure';
 import DigitalSecurityGuardianAdventure from '@/components/kids/stories/DigitalSecurityGuardianAdventure';
-import AuthModal from '@/components/auth/AuthModal';
-import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import HybridServiceManager from '@/services/HybridServiceManager';
-import { ModelManager } from '@/services/ModelManager';
-import { WhisperService } from '@/services/WhisperService';
-import { TransformersService } from '@/services/TransformersService';
-import { TimeTracker } from '@/services/TimeTracker';
-import EnhancedTTS from '@/services/EnhancedTTS';
+
+const TEEN_STORY_TYPE_TO_INTERNAL: Record<string, string> = {
+  mystery: 'mystery-detective',
+  space: 'space-explorer-teen',
+  environment: 'environmental-hero',
+  technology: 'tech-innovator',
+  culture: 'global-citizen',
+  leadership: 'future-leader',
+  science: 'scientific-discovery',
+  digital: 'social-media-expert',
+  ai: 'ai-ethics-explorer',
+  cybersecurity: 'digital-security-guardian',
+};
+
+const TEEN_INTERNAL_STORY_IDS = Object.values(TEEN_STORY_TYPE_TO_INTERNAL);
+
+const DEFAULT_TEEN_STATS = {
+  points: 0,
+  streak: 0,
+  lastEngagement: undefined as string | undefined,
+};
+
+type TeenStory = {
+  title: string;
+  description: string;
+  difficulty: 'Easy' | 'Medium' | 'Hard';
+  duration: string;
+  words: number;
+  image: string;
+  character: any;
+  gradient: string;
+  bgGradient: string;
+  animation: string;
+  type: keyof typeof TEEN_STORY_TYPE_TO_INTERNAL;
+  id: string;
+};
+
+const allTeenStories: TeenStory[] = [
+  {
+    title: 'Mystery Detective',
+    description: 'Solve complex mysteries while sharpening critical thinking and English comprehension.',
+    difficulty: 'Hard',
+    duration: '12 min',
+    words: 800,
+    image: '🕵️',
+    character: Target,
+    gradient: 'from-slate-500 to-slate-700',
+    bgGradient: 'from-slate-200 to-slate-300 dark:from-slate-900 dark:to-slate-950',
+    animation: 'animate-float-slow',
+    type: 'mystery',
+    id: 'teen-0',
+  },
+  {
+    title: 'Space Explorer',
+    description: 'Navigate scientific missions that test your vocabulary, logic, and teamwork.',
+    difficulty: 'Hard',
+    duration: '15 min',
+    words: 950,
+    image: '🚀',
+    character: Globe,
+    gradient: 'from-indigo-500 to-blue-600',
+    bgGradient: 'from-blue-200 to-indigo-300 dark:from-indigo-900 dark:to-slate-900',
+    animation: 'animate-bounce',
+    type: 'space',
+    id: 'teen-1',
+  },
+  {
+    title: 'Environmental Hero',
+    description: 'Design solutions for real-world climate challenges and communicate your ideas clearly.',
+    difficulty: 'Medium',
+    duration: '10 min',
+    words: 700,
+    image: '🌍',
+    character: Brain,
+    gradient: 'from-emerald-400 to-green-500',
+    bgGradient: 'from-emerald-200 to-green-300 dark:from-emerald-900 dark:to-green-950',
+    animation: 'animate-float-medium',
+    type: 'environment',
+    id: 'teen-2',
+  },
+  {
+    title: 'Tech Innovator',
+    description: 'Prototype emerging technology and pitch futuristic solutions with persuasive language.',
+    difficulty: 'Hard',
+    duration: '12 min',
+    words: 850,
+    image: '💻',
+    character: Cpu,
+    gradient: 'from-purple-500 to-fuchsia-500',
+    bgGradient: 'from-purple-200 to-fuchsia-300 dark:from-purple-900 dark:to-fuchsia-950',
+    animation: 'animate-float-fast',
+    type: 'technology',
+    id: 'teen-3',
+  },
+  {
+    title: 'Global Citizen',
+    description: 'Work through cultural case studies and build empathy-driven communication skills.',
+    difficulty: 'Medium',
+    duration: '11 min',
+    words: 750,
+    image: '🌐',
+    character: Globe,
+    gradient: 'from-orange-400 to-rose-500',
+    bgGradient: 'from-orange-200 to-rose-300 dark:from-orange-900 dark:to-rose-950',
+    animation: 'animate-float-slow',
+    type: 'culture',
+    id: 'teen-4',
+  },
+  {
+    title: 'Future Leader',
+    description: 'Lead a team through strategic challenges and develop confident presentation skills.',
+    difficulty: 'Hard',
+    duration: '13 min',
+    words: 900,
+    image: '👑',
+    character: Crown,
+    gradient: 'from-amber-400 to-yellow-500',
+    bgGradient: 'from-amber-200 to-yellow-300 dark:from-amber-900 dark:to-yellow-950',
+    animation: 'animate-bounce',
+    type: 'leadership',
+    id: 'teen-5',
+  },
+  {
+    title: 'Scientific Discovery',
+    description: 'Investigate experiments, interpret data, and report findings like a research professional.',
+    difficulty: 'Hard',
+    duration: '14 min',
+    words: 950,
+    image: '🔬',
+    character: Target,
+    gradient: 'from-cyan-400 to-blue-500',
+    bgGradient: 'from-cyan-200 to-blue-300 dark:from-cyan-900 dark:to-blue-950',
+    animation: 'animate-float-medium',
+    type: 'science',
+    id: 'teen-6',
+  },
+  {
+    title: 'Social Media Expert',
+    description: 'Craft impactful digital campaigns focused on safety, ethics, and persuasive messaging.',
+    difficulty: 'Medium',
+    duration: '9 min',
+    words: 650,
+    image: '📱',
+    character: MessageSquare,
+    gradient: 'from-pink-400 to-purple-500',
+    bgGradient: 'from-pink-200 to-purple-300 dark:from-pink-900 dark:to-purple-950',
+    animation: 'animate-float-fast',
+    type: 'digital',
+    id: 'teen-7',
+  },
+  {
+    title: 'AI Ethics Explorer',
+    description: 'Debate responsible AI in schools, communities, and global contexts with evidence-based arguments.',
+    difficulty: 'Hard',
+    duration: '14 min',
+    words: 980,
+    image: '🤖',
+    character: Cpu,
+    gradient: 'from-indigo-500 to-violet-600',
+    bgGradient: 'from-indigo-200 to-violet-300 dark:from-indigo-900 dark:to-violet-950',
+    animation: 'animate-float-medium',
+    type: 'ai',
+    id: 'teen-8',
+  },
+  {
+    title: 'Digital Security Guardian',
+    description: 'Protect data, decode cyber threats, and master professional communication about online safety.',
+    difficulty: 'Hard',
+    duration: '13 min',
+    words: 920,
+    image: '🔐',
+    character: Lock,
+    gradient: 'from-rose-500 to-red-600',
+    bgGradient: 'from-rose-200 to-red-300 dark:from-rose-900 dark:to-red-950',
+    animation: 'animate-float-slow',
+    type: 'cybersecurity',
+    id: 'teen-9',
+  },
+];
+
+const sanitizeSpeechText = (text: string) =>
+  text
+    .replace(/\p{Extended_Pictographic}/gu, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+
+const speakWithSanitizedText = (
+  text: string,
+  options?: Parameters<typeof EnhancedTTS.speak>[1]
+) => {
+  const sanitized = sanitizeSpeechText(text);
+  if (!sanitized) return Promise.resolve();
+  return EnhancedTTS.speak(sanitized, options);
+};
 
 const TeenKidsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCategory = searchParams.get('section') || 'stories';
   const [activeCategory, setActiveCategory] = useState(initialCategory);
-  const [isOpeningFromFavorites, setIsOpeningFromFavorites] = useState(false);
   const [currentStory, setCurrentStory] = useState<string>('');
   const [isPlaying, setIsPlaying] = useState(false);
-  const { user, isAuthenticated } = useAuth();
-  const userId = user?.id ? String(user.id) : 'local-user';
-  const location = useLocation();
-  const [points, setPoints] = useState(0);
-  const [streak, setStreak] = useState(0);
-  const [favorites, setFavorites] = useState<string[]>([]);
-  const [floatingIcons, setFloatingIcons] = useState<Array<{id: number; type: string; x: number; y: number}>>([]);
-  const [bounceAnimation, setBounceAnimation] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const storiesPerPage = 6;
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
-  const [pronunciationAttempts, setPronunciationAttempts] = useState(0);
-  const [vocabularyAttempts, setVocabularyAttempts] = useState(0);
-  const [enrolledWords, setEnrolledWords] = useState<Array<{ word: string; hint: string }>>([]);
-  const [enrolledStoryWordsDetailed, setEnrolledStoryWordsDetailed] = useState<Array<{ word: string; hint: string; storyId: string; storyTitle: string }>>([]);
-  const [enrolledPhrases, setEnrolledPhrases] = useState<Array<{ phrase: string; phonemes: string }>>([]);
-  const [enrolledStoryPhrasesDetailed, setEnrolledStoryPhrasesDetailed] = useState<Array<{ phrase: string; phonemes: string; storyId: string; storyTitle: string }>>([]);
-  const storiesPerPage = 4;
-  const containerRef = useRef<HTMLDivElement>(null);
+  const { user, isAuthenticated } = useAuth();
+  const userId = user?.id ? String(user.id) : 'local-user';
   const navigate = useNavigate();
+  const location = useLocation();
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Interactive features state
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
   const [isMusicEnabled, setIsMusicEnabled] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
-  const [celebrating, setCelebrating] = useState(false);
-  const [hoveredElement, setHoveredElement] = useState<string | null>(null);
-  const [pulseAnimation, setPulseAnimation] = useState(false);
-  const [selectedAchievement, setSelectedAchievement] = useState<number | null>(null);
-
-  // SLM & Model Management State
   const [modelsReady, setModelsReady] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
-  
-  // Story modal state
+  const [isOpeningFromFavorites, setIsOpeningFromFavorites] = useState(false);
+
+  const [points, setPoints] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [pronunciationAttempts, setPronunciationAttempts] = useState(0);
+  const [vocabularyAttempts, setVocabularyAttempts] = useState(0);
+  const [gamesAttempts, setGamesAttempts] = useState(0);
+  const [enrolledStoryWordsDetailed, setEnrolledStoryWordsDetailed] = useState<Array<{ word: string; hint: string; storyId: string; storyTitle: string }>>([]);
+  const [enrolledStoryPhrasesDetailed, setEnrolledStoryPhrasesDetailed] = useState<Array<{ phrase: string; phonemes: string; storyId: string; storyTitle: string }>>([]);
+  const [selectedStoryFilter, setSelectedStoryFilter] = useState<string>('all');
+  const [selectedPhraseFilter, setSelectedPhraseFilter] = useState<string>('all');
+  const [serverAchievements, setServerAchievements] = useState<any[]>([]);
+
+  const teenStatsRef = useRef({ ...DEFAULT_TEEN_STATS });
+
+  const teenFavorites = useMemo(
+    () => favorites.filter((id) => id.startsWith('teen-')),
+    [favorites]
+  );
+
+  const teenStoryIdSet = useMemo(() => new Set(TEEN_INTERNAL_STORY_IDS), []);
+
+  const enrolledInternalStoryIds = useMemo(() => {
+    const ids = new Set<string>();
+    enrolledStoryWordsDetailed.forEach((w) => ids.add(w.storyId));
+    enrolledStoryPhrasesDetailed.forEach((p) => ids.add(p.storyId));
+    return ids;
+  }, [enrolledStoryWordsDetailed, enrolledStoryPhrasesDetailed]);
+
+  const completedStoryIds = useMemo(() => {
+    try {
+      const stories = StoryWordsService.getEnrolledStories(userId) || [];
+      return new Set(
+        stories
+          .filter((story: any) => story?.completed && teenStoryIdSet.has(story.storyId))
+          .map((story: any) => story.storyId)
+      );
+    } catch {
+      return new Set<string>();
+    }
+  }, [userId, teenStoryIdSet, enrolledStoryWordsDetailed, enrolledStoryPhrasesDetailed]);
+
+  const filteredStoryWords = useMemo(() => {
+    if (selectedStoryFilter === 'all') return enrolledStoryWordsDetailed;
+    return enrolledStoryWordsDetailed.filter((w) => w.storyId === selectedStoryFilter);
+  }, [enrolledStoryWordsDetailed, selectedStoryFilter]);
+
+  const vocabularyWordsToUse = useMemo(
+    () => filteredStoryWords.map((w) => ({ word: w.word, hint: w.hint })),
+    [filteredStoryWords]
+  );
+
+  const filteredStoryPhrases = useMemo(() => {
+    if (selectedPhraseFilter === 'all') return enrolledStoryPhrasesDetailed;
+    return enrolledStoryPhrasesDetailed.filter((p) => p.storyId === selectedPhraseFilter);
+  }, [enrolledStoryPhrasesDetailed, selectedPhraseFilter]);
+
+  const pronunciationItems = useMemo(
+    () => filteredStoryPhrases.map((p) => ({ phrase: p.phrase, phonemes: p.phonemes })),
+    [filteredStoryPhrases]
+  );
+
+  useEffect(() => {
+    const urlCategory = searchParams.get('section') || 'stories';
+    if (urlCategory !== activeCategory) {
+      setActiveCategory(urlCategory);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  useEffect(() => {
+    const currentSection = searchParams.get('section') || 'stories';
+    if (activeCategory !== currentSection) {
+      setSearchParams({ section: activeCategory }, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeCategory]);
+
+  useEffect(() => {
+    const checkUserAndRedirect = async () => {
+      if (!isAuthenticated) {
+        const speakbeeUsers = JSON.parse(localStorage.getItem('speakbee_users') || '[]');
+        const legacyUsers = JSON.parse(localStorage.getItem('users') || '[]');
+        const hasExistingUsers = speakbeeUsers.length > 0 || legacyUsers.length > 0;
+        setAuthMode(hasExistingUsers ? 'login' : 'register');
+        setShowAuthModal(true);
+      }
+    };
+    checkUserAndRedirect();
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    const initializeServices = async () => {
+      if (!isAuthenticated) return;
+      setIsInitializing(true);
+      try {
+        await HybridServiceManager.initialize({
+          mode: 'hybrid',
+          preferOffline: false,
+          autoSync: true,
+          syncInterval: 15,
+        } as any);
+        const health = await HybridServiceManager.getSystemHealth();
+        console.log('📊 Teen system health:', health);
+        const piperReady = await ModelManager.isModelCached('piper-en-us-lessac-medium');
+        const whisperReady = await ModelManager.isModelCached('whisper-tiny-en');
+        const llmReady = await ModelManager.isModelCached('distilgpt2');
+        setModelsReady(piperReady || whisperReady || llmReady);
+        if (piperReady || whisperReady || llmReady) {
+          await Promise.allSettled([
+            WhisperService.initialize().catch((err) => console.warn('Whisper teen init skipped:', err)),
+            TransformersService.initialize().catch((err) => console.warn('Transformers teen init skipped:', err)),
+          ]);
+        }
+      } catch (error) {
+        console.error('Error initializing teen services:', error);
+      } finally {
+        setIsInitializing(false);
+      }
+    };
+    initializeServices();
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (isAuthenticated && userId) {
+      TimeTracker.initialize(userId);
+      return () => {
+        TimeTracker.cleanup();
+      };
+    }
+  }, [isAuthenticated, userId]);
+
+  useEffect(() => {
+    if (isAuthenticated && isSoundEnabled) {
+      const welcomeMessages = [
+        "Welcome back to Teen Explorer Zone! Ready for advanced challenges?",
+        "Let's elevate your English with real-world missions!",
+        'Great to see you! Prepare for professional-level practice!',
+      ];
+      const timer = setTimeout(() => {
+        if (!isOpeningFromFavorites) {
+          speakWithSanitizedText(welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)], {
+            rate: 0.98,
+            emotion: 'excited',
+          }).catch(() => undefined);
+        }
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isAuthenticated, isSoundEnabled, isOpeningFromFavorites]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    let isMounted = true;
+
+    const loadProgress = async () => {
+      try {
+        const token = localStorage.getItem('speakbee_auth_token');
+        let serverProgress: any = null;
+        let localProgress: any = null;
+        
+        if (token && token !== 'local-token') {
+          try {
+            serverProgress = await KidsApi.getProgress(token);
+          } catch (error) {
+            console.warn('Teen progress server fetch failed:', error);
+          }
+        }
+        
+        try {
+          localProgress = await KidsProgressService.get(userId);
+        } catch (error) {
+          console.warn('Teen local progress fetch failed:', error);
+        }
+        
+        if (!isMounted) return;
+
+        const serverDetails = (serverProgress as any)?.details || {};
+        const localDetails = (localProgress as any)?.details || {};
+        
+        const mergedPron = {
+          ...(localDetails.pronunciation || {}),
+          ...(serverDetails.pronunciation || {}),
+        };
+        const mergedVocab = {
+          ...(localDetails.vocabulary || {}),
+          ...(serverDetails.vocabulary || {}),
+        };
+        const mergedGames = {
+          ...(localDetails.games || {}),
+          ...(serverDetails.games || {}),
+        };
+
+        const pronCount = Object.keys(mergedPron).length;
+        const vocabCount = Object.keys(mergedVocab).length;
+        const gamesAttemptsFromDetails = Number(mergedGames.attempts || 0) || 0;
+        const gamesTypes = Array.isArray(mergedGames.types) ? mergedGames.types : [];
+        const gamesPoints = Number(mergedGames.points || 0) || 0;
+        const estimatedGamesAttempts = Math.max(
+          gamesAttemptsFromDetails,
+          gamesTypes.length,
+          Math.floor(gamesPoints / 25)
+        );
+
+        setPronunciationAttempts(pronCount);
+        setVocabularyAttempts(vocabCount);
+        setGamesAttempts(estimatedGamesAttempts);
+
+        const favoriteList = serverDetails.favorites || localDetails.favorites || [];
+        const convertedFavorites = Array.isArray(favoriteList)
+          ? favoriteList.map((f: any) => {
+              if (typeof f === 'number') return `teen-${f}`;
+          return f;
+            })
+          : [];
+        setFavorites(convertedFavorites);
+        
+        const serverAudience = (serverDetails.audienceStats || {}).teen || {};
+        const localAudience = (localDetails.audienceStats || {}).teen || {};
+        const mergedTeenPoints = Math.max(serverAudience.points ?? 0, localAudience.points ?? 0);
+        const mergedTeenStreak = Math.max(serverAudience.streak ?? 0, localAudience.streak ?? 0);
+        const lastEngagement = serverAudience.lastEngagement || localAudience.lastEngagement;
+
+        teenStatsRef.current = {
+          points: mergedTeenPoints,
+          streak: mergedTeenStreak,
+          lastEngagement,
+        };
+
+        setPoints(mergedTeenPoints);
+        setStreak(mergedTeenStreak);
+
+        if (token && token !== 'local-token') {
+          try {
+            const achievementsResponse = await (KidsApi as any).getAchievements(token);
+            if (Array.isArray(achievementsResponse)) {
+              setServerAchievements(achievementsResponse);
+            } else if (Array.isArray((achievementsResponse as any)?.data)) {
+              setServerAchievements((achievementsResponse as any).data);
+            }
+      } catch (error) {
+            console.warn('Teen achievements fetch skipped:', error);
+          }
+        } else {
+          setServerAchievements([]);
+        }
+      } catch (error) {
+        console.error('Error loading teen progress:', error);
+      }
+    };
+
+    loadProgress();
+    const interval = setInterval(loadProgress, 4000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [isAuthenticated, userId]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    try {
+      const words = StoryWordsService.getWordsFromEnrolledStories(userId).filter((w) =>
+        TEEN_INTERNAL_STORY_IDS.includes(w.storyId)
+      );
+      const wordDetails = words.map((w) => ({
+        word: w.word,
+        hint: w.hint,
+        storyId: w.storyId,
+        storyTitle: w.storyTitle,
+      }));
+      setEnrolledStoryWordsDetailed(wordDetails);
+    } catch (error) {
+      console.error('Error loading teen story words:', error);
+      setEnrolledStoryWordsDetailed([]);
+    }
+
+    try {
+      const phrases = StoryWordsService.getPhrasesFromEnrolledStories(userId).filter((p) =>
+        TEEN_INTERNAL_STORY_IDS.includes(p.storyId)
+      );
+      const phraseDetails = phrases.map((p) => ({
+        phrase: p.phrase,
+        phonemes: p.phonemes,
+        storyId: p.storyId,
+        storyTitle: p.storyTitle,
+      }));
+      setEnrolledStoryPhrasesDetailed(phraseDetails);
+      } catch (error) {
+      console.error('Error loading teen story phrases:', error);
+      setEnrolledStoryPhrasesDetailed([]);
+    }
+  }, [isAuthenticated, userId]);
+
+  useEffect(() => {
+    if (location.state?.startStory && location.state?.storyType) {
+      const { startStory } = location.state;
+      const story = allTeenStories.find((s) => s.id === startStory);
+      if (story) {
+        setIsOpeningFromFavorites(true);
+        setCurrentStory(startStory);
+        openStoryModal(story.type);
+        navigate(location.pathname, { replace: true });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.state]);
+
+  const paginatedStories = useMemo(() => {
+  const startIndex = (currentPage - 1) * storiesPerPage;
+    return allTeenStories.slice(startIndex, startIndex + storiesPerPage);
+  }, [currentPage, storiesPerPage]);
+
+  const totalPages = Math.ceil(allTeenStories.length / storiesPerPage);
+
+  const achievements = useMemo(() => {
+    const achievementList = [
+    { 
+      name: 'Advanced Learner', 
+      icon: Star, 
+        progress: Math.min(100, Math.round((points / 2500) * 100)),
+      emoji: '🌟',
+        description: `${points}/2500 points`,
+    },
+    { 
+        name: 'Story Strategist',
+      icon: BookOpen, 
+        progress: Math.min(100, teenFavorites.length * 10),
+      emoji: '📖',
+        description: `${teenFavorites.length}/10 stories saved`,
+    },
+    { 
+      name: 'Speaking Pro', 
+      icon: Mic, 
+      progress: Math.min(100, Math.min(pronunciationAttempts, 20) * 5), 
+      emoji: '🎤',
+        description: `${pronunciationAttempts} practiced`,
+    },
+    { 
+      name: 'Vocabulary Expert', 
+      icon: Brain, 
+      progress: Math.min(100, Math.min(vocabularyAttempts, 20) * 5), 
+      emoji: '🧠',
+        description: `${vocabularyAttempts} words mastered`,
+      },
+      {
+        name: 'Challenge Champion',
+        icon: Trophy,
+        progress: Math.min(100, Math.min(gamesAttempts, 4) * 25),
+        emoji: '🏆',
+        description: `${Math.min(gamesAttempts, 4)}/4 challenges`,
+      },
+    ];
+    return achievementList;
+  }, [points, teenFavorites.length, pronunciationAttempts, vocabularyAttempts, gamesAttempts]);
+
+  const completedAchievements = useMemo(() => {
+    if (serverAchievements.length > 0) {
+      return serverAchievements.filter((a: any) => a.unlocked === true).length;
+    }
+    return achievements.filter((a) => a.progress >= 100).length;
+  }, [achievements, serverAchievements]);
+
+  const categories = [
+    { id: 'stories', label: 'Adventure Stories', emoji: '📚' },
+    { id: 'vocabulary', label: 'Advanced Vocabulary', emoji: '🧠' },
+    { id: 'pronunciation', label: 'Speaking Lab', emoji: '🎤' },
+    { id: 'games', label: 'Challenge Arena', emoji: '🏆' },
+  ];
+
+  const getInternalStoryId = (storyType: string): string => {
+    return TEEN_STORY_TYPE_TO_INTERNAL[storyType] || storyType;
+  };
+
+  const openStoryModal = (storyType: keyof typeof TEEN_STORY_TYPE_TO_INTERNAL) => {
+    switch (storyType) {
+      case 'mystery':
+        setShowMysteryDetective(true);
+        break;
+      case 'space':
+        setShowSpaceExplorer(true);
+        break;
+      case 'environment':
+        setShowEnvironmentalHero(true);
+        break;
+      case 'technology':
+        setShowTechInnovator(true);
+        break;
+      case 'culture':
+        setShowGlobalCitizen(true);
+        break;
+      case 'leadership':
+        setShowFutureLeader(true);
+        break;
+      case 'science':
+        setShowScientificDiscovery(true);
+        break;
+      case 'digital':
+        setShowSocialMediaExpert(true);
+        break;
+      case 'ai':
+        setShowAIEthics(true);
+        break;
+      case 'cybersecurity':
+        setShowDigitalSecurity(true);
+        break;
+      default:
+        break;
+    }
+  };
+
   const [showMysteryDetective, setShowMysteryDetective] = useState(false);
   const [showSpaceExplorer, setShowSpaceExplorer] = useState(false);
   const [showEnvironmentalHero, setShowEnvironmentalHero] = useState(false);
@@ -92,677 +695,169 @@ const TeenKidsPage = () => {
   const [showAIEthics, setShowAIEthics] = useState(false);
   const [showDigitalSecurity, setShowDigitalSecurity] = useState(false);
 
-  // Reset bounce animation when all modals are closed
-  useEffect(() => {
-    const anyModalOpen = showMysteryDetective || showSpaceExplorer || showEnvironmentalHero || 
-                         showTechInnovator || showGlobalCitizen || showFutureLeader || showScientificDiscovery || showSocialMediaExpert || showAIEthics;
-    
-    if (!anyModalOpen) {
-      // Reset bounce animation when modal closes
-      setBounceAnimation(false);
-      setCurrentStory('');
-      setIsPlaying(false);
-    }
-  }, [showMysteryDetective, showSpaceExplorer, showEnvironmentalHero, 
-      showTechInnovator, showGlobalCitizen, showFutureLeader, showScientificDiscovery, showSocialMediaExpert, showAIEthics]);
-
-  // Enrolled internal story IDs, derived from enrolled words/phrases (populated after completion)
-  const enrolledInternalStoryIds = useMemo(() => {
-    const ids = new Set<string>();
-    enrolledStoryWordsDetailed.forEach(w => ids.add(w.storyId));
-    enrolledStoryPhrasesDetailed.forEach(p => ids.add(p.storyId));
-    return ids;
-  }, [enrolledStoryWordsDetailed, enrolledStoryPhrasesDetailed]);
-
-  // Sync activeCategory with URL on mount or URL change - ensure persistence
-  useEffect(() => {
-    const urlCategory = searchParams.get('section') || 'stories';
-    if (urlCategory !== activeCategory) {
-      setActiveCategory(urlCategory);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
-
-  // Persist category to URL on change
-  useEffect(() => {
-    const currentSection = searchParams.get('section') || 'stories';
-    if (activeCategory !== currentSection) {
-      setSearchParams({ section: activeCategory }, { replace: true });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeCategory]);
-
-  // Check authentication and user existence on mount
-  useEffect(() => {
-    const checkUserAndRedirect = async () => {
-      if (!isAuthenticated) {
-        const speakbeeUsers = JSON.parse(localStorage.getItem("speakbee_users") || "[]");
-        const legacyUsers = JSON.parse(localStorage.getItem('users') || "[]");
-        
-        const hasExistingUsers = speakbeeUsers.length > 0 || legacyUsers.length > 0;
-        
-        setAuthMode(hasExistingUsers ? 'login' : 'register');
-        setShowAuthModal(true);
-      }
-    };
-
-    checkUserAndRedirect();
-  }, [isAuthenticated]);
-
-  // Initialize SLM and Hybrid Services
-  useEffect(() => {
-    const initializeServices = async () => {
-      if (!isAuthenticated) return;
-
-      setIsInitializing(true);
-      console.log('🚀 Initializing Teen Learning Environment...');
-
-      try {
-        await HybridServiceManager.initialize({
-          mode: 'hybrid',
-          preferOffline: false,
-          autoSync: true,
-          syncInterval: 15
-        });
-
-        const health = await HybridServiceManager.getSystemHealth();
-        console.log('📊 System Health:', health);
-
-        const piperReady = await ModelManager.isModelCached('piper-en-us-lessac-medium');
-        const whisperReady = await ModelManager.isModelCached('whisper-tiny-en');
-        const llmReady = await ModelManager.isModelCached('distilgpt2');
-
-        setModelsReady(piperReady || whisperReady || llmReady);
-
-        if (!piperReady && !whisperReady && !llmReady) {
-          console.log('📦 Models not found. User can download from Model Manager page.');
-        } else {
-          console.log('✅ Models ready! Initializing services...');
-          
-          await Promise.allSettled([
-            WhisperService.initialize().catch(err => 
-              console.warn('Whisper initialization skipped:', err)
-            ),
-            TransformersService.initialize().catch(err => 
-              console.warn('Transformers initialization skipped:', err)
-            )
-          ]);
-          
-          console.log('✅ Teen Learning Environment Ready!');
-        }
-      } catch (error) {
-        console.error('Error initializing services:', error);
-      } finally {
-        setIsInitializing(false);
-      }
-    };
-
-    initializeServices();
-  }, [isAuthenticated]);
-
-  // Initialize Time Tracker
-  useEffect(() => {
-    if (isAuthenticated && userId) {
-      TimeTracker.initialize(userId);
-      
-      return () => {
-        TimeTracker.cleanup();
-      };
-    }
-  }, [isAuthenticated, userId]);
-
-  // Welcome voice greeting
-  useEffect(() => {
-    if (isAuthenticated && isSoundEnabled) {
-      const welcomeMessages = [
-        "Welcome to Teen Explorer Zone! Ready to level up your English skills?",
-        "Hey there! Let's tackle some challenging adventures together!",
-        "Welcome back! Time to master some advanced English concepts!",
-        "Ready for some real-world English practice? Let's go!"
-      ];
-      
-      const randomMessage = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
-      
-      const timer = setTimeout(() => {
-        if (!isOpeningFromFavorites) {
-          EnhancedTTS.speak(randomMessage, { rate: 1.0, emotion: 'excited' }).catch(() => {});
-        }
-      }, 1000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [isAuthenticated, isSoundEnabled, isOpeningFromFavorites]);
-
-  // Load progress and generate floating icons
-  useEffect(() => {
-    if (!isAuthenticated) return;
-
-    const loadProgress = async () => {
-      try {
-        const token = localStorage.getItem('speakbee_auth_token');
-        let serverProgress: any = null;
-        let localProgress: any = null;
-        
-        // Try to load from server first
-        if (token && token !== 'local-token') {
-          try {
-            serverProgress = await KidsApi.getProgress(token);
-          } catch {
-            // Fallback to local
-          }
-        }
-        
-        // Always load local as fallback/merge source
-        try {
-          localProgress = await KidsProgressService.get(userId);
-        } catch {}
-        
-        // Merge server and local data - prefer server for points/streak, merge details
-        const mergedProgress = serverProgress || localProgress || { points: 0, streak: 0, details: {} };
-        const serverDetails = (serverProgress as any)?.details || {};
-        const localDetails = (localProgress as any)?.details || {};
-        
-        // Points: Use the maximum of server and local (to account for offline progress)
-        const serverPoints = (serverProgress as any)?.points ?? 0;
-        const localPoints = localProgress?.points ?? 0;
-        setPoints(Math.max(serverPoints, localPoints));
-        
-        // Streak: Use the maximum of server and local
-        const serverStreak = (serverProgress as any)?.streak ?? 0;
-        const localStreak = localProgress?.streak ?? 0;
-        setStreak(Math.max(serverStreak, localStreak));
-        
-        // Favorites: Merge and convert
-        const fav = (serverDetails.favorites || localDetails.favorites || []);
-        const convertedFavorites = Array.isArray(fav) ? fav.map((f: any) => {
-          if (typeof f === 'number') {
-            return `teen-${f}`;
-          }
-          return f;
-        }) : [];
-        setFavorites(convertedFavorites);
-        
-        // Merge pronunciation, vocabulary data
-        const mergedPron = { ...(localDetails.pronunciation || {}), ...(serverDetails.pronunciation || {}) };
-        const mergedVocab = { ...(localDetails.vocabulary || {}), ...(serverDetails.vocabulary || {}) };
-        
-        // Count attempts from merged data
-        const pronCount = Object.keys(mergedPron).length;
-        const vocabCount = Object.keys(mergedVocab).length;
-        setPronunciationAttempts(pronCount);
-        setVocabularyAttempts(vocabCount);
-      } catch (error) {
-        console.error('Error loading progress:', error);
-      }
-    };
-
-    loadProgress();
-
-    const icons = ['star', 'heart', 'sparkles', 'zap'];
-    const newFloatingIcons = Array.from({ length: 8 }, (_, i) => ({
-      id: i,
-      type: icons[Math.floor(Math.random() * icons.length)],
-      x: Math.random() * 80 + 10,
-      y: Math.random() * 80 + 10,
-    }));
-    setFloatingIcons(newFloatingIcons);
-    
-    // Set up real-time polling for progress updates every 3 seconds
-    const progressInterval = setInterval(loadProgress, 3000);
-    
-    return () => clearInterval(progressInterval);
-  }, [userId, isAuthenticated]);
-
-  // Load vocabulary words and phrases from enrolled TEEN stories only
-  useEffect(() => {
-    if (!isAuthenticated) return;
-
-    const loadVocabularyWordsAndPhrases = () => {
-      try {
-        // Define teen story IDs to filter
-        const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
-          'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
-          'ai-ethics-explorer', 'digital-security-guardian'];
-        
-        // Get words from enrolled stories and filter to only teen stories
-        const allStoryWords = StoryWordsService.getWordsFromEnrolledStories(userId);
-        const teenStoryWords = allStoryWords.filter(sw => teenStoryIds.includes(sw.storyId));
-        
-        // Save detailed for filtering
-        const detailed = teenStoryWords.map(sw => ({
-          word: sw.word,
-          hint: sw.hint,
-          storyId: sw.storyId,
-          storyTitle: sw.storyTitle
-        }));
-        setEnrolledStoryWordsDetailed(detailed);
-        const words = detailed.map(w => ({ word: w.word, hint: w.hint }));
-        console.log(`📚 Loaded ${words.length} words from enrolled teen stories (filtered from ${allStoryWords.length} total)`);
-        setEnrolledWords(words);
-
-        // Get phrases from enrolled stories and filter to only teen stories
-        const allStoryPhrases = StoryWordsService.getPhrasesFromEnrolledStories(userId);
-        const teenStoryPhrases = allStoryPhrases.filter(sp => teenStoryIds.includes(sp.storyId));
-        
-        // Save detailed for filtering
-        const detailedPhrases = teenStoryPhrases.map(sp => ({
-          phrase: sp.phrase,
-          phonemes: sp.phonemes,
-          storyId: sp.storyId,
-          storyTitle: sp.storyTitle
-        }));
-        setEnrolledStoryPhrasesDetailed(detailedPhrases);
-        const phrases = detailedPhrases.map(p => ({ phrase: p.phrase, phonemes: p.phonemes }));
-        console.log(`🎤 Loaded ${phrases.length} phrases from enrolled teen stories (filtered from ${allStoryPhrases.length} total)`);
-        setEnrolledPhrases(phrases);
-      } catch (error) {
-        console.error('Error loading vocabulary words and phrases:', error);
-        setEnrolledWords([]);
-        setEnrolledPhrases([]);
-      }
-    };
-
-    loadVocabularyWordsAndPhrases();
-  }, [userId, isAuthenticated]);
-
-  const categories = [
-    { id: 'stories', label: 'Adventure Stories', icon: BookOpen, emoji: '📚' },
-    { id: 'vocabulary', label: 'Advanced Vocabulary', icon: Brain, emoji: '🧠' },
-    { id: 'pronunciation', label: 'Speaking Practice', icon: Mic, emoji: '🎤' },
-    { id: 'games', label: 'Challenge Games', icon: Trophy, emoji: '🏆' },
-  ];
-
-  // Advanced stories for teens
-  const allStories = [
-    {
-      title: "Mystery Detective",
-      description: "Solve crimes and mysteries while learning advanced English!",
-      difficulty: 'Hard',
-      duration: '12 min',
-      words: 800,
-      image: '🕵️',
-      character: Target,
-      gradient: 'from-gray-400 to-slate-400',
-      bgGradient: 'from-gray-200 to-slate-300 dark:from-gray-900 dark:to-slate-900',
-      animation: 'animate-float-slow',
-      type: 'mystery',
-      id: 'teen-0'
-    },
-    {
-      title: "Space Explorer",
-      description: "Navigate complex space missions and scientific discoveries!",
-      difficulty: 'Hard',
-      duration: '15 min',
-      words: 950,
-      image: '🚀',
-      character: Globe,
-      gradient: 'from-blue-400 to-indigo-400',
-      bgGradient: 'from-blue-200 to-indigo-300 dark:from-blue-900 dark:to-indigo-900',
-      animation: 'animate-bounce',
-      type: 'space',
-      id: 'teen-1'
-    },
-    {
-      title: "Environmental Hero",
-      description: "Learn about climate change and environmental solutions!",
-      difficulty: 'Medium',
-      duration: '10 min',
-      words: 700,
-      image: '🌍',
-      character: Shield,
-      gradient: 'from-green-400 to-emerald-400',
-      bgGradient: 'from-green-200 to-emerald-300 dark:from-green-900 dark:to-emerald-900',
-      animation: 'animate-float-medium',
-      type: 'environment',
-      id: 'teen-2'
-    },
-    {
-      title: "Tech Innovator",
-      description: "Explore the world of technology and innovation!",
-      difficulty: 'Hard',
-      duration: '12 min',
-      words: 850,
-      image: '💻',
-      character: Brain,
-      gradient: 'from-purple-400 to-pink-400',
-      bgGradient: 'from-purple-200 to-pink-300 dark:from-purple-900 dark:to-pink-900',
-      animation: 'animate-float-fast',
-      type: 'technology',
-      id: 'teen-3'
-    },
-    {
-      title: "Global Citizen",
-      description: "Learn about different cultures and global issues!",
-      difficulty: 'Medium',
-      duration: '11 min',
-      words: 750,
-      image: '🌐',
-      character: Users,
-      gradient: 'from-orange-400 to-red-400',
-      bgGradient: 'from-orange-200 to-red-300 dark:from-orange-900 dark:to-red-900',
-      animation: 'animate-float-slow',
-      type: 'culture',
-      id: 'teen-4'
-    },
-    {
-      title: "Future Leader",
-      description: "Develop leadership skills and critical thinking!",
-      difficulty: 'Hard',
-      duration: '13 min',
-      words: 900,
-      image: '👑',
-      character: Crown,
-      gradient: 'from-yellow-400 to-orange-400',
-      bgGradient: 'from-yellow-200 to-orange-300 dark:from-yellow-900 dark:to-orange-900',
-      animation: 'animate-bounce',
-      type: 'leadership',
-      id: 'teen-5'
-    },
-    {
-      title: "Scientific Discovery",
-      description: "Explore scientific concepts and research methods!",
-      difficulty: 'Hard',
-      duration: '14 min',
-      words: 950,
-      image: '🔬',
-      character: Compass,
-      gradient: 'from-cyan-400 to-blue-400',
-      bgGradient: 'from-cyan-200 to-blue-300 dark:from-cyan-900 dark:to-blue-900',
-      animation: 'animate-float-medium',
-      type: 'science',
-      id: 'teen-6'
-    },
-    {
-      title: "Social Media Expert",
-      description: "Navigate digital communication and online safety!",
-      difficulty: 'Medium',
-      duration: '9 min',
-      words: 650,
-      image: '📱',
-      character: MessageSquare,
-      gradient: 'from-pink-400 to-purple-400',
-      bgGradient: 'from-pink-200 to-purple-300 dark:from-pink-900 dark:to-purple-900',
-      animation: 'animate-float-fast',
-      type: 'digital',
-      id: 'teen-7'
-    },
-    {
-      title: "AI Ethics Explorer",
-      description: "Navigate the ethical landscape of artificial intelligence and machine learning!",
-      difficulty: 'Hard',
-      duration: '14 min',
-      words: 980,
-      image: '🤖',
-      character: Cpu,
-      gradient: 'from-indigo-400 to-violet-400',
-      bgGradient: 'from-indigo-200 to-violet-300 dark:from-indigo-900 dark:to-violet-900',
-      animation: 'animate-float-medium',
-      type: 'ai',
-      id: 'teen-8'
-    },
-    {
-      title: "Digital Security Guardian",
-      description: "Master encryption, data protection, and cybersecurity fundamentals!",
-      difficulty: 'Hard',
-      duration: '13 min',
-      words: 920,
-      image: '🔐',
-      character: Lock,
-      gradient: 'from-red-400 to-rose-400',
-      bgGradient: 'from-red-200 to-rose-300 dark:from-red-900 dark:to-rose-900',
-      animation: 'animate-float-slow',
-      type: 'cybersecurity',
-      id: 'teen-9'
-    }
-  ];
-
-  // Handle story opening from Favorites page
-  useEffect(() => {
-    if (location.state?.startStory && location.state?.storyType) {
-      const { startStory, storyType } = location.state;
-      
-      // Find the story by ID
-      const story = allStories.find(s => s.id === startStory);
-      if (story) {
-        // Set flag to indicate we're opening from Favorites
-        setIsOpeningFromFavorites(true);
-        
-        // Set current story and open the appropriate adventure
-        setCurrentStory(startStory);
-        setIsPlaying(true);
-        setBounceAnimation(true);
-        
-        // Open the story adventure based on type (skip welcome message when coming from Favorites)
-        // Open immediately without any delays when coming from Favorites
-        if (storyType === 'mystery') {
-          setShowMysteryDetective(true);
-        } else if (storyType === 'space') {
-          setShowSpaceExplorer(true);
-        } else if (storyType === 'environment') {
-          setShowEnvironmentalHero(true);
-        } else if (storyType === 'technology') {
-          setShowTechInnovator(true);
-        } else if (storyType === 'culture') {
-          setShowGlobalCitizen(true);
-        } else if (storyType === 'leadership') {
-          setShowFutureLeader(true);
-        } else if (storyType === 'science') {
-          setShowScientificDiscovery(true);
-        } else if (storyType === 'digital') {
-          setShowSocialMediaExpert(true);
-        } else if (storyType === 'ai') {
-          setShowAIEthics(true);
-        } else if (storyType === 'cybersecurity') {
-          setShowDigitalSecurity(true);
-        }
-        
-        // Clear the location state to prevent re-opening
-        navigate(location.pathname, { replace: true });
-      }
-    }
-  }, [location.state, allStories, navigate, location.pathname]);
-
-  // Calculate pagination
-  const startIndex = (currentPage - 1) * storiesPerPage;
-  const paginatedStories = allStories.slice(startIndex, startIndex + storiesPerPage);
-  const totalPages = Math.ceil(allStories.length / storiesPerPage);
-
-  // Advanced achievements
-  const achievements = [
-    { 
-      name: 'Advanced Learner', 
-      icon: Star, 
-      progress: Math.min(100, Math.round((points / 2000) * 100)), 
-      emoji: '🌟',
-      description: `${points}/2000 points`
-    },
-    { 
-      name: 'Story Master', 
-      icon: BookOpen, 
-      progress: Math.min(100, favorites.length * 10), 
-      emoji: '📖',
-      description: `${favorites.length}/10 favorite stories`
-    },
-    { 
-      name: 'Speaking Pro', 
-      icon: Mic, 
-      progress: Math.min(100, Math.min(pronunciationAttempts, 20) * 5), 
-      emoji: '🎤',
-      description: `${pronunciationAttempts} practiced`
-    },
-    { 
-      name: 'Vocabulary Expert', 
-      icon: Brain, 
-      progress: Math.min(100, Math.min(vocabularyAttempts, 20) * 5), 
-      emoji: '🧠',
-      description: `${vocabularyAttempts} words learned`
-    },
-  ];
-  const completedAchievements = achievements.filter(a => a.progress === 100).length;
-
-  // Advanced vocabulary words for teens
-  const vocabWords = [
-    { word: 'investigate', hint: '🔍 Say: in-VES-ti-gate' },
-    { word: 'environment', hint: '🌍 Say: en-VY-ron-ment' },
-    { word: 'technology', hint: '💻 Say: tek-NOL-o-gy' },
-    { word: 'innovation', hint: '💡 Say: in-no-VAY-shun' },
-    { word: 'leadership', hint: '👑 Say: LEE-der-ship' },
-    { word: 'discovery', hint: '🔬 Say: dis-KUV-er-ee' },
-    { word: 'communication', hint: '💬 Say: com-mu-ni-KAY-shun' },
-    { word: 'responsibility', hint: '⚖️ Say: re-spon-si-BIL-i-ty' },
-    { word: 'sustainability', hint: '♻️ Say: sus-tain-a-BIL-i-ty' },
-    { word: 'collaboration', hint: '🤝 Say: col-lab-or-AY-shun' },
-    { word: 'creativity', hint: '🎨 Say: cree-a-TIV-i-ty' },
-    { word: 'entrepreneur', hint: '💼 Say: on-tre-pre-NUR' },
-    { word: 'philosophy', hint: '🤔 Say: fi-LOS-o-fy' },
-    { word: 'psychology', hint: '🧠 Say: sy-KOL-o-gy' }
-  ];
-
-  // Helper function to map teen story type to internal StoryWordsService ID
-  const getInternalStoryId = (storyType: string): string => {
-    const mapping: Record<string, string> = {
-      'mystery': 'mystery-detective',
-      'space': 'space-explorer-teen',
-      'environment': 'environmental-hero',
-      'technology': 'tech-innovator',
-      'culture': 'global-citizen',
-      'leadership': 'future-leader',
-      'science': 'scientific-discovery',
-      'digital': 'social-media-expert',
-      'ai': 'ai-ethics-explorer',
-      'cybersecurity': 'digital-security-guardian'
-    };
-    return mapping[storyType] || storyType;
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const vocabularyWordsToUse = enrolledWords.length > 0 ? enrolledWords : vocabWords;
+  const updateTeenStatsRef = (updates: Partial<typeof DEFAULT_TEEN_STATS>) => {
+    teenStatsRef.current = {
+      ...teenStatsRef.current,
+      ...updates,
+    };
+  };
 
-  const pronounceItems = [
-    { phrase: 'Critical thinking skills', phonemes: '🧠 Say: KRIT-i-kal THINK-ing skilz' },
-    { phrase: 'Environmental protection', phonemes: '🌍 Say: en-vy-ron-MEN-tal pro-TEK-shun' },
-    { phrase: 'Technological advancement', phonemes: '💻 Say: tek-no-LOJ-i-kal ad-VANS-ment' },
-    { phrase: 'Social responsibility', phonemes: '🤝 Say: SO-shul re-spon-si-BIL-i-ty' },
-    { phrase: 'Global communication', phonemes: '🌐 Say: GLO-bal com-mu-ni-KAY-shun' },
-    { phrase: 'Innovation and creativity', phonemes: '💡 Say: in-no-VAY-shun and cree-a-TIV-i-ty' },
-    { phrase: 'Sustainable development', phonemes: '♻️ Say: sus-TAIN-a-bul de-VEL-op-ment' },
-    { phrase: 'Digital transformation', phonemes: '📱 Say: DIJ-i-tal trans-for-MAY-shun' },
-    { phrase: 'Scientific methodology', phonemes: '🔬 Say: sy-en-TIF-ik meth-o-DOL-o-gy' },
-    { phrase: 'Cultural diversity', phonemes: '🌍 Say: KUL-chur-al di-VUR-si-ty' },
-    { phrase: 'Economic globalization', phonemes: '💰 Say: ee-ko-NOM-ik glo-bal-i-ZAY-shun' },
-    { phrase: 'Educational excellence', phonemes: '🎓 Say: ed-u-KAY-shun-al EK-se-lens' },
-    { phrase: 'Professional development', phonemes: '💼 Say: pro-FESH-un-al de-VEL-op-ment' },
-    { phrase: 'Interdisciplinary approach', phonemes: '🔗 Say: in-ter-DIS-i-plin-ar-ee a-PROCH' }
-  ];
+  const incrementTeenStreak = (source: string) => {
+    const today = new Date();
+    const todayKey = today.toDateString();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayKey = yesterday.toDateString();
 
-  const pronounceItemsToUse = enrolledPhrases.length > 0 ? enrolledPhrases : pronounceItems;
+    const localKey = `teen_streak_last_engagement_${userId}`;
+    const stored = teenStatsRef.current.lastEngagement || localStorage.getItem(localKey) || undefined;
 
-  // Handle story completion - track enrollment, update points/streak, reload words/phrases
-  const handleAdventureComplete = async (storyId: string, score: number) => {
-    if (!isAuthenticated) return;
+    if (stored === todayKey) return teenStatsRef.current.streak;
 
-    const storyIndex = allStories.findIndex(s => s.id === storyId);
-    if (storyIndex === -1) return;
+    let newStreak = 1;
+    if (stored === yesterdayKey) {
+      newStreak = (teenStatsRef.current.streak || 0) + 1;
+    }
 
-    // Calculate points based on score: base points from score + completion bonus
-    const basePoints = Math.round(score / 10);
-    const completionBonus = 50; // Bonus for completing the story
-    const pointsToAdd = basePoints + completionBonus;
-    
-    const newPoints = points + pointsToAdd;
-    setPoints(newPoints);
-    
-    // Update streak
-    const newStreak = streak + 1;
+    updateTeenStatsRef({ streak: newStreak, lastEngagement: todayKey });
     setStreak(newStreak);
     
-    // Get story information for enrollment
-    const story = allStories[storyIndex];
-    const storyType = story.type;
-    const storyTitle = story.title;
-    
-    // Map the story type to internal StoryWordsService format
-    const internalStoryId = getInternalStoryId(storyType);
-    
+    try {
+      localStorage.setItem(localKey, todayKey);
+    } catch {
+      // Ignore storage errors
+    }
+
+    console.log(`Teen streak incremented via ${source}: ${newStreak}`);
+    return newStreak;
+  };
+
+  const syncProgress = async ({
+    newTeenPoints,
+    newTeenStreak,
+    mutateDetails,
+    engagementSource,
+  }: {
+    newTeenPoints?: number;
+    newTeenStreak?: number;
+    mutateDetails?: (details: any) => void;
+    engagementSource?: string;
+  }) => {
     try {
       const token = localStorage.getItem('speakbee_auth_token');
-      const key = `story-${storyId}`;
-      
-      // Record story completion and enrollment using internal story ID
-      await KidsProgressService.recordStoryCompletion(
-        userId,
-        internalStoryId,
-        storyTitle,
-        storyType,
-        score
-      );
-      
-      // Reload vocabulary words and phrases to include data from this newly completed story
-      // Filter to only teen stories
-      const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
-        'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
-        'ai-ethics-explorer', 'digital-security-guardian'];
-      
-      const allStoryWords = StoryWordsService.getWordsFromEnrolledStories(userId);
-      const teenStoryWords = allStoryWords.filter(sw => teenStoryIds.includes(sw.storyId));
-      const detailedWords = teenStoryWords.map(sw => ({
-        word: sw.word,
-        hint: sw.hint,
-        storyId: sw.storyId,
-        storyTitle: sw.storyTitle
-      }));
-      setEnrolledStoryWordsDetailed(detailedWords);
-      const words = detailedWords.map(w => ({ word: w.word, hint: w.hint }));
-      console.log(`🎉 Story completed! Loaded ${words.length} teen words from enrolled stories (filtered from ${allStoryWords.length} total)`);
-      setEnrolledWords(words);
+      const isOnline = token && token !== 'local-token';
 
-      const allStoryPhrases = StoryWordsService.getPhrasesFromEnrolledStories(userId);
-      const teenStoryPhrases = allStoryPhrases.filter(sp => teenStoryIds.includes(sp.storyId));
-      const detailedPhrases = teenStoryPhrases.map(sp => ({
-        phrase: sp.phrase,
-        phonemes: sp.phonemes,
-        storyId: sp.storyId,
-        storyTitle: sp.storyTitle
-      }));
-      setEnrolledStoryPhrasesDetailed(detailedPhrases);
-      const phrases = detailedPhrases.map(p => ({ phrase: p.phrase, phonemes: p.phonemes }));
-      console.log(`🎉 Story completed! Loaded ${phrases.length} teen phrases from enrolled stories (filtered from ${allStoryPhrases.length} total)`);
-      setEnrolledPhrases(phrases);
-      
-      if (token && token !== 'local-token') {
+      if (isOnline) {
         const current = await KidsApi.getProgress(token);
         const currentPoints = (current as any)?.points ?? 0;
         const currentStreak = (current as any)?.streak ?? 0;
         const details = { ...((current as any).details || {}) };
-        details.readAloud = details.readAloud || {};
-        const prev = details.readAloud[key] || { bestScore: 0, attempts: 0 };
-        details.readAloud[key] = { 
-          bestScore: Math.max(prev.bestScore, score), 
-          attempts: prev.attempts + 1 
+        if (mutateDetails) mutateDetails(details);
+        const audienceStats = { ...(details.audienceStats || {}) };
+        audienceStats.teen = {
+          points: newTeenPoints ?? teenStatsRef.current.points,
+          streak: newTeenStreak ?? teenStatsRef.current.streak,
+          lastEngagement: teenStatsRef.current.lastEngagement,
+        };
+        details.audienceStats = audienceStats;
+        if (!details.engagement) details.engagement = {};
+        details.engagement.teen = {
+          lastStreakDate: teenStatsRef.current.lastEngagement,
+          source: engagementSource,
         };
         await KidsApi.updateProgress(token, { 
-          points: currentPoints + pointsToAdd, 
-          streak: newStreak,
-          details 
+          points: Math.max(currentPoints, newTeenPoints ?? teenStatsRef.current.points),
+          streak: Math.max(currentStreak, newTeenStreak ?? teenStatsRef.current.streak),
+          details,
         });
       } else {
         await KidsProgressService.update(userId, (p) => {
-          const details = { ...(p as any).details };
-          details.readAloud = details.readAloud || {};
-          const prev = details.readAloud[key] || { bestScore: 0, attempts: 0 };
-          details.readAloud[key] = { 
-            bestScore: Math.max(prev.bestScore, score), 
-            attempts: prev.attempts + 1 
+          const progress: any = p as any;
+          const details = { ...(progress.details || {}) };
+          if (mutateDetails) mutateDetails(details);
+          const audienceStats = { ...(details.audienceStats || {}) };
+          audienceStats.teen = {
+            points: newTeenPoints ?? teenStatsRef.current.points,
+            streak: newTeenStreak ?? teenStatsRef.current.streak,
+            lastEngagement: teenStatsRef.current.lastEngagement,
+          };
+          details.audienceStats = audienceStats;
+          details.engagement = {
+            ...(details.engagement || {}),
+            teen: {
+              lastStreakDate: teenStatsRef.current.lastEngagement,
+              source: engagementSource,
+            },
           };
           return { 
-            ...p, 
-            points: p.points + pointsToAdd, 
-            streak: newStreak,
-            details 
+            ...progress,
+            points: Math.max(progress.points ?? 0, newTeenPoints ?? teenStatsRef.current.points),
+            streak: Math.max(progress.streak ?? 0, newTeenStreak ?? teenStatsRef.current.streak),
+            details,
           } as any;
         });
       }
     } catch (error) {
-      console.error('Error updating adventure progress:', error);
+      console.error('Error syncing teen progress:', error);
+    }
+  };
+
+  const handleCategoryClick = (categoryId: string) => {
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+      return;
+    }
+
+    const instructions: Record<string, string> = {
+      stories: "Let's tackle a new advanced story!",
+      vocabulary: 'Time to expand your academic vocabulary!',
+      pronunciation: 'Sharpen your pronunciation with real-world phrases!',
+      games: 'Challenge yourself with advanced speaking games!',
+    };
+
+    if (isSoundEnabled) {
+      speakWithSanitizedText(instructions[categoryId] || "Let's keep learning!", {
+        rate: 1,
+        emotion: 'excited',
+      }).catch(() => undefined);
+    }
+
+    setActiveCategory(categoryId);
+  };
+
+  const toggleFavorite = async (storyId: string) => {
+    const next = favorites.includes(storyId)
+      ? favorites.filter((id) => id !== storyId)
+      : [...favorites, storyId];
+    setFavorites(next);
+    
+    try {
+      const token = localStorage.getItem('speakbee_auth_token');
+      if (token && token !== 'local-token') {
+        try {
+          await API.kids.toggleFavorite(storyId, !favorites.includes(storyId));
+          const current = await KidsApi.getProgress(token);
+          const details = { ...((current as any).details || {}), favorites: next };
+          await KidsApi.updateProgress(token, { details });
+          return;
+        } catch (error) {
+          console.error('Teen favorite server update failed:', error);
+        }
+      }
+      
+      await KidsProgressService.update(userId, (p) => {
+        const progress: any = p as any;
+        const details = { ...(progress.details || {}) };
+        details.favorites = next;
+        return { ...progress, details } as any;
+      });
+    } catch (error) {
+      console.error('Teen favorite update error:', error);
     }
   };
 
@@ -771,192 +866,142 @@ const TeenKidsPage = () => {
       setShowAuthModal(true);
       return;
     }
-
-    const storyIndex = allStories.findIndex(s => s.id === storyId);
-    if (storyIndex === -1) return;
-
-    handleElementClick(`story-${storyId}`);
     
-    // Play story-specific voice introduction (skip if opening from Favorites)
+    const story = allTeenStories.find((s) => s.id === storyId);
+    if (!story) return;
+
+    setCurrentStory(storyId);
+    setIsPlaying(true);
+
     if (isSoundEnabled && !isOpeningFromFavorites) {
-      const story = allStories[storyIndex];
-      await EnhancedTTS.speak(
-        `Welcome to ${story.title}! ${story.description} Let's begin this challenging adventure!`, 
+      await speakWithSanitizedText(
+        `Welcome to ${story.title}. ${story.description} Ready to lead this challenge?`,
         { rate: 1.0, emotion: 'excited' }
-      ).catch(() => {});
+      ).catch(() => undefined);
     }
-    
-    // Reset the flag after handling
+
     if (isOpeningFromFavorites) {
       setIsOpeningFromFavorites(false);
     }
 
-    setCurrentStory(storyId);
-    setIsPlaying(true);
-    setBounceAnimation(true);
-    
-    // Open appropriate adventure modal based on story type
-    const storyType = allStories[storyIndex].type;
-    if (storyType === 'mystery') {
-      setShowMysteryDetective(true);
-      setIsPlaying(false);
-      return;
-    }
-    if (storyType === 'space') {
-      setShowSpaceExplorer(true);
-      setIsPlaying(false);
-      return;
-    }
-    if (storyType === 'environment') {
-      setShowEnvironmentalHero(true);
-      setIsPlaying(false);
-      return;
-    }
-    if (storyType === 'technology') {
-      setShowTechInnovator(true);
-      setIsPlaying(false);
-      return;
-    }
-    if (storyType === 'culture') {
-      setShowGlobalCitizen(true);
-      setIsPlaying(false);
-      return;
-    }
-    if (storyType === 'leadership') {
-      setShowFutureLeader(true);
-      setIsPlaying(false);
-      return;
-    }
-    if (storyType === 'science') {
-      setShowScientificDiscovery(true);
-      setIsPlaying(false);
-      return;
-    }
-    if (storyType === 'digital') {
-      setShowSocialMediaExpert(true);
-      setIsPlaying(false);
-      return;
-    }
-    if (storyType === 'ai') {
-      setShowAIEthics(true);
-      setIsPlaying(false);
-      return;
-    }
-    if (storyType === 'cybersecurity') {
-      setShowDigitalSecurity(true);
-      setIsPlaying(false);
-      return;
-    }
-    
-    // Add celebration effects
-    const newPoints = points + 100;
-    const newStreak = streak + 1;
+    const newPoints = points + 50;
     setPoints(newPoints);
-    setStreak(newStreak);
-    
-    // Reset bounce animation
-    setTimeout(() => setBounceAnimation(false), 1000);
-    
-    // Add floating particles
-    const newParticles = Array.from({ length: 12 }, (_, i) => ({
-      id: Date.now() + i,
-      type: ['star', 'heart', 'sparkles'][Math.floor(Math.random() * 3)],
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-    }));
-    setFloatingIcons(prev => [...prev, ...newParticles]);
-    
-    setTimeout(() => {
-      setFloatingIcons(prev => prev.filter(icon => !newParticles.find(p => p.id === icon.id)));
-    }, 2000);
-    
+    updateTeenStatsRef({ points: newPoints });
+    const newStreak = incrementTeenStreak('story-start');
+
+    const internalStoryId = getInternalStoryId(story.type);
+
+    await syncProgress({
+      newTeenPoints: newPoints,
+      newTeenStreak: newStreak,
+      engagementSource: 'story-start',
+      mutateDetails: (details) => {
+        details.readAloud = details.readAloud || {};
+        const key = `story-${storyId}`;
+        const previous = details.readAloud[key] || { bestScore: 0, attempts: 0 };
+        details.readAloud[key] = {
+          bestScore: Math.max(previous.bestScore, 80),
+          attempts: (previous.attempts || 0) + 1,
+        };
+      },
+    });
+
+    openStoryModal(story.type);
     setIsPlaying(false);
-  };
 
-  const toggleFavorite = async (storyId: string) => {
-    if (!isAuthenticated) {
-      setShowAuthModal(true);
-      return;
-    }
-
-    const next = favorites.includes(storyId)
-      ? favorites.filter(id => id !== storyId)
-      : [...favorites, storyId];
-    setFavorites(next);
-    
     try {
-      const token = localStorage.getItem('speakbee_auth_token');
-      if (token && token !== 'local-token') {
-        try {
-          const current = await KidsApi.getProgress(token);
-          const details = { ...((current as any).details || {}), favorites: next };
-          await KidsApi.updateProgress(token, { details });
-          return;
-        } catch (error) {
-          console.error('Error updating favorites on server:', error);
-        }
-      }
-      
-      await KidsProgressService.update(userId, (p) => {
-        const details = { ...(p as any).details };
-        details.favorites = next;
-        return { ...p, details } as any;
-      });
+      await KidsProgressService.recordStoryCompletion(
+        userId,
+        internalStoryId,
+        story.title,
+        story.type,
+        80
+      );
     } catch (error) {
-      console.error('Error updating favorites:', error);
+      console.warn('Teen local story enrollment skipped:', error);
     }
   };
 
-  const getIconComponent = (type: string) => {
-    switch (type) {
-      case 'star': return Star;
-      case 'heart': return Heart;
-      case 'sparkles': return Sparkles;
-      case 'zap': return Zap;
-      default: return Star;
+  const handleAdventureComplete = async (storyId: string, score: number) => {
+    if (!isAuthenticated) return;
+
+    const story = allTeenStories.find((s) => s.id === storyId);
+    if (!story) return;
+
+    const basePoints = Math.round(score / 8);
+    const completionBonus = 60;
+    const pointsToAdd = basePoints + completionBonus;
+    const newPoints = points + pointsToAdd;
+    setPoints(newPoints);
+    updateTeenStatsRef({ points: newPoints });
+    const newStreak = incrementTeenStreak('story-complete');
+
+    const internalStoryId = getInternalStoryId(story.type);
+
+    try {
+      await KidsProgressService.recordStoryCompletion(
+        userId,
+        internalStoryId,
+        story.title,
+        story.type,
+        score
+      );
+    } catch (error) {
+      console.warn('Teen local story completion skipped:', error);
     }
+
+    try {
+      const words = StoryWordsService.getWordsFromEnrolledStories(userId).filter((w) =>
+        TEEN_INTERNAL_STORY_IDS.includes(w.storyId)
+      );
+      const wordDetails = words.map((w) => ({
+        word: w.word,
+        hint: w.hint,
+        storyId: w.storyId,
+        storyTitle: w.storyTitle,
+      }));
+      setEnrolledStoryWordsDetailed(wordDetails);
+
+      const phrases = StoryWordsService.getPhrasesFromEnrolledStories(userId).filter((p) =>
+        TEEN_INTERNAL_STORY_IDS.includes(p.storyId)
+      );
+      const phraseDetails = phrases.map((p) => ({
+        phrase: p.phrase,
+        phonemes: p.phonemes,
+        storyId: p.storyId,
+        storyTitle: p.storyTitle,
+      }));
+      setEnrolledStoryPhrasesDetailed(phraseDetails);
+    } catch (error) {
+      console.warn('Teen vocabulary refresh skipped:', error);
+    }
+
+    await syncProgress({
+      newTeenPoints: newPoints,
+      newTeenStreak: newStreak,
+      engagementSource: 'story-complete',
+      mutateDetails: (details) => {
+        details.readAloud = details.readAloud || {};
+        const key = `story-${storyId}`;
+        const previous = details.readAloud[key] || { bestScore: 0, attempts: 0 };
+        details.readAloud[key] = {
+          bestScore: Math.max(previous.bestScore, score),
+          attempts: (previous.attempts || 0) + 1,
+        };
+      },
+    });
   };
 
-  const getIconColor = (type: string) => {
-    switch (type) {
-      case 'star': return 'text-yellow-400 dark:text-yellow-300';
-      case 'heart': return 'text-pink-400 dark:text-pink-300';
-      case 'sparkles': return 'text-purple-400 dark:text-purple-300';
-      case 'zap': return 'text-blue-400 dark:text-blue-300';
-      default: return 'text-yellow-400 dark:text-yellow-300';
-    }
-  };
-
-  const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
-    containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleCategoryClick = (categoryId: string) => {
-    if (!isAuthenticated) {
-      setShowAuthModal(true);
-      return;
-    }
-    
-    handleElementClick(`category-${categoryId}`);
-    
-    const categoryInstructions = {
-      stories: "Let's dive into some challenging adventure stories!",
-      vocabulary: "Time to expand your advanced vocabulary!",
-      pronunciation: "Let's practice professional speaking skills!",
-      games: "Ready for some brain-challenging games?"
-    };
-    
-    if (isSoundEnabled) {
-      EnhancedTTS.speak(categoryInstructions[categoryId as keyof typeof categoryInstructions] || "Let's learn!", { 
-        rate: 1.0, 
-        emotion: 'excited' 
-      }).catch(() => {});
-    }
-    
-    setActiveCategory(categoryId);
-    
-    // Update URL to persist the section on refresh (already handled by useEffect above)
+  const awardEngagementPoints = async (delta: number, source: string) => {
+    const newPoints = points + delta;
+    setPoints(newPoints);
+    updateTeenStatsRef({ points: newPoints });
+    const newStreak = incrementTeenStreak(source);
+    await syncProgress({
+      newTeenPoints: newPoints,
+      newTeenStreak: newStreak,
+      engagementSource: source,
+    });
   };
 
   const handleAuthSuccess = () => {
@@ -968,909 +1013,585 @@ const TeenKidsPage = () => {
     navigate('/');
   };
 
-  // Interactive functions
-  const playSound = async (soundType: 'success' | 'celebration' | 'error') => {
-    if (!isSoundEnabled) return;
-    
-    try {
-      const soundMessages = {
-        success: 'Excellent work!',
-        celebration: 'Outstanding achievement!',
-        error: 'Try again!'
-      };
-      
-      await EnhancedTTS.speak(soundMessages[soundType], { 
-        rate: 1.0, 
-        emotion: soundType === 'celebration' ? 'excited' : 'excited' 
-      });
-    } catch (error) {
-      console.log('Sound playback not available');
-    }
-  };
-
-  const triggerCelebration = () => {
-    setCelebrating(true);
-    playSound('celebration');
-    setTimeout(() => setCelebrating(false), 3000);
-  };
-
-  const handleElementHover = (elementId: string) => {
-    setHoveredElement(elementId);
-  };
-
-  const handleElementClick = (elementId: string) => {
-    setPulseAnimation(true);
-    setTimeout(() => setPulseAnimation(false), 1000);
-    console.log(`Clicked element: ${elementId}`);
-  };
-
-  // Show auth modal if not authenticated
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-3 sm:px-4 md:px-6">
+      <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
         <AuthModal 
           isOpen={showAuthModal} 
           onClose={handleAuthModalClose}
           initialMode={authMode}
-          redirectFromKids={true}
+          redirectFromKids
           onAuthSuccess={handleAuthSuccess}
         />
-        <div className="text-center p-4 sm:p-6 md:p-8 max-w-2xl w-full">
-          <div className="animate-bounce mb-4 sm:mb-6">
-            <Brain className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 text-blue-500 mx-auto" />
+        <Card className="max-w-xl w-full shadow-xl border-none">
+          <CardContent className="py-12 px-8 text-center space-y-6">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+              <Target className="h-8 w-8 text-primary" />
           </div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#118AB2] bg-clip-text text-transparent mb-3 sm:mb-4 md:mb-6 px-2">
-            Welcome to Teen Explorer Zone!
-          </h1>
-          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 dark:text-gray-300 mb-6 sm:mb-8 px-2">
-            {authMode === 'login' 
-              ? 'Please sign in to continue your advanced learning journey! 🚀' 
-              : 'Create an account to start your advanced learning journey! 🚀'}
-          </p>
-          <Button 
-            onClick={() => setShowAuthModal(true)}
-            className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white font-bold py-3 sm:py-4 px-6 sm:px-8 md:px-10 rounded-xl sm:rounded-2xl text-sm sm:text-base md:text-lg w-full sm:w-auto transition-all hover:scale-105"
-          >
-            {authMode === 'login' ? 'Sign In' : 'Create Account'}
+            <div className="space-y-2">
+              <h1 className="text-3xl font-semibold text-foreground">Teen Explorer Zone</h1>
+              <p className="text-base text-muted-foreground">
+                Advanced missions, debate-ready vocabulary, and professional speaking practice. Sign in to keep leveling up.
+              </p>
+            </div>
+            <Button onClick={() => setShowAuthModal(true)} size="lg" className="w-full">
+              {authMode === 'login' ? 'Sign in to continue' : 'Create an account'}
           </Button>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div 
-      ref={containerRef} 
-      className="min-h-screen pb-16 sm:pb-20 pt-24 sm:pt-32 md:pt-40 relative overflow-hidden"
-    >
-      {/* Auth Modal */}
+    <div ref={containerRef} className="min-h-screen bg-muted/20 pb-24">
       <AuthModal 
         isOpen={showAuthModal} 
         onClose={handleAuthModalClose}
         initialMode={authMode}
-        redirectFromKids={true}
+        redirectFromKids
         onAuthSuccess={handleAuthSuccess}
       />
-
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none hidden sm:block">
-        <div className="absolute top-10 left-4 sm:left-10 animate-float-slow">
-          <Brain className="w-8 h-8 sm:w-12 sm:h-12 text-blue-200/60 dark:text-blue-700/60" />
+      <main className="container mx-auto max-w-6xl px-4 pt-24 pb-16 space-y-10">
+        <section>
+          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-[#0F3D3E] via-[#146356] to-[#1B7F6E] text-white shadow-xl">
+            <span className="absolute -right-24 -top-24 h-56 w-56 rounded-full bg-white/10 blur-3xl" aria-hidden />
+            <span className="absolute -left-28 bottom-0 h-48 w-48 rounded-full bg-white/10 blur-3xl" aria-hidden />
+            <CardHeader className="space-y-6 relative z-10">
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+                <div className="space-y-4 lg:max-w-2xl">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Badge className="rounded-full bg-white/20 text-white uppercase tracking-wide">
+                      Teen Learners
+                    </Badge>
+                    <SyncStatusIndicator showDetails={false} className="bg-white/20 text-white backdrop-blur-sm" />
+                    <Badge className="rounded-full bg-white/20 text-white">
+                      {modelsReady ? (
+                        <span className="flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4" />
+                          AI tutor ready
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Preparing offline tools
+                        </span>
+                      )}
+                    </Badge>
+                    {isInitializing && (
+                      <Badge className="rounded-full bg-white/10 text-white">
+                        Initialising teen environment…
+                      </Badge>
+                    )}
         </div>
-        <div className="absolute top-20 right-4 sm:right-20 animate-float-medium">
-          <TrendingUp className="w-10 h-10 sm:w-16 sm:h-16 text-green-200/60 dark:text-green-800/60" />
+                  <CardTitle className="text-3xl md:text-4xl font-semibold text-white leading-tight">
+                    Modern English experiences for future leaders
+                  </CardTitle>
+                  <CardDescription className="text-white/85 text-base md:text-lg leading-relaxed">
+                    Dive into mission-based stories, advanced vocabulary labs, and professional speaking practice designed for confident teens.
+                  </CardDescription>
         </div>
-        <div className="absolute bottom-20 left-4 sm:left-20 animate-float-fast">
-          <Target className="w-10 h-10 sm:w-14 sm:h-14 text-purple-300/60 dark:text-purple-600/60" />
-        </div>
-      </div>
-
-      {/* Floating Icons */}
-      {floatingIcons.map((icon) => {
-        const IconComponent = getIconComponent(icon.type);
-        return (
-          <div
-            key={icon.id}
-            className="absolute pointer-events-none animate-float-random"
-            style={{
-              left: `${icon.x}%`,
-              top: `${icon.y}%`,
-              animationDelay: `${Math.random() * 2}s`,
-              animationDuration: `${3 + Math.random() * 2}s`
-            }}
-          >
-            <IconComponent className={cn("w-6 h-6", getIconColor(icon.type))} />
-          </div>
-        );
-      })}
-
-      {/* Celebration Effects */}
-      {celebrating && (
-        <div className="fixed inset-0 pointer-events-none z-50">
-          {Array.from({ length: 20 }, (_, i) => (
-            <div
-              key={i}
-              className="absolute animate-bounce"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 2}s`,
-                animationDuration: `${2 + Math.random() * 2}s`
-              }}
-            >
-              <Sparkles className="w-4 h-4 text-yellow-400" />
-            </div>
-          ))}
-        </div>
-      )}
-
-      <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative z-10">
-        {/* Header Section */}
-        <div className="text-center mb-6 sm:mb-8 relative">
-          {/* Interactive Controls */}
-          <div className="absolute top-0 right-0 flex gap-2 z-20">
+                <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 sm:flex-nowrap">
             <Button
               variant="ghost"
-              size="sm"
-              onClick={() => setIsSoundEnabled(!isSoundEnabled)}
-              className={cn(
-                "rounded-full p-2 transition-all duration-300 hover:scale-110",
-                isSoundEnabled ? "text-green-600 hover:bg-green-100" : "text-gray-400 hover:bg-gray-100"
-              )}
-              title={isSoundEnabled ? "Sound On" : "Sound Off"}
-            >
-              {isSoundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+                    size="icon"
+                    onClick={() => setIsSoundEnabled((prev) => !prev)}
+                    className="rounded-full bg-white/15 text-white hover:bg-white/25 focus-visible:ring-offset-0"
+                    title={isSoundEnabled ? 'Mute narration' : 'Enable narration'}
+                  >
+                    {isSoundEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
             </Button>
             <Button
               variant="ghost"
-              size="sm"
-              onClick={() => setIsMusicEnabled(!isMusicEnabled)}
-              className={cn(
-                "rounded-full p-2 transition-all duration-300 hover:scale-110",
-                isMusicEnabled ? "text-purple-600 hover:bg-purple-100" : "text-gray-400 hover:bg-gray-100"
-              )}
-              title={isMusicEnabled ? "Music On" : "Music Off"}
-            >
-              <Music className="w-5 h-5" />
+                    size="icon"
+                    onClick={() => setIsMusicEnabled((prev) => !prev)}
+                    className="rounded-full bg-white/15 text-white hover:bg-white/25 focus-visible:ring-offset-0"
+                    title={isMusicEnabled ? 'Pause ambient sound' : 'Play ambient sound'}
+                  >
+                    <Headphones className="h-5 w-5" />
             </Button>
             <Button
               variant="ghost"
-              size="sm"
-              onClick={() => setShowHelp(!showHelp)}
-              className={cn(
-                "rounded-full p-2 transition-all duration-300 hover:scale-110",
-                showHelp ? "text-blue-600 hover:bg-blue-100" : "text-gray-400 hover:bg-gray-100"
-              )}
-              title="Help & Tips"
-            >
-              <HelpCircle className="w-5 h-5" />
+                    size="icon"
+                    onClick={() => setShowHelp((prev) => !prev)}
+                    className="rounded-full bg-white/15 text-white hover:bg-white/25"
+                    title="Show quick tips"
+                  >
+                    <BookOpen className="h-5 w-5" />
             </Button>
           </div>
-
-          {/* Help Panel */}
-          {showHelp && (
-            <div className="absolute top-12 right-0 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-4 max-w-xs z-30 border-2 border-blue-200 dark:border-blue-600">
-              <h3 className="font-bold text-sm mb-2 text-blue-600 dark:text-blue-400">🎯 Advanced Tips!</h3>
-              <ul className="text-xs text-gray-600 dark:text-gray-300 space-y-1">
-                <li>• Challenge yourself with harder stories!</li>
-                <li>• Practice advanced vocabulary daily</li>
-                <li>• Focus on real-world scenarios</li>
-                <li>• Build critical thinking skills!</li>
-              </ul>
             </div>
-          )}
-          
-          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4 px-2">
-            <div className="relative">
-              <div className={cn(
-                "absolute inset-0 bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] rounded-full blur-md opacity-60 animate-pulse transition-all duration-300",
-                celebrating && "animate-ping"
-              )}></div>
-            </div>
-            <h1 
-              className={cn(
-                "text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#118AB2] bg-clip-text text-transparent cursor-pointer transition-all duration-300 hover:scale-105",
-                pulseAnimation && "animate-pulse"
+              {showHelp && (
+                <Card className="bg-white/80 text-slate-900 backdrop-blur-md shadow-lg lg:absolute lg:right-6 lg:top-6 lg:max-w-sm">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base font-semibold text-slate-900">Quick tips</CardTitle>
+                    <CardDescription className="text-sm text-slate-600">
+                      Complete stories to unlock curated vocabulary and speaking labs. Track your streak to secure elite certificates.
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
               )}
-              onClick={() => {
-                handleElementClick('title');
-              }}
-              onMouseEnter={() => handleElementHover('title')}
-            >
-              Teen Explorers
-            </h1>
+            </CardHeader>
+          </Card>
+        </section>
+
+        <section className="space-y-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="text-lg font-semibold text-foreground">Progress snapshot</h2>
+            <span className="text-sm text-muted-foreground">Teen metrics update automatically</span>
+            </div>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <Card className="shadow-sm">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Achievement Points ✨</CardTitle>
+                <Trophy className="h-5 w-5 text-amber-500" />
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-3xl font-semibold text-foreground">{points}</p>
+                <p className="text-sm text-muted-foreground">
+                  Earned exclusively from teen missions, vocabulary labs, speaking practice, and challenge arenas.
+              </p>
+            </CardContent>
+          </Card>
+            <Card className="shadow-sm">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Learning Streak 🔥</CardTitle>
+                <Target className="h-5 w-5 text-emerald-500" />
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-3xl font-semibold text-foreground">{streak} days</p>
+                <p className="text-sm text-muted-foreground">
+                  Stay consistent with teen-focused practice to unlock elite certificates and badges.
+              </p>
+            </CardContent>
+          </Card>
+            <Card className="shadow-sm">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Advanced Achievements 🏆</CardTitle>
+                <Award className="h-5 w-5 text-sky-500" />
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-baseline gap-2">
+                  <p className="text-3xl font-semibold text-foreground">{completedAchievements}</p>
+                  <p className="text-sm text-muted-foreground">of {achievements.length} unlocked</p>
+              </div>
+                <Progress value={(completedAchievements / achievements.length) * 100} />
+            </CardContent>
+          </Card>
+        </div>
+        </section>
+
+        <section className="space-y-6">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="text-lg font-semibold text-foreground">Learning hub</h2>
+            <p className="text-sm text-muted-foreground">Switch between story campaigns, vocabulary labs, speaking practice, and challenge games.</p>
           </div>
-          <p 
-            className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-500 dark:text-gray-300 max-w-2xl mx-auto mb-3 sm:mb-4 px-4 cursor-pointer transition-all duration-300 hover:text-gray-700 dark:hover:text-gray-100"
-            onClick={() => handleElementClick('subtitle')}
-            onMouseEnter={() => handleElementHover('subtitle')}
-          >
-            Advanced adventures, challenging games, and real-world English skills!
-          </p>
-        </div>
-
-        {/* Sync Status */}
-        <div className="mb-4 sm:mb-6 w-full max-w-full px-2 sm:px-0">
-          <SyncStatusIndicator showDetails={false} className="w-full sm:w-auto" />
-        </div>
-
-        {/* Stats Bar */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-5 lg:gap-6 mb-6 sm:mb-8 px-2 sm:px-0 relative">
-          <Card 
-            className={cn(
-              "bg-yellow-50/30 dark:bg-yellow-900/10 backdrop-blur-sm border-2 border-yellow-200 dark:border-yellow-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative cursor-pointer group",
-              hoveredElement === 'points-card' && "scale-105 shadow-2xl"
-            )}
-            onMouseEnter={() => handleElementHover('points-card')}
-            onClick={() => {
-              handleElementClick('points-card');
-              triggerCelebration();
-            }}
-          >
-            <CardContent className="p-4 sm:p-5 md:p-6 text-center">
-              <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-                <Trophy className={cn(
-                  "w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-yellow-600 dark:text-yellow-500 flex-shrink-0 transition-all duration-300",
-                  hoveredElement === 'points-card' && "animate-bounce"
-                )} />
-                <span className={cn(
-                  "text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white transition-all duration-300",
-                  celebrating && "animate-pulse"
-                )}>{points}</span>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-300 font-bold group-hover:text-yellow-600 dark:group-hover:text-yellow-400 transition-colors">
-                Achievement Points ✨
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card 
-            className={cn(
-              "bg-green-50/30 dark:bg-green-900/10 backdrop-blur-sm border-2 border-green-200 dark:border-green-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative cursor-pointer group",
-              hoveredElement === 'streak-card' && "scale-105 shadow-2xl"
-            )}
-            onMouseEnter={() => handleElementHover('streak-card')}
-            onClick={() => {
-              handleElementClick('streak-card');
-            }}
-          >
-            <CardContent className="p-4 sm:p-5 md:p-6 text-center">
-              <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-                <TrendingUp className={cn(
-                  "w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-green-600 dark:text-green-500 flex-shrink-0 transition-all duration-300",
-                  hoveredElement === 'streak-card' && "animate-pulse"
-                )} />
-                <span className={cn(
-                  "text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white transition-all duration-300",
-                  celebrating && "animate-pulse"
-                )}>{streak} days</span>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-300 font-bold group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
-                Learning Streak 🔥
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card 
-            className={cn(
-              "bg-blue-50/30 dark:bg-blue-900/10 backdrop-blur-sm border-2 border-blue-200 dark:border-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative cursor-pointer group",
-              hoveredElement === 'achievements-card' && "scale-105 shadow-2xl"
-            )}
-            onMouseEnter={() => handleElementHover('achievements-card')}
-            onClick={() => {
-              handleElementClick('achievements-card');
-              if (completedAchievements > 0) {
-                triggerCelebration();
-              }
-            }}
-          >
-            <CardContent className="p-4 sm:p-5 md:p-6 text-center">
-              <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-                <Award className={cn(
-                  "w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-blue-600 dark:text-blue-500 flex-shrink-0 transition-all duration-300",
-                  hoveredElement === 'achievements-card' && "animate-bounce"
-                )} />
-                <span className={cn(
-                  "text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white transition-all duration-300",
-                  celebrating && "animate-pulse"
-                )}>{completedAchievements}/{achievements.length}</span>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-300 font-bold group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                Advanced Achievements 🏆
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Categories Navigation */}
-        <div className="mb-8 sm:mb-10 md:mb-12">
-          {/* Mobile: Vertical Stack */}
-          <div className="grid grid-cols-2 sm:hidden gap-2 px-2">
-            {categories.map((category) => {
-              const getCategoryColor = () => {
-                switch(category.id) {
-                  case 'stories': return 'bg-blue-50/40 dark:bg-blue-900/10 border-blue-300 dark:border-blue-600 hover:border-blue-400 dark:hover:border-blue-500';
-                  case 'vocabulary': return 'bg-purple-50/40 dark:bg-purple-900/10 border-purple-300 dark:border-purple-600 hover:border-purple-400 dark:hover:border-purple-500';
-                  case 'pronunciation': return 'bg-green-50/40 dark:bg-green-900/10 border-green-300 dark:border-green-600 hover:border-green-400 dark:hover:border-green-500';
-                  case 'games': return 'bg-orange-50/40 dark:bg-orange-900/10 border-orange-300 dark:border-orange-600 hover:border-orange-400 dark:hover:border-orange-500';
-                  default: return 'bg-gray-50/40 dark:bg-gray-900/10 border-gray-300 dark:border-gray-600';
-                }
-              };
-              
-              return (
-                <Button
+          <Tabs value={activeCategory} onValueChange={handleCategoryClick} className="space-y-6">
+            <TabsList className="flex w-full gap-2 overflow-x-auto rounded-xl bg-muted/40 p-1 backdrop-blur sm:grid sm:grid-cols-4 sm:overflow-visible sm:bg-transparent sm:p-0">
+              {categories.map((category) => (
+                <TabsTrigger
                   key={category.id}
-                  variant={activeCategory === category.id ? "default" : "outline"}
-                  className={cn(
-                    "rounded-xl px-3 py-4 text-sm font-bold transition-all duration-300 relative overflow-hidden group h-auto min-h-[80px] flex flex-col items-center justify-center gap-2 cursor-pointer",
-                    activeCategory === category.id 
-                      ? "bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white shadow-xl scale-105" 
-                      : `${getCategoryColor()} backdrop-blur-sm text-gray-800 dark:text-white border-2 hover:shadow-md hover:scale-105`,
-                    hoveredElement === `category-${category.id}` && "scale-110 shadow-lg"
-                  )}
-                  onClick={() => handleCategoryClick(category.id)}
-                  onMouseEnter={() => handleElementHover(`category-${category.id}`)}
-                  onMouseLeave={() => setHoveredElement(null)}
+                  value={category.id}
+                  className="min-w-[160px] rounded-lg px-3 py-2 text-sm font-semibold transition data-[state=active]:bg-background data-[state=active]:shadow sm:min-w-0"
                 >
-                  <span className={cn(
-                    "text-3xl flex-shrink-0 transition-all duration-300",
-                    hoveredElement === `category-${category.id}` && "animate-bounce"
-                  )}>{category.emoji}</span>
-                  <span className="text-xs font-semibold text-center leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  <span className="mr-2 text-lg">{category.emoji}</span>
                     {category.label}
-                  </span>
-                  {activeCategory === category.id && (
-                    <Sparkles className="w-3 h-3 absolute top-1 right-1 animate-spin flex-shrink-0" />
-                  )}
-                </Button>
-              );
-            })}
-          </div>
+                </TabsTrigger>
+              ))}
+            </TabsList>
 
-          {/* Tablet & Desktop: Horizontal */}
-          <div className="hidden sm:flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 lg:gap-5 px-2">
-            {categories.map((category) => {
-              const getCategoryColor = () => {
-                switch(category.id) {
-                  case 'stories': return 'bg-blue-50/40 dark:bg-blue-900/10 border-blue-300 dark:border-blue-600 hover:border-blue-400 dark:hover:border-blue-500';
-                  case 'vocabulary': return 'bg-purple-50/40 dark:bg-purple-900/10 border-purple-300 dark:border-purple-600 hover:border-purple-400 dark:hover:border-purple-500';
-                  case 'pronunciation': return 'bg-green-50/40 dark:bg-green-900/10 border-green-300 dark:border-green-600 hover:border-green-400 dark:hover:border-green-500';
-                  case 'games': return 'bg-orange-50/40 dark:bg-orange-900/10 border-orange-300 dark:border-orange-600 hover:border-orange-400 dark:hover:border-orange-500';
-                  default: return 'bg-gray-50/40 dark:bg-gray-900/10 border-gray-300 dark:border-gray-600';
-                }
-              };
-              
-              return (
-                <Button
-                  key={category.id}
-                  variant={activeCategory === category.id ? "default" : "outline"}
-                  className={cn(
-                    "rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 lg:px-10 py-2.5 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg lg:text-xl font-bold transition-all duration-300 relative overflow-hidden group cursor-pointer",
-                    activeCategory === category.id 
-                      ? "bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white shadow-2xl transform hover:scale-110" 
-                      : `${getCategoryColor()} backdrop-blur-sm text-gray-800 dark:text-white border-2 hover:shadow-lg hover:scale-105`,
-                    hoveredElement === `category-${category.id}` && "scale-110 shadow-lg"
-                  )}
-                  onClick={() => handleCategoryClick(category.id)}
-                  onMouseEnter={() => handleElementHover(`category-${category.id}`)}
-                  onMouseLeave={() => setHoveredElement(null)}
-                >
-                  <span className={cn(
-                    "text-lg sm:text-xl md:text-2xl lg:text-3xl mr-1.5 sm:mr-2 md:mr-3 flex-shrink-0 transition-all duration-300",
-                    hoveredElement === `category-${category.id}` && "animate-bounce"
-                  )}>{category.emoji}</span>
-                  <span className="whitespace-nowrap group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                    {category.label}
-                  </span>
-                  {activeCategory === category.id && (
-                    <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 ml-1.5 sm:ml-2 animate-spin flex-shrink-0" />
-                  )}
-                </Button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Stories Grid */}
-        {activeCategory === 'stories' && (
-          <div className="mb-8 sm:mb-10 md:mb-12 px-2 sm:px-0">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6 lg:gap-8 mb-6 sm:mb-8">
+            <TabsContent value="stories" className="mt-0 space-y-6">
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {paginatedStories.map((story) => {
+                  const internalId = getInternalStoryId(story.type);
+                  const isEnrolled = enrolledInternalStoryIds.has(internalId) || completedStoryIds.has(internalId);
                 const CharacterIcon = story.character;
                 return (
-                  <Card 
-                    key={story.id} 
-                    className={cn(
-                      "group cursor-pointer bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-2 border-transparent hover:border-[#FF6B6B] transition-all duration-500 hover:shadow-2xl overflow-hidden w-full",
-                      bounceAnimation && currentStory === story.id && "animate-bounce",
-                      hoveredElement === `story-card-${story.id}` && "scale-105 shadow-2xl"
-                    )}
-                    onMouseEnter={() => {
-                      setCurrentStory(story.id);
-                      handleElementHover(`story-card-${story.id}`);
-                    }}
-                    onMouseLeave={() => setHoveredElement(null)}
-                    onClick={() => {
-                      if (isSoundEnabled) {
-                        EnhancedTTS.speak(
-                          `${story.title}. ${story.description} Difficulty: ${story.difficulty}. Duration: ${story.duration}.`, 
-                          { rate: 0.9, emotion: 'excited' }
-                        ).catch(() => {});
-                      }
-                    }}
-                  >
-                    <CardContent className="p-0 overflow-hidden rounded-xl sm:rounded-2xl lg:rounded-3xl">
-                      <div className={cn(
-                        "p-4 sm:p-6 md:p-8 relative overflow-hidden bg-gradient-to-br",
-                        story.bgGradient
-                      )}>
-                        {/* Enrolled Badge */}
-                        {(() => {
-                          const internalId = getInternalStoryId(story.type);
-                          const isEnrolled = enrolledInternalStoryIds.has(internalId);
-                          const storyEnrollments = StoryWordsService.getEnrolledStories(userId);
-                          const isCompleted = storyEnrollments.some(e => 
-                            e.storyId === internalId && e.completed === true && e.wordsExtracted === true
-                          );
-                          return (isEnrolled || isCompleted) ? (
-                            <div className="absolute top-2 right-2 z-20 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-lg">
-                              <CheckCircle className="w-3 h-3" />
-                              Enrolled
-                            </div>
-                          ) : null;
-                        })()}
-                        <div className="absolute top-0 right-0 w-20 h-20 sm:w-32 sm:h-32 bg-white/20 dark:bg-black/20 rounded-full -mr-10 sm:-mr-16 -mt-10 sm:-mt-16"></div>
-                        <div className="absolute bottom-0 left-0 w-16 h-16 sm:w-24 sm:h-24 bg-white/20 dark:bg-black/20 rounded-full -ml-8 sm:-ml-12 -mb-8 sm:-mb-12"></div>
-                        <div className="relative z-10 text-center">
-                          <div className={cn(
-                            "text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4 transform transition-transform duration-300 group-hover:scale-110", 
-                            story.animation,
-                            hoveredElement === `story-card-${story.id}` && "animate-bounce"
-                          )}>
-                            {story.image}
-                          </div>
-                          <CharacterIcon className={cn(
-                            "w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 mx-auto mb-2 sm:mb-3 text-gray-600 dark:text-gray-300 opacity-80 transition-all duration-300",
-                            hoveredElement === `story-card-${story.id}` && "animate-pulse scale-110"
-                          )} />
-                          <h3 className={cn(
-                            "text-lg sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2 text-gray-800 dark:text-white transition-all duration-300",
-                            hoveredElement === `story-card-${story.id}` && "text-blue-600 dark:text-blue-400"
-                          )}>
-                            {story.title}
-                          </h3>
-                          <p className={cn(
-                            "text-xs sm:text-sm leading-relaxed text-gray-600 dark:text-gray-300 px-2 transition-all duration-300",
-                            hoveredElement === `story-card-${story.id}` && "text-gray-700 dark:text-gray-200"
-                          )}>
-                            {story.description}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="p-4 sm:p-5 md:p-6">
-                        <div className="flex justify-between text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-4 sm:mb-6">
-                          <span className="flex items-center gap-0.5 sm:gap-1 font-semibold">📚 {story.words}</span>
-                          <span className="flex items-center gap-0.5 sm:gap-1 font-semibold">⏱️ {story.duration}</span>
-                          <span className={cn(
-                            "font-semibold",
-                            story.difficulty === 'Easy' && "text-green-500 dark:text-green-400",
-                            story.difficulty === 'Medium' && "text-yellow-500 dark:text-yellow-400",
-                            story.difficulty === 'Hard' && "text-red-500 dark:text-red-400"
-                          )}>
-                            🎯 {story.difficulty}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 mb-3">
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleFavorite(story.id);
-                            }} 
-                            className={cn(
-                              "rounded-lg sm:rounded-xl text-base sm:text-lg bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors", 
-                              favorites.includes(story.id) && "border-pink-500 text-pink-600 hover:bg-pink-50 dark:hover:bg-pink-900/20"
-                            )}
+                    <Card key={story.id} className="flex h-full flex-col overflow-hidden border border-muted shadow-sm transition hover:shadow-lg">
+                      <div className={cn('relative overflow-hidden bg-gradient-to-br p-4 text-white', story.bgGradient)}>
+                        <div className="flex items-start justify-between gap-2">
+                          <span className={cn('text-4xl sm:text-5xl', story.animation)}>{story.image}</span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => toggleFavorite(story.id)}
+                            className="rounded-full bg-black/15 text-white hover:bg-black/25"
                           >
-                            ❤
+                            <Heart
+                              className={cn('h-4 w-4', favorites.includes(story.id) && 'fill-current text-rose-400')}
+                            />
                           </Button>
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
-                            {favorites.includes(story.id) ? 'In favorites' : 'Add to favorites'}
-                          </span>
+                            </div>
+                        <div className="absolute top-3 right-3" />
+                        <div className="mt-4 space-y-1.5">
+                          <CardTitle className="text-lg font-semibold text-white">{story.title}</CardTitle>
+                          <p className="text-xs text-white/85 leading-relaxed">{story.description}</p>
+                          </div>
+                        <div className="mt-3 flex flex-wrap items-center gap-1.5 text-[11px] font-semibold text-white/80">
+                          <Badge className="bg-white/20 text-white">⏱ {story.duration}</Badge>
+                          <Badge className="bg-white/20 text-white">📚 {story.words} words</Badge>
+                          <Badge className="bg-white/20 text-white">🎯 {story.difficulty}</Badge>
                         </div>
-                        <Button 
-                          className={cn(
-                            "w-full bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white font-bold py-3 sm:py-4 rounded-xl sm:rounded-2xl transition-all duration-300 group-hover:shadow-xl relative overflow-hidden text-sm sm:text-base",
-                            bounceAnimation && currentStory === story.id && "animate-pulse"
-                          )}
-                          onClick={() => handleStartLesson(story.id)}
-                          disabled={isPlaying}
-                        >
-                          <span className="relative z-10 flex items-center justify-center">
-                            <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
-                            {isPlaying && currentStory === story.id ? 'Starting...' : 'Start Challenge!'}
-                          </span>
-                          <div className="absolute inset-0 bg-white/20 transform scale-0 group-hover:scale-100 transition-transform duration-300"></div>
-                        </Button>
+                        {isEnrolled && (
+                          <Badge className="absolute left-3 top-3 bg-white/90 text-indigo-600">
+                            <CheckCircle className="mr-1 h-3 w-3" /> Enrolled
+                          </Badge>
+                        )}
                       </div>
+                      <CardContent className="flex flex-1 flex-col justify-between space-y-3 p-4">
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <CharacterIcon className="h-4 w-4 text-muted-foreground" />
+                          <span className="truncate capitalize">Focus: {story.type.replace('-', ' ')}</span>
+                        </div>
+                          <Button 
+                          onClick={() => handleStartLesson(story.id)}
+                          disabled={isPlaying && currentStory === story.id}
+                          className="w-full py-2 text-sm"
+                        >
+                          <Play className="mr-2 h-4 w-4" />
+                          {isPlaying && currentStory === story.id ? 'Starting…' : 'Start mission'}
+                        </Button>
                     </CardContent>
                   </Card>
                 );
               })}
             </div>
-
-            {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2 sm:gap-3 md:gap-4 mt-6 sm:mt-8 px-2">
+                <div className="flex items-center justify-between gap-4 rounded-xl border border-dashed border-muted px-4 py-3">
+                  <span className="text-sm text-muted-foreground">
+                    Showing {(currentPage - 1) * storiesPerPage + 1}-
+                    {Math.min(currentPage * storiesPerPage, allTeenStories.length)} of {allTeenStories.length} missions
+                  </span>
+                  <div className="flex items-center gap-2">
                 <Button
-                  variant="outline"
-                  size="sm"
+                      variant="ghost"
+                      size="icon"
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="rounded-lg sm:rounded-xl px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-xs sm:text-sm font-semibold disabled:opacity-50 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border-gray-300 dark:border-gray-600 text-teal-800 dark:text-teal-800"
                 >
-                  <ChevronLeft className="w-4 h-4 sm:w-4 sm:h-4 sm:mr-1 md:mr-2 text-teal-800" />
-                  <span className="hidden md:inline">Previous</span>
+                      <ChevronLeft className="h-4 w-4" />
                 </Button>
-                
-                <div className="flex items-center gap-1 sm:gap-2">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <span className="text-sm text-muted-foreground">
+                      Page {currentPage} of {totalPages}
+                    </span>
                     <Button
-                      key={page}
-                      variant={currentPage === page ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => handlePageChange(page)}
-                      className={cn(
-                        "w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl text-xs sm:text-sm md:text-base font-bold",
-                        currentPage === page 
-                          ? "bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white shadow-lg" 
-                          : "bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border-gray-300 dark:border-gray-600 text-teal-800 dark:text-teal-800"
-                      )}
-                    >
-                      {page}
-                    </Button>
-                  ))}
-                </div>
-
-                <Button
-                  variant="outline"
-                  size="sm"
+                      variant="ghost"
+                      size="icon"
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="rounded-lg sm:rounded-xl px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-xs sm:text-sm font-semibold disabled:opacity-50 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border-gray-300 dark:border-gray-600 text-teal-800 dark:text-teal-800"
                 >
-                  <span className="hidden md:inline">Next</span>
-                  <ChevronRight className="w-4 h-4 sm:w-4 sm:h-4 sm:ml-1 md:ml-2 text-teal-800" />
+                      <ChevronRight className="h-4 w-4" />
                 </Button>
-              </div>
-            )}
-
-            {/* Page Info */}
-            <div className="text-center mt-3 sm:mt-4 px-4">
-              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-600">
-                Showing {startIndex + 1}-{Math.min(startIndex + storiesPerPage, allStories.length)} of {allStories.length} challenging adventures
-              </p>
             </div>
           </div>
         )}
+            </TabsContent>
 
-        {activeCategory === 'vocabulary' && (
-          <div className="mb-8 sm:mb-10 md:mb-12 px-2 sm:px-0 mx-auto w-full lg:max-w-7xl xl:max-w-[1400px]">
-            {enrolledWords.length > 0 ? (
-              <div>
-                <Card className="border-2 border-purple-300/50 bg-purple-50/40 dark:bg-purple-900/10 backdrop-blur-sm shadow-lg p-4 mb-4">
+            <TabsContent value="vocabulary" className="mt-0 space-y-4">
+              {vocabularyWordsToUse.length === 0 ? (
+                <Card className="border-dashed">
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold text-foreground">Unlock advanced vocabulary</CardTitle>
+                    <CardDescription className="text-sm text-muted-foreground">
+                      Finish teen story missions to automatically add their vocabulary here.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <Button onClick={() => handleCategoryClick('stories')} variant="default">
+                      Browse missions
+                    </Button>
+                    <p className="text-sm text-muted-foreground">
+                      Words appear instantly once you complete a teen story.
+                    </p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-center gap-3">
-                    <Brain className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                      <Brain className="h-5 w-5 text-primary" />
                     <div>
-                      <h3 className="font-bold text-gray-800 dark:text-white">
-                        Advanced Vocabulary Building
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">
-                        {vocabularyWordsToUse.length} advanced words from your enrolled teen stories
+                        <h3 className="text-base font-semibold text-foreground">Words from your teen missions</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {vocabularyWordsToUse.length} advanced words available for practice
                       </p>
                     </div>
                   </div>
-                </Card>
+                    <div className="flex items-center gap-2">
+                      <label className="text-xs font-medium text-muted-foreground uppercase">Filter</label>
+                      <select
+                        className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                        value={selectedStoryFilter}
+                        onChange={(e) => setSelectedStoryFilter(e.target.value)}
+                      >
+                        <option value="all">All stories</option>
+                        {Array.from(new Map(enrolledStoryWordsDetailed.map((w) => [w.storyId, w.storyTitle])).entries()).map(
+                          ([id, title]) => (
+                            <option key={id} value={id}>
+                              {title}
+                            </option>
+                          )
+                        )}
+                      </select>
+                    </div>
+                  </div>
                 <Vocabulary 
+                    key={`${selectedStoryFilter}-${vocabularyWordsToUse.length}`}
                   words={vocabularyWordsToUse} 
-                  onWordPracticed={() => {
-                    setVocabularyAttempts(prev => prev + 1);
+                    onWordPracticed={async (word: string) => {
+                      setVocabularyAttempts((prev) => prev + 1);
+                      const wordDetail = enrolledStoryWordsDetailed.find((w) => w.word === word);
+                      const storyId = wordDetail?.storyId;
+                      try {
+                        const token = localStorage.getItem('speakbee_auth_token');
+                        if (token && token !== 'local-token') {
+                          await API.kids.recordVocabularyPractice({ word, story_id: storyId || '', score: 100 }).catch(
+                            (error) => console.warn('Teen vocabulary practice sync failed:', error)
+                          );
+                        }
+                      } catch (error) {
+                        console.warn('Teen vocabulary practice local only:', error);
+                      }
+                      await awardEngagementPoints(25, 'vocabulary');
                   }}
                 />
               </div>
-            ) : (
-              <Card className="border-2 border-purple-300/50 bg-purple-50/40 dark:bg-purple-900/10 backdrop-blur-sm shadow-lg p-8 sm:p-12 text-center">
-                <div className="flex flex-col items-center gap-4">
-                  <Brain className="w-16 h-16 sm:w-20 sm:h-20 text-purple-600 dark:text-purple-400 animate-pulse" />
-                  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">
-                    No Vocabulary Words Yet
-                  </h3>
-                  <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-300 max-w-2xl">
-                    Complete teen adventure stories to unlock advanced vocabulary words from those stories! 📚
-                  </p>
-                  <Button
-                    onClick={() => {
-                      handleCategoryClick('stories');
-                      setSearchParams({ section: 'stories' }, { replace: true });
-                    }}
-                    className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white font-bold py-3 px-6 rounded-xl transition-all hover:scale-105 mt-4"
-                  >
-                    <BookOpen className="w-5 h-5 mr-2" />
-                    Explore Adventure Stories
-                  </Button>
-                </div>
-              </Card>
-            )}
-          </div>
-        )}
-        
-        {activeCategory === 'pronunciation' && (
-          <div className="mb-8 sm:mb-10 md:mb-12 px-2 sm:px-0 mx-auto w-full lg:max-w-7xl xl:max-w-[1400px]">
-            {enrolledPhrases.length > 0 ? (
-              <div>
-                <Card className="border-2 border-green-300/50 bg-green-50/40 dark:bg-green-900/10 backdrop-blur-sm shadow-lg p-4 mb-4">
+              )}
+            </TabsContent>
+
+            <TabsContent value="pronunciation" className="mt-0 space-y-4">
+              {pronunciationItems.length === 0 ? (
+                <Card className="border-dashed">
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold text-foreground">Unlock the speaking lab</CardTitle>
+                    <CardDescription className="text-sm text-muted-foreground">
+                      Complete teen stories to add their debate-worthy phrases here.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <Button onClick={() => handleCategoryClick('stories')} variant="default">
+                      Complete a mission
+                    </Button>
+                    <p className="text-sm text-muted-foreground">
+                      Phrases unlock instantly after each adventure.
+                    </p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-center gap-3">
-                    <Mic className="w-6 h-6 text-green-600 dark:text-green-400" />
+                      <Mic className="h-5 w-5 text-primary" />
                     <div>
-                      <h3 className="font-bold text-gray-800 dark:text-white">
-                        Professional Speaking Practice
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">
-                        {pronounceItemsToUse.length} advanced phrases from your enrolled teen stories
+                        <h3 className="text-base font-semibold text-foreground">Professional speaking studio</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {pronunciationItems.length} advanced phrases ready for practice
                       </p>
                     </div>
                   </div>
-                </Card>
+                    <div className="flex items-center gap-2">
+                      <label className="text-xs font-medium text-muted-foreground uppercase">Filter</label>
+                      <select
+                        className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                        value={selectedPhraseFilter}
+                        onChange={(e) => setSelectedPhraseFilter(e.target.value)}
+                      >
+                        <option value="all">All stories</option>
+                        {Array.from(new Map(enrolledStoryPhrasesDetailed.map((p) => [p.storyId, p.storyTitle])).entries()).map(
+                          ([id, title]) => (
+                            <option key={id} value={id}>
+                              {title}
+                            </option>
+                          )
+                        )}
+                      </select>
+                    </div>
+                  </div>
                 <Pronunciation 
-                  items={pronounceItemsToUse}
-                  onPhrasePracticed={() => {
-                    setPronunciationAttempts(prev => prev + 1);
+                    key={`${selectedPhraseFilter}-${pronunciationItems.length}`}
+                    items={pronunciationItems}
+                    onPhrasePracticed={async (phrase: string) => {
+                      setPronunciationAttempts((prev) => prev + 1);
+                      const phraseDetail = enrolledStoryPhrasesDetailed.find((p) => p.phrase === phrase);
+                      const storyId = phraseDetail?.storyId;
+                      try {
+                        const token = localStorage.getItem('speakbee_auth_token');
+                        if (token && token !== 'local-token') {
+                          await API.kids
+                            .recordPronunciationPractice({ phrase, story_id: storyId || '', score: 100 })
+                            .catch((error) => console.warn('Teen pronunciation practice sync failed:', error));
+                        }
+                      } catch (error) {
+                        console.warn('Teen pronunciation practice local only:', error);
+                      }
+                      await awardEngagementPoints(35, 'pronunciation');
                   }}
                 />
               </div>
-            ) : (
-              <Card className="border-2 border-green-300/50 bg-green-50/40 dark:bg-green-900/10 backdrop-blur-sm shadow-lg p-8 sm:p-12 text-center">
-                <div className="flex flex-col items-center gap-4">
-                  <Mic className="w-16 h-16 sm:w-20 sm:h-20 text-green-600 dark:text-green-400 animate-pulse" />
-                  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">
-                    No Speaking Phrases Yet
-                  </h3>
-                  <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-300 max-w-2xl">
-                    Complete teen adventure stories to unlock advanced speaking phrases from those stories! 🎤
-                  </p>
-                  <Button
-                    onClick={() => {
-                      handleCategoryClick('stories');
-                      setSearchParams({ section: 'stories' }, { replace: true });
-                    }}
-                    className="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] hover:from-[#4ECDC4] hover:to-[#FF6B6B] text-white font-bold py-3 px-6 rounded-xl transition-all hover:scale-105 mt-4"
-                  >
-                    <BookOpen className="w-5 h-5 mr-2" />
-                    Explore Adventure Stories
-                  </Button>
-                </div>
-              </Card>
-            )}
-          </div>
-        )}
-        
-        {activeCategory === 'games' && (
-          <div className="mb-8 sm:mb-10 md:mb-12 px-2 sm:px-0">
-            <InteractiveGames isTeenKids={true} />
-          </div>
-        )}
+              )}
+            </TabsContent>
 
-        {/* Achievements Section */}
-        <Card className="bg-purple-100/50 dark:bg-purple-950/30 backdrop-blur-sm border-2 border-purple-300 dark:border-purple-600 rounded-xl sm:rounded-2xl lg:rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl mb-6 sm:mb-8 mx-2 sm:mx-auto w-full lg:max-w-7xl xl:max-w-[1400px] relative">
-          <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-center mb-4 sm:mb-6 md:mb-8 text-gray-900 dark:text-white flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
-            <span>Your Advanced Achievements!</span>
-          </h2>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
+            <TabsContent value="games" className="mt-0">
+              <Card className="shadow-sm">
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold text-foreground">Interactive challenges</CardTitle>
+                  <CardDescription className="text-sm text-muted-foreground">
+                    Reinforce debate, storytelling, and critical thinking with high-energy mini games built for teens.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <InteractiveGames isTeenKids />
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </section>
+
+        <section className="space-y-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="text-lg font-semibold text-foreground">Achievement roadmap</h2>
+            <p className="text-sm text-muted-foreground">Collect badges as you lead missions, master vocabulary, and speak with confidence.</p>
+          </div>
+          <Card className="shadow-sm">
+            <CardContent className="space-y-4 p-6">
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {achievements.map((achievement, index) => {
-              const isComplete = achievement.progress === 100;
+                  const isComplete = achievement.progress >= 100;
               return (
                 <div 
-                  key={index} 
-                  className={cn(
-                    "text-center group cursor-pointer transform hover:scale-110 transition-all duration-300 relative",
-                    hoveredElement === `achievement-${index}` && "scale-110"
-                  )}
-                  onMouseEnter={() => handleElementHover(`achievement-${index}`)}
-                  onMouseLeave={() => setHoveredElement(null)}
-                  onClick={() => {
-                    handleElementClick(`achievement-${index}`);
-                    setSelectedAchievement(selectedAchievement === index ? null : index);
-                  }}
-                >
-                  <div className="relative inline-block mb-2 sm:mb-3">
-                    <div className={cn(
-                      "w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-1 sm:mb-2 transition-all duration-300",
-                      isComplete 
-                        ? "bg-gradient-to-r from-yellow-400 to-orange-400 shadow-lg" 
-                        : "bg-white/80 dark:bg-gray-700 border-2 border-purple-200 dark:border-gray-600",
-                      hoveredElement === `achievement-${index}` && "shadow-xl scale-110"
-                    )}>
-                      <span className={cn(
-                        "text-xl sm:text-2xl transition-all duration-300",
-                        hoveredElement === `achievement-${index}` && "animate-bounce"
-                      )}>{achievement.emoji}</span>
-                    </div>
-                  </div>
-                  <p className={cn(
-                    "text-xs sm:text-sm font-bold text-gray-900 dark:text-white mb-1 sm:mb-2 px-1 transition-all duration-300",
-                    hoveredElement === `achievement-${index}` && "text-blue-600 dark:text-blue-400"
-                  )}>{achievement.name}</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-500 mb-2 font-semibold">{achievement.description}</p>
-                  <Progress value={achievement.progress} className="h-2 sm:h-3 bg-purple-200/60 dark:bg-gray-600 rounded-full mb-1 sm:mb-2">
+                      key={`${achievement.name}-${index}`}
+                      className="rounded-xl border border-muted bg-card p-4 shadow-sm transition hover:shadow-md"
+                    >
+                      <div className="flex items-center gap-3">
                     <div 
                       className={cn(
-                        "h-full rounded-full transition-all duration-1000",
-                        isComplete ? "bg-gradient-to-r from-yellow-400 to-orange-400" : "bg-gradient-to-r from-blue-400 to-purple-400"
-                      )}
-                    />
-                  </Progress>
-                  <span className={cn(
-                    "text-s font-bold text-teal-700 transition-all duration-300",
-                    hoveredElement === `achievement-${index}` && "text-blue-600 dark:text-blue-400"
-                  )}>{achievement.progress.toFixed(0)}%</span>
-                  
-                  {/* Achievement Details Popup */}
-                  {selectedAchievement === index && (
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-3 z-50 border-2 border-blue-200 dark:border-blue-600 min-w-[200px]">
-                      <h4 className="font-bold text-sm mb-2 text-blue-600 dark:text-blue-400">
-                        {achievement.name} {achievement.emoji}
-                      </h4>
-                      <p className="text-xs text-gray-600 dark:text-gray-300 mb-2">
-                        {achievement.description}
-                      </p>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">
-                        Progress: {achievement.progress.toFixed(0)}%
+                            'flex h-10 w-10 items-center justify-center rounded-full',
+                            isComplete ? 'bg-amber-100 text-amber-600' : 'bg-muted text-muted-foreground'
+                          )}
+                        >
+                          {achievement.emoji}
                       </div>
-                      {isComplete && (
-                        <div className="text-xs text-green-600 dark:text-green-400 font-bold mt-1">
-                          🎉 Completed!
+                        <div>
+                          <p className="text-sm font-semibold text-foreground">{achievement.name}</p>
+                          <p className="text-xs text-muted-foreground">{achievement.description}</p>
                         </div>
-                      )}
                     </div>
-                  )}
+                      <div className="mt-4 space-y-2">
+                        <Progress value={achievement.progress} />
+                        <p className="text-xs font-medium text-muted-foreground">
+                          {achievement.progress.toFixed(0)}% complete
+                        </p>
+                      </div>
                 </div>
               );
             })}
           </div>
+            </CardContent>
         </Card>
+        </section>
 
-        {/* Quick Actions */}
-        <div className="text-center px-4 sm:px-6">
-          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-500 dark:text-gray-500 mb-4 sm:mb-6 font-semibold">Ready for advanced challenges? Let's level up! 🚀</p>
-          <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 max-w-4xl mx-auto">
+        <section className="space-y-4">
+          <h2 className="text-lg font-semibold text-foreground">Quick actions</h2>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <Card className="shadow-sm transition hover:shadow-md">
+              <CardContent className="flex h-full flex-col justify-between space-y-4 p-5">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    <Volume2 className="h-5 w-5 text-emerald-500" />
+                    <p className="text-sm font-semibold text-foreground">Listening lab</p>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Jump straight into pronunciation recap for your unlocked teen phrases.
+                  </p>
+                </div>
             <Button 
-              variant="outline" 
-              className={cn(
-                "rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-3 sm:py-3 md:py-4 border-2 border-green-300 dark:border-green-600 hover:border-green-400 dark:hover:border-green-500 bg-green-50/40 dark:bg-green-900/10 hover:bg-green-100/60 dark:hover:bg-green-900/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 group text-sm sm:text-base w-full sm:w-auto sm:flex-1 sm:min-w-[160px] cursor-pointer",
-                hoveredElement === 'quick-listen' && "scale-110 shadow-lg"
-              )}
-              onClick={() => {
-                handleElementClick('quick-listen');
+                  variant="secondary"
+                  onClick={async () => {
                 handleCategoryClick('pronunciation');
-              }}
-              onMouseEnter={() => handleElementHover('quick-listen')}
-              onMouseLeave={() => setHoveredElement(null)}
-            >
-              <Volume2 className={cn(
-                "w-4 h-4 sm:w-5 sm:h-5 mr-2 text-green-600 dark:text-green-400 group-hover:animate-bounce flex-shrink-0 transition-all duration-300",
-                hoveredElement === 'quick-listen' && "animate-bounce"
-              )} />
-              <span className="font-semibold text-gray-800 dark:text-gray-500 whitespace-nowrap group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
-                Advanced Listening
-              </span>
+                    await awardEngagementPoints(10, 'quick-listen');
+                  }}
+                >
+                  Start practising
             </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-sm transition hover:shadow-md">
+              <CardContent className="flex h-full flex-col justify-between space-y-4 p-5">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    <Mic className="h-5 w-5 text-sky-500" />
+                    <p className="text-sm font-semibold text-foreground">Speak now</p>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Record a concise pitch to keep your streak alive and earn speaking badges.
+                  </p>
+                </div>
             <Button 
-              variant="outline" 
-              className={cn(
-                "rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-3 sm:py-3 md:py-4 border-2 border-blue-300 dark:border-blue-600 hover:border-blue-400 dark:hover:border-blue-500 bg-blue-50/40 dark:bg-blue-900/10 hover:bg-blue-100/60 dark:hover:bg-blue-900/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 group text-sm sm:text-base w-full sm:w-auto sm:flex-1 sm:min-w-[160px] cursor-pointer",
-                hoveredElement === 'quick-speak' && "scale-110 shadow-lg"
-              )}
-              onClick={() => {
-                handleElementClick('quick-speak');
+                  variant="secondary"
+                  onClick={async () => {
                 handleCategoryClick('pronunciation');
-              }}
-              onMouseEnter={() => handleElementHover('quick-speak')}
-              onMouseLeave={() => setHoveredElement(null)}
-            >
-              <Mic className={cn(
-                "w-4 h-4 sm:w-5 sm:h-5 mr-2 text-blue-600 dark:text-blue-400 group-hover:animate-pulse flex-shrink-0 transition-all duration-300",
-                hoveredElement === 'quick-speak' && "animate-pulse"
-              )} />
-              <span className="font-semibold text-gray-800 dark:text-gray-500 whitespace-nowrap group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                Professional Speaking
-              </span>
+                    await awardEngagementPoints(10, 'quick-speak');
+                  }}
+                >
+                  Open studio
             </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-sm transition hover:shadow-md">
+              <CardContent className="flex h-full flex-col justify-between space-y-4 p-5">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    <Heart className="h-5 w-5 text-rose-500" />
+                    <p className="text-sm font-semibold text-foreground">Favourite missions</p>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Review and launch the teen adventures you've saved for quick replay.
+                  </p>
+                </div>
             <Button 
-              variant="outline" 
-              className={cn(
-                "rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-3 sm:py-3 md:py-4 border-2 border-yellow-300 dark:border-yellow-600 hover:border-yellow-400 dark:hover:border-yellow-500 bg-yellow-50/40 dark:bg-yellow-900/10 hover:bg-yellow-100/60 dark:hover:bg-yellow-900/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 group text-sm sm:text-base w-full sm:w-auto sm:flex-1 sm:min-w-[160px] cursor-pointer",
-                hoveredElement === 'quick-certificates' && "scale-110 shadow-lg"
-              )}
-              onClick={() => {
-                handleElementClick('quick-certificates');
-                try {
-                  sessionStorage.setItem('speakbee_certificates_audience', 'teen');
-                } catch {}
-                navigate('/certificates', { state: { audience: 'teen' } });
-              }}
-              onMouseEnter={() => handleElementHover('quick-certificates')}
-              onMouseLeave={() => setHoveredElement(null)}
-            >
-              <Award className={cn(
-                "w-4 h-4 sm:w-5 sm:h-5 mr-2 text-yellow-600 dark:text-yellow-400 group-hover:animate-bounce flex-shrink-0 transition-all duration-300",
-                hoveredElement === 'quick-certificates' && "animate-bounce"
-              )} />
-              <span className="font-semibold text-gray-800 dark:text-gray-500 whitespace-nowrap group-hover:text-yellow-600 dark:group-hover:text-yellow-400 transition-colors">
-                View Certificates 🏆
-              </span>
+                  variant="secondary"
+                  onClick={async () => {
+                    await awardEngagementPoints(5, 'quick-favorites');
+                    navigate('/favorites');
+                  }}
+                >
+                  View favourites
             </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-sm transition hover:shadow-md">
+              <CardContent className="flex h-full flex-col justify-between space-y-4 p-5">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    <Crown className="h-5 w-5 text-violet-500" />
+                    <p className="text-sm font-semibold text-foreground">Certificates</p>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Download personalised certificates that recognise your teen achievements.
+                  </p>
+                </div>
             <Button 
-              variant="outline" 
-              className={cn(
-                "rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-3 sm:py-3 md:py-4 border-2 border-purple-300 dark:border-purple-600 hover:border-purple-400 dark:hover:border-purple-500 bg-purple-50/40 dark:bg-purple-900/10 hover:bg-purple-100/60 dark:hover:bg-purple-900/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 group text-sm sm:text-base w-full sm:w-auto sm:flex-1 sm:min-w-[160px] cursor-pointer",
-                hoveredElement === 'quick-favorites' && "scale-110 shadow-lg"
-              )}
+                  variant="secondary"
               onClick={() => {
-                setPulseAnimation(true);
-                setTimeout(() => setPulseAnimation(false), 1000);
-                navigate('/favorites/teen');
-              }}
-              onMouseEnter={() => handleElementHover('quick-favorites')}
-              onMouseLeave={() => setHoveredElement(null)}
-            >
-              <Heart className={cn(
-                "w-4 h-4 sm:w-5 sm:h-5 mr-2 text-purple-600 dark:text-purple-400 group-hover:animate-pulse flex-shrink-0 transition-all duration-300",
-                hoveredElement === 'quick-favorites' && "animate-pulse"
-              )} />
-              <span className="font-semibold text-gray-800 dark:text-gray-500 whitespace-nowrap group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
-                Favorite Adventures {(() => { const teenFavorites = favorites.filter(f => f.startsWith('teen-')); return teenFavorites.length > 0 ? `(${teenFavorites.length})` : ''; })()}
-              </span>
+                    try {
+                      sessionStorage.setItem('speakbee_certificates_audience', 'teen');
+                    } catch {
+                      // ignore
+                    }
+                    navigate('/certificates', { state: { audience: 'teen' } });
+                  }}
+                >
+                  Open certificates
             </Button>
+              </CardContent>
+            </Card>
           </div>
-        </div>
-      </div>
+        </section>
+      </main>
 
-      {/* Custom Animations */}
-      <style>{`
-        @keyframes float-random {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          33% { transform: translateY(-20px) rotate(120deg); }
-          66% { transform: translateY(10px) rotate(240deg); }
-        }
-        @keyframes float-slow {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-        @keyframes float-medium {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-15px); }
-        }
-        @keyframes float-fast {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-        .animate-float-random {
-          animation: float-random 6s ease-in-out infinite;
-        }
-        .animate-float-slow {
-          animation: float-slow 3s ease-in-out infinite;
-        }
-        .animate-float-medium {
-          animation: float-medium 2.5s ease-in-out infinite;
-        }
-        .animate-float-fast {
-          animation: float-fast 2s ease-in-out infinite;
-        }
-      `}</style>
-
-      {/* Story Modals */}
       {showMysteryDetective && (
         <MysteryDetectiveAdventure 
           onClose={() => setShowMysteryDetective(false)} 

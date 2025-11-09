@@ -196,11 +196,23 @@ const CertificatesPage = () => {
     };
   })();
 
+  const audienceStats = (mergedDetails as any)?.audienceStats || {};
+  const teenAudienceStats = (audienceStats as any).teen || {};
+  const youngAudienceStats = (audienceStats as any).young || {};
+
+  const resolvedPoints = isTeenKids
+    ? teenAudienceStats.points ?? (progress as any)?.points ?? 0
+    : youngAudienceStats.points ?? (progress as any)?.points ?? 0;
+
+  const resolvedStreak = isTeenKids
+    ? teenAudienceStats.streak ?? (progress as any)?.streak ?? 0
+    : youngAudienceStats.streak ?? (progress as any)?.streak ?? 0;
+
   const ctx = {
-    points: (progress as any)?.points ?? 0,
-    streak: (progress as any)?.streak ?? 0,
+    points: resolvedPoints,
+    streak: resolvedStreak,
     details: mergedDetails,
-    achievements
+    achievements,
   };
 
   const certificates: CertificateSpec[] = [
