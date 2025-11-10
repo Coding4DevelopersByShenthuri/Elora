@@ -1,15 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import {
-  BookOpen,
-  Play,
-  Sparkles,
-  HeartOff,
-} from 'lucide-react';
+import { BookOpen, Play, HeartOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import KidsApi from '@/services/KidsApi';
 import KidsProgressService from '@/services/KidsProgressService';
 import { API } from '@/services/ApiService';
+import TeenApi from '@/services/TeenApi';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -301,7 +297,9 @@ const teenStories = [
   },
 ];
 
-const storyCatalog = [...youngStories, ...teenStories].reduce<Record<string, (typeof youngStories)[number]>>(
+type StoryDefinition = (typeof youngStories)[number] | (typeof teenStories)[number];
+
+const storyCatalog = [...youngStories, ...teenStories].reduce<Record<string, StoryDefinition>>(
   (map, story) => {
     map[story.id] = story;
     return map;
@@ -335,47 +333,62 @@ const FavoritesPage = () => {
 
       try {
         const token = localStorage.getItem('speakbee_auth_token');
+        const aggregated = new Set<string>();
+
         if (token && token !== 'local-token') {
           try {
             const response = await API.kids.getFavorites();
             const data = Array.isArray((response as any)?.data) ? (response as any).data : response;
             if (Array.isArray(data)) {
-              const ids = data.map((item: any) => String(item.story_id));
-              setFavorites(ids);
-              setIsLoading(false);
-              return;
+              data.forEach((item: any) => aggregated.add(String(item.story_id)));
             }
           } catch (error) {
-            console.warn('Favorites endpoint not available, falling back to progress:', error);
+            console.warn('Favorites endpoint not available, falling back to kids progress:', error);
+            try {
+              const progress = await KidsApi.getProgress(token);
+              const raw = (progress as any)?.details?.favorites ?? [];
+              if (Array.isArray(raw)) {
+                raw.forEach((f: any) => {
+                  if (typeof f === 'number') {
+                    aggregated.add(`young-${f}`);
+                  } else {
+                    aggregated.add(String(f));
+                  }
+                });
+              }
+            } catch (progressError) {
+              console.warn('Unable to load kids favorites from progress:', progressError);
+            }
+          }
+
+          try {
+            const teenDashboard = await TeenApi.getDashboard(token);
+            const teenFavorites = Array.isArray((teenDashboard as any)?.favorites)
+              ? (teenDashboard as any).favorites
+              : [];
+            teenFavorites.forEach((id: any) => aggregated.add(String(id)));
+          } catch (error) {
+            console.warn('Unable to load teen favorites:', error);
+          }
+        } else if (user?.id) {
+          try {
+            const local = await KidsProgressService.get(String(user.id));
+            const raw = (local as any)?.details?.favorites ?? [];
+            if (Array.isArray(raw)) {
+              raw.forEach((f: any) => {
+                if (typeof f === 'number') {
+                  aggregated.add(`young-${f}`);
+                } else {
+                  aggregated.add(String(f));
+                }
+              });
+            }
+          } catch (error) {
+            console.warn('Unable to load offline favorites:', error);
           }
         }
 
-        const fallbackToken = localStorage.getItem('speakbee_auth_token');
-        if (fallbackToken && fallbackToken !== 'local-token') {
-          const progress = await KidsApi.getProgress(fallbackToken);
-          const raw = (progress as any)?.details?.favorites ?? [];
-          const converted = Array.isArray(raw)
-            ? raw.map((f: any) => {
-                if (typeof f === 'number') {
-                  return `young-${f}`;
-                }
-                return String(f);
-              })
-            : [];
-          setFavorites(converted);
-        } else if (user?.id) {
-          const local = await KidsProgressService.get(String(user.id));
-          const raw = (local as any)?.details?.favorites ?? [];
-          const converted = Array.isArray(raw)
-            ? raw.map((f: any) => {
-                if (typeof f === 'number') {
-                  return `young-${f}`;
-                }
-                return String(f);
-              })
-            : [];
-          setFavorites(converted);
-        }
+        setFavorites(Array.from(aggregated));
       } catch (error) {
         console.error('Failed to load favorites:', error);
       } finally {
@@ -407,15 +420,25 @@ const FavoritesPage = () => {
   }, [favorites]);
 
   const toggleFavorite = async (storyId: string) => {
-    const next = favorites.includes(storyId)
-      ? favorites.filter((id) => id !== storyId)
-      : [...favorites, storyId];
+    const willAdd = !favorites.includes(storyId);
+    const previous = favorites;
+    const next = willAdd ? [...favorites, storyId] : favorites.filter((id) => id !== storyId);
     setFavorites(next);
 
     try {
       const token = localStorage.getItem('speakbee_auth_token');
+      if (storyId.startsWith('teen-')) {
+        if (token && token !== 'local-token') {
+          await TeenApi.toggleFavorite(token, { storyId, add: willAdd });
+        } else {
+          console.warn('Teen favorites require an online teen profile.');
+          setFavorites(previous);
+        }
+        return;
+      }
+
       if (token && token !== 'local-token') {
-        await API.kids.toggleFavorite(storyId, !favorites.includes(storyId));
+        await API.kids.toggleFavorite(storyId, willAdd);
         const progress = await KidsApi.getProgress(token);
         const details = { ...((progress as any).details || {}), favorites: next };
         await KidsApi.updateProgress(token, { details });
@@ -429,6 +452,7 @@ const FavoritesPage = () => {
       }
     } catch (error) {
       console.error('Error updating favorites:', error);
+      setFavorites(previous);
     }
   };
 
@@ -536,7 +560,7 @@ const FavoritesPage = () => {
                   <div className="text-6xl animate-bounce" aria-hidden>
                     💫
                   </div>
-                  <Sparkles className="absolute -right-2 -top-2 h-6 w-6 text-primary animate-pulse" aria-hidden />
+                  
                 </div>
                 <div className="space-y-2">
                   <h2 className="text-2xl font-semibold text-foreground">No favourites yet</h2>

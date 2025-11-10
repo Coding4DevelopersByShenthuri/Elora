@@ -579,6 +579,140 @@ class KidsGameSession(models.Model):
         return f"{self.user.username} - {self.game_type} ({self.score}%) - {self.created_at.date()}"
 
 
+# ============= Teen Specific Models =============
+class TeenProgress(models.Model):
+    """Aggregate teen experience metrics."""
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='teen_progress')
+    points = models.IntegerField(default=0)
+    streak = models.IntegerField(default=0)
+    last_engagement = models.DateField(null=True, blank=True)
+    vocabulary_attempts = models.IntegerField(default=0)
+    pronunciation_attempts = models.IntegerField(default=0)
+    games_attempts = models.IntegerField(default=0)
+    missions_started = models.IntegerField(default=0)
+    missions_completed = models.IntegerField(default=0)
+    favorites_count = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Teen Progress"
+        verbose_name_plural = "Teen Progress"
+
+    def __str__(self):
+        return f"TeenProgress(user={self.user_id}, points={self.points}, streak={self.streak})"
+
+
+class TeenStoryProgress(models.Model):
+    """Track progress for individual teen missions."""
+    STATUS_CHOICES = [
+        ('started', 'Started'),
+        ('completed', 'Completed'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='teen_story_progress')
+    story_id = models.CharField(max_length=100)
+    story_title = models.CharField(max_length=255)
+    story_type = models.CharField(max_length=50, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='started')
+    attempts = models.IntegerField(default=0)
+    best_score = models.FloatField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    total_points_earned = models.IntegerField(default=0)
+    last_started_at = models.DateTimeField(auto_now=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ('user', 'story_id')
+        indexes = [
+            models.Index(fields=['user', 'story_id']),
+            models.Index(fields=['user', 'status']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.story_title} ({self.status})"
+
+
+class TeenVocabularyPractice(models.Model):
+    """Track vocabulary practice sessions for teen experiences."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='teen_vocabulary_practice')
+    word = models.CharField(max_length=100)
+    story_id = models.CharField(max_length=100, blank=True)
+    story_title = models.CharField(max_length=255, blank=True)
+    attempts = models.IntegerField(default=0)
+    best_score = models.FloatField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    last_practiced = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'word')
+        indexes = [
+            models.Index(fields=['user', 'word']),
+            models.Index(fields=['user', 'last_practiced']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.word} ({self.best_score}%)"
+
+
+class TeenPronunciationPractice(models.Model):
+    """Track pronunciation practice sessions for teen experiences."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='teen_pronunciation_practice')
+    phrase = models.CharField(max_length=500)
+    story_id = models.CharField(max_length=100, blank=True)
+    story_title = models.CharField(max_length=255, blank=True)
+    attempts = models.IntegerField(default=0)
+    best_score = models.FloatField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    last_practiced = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'phrase')
+        indexes = [
+            models.Index(fields=['user', 'phrase']),
+            models.Index(fields=['user', 'last_practiced']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.phrase[:40]} ({self.best_score}%)"
+
+
+class TeenFavorite(models.Model):
+    """Teen user's favorite missions."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='teen_favorites')
+    story_id = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'story_id')
+        indexes = [
+            models.Index(fields=['user']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.story_id}"
+
+
+class TeenAchievement(models.Model):
+    """Track teen-specific achievement progress."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='teen_achievements')
+    key = models.CharField(max_length=100)
+    progress = models.FloatField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    unlocked = models.BooleanField(default=False)
+    unlocked_at = models.DateTimeField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('user', 'key')
+        indexes = [
+            models.Index(fields=['user', 'key']),
+            models.Index(fields=['user', 'unlocked']),
+        ]
+
+    def __str__(self):
+        status = "Unlocked" if self.unlocked else f"{self.progress}%"
+        return f"{self.user.username} - {self.key} ({status})"
+
+
 class UserNotification(models.Model):
     """Notifications for end users."""
     TYPE_CHOICES = [
@@ -734,6 +868,41 @@ class AdminNotification(models.Model):
         """Delete expired notifications (called by management command or cron)"""
         from django.utils import timezone
         return AdminNotification.objects.filter(expires_at__lt=timezone.now()).delete()
+
+
+# ============= Cookie Consent Preferences =============
+class CookieConsent(models.Model):
+    """Stores cookie consent decisions per device/user."""
+
+    consent_id = models.CharField(max_length=64, unique=True, help_text="Client-generated identifier for this device/session")
+    user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='cookie_consents',
+        help_text="Associated user if authenticated when consent given",
+    )
+    accepted = models.BooleanField(default=False)
+    functional = models.BooleanField(default=True)
+    statistics = models.BooleanField(default=False)
+    marketing = models.BooleanField(default=False)
+    user_agent = models.CharField(max_length=512, blank=True, default='', help_text="User agent string captured when consent saved")
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    accepted_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-updated_at']
+        indexes = [
+            models.Index(fields=['consent_id'], name='cookie_consent_id_idx'),
+            models.Index(fields=['user', 'updated_at'], name='cookie_consent_usr_idx'),
+        ]
+
+    def __str__(self):
+        status = 'accepted' if self.accepted else 'pending'
+        return f"CookieConsent({self.consent_id}, {status})"
 
 
 # ============= Platform Settings (Singleton) =============

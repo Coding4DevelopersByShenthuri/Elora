@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import KidsApi from '@/services/KidsApi';
 import KidsProgressService from '@/services/KidsProgressService';
+import TeenApi from '@/services/TeenApi';
 import { GeminiService } from '@/services/GeminiService';
 import StoryWordsService from '@/services/StoryWordsService';
 
@@ -62,13 +63,21 @@ const InteractiveGames = ({ isTeenKids }: InteractiveGamesProps = {}) => {
       try {
         const token = localStorage.getItem('speakbee_auth_token');
         if (token && token !== 'local-token') {
+          if (isTeenContext) {
+            const dashboard = await TeenApi.getDashboard(token);
+            const points = (dashboard as any)?.points ?? (dashboard as any)?.progress?.points ?? 0;
+            setGameScore(Number(points));
+            return;
+          }
           const progress = await KidsApi.getProgress(token);
           const gamesPoints = (progress as any)?.details?.games?.points || 0;
           setGameScore(Number(gamesPoints));
-        } else {
+        } else if (!isTeenContext) {
           const progress = await KidsProgressService.get(userId);
           const gamesPoints = (progress as any)?.details?.games?.points || 0;
           setGameScore(Number(gamesPoints));
+        } else {
+          setGameScore(0);
         }
       } catch (error) {
         console.error('Error loading game score:', error);

@@ -1084,6 +1084,70 @@ export const ParentalControlsAPI = {
 };
 
 
+// ============= Privacy & Compliance API =============
+export const CookieConsentAPI = {
+  /**
+   * Fetch cookie consent preferences for a given consent id
+   */
+  get: async (consentId: string) => {
+    try {
+      if (!consentId) {
+        return {
+          success: false,
+          message: 'Consent identifier is required.',
+          errors: null,
+          status: 400
+        };
+      }
+
+      const result = await fetchWithAuth(`privacy/cookie-consent?consent_id=${encodeURIComponent(consentId)}`);
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Persist cookie consent preferences
+   */
+  save: async (data: {
+    consentId: string;
+    preferences: {
+      functional: boolean;
+      statistics: boolean;
+      marketing: boolean;
+    };
+    accepted?: boolean;
+  }) => {
+    try {
+      const payload = {
+        consent_id: data.consentId,
+        preferences: {
+          functional: true, // functional is always true/required
+          statistics: data.preferences.statistics,
+          marketing: data.preferences.marketing
+        },
+        accepted: data.accepted ?? true
+      };
+
+      const result = await fetchWithAuth('privacy/cookie-consent', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  }
+};
+
+
 // ============= Waitlist API =============
 export const WaitlistAPI = {
   /**
@@ -1124,6 +1188,7 @@ export const API = {
   stats: StatsAPI,
   kids: KidsAPI,
   parentalControls: ParentalControlsAPI,
+  cookieConsent: CookieConsentAPI,
   waitlist: WaitlistAPI
 };
 

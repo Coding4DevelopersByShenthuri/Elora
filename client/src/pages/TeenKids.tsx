@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { 
   Volume2,
   VolumeX,
@@ -35,8 +35,7 @@ import Vocabulary from '@/components/kids/Vocabulary';
 import Pronunciation from '@/components/kids/Pronunciation';
 import InteractiveGames from '@/components/kids/InteractiveGames';
 import SyncStatusIndicator from '@/components/kids/SyncStatusIndicator';
-import KidsProgressService from '@/services/KidsProgressService';
-import KidsApi from '@/services/KidsApi';
+import TeenApi from '@/services/TeenApi';
 import StoryWordsService from '@/services/StoryWordsService';
 import HybridServiceManager from '@/services/HybridServiceManager';
 import { ModelManager } from '@/services/ModelManager';
@@ -44,7 +43,6 @@ import { WhisperService } from '@/services/WhisperService';
 import { TransformersService } from '@/services/TransformersService';
 import { TimeTracker } from '@/services/TimeTracker';
 import EnhancedTTS from '@/services/EnhancedTTS';
-import { API } from '@/services/ApiService';
 import MysteryDetectiveAdventure from '@/components/kids/stories/MysteryDetectiveAdventure';
 import SpaceExplorerAdventure from '@/components/kids/stories/SpaceExplorerAdventure';
 import EnvironmentalHeroAdventure from '@/components/kids/stories/EnvironmentalHeroAdventure';
@@ -67,14 +65,6 @@ const TEEN_STORY_TYPE_TO_INTERNAL: Record<string, string> = {
   digital: 'social-media-expert',
   ai: 'ai-ethics-explorer',
   cybersecurity: 'digital-security-guardian',
-};
-
-const TEEN_INTERNAL_STORY_IDS = Object.values(TEEN_STORY_TYPE_TO_INTERNAL);
-
-const DEFAULT_TEEN_STATS = {
-  points: 0,
-  streak: 0,
-  lastEngagement: undefined as string | undefined,
 };
 
 type TeenStory = {
@@ -283,16 +273,12 @@ const TeenKidsPage = () => {
   const [enrolledStoryPhrasesDetailed, setEnrolledStoryPhrasesDetailed] = useState<Array<{ phrase: string; phonemes: string; storyId: string; storyTitle: string }>>([]);
   const [selectedStoryFilter, setSelectedStoryFilter] = useState<string>('all');
   const [selectedPhraseFilter, setSelectedPhraseFilter] = useState<string>('all');
-  const [serverAchievements, setServerAchievements] = useState<any[]>([]);
-
-  const teenStatsRef = useRef({ ...DEFAULT_TEEN_STATS });
+  const [completedStoryIds, setCompletedStoryIds] = useState<string[]>([]);
 
   const teenFavorites = useMemo(
     () => favorites.filter((id) => id.startsWith('teen-')),
     [favorites]
   );
-
-  const teenStoryIdSet = useMemo(() => new Set(TEEN_INTERNAL_STORY_IDS), []);
 
   const enrolledInternalStoryIds = useMemo(() => {
     const ids = new Set<string>();
@@ -301,18 +287,68 @@ const TeenKidsPage = () => {
     return ids;
   }, [enrolledStoryWordsDetailed, enrolledStoryPhrasesDetailed]);
 
-  const completedStoryIds = useMemo(() => {
-    try {
-      const stories = StoryWordsService.getEnrolledStories(userId) || [];
-      return new Set(
-        stories
-          .filter((story: any) => story?.completed && teenStoryIdSet.has(story.storyId))
-          .map((story: any) => story.storyId)
-      );
-    } catch {
-      return new Set<string>();
-    }
-  }, [userId, teenStoryIdSet, enrolledStoryWordsDetailed, enrolledStoryPhrasesDetailed]);
+  const completedStoryIdSet = useMemo(() => new Set(completedStoryIds), [completedStoryIds]);
+
+  const applyDashboard = useCallback(
+    (data: any) => {
+      if (!data) return;
+
+      const pointsFromPayload = data.points ?? data.progress?.points ?? 0;
+      const streakFromPayload = data.streak ?? data.progress?.streak ?? 0;
+      setPoints(Number(pointsFromPayload) || 0);
+      setStreak(Number(streakFromPayload) || 0);
+
+      const favoritesFromPayload = Array.isArray(data.favorites) ? data.favorites : [];
+      setFavorites(favoritesFromPayload);
+
+      setPronunciationAttempts(Number(data.pronunciation_attempts ?? 0) || 0);
+      setVocabularyAttempts(Number(data.vocabulary_attempts ?? 0) || 0);
+      setGamesAttempts(Number(data.games_attempts ?? 0) || 0);
+
+      const completedIds = Array.isArray(data.completed_story_ids) ? data.completed_story_ids : [];
+      setCompletedStoryIds(completedIds);
+
+      const wordDetails = StoryWordsService.getWordsForStoryIds(completedIds).map((w) => ({
+        word: w.word,
+        hint: w.hint,
+        storyId: w.storyId,
+        storyTitle: w.storyTitle,
+      }));
+      setEnrolledStoryWordsDetailed(wordDetails);
+
+      const phraseDetails = StoryWordsService.getPhrasesForStoryIds(completedIds).map((p) => ({
+        phrase: p.phrase,
+        phonemes: p.phonemes,
+        storyId: p.storyId,
+        storyTitle: p.storyTitle,
+      }));
+      setEnrolledStoryPhrasesDetailed(phraseDetails);
+    },
+    []
+  );
+
+  const callTeenApi = useCallback(
+    async (invoke: (token: string) => Promise<any>, fallback?: () => void) => {
+      const token = localStorage.getItem('speakbee_auth_token');
+      if (!token || token === 'local-token') {
+        console.warn('Teen action skipped: online authentication required.');
+        if (fallback) fallback();
+        return null;
+      }
+      try {
+        const response = await invoke(token);
+        if (response) {
+          applyDashboard(response);
+        }
+        return response;
+      } catch (error) {
+        console.error('Teen API action failed:', error);
+        if (fallback) fallback();
+        return null;
+      }
+    },
+    [applyDashboard]
+  );
 
   const filteredStoryWords = useMemo(() => {
     if (selectedStoryFilter === 'all') return enrolledStoryWordsDetailed;
@@ -425,147 +461,25 @@ const TeenKidsPage = () => {
 
   useEffect(() => {
     if (!isAuthenticated) return;
-
-    let isMounted = true;
-
-    const loadProgress = async () => {
-      try {
-        const token = localStorage.getItem('speakbee_auth_token');
-        let serverProgress: any = null;
-        let localProgress: any = null;
-        
-        if (token && token !== 'local-token') {
-          try {
-            serverProgress = await KidsApi.getProgress(token);
-          } catch (error) {
-            console.warn('Teen progress server fetch failed:', error);
-          }
-        }
-        
-        try {
-          localProgress = await KidsProgressService.get(userId);
-        } catch (error) {
-          console.warn('Teen local progress fetch failed:', error);
-        }
-        
-        if (!isMounted) return;
-
-        const serverDetails = (serverProgress as any)?.details || {};
-        const localDetails = (localProgress as any)?.details || {};
-        
-        const mergedPron = {
-          ...(localDetails.pronunciation || {}),
-          ...(serverDetails.pronunciation || {}),
-        };
-        const mergedVocab = {
-          ...(localDetails.vocabulary || {}),
-          ...(serverDetails.vocabulary || {}),
-        };
-        const mergedGames = {
-          ...(localDetails.games || {}),
-          ...(serverDetails.games || {}),
-        };
-
-        const pronCount = Object.keys(mergedPron).length;
-        const vocabCount = Object.keys(mergedVocab).length;
-        const gamesAttemptsFromDetails = Number(mergedGames.attempts || 0) || 0;
-        const gamesTypes = Array.isArray(mergedGames.types) ? mergedGames.types : [];
-        const gamesPoints = Number(mergedGames.points || 0) || 0;
-        const estimatedGamesAttempts = Math.max(
-          gamesAttemptsFromDetails,
-          gamesTypes.length,
-          Math.floor(gamesPoints / 25)
-        );
-
-        setPronunciationAttempts(pronCount);
-        setVocabularyAttempts(vocabCount);
-        setGamesAttempts(estimatedGamesAttempts);
-
-        const favoriteList = serverDetails.favorites || localDetails.favorites || [];
-        const convertedFavorites = Array.isArray(favoriteList)
-          ? favoriteList.map((f: any) => {
-              if (typeof f === 'number') return `teen-${f}`;
-          return f;
-            })
-          : [];
-        setFavorites(convertedFavorites);
-        
-        const serverAudience = (serverDetails.audienceStats || {}).teen || {};
-        const localAudience = (localDetails.audienceStats || {}).teen || {};
-        const mergedTeenPoints = Math.max(serverAudience.points ?? 0, localAudience.points ?? 0);
-        const mergedTeenStreak = Math.max(serverAudience.streak ?? 0, localAudience.streak ?? 0);
-        const lastEngagement = serverAudience.lastEngagement || localAudience.lastEngagement;
-
-        teenStatsRef.current = {
-          points: mergedTeenPoints,
-          streak: mergedTeenStreak,
-          lastEngagement,
-        };
-
-        setPoints(mergedTeenPoints);
-        setStreak(mergedTeenStreak);
-
-        if (token && token !== 'local-token') {
-          try {
-            const achievementsResponse = await (KidsApi as any).getAchievements(token);
-            if (Array.isArray(achievementsResponse)) {
-              setServerAchievements(achievementsResponse);
-            } else if (Array.isArray((achievementsResponse as any)?.data)) {
-              setServerAchievements((achievementsResponse as any).data);
-            }
-      } catch (error) {
-            console.warn('Teen achievements fetch skipped:', error);
-          }
-        } else {
-          setServerAchievements([]);
-        }
-      } catch (error) {
-        console.error('Error loading teen progress:', error);
-      }
-    };
-
-    loadProgress();
-    const interval = setInterval(loadProgress, 4000);
-    return () => {
-      isMounted = false;
-      clearInterval(interval);
-    };
-  }, [isAuthenticated, userId]);
+    const token = localStorage.getItem('speakbee_auth_token');
+    if (!token || token === 'local-token') {
+      return;
+    }
+    TeenApi.getDashboard(token)
+      .then(applyDashboard)
+      .catch((error) => {
+        console.error('Error loading teen dashboard:', error);
+      });
+  }, [isAuthenticated, applyDashboard]);
 
   useEffect(() => {
-    if (!isAuthenticated) return;
-    try {
-      const words = StoryWordsService.getWordsFromEnrolledStories(userId).filter((w) =>
-        TEEN_INTERNAL_STORY_IDS.includes(w.storyId)
-      );
-      const wordDetails = words.map((w) => ({
-        word: w.word,
-        hint: w.hint,
-        storyId: w.storyId,
-        storyTitle: w.storyTitle,
-      }));
-      setEnrolledStoryWordsDetailed(wordDetails);
-    } catch (error) {
-      console.error('Error loading teen story words:', error);
+    if (!isAuthenticated) {
       setEnrolledStoryWordsDetailed([]);
-    }
-
-    try {
-      const phrases = StoryWordsService.getPhrasesFromEnrolledStories(userId).filter((p) =>
-        TEEN_INTERNAL_STORY_IDS.includes(p.storyId)
-      );
-      const phraseDetails = phrases.map((p) => ({
-        phrase: p.phrase,
-        phonemes: p.phonemes,
-        storyId: p.storyId,
-        storyTitle: p.storyTitle,
-      }));
-      setEnrolledStoryPhrasesDetailed(phraseDetails);
-      } catch (error) {
-      console.error('Error loading teen story phrases:', error);
       setEnrolledStoryPhrasesDetailed([]);
+      setCompletedStoryIds([]);
+      return;
     }
-  }, [isAuthenticated, userId]);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (location.state?.startStory && location.state?.storyType) {
@@ -629,12 +543,10 @@ const TeenKidsPage = () => {
     return achievementList;
   }, [points, teenFavorites.length, pronunciationAttempts, vocabularyAttempts, gamesAttempts]);
 
-  const completedAchievements = useMemo(() => {
-    if (serverAchievements.length > 0) {
-      return serverAchievements.filter((a: any) => a.unlocked === true).length;
-    }
-    return achievements.filter((a) => a.progress >= 100).length;
-  }, [achievements, serverAchievements]);
+  const completedAchievements = useMemo(
+    () => achievements.filter((a) => a.progress >= 100).length,
+    [achievements]
+  );
 
   const categories = [
     { id: 'stories', label: 'Adventure Stories', emoji: '📚' },
@@ -700,113 +612,6 @@ const TeenKidsPage = () => {
     containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const updateTeenStatsRef = (updates: Partial<typeof DEFAULT_TEEN_STATS>) => {
-    teenStatsRef.current = {
-      ...teenStatsRef.current,
-      ...updates,
-    };
-  };
-
-  const incrementTeenStreak = (source: string) => {
-    const today = new Date();
-    const todayKey = today.toDateString();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayKey = yesterday.toDateString();
-
-    const localKey = `teen_streak_last_engagement_${userId}`;
-    const stored = teenStatsRef.current.lastEngagement || localStorage.getItem(localKey) || undefined;
-
-    if (stored === todayKey) return teenStatsRef.current.streak;
-
-    let newStreak = 1;
-    if (stored === yesterdayKey) {
-      newStreak = (teenStatsRef.current.streak || 0) + 1;
-    }
-
-    updateTeenStatsRef({ streak: newStreak, lastEngagement: todayKey });
-    setStreak(newStreak);
-    
-    try {
-      localStorage.setItem(localKey, todayKey);
-    } catch {
-      // Ignore storage errors
-    }
-
-    console.log(`Teen streak incremented via ${source}: ${newStreak}`);
-    return newStreak;
-  };
-
-  const syncProgress = async ({
-    newTeenPoints,
-    newTeenStreak,
-    mutateDetails,
-    engagementSource,
-  }: {
-    newTeenPoints?: number;
-    newTeenStreak?: number;
-    mutateDetails?: (details: any) => void;
-    engagementSource?: string;
-  }) => {
-    try {
-      const token = localStorage.getItem('speakbee_auth_token');
-      const isOnline = token && token !== 'local-token';
-
-      if (isOnline) {
-        const current = await KidsApi.getProgress(token);
-        const currentPoints = (current as any)?.points ?? 0;
-        const currentStreak = (current as any)?.streak ?? 0;
-        const details = { ...((current as any).details || {}) };
-        if (mutateDetails) mutateDetails(details);
-        const audienceStats = { ...(details.audienceStats || {}) };
-        audienceStats.teen = {
-          points: newTeenPoints ?? teenStatsRef.current.points,
-          streak: newTeenStreak ?? teenStatsRef.current.streak,
-          lastEngagement: teenStatsRef.current.lastEngagement,
-        };
-        details.audienceStats = audienceStats;
-        if (!details.engagement) details.engagement = {};
-        details.engagement.teen = {
-          lastStreakDate: teenStatsRef.current.lastEngagement,
-          source: engagementSource,
-        };
-        await KidsApi.updateProgress(token, { 
-          points: Math.max(currentPoints, newTeenPoints ?? teenStatsRef.current.points),
-          streak: Math.max(currentStreak, newTeenStreak ?? teenStatsRef.current.streak),
-          details,
-        });
-      } else {
-        await KidsProgressService.update(userId, (p) => {
-          const progress: any = p as any;
-          const details = { ...(progress.details || {}) };
-          if (mutateDetails) mutateDetails(details);
-          const audienceStats = { ...(details.audienceStats || {}) };
-          audienceStats.teen = {
-            points: newTeenPoints ?? teenStatsRef.current.points,
-            streak: newTeenStreak ?? teenStatsRef.current.streak,
-            lastEngagement: teenStatsRef.current.lastEngagement,
-          };
-          details.audienceStats = audienceStats;
-          details.engagement = {
-            ...(details.engagement || {}),
-            teen: {
-              lastStreakDate: teenStatsRef.current.lastEngagement,
-              source: engagementSource,
-            },
-          };
-          return { 
-            ...progress,
-            points: Math.max(progress.points ?? 0, newTeenPoints ?? teenStatsRef.current.points),
-            streak: Math.max(progress.streak ?? 0, newTeenStreak ?? teenStatsRef.current.streak),
-            details,
-          } as any;
-        });
-      }
-    } catch (error) {
-      console.error('Error syncing teen progress:', error);
-    }
-  };
-
   const handleCategoryClick = (categoryId: string) => {
     if (!isAuthenticated) {
       setShowAuthModal(true);
@@ -831,34 +636,21 @@ const TeenKidsPage = () => {
   };
 
   const toggleFavorite = async (storyId: string) => {
-    const next = favorites.includes(storyId)
-      ? favorites.filter((id) => id !== storyId)
-      : [...favorites, storyId];
-    setFavorites(next);
-    
-    try {
-      const token = localStorage.getItem('speakbee_auth_token');
-      if (token && token !== 'local-token') {
-        try {
-          await API.kids.toggleFavorite(storyId, !favorites.includes(storyId));
-          const current = await KidsApi.getProgress(token);
-          const details = { ...((current as any).details || {}), favorites: next };
-          await KidsApi.updateProgress(token, { details });
-          return;
-        } catch (error) {
-          console.error('Teen favorite server update failed:', error);
-        }
-      }
-      
-      await KidsProgressService.update(userId, (p) => {
-        const progress: any = p as any;
-        const details = { ...(progress.details || {}) };
-        details.favorites = next;
-        return { ...progress, details } as any;
-      });
-    } catch (error) {
-      console.error('Teen favorite update error:', error);
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+      return;
     }
+
+    const willAdd = !favorites.includes(storyId);
+    const previousFavorites = favorites;
+    setFavorites(
+      willAdd ? [...favorites, storyId] : favorites.filter((id) => id !== storyId)
+    );
+
+    await callTeenApi(
+      (token) => TeenApi.toggleFavorite(token, { storyId, add: willAdd }),
+      () => setFavorites(previousFavorites)
+    );
   };
 
   const handleStartLesson = async (storyId: string) => {
@@ -884,42 +676,16 @@ const TeenKidsPage = () => {
       setIsOpeningFromFavorites(false);
     }
 
-    const newPoints = points + 50;
-    setPoints(newPoints);
-    updateTeenStatsRef({ points: newPoints });
-    const newStreak = incrementTeenStreak('story-start');
-
-    const internalStoryId = getInternalStoryId(story.type);
-
-    await syncProgress({
-      newTeenPoints: newPoints,
-      newTeenStreak: newStreak,
-      engagementSource: 'story-start',
-      mutateDetails: (details) => {
-        details.readAloud = details.readAloud || {};
-        const key = `story-${storyId}`;
-        const previous = details.readAloud[key] || { bestScore: 0, attempts: 0 };
-        details.readAloud[key] = {
-          bestScore: Math.max(previous.bestScore, 80),
-          attempts: (previous.attempts || 0) + 1,
-        };
-      },
-    });
+    void callTeenApi((token) =>
+      TeenApi.startStory(token, {
+        storyId,
+        storyTitle: story.title,
+        storyType: story.type,
+      })
+    );
 
     openStoryModal(story.type);
     setIsPlaying(false);
-
-    try {
-      await KidsProgressService.recordStoryCompletion(
-        userId,
-        internalStoryId,
-        story.title,
-        story.type,
-        80
-      );
-    } catch (error) {
-      console.warn('Teen local story enrollment skipped:', error);
-    }
   };
 
   const handleAdventureComplete = async (storyId: string, score: number) => {
@@ -928,80 +694,28 @@ const TeenKidsPage = () => {
     const story = allTeenStories.find((s) => s.id === storyId);
     if (!story) return;
 
-    const basePoints = Math.round(score / 8);
-    const completionBonus = 60;
-    const pointsToAdd = basePoints + completionBonus;
-    const newPoints = points + pointsToAdd;
-    setPoints(newPoints);
-    updateTeenStatsRef({ points: newPoints });
-    const newStreak = incrementTeenStreak('story-complete');
-
-    const internalStoryId = getInternalStoryId(story.type);
-
-    try {
-      await KidsProgressService.recordStoryCompletion(
-        userId,
-        internalStoryId,
-        story.title,
-        story.type,
-        score
-      );
-    } catch (error) {
-      console.warn('Teen local story completion skipped:', error);
-    }
-
-    try {
-      const words = StoryWordsService.getWordsFromEnrolledStories(userId).filter((w) =>
-        TEEN_INTERNAL_STORY_IDS.includes(w.storyId)
-      );
-      const wordDetails = words.map((w) => ({
-        word: w.word,
-        hint: w.hint,
-        storyId: w.storyId,
-        storyTitle: w.storyTitle,
-      }));
-      setEnrolledStoryWordsDetailed(wordDetails);
-
-      const phrases = StoryWordsService.getPhrasesFromEnrolledStories(userId).filter((p) =>
-        TEEN_INTERNAL_STORY_IDS.includes(p.storyId)
-      );
-      const phraseDetails = phrases.map((p) => ({
-        phrase: p.phrase,
-        phonemes: p.phonemes,
-        storyId: p.storyId,
-        storyTitle: p.storyTitle,
-      }));
-      setEnrolledStoryPhrasesDetailed(phraseDetails);
-    } catch (error) {
-      console.warn('Teen vocabulary refresh skipped:', error);
-    }
-
-    await syncProgress({
-      newTeenPoints: newPoints,
-      newTeenStreak: newStreak,
-      engagementSource: 'story-complete',
-      mutateDetails: (details) => {
-        details.readAloud = details.readAloud || {};
-        const key = `story-${storyId}`;
-        const previous = details.readAloud[key] || { bestScore: 0, attempts: 0 };
-        details.readAloud[key] = {
-          bestScore: Math.max(previous.bestScore, score),
-          attempts: (previous.attempts || 0) + 1,
-        };
-      },
-    });
+    await callTeenApi((token) =>
+      TeenApi.completeStory(token, {
+        storyId,
+        storyTitle: story.title,
+        storyType: story.type,
+        score,
+      })
+    );
   };
 
-  const awardEngagementPoints = async (delta: number, source: string) => {
-    const newPoints = points + delta;
-    setPoints(newPoints);
-    updateTeenStatsRef({ points: newPoints });
-    const newStreak = incrementTeenStreak(source);
-    await syncProgress({
-      newTeenPoints: newPoints,
-      newTeenStreak: newStreak,
-      engagementSource: source,
-    });
+  const awardEngagementPoints = async (delta: number, source: string, options?: { incrementGames?: boolean }) => {
+    await callTeenApi(
+      (token) =>
+        TeenApi.recordQuickAction(token, {
+          action: source,
+          deltaPoints: delta,
+          incrementGames: options?.incrementGames,
+        }),
+      () => {
+        setPoints((prev) => prev + delta);
+      }
+    );
   };
 
   const handleAuthSuccess = () => {
@@ -1204,7 +918,7 @@ const TeenKidsPage = () => {
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {paginatedStories.map((story) => {
                   const internalId = getInternalStoryId(story.type);
-                  const isEnrolled = enrolledInternalStoryIds.has(internalId) || completedStoryIds.has(internalId);
+                  const isEnrolled = enrolledInternalStoryIds.has(internalId) || completedStoryIdSet.has(internalId);
                 const CharacterIcon = story.character;
                 return (
                     <Card key={story.id} className="flex h-full flex-col overflow-hidden border border-muted shadow-sm transition hover:shadow-lg">
@@ -1335,24 +1049,25 @@ const TeenKidsPage = () => {
                       </select>
                     </div>
                   </div>
-                <Vocabulary 
-                    key={`${selectedStoryFilter}-${vocabularyWordsToUse.length}`}
-                  words={vocabularyWordsToUse} 
-                    onWordPracticed={async (word: string) => {
-                      setVocabularyAttempts((prev) => prev + 1);
-                      const wordDetail = enrolledStoryWordsDetailed.find((w) => w.word === word);
-                      const storyId = wordDetail?.storyId;
-                      try {
-                        const token = localStorage.getItem('speakbee_auth_token');
-                        if (token && token !== 'local-token') {
-                          await API.kids.recordVocabularyPractice({ word, story_id: storyId || '', score: 100 }).catch(
-                            (error) => console.warn('Teen vocabulary practice sync failed:', error)
-                          );
-                        }
-                      } catch (error) {
-                        console.warn('Teen vocabulary practice local only:', error);
+                <Vocabulary
+                  key={`${selectedStoryFilter}-${vocabularyWordsToUse.length}`}
+                  words={vocabularyWordsToUse}
+                  onWordPracticed={async (word: string) => {
+                    const wordDetail = enrolledStoryWordsDetailed.find((w) => w.word === word);
+                    await callTeenApi(
+                      (token) =>
+                        TeenApi.recordVocabularyPractice(token, {
+                          word,
+                          storyId: wordDetail?.storyId,
+                          storyTitle: wordDetail?.storyTitle,
+                          score: 100,
+                          pointsAwarded: 25,
+                        }),
+                      () => {
+                        setVocabularyAttempts((prev) => prev + 1);
+                        setPoints((prev) => prev + 25);
                       }
-                      await awardEngagementPoints(25, 'vocabulary');
+                    );
                   }}
                 />
               </div>
@@ -1407,24 +1122,25 @@ const TeenKidsPage = () => {
                       </select>
                     </div>
                   </div>
-                <Pronunciation 
-                    key={`${selectedPhraseFilter}-${pronunciationItems.length}`}
-                    items={pronunciationItems}
-                    onPhrasePracticed={async (phrase: string) => {
-                      setPronunciationAttempts((prev) => prev + 1);
-                      const phraseDetail = enrolledStoryPhrasesDetailed.find((p) => p.phrase === phrase);
-                      const storyId = phraseDetail?.storyId;
-                      try {
-                        const token = localStorage.getItem('speakbee_auth_token');
-                        if (token && token !== 'local-token') {
-                          await API.kids
-                            .recordPronunciationPractice({ phrase, story_id: storyId || '', score: 100 })
-                            .catch((error) => console.warn('Teen pronunciation practice sync failed:', error));
-                        }
-                      } catch (error) {
-                        console.warn('Teen pronunciation practice local only:', error);
+                <Pronunciation
+                  key={`${selectedPhraseFilter}-${pronunciationItems.length}`}
+                  items={pronunciationItems}
+                  onPhrasePracticed={async (phrase: string) => {
+                    const phraseDetail = enrolledStoryPhrasesDetailed.find((p) => p.phrase === phrase);
+                    await callTeenApi(
+                      (token) =>
+                        TeenApi.recordPronunciationPractice(token, {
+                          phrase,
+                          storyId: phraseDetail?.storyId,
+                          storyTitle: phraseDetail?.storyTitle,
+                          score: 100,
+                          pointsAwarded: 35,
+                        }),
+                      () => {
+                        setPronunciationAttempts((prev) => prev + 1);
+                        setPoints((prev) => prev + 35);
                       }
-                      await awardEngagementPoints(35, 'pronunciation');
+                    );
                   }}
                 />
               </div>

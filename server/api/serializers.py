@@ -5,9 +5,12 @@ from .models import (
     VocabularyWord, Achievement, UserAchievement,
     KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, WaitlistEntry,
     UserNotification, AdminNotification, SurveyStepResponse, PlatformSettings,
+    CookieConsent,
     StoryEnrollment, StoryWord, StoryPhrase, KidsFavorite,
     KidsVocabularyPractice, KidsPronunciationPractice, KidsGameSession,
-    ParentalControlSettings
+    ParentalControlSettings, TeenProgress, TeenStoryProgress,
+    TeenVocabularyPractice, TeenPronunciationPractice, TeenFavorite,
+    TeenAchievement
 )
 from django.contrib.auth.password_validation import validate_password
 
@@ -37,6 +40,50 @@ class PlatformSettingsSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at',
         ]
         read_only_fields = ['created_at', 'updated_at']
+
+
+class CookieConsentDetailSerializer(serializers.ModelSerializer):
+    preferences = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CookieConsent
+        fields = [
+            'consent_id',
+            'accepted',
+            'preferences',
+            'accepted_at',
+            'created_at',
+            'updated_at',
+        ]
+        read_only_fields = ['consent_id', 'accepted_at', 'created_at', 'updated_at']
+
+    def get_preferences(self, obj):
+        return {
+            'functional': True,
+            'statistics': obj.statistics,
+            'marketing': obj.marketing,
+        }
+
+
+class CookieConsentPreferencesSerializer(serializers.Serializer):
+    consent_id = serializers.CharField(max_length=64)
+    accepted = serializers.BooleanField(default=True)
+    preferences = serializers.DictField(child=serializers.BooleanField(), required=True)
+
+    def validate_consent_id(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError("Consent identifier is required.")
+        return value
+
+    def validate_preferences(self, value):
+        functional = value.get('functional', True)
+        if functional is False:
+            raise serializers.ValidationError("Functional cookies must remain enabled.")
+        value['functional'] = True
+        value['statistics'] = bool(value.get('statistics', False))
+        value['marketing'] = bool(value.get('marketing', False))
+        return value
 
 
 class SurveyStepResponseSerializer(serializers.ModelSerializer):
@@ -208,6 +255,76 @@ class UserAchievementSerializer(serializers.ModelSerializer):
             'unlocked', 'unlocked_at'
         ]
         read_only_fields = ['unlocked_at']
+
+
+# ============= Teen Serializers =============
+class TeenProgressSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+
+    class Meta:
+        model = TeenProgress
+        fields = [
+            'user_id', 'points', 'streak', 'last_engagement',
+            'vocabulary_attempts', 'pronunciation_attempts',
+            'games_attempts', 'missions_started', 'missions_completed',
+            'favorites_count', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['created_at', 'updated_at']
+
+
+class TeenStoryProgressSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+
+    class Meta:
+        model = TeenStoryProgress
+        fields = [
+            'id', 'user_id', 'story_id', 'story_title', 'story_type',
+            'status', 'attempts', 'best_score', 'total_points_earned',
+            'last_started_at', 'completed_at'
+        ]
+        read_only_fields = ['last_started_at', 'completed_at']
+
+
+class TeenVocabularyPracticeSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+
+    class Meta:
+        model = TeenVocabularyPractice
+        fields = [
+            'id', 'user_id', 'word', 'story_id', 'story_title',
+            'attempts', 'best_score', 'last_practiced', 'created_at'
+        ]
+        read_only_fields = ['last_practiced', 'created_at']
+
+
+class TeenPronunciationPracticeSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+
+    class Meta:
+        model = TeenPronunciationPractice
+        fields = [
+            'id', 'user_id', 'phrase', 'story_id', 'story_title',
+            'attempts', 'best_score', 'last_practiced', 'created_at'
+        ]
+        read_only_fields = ['last_practiced', 'created_at']
+
+
+class TeenFavoriteSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+
+    class Meta:
+        model = TeenFavorite
+        fields = ['id', 'user_id', 'story_id', 'created_at']
+        read_only_fields = ['created_at']
+
+
+class TeenAchievementSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+
+    class Meta:
+        model = TeenAchievement
+        fields = ['id', 'user_id', 'key', 'progress', 'unlocked', 'unlocked_at', 'updated_at']
+        read_only_fields = ['unlocked_at', 'updated_at']
 
 
 # ============= Kids Serializers (Keep existing) =============

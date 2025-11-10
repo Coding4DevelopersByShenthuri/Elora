@@ -4,9 +4,11 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { CookieConsentAPI } from '@/services/ApiService';
 
 const COOKIE_CONSENT_KEY = 'elora_cookie_consent';
 const COOKIE_PREFERENCES_KEY = 'elora_cookie_preferences';
+const COOKIE_CONSENT_ID_KEY = 'elora_cookie_consent_id';
 
 interface CookiePreferences {
   functional: boolean;
@@ -17,57 +19,228 @@ interface CookiePreferences {
 const CookieConsent = () => {
   const { user, isAuthenticated } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [consentId, setConsentId] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [viewingPolicy, setViewingPolicy] = useState<'cookie' | 'privacy' | null>(null);
   const [preferences, setPreferences] = useState<CookiePreferences>({
-    functional: true, // Always active
-    statistics: true,
-    marketing: true,
+    functional: true,
+    statistics: false,
+    marketing: false,
   });
 
+  const getStoredValue = (key: string): string | null => {
+    if (typeof window === 'undefined') return null;
+    try {
+      return window.localStorage.getItem(key);
+    } catch (error) {
+      console.error(`Error reading ${key} from storage:`, error);
+      return null;
+    }
+  };
+
+  const setStoredValue = (key: string, value: string) => {
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem(key, value);
+    } catch (error) {
+      console.error(`Error writing ${key} to storage:`, error);
+    }
+  };
+
+  const readLocalPreferences = (): CookiePreferences | null => {
+    const stored = getStoredValue(COOKIE_PREFERENCES_KEY);
+    if (!stored) return null;
+
+    try {
+      const parsed = JSON.parse(stored);
+      return {
+        functional: true,
+        statistics: Boolean(parsed.statistics),
+        marketing: Boolean(parsed.marketing),
+      };
+    } catch (error) {
+      console.error('Error parsing cookie preferences:', error);
+      return null;
+    }
+  };
+
+  const updateLocalState = (accepted: boolean, updatedPreferences: CookiePreferences) => {
+    setStoredValue(COOKIE_CONSENT_KEY, accepted ? 'accepted' : 'pending');
+    setStoredValue(COOKIE_PREFERENCES_KEY, JSON.stringify(updatedPreferences));
+  };
+
   useEffect(() => {
-    // Don't show cookie consent if user is authenticated/registered/logged in
-    if (user || isAuthenticated) {
-      setIsVisible(false);
-      return;
+    let storedConsentId: string | null = getStoredValue(COOKIE_CONSENT_ID_KEY);
+
+    if (!storedConsentId) {
+      let generatedId: string;
+      if (
+        typeof window !== 'undefined' &&
+        window.crypto &&
+        typeof window.crypto.randomUUID === 'function'
+      ) {
+        generatedId = window.crypto.randomUUID();
+      } else {
+        generatedId = `consent_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+      }
+      storedConsentId = generatedId;
+      setStoredValue(COOKIE_CONSENT_ID_KEY, generatedId);
     }
 
-    // Check if user has already accepted cookies
-    const consent = localStorage.getItem(COOKIE_CONSENT_KEY);
-    if (consent === 'accepted') {
-      // User has accepted - don't show
+    const localPrefs = readLocalPreferences();
+    if (localPrefs) {
+      setPreferences(localPrefs);
+    }
+
+    const consentStatus = getStoredValue(COOKIE_CONSENT_KEY);
+    if (consentStatus === 'accepted') {
       setIsVisible(false);
-    } else {
-      // User hasn't accepted yet - show the consent banner
-      // This will keep showing on every visit until they accept
+    } else if (consentStatus) {
       setIsVisible(true);
     }
 
-    // Load saved preferences if they exist
-    const savedPreferences = localStorage.getItem(COOKIE_PREFERENCES_KEY);
-    if (savedPreferences) {
-      try {
-        const parsed = JSON.parse(savedPreferences);
-        setPreferences(parsed);
-      } catch (e) {
-        console.error('Error parsing cookie preferences:', e);
-      }
-    }
-  }, [user, isAuthenticated]);
+    setConsentId(storedConsentId);
 
-  const handleAccept = () => {
-    localStorage.setItem(COOKIE_CONSENT_KEY, 'accepted');
-    localStorage.setItem(COOKIE_PREFERENCES_KEY, JSON.stringify(preferences));
-    setIsVisible(false);
+    if (!storedConsentId) {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!consentId) return;
+
+    let isCancelled = false;
+
+    const fetchConsent = async () => {
+      setIsLoading(true);
+      try {
+        const response = await CookieConsentAPI.get(consentId);
+        if (isCancelled) {
+          return;
+        }
+
+        if (response.success && 'data' in response && response.data) {
+          const remoteData = response.data;
+          const remotePreferences: CookiePreferences = {
+            functional: true,
+            statistics: Boolean(remoteData.preferences?.statistics),
+            marketing: Boolean(remoteData.preferences?.marketing),
+          };
+          const acceptedFlag = Boolean(remoteData.accepted);
+
+          if (remoteData.consent_id && remoteData.consent_id !== consentId) {
+            setStoredValue(COOKIE_CONSENT_ID_KEY, remoteData.consent_id);
+            setConsentId(remoteData.consent_id);
+          }
+
+          setPreferences(remotePreferences);
+          setIsVisible(!acceptedFlag);
+          setErrorMessage(null);
+          updateLocalState(acceptedFlag, remotePreferences);
+        } else {
+          if ('message' in response && response.message) {
+            setErrorMessage(response.message);
+          }
+          const fallbackPrefs = readLocalPreferences();
+          if (fallbackPrefs) {
+            setPreferences(fallbackPrefs);
+          }
+          const consentStatus = getStoredValue(COOKIE_CONSENT_KEY);
+          setIsVisible(consentStatus === 'accepted' ? false : true);
+        }
+      } catch (error) {
+        if (isCancelled) {
+          return;
+        }
+        console.error('Failed to load cookie consent:', error);
+        setErrorMessage('We could not load your cookie preferences. Please review them below.');
+
+        const fallbackPrefs = readLocalPreferences();
+        if (fallbackPrefs) {
+          setPreferences(fallbackPrefs);
+        }
+        const consentStatus = getStoredValue(COOKIE_CONSENT_KEY);
+        setIsVisible(consentStatus === 'accepted' ? false : true);
+      } finally {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchConsent();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [consentId, isAuthenticated, user?.id]);
+
+  const persistConsent = async (updatedPreferences: CookiePreferences, accepted = true) => {
+    if (!consentId) {
+      setErrorMessage('Unable to determine a device identifier for your cookie preferences.');
+      return false;
+    }
+
+    setIsSaving(true);
+    setErrorMessage(null);
+
+    try {
+      const response = await CookieConsentAPI.save({
+        consentId,
+        preferences: updatedPreferences,
+        accepted,
+      });
+
+      if (!response.success) {
+        const message =
+          'message' in response && response.message
+            ? response.message
+            : 'Unable to save your preferences. Please try again.';
+        setErrorMessage(message);
+        return false;
+      }
+
+      const payload = 'data' in response ? response.data : null;
+      const savedPreferences: CookiePreferences = payload?.preferences
+        ? {
+            functional: true,
+            statistics: Boolean(payload.preferences.statistics),
+            marketing: Boolean(payload.preferences.marketing),
+          }
+        : updatedPreferences;
+      const savedAccepted = payload?.accepted ?? accepted;
+
+      updateLocalState(savedAccepted, savedPreferences);
+      setPreferences(savedPreferences);
+      setIsVisible(!savedAccepted);
+      return true;
+    } catch (error) {
+      console.error('Failed to save cookie preferences:', error);
+      setErrorMessage('Unable to save your preferences. Please try again.');
+      return false;
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleSavePreferences = () => {
-    localStorage.setItem(COOKIE_CONSENT_KEY, 'accepted');
-    localStorage.setItem(COOKIE_PREFERENCES_KEY, JSON.stringify(preferences));
-    setIsVisible(false);
+  const handleAccept = async () => {
+    const updatedPreferences: CookiePreferences = {
+      functional: true,
+      statistics: true,
+      marketing: true,
+    };
+    await persistConsent(updatedPreferences, true);
+  };
+
+  const handleSavePreferences = async () => {
+    await persistConsent(preferences, true);
   };
 
   const toggleCategory = (category: 'statistics' | 'marketing') => {
+    if (isSaving || isLoading) return;
     setPreferences((prev) => ({
       ...prev,
       [category]: !prev[category],
@@ -78,7 +251,7 @@ const CookieConsent = () => {
     setExpandedCategory(expandedCategory === category ? null : category);
   };
 
-  if (!isVisible) return null;
+  if (!isVisible || isLoading) return null;
 
   return (
     <>
@@ -252,6 +425,7 @@ const CookieConsent = () => {
                         checked={preferences.statistics}
                         onCheckedChange={() => toggleCategory('statistics')}
                         className="data-[state=checked]:bg-primary data-[state=unchecked]:bg-input"
+                        disabled={isSaving || isLoading}
                       />
                       <div className="flex-1">
                         <Label className="text-sm md:text-base font-semibold text-foreground cursor-pointer">
@@ -288,6 +462,7 @@ const CookieConsent = () => {
                         checked={preferences.marketing}
                         onCheckedChange={() => toggleCategory('marketing')}
                         className="data-[state=checked]:bg-primary data-[state=unchecked]:bg-input"
+                        disabled={isSaving || isLoading}
                       />
                       <div className="flex-1">
                         <Label className="text-sm md:text-base font-semibold text-foreground cursor-pointer">
@@ -323,17 +498,26 @@ const CookieConsent = () => {
                   onClick={handleAccept}
                   size="default"
                   className="w-full sm:w-auto min-w-[140px]"
+                  disabled={isSaving || isLoading}
+                  aria-busy={isSaving}
                 >
-                  Accept
+                  Accept all
                 </Button>
                 <Button
                   onClick={handleSavePreferences}
                   variant="outline"
                   size="default"
                   className="w-full sm:w-auto"
+                  disabled={isSaving || isLoading}
+                  aria-busy={isSaving}
                 >
-                  Save preferences
+                  {isSaving ? 'Saving...' : 'Save preferences'}
                 </Button>
+                {errorMessage && (
+                  <p className="text-xs text-destructive w-full sm:text-center" role="alert">
+                    {errorMessage}
+                  </p>
+                )}
               </div>
             </div>
 

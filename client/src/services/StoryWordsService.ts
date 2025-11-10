@@ -485,6 +485,27 @@ export class StoryWordsService {
   }
 
   /**
+   * Get vocabulary words for provided story ids (without local storage dependency)
+   */
+  static getWordsForStoryIds(storyIds: string[]): StoryWord[] {
+    const result: StoryWord[] = [];
+    const seen = new Set<string>();
+
+    storyIds.forEach((storyId) => {
+      const words = this.STORY_VOCABULARY[storyId] || [];
+      words.forEach((word) => {
+        const key = `${storyId}-${word.word}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          result.push(word);
+        }
+      });
+    });
+
+    return result;
+  }
+
+  /**
    * Get phrases from completed stories for pronunciation practice
    */
   static getPhrasesFromEnrolledStories(userId: string): StoryPhrase[] {
@@ -501,6 +522,27 @@ export class StoryWordsService {
     });
 
     return allPhrases;
+  }
+
+  /**
+   * Get phrases for provided story ids (without local storage dependency)
+   */
+  static getPhrasesForStoryIds(storyIds: string[]): StoryPhrase[] {
+    const result: StoryPhrase[] = [];
+    const seen = new Set<string>();
+
+    storyIds.forEach((storyId) => {
+      const phrases = this.STORY_PHRASES[storyId] || [];
+      phrases.forEach((phrase) => {
+        const key = `${storyId}-${phrase.phrase}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          result.push(phrase);
+        }
+      });
+    });
+
+    return result;
   }
 
   /**

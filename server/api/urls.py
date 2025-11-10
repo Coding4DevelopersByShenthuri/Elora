@@ -36,9 +36,21 @@ urlpatterns = [
     path('achievements/my', views.my_achievements, name='my-achievements'),
     path('achievements/check', views.check_achievements, name='check-achievements'),
     
+    # ============= Privacy & Compliance =============
+    path('privacy/cookie-consent', views.cookie_consent_view, name='cookie-consent'),
+    
     # ============= Statistics =============
     path('stats/user', views.user_stats, name='user-stats'),
     path('stats/daily', views.daily_progress, name='daily-progress'),
+    
+    # ============= Teen Specific =============
+    path('teen/dashboard', views.teen_dashboard, name='teen-dashboard'),
+    path('teen/story/start', views.teen_story_start, name='teen-story-start'),
+    path('teen/story/complete', views.teen_story_complete, name='teen-story-complete'),
+    path('teen/vocabulary/practice', views.teen_vocabulary_practice, name='teen-vocabulary-practice'),
+    path('teen/pronunciation/practice', views.teen_pronunciation_practice, name='teen-pronunciation-practice'),
+    path('teen/favorite/toggle', views.teen_toggle_favorite, name='teen-toggle-favorite'),
+    path('teen/quick-action', views.teen_quick_action, name='teen-quick-action'),
     
     # ============= Kids Specific =============
     path('kids/lessons', views.kids_lessons, name='kids-lessons'),

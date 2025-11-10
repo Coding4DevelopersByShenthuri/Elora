@@ -34,18 +34,24 @@ from .serializers import (
     KidsLessonSerializer, KidsProgressSerializer, KidsAchievementSerializer, KidsCertificateSerializer,
     WaitlistSerializer, DailyProgressSerializer, WeeklyStatsSerializer, UserStatsSerializer,
     UserNotificationSerializer, AdminNotificationSerializer, SurveyStepResponseSerializer, PlatformSettingsSerializer,
+    CookieConsentDetailSerializer, CookieConsentPreferencesSerializer,
     StoryEnrollmentSerializer, StoryWordSerializer, StoryPhraseSerializer, KidsFavoriteSerializer,
     KidsVocabularyPracticeSerializer, KidsPronunciationPracticeSerializer, KidsGameSessionSerializer,
-    ParentalControlSettingsSerializer
+    ParentalControlSettingsSerializer, TeenProgressSerializer, TeenStoryProgressSerializer,
+    TeenVocabularyPracticeSerializer, TeenPronunciationPracticeSerializer, TeenFavoriteSerializer,
+    TeenAchievementSerializer
 )
 from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
     VocabularyWord, Achievement, UserAchievement,
     KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, WaitlistEntry,
     EmailVerificationToken, UserNotification, AdminNotification, SurveyStepResponse, PlatformSettings,
+    CookieConsent,
     StoryEnrollment, StoryWord, StoryPhrase, KidsFavorite,
     KidsVocabularyPractice, KidsPronunciationPractice, KidsGameSession,
-    ParentalControlSettings
+    ParentalControlSettings, TeenProgress, TeenStoryProgress,
+    TeenVocabularyPractice, TeenPronunciationPractice, TeenFavorite,
+    TeenAchievement
 )
 
 logger = logging.getLogger(__name__)
@@ -1343,6 +1349,409 @@ def kids_parental_controls_pin(request):
     })
 
 
+# ============= Teen Helper Functions =============
+def _get_or_create_teen_progress(user, for_update: bool = False) -> TeenProgress:
+    qs = TeenProgress.objects
+    if for_update:
+        qs = qs.select_for_update()
+    progress, _ = qs.get_or_create(user=user)
+    return progress
+
+
+def _update_teen_streak(progress: TeenProgress) -> int:
+    today = timezone.now().date()
+    if progress.last_engagement == today:
+        return progress.streak
+
+    yesterday = today - timedelta(days=1)
+    if progress.last_engagement == yesterday:
+        progress.streak = (progress.streak or 0) + 1
+    else:
+        progress.streak = 1
+
+    progress.last_engagement = today
+    return progress.streak
+
+
+def _sync_teen_achievements(user, progress: TeenProgress, favorites_count: int):
+    definitions = [
+        {
+            'key': 'advanced_learner',
+            'name': 'Advanced Learner',
+            'emoji': '🌟',
+            'description': f"{progress.points}/2500 points",
+            'current': progress.points,
+            'target': 2500,
+        },
+        {
+            'key': 'story_strategist',
+            'name': 'Story Strategist',
+            'emoji': '📖',
+            'description': f"{favorites_count}/10 stories saved",
+            'current': favorites_count,
+            'target': 10,
+        },
+        {
+            'key': 'speaking_pro',
+            'name': 'Speaking Pro',
+            'emoji': '🎤',
+            'description': f"{progress.pronunciation_attempts} practiced",
+            'current': progress.pronunciation_attempts,
+            'target': 20,
+        },
+        {
+            'key': 'vocabulary_expert',
+            'name': 'Vocabulary Expert',
+            'emoji': '🧠',
+            'description': f"{progress.vocabulary_attempts} words mastered",
+            'current': progress.vocabulary_attempts,
+            'target': 20,
+        },
+        {
+            'key': 'challenge_champion',
+            'name': 'Challenge Champion',
+            'emoji': '🏆',
+            'description': f"{min(progress.games_attempts, 4)}/4 challenges",
+            'current': progress.games_attempts,
+            'target': 4,
+        },
+    ]
+
+    achievements = []
+    for definition in definitions:
+        target = definition['target'] or 1
+        current = max(0, definition['current'])
+        percent = min(100.0, round((current / target) * 100, 2))
+        unlocked = percent >= 100
+
+        record, _ = TeenAchievement.objects.get_or_create(user=user, key=definition['key'])
+        updates = {}
+        if abs(record.progress - percent) > 0.01:
+            record.progress = percent
+            updates['progress'] = percent
+        if unlocked and not record.unlocked:
+            record.unlocked = True
+            record.unlocked_at = timezone.now()
+            updates['unlocked'] = True
+            updates['unlocked_at'] = record.unlocked_at
+        if updates:
+            record.save(update_fields=list(updates.keys()))
+
+        achievements.append({
+            'key': definition['key'],
+            'name': definition['name'],
+            'emoji': definition['emoji'],
+            'description': definition['description'],
+            'progress': percent,
+            'unlocked': record.unlocked or unlocked,
+        })
+
+    return achievements
+
+
+def _build_teen_dashboard_payload(user) -> dict:
+    progress = _get_or_create_teen_progress(user)
+    favorites = list(TeenFavorite.objects.filter(user=user).values_list('story_id', flat=True))
+    favorites_count = len(favorites)
+
+    if progress.favorites_count != favorites_count:
+        progress.favorites_count = favorites_count
+        progress.save(update_fields=['favorites_count', 'updated_at'])
+
+    story_progress_qs = TeenStoryProgress.objects.filter(user=user)
+    completed_story_ids = [
+        story.story_id for story in story_progress_qs if story.status == 'completed'
+    ]
+
+    achievements = _sync_teen_achievements(
+        user,
+        progress,
+        favorites_count=favorites_count,
+    )
+
+    story_progress_data = TeenStoryProgressSerializer(story_progress_qs, many=True).data
+
+    return {
+        'points': progress.points,
+        'streak': progress.streak,
+        'last_engagement': progress.last_engagement,
+        'vocabulary_attempts': progress.vocabulary_attempts,
+        'pronunciation_attempts': progress.pronunciation_attempts,
+        'games_attempts': progress.games_attempts,
+        'missions_started': progress.missions_started,
+        'missions_completed': progress.missions_completed,
+        'favorites': favorites,
+        'favorites_count': favorites_count,
+        'completed_story_ids': completed_story_ids,
+        'story_progress': story_progress_data,
+        'achievements': achievements,
+        'progress': TeenProgressSerializer(progress).data,
+    }
+
+
+# ============= Teen Endpoints =============
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def teen_dashboard(request):
+    payload = _build_teen_dashboard_payload(request.user)
+    return Response(payload)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def teen_story_start(request):
+    story_id = request.data.get('story_id')
+    story_title = request.data.get('story_title')
+    story_type = request.data.get('story_type', '')
+
+    if not story_id or not story_title:
+        return Response(
+            {'message': 'story_id and story_title are required'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    with transaction.atomic():
+        progress = _get_or_create_teen_progress(request.user, for_update=True)
+        story_qs = TeenStoryProgress.objects.select_for_update()
+        story_progress, _ = story_qs.get_or_create(
+            user=request.user,
+            story_id=story_id,
+            defaults={
+                'story_title': story_title,
+                'story_type': story_type,
+                'status': 'started',
+                'attempts': 0,
+            }
+        )
+
+        story_progress.story_title = story_title
+        story_progress.story_type = story_type
+        story_progress.status = 'started'
+        story_progress.attempts = (story_progress.attempts or 0) + 1
+        story_progress.last_started_at = timezone.now()
+        story_progress.save()
+
+        points_awarded = 50
+        progress.points = max(0, (progress.points or 0) + points_awarded)
+        progress.missions_started = (progress.missions_started or 0) + 1
+        _update_teen_streak(progress)
+        progress.save()
+
+    payload = _build_teen_dashboard_payload(request.user)
+    payload['reward'] = {'points_awarded': points_awarded}
+    return Response(payload, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def teen_story_complete(request):
+    story_id = request.data.get('story_id')
+    story_title = request.data.get('story_title')
+    story_type = request.data.get('story_type', '')
+    score = request.data.get('score', 0)
+
+    if not story_id or not story_title:
+        return Response(
+            {'message': 'story_id and story_title are required'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        score = float(score)
+    except (TypeError, ValueError):
+        score = 0
+
+    base_points = max(0, round(score / 8))
+    completion_bonus = 60
+    points_to_add = base_points + completion_bonus
+
+    with transaction.atomic():
+        progress = _get_or_create_teen_progress(request.user, for_update=True)
+        story_qs = TeenStoryProgress.objects.select_for_update()
+        story_progress, _ = story_qs.get_or_create(
+            user=request.user,
+            story_id=story_id,
+            defaults={
+                'story_title': story_title,
+                'story_type': story_type,
+                'status': 'started',
+            }
+        )
+
+        story_progress.story_title = story_title
+        story_progress.story_type = story_type
+        story_progress.status = 'completed'
+        story_progress.best_score = max(story_progress.best_score or 0, score)
+        story_progress.total_points_earned = (story_progress.total_points_earned or 0) + points_to_add
+        story_progress.completed_at = timezone.now()
+        story_progress.save()
+
+        progress.points = max(0, (progress.points or 0) + points_to_add)
+        progress.missions_completed = (progress.missions_completed or 0) + 1
+        _update_teen_streak(progress)
+        progress.save()
+
+    payload = _build_teen_dashboard_payload(request.user)
+    payload['reward'] = {'points_awarded': points_to_add}
+    return Response(payload, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def teen_vocabulary_practice(request):
+    word = request.data.get('word')
+    story_id = request.data.get('story_id', '')
+    story_title = request.data.get('story_title', '')
+    score = request.data.get('score', 0)
+
+    if not word:
+        return Response({'message': 'word is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        score = float(score)
+    except (TypeError, ValueError):
+        score = 0
+
+    points_awarded = max(0, int(request.data.get('points_awarded', 25))) or 25
+
+    with transaction.atomic():
+        progress = _get_or_create_teen_progress(request.user, for_update=True)
+        practice_qs = TeenVocabularyPractice.objects.select_for_update()
+        practice, _ = practice_qs.get_or_create(
+            user=request.user,
+            word=word,
+            defaults={
+                'story_id': story_id,
+                'story_title': story_title,
+                'attempts': 0,
+            }
+        )
+
+        practice.story_id = story_id
+        practice.story_title = story_title
+        practice.attempts = (practice.attempts or 0) + 1
+        practice.best_score = max(practice.best_score or 0, score)
+        practice.last_practiced = timezone.now()
+        practice.save()
+
+        progress.vocabulary_attempts = (progress.vocabulary_attempts or 0) + 1
+        progress.points = max(0, (progress.points or 0) + points_awarded)
+        _update_teen_streak(progress)
+        progress.save()
+
+    payload = _build_teen_dashboard_payload(request.user)
+    payload['reward'] = {'points_awarded': points_awarded}
+    return Response(payload, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def teen_pronunciation_practice(request):
+    phrase = request.data.get('phrase')
+    story_id = request.data.get('story_id', '')
+    story_title = request.data.get('story_title', '')
+    score = request.data.get('score', 0)
+
+    if not phrase:
+        return Response({'message': 'phrase is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        score = float(score)
+    except (TypeError, ValueError):
+        score = 0
+
+    points_awarded = max(0, int(request.data.get('points_awarded', 35))) or 35
+
+    with transaction.atomic():
+        progress = _get_or_create_teen_progress(request.user, for_update=True)
+        practice_qs = TeenPronunciationPractice.objects.select_for_update()
+        practice, _ = practice_qs.get_or_create(
+            user=request.user,
+            phrase=phrase,
+            defaults={
+                'story_id': story_id,
+                'story_title': story_title,
+                'attempts': 0,
+            }
+        )
+
+        practice.story_id = story_id
+        practice.story_title = story_title
+        practice.attempts = (practice.attempts or 0) + 1
+        practice.best_score = max(practice.best_score or 0, score)
+        practice.last_practiced = timezone.now()
+        practice.save()
+
+        progress.pronunciation_attempts = (progress.pronunciation_attempts or 0) + 1
+        progress.points = max(0, (progress.points or 0) + points_awarded)
+        _update_teen_streak(progress)
+        progress.save()
+
+    payload = _build_teen_dashboard_payload(request.user)
+    payload['reward'] = {'points_awarded': points_awarded}
+    return Response(payload, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def teen_toggle_favorite(request):
+    story_id = request.data.get('story_id')
+    add = request.data.get('add', True)
+
+    if not story_id:
+        return Response({'message': 'story_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    with transaction.atomic():
+        progress = _get_or_create_teen_progress(request.user, for_update=True)
+        if add:
+            TeenFavorite.objects.get_or_create(user=request.user, story_id=story_id)
+        else:
+            TeenFavorite.objects.filter(user=request.user, story_id=story_id).delete()
+
+        favorites_count = TeenFavorite.objects.filter(user=request.user).count()
+        progress.favorites_count = favorites_count
+        progress.save(update_fields=['favorites_count', 'updated_at'])
+
+    payload = _build_teen_dashboard_payload(request.user)
+    return Response(payload, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def teen_quick_action(request):
+    action = request.data.get('action')
+    delta_points = request.data.get('delta_points')
+    increment_games = request.data.get('increment_games', False)
+
+    default_points_map = {
+        'quick-listen': 10,
+        'quick-speak': 10,
+        'quick-favorites': 5,
+        'teen-game': 40,
+    }
+
+    if delta_points is None:
+        delta_points = default_points_map.get(action, 0)
+
+    try:
+        delta_points = int(delta_points)
+    except (TypeError, ValueError):
+        delta_points = 0
+
+    with transaction.atomic():
+        progress = _get_or_create_teen_progress(request.user, for_update=True)
+        if delta_points:
+            progress.points = max(0, (progress.points or 0) + delta_points)
+        if increment_games:
+            progress.games_attempts = (progress.games_attempts or 0) + 1
+        _update_teen_streak(progress)
+        progress.save()
+
+    payload = _build_teen_dashboard_payload(request.user)
+    payload['reward'] = {'points_awarded': delta_points}
+    return Response(payload, status=status.HTTP_200_OK)
+
+
 # ============= Kids Endpoints (Keep existing) =============
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -2593,6 +3002,103 @@ def idempotent_upsert(request):
         logger.error(f"Idempotent upsert error: {str(e)}")
         return Response({
             "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# ============= Privacy & Compliance =============
+@api_view(['GET', 'POST'])
+@permission_classes([AllowAny])
+def cookie_consent_view(request):
+    """Retrieve or persist cookie consent preferences."""
+    try:
+        if request.method == 'GET':
+            consent_id = (request.query_params.get('consent_id') or '').strip()
+
+            if not consent_id and not request.user.is_authenticated:
+                return Response({
+                    "message": "consent_id is required for anonymous users."
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            consent = None
+            if consent_id:
+                consent = CookieConsent.objects.filter(consent_id=consent_id).first()
+
+            if not consent and request.user.is_authenticated:
+                consent = (
+                    CookieConsent.objects.filter(user=request.user)
+                    .order_by('-updated_at')
+                    .first()
+                )
+
+            if not consent:
+                return Response({
+                    "consent_id": consent_id,
+                    "accepted": False,
+                    "preferences": {
+                        "functional": True,
+                        "statistics": False,
+                        "marketing": False,
+                    },
+                    "accepted_at": None,
+                    "created_at": None,
+                    "updated_at": None,
+                }, status=status.HTTP_200_OK)
+
+            serializer = CookieConsentDetailSerializer(consent)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        serializer = CookieConsentPreferencesSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({
+                "message": "Validation error",
+                "errors": serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        data = serializer.validated_data
+        preferences = data['preferences']
+        consent_id = data['consent_id']
+        accepted = data.get('accepted', True)
+
+        forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '')
+        ip_candidates = [ip.strip() for ip in forwarded_for.split(',') if ip.strip()]
+        ip_address = ip_candidates[0] if ip_candidates else request.META.get('REMOTE_ADDR')
+
+        user_agent = (request.META.get('HTTP_USER_AGENT') or '')[:512]
+
+        consent, created = CookieConsent.objects.get_or_create(
+            consent_id=consent_id,
+            defaults={
+                'accepted': accepted,
+                'functional': True,
+                'statistics': preferences['statistics'],
+                'marketing': preferences['marketing'],
+                'accepted_at': timezone.now() if accepted else None,
+                'user_agent': user_agent,
+                'ip_address': ip_address,
+            }
+        )
+
+        if not created:
+            consent.accepted = accepted
+            consent.statistics = preferences['statistics']
+            consent.marketing = preferences['marketing']
+            consent.accepted_at = timezone.now() if accepted else None
+            consent.user_agent = user_agent
+            consent.ip_address = ip_address
+
+        if request.user.is_authenticated:
+            consent.user = request.user
+
+        consent.save()
+
+        serializer = CookieConsentDetailSerializer(consent)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    except Exception as exc:
+        logger.error("Cookie consent error: %s", exc, exc_info=True)
+        return Response({
+            "message": "Unable to process cookie consent at this time.",
+            "error": str(exc)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 

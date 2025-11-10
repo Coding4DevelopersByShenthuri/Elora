@@ -5,7 +5,9 @@ from .models import (
     VocabularyWord, Achievement, UserAchievement,
     KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, WaitlistEntry,
     UserNotification, AdminNotification, StoryEnrollment, StoryWord, StoryPhrase, KidsFavorite,
-    KidsVocabularyPractice, KidsPronunciationPractice, KidsGameSession
+    KidsVocabularyPractice, KidsPronunciationPractice, KidsGameSession,
+    TeenProgress, TeenStoryProgress, TeenVocabularyPractice,
+    TeenPronunciationPractice, TeenFavorite, TeenAchievement
 )
 
 
@@ -127,6 +129,54 @@ class UserAchievementAdmin(admin.ModelAdmin):
     search_fields = ['user__username', 'achievement__title']
     readonly_fields = ['unlocked_at']
     date_hierarchy = 'unlocked_at'
+
+
+# ============= Teen Models Admin =============
+@admin.register(TeenProgress)
+class TeenProgressAdmin(admin.ModelAdmin):
+    list_display = ['user', 'points', 'streak', 'vocabulary_attempts', 'pronunciation_attempts', 'games_attempts', 'updated_at']
+    search_fields = ['user__username', 'user__email']
+    readonly_fields = ['created_at', 'updated_at']
+
+
+@admin.register(TeenStoryProgress)
+class TeenStoryProgressAdmin(admin.ModelAdmin):
+    list_display = ['user', 'story_title', 'story_id', 'status', 'best_score', 'attempts', 'completed_at']
+    list_filter = ['status', 'story_type']
+    search_fields = ['user__username', 'story_title', 'story_id']
+    readonly_fields = ['last_started_at', 'completed_at']
+
+
+@admin.register(TeenVocabularyPractice)
+class TeenVocabularyPracticeAdmin(admin.ModelAdmin):
+    list_display = ['user', 'word', 'story_id', 'attempts', 'best_score', 'last_practiced']
+    search_fields = ['user__username', 'word', 'story_id']
+    list_filter = ['story_id']
+    readonly_fields = ['created_at', 'last_practiced']
+
+
+@admin.register(TeenPronunciationPractice)
+class TeenPronunciationPracticeAdmin(admin.ModelAdmin):
+    list_display = ['user', 'phrase', 'story_id', 'attempts', 'best_score', 'last_practiced']
+    search_fields = ['user__username', 'phrase', 'story_id']
+    list_filter = ['story_id']
+    readonly_fields = ['created_at', 'last_practiced']
+
+
+@admin.register(TeenFavorite)
+class TeenFavoriteAdmin(admin.ModelAdmin):
+    list_display = ['user', 'story_id', 'created_at']
+    search_fields = ['user__username', 'story_id']
+    readonly_fields = ['created_at']
+    date_hierarchy = 'created_at'
+
+
+@admin.register(TeenAchievement)
+class TeenAchievementAdmin(admin.ModelAdmin):
+    list_display = ['user', 'key', 'progress', 'unlocked', 'updated_at']
+    list_filter = ['unlocked']
+    search_fields = ['user__username', 'key']
+    readonly_fields = ['unlocked_at', 'updated_at']
 
 
 # ============= Kids Models Admin =============
