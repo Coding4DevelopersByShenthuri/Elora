@@ -7,7 +7,9 @@ from .models import (
     UserNotification, AdminNotification, StoryEnrollment, StoryWord, StoryPhrase, KidsFavorite,
     KidsVocabularyPractice, KidsPronunciationPractice, KidsGameSession,
     TeenProgress, TeenStoryProgress, TeenVocabularyPractice,
-    TeenPronunciationPractice, TeenFavorite, TeenAchievement
+    TeenPronunciationPractice, TeenFavorite, TeenAchievement,
+    EmailVerificationToken, SurveyStepResponse, ParentalControlSettings,
+    CookieConsent, PlatformSettings
 )
 
 
@@ -27,7 +29,7 @@ class UserProfileAdmin(admin.ModelAdmin):
             'fields': ('level', 'points', 'current_streak', 'longest_streak', 'avatar')
         }),
         ('Survey Data', {
-            'fields': ('age_range', 'native_language', 'english_level', 'learning_purpose', 'interests', 'survey_completed_at')
+            'fields': ('age_range', 'native_language', 'english_level', 'learning_purpose', 'interests', 'survey_completed_at', 'practice_goal_minutes', 'practice_start_time')
         }),
         ('Settings', {
             'fields': ('voice_speed', 'difficulty', 'notifications_enabled', 'auto_play')
@@ -373,3 +375,88 @@ class AdminNotificationAdmin(admin.ModelAdmin):
         deleted_count, _ = AdminNotification.cleanup_expired()
         self.message_user(request, f'{deleted_count} expired notifications deleted.')
     cleanup_expired.short_description = "Cleanup expired notifications (30+ days old)"
+
+
+# ============= Email Verification Admin =============
+@admin.register(EmailVerificationToken)
+class EmailVerificationTokenAdmin(admin.ModelAdmin):
+    list_display = ['user', 'token_short', 'is_used', 'is_valid_display', 'created_at']
+    list_filter = ['is_used', 'created_at']
+    search_fields = ['user__username', 'user__email', 'token']
+    readonly_fields = ['created_at', 'token']
+    date_hierarchy = 'created_at'
+    ordering = ['-created_at']
+    
+    def token_short(self, obj):
+        return f"{obj.token[:20]}..." if obj.token else "-"
+    token_short.short_description = "Token"
+    
+    def is_valid_display(self, obj):
+        return "Yes" if obj.is_valid() else "No"
+    is_valid_display.short_description = "Valid"
+
+
+# ============= Survey Step Response Admin =============
+@admin.register(SurveyStepResponse)
+class SurveyStepResponseAdmin(admin.ModelAdmin):
+    list_display = ['user', 'step_name', 'step_number', 'completed_at']
+    list_filter = ['step_name', 'step_number', 'completed_at']
+    search_fields = ['user__username', 'user__email', 'step_name']
+    readonly_fields = ['completed_at']
+    date_hierarchy = 'completed_at'
+    ordering = ['user', 'step_number', '-completed_at']
+
+
+# ============= Parental Control Settings Admin =============
+@admin.register(ParentalControlSettings)
+class ParentalControlSettingsAdmin(admin.ModelAdmin):
+    list_display = ['user', 'has_pin', 'daily_limit_minutes', 'last_pin_update', 'updated_at']
+    list_filter = ['daily_limit_minutes', 'created_at']
+    search_fields = ['user__username', 'user__email']
+    readonly_fields = ['created_at', 'updated_at', 'last_pin_update']
+    date_hierarchy = 'created_at'
+
+
+# ============= Cookie Consent Admin =============
+@admin.register(CookieConsent)
+class CookieConsentAdmin(admin.ModelAdmin):
+    list_display = ['consent_id', 'user', 'accepted', 'functional', 'statistics', 'marketing', 'accepted_at', 'updated_at']
+    list_filter = ['accepted', 'functional', 'statistics', 'marketing', 'accepted_at', 'updated_at']
+    search_fields = ['consent_id', 'user__username', 'user__email']
+    readonly_fields = ['created_at', 'updated_at', 'accepted_at']
+    date_hierarchy = 'updated_at'
+    ordering = ['-updated_at']
+
+
+# ============= Platform Settings Admin =============
+@admin.register(PlatformSettings)
+class PlatformSettingsAdmin(admin.ModelAdmin):
+    list_display = ['platform_name', 'maintenance_mode', 'allow_registrations', 'analytics_enabled', 'updated_at']
+    list_filter = ['maintenance_mode', 'allow_registrations', 'analytics_enabled', 'require_email_verification']
+    readonly_fields = ['created_at', 'updated_at']
+    
+    fieldsets = (
+        ('General', {
+            'fields': ('platform_name', 'support_email', 'maintenance_mode', 'allow_registrations')
+        }),
+        ('Analytics', {
+            'fields': ('analytics_enabled', 'ga_id', 'clarity_id')
+        }),
+        ('Security', {
+            'fields': ('require_email_verification', 'two_factor_admin', 'session_timeout_minutes')
+        }),
+        ('Appearance', {
+            'fields': ('default_theme',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
+    
+    def has_add_permission(self, request):
+        # Only allow one instance (singleton pattern)
+        return not PlatformSettings.objects.exists()
+    
+    def has_delete_permission(self, request, obj=None):
+        # Prevent deletion of platform settings
+        return False

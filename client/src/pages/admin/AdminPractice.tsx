@@ -104,9 +104,11 @@ export default function AdminPractice() {
   // Debounce search input
   const debouncedSearch = useDebounce(search, 500);
 
-  const loadSessions = useCallback(async () => {
+  const loadSessions = useCallback(async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) {
+        setLoading(true);
+      }
       setError(null);
       
       const response = await AdminAPI.getPracticeSessions({
@@ -122,6 +124,18 @@ export default function AdminPractice() {
         setPagination(data.pagination || null);
       } else {
         const errorMessage = response.message || 'Failed to load practice sessions';
+        if (!silent) {
+          setError(errorMessage);
+          toast({
+            title: 'Error',
+            description: errorMessage,
+            variant: 'destructive',
+          });
+        }
+      }
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || error?.message || 'An error occurred while loading practice sessions';
+      if (!silent) {
         setError(errorMessage);
         toast({
           title: 'Error',
@@ -129,16 +143,10 @@ export default function AdminPractice() {
           variant: 'destructive',
         });
       }
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || error?.message || 'An error occurred while loading practice sessions';
-      setError(errorMessage);
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
     } finally {
-      setLoading(false);
+      if (!silent) {
+        setLoading(false);
+      }
     }
   }, [debouncedSearch, page, sessionTypeFilter, toast]);
 
@@ -163,6 +171,16 @@ export default function AdminPractice() {
   useEffect(() => {
     loadStats();
   }, [loadStats]);
+
+  // Auto-refresh every 30 seconds for real-time data
+  useEffect(() => {
+    const refreshInterval = setInterval(() => {
+      loadSessions(true);
+      loadStats();
+    }, 30000); // 30 seconds
+    
+    return () => clearInterval(refreshInterval);
+  }, [search, sessionTypeFilter, page]);
 
   const handleViewSession = async (sessionId: number) => {
     setActionLoading(sessionId);

@@ -23,8 +23,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = [
             'level', 'points', 'current_streak', 'longest_streak', 'avatar',
             'age_range', 'native_language', 'english_level', 'learning_purpose',
-            'interests', 'survey_completed_at', 'voice_speed', 'difficulty',
-            'notifications_enabled', 'auto_play', 'created_at', 'updated_at'
+            'interests', 'survey_completed_at', 'practice_goal_minutes', 'practice_start_time',
+            'voice_speed', 'difficulty', 'notifications_enabled', 'auto_play', 
+            'created_at', 'updated_at'
         ]
         read_only_fields = ['created_at', 'updated_at']
 

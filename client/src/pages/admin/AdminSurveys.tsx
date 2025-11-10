@@ -104,9 +104,11 @@ export default function AdminSurveys() {
   // Debounce search input
   const debouncedSearch = useDebounce(search, 500);
 
-  const loadSurveys = useCallback(async () => {
+  const loadSurveys = useCallback(async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) {
+        setLoading(true);
+      }
       setError(null);
       
       const response = await AdminAPI.getSurveys({
@@ -121,13 +123,27 @@ export default function AdminSurveys() {
       if (response.success) {
         const data = response.data;
         const surveysData = data.surveys || [];
-        console.log('✅ Loaded surveys from MySQL:', surveysData.length, 'total surveys');
-        console.log('📊 Survey data from database:', surveysData);
-        console.log('📄 Pagination info:', data.pagination);
+        if (!silent) {
+          console.log('✅ Loaded surveys from MySQL:', surveysData.length, 'total surveys');
+          console.log('📊 Survey data from database:', surveysData);
+          console.log('📄 Pagination info:', data.pagination);
+        }
         setSurveys(surveysData);
         setPagination(data.pagination || null);
       } else {
         const errorMessage = response.message || 'Failed to load surveys';
+        if (!silent) {
+          setError(errorMessage);
+          toast({
+            title: 'Error',
+            description: errorMessage,
+            variant: 'destructive',
+          });
+        }
+      }
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || error?.message || 'An error occurred while loading surveys';
+      if (!silent) {
         setError(errorMessage);
         toast({
           title: 'Error',
@@ -135,16 +151,10 @@ export default function AdminSurveys() {
           variant: 'destructive',
         });
       }
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || error?.message || 'An error occurred while loading surveys';
-      setError(errorMessage);
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
     } finally {
-      setLoading(false);
+      if (!silent) {
+        setLoading(false);
+      }
     }
   }, [debouncedSearch, page, completedFilter, ageRangeFilter, englishLevelFilter, toast]);
 
@@ -170,6 +180,16 @@ export default function AdminSurveys() {
   useEffect(() => {
     loadStats();
   }, [loadStats]);
+
+  // Auto-refresh every 30 seconds for real-time data
+  useEffect(() => {
+    const refreshInterval = setInterval(() => {
+      loadSurveys(true);
+      loadStats();
+    }, 30000); // 30 seconds
+    
+    return () => clearInterval(refreshInterval);
+  }, [debouncedSearch, page, completedFilter, ageRangeFilter, englishLevelFilter]);
 
   const handleViewSurvey = async (userId: number) => {
     setActionLoading(userId);

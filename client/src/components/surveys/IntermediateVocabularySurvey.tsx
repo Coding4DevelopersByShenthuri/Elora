@@ -4,7 +4,7 @@ import SurveyProgress from '@/components/surveys/SurveyProgress';
 
 interface IntermediateVocabularySurveyProps {
   isOpen: boolean;
-  onComplete: () => void;
+  onComplete: (surveyData?: any) => void;
   onBack?: () => void;
   currentStep?: number;
   totalSteps?: number;
@@ -70,8 +70,18 @@ const IntermediateVocabularySurvey: React.FC<IntermediateVocabularySurveyProps> 
   }, [isOpen]);
 
   const handleContinue = React.useCallback(() => {
-    onComplete();
-  }, [onComplete]);
+    // Save selected words to sessionStorage
+    const surveyData = {
+      intermediateVocabulary: Array.from(selectedWords),
+      completedAt: new Date().toISOString()
+    };
+    const existingData = sessionStorage.getItem('speakbee_survey_data');
+    const allData = existingData ? JSON.parse(existingData) : {};
+    const mergedData = { ...allData, ...surveyData };
+    sessionStorage.setItem('speakbee_survey_data', JSON.stringify(mergedData));
+    // Pass data to onComplete
+    onComplete(surveyData);
+  }, [onComplete, selectedWords]);
 
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>

@@ -100,9 +100,11 @@ export default function AdminAchievements() {
   const { toast } = useToast();
   const debouncedSearch = useDebounce(search, 500);
 
-  const loadAchievements = useCallback(async () => {
+  const loadAchievements = useCallback(async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) {
+        setLoading(true);
+      }
       setError(null);
       const response = await AdminAPI.getAchievements({
         search: debouncedSearch, page, page_size: 20,
@@ -113,20 +115,28 @@ export default function AdminAchievements() {
         setAchievements(data.achievements || []);
         setPagination(data.pagination || null);
       } else {
-        setError(response.message || 'Failed to load achievements');
-        toast({ title: 'Error', description: response.message || 'Failed to load achievements', variant: 'destructive' });
+        if (!silent) {
+          setError(response.message || 'Failed to load achievements');
+          toast({ title: 'Error', description: response.message || 'Failed to load achievements', variant: 'destructive' });
+        }
       }
     } catch (error: any) {
-      setError(error?.response?.data?.message || error?.message || 'An error occurred');
-      toast({ title: 'Error', description: error?.message || 'An error occurred', variant: 'destructive' });
+      if (!silent) {
+        setError(error?.response?.data?.message || error?.message || 'An error occurred');
+        toast({ title: 'Error', description: error?.message || 'An error occurred', variant: 'destructive' });
+      }
     } finally {
-      setLoading(false);
+      if (!silent) {
+        setLoading(false);
+      }
     }
   }, [debouncedSearch, page, categoryFilter, tierFilter, activeFilter, toast]);
 
-  const loadUserAchievements = useCallback(async () => {
+  const loadUserAchievements = useCallback(async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) {
+        setLoading(true);
+      }
       const response = await AdminAPI.getUserAchievements({ search: debouncedSearch, page: userAchievementsPage, page_size: 20 });
       if (response.success) {
         const data = response.data;
@@ -134,9 +144,13 @@ export default function AdminAchievements() {
         setUserAchievementsPagination(data.pagination || null);
       }
     } catch (error: any) {
-      console.error('Error loading user achievements:', error);
+      if (!silent) {
+        console.error('Error loading user achievements:', error);
+      }
     } finally {
-      setLoading(false);
+      if (!silent) {
+        setLoading(false);
+      }
     }
   }, [debouncedSearch, userAchievementsPage]);
 
@@ -157,6 +171,17 @@ export default function AdminAchievements() {
     if (activeTab === 'achievements') loadAchievements();
     else if (activeTab === 'user-achievements') loadUserAchievements();
   }, [activeTab, loadAchievements, loadUserAchievements]);
+
+  // Auto-refresh every 30 seconds for real-time data
+  useEffect(() => {
+    const refreshInterval = setInterval(() => {
+      loadStats();
+      if (activeTab === 'achievements') loadAchievements(true);
+      else if (activeTab === 'user-achievements') loadUserAchievements(true);
+    }, 30000); // 30 seconds
+    
+    return () => clearInterval(refreshInterval);
+  }, [activeTab, search, categoryFilter, tierFilter, activeFilter, page, userAchievementsPage]);
 
   const handleCreate = async () => {
     try {

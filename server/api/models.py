@@ -69,6 +69,10 @@ class UserProfile(models.Model):
     interests = models.JSONField(default=list, blank=True)  # Array of interests
     survey_completed_at = models.DateTimeField(blank=True, null=True)
     
+    # Practice Goals (from personalization survey)
+    practice_goal_minutes = models.IntegerField(blank=True, null=True, help_text="Daily practice goal in minutes")
+    practice_start_time = models.TimeField(blank=True, null=True, help_text="Preferred daily practice start time")
+    
     # Settings
     voice_speed = models.CharField(max_length=20, default='normal')
     difficulty = models.CharField(max_length=20, default='medium')

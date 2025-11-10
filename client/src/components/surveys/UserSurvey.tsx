@@ -9,6 +9,7 @@ export interface SurveyData {
   learningPurpose?: string[];
   interests?: string[];
   practiceGoalMinutes?: number;
+  practiceStartTime?: string;
   personalizationCompleted?: boolean;
   completedAt: string;
 }

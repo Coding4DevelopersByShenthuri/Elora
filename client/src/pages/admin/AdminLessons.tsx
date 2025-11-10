@@ -133,6 +133,16 @@ export default function AdminLessons() {
     loadStats();
   }, [lessonTypeFilter, contentTypeFilter, statusFilter, debouncedSearch, currentPage]);
 
+  // Auto-refresh every 30 seconds for real-time data
+  useEffect(() => {
+    const refreshInterval = setInterval(() => {
+      loadLessons(true);
+      loadStats();
+    }, 30000); // 30 seconds
+    
+    return () => clearInterval(refreshInterval);
+  }, [lessonTypeFilter, contentTypeFilter, statusFilter, debouncedSearch, currentPage]);
+
   const loadLessons = async (silent = false) => {
     try {
       if (!silent) {

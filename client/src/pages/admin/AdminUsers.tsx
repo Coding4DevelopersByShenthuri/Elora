@@ -194,6 +194,15 @@ export default function AdminUsers() {
     loadUsers();
   }, [loadUsers]);
 
+  // Auto-refresh every 30 seconds for real-time data
+  useEffect(() => {
+    const refreshInterval = setInterval(() => {
+      loadUsers();
+    }, 30000); // 30 seconds
+    
+    return () => clearInterval(refreshInterval);
+  }, [debouncedSearch, page, levelFilter, activeFilter]);
+
   const handleDeleteClick = (user: any) => {
     setUserToDelete(user);
     setShowDeleteDialog(true);

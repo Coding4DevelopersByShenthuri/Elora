@@ -22,7 +22,10 @@ interface User {
     englishLevel?: string;
     learningPurpose?: string[];
     interests?: string[];
-    completedAt: string;
+    practiceGoalMinutes?: number;
+    practiceStartTime?: string;
+    personalizationCompleted?: boolean;
+    completedAt?: string;
   };
   // Admin flags (optional - only present for admin users)
   is_staff?: boolean;
@@ -104,6 +107,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     localStorage.setItem('speakbee_auth_token', tokenToStore);
     localStorage.setItem('speakbee_current_user', JSON.stringify(updatedUser));
+    
+    // Mark that user just authenticated - this will trigger survey if not completed
+    sessionStorage.setItem('speakbee_just_authenticated', 'true');
   };
 
   const loginWithServer = async (email: string, password: string) => {
@@ -114,15 +120,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const userData = response.data.user;
         const authToken = response.data.token || localStorage.getItem('speakbee_auth_token') || '';
         
-        // Check if survey is completed (has survey_completed_at)
-        const hasSurveyData = userData.profile?.survey_completed_at;
-        const surveyData = hasSurveyData ? {
+        // Check if survey is completed (has survey_completed_at) - this is the source of truth
+        const surveyCompletedAt = userData.profile?.survey_completed_at;
+        const surveyData = surveyCompletedAt ? {
           ageRange: userData.profile.age_range,
           nativeLanguage: userData.profile.native_language,
           englishLevel: userData.profile.english_level,
           learningPurpose: userData.profile.learning_purpose,
           interests: userData.profile.interests,
-          completedAt: userData.profile.survey_completed_at
+          practiceGoalMinutes: userData.profile.practice_goal_minutes,
+          practiceStartTime: userData.profile.practice_start_time,
+          personalizationCompleted: true,
+          completedAt: surveyCompletedAt // Use server's survey_completed_at
         } : undefined;
 
         const transformedUser: User = {
@@ -144,7 +153,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           is_superuser: userData.is_superuser
         };
         
-        // transformedUser is already used in login() above, no need to reference it here
+        // Mark that user just authenticated - this will trigger survey if not completed
         login(transformedUser, { token: authToken || undefined });
         return { success: true, message: response.message };
       }
@@ -170,7 +179,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           englishLevel: userData.profile?.english_level,
           learningPurpose: userData.profile?.learning_purpose,
           interests: userData.profile?.interests,
-          completedAt: surveyCompletedAt
+          practiceGoalMinutes: userData.profile.practice_goal_minutes,
+          practiceStartTime: userData.profile.practice_start_time,
+          personalizationCompleted: true,
+          completedAt: surveyCompletedAt // Use server's survey_completed_at
         } : undefined;
         const transformedUser: User = {
           id: userData.id.toString(),
@@ -188,6 +200,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           surveyData
         };
         
+        // Mark that user just authenticated - this will trigger survey if not completed
         login(transformedUser, { token: authToken || undefined });
         return { success: true, message: response.message || 'Google authentication successful' };
       }
@@ -272,6 +285,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           englishLevel: userData.profile?.english_level,
           learningPurpose: userData.profile?.learning_purpose,
           interests: userData.profile?.interests,
+          practiceGoalMinutes: userData.profile?.practice_goal_minutes,
+          practiceStartTime: userData.profile?.practice_start_time,
           completedAt: userData.profile?.survey_completed_at
         } : undefined;
 
@@ -299,6 +314,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const logout = () => {
     setUser(null);
     API.auth.logout();
+    // Clear all session storage flags on logout
+    sessionStorage.removeItem('speakbee_just_authenticated');
+    sessionStorage.removeItem('speakbee_survey_in_progress');
+    sessionStorage.removeItem('speakbee_survey_step');
+    sessionStorage.removeItem('speakbee_survey_data');
   };
 
   const updateUserProfile = (updates: Partial<User['profile']>) => {
@@ -376,10 +396,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               interests: surveyData?.interests || [],
             };
             
-            // Only set survey_completed_at if we have required survey data
-            // This prevents marking incomplete surveys as completed
-            if (hasRequiredFields) {
+            // Only set survey_completed_at if personalization is completed (survey is fully done)
+            // This is the final step - when personalization completes, mark survey as complete
+            if (surveyData?.personalizationCompleted === true || hasRequiredFields) {
               profileUpdateData.survey_completed_at = new Date().toISOString();
+              
+              // Also save practice goal and start time if provided
+              if (surveyData?.practiceGoalMinutes) {
+                profileUpdateData.practice_goal_minutes = surveyData.practiceGoalMinutes;
+              }
+              if (surveyData?.practiceStartTime) {
+                profileUpdateData.practice_start_time = surveyData.practiceStartTime;
+              }
             }
 
             // Update profile via API

@@ -101,9 +101,11 @@ export default function AdminVocabulary() {
   // Debounce search input
   const debouncedSearch = useDebounce(search, 500);
 
-  const loadWords = useCallback(async () => {
+  const loadWords = useCallback(async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) {
+        setLoading(true);
+      }
       setError(null);
       
       const response = await AdminAPI.getVocabularyWords({
@@ -120,6 +122,18 @@ export default function AdminVocabulary() {
         setPagination(data.pagination || null);
       } else {
         const errorMessage = response.message || 'Failed to load vocabulary words';
+        if (!silent) {
+          setError(errorMessage);
+          toast({
+            title: 'Error',
+            description: errorMessage,
+            variant: 'destructive',
+          });
+        }
+      }
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || error?.message || 'An error occurred while loading vocabulary words';
+      if (!silent) {
         setError(errorMessage);
         toast({
           title: 'Error',
@@ -127,16 +141,10 @@ export default function AdminVocabulary() {
           variant: 'destructive',
         });
       }
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || error?.message || 'An error occurred while loading vocabulary words';
-      setError(errorMessage);
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
     } finally {
-      setLoading(false);
+      if (!silent) {
+        setLoading(false);
+      }
     }
   }, [debouncedSearch, page, categoryFilter, difficultyFilter, toast]);
 
@@ -161,6 +169,16 @@ export default function AdminVocabulary() {
   useEffect(() => {
     loadStats();
   }, [loadStats]);
+
+  // Auto-refresh every 30 seconds for real-time data
+  useEffect(() => {
+    const refreshInterval = setInterval(() => {
+      loadWords(true);
+      loadStats();
+    }, 30000); // 30 seconds
+    
+    return () => clearInterval(refreshInterval);
+  }, [search, categoryFilter, difficultyFilter, page]);
 
   const handleViewWord = async (wordId: number) => {
     setActionLoading(wordId);

@@ -5,7 +5,7 @@ import SurveyProgress from '@/components/surveys/SurveyProgress';
 
 interface InterestsSurveyProps {
   isOpen: boolean;
-  onComplete: () => void;
+  onComplete: (surveyData?: any) => void;
   onBack?: () => void;
   currentStep?: number;
   totalSteps?: number;
@@ -77,7 +77,8 @@ const InterestsSurvey: React.FC<InterestsSurveyProps> = ({
     const allData = existingData ? JSON.parse(existingData) : {};
     const mergedData = { ...allData, ...surveyData };
     sessionStorage.setItem('speakbee_survey_data', JSON.stringify(mergedData));
-    onComplete();
+    // Pass data to onComplete
+    onComplete(surveyData);
   }, [onComplete, selected]);
 
   return (

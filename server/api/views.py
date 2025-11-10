@@ -568,24 +568,54 @@ def user_profile(request):
             # Handle survey_completed_at - set it only if survey is being completed
             data = request.data.copy()
             
-            # If survey_completed_at is provided and all required survey fields are present, ensure it's set
-            if 'survey_completed_at' in data and data['survey_completed_at']:
-                # Verify that key survey fields are present
+            # Handle practice_start_time - convert string to Time object if provided
+            if 'practice_start_time' in data and data.get('practice_start_time'):
+                practice_time_str = data.get('practice_start_time')
+                if isinstance(practice_time_str, str):
+                    try:
+                        # Parse time string (format: "HH:MM" or "HH:MM:SS")
+                        from datetime import datetime
+                        time_obj = datetime.strptime(practice_time_str, '%H:%M').time()
+                        data['practice_start_time'] = time_obj
+                    except (ValueError, TypeError):
+                        try:
+                            # Try with seconds
+                            time_obj = datetime.strptime(practice_time_str, '%H:%M:%S').time()
+                            data['practice_start_time'] = time_obj
+                        except (ValueError, TypeError):
+                            logger.warning(f"Invalid time format for practice_start_time: {practice_time_str}")
+                            data['practice_start_time'] = None
+            
+            # If survey_completed_at is provided, ensure it's set correctly
+            # This happens when personalization is completed (final survey step)
+            if 'survey_completed_at' in data:
+                survey_completed_at_value = data.get('survey_completed_at')
+                
+                # Verify that key survey fields are present to ensure this is a complete survey
                 has_survey_data = (
-                    data.get('age_range') or 
-                    data.get('native_language') or 
-                    data.get('english_level') or 
-                    data.get('learning_purpose')
+                    data.get('age_range') or profile.age_range or
+                    data.get('native_language') or profile.native_language or
+                    data.get('english_level') or profile.english_level or
+                    data.get('learning_purpose') or (profile.learning_purpose and len(profile.learning_purpose) > 0)
                 )
-                if not has_survey_data:
-                    # If no survey data is being updated, don't update completed_at
-                    # This allows partial updates without affecting completion status
-                    pass
+                
+                if survey_completed_at_value and has_survey_data:
+                    # Survey is being completed - ensure timestamp is set
+                    # If it's already a datetime string, keep it; otherwise use current time
+                    # timezone is already imported at the top of the file
+                    if not survey_completed_at_value or survey_completed_at_value == '':
+                        data['survey_completed_at'] = timezone.now()
+                    # If it's a valid ISO string, the serializer will handle it
+                elif survey_completed_at_value is None or survey_completed_at_value == '':
+                    # Explicitly clearing survey_completed_at
+                    data['survey_completed_at'] = None
+                # If no survey data but survey_completed_at is being set, allow it
+                # (this handles cases where survey data was already saved in previous steps)
             
             serializer = UserProfileSerializer(profile, data=data, partial=(request.method == 'PATCH'))
             if serializer.is_valid():
                 serializer.save()
-                logger.info(f"Profile updated for user {request.user.username}: survey data saved")
+                logger.info(f"Profile updated for user {request.user.username}: survey_completed_at={data.get('survey_completed_at', 'not set')}")
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     

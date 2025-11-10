@@ -137,9 +137,11 @@ export default function AdminProgress() {
   // Debounce search input
   const debouncedSearch = useDebounce(search, 500);
 
-  const loadProgressRecords = useCallback(async () => {
+  const loadProgressRecords = useCallback(async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) {
+        setLoading(true);
+      }
       setError(null);
       
       const response = await AdminAPI.getProgressRecords({
@@ -157,6 +159,18 @@ export default function AdminProgress() {
         setPagination(data.pagination || null);
       } else {
         const errorMessage = response.message || 'Failed to load progress records';
+        if (!silent) {
+          setError(errorMessage);
+          toast({
+            title: 'Error',
+            description: errorMessage,
+            variant: 'destructive',
+          });
+        }
+      }
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || error?.message || 'An error occurred while loading progress records';
+      if (!silent) {
         setError(errorMessage);
         toast({
           title: 'Error',
@@ -164,16 +178,10 @@ export default function AdminProgress() {
           variant: 'destructive',
         });
       }
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || error?.message || 'An error occurred while loading progress records';
-      setError(errorMessage);
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
     } finally {
-      setLoading(false);
+      if (!silent) {
+        setLoading(false);
+      }
     }
   }, [debouncedSearch, page, lessonTypeFilter, contentTypeFilter, completedFilter, toast]);
 
@@ -198,6 +206,16 @@ export default function AdminProgress() {
   useEffect(() => {
     loadStats();
   }, [loadStats]);
+
+  // Auto-refresh every 30 seconds for real-time data
+  useEffect(() => {
+    const refreshInterval = setInterval(() => {
+      loadProgressRecords(true);
+      loadStats();
+    }, 30000); // 30 seconds
+    
+    return () => clearInterval(refreshInterval);
+  }, [search, lessonTypeFilter, contentTypeFilter, completedFilter, page]);
 
   const handleViewProgress = async (progressId: number) => {
     setActionLoading(progressId);

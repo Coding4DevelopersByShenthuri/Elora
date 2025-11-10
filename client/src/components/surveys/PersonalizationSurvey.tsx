@@ -1,14 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import type { SurveyData } from '@/components/surveys/UserSurvey';
+import { Clock, ChevronDown } from 'lucide-react';
 
-const progressSteps = [35, 62, 85, 95];
+const progressSteps = [35, 70, 85, 100];
 
 const personalizationTasks = [
-  { id: 'topics', label: 'Creating diverse topics' },
-  { id: 'dialogues', label: 'Preparing interactive dialogues' },
-  { id: 'path', label: 'Optimizing your learning path' },
-  { id: 'plan', label: 'Finalizing your plan' }
+  { id: 'topics', label: 'Creating diverse topics', icon: '✨' },
+  { id: 'dialogues', label: 'Preparing interactive dialogues', icon: '💬' },
+  { id: 'path', label: 'Optimizing your learning path', icon: '📊' },
+  { id: 'plan', label: 'Finalizing your plan', icon: '📋' }
 ] as const;
 
 interface PersonalizationSurveyProps {
@@ -26,6 +27,10 @@ const PersonalizationSurvey: React.FC<PersonalizationSurveyProps> = ({
   const [activeTaskIndex, setActiveTaskIndex] = useState<number | null>(null);
   const [completedTaskCount, setCompletedTaskCount] = useState(0);
   const [showGoalChooser, setShowGoalChooser] = useState(false);
+  const [showStartTimeChooser, setShowStartTimeChooser] = useState(false);
+  const [selectedGoal, setSelectedGoal] = useState<number | null>(null);
+  const [selectedStartTime, setSelectedStartTime] = useState<string>('');
+  const [showTimeDropdown, setShowTimeDropdown] = useState(false);
 
   useEffect(() => {
     const timers: number[] = [];
@@ -40,6 +45,10 @@ const PersonalizationSurvey: React.FC<PersonalizationSurveyProps> = ({
     setActiveTaskIndex(null);
     setCompletedTaskCount(0);
     setShowGoalChooser(false);
+    setShowStartTimeChooser(false);
+    setSelectedGoal(null);
+    setSelectedStartTime('');
+    setShowTimeDropdown(false);
 
     let step = 0;
 
@@ -54,7 +63,12 @@ const PersonalizationSurvey: React.FC<PersonalizationSurveyProps> = ({
             setCompletedTaskCount(personalizationTasks.length);
             setActiveTaskIndex(null);
             setProgress(100);
-            setShowGoalChooser(true);
+            // Show first popup after a brief delay when initialization completes
+            timers.push(
+              window.setTimeout(() => {
+                setShowGoalChooser(true);
+              }, 500)
+            );
           }, 1000)
         );
         return;
@@ -77,21 +91,68 @@ const PersonalizationSurvey: React.FC<PersonalizationSurveyProps> = ({
     };
   }, [progress]);
 
-  const handleGoalSelect = async (minutes: number) => {
+  const handleGoalSelect = (minutes: number) => {
+    setSelectedGoal(minutes);
+    setShowGoalChooser(false);
+    // Show second popup after goal is selected
+    setTimeout(() => {
+      setShowStartTimeChooser(true);
+    }, 300);
+  };
+
+  const handleStartTimeSelect = (time: string, goalMinutes: number) => {
+    setSelectedStartTime(time);
+    setShowStartTimeChooser(false);
+    
+    // Save to sessionStorage - App.tsx will handle saving all data to MySQL
     const surveyData: SurveyData = {
-      practiceGoalMinutes: minutes,
+      practiceGoalMinutes: goalMinutes,
+      practiceStartTime: time,
       personalizationCompleted: true,
       completedAt: new Date().toISOString()
     };
 
-    // Save to sessionStorage - App.tsx will handle saving all data to MySQL
     const existingData = sessionStorage.getItem('speakbee_survey_data');
     const allData = existingData ? JSON.parse(existingData) : {};
     const mergedData = { ...allData, ...surveyData };
     sessionStorage.setItem('speakbee_survey_data', JSON.stringify(mergedData));
     
-    onComplete?.(surveyData);
+    // Complete after a brief delay
+    setTimeout(() => {
+      onComplete?.(surveyData);
+    }, 300);
   };
+
+  // Generate time options (every 30 minutes from 6 AM to 11 PM)
+  const generateTimeOptions = () => {
+    const times: string[] = [];
+    for (let hour = 6; hour <= 23; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        times.push(timeString);
+      }
+    }
+    return times;
+  };
+
+  const timeOptions = generateTimeOptions();
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    if (!showTimeDropdown) return;
+    
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.time-selector-container')) {
+        setShowTimeDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showTimeDropdown]);
 
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
@@ -183,18 +244,7 @@ const PersonalizationSurvey: React.FC<PersonalizationSurveyProps> = ({
                           className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3"
                         >
                           <div className="flex items-center gap-3">
-                            <span
-                              className={[
-                                'flex h-8 w-8 items-center justify-center rounded-full border text-sm font-medium',
-                                isCompleted
-                                  ? 'border-green-200 bg-green-100 text-green-700'
-                                  : isActive
-                                  ? 'border-blue-200 bg-blue-100 text-blue-600 animate-pulse'
-                                  : 'border-slate-200 bg-white text-slate-500'
-                              ].join(' ')}
-                            >
-                              {index + 1}
-                            </span>
+                            <span className="text-lg">{task.icon}</span>
                             <span className="text-sm font-medium text-slate-700">{task.label}</span>
                           </div>
                           <span
@@ -207,7 +257,7 @@ const PersonalizationSurvey: React.FC<PersonalizationSurveyProps> = ({
                                 : 'text-slate-400'
                             ].join(' ')}
                           >
-                            {isCompleted ? 'Done' : isActive ? 'Working…' : 'Loading…'}
+                            {isCompleted ? 'Done' : isActive ? 'Loading…' : 'Loading…'}
                           </span>
                         </li>
                       );
@@ -218,10 +268,11 @@ const PersonalizationSurvey: React.FC<PersonalizationSurveyProps> = ({
             </div>
           </div>
 
+          {/* First Popup: Daily Practice Goal */}
           {showGoalChooser && (
-            <div className="absolute inset-0 z-30 flex items-center justify-center bg-slate-900/30 px-4">
-              <div className="w-full max-w-xl rounded-3xl bg-white p-10 shadow-2xl">
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-blue-500 text-center">
+            <div className="absolute inset-0 z-30 flex items-center justify-center bg-slate-900/30 backdrop-blur-sm px-4">
+              <div className="w-full max-w-xl rounded-3xl bg-white p-10 shadow-2xl animate-in fade-in-0 zoom-in-95 duration-200">
+                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 text-center">
                   To make progress, please clarify
                 </p>
                 <h3 className="mt-4 text-center text-2xl font-semibold text-slate-900">
@@ -232,7 +283,7 @@ const PersonalizationSurvey: React.FC<PersonalizationSurveyProps> = ({
                     <button
                       key={minutes}
                       onClick={() => handleGoalSelect(minutes)}
-                      className="flex-1 rounded-2xl border border-slate-200 bg-white px-6 py-4 text-lg font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-400 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                      className="flex-1 rounded-2xl border-2 border-slate-200 bg-white px-6 py-4 text-lg font-semibold text-slate-700 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-400 hover:shadow-lg hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                     >
                       {minutes} min/day
                     </button>
@@ -240,6 +291,71 @@ const PersonalizationSurvey: React.FC<PersonalizationSurveyProps> = ({
                 </div>
                 <p className="mt-6 text-center text-xs text-slate-400">
                   Pick what feels right today. You can always adjust this later.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Second Popup: Practice Start Time */}
+          {showStartTimeChooser && (
+            <div className="absolute inset-0 z-30 flex items-center justify-center bg-slate-900/30 backdrop-blur-sm px-4">
+              <div className="w-full max-w-xl rounded-3xl bg-white p-10 shadow-2xl animate-in fade-in-0 zoom-in-95 duration-200">
+                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 text-center">
+                  To make progress, please clarify
+                </p>
+                <h3 className="mt-4 text-center text-2xl font-semibold text-slate-900">
+                  When would you like to start your daily practice?
+                </h3>
+                <div className="mt-8 relative time-selector-container">
+                  <button
+                    onClick={() => setShowTimeDropdown(!showTimeDropdown)}
+                    className="w-full rounded-2xl border-2 border-slate-200 bg-white px-6 py-4 text-left text-lg font-semibold text-slate-700 shadow-sm transition-all hover:border-blue-400 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Clock className="h-5 w-5 text-slate-400" />
+                      <span>
+                        {selectedStartTime
+                          ? new Date(`2000-01-01T${selectedStartTime}`).toLocaleTimeString('en-US', {
+                              hour: 'numeric',
+                              minute: '2-digit',
+                              hour12: true
+                            })
+                          : 'Choose start time'}
+                      </span>
+                    </div>
+                    <ChevronDown
+                      className={`h-5 w-5 text-slate-400 transition-transform ${
+                        showTimeDropdown ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+                  {showTimeDropdown && (
+                    <div className="absolute z-40 mt-2 w-full max-h-60 overflow-y-auto rounded-2xl border-2 border-slate-200 bg-white shadow-lg">
+                      {timeOptions.map((time) => {
+                        const displayTime = new Date(`2000-01-01T${time}`).toLocaleTimeString('en-US', {
+                          hour: 'numeric',
+                          minute: '2-digit',
+                          hour12: true
+                        });
+                        return (
+                          <button
+                            key={time}
+                            onClick={() => {
+                              setSelectedStartTime(time);
+                              setShowTimeDropdown(false);
+                              handleStartTimeSelect(time, selectedGoal || 10);
+                            }}
+                            className="w-full px-6 py-3 text-left text-base text-slate-700 hover:bg-blue-50 transition-colors border-b border-slate-100 last:border-b-0"
+                          >
+                            {displayTime}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+                <p className="mt-6 text-center text-xs text-slate-400">
+                  We'll remind you to practice at this time each day.
                 </p>
               </div>
             </div>
