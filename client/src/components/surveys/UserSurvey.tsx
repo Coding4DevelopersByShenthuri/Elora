@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { useAuth } from '@/contexts/AuthContext';
 import SurveyProgress from '@/components/surveys/SurveyProgress';
 
 export interface SurveyData {
@@ -8,6 +7,9 @@ export interface SurveyData {
   nativeLanguage?: string;
   englishLevel?: string;
   learningPurpose?: string[];
+  interests?: string[];
+  practiceGoalMinutes?: number;
+  personalizationCompleted?: boolean;
   completedAt: string;
 }
 
@@ -55,7 +57,6 @@ const ageOptions = [
 const UserSurvey: React.FC<UserSurveyProps> = ({ isOpen, onComplete, currentStep = 1, totalSteps = 10 }) => {
   const [selectedAge, setSelectedAge] = useState<string | null>(null);
   const [shouldAnimate, setShouldAnimate] = useState(false);
-  const { updateUserSurveyData } = useAuth();
 
   // Trigger animation when component mounts or isOpen changes
   React.useEffect(() => {
@@ -75,8 +76,11 @@ const UserSurvey: React.FC<UserSurveyProps> = ({ isOpen, onComplete, currentStep
       ageRange: ageId,
       completedAt: new Date().toISOString()
     };
-    // Save step 1 (user/age) response to MySQL
-    updateUserSurveyData(surveyData, 'user', 1);
+    // Save to sessionStorage only (not MySQL) during steps 1-16
+    const existingData = sessionStorage.getItem('speakbee_survey_data');
+    const allData = existingData ? JSON.parse(existingData) : {};
+    const mergedData = { ...allData, ...surveyData };
+    sessionStorage.setItem('speakbee_survey_data', JSON.stringify(mergedData));
     onComplete(surveyData);
   };
 

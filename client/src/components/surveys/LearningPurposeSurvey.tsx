@@ -24,7 +24,6 @@ const PURPOSE_OPTIONS = [
 ];
 
 const LearningPurposeSurvey: React.FC<LearningPurposeSurveyProps> = ({ isOpen, onComplete, onBack, currentStep = 1, totalSteps = 3 }) => {
-	const { updateUserSurveyData } = useAuth();
 	const [selectedPurposes, setSelectedPurposes] = React.useState<string[]>([]);
 	const [shouldBounce, setShouldBounce] = React.useState(false);
 
@@ -49,8 +48,11 @@ const LearningPurposeSurvey: React.FC<LearningPurposeSurveyProps> = ({ isOpen, o
 			learningPurpose: selectedPurposes,
 			completedAt: new Date().toISOString()
 		};
-		// Save step 4 (learningPurpose) response to MySQL
-		updateUserSurveyData(surveyData as any, 'learningPurpose', 4);
+		// Save to sessionStorage only (not MySQL) during steps 1-16
+		const existingData = sessionStorage.getItem('speakbee_survey_data');
+		const allData = existingData ? JSON.parse(existingData) : {};
+		const mergedData = { ...allData, ...surveyData };
+		sessionStorage.setItem('speakbee_survey_data', JSON.stringify(mergedData));
 		onComplete(surveyData);
 	};
 

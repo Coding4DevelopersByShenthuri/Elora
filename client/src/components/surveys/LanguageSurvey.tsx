@@ -20,7 +20,6 @@ const languages = [
 const LanguageSurvey: React.FC<LanguageSurveyProps> = ({ isOpen, onComplete, onBack, currentStep = 2, totalSteps = 10 }) => {
   const [selectedLanguage, setSelectedLanguage] = React.useState<string>('');
   const [shouldAnimate, setShouldAnimate] = React.useState(false);
-  const { updateUserSurveyData } = useAuth();
 
   // Trigger animation when component mounts or isOpen changes
   React.useEffect(() => {
@@ -40,8 +39,11 @@ const LanguageSurvey: React.FC<LanguageSurveyProps> = ({ isOpen, onComplete, onB
       nativeLanguage: selectedLanguage,
       completedAt: new Date().toISOString()
     };
-    // Save step 2 (language) response to MySQL
-    updateUserSurveyData(surveyData, 'language', 2);
+    // Save to sessionStorage only (not MySQL) during steps 1-16
+    const existingData = sessionStorage.getItem('speakbee_survey_data');
+    const allData = existingData ? JSON.parse(existingData) : {};
+    const mergedData = { ...allData, ...surveyData };
+    sessionStorage.setItem('speakbee_survey_data', JSON.stringify(mergedData));
     onComplete(surveyData);
   };
 

@@ -27,7 +27,6 @@ const englishLevels = [
 const EnglishLevelSurvey: React.FC<EnglishLevelSurveyProps> = ({ isOpen, onComplete, onBack, currentStep = 3, totalSteps = 3 }) => {
   const [selectedLevel, setSelectedLevel] = React.useState<string>('');
   const [shouldAnimate, setShouldAnimate] = React.useState(false);
-  const { updateUserSurveyData } = useAuth();
 
   // Trigger animation when component mounts or isOpen changes
   React.useEffect(() => {
@@ -47,8 +46,11 @@ const EnglishLevelSurvey: React.FC<EnglishLevelSurveyProps> = ({ isOpen, onCompl
       englishLevel: levelId,
       completedAt: new Date().toISOString()
     };
-    // Save step 3 (englishLevel) response to MySQL
-    updateUserSurveyData(surveyData, 'englishLevel', 3);
+    // Save to sessionStorage only (not MySQL) during steps 1-16
+    const existingData = sessionStorage.getItem('speakbee_survey_data');
+    const allData = existingData ? JSON.parse(existingData) : {};
+    const mergedData = { ...allData, ...surveyData };
+    sessionStorage.setItem('speakbee_survey_data', JSON.stringify(mergedData));
     onComplete(surveyData);
   };
 

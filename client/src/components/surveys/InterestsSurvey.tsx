@@ -27,8 +27,6 @@ const InterestsSurvey: React.FC<InterestsSurveyProps> = ({
   const [bounce, setBounce] = React.useState(false);
   const [floatOn, setFloatOn] = React.useState(false);
   const [selected, setSelected] = React.useState<Set<string>>(new Set());
-  const { updateUserSurveyData } = useAuth();
-
   const toggle = React.useCallback((option: string) => {
     setSelected(prev => {
       const next = new Set(prev);
@@ -70,14 +68,17 @@ const InterestsSurvey: React.FC<InterestsSurveyProps> = ({
   }, [isOpen]);
 
   const handleContinue = React.useCallback(() => {
-    // Save step 16 (interests) response to MySQL
+    // Save to sessionStorage only (not MySQL) during steps 1-16
     const surveyData = {
       interests: Array.from(selected),
       completedAt: new Date().toISOString()
     };
-    updateUserSurveyData(surveyData as any, 'interests', 16);
+    const existingData = sessionStorage.getItem('speakbee_survey_data');
+    const allData = existingData ? JSON.parse(existingData) : {};
+    const mergedData = { ...allData, ...surveyData };
+    sessionStorage.setItem('speakbee_survey_data', JSON.stringify(mergedData));
     onComplete();
-  }, [onComplete, selected, updateUserSurveyData]);
+  }, [onComplete, selected]);
 
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
