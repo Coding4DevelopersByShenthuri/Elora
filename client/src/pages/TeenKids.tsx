@@ -287,44 +287,123 @@ const TeenKidsPage = () => {
     return ids;
   }, [enrolledStoryWordsDetailed, enrolledStoryPhrasesDetailed]);
 
-  const completedStoryIdSet = useMemo(() => new Set(completedStoryIds), [completedStoryIds]);
+  // Helper function to get internal story ID
+  const getInternalStoryId = useCallback((storyType: string): string => {
+    return TEEN_STORY_TYPE_TO_INTERNAL[storyType] || storyType;
+  }, []);
+
+  // Combine enrolled and completed stories for badge display
+  const allEnrolledStoryIds = useMemo(() => {
+    const combined = new Set<string>();
+    enrolledInternalStoryIds.forEach((id) => combined.add(id));
+    completedStoryIds.forEach((id) => {
+      // Convert completed story IDs (like 'teen-0') to internal IDs
+      const story = allTeenStories.find((s) => s.id === id);
+      if (story) {
+        const internalId = getInternalStoryId(story.type);
+        combined.add(internalId);
+      }
+    });
+    return combined;
+  }, [enrolledInternalStoryIds, completedStoryIds, getInternalStoryId]);
 
   const applyDashboard = useCallback(
-    (data: any) => {
+    (data: any, mergeMode: boolean = false) => {
       if (!data) return;
 
       const pointsFromPayload = data.points ?? data.progress?.points ?? 0;
       const streakFromPayload = data.streak ?? data.progress?.streak ?? 0;
-      setPoints(Number(pointsFromPayload) || 0);
-      setStreak(Number(streakFromPayload) || 0);
-
+      const pronunciationAttemptsFromPayload = Number(data.pronunciation_attempts ?? 0) || 0;
+      const vocabularyAttemptsFromPayload = Number(data.vocabulary_attempts ?? 0) || 0;
+      const gamesAttemptsFromPayload = Number(data.games_attempts ?? 0) || 0;
       const favoritesFromPayload = Array.isArray(data.favorites) ? data.favorites : [];
-      setFavorites(favoritesFromPayload);
-
-      setPronunciationAttempts(Number(data.pronunciation_attempts ?? 0) || 0);
-      setVocabularyAttempts(Number(data.vocabulary_attempts ?? 0) || 0);
-      setGamesAttempts(Number(data.games_attempts ?? 0) || 0);
-
       const completedIds = Array.isArray(data.completed_story_ids) ? data.completed_story_ids : [];
-      setCompletedStoryIds(completedIds);
 
-      const wordDetails = StoryWordsService.getWordsForStoryIds(completedIds).map((w) => ({
-        word: w.word,
-        hint: w.hint,
-        storyId: w.storyId,
-        storyTitle: w.storyTitle,
-      }));
-      setEnrolledStoryWordsDetailed(wordDetails);
+      if (mergeMode) {
+        // Merge mode: take maximum values to preserve local progress
+        setPoints((prev) => Math.max(prev, Number(pointsFromPayload) || 0));
+        setStreak((prev) => Math.max(prev, Number(streakFromPayload) || 0));
+        setPronunciationAttempts((prev) => Math.max(prev, pronunciationAttemptsFromPayload));
+        setVocabularyAttempts((prev) => Math.max(prev, vocabularyAttemptsFromPayload));
+        setGamesAttempts((prev) => Math.max(prev, gamesAttemptsFromPayload));
+        
+        // Merge favorites
+        setFavorites((prev) => {
+          const merged = new Set([...prev, ...favoritesFromPayload]);
+          return Array.from(merged);
+        });
 
-      const phraseDetails = StoryWordsService.getPhrasesForStoryIds(completedIds).map((p) => ({
-        phrase: p.phrase,
-        phonemes: p.phonemes,
-        storyId: p.storyId,
-        storyTitle: p.storyTitle,
-      }));
-      setEnrolledStoryPhrasesDetailed(phraseDetails);
+        // Merge completed story IDs
+        setCompletedStoryIds((prev) => {
+          const merged = new Set([...prev, ...completedIds]);
+          const mergedArray = Array.from(merged);
+          
+          // Convert merged story IDs to internal IDs for words/phrases
+          const internalStoryIds = mergedArray
+            .map((id: string) => {
+              const story = allTeenStories.find((s) => s.id === id);
+              return story ? getInternalStoryId(story.type) : null;
+            })
+            .filter((id: string | null): id is string => id !== null);
+
+          // Update words and phrases based on merged completed stories
+          const wordDetails = StoryWordsService.getWordsForStoryIds(internalStoryIds);
+          const phraseDetails = StoryWordsService.getPhrasesForStoryIds(internalStoryIds);
+          
+          setEnrolledStoryWordsDetailed((prevWords) => {
+            const existing = new Set(prevWords.map((w) => `${w.storyId}-${w.word}`));
+            const toAdd = wordDetails
+              .map((w) => ({ word: w.word, hint: w.hint, storyId: w.storyId, storyTitle: w.storyTitle }))
+              .filter((w) => !existing.has(`${w.storyId}-${w.word}`));
+            return [...prevWords, ...toAdd];
+          });
+          
+          setEnrolledStoryPhrasesDetailed((prevPhrases) => {
+            const existing = new Set(prevPhrases.map((p) => `${p.storyId}-${p.phrase}`));
+            const toAdd = phraseDetails
+              .map((p) => ({ phrase: p.phrase, phonemes: p.phonemes, storyId: p.storyId, storyTitle: p.storyTitle }))
+              .filter((p) => !existing.has(`${p.storyId}-${p.phrase}`));
+            return [...prevPhrases, ...toAdd];
+          });
+          
+          return mergedArray;
+        });
+      } else {
+        // Replace mode: use server data as source of truth
+        setPoints(Number(pointsFromPayload) || 0);
+        setStreak(Number(streakFromPayload) || 0);
+        setPronunciationAttempts(pronunciationAttemptsFromPayload);
+        setVocabularyAttempts(vocabularyAttemptsFromPayload);
+        setGamesAttempts(gamesAttemptsFromPayload);
+        setFavorites(favoritesFromPayload);
+        setCompletedStoryIds(completedIds);
+        
+        // Convert story IDs to internal IDs
+        const internalStoryIds = completedIds
+          .map((id: string) => {
+            const story = allTeenStories.find((s) => s.id === id);
+            return story ? getInternalStoryId(story.type) : null;
+          })
+          .filter((id: string | null): id is string => id !== null);
+
+        const wordDetails = StoryWordsService.getWordsForStoryIds(internalStoryIds).map((w) => ({
+          word: w.word,
+          hint: w.hint,
+          storyId: w.storyId,
+          storyTitle: w.storyTitle,
+        }));
+        setEnrolledStoryWordsDetailed(wordDetails);
+
+        const phraseDetails = StoryWordsService.getPhrasesForStoryIds(internalStoryIds).map((p) => ({
+          phrase: p.phrase,
+          phonemes: p.phonemes,
+          storyId: p.storyId,
+          storyTitle: p.storyTitle,
+        }));
+        setEnrolledStoryPhrasesDetailed(phraseDetails);
+      }
     },
-    []
+    [getInternalStoryId]
   );
 
   const callTeenApi = useCallback(
@@ -555,10 +634,6 @@ const TeenKidsPage = () => {
     { id: 'games', label: 'Challenge Arena', emoji: '🏆' },
   ];
 
-  const getInternalStoryId = (storyType: string): string => {
-    return TEEN_STORY_TYPE_TO_INTERNAL[storyType] || storyType;
-  };
-
   const openStoryModal = (storyType: keyof typeof TEEN_STORY_TYPE_TO_INTERNAL) => {
     switch (storyType) {
       case 'mystery':
@@ -694,14 +769,75 @@ const TeenKidsPage = () => {
     const story = allTeenStories.find((s) => s.id === storyId);
     if (!story) return;
 
-    await callTeenApi((token) =>
-      TeenApi.completeStory(token, {
-        storyId,
-        storyTitle: story.title,
-        storyType: story.type,
-        score,
-      })
-    );
+    // Immediately mark story as completed locally for instant badge display
+    const internalId = getInternalStoryId(story.type);
+    
+    // Add to completed story IDs immediately (this triggers badge display)
+    setCompletedStoryIds((prev) => {
+      if (!prev.includes(storyId)) {
+        return [...prev, storyId];
+      }
+      return prev;
+    });
+
+    // Immediately update enrolled words and phrases from the completed story
+    const newWords = StoryWordsService.getWordsForStoryIds([internalId]);
+    const newPhrases = StoryWordsService.getPhrasesForStoryIds([internalId]);
+
+    // Update enrolled words and phrases immediately
+    setEnrolledStoryWordsDetailed((prev) => {
+      const existing = new Set(prev.map((w) => `${w.storyId}-${w.word}`));
+      const toAdd = newWords
+        .map((w) => ({ word: w.word, hint: w.hint, storyId: w.storyId, storyTitle: w.storyTitle }))
+        .filter((w) => !existing.has(`${w.storyId}-${w.word}`));
+      return [...prev, ...toAdd];
+    });
+
+    setEnrolledStoryPhrasesDetailed((prev) => {
+      const existing = new Set(prev.map((p) => `${p.storyId}-${p.phrase}`));
+      const toAdd = newPhrases
+        .map((p) => ({ phrase: p.phrase, phonemes: p.phonemes, storyId: p.storyId, storyTitle: p.storyTitle }))
+        .filter((p) => !existing.has(`${p.storyId}-${p.phrase}`));
+      return [...prev, ...toAdd];
+    });
+
+    // Call API to sync with server and update points
+    try {
+      const token = localStorage.getItem('speakbee_auth_token');
+      if (token && token !== 'local-token') {
+        const response = await TeenApi.completeStory(token, {
+          storyId,
+          storyTitle: story.title,
+          storyType: story.type,
+          score,
+        });
+        
+        // Update points immediately from API response (points already include the reward)
+        if (response && typeof response === 'object' && 'points' in response) {
+          const pointsValue = (response as any).points;
+          if (pointsValue !== undefined) {
+            setPoints(Number(pointsValue) || 0);
+          }
+        }
+        
+        // Refresh dashboard after a short delay to sync server state
+        // Use merge mode to preserve our immediate updates and get latest server data
+        setTimeout(async () => {
+          try {
+            const dashboardData = await TeenApi.getDashboard(token);
+            if (dashboardData) {
+              // Merge server data with our immediate updates (preserves badge and points)
+              applyDashboard(dashboardData, true);
+            }
+          } catch (error) {
+            console.error('Error refreshing dashboard after completion:', error);
+          }
+        }, 1500);
+      }
+    } catch (error) {
+      console.error('Error completing story:', error);
+      // State is already updated locally, so badge will still show
+    }
   };
 
   const awardEngagementPoints = async (delta: number, source: string, options?: { incrementGames?: boolean }) => {
@@ -918,7 +1054,8 @@ const TeenKidsPage = () => {
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {paginatedStories.map((story) => {
                   const internalId = getInternalStoryId(story.type);
-                  const isEnrolled = enrolledInternalStoryIds.has(internalId) || completedStoryIdSet.has(internalId);
+                  // Check if enrolled: either through words/phrases (internal ID) OR through completed story IDs
+                  const isEnrolled = enrolledInternalStoryIds.has(internalId) || completedStoryIds.includes(story.id) || allEnrolledStoryIds.has(internalId);
                 const CharacterIcon = story.character;
                 return (
                     <Card key={story.id} className="flex h-full flex-col overflow-hidden border border-muted shadow-sm transition hover:shadow-lg">

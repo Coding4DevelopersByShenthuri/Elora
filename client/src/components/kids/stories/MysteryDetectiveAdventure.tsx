@@ -604,14 +604,8 @@ const MysteryDetectiveAdventure = ({ onClose, onComplete }: Props) => {
     // Calculate time spent on this question
     const questionTime = Math.round((Date.now() - questionStartTime) / 1000);
     
-    // Check if choice is correct
-    // For true/false questions, check if choice text contains the audioText
-    let isCorrect = false;
-    if ((current as any).questionType === 'true-false') {
-      isCorrect = choice === 'True - Body language can reveal deception';
-    } else {
-      isCorrect = choice === (current as any).audioText;
-    }
+    // Check if choice is correct by comparing with audioText
+    const isCorrect = choice === (current as any).audioText;
     
     // Record attempt in analytics
     if (currentSession && current.listeningFirst) {
@@ -1207,9 +1201,7 @@ const MysteryDetectiveAdventure = ({ onClose, onComplete }: Props) => {
                     <div className="grid grid-cols-1 gap-2.5 sm:gap-2 md:gap-3 justify-center">
                       {(shuffledChoices || (current as any).choices).map((choice: any, idx: number) => {
                         const isSelected = selectedChoice === choice.text;
-                        const isCorrect = (current as any).questionType === 'true-false' 
-                          ? choice.text === 'True - Body language can reveal deception'
-                          : choice.text === (current as any).audioText;
+                        const isCorrect = choice.text === (current as any).audioText;
                         const showResult = showFeedback && isSelected;
                         
                         return (
@@ -1242,9 +1234,7 @@ const MysteryDetectiveAdventure = ({ onClose, onComplete }: Props) => {
                   {/* Feedback */}
                   {showFeedback && (
                     <div className="mt-2 sm:mt-3 animate-fade-in">
-                      {((current as any).questionType === 'true-false' 
-                          ? selectedChoice === 'True - Body language can reveal deception'
-                          : selectedChoice === (current as any).audioText) ? (
+                      {selectedChoice === (current as any).audioText ? (
                         <div className="text-green-600 dark:text-green-400 text-xs sm:text-sm md:text-base font-bold animate-bounce bg-green-50 dark:bg-green-900/20 rounded-lg sm:rounded-lg md:rounded-xl p-2.5 sm:p-2 md:p-3 border border-green-200 dark:border-green-700">
                           {getCorrectFeedback()}
                           {attemptCount === 0 && (
@@ -1520,9 +1510,7 @@ const MysteryDetectiveAdventure = ({ onClose, onComplete }: Props) => {
                     <div className="grid grid-cols-1 gap-1.5">
                       {(shuffledChoices || (current as any).choices).map((choice: any, idx: number) => {
                         const isSelected = selectedChoice === choice.text;
-                        const isCorrect = (current as any).questionType === 'true-false' 
-                          ? choice.text === 'True - Body language can reveal deception'
-                          : choice.text === (current as any).audioText;
+                        const isCorrect = choice.text === (current as any).audioText;
                         const showResult = showFeedback && isSelected;
                         
                         return (
@@ -1554,9 +1542,7 @@ const MysteryDetectiveAdventure = ({ onClose, onComplete }: Props) => {
 
                   {showFeedback && (
                     <div className="mt-1.5 animate-fade-in relative z-10">
-                      {((current as any).questionType === 'true-false' 
-                          ? selectedChoice === 'True - Body language can reveal deception'
-                          : selectedChoice === (current as any).audioText) ? (
+                      {selectedChoice === (current as any).audioText ? (
                         <div className="text-green-600 dark:text-green-400 text-xs md:text-sm font-bold bg-green-50 dark:bg-green-900/20 rounded-lg p-2 border-2 border-green-400 shadow-sm">
                           {getCorrectFeedback()}
                           {attemptCount === 0 && (

@@ -1389,6 +1389,7 @@ def _get_or_create_teen_progress(user, for_update: bool = False) -> TeenProgress
 
 
 def _update_teen_streak(progress: TeenProgress) -> int:
+    """Update teen engagement streak based on last engagement date."""
     today = timezone.now().date()
     if progress.last_engagement == today:
         return progress.streak
@@ -1401,6 +1402,23 @@ def _update_teen_streak(progress: TeenProgress) -> int:
 
     progress.last_engagement = today
     return progress.streak
+
+
+def _parse_score(score_value) -> float:
+    """Parse and validate score value, returning 0 if invalid."""
+    try:
+        return float(score_value)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def _parse_points(points_value, default: int = 0) -> int:
+    """Parse and validate points value, returning default if invalid."""
+    try:
+        parsed = int(points_value)
+        return max(0, parsed) if parsed else default
+    except (TypeError, ValueError):
+        return default
 
 
 def _sync_teen_achievements(user, progress: TeenProgress, favorites_count: int):
@@ -1554,6 +1572,7 @@ def teen_story_start(request):
             }
         )
 
+        # Update story progress fields (always update for data consistency)
         story_progress.story_title = story_title
         story_progress.story_type = story_type
         story_progress.status = 'started'
@@ -1586,11 +1605,7 @@ def teen_story_complete(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    try:
-        score = float(score)
-    except (TypeError, ValueError):
-        score = 0
-
+    score = _parse_score(score)
     base_points = max(0, round(score / 8))
     completion_bonus = 60
     points_to_add = base_points + completion_bonus
@@ -1608,6 +1623,7 @@ def teen_story_complete(request):
             }
         )
 
+        # Update story progress fields (always update for data consistency)
         story_progress.story_title = story_title
         story_progress.story_type = story_type
         story_progress.status = 'completed'
@@ -1637,12 +1653,8 @@ def teen_vocabulary_practice(request):
     if not word:
         return Response({'message': 'word is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-    try:
-        score = float(score)
-    except (TypeError, ValueError):
-        score = 0
-
-    points_awarded = max(0, int(request.data.get('points_awarded', 25))) or 25
+    score = _parse_score(score)
+    points_awarded = _parse_points(request.data.get('points_awarded', 25), default=25)
 
     with transaction.atomic():
         progress = _get_or_create_teen_progress(request.user, for_update=True)
@@ -1657,6 +1669,7 @@ def teen_vocabulary_practice(request):
             }
         )
 
+        # Update practice record (always update for data consistency)
         practice.story_id = story_id
         practice.story_title = story_title
         practice.attempts = (practice.attempts or 0) + 1
@@ -1664,6 +1677,7 @@ def teen_vocabulary_practice(request):
         practice.last_practiced = timezone.now()
         practice.save()
 
+        # Update progress metrics
         progress.vocabulary_attempts = (progress.vocabulary_attempts or 0) + 1
         progress.points = max(0, (progress.points or 0) + points_awarded)
         _update_teen_streak(progress)
@@ -1685,12 +1699,8 @@ def teen_pronunciation_practice(request):
     if not phrase:
         return Response({'message': 'phrase is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-    try:
-        score = float(score)
-    except (TypeError, ValueError):
-        score = 0
-
-    points_awarded = max(0, int(request.data.get('points_awarded', 35))) or 35
+    score = _parse_score(score)
+    points_awarded = _parse_points(request.data.get('points_awarded', 35), default=35)
 
     with transaction.atomic():
         progress = _get_or_create_teen_progress(request.user, for_update=True)
@@ -1705,6 +1715,7 @@ def teen_pronunciation_practice(request):
             }
         )
 
+        # Update practice record (always update for data consistency)
         practice.story_id = story_id
         practice.story_title = story_title
         practice.attempts = (practice.attempts or 0) + 1
@@ -1712,6 +1723,7 @@ def teen_pronunciation_practice(request):
         practice.last_practiced = timezone.now()
         practice.save()
 
+        # Update progress metrics
         progress.pronunciation_attempts = (progress.pronunciation_attempts or 0) + 1
         progress.points = max(0, (progress.points or 0) + points_awarded)
         _update_teen_streak(progress)
@@ -1763,10 +1775,7 @@ def teen_quick_action(request):
     if delta_points is None:
         delta_points = default_points_map.get(action, 0)
 
-    try:
-        delta_points = int(delta_points)
-    except (TypeError, ValueError):
-        delta_points = 0
+    delta_points = _parse_points(delta_points, default=0)
 
     with transaction.atomic():
         progress = _get_or_create_teen_progress(request.user, for_update=True)
