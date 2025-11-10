@@ -15,6 +15,7 @@ const INTERMEDIATE_WORDS: string[] = [
   'argument','explain','neighbor','opportunity','knowledge','relationship','challenge','prepare','disappointment','concentrate','compromise','creative','recommendation','responsibility','confident','decision','solution','environment','experience','ability','advantage','difference','education','encourage','discover','improvement','influence','opinion','behavior','communication','achievement','support','community','technology','tradition','competition','direction','security','exercise','transport'
 ];
 
+
 const IntermediateVocabularySurvey: React.FC<IntermediateVocabularySurveyProps> = ({
   isOpen,
   onComplete,
@@ -85,7 +86,11 @@ const IntermediateVocabularySurvey: React.FC<IntermediateVocabularySurveyProps> 
 
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
-      <DialogContent className="w-full h-full max-w-none max-h-none p-0 overflow-hidden border-0 bg-transparent m-0 rounded-none">
+      <DialogContent 
+        className="w-full h-full max-w-none max-h-none p-0 overflow-hidden border-0 bg-transparent m-0 rounded-none z-[9999]"
+        title="Intermediate Vocabulary Survey"
+        description="Select intermediate vocabulary words"
+      >
         <div className="w-full h-screen bg-white flex flex-col md:flex-row relative">
           {/* Mobile layout */}
           <div className="md:hidden w-full h-full flex flex-col">
@@ -113,16 +118,17 @@ const IntermediateVocabularySurvey: React.FC<IntermediateVocabularySurveyProps> 
 
                 <div className="max-w-xl mx-auto w-full">
                   {mobileRows.map((row, idx) => (
-                    <div key={idx} className={`${idx === 0 || idx === 2 || idx === 3 || idx === 4 || idx === 5 || idx === 7 || idx === 8 ? 'grid grid-cols-3' : 'grid grid-cols-4'} gap-y-0.5 gap-x-1.5 ${idx > 0 ? 'mt-0.5' : ''} justify-items-center`}>
+                    <div key={idx} className={`flex flex-wrap justify-center gap-2 ${idx > 0 ? 'mt-2' : ''}`}>
                       {row.map((w) => {
                         const isSelected = selectedWords.has(w);
                         return (
                           <button
                             key={w}
                             onClick={() => toggleWord(w)}
-                            className={`rounded-2xl h-12 px-2 text-sm border transition-colors min-w-0 w-[108px] flex items-center justify-between gap-1 ${isSelected ? 'bg-yellow-400 text-gray-900 border-yellow-400' : 'bg-white text-gray-800 border-gray-200 hover:border-blue-300'}`}
+                            className={`rounded-2xl min-h-[48px] px-3 py-2 text-sm border transition-colors flex items-center justify-between gap-2 flex-shrink-0 ${isSelected ? 'bg-yellow-400 text-gray-900 border-yellow-400' : 'bg-white text-gray-800 border-gray-200 hover:border-blue-300'}`}
+                            style={{ minWidth: 'fit-content', maxWidth: '100%' }}
                           >
-                            <span className="truncate">{w}</span>
+                            <span className="text-left break-words whitespace-normal leading-tight">{w}</span>
                             <span className={`flex-shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full border transition-colors ${isSelected ? 'bg-white border-yellow-500' : 'bg-white border-gray-300'}`}>
                               {isSelected && (
                                 <svg viewBox="0 0 20 20" className="w-3.5 h-3.5 text-green-600" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -167,16 +173,17 @@ const IntermediateVocabularySurvey: React.FC<IntermediateVocabularySurveyProps> 
                 <p className="text-gray-500 text-center mb-6">B1-B2 Intermediate Level</p>
 
                 <div className="mt-2 max-h-[360px] overflow-y-auto pr-2">
-                  <div className="grid grid-cols-4 gap-2">
+                  <div className="flex flex-wrap gap-3 justify-center">
                     {firstTwelve.map((w) => {
                       const isSelected = selectedWords.has(w);
                       return (
                         <button
                           key={w}
                           onClick={() => toggleWord(w)}
-                          className={`rounded-2xl h-12 px-3 text-[15px] border transition-colors min-w-0 w-full max-w-[160px] justify-self-center flex items-center justify-between gap-2 ${isSelected ? 'bg-yellow-400 text-gray-900 border-yellow-400' : 'bg-white text-gray-900 border-gray-200 hover:border-blue-300'}`}
+                          className={`rounded-2xl min-h-[48px] px-4 py-2.5 text-sm border transition-colors flex items-center justify-center gap-2 flex-shrink-0 ${isSelected ? 'bg-yellow-400 text-gray-900 border-yellow-400' : 'bg-white text-gray-900 border-gray-200 hover:border-blue-300'}`}
+                          style={{ minWidth: 'fit-content', maxWidth: '280px' }}
                         >
-                          <span className="truncate">{w}</span>
+                          <span className="text-center break-words whitespace-normal leading-tight">{w}</span>
                           <span className={`flex-shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full border transition-colors ${isSelected ? 'bg-white border-yellow-500' : 'bg-white border-gray-300'}`}>
                             {isSelected && (
                               <svg viewBox="0 0 20 20" className="w-3.5 h-3.5 text-green-600" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -190,16 +197,17 @@ const IntermediateVocabularySurvey: React.FC<IntermediateVocabularySurveyProps> 
                   </div>
 
                   {/* 4th row centered for desktop */}
-                  <div className="mt-2 flex justify-center gap-2">
+                  <div className="mt-3 flex flex-wrap justify-center gap-3">
                     {fourthRow.map((w) => {
                       const isSelected = selectedWords.has(w);
                       return (
                         <button
                           key={w}
                           onClick={() => toggleWord(w)}
-                          className={`rounded-2xl h-12 px-3 text-[15px] border transition-colors min-w-0 w-full max-w-[160px] flex items-center justify-between gap-2 ${isSelected ? 'bg-yellow-400 text-gray-900 border-yellow-400' : 'bg-white text-gray-900 border-gray-200 hover:border-blue-300'}`}
+                          className={`rounded-2xl min-h-[48px] px-4 py-2.5 text-sm border transition-colors flex items-center justify-center gap-2 flex-shrink-0 ${isSelected ? 'bg-yellow-400 text-gray-900 border-yellow-400' : 'bg-white text-gray-900 border-gray-200 hover:border-blue-300'}`}
+                          style={{ minWidth: 'fit-content', maxWidth: '280px' }}
                         >
-                          <span className="truncate">{w}</span>
+                          <span className="text-center break-words whitespace-normal leading-tight">{w}</span>
                           <span className={`flex-shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full border transition-colors ${isSelected ? 'bg-white border-yellow-500' : 'bg-white border-gray-300'}`}>
                             {isSelected && (
                               <svg viewBox="0 0 20 20" className="w-3.5 h-3.5 text-green-600" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -213,17 +221,18 @@ const IntermediateVocabularySurvey: React.FC<IntermediateVocabularySurveyProps> 
                   </div>
 
                   {/* Remaining words below */}
-                  <div className="mt-2">
-                    <div className="grid grid-cols-4 gap-2">
+                  <div className="mt-3">
+                    <div className="flex flex-wrap gap-3 justify-center">
                       {remainingFullRows.map((w) => {
                         const isSelected = selectedWords.has(w);
                         return (
                           <button
                             key={w}
                             onClick={() => toggleWord(w)}
-                            className={`rounded-2xl h-12 px-3 text-[15px] border transition-colors min-w-0 w-full max-w-[160px] justify-self-center flex items-center justify-between gap-2 ${isSelected ? 'bg-yellow-400 text-gray-900 border-yellow-400' : 'bg-white text-gray-900 border-gray-200 hover:border-blue-300'}`}
+                            className={`rounded-2xl min-h-[48px] px-4 py-2.5 text-sm border transition-colors flex items-center justify-center gap-2 flex-shrink-0 ${isSelected ? 'bg-yellow-400 text-gray-900 border-yellow-400' : 'bg-white text-gray-900 border-gray-200 hover:border-blue-300'}`}
+                            style={{ minWidth: 'fit-content', maxWidth: '280px' }}
                           >
-                            <span className="truncate">{w}</span>
+                            <span className="text-center break-words whitespace-normal leading-tight">{w}</span>
                             <span className={`flex-shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full border transition-colors ${isSelected ? 'bg-white border-yellow-500' : 'bg-white border-gray-300'}`}>
                               {isSelected && (
                                 <svg viewBox="0 0 20 20" className="w-3.5 h-3.5 text-green-600" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -236,16 +245,17 @@ const IntermediateVocabularySurvey: React.FC<IntermediateVocabularySurveyProps> 
                       })}
                     </div>
                     {remainingLastRow.length > 0 && (
-                      <div className="mt-2 flex justify-center gap-2">
+                      <div className="mt-3 flex flex-wrap justify-center gap-3">
                         {remainingLastRow.map((w) => {
                           const isSelected = selectedWords.has(w);
                           return (
                             <button
                               key={w}
                               onClick={() => toggleWord(w)}
-                              className={`rounded-2xl h-12 px-3 text-[15px] border transition-colors min-w-0 w-full max-w-[160px] flex items-center justify-between gap-2 ${isSelected ? 'bg-yellow-400 text-gray-900 border-yellow-400' : 'bg-white text-gray-900 border-gray-200 hover:border-blue-300'}`}
+                              className={`rounded-2xl min-h-[48px] px-4 py-2.5 text-sm border transition-colors flex items-center justify-center gap-2 flex-shrink-0 ${isSelected ? 'bg-yellow-400 text-gray-900 border-yellow-400' : 'bg-white text-gray-900 border-gray-200 hover:border-blue-300'}`}
+                              style={{ minWidth: 'fit-content', maxWidth: '280px' }}
                             >
-                              <span className="truncate">{w}</span>
+                              <span className="text-center break-words whitespace-normal leading-tight">{w}</span>
                               <span className={`flex-shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full border transition-colors ${isSelected ? 'bg-white border-yellow-500' : 'bg-white border-gray-300'}`}>
                                 {isSelected && (
                                   <svg viewBox="0 0 20 20" className="w-3.5 h-3.5 text-green-600" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

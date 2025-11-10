@@ -38,9 +38,22 @@ const AimSurvey: React.FC<AimSurveyProps> = ({
     onComplete();
   };
 
+  // Debug: Log when dialog opens/closes
+  React.useEffect(() => {
+    if (isOpen) {
+      console.log('✅ AimSurvey (Step 6) is now OPEN');
+    } else {
+      console.log('❌ AimSurvey (Step 6) is now CLOSED');
+    }
+  }, [isOpen]);
+
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
-      <DialogContent className="w-full h-full max-w-none max-h-none p-0 overflow-hidden border-0 bg-transparent m-0 rounded-none">
+      <DialogContent 
+        className="w-full h-full max-w-none max-h-none p-0 overflow-hidden border-0 bg-transparent m-0 rounded-none z-[9999]"
+        title="Aim Survey"
+        description="Select your learning aim"
+      >
         <div className="w-full h-screen bg-white flex flex-col md:flex-row relative">
           {/* Mobile layout */}
           <div className="md:hidden w-full h-full flex flex-col">

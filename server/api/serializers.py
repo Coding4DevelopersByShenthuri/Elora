@@ -10,7 +10,7 @@ from .models import (
     KidsVocabularyPractice, KidsPronunciationPractice, KidsGameSession,
     ParentalControlSettings, TeenProgress, TeenStoryProgress,
     TeenVocabularyPractice, TeenPronunciationPractice, TeenFavorite,
-    TeenAchievement
+    TeenAchievement, TeenGameSession, TeenCertificate
 )
 from django.contrib.auth.password_validation import validate_password
 
@@ -326,6 +326,28 @@ class TeenAchievementSerializer(serializers.ModelSerializer):
         model = TeenAchievement
         fields = ['id', 'user_id', 'key', 'progress', 'unlocked', 'unlocked_at', 'updated_at']
         read_only_fields = ['unlocked_at', 'updated_at']
+
+
+class TeenGameSessionSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+
+    class Meta:
+        model = TeenGameSession
+        fields = [
+            'id', 'user_id', 'game_type', 'game_title', 'score', 'points_earned',
+            'rounds', 'difficulty', 'duration_seconds', 'completed', 'details',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['created_at', 'updated_at']
+
+
+class TeenCertificateSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+
+    class Meta:
+        model = TeenCertificate
+        fields = ['id', 'user_id', 'cert_id', 'title', 'file_url', 'issued_at']
+        read_only_fields = ['issued_at']
 
 
 # ============= Kids Serializers (Keep existing) =============

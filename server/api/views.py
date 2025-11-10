@@ -39,7 +39,7 @@ from .serializers import (
     KidsVocabularyPracticeSerializer, KidsPronunciationPracticeSerializer, KidsGameSessionSerializer,
     ParentalControlSettingsSerializer, TeenProgressSerializer, TeenStoryProgressSerializer,
     TeenVocabularyPracticeSerializer, TeenPronunciationPracticeSerializer, TeenFavoriteSerializer,
-    TeenAchievementSerializer
+    TeenAchievementSerializer, TeenGameSessionSerializer, TeenCertificateSerializer
 )
 from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
@@ -51,7 +51,7 @@ from .models import (
     KidsVocabularyPractice, KidsPronunciationPractice, KidsGameSession,
     ParentalControlSettings, TeenProgress, TeenStoryProgress,
     TeenVocabularyPractice, TeenPronunciationPractice, TeenFavorite,
-    TeenAchievement
+    TeenAchievement, TeenGameSession, TeenCertificate
 )
 
 logger = logging.getLogger(__name__)
@@ -1580,14 +1580,13 @@ def teen_story_start(request):
         story_progress.last_started_at = timezone.now()
         story_progress.save()
 
-        points_awarded = 50
-        progress.points = max(0, (progress.points or 0) + points_awarded)
+        # No points awarded for starting - points only come from completing stories, vocabulary, and pronunciation practice
         progress.missions_started = (progress.missions_started or 0) + 1
         _update_teen_streak(progress)
         progress.save()
 
     payload = _build_teen_dashboard_payload(request.user)
-    payload['reward'] = {'points_awarded': points_awarded}
+    payload['reward'] = {'points_awarded': 0}
     return Response(payload, status=status.HTTP_200_OK)
 
 
@@ -1765,30 +1764,98 @@ def teen_quick_action(request):
     delta_points = request.data.get('delta_points')
     increment_games = request.data.get('increment_games', False)
 
-    default_points_map = {
-        'quick-listen': 10,
-        'quick-speak': 10,
-        'quick-favorites': 5,
-        'teen-game': 40,
-    }
-
-    if delta_points is None:
-        delta_points = default_points_map.get(action, 0)
-
-    delta_points = _parse_points(delta_points, default=0)
+    # No points awarded for quick actions - points only come from completing stories, vocabulary, and pronunciation practice
+    # Quick actions are just navigation/engagement tracking, not actual practice
+    delta_points = 0
 
     with transaction.atomic():
         progress = _get_or_create_teen_progress(request.user, for_update=True)
-        if delta_points:
-            progress.points = max(0, (progress.points or 0) + delta_points)
         if increment_games:
             progress.games_attempts = (progress.games_attempts or 0) + 1
         _update_teen_streak(progress)
         progress.save()
 
     payload = _build_teen_dashboard_payload(request.user)
-    payload['reward'] = {'points_awarded': delta_points}
+    payload['reward'] = {'points_awarded': 0}
     return Response(payload, status=status.HTTP_200_OK)
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def teen_game_session(request):
+    """Get or record a teen game session"""
+    if request.method == 'GET':
+        # Get all game sessions for the user
+        sessions = TeenGameSession.objects.filter(user=request.user).order_by('-created_at')
+        serializer = TeenGameSessionSerializer(sessions, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    # POST - Record a game session
+    game_type = request.data.get('game_type')
+    game_title = request.data.get('game_title', '')
+    score = request.data.get('score', 0)
+    points_earned = request.data.get('points_earned', 0)
+    rounds = request.data.get('rounds', 0)
+    difficulty = request.data.get('difficulty', 'beginner')
+    duration_seconds = request.data.get('duration_seconds', 0)
+    completed = request.data.get('completed', False)
+    details = request.data.get('details', {})
+    
+    if not game_type:
+        return Response(
+            {"message": "game_type is required"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    session = TeenGameSession.objects.create(
+        user=request.user,
+        game_type=game_type,
+        game_title=game_title,
+        score=score,
+        points_earned=points_earned,
+        rounds=rounds,
+        difficulty=difficulty,
+        duration_seconds=duration_seconds,
+        completed=completed,
+        details=details
+    )
+    
+    serializer = TeenGameSessionSerializer(session)
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def teen_issue_certificate(request):
+    """Issue a certificate for teen user"""
+    cert_id = request.data.get('cert_id')
+    title = request.data.get('title', '')
+    file_url = request.data.get('file_url', '')
+    
+    if not cert_id:
+        return Response(
+            {"message": "cert_id is required"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    obj, _ = TeenCertificate.objects.get_or_create(
+        user=request.user,
+        cert_id=cert_id,
+        defaults={
+            'title': title,
+            'file_url': file_url,
+        }
+    )
+    
+    return Response(TeenCertificateSerializer(obj).data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def teen_my_certificates(request):
+    """Get all certificates for teen user"""
+    qs = TeenCertificate.objects.filter(user=request.user).order_by('-issued_at')
+    return Response(TeenCertificateSerializer(qs, many=True).data)
 
 
 # ============= Kids Endpoints (Keep existing) =============

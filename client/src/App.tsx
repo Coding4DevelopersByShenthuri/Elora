@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
@@ -155,9 +155,43 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+// ✅ Helper function to determine learning page based on survey responses
+const getLearningPageFromSurvey = (surveyData: any): string => {
+  const ageRange = surveyData?.ageRange;
+  const englishLevel = surveyData?.englishLevel;
+  const learningPurpose = surveyData?.learningPurpose || [];
+
+  // If user is a kid (age 4-17), redirect to kids page
+  if (ageRange === '4-17') {
+    return '/kids';
+  }
+
+  // If learning purpose includes IELTS/PTE exam preparation, redirect to IELTS/PTE page
+  if (Array.isArray(learningPurpose) && learningPurpose.includes('Exam preparation (IELTS / PTE)')) {
+    return '/ielts-pte';
+  }
+
+  // For adults, determine level based on English proficiency
+  if (englishLevel) {
+    if (englishLevel === 'beginner' || englishLevel === 'pre-intermediate') {
+      return '/adults/beginners';
+    }
+    if (englishLevel === 'intermediate' || englishLevel === 'upper-intermediate') {
+      return '/adults/intermediates';
+    }
+    if (englishLevel === 'advanced' || englishLevel === 'proficient') {
+      return '/adults/advanced';
+    }
+  }
+
+  // Default fallback for adults
+  return '/adults';
+};
+
 // ✅ Route Definitions
 const AppRoutes = () => {
   const { updateUserSurveyData, syncWithServer, user, isOnline } = useAuth();
+  const navigate = useNavigate();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   
   // Helper function to save survey step to MySQL database
@@ -180,6 +214,42 @@ const AppRoutes = () => {
   };
   const [isSurveyOpen, setIsSurveyOpen] = useState(false);
   const [isLanguageSurveyOpen, setIsLanguageSurveyOpen] = useState(false);
+  const [surveyInProgress, setSurveyInProgress] = useState(false);
+  
+  // Debug: Track when survey states change
+  useEffect(() => {
+    if (isSurveyOpen) {
+      console.log('✅ isSurveyOpen = TRUE - Step 1 should be visible');
+    }
+  }, [isSurveyOpen]);
+  
+  useEffect(() => {
+    if (isLanguageSurveyOpen) {
+      console.log('✅ isLanguageSurveyOpen = TRUE - Step 2 should be visible');
+    }
+  }, [isLanguageSurveyOpen]);
+  
+  // Track survey progress state for overlay
+  useEffect(() => {
+    const checkProgress = () => {
+      const inProgress = sessionStorage.getItem('speakbee_survey_in_progress') === 'true';
+      setSurveyInProgress(inProgress);
+    };
+    
+    // Check initially
+    checkProgress();
+    
+    // Listen for storage changes (when other tabs/windows update)
+    window.addEventListener('storage', checkProgress);
+    
+    // Poll for changes (since storage event doesn't fire in same tab)
+    const interval = setInterval(checkProgress, 100);
+    
+    return () => {
+      window.removeEventListener('storage', checkProgress);
+      clearInterval(interval);
+    };
+  }, []);
   const [isLearningPurposeSurveyOpen, setIsLearningPurposeSurveyOpen] = useState(false);
   const [isEnglishLevelSurveyOpen, setIsEnglishLevelSurveyOpen] = useState(false);
   const [isSpeakOutSurveyOpen, setIsSpeakOutSurveyOpen] = useState(false);
@@ -476,19 +546,39 @@ const AppRoutes = () => {
       
       {/* Survey Manager - handles showing survey after login */}
       <SurveyManager onShowSurvey={() => {
+        console.log('📋 onShowSurvey callback called - setting isSurveyOpen to true');
         setIsSurveyOpen(true);
         // Mark survey as in progress when it first opens
         sessionStorage.setItem('speakbee_survey_in_progress', 'true');
         sessionStorage.setItem('speakbee_survey_step', 'user');
+        console.log('✅ isSurveyOpen set to true, sessionStorage updated');
       }} />
       
+      {/* Survey Overlay - Prevents blank page during transitions */}
+      {/* Keep overlay visible if ANY survey step is open OR if survey is in progress */}
+      {(() => {
+        const anySurveyOpen = isSurveyOpen || isLanguageSurveyOpen || isEnglishLevelSurveyOpen || 
+          isLearningPurposeSurveyOpen || isSpeakOutSurveyOpen || isAimSurveyOpen ||
+          isFluentUnderstandingSurveyOpen || isLimitedWordsSurveyOpen || 
+          isSentenceFormationSurveyOpen || isCantSpeakSurveyOpen || 
+          isNeedFluencySurveyOpen || isHelloSurveyOpen || isMoviesSurveyOpen ||
+          isVocabularySurveyOpen || isIntermediateVocabOpen || isAdvancedVocabOpen ||
+          isInterestsOpen || isPersonalizationOpen;
+        
+        // Show overlay if any survey is open OR if survey is in progress (during transitions)
+        if (anySurveyOpen || surveyInProgress) {
+          return <div className="fixed inset-0 z-[9998] bg-white pointer-events-none" />;
+        }
+        return null;
+      })()}
+
       {/* Global User Survey */}
       <UserSurvey 
         isOpen={isSurveyOpen}
         currentStep={1}
         totalSteps={17}
         onComplete={async (surveyData) => {
-          console.log('UserSurvey onComplete called, moving to step 2');
+          console.log('📝 UserSurvey onComplete called, moving to step 2');
           
           // Save step 1 data to backend (ageRange)
           await saveSurveyStepToBackend('user', 1, { ageRange: surveyData.ageRange });
@@ -497,23 +587,24 @@ const AppRoutes = () => {
           // This ensures the refresh detection logic knows survey is active
           sessionStorage.setItem('speakbee_survey_in_progress', 'true');
           sessionStorage.setItem('speakbee_survey_step', 'language');
-          console.log('SessionStorage flags set:', {
-            inProgress: sessionStorage.getItem('speakbee_survey_in_progress'),
-            step: sessionStorage.getItem('speakbee_survey_step')
-          });
+          setSurveyInProgress(true); // Update state for overlay
+          console.log('✅ SessionStorage flags set for step 2');
           
-          // Close current step first, then open next step after a brief delay
-          // This ensures the Dialog component properly closes before the next one opens
+          // Close current step first, then open next step
+          // This prevents Radix UI Dialog conflicts when both are open
+          console.log('🔒 Closing UserSurvey (step 1)...');
           setIsSurveyOpen(false);
-          console.log('Step 1 closed, opening step 2...');
-          // Use a small delay to ensure smooth transition between dialogs
+          
+          // Wait for current dialog to close, then open next one
           setTimeout(() => {
+            console.log('🚀 Opening LanguageSurvey (step 2)...');
             setIsLanguageSurveyOpen(true);
-            console.log('Step 2 opened');
-          }, 100);
+            console.log('✅ Step 2 should now be visible');
+          }, 200); // Wait for step 1 to fully close before opening step 2
         }}
         onSkip={() => {
           setIsSurveyOpen(false);
+          setSurveyInProgress(false);
           // Clear survey progress flags and just_authenticated flag
           // This prevents the survey from showing again after skip
           sessionStorage.removeItem('speakbee_survey_in_progress');
@@ -528,6 +619,8 @@ const AppRoutes = () => {
         currentStep={2}
         totalSteps={17}
         onComplete={async (surveyData) => {
+          console.log('📝 LanguageSurvey onComplete called, moving to step 3');
+          
           // Save step 2 data to backend (nativeLanguage)
           await saveSurveyStepToBackend('language', 2, { nativeLanguage: surveyData.nativeLanguage });
           
@@ -535,9 +628,13 @@ const AppRoutes = () => {
           sessionStorage.setItem('speakbee_survey_in_progress', 'true');
           sessionStorage.setItem('speakbee_survey_step', 'englishLevel');
           
-          // Then update state
+          // Close current step first, then open next step
+          console.log('🔒 Closing LanguageSurvey (step 2)...');
           setIsLanguageSurveyOpen(false);
-          setIsEnglishLevelSurveyOpen(true);
+          setTimeout(() => {
+            console.log('🚀 Opening EnglishLevelSurvey (step 3)...');
+            setIsEnglishLevelSurveyOpen(true);
+          }, 200);
         }}
         onBack={() => {
           sessionStorage.setItem('speakbee_survey_step', 'user');
@@ -558,9 +655,11 @@ const AppRoutes = () => {
           sessionStorage.setItem('speakbee_survey_in_progress', 'true');
           sessionStorage.setItem('speakbee_survey_step', 'learningPurpose');
           
-          // Then update state
+          // Close current step first, then open next step
           setIsEnglishLevelSurveyOpen(false);
-          setIsLearningPurposeSurveyOpen(true);
+          setTimeout(() => {
+            setIsLearningPurposeSurveyOpen(true);
+          }, 200);
         }}
         onBack={() => {
           sessionStorage.setItem('speakbee_survey_step', 'language');
@@ -581,9 +680,11 @@ const AppRoutes = () => {
           sessionStorage.setItem('speakbee_survey_in_progress', 'true');
           sessionStorage.setItem('speakbee_survey_step', 'speakOut');
           
-          // Then update state
-          setIsLearningPurposeSurveyOpen(false);
+          // Open next step immediately, then close current step to prevent flash
           setIsSpeakOutSurveyOpen(true);
+          requestAnimationFrame(() => {
+            setIsLearningPurposeSurveyOpen(false);
+          });
         }}
         onBack={() => {
           sessionStorage.setItem('speakbee_survey_step', 'englishLevel');
@@ -602,10 +703,12 @@ const AppRoutes = () => {
           const allData = surveyDataStr ? JSON.parse(surveyDataStr) : {};
           await saveSurveyStepToBackend('speakOut', 5, { stepCompleted: true, ...allData });
           
-          setIsSpeakOutSurveyOpen(false);
-          setIsAimSurveyOpen(true);
           sessionStorage.setItem('speakbee_survey_in_progress', 'true');
           sessionStorage.setItem('speakbee_survey_step', 'aim');
+          setIsSpeakOutSurveyOpen(false);
+          setTimeout(() => {
+            setIsAimSurveyOpen(true);
+          }, 200);
         }}
         onBack={() => {
           setIsSpeakOutSurveyOpen(false);
@@ -624,11 +727,13 @@ const AppRoutes = () => {
           const allData = surveyDataStr ? JSON.parse(surveyDataStr) : {};
           await saveSurveyStepToBackend('aim', 6, { stepCompleted: true, ...allData });
           
-          setIsAimSurveyOpen(false);
-          setIsFluentUnderstandingSurveyOpen(true);
           // Keep survey in progress until final step
           sessionStorage.setItem('speakbee_survey_in_progress', 'true');
           sessionStorage.setItem('speakbee_survey_step', 'fluentUnderstanding');
+          setIsAimSurveyOpen(false);
+          setTimeout(() => {
+            setIsFluentUnderstandingSurveyOpen(true);
+          }, 200);
         }}
         onBack={() => {
           setIsAimSurveyOpen(false);
@@ -647,10 +752,12 @@ const AppRoutes = () => {
           const allData = surveyDataStr ? JSON.parse(surveyDataStr) : {};
           await saveSurveyStepToBackend('fluentUnderstanding', 7, { stepCompleted: true, ...allData });
           
-          setIsFluentUnderstandingSurveyOpen(false);
-          setIsLimitedWordsSurveyOpen(true);
           sessionStorage.setItem('speakbee_survey_in_progress', 'true');
           sessionStorage.setItem('speakbee_survey_step', 'limitedWords');
+          setIsFluentUnderstandingSurveyOpen(false);
+          setTimeout(() => {
+            setIsLimitedWordsSurveyOpen(true);
+          }, 200);
         }}
         onBack={() => {
           setIsFluentUnderstandingSurveyOpen(false);
@@ -669,10 +776,12 @@ const AppRoutes = () => {
           const allData = surveyDataStr ? JSON.parse(surveyDataStr) : {};
           await saveSurveyStepToBackend('limitedWords', 8, { stepCompleted: true, ...allData });
           
-          setIsLimitedWordsSurveyOpen(false);
-          setIsSentenceFormationSurveyOpen(true);
           sessionStorage.setItem('speakbee_survey_in_progress', 'true');
           sessionStorage.setItem('speakbee_survey_step', 'sentenceFormation');
+          setIsLimitedWordsSurveyOpen(false);
+          setTimeout(() => {
+            setIsSentenceFormationSurveyOpen(true);
+          }, 200);
         }}
         onBack={() => {
           setIsLimitedWordsSurveyOpen(false);
@@ -691,10 +800,12 @@ const AppRoutes = () => {
           const allData = surveyDataStr ? JSON.parse(surveyDataStr) : {};
           await saveSurveyStepToBackend('sentenceFormation', 9, { stepCompleted: true, ...allData });
           
-          setIsSentenceFormationSurveyOpen(false);
-          setIsCantSpeakSurveyOpen(true);
           sessionStorage.setItem('speakbee_survey_in_progress', 'true');
           sessionStorage.setItem('speakbee_survey_step', 'cantSpeak');
+          setIsCantSpeakSurveyOpen(true);
+          requestAnimationFrame(() => {
+            setIsSentenceFormationSurveyOpen(false);
+          });
         }}
         onBack={() => {
           setIsSentenceFormationSurveyOpen(false);
@@ -713,10 +824,12 @@ const AppRoutes = () => {
           const allData = surveyDataStr ? JSON.parse(surveyDataStr) : {};
           await saveSurveyStepToBackend('cantSpeak', 10, { stepCompleted: true, ...allData });
           
-          setIsCantSpeakSurveyOpen(false);
-          setIsNeedFluencySurveyOpen(true);
           sessionStorage.setItem('speakbee_survey_in_progress', 'true');
           sessionStorage.setItem('speakbee_survey_step', 'needFluency');
+          setIsCantSpeakSurveyOpen(false);
+          setTimeout(() => {
+            setIsNeedFluencySurveyOpen(true);
+          }, 200);
         }}
         onBack={() => {
           setIsCantSpeakSurveyOpen(false);
@@ -735,10 +848,12 @@ const AppRoutes = () => {
           const allData = surveyDataStr ? JSON.parse(surveyDataStr) : {};
           await saveSurveyStepToBackend('needFluency', 11, { stepCompleted: true, ...allData });
           
-          setIsNeedFluencySurveyOpen(false);
-          setIsMoviesSurveyOpen(true);
           sessionStorage.setItem('speakbee_survey_in_progress', 'true');
           sessionStorage.setItem('speakbee_survey_step', 'movies');
+          setIsNeedFluencySurveyOpen(false);
+          setTimeout(() => {
+            setIsMoviesSurveyOpen(true);
+          }, 200);
         }}
         onBack={() => {
           setIsNeedFluencySurveyOpen(false);
@@ -757,10 +872,12 @@ const AppRoutes = () => {
           const allData = surveyDataStr ? JSON.parse(surveyDataStr) : {};
           await saveSurveyStepToBackend('movies', 12, { stepCompleted: true, ...allData });
           
-          setIsMoviesSurveyOpen(false);
-          setIsVocabularySurveyOpen(true);
           sessionStorage.setItem('speakbee_survey_in_progress', 'true');
           sessionStorage.setItem('speakbee_survey_step', 'vocabulary');
+          setIsMoviesSurveyOpen(false);
+          setTimeout(() => {
+            setIsVocabularySurveyOpen(true);
+          }, 200);
         }}
         onBack={() => {
           setIsMoviesSurveyOpen(false);
@@ -778,10 +895,12 @@ const AppRoutes = () => {
           // surveyData contains { vocabulary: string[], completedAt: string }
           await saveSurveyStepToBackend('vocabulary', 13, surveyData || { stepCompleted: true });
           
-          setIsVocabularySurveyOpen(false);
-          setIsIntermediateVocabOpen(true);
           sessionStorage.setItem('speakbee_survey_in_progress', 'true');
           sessionStorage.setItem('speakbee_survey_step', 'intermediateVocab');
+          setIsVocabularySurveyOpen(false);
+          setTimeout(() => {
+            setIsIntermediateVocabOpen(true);
+          }, 200);
         }}
         onBack={() => {
           setIsVocabularySurveyOpen(false);
@@ -799,10 +918,12 @@ const AppRoutes = () => {
           // surveyData contains { intermediateVocabulary: string[], completedAt: string }
           await saveSurveyStepToBackend('intermediateVocab', 14, surveyData || { stepCompleted: true });
           
-          setIsIntermediateVocabOpen(false);
-          setIsAdvancedVocabOpen(true);
           sessionStorage.setItem('speakbee_survey_in_progress', 'true');
           sessionStorage.setItem('speakbee_survey_step', 'advancedVocab');
+          setIsIntermediateVocabOpen(false);
+          setTimeout(() => {
+            setIsAdvancedVocabOpen(true);
+          }, 200);
         }}
         onBack={() => {
           setIsIntermediateVocabOpen(false);
@@ -820,10 +941,12 @@ const AppRoutes = () => {
           // surveyData contains { advancedVocabulary: string[], completedAt: string }
           await saveSurveyStepToBackend('advancedVocab', 15, surveyData || { stepCompleted: true });
           
-          setIsAdvancedVocabOpen(false);
-          setIsInterestsOpen(true);
           sessionStorage.setItem('speakbee_survey_in_progress', 'true');
           sessionStorage.setItem('speakbee_survey_step', 'interests');
+          setIsAdvancedVocabOpen(false);
+          setTimeout(() => {
+            setIsInterestsOpen(true);
+          }, 200);
         }}
         onBack={() => {
           setIsAdvancedVocabOpen(false);
@@ -841,10 +964,12 @@ const AppRoutes = () => {
           // surveyData contains { interests: string[], completedAt: string }
           await saveSurveyStepToBackend('interests', 16, surveyData || { stepCompleted: true });
           
-          setIsInterestsOpen(false);
-          setIsHelloSurveyOpen(true);
           sessionStorage.setItem('speakbee_survey_in_progress', 'true');
           sessionStorage.setItem('speakbee_survey_step', 'hello');
+          setIsInterestsOpen(false);
+          setTimeout(() => {
+            setIsHelloSurveyOpen(true);
+          }, 200);
         }}
         onBack={() => {
           setIsInterestsOpen(false);
@@ -863,10 +988,12 @@ const AppRoutes = () => {
           const allData = surveyDataStr ? JSON.parse(surveyDataStr) : {};
           await saveSurveyStepToBackend('hello', 17, { stepCompleted: true, ...allData });
           
-          setIsHelloSurveyOpen(false);
-          setIsPersonalizationOpen(true);
           sessionStorage.setItem('speakbee_survey_in_progress', 'true');
           sessionStorage.setItem('speakbee_survey_step', 'personalization');
+          setIsHelloSurveyOpen(false);
+          setTimeout(() => {
+            setIsPersonalizationOpen(true);
+          }, 200);
         }}
         onBack={() => {
           setIsHelloSurveyOpen(false);
@@ -878,7 +1005,6 @@ const AppRoutes = () => {
       <PersonalizationSurvey
         isOpen={isPersonalizationOpen}
         onComplete={async (surveyData) => {
-          setIsPersonalizationOpen(false);
           // Now that personalization is complete, save ALL survey data to MySQL
           try {
             // Save step 18 (personalization) to backend
@@ -923,93 +1049,47 @@ const AppRoutes = () => {
             sessionStorage.removeItem('speakbee_survey_step');
             sessionStorage.removeItem('speakbee_survey_data');
 
-            // Smart redirect: send user to recommended page based on survey
-            // Use the saved survey data for redirect decision
-            try {
-              const age = (allSurveyData.ageRange || '').toLowerCase();
-              const purposes: string[] = Array.isArray(allSurveyData.learningPurpose) 
-                ? allSurveyData.learningPurpose.map((p: any) => String(p).toLowerCase()) 
-                : [];
-              const englishLevel = (allSurveyData.englishLevel || '').toLowerCase();
-
-              let target = '/';
-              
-              // Priority order: Check specific age ranges first, then general, then purposes, then levels
-              // Kids - Young (4-11 or 4-10)
-              if (
-                age.includes('4-11') ||
-                age.includes('4 – 11') ||
-                age.includes('4–11') ||
-                age.includes('4 to 11') ||
-                age.includes('4-10') || // legacy support
-                age.includes('4 – 10') ||
-                age.includes('4–10') ||
-                age.includes('4 to 10')
-              ) {
-                target = '/kids/young';
-              } 
-              // Kids - Teen (11-17 or 12-17)
-              else if (
-                age.includes('11-17') ||
-                age.includes('11 – 17') ||
-                age.includes('11–17') ||
-                age.includes('11 to 17') ||
-                age.includes('12-17') ||
-                age.includes('12 – 17') ||
-                age.includes('12–17') ||
-                age.includes('12 to 17')
-              ) {
-                target = '/kids/teen';
-              }
-              // Kids - General (4-17) - catch-all for kids
-              else if (
-                age.includes('4-17') ||
-                age.includes('4 – 17') ||
-                age.includes('4–17') ||
-                age.includes('4 to 17') ||
-                age.startsWith('4') // Any age starting with 4 (kids)
-              ) {
-                target = '/kids';
-              }
-              // IELTS/PTE (exam preparation)
-              else if (purposes.includes('ielts') || purposes.includes('pte')) {
-                target = '/ielts-pte';
-              } 
-              // Adults by English level
-              else if (englishLevel.includes('beginner') || englishLevel.includes('a1') || englishLevel.includes('a2')) {
-                target = '/adults/beginners';
-              } else if (englishLevel.includes('intermediate') || englishLevel.includes('b1') || englishLevel.includes('b2')) {
-                target = '/adults/intermediates';
-              } else if (englishLevel.includes('advanced') || englishLevel.includes('c1') || englishLevel.includes('c2')) {
-                target = '/adults/advanced';
-              } else {
-                // Default to adults page if no specific match
-                target = '/adults';
-              }
-
-              // Clear the just_authenticated flag since survey is now complete
-              sessionStorage.removeItem('speakbee_just_authenticated');
-              
-              // Redirect to recommended learning page based on survey categories
-              console.log('🔄 Redirecting to:', target, 'based on survey data:', { age, purposes, englishLevel });
-              setTimeout(() => {
-                window.location.href = target;
-              }, 800);
-            } catch (error) {
-              console.error('Error redirecting after survey completion:', error);
-              // Clear flags even on error
-              sessionStorage.removeItem('speakbee_just_authenticated');
-              // Fallback to home if redirect fails
-              setTimeout(() => {
-                window.location.href = '/';
-              }, 800);
-            }
+            // Clear the just_authenticated flag since survey is now complete
+            sessionStorage.removeItem('speakbee_just_authenticated');
+            
+            // Determine the appropriate learning page based on survey responses
+            const learningPage = getLearningPageFromSurvey(allSurveyData);
+            
+            // Clear survey progress state
+            setSurveyInProgress(false);
+            sessionStorage.removeItem('speakbee_survey_in_progress');
+            sessionStorage.removeItem('speakbee_survey_step');
+            
+            // Keep dialog open during redirect to prevent blank page
+            console.log('✅ Survey completed! Redirecting to learning page:', learningPage);
+            setTimeout(() => {
+              // Close dialog and redirect to appropriate learning page
+              setIsPersonalizationOpen(false);
+              navigate(learningPage);
+            }, 500);
           } catch (error) {
             console.error('Error saving survey data:', error);
-            // Even if save fails, try to redirect based on available data
+            // Clear survey progress state even on error
+            setSurveyInProgress(false);
+            sessionStorage.removeItem('speakbee_survey_in_progress');
+            sessionStorage.removeItem('speakbee_survey_step');
+            
+            // Even if save fails, determine and redirect to appropriate learning page
+            const surveyDataStr = sessionStorage.getItem('speakbee_survey_data');
+            let fallbackSurveyData: any = surveyData || {};
+            if (surveyDataStr) {
+              try {
+                const parsedData = JSON.parse(surveyDataStr);
+                fallbackSurveyData = { ...parsedData, ...fallbackSurveyData };
+              } catch (e) {
+                console.error('Error parsing survey data from sessionStorage:', e);
+              }
+            }
+            const learningPage = getLearningPageFromSurvey(fallbackSurveyData);
             setTimeout(() => {
-              window.location.href = '/';
-            }, 800);
+              setIsPersonalizationOpen(false);
+              navigate(learningPage);
+            }, 500);
           }
         }}
         onBack={() => {

@@ -6,6 +6,7 @@ import { Crown, Award, ArrowLeft, Download, Loader2, Share2, Printer } from 'luc
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import KidsApi from '@/services/KidsApi';
+import TeenApi from '@/services/TeenApi';
 import KidsProgressService from '@/services/KidsProgressService';
 import CertificatesService, { type CertificateLayout } from '@/services/CertificatesService';
 import StorageService from '@/services/StorageService';
@@ -139,18 +140,117 @@ const CertificatesPage = () => {
           setLocalKidsProgress(local);
         } catch (_) {}
         if (isAuthenticated && token && token !== 'local-token') {
-          const [pg, ach] = await Promise.all([
-            KidsApi.getProgress(token),
-            (KidsApi as any).getAchievements(token)
-          ]);
-          setProgress(pg);
-          if (Array.isArray(ach)) setAchievements(ach);
+          if (isTeenKids) {
+            // For teen mode, fetch from TeenApi and merge with KidsApi data
+            try {
+              const [teenDashboard, kidsProgress, ach] = await Promise.all([
+                TeenApi.getDashboard(token).catch(() => null),
+                KidsApi.getProgress(token).catch(() => null),
+                (KidsApi as any).getAchievements(token).catch(() => [])
+              ]);
+              
+              // Merge teen dashboard data into progress structure
+              let mergedProgress: any = kidsProgress || {};
+              
+              if (teenDashboard) {
+                const dashboard = teenDashboard as any;
+                // Extract teen-specific data from dashboard
+                const teenPoints = dashboard.points ?? dashboard.progress?.points ?? 0;
+                const teenStreak = dashboard.streak ?? dashboard.progress?.streak ?? 0;
+                const teenPronunciationAttempts = Number(dashboard.pronunciation_attempts ?? 0) || 0;
+                const teenVocabularyAttempts = Number(dashboard.vocabulary_attempts ?? 0) || 0;
+                const teenGamesAttempts = Number(dashboard.games_attempts ?? 0) || 0;
+                const completedStoryIds = Array.isArray(dashboard.completed_story_ids) ? dashboard.completed_story_ids : [];
+                
+                // Ensure audienceStats structure exists
+                if (!mergedProgress.details) {
+                  mergedProgress.details = {};
+                }
+                if (!mergedProgress.details.audienceStats) {
+                  mergedProgress.details.audienceStats = {};
+                }
+                
+                // Set teen-specific stats
+                mergedProgress.details.audienceStats.teen = {
+                  points: teenPoints,
+                  streak: teenStreak,
+                  pronunciation_attempts: teenPronunciationAttempts,
+                  vocabulary_attempts: teenVocabularyAttempts,
+                  games_attempts: teenGamesAttempts,
+                };
+                
+                // Update story enrollments from completed stories
+                if (!mergedProgress.details.storyEnrollments) {
+                  mergedProgress.details.storyEnrollments = [];
+                }
+                
+                // Add completed teen stories to enrollments if not already present
+                const existingStoryIds = new Set(
+                  (mergedProgress.details.storyEnrollments || []).map((s: any) => s.storyId)
+                );
+                
+                completedStoryIds.forEach((storyId: string) => {
+                  if (!existingStoryIds.has(storyId)) {
+                    // Convert teen story ID (like 'teen-0') to internal story ID
+                    const teenStoryMapping: Record<string, string> = {
+                      'teen-0': 'mystery-detective',
+                      'teen-1': 'space-explorer-teen',
+                      'teen-2': 'environmental-hero',
+                      'teen-3': 'tech-innovator',
+                      'teen-4': 'global-citizen',
+                      'teen-5': 'future-leader',
+                      'teen-6': 'scientific-discovery',
+                      'teen-7': 'social-media-expert',
+                      'teen-8': 'ai-ethics-explorer',
+                      'teen-9': 'digital-security-guardian',
+                    };
+                    const internalStoryId = teenStoryMapping[storyId] || storyId;
+                    mergedProgress.details.storyEnrollments.push({
+                      storyId: internalStoryId,
+                      completed: true,
+                      wordsExtracted: true,
+                      score: 100,
+                    });
+                  }
+                });
+                
+                // Update points and streak at root level for backward compatibility
+                mergedProgress.points = teenPoints;
+                mergedProgress.streak = teenStreak;
+              }
+              
+              setProgress(mergedProgress);
+              if (Array.isArray(ach)) setAchievements(ach);
+            } catch (error) {
+              console.error('Error loading teen progress:', error);
+              // Fallback to regular kids progress
+              try {
+                const [pg, ach] = await Promise.all([
+                  KidsApi.getProgress(token),
+                  (KidsApi as any).getAchievements(token)
+                ]);
+                setProgress(pg);
+                if (Array.isArray(ach)) setAchievements(ach);
+              } catch (_) {}
+            }
+          } else {
+            // For young mode, use regular KidsApi
+            const [pg, ach] = await Promise.all([
+              KidsApi.getProgress(token),
+              (KidsApi as any).getAchievements(token)
+            ]);
+            setProgress(pg);
+            if (Array.isArray(ach)) setAchievements(ach);
+          }
         }
-      } catch (_) {}
-      setLoading(false);
+      } catch (error) {
+        console.error('Error loading progress:', error);
+      } finally {
+        setLoading(false);
+      }
     };
     load();
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isTeenKids]);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -200,9 +300,88 @@ const CertificatesPage = () => {
   const teenAudienceStats = (audienceStats as any).teen || {};
   const youngAudienceStats = (audienceStats as any).young || {};
 
-  const resolvedPoints = isTeenKids
-    ? teenAudienceStats.points ?? (progress as any)?.points ?? 0
-    : youngAudienceStats.points ?? (progress as any)?.points ?? 0;
+  // Get userId for calculations (used in points calculation and badge/trophy calculations)
+  const userData = localStorage.getItem('speakbee_current_user');
+  const userId = userData ? (JSON.parse(userData)?.id || 'anonymous') : 'anonymous';
+
+  // Calculate points from only: completed stories, mastered words, and pronunciation practice
+  // Exclude games points
+  const calculateLearningPoints = useMemo(() => {
+    try {
+      let totalPoints = 0;
+      const vocab = mergedDetails?.vocabulary || {};
+      const pron = mergedDetails?.pronunciation || {};
+      const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
+        'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
+        'ai-ethics-explorer', 'digital-security-guardian'];
+      const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
+        'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
+        'rainbow-castle', 'jungle-explorer'];
+      
+      const targetStoryIds = isTeenKids ? teenStoryIds : youngStoryIds;
+      const enrolledStories = StoryWordsService.getEnrolledStories(userId);
+      
+      // Get completed stories
+      const completedStoryIds = enrolledStories
+        .filter(e => 
+          e.completed === true && 
+          e.wordsExtracted === true &&
+          targetStoryIds.includes(e.storyId)
+        )
+        .map(e => e.storyId);
+      
+      // Points from completed stories (typically 100-200 points per story based on score)
+      // We'll estimate based on story score, but for now use a base of 150 points per completed story
+      completedStoryIds.forEach(storyId => {
+        const story = enrolledStories.find(e => e.storyId === storyId);
+        if (story && story.score) {
+          // Story completion points: base 100 + score bonus (up to 100 more)
+          const storyPoints = 100 + Math.round(story.score);
+          totalPoints += storyPoints;
+        } else {
+          // Default points for completed story without score
+          totalPoints += 150;
+        }
+      });
+      
+      // Points from mastered words (25 points per word with ≥2 attempts)
+      if (completedStoryIds.length > 0) {
+        const words = StoryWordsService.getWordsForStoryIds(completedStoryIds);
+        const storyWords = new Set<string>();
+        words.forEach(w => storyWords.add(w.word.toLowerCase()));
+        
+        const filteredVocab = Object.entries(vocab).filter(([word]) => 
+          storyWords.has(word.toLowerCase())
+        ).map(([, data]) => data as any);
+        
+        const masteredWords = filteredVocab.filter((r: any) => (r.attempts || 0) >= 2);
+        totalPoints += masteredWords.length * 25; // 25 points per mastered word
+      }
+      
+      // Points from pronunciation practice (35 points per phrase practiced)
+      if (completedStoryIds.length > 0) {
+        const phrases = StoryWordsService.getPhrasesForStoryIds(completedStoryIds);
+        const storyPhrases = new Set<string>();
+        phrases.forEach(p => storyPhrases.add(p.phrase.toLowerCase()));
+        
+        const filteredSessions = Object.entries(pron).filter(([phrase]) => 
+          storyPhrases.has(phrase.toLowerCase())
+        ).map(([, data]) => data as any);
+        
+        // Count total pronunciation attempts (35 points per attempt)
+        const totalPronAttempts = filteredSessions.reduce((sum: number, r: any) => sum + (r.attempts || 0), 0);
+        totalPoints += totalPronAttempts * 35; // 35 points per pronunciation practice
+      }
+      
+      return totalPoints;
+    } catch (error) {
+      console.error('Error calculating learning points:', error);
+      return 0;
+    }
+  }, [mergedDetails, userId, isTeenKids]);
+
+  // Use calculated learning points instead of total points (which includes games)
+  const resolvedPoints = calculateLearningPoints;
 
   const resolvedStreak = isTeenKids
     ? teenAudienceStats.streak ?? (progress as any)?.streak ?? 0
@@ -440,6 +619,7 @@ const CertificatesPage = () => {
     hint: superEligible ? 'Ready to download!' : `Certificates: ${Math.min(earnedCount, 3)}/3` 
   };
 
+
   // Derive badges and trophies lists similar to Microsoft Learn layout
   // If Story Time Champion is eligible, surface its badge in Badges section
   const notifyUnlock = useCallback(
@@ -489,11 +669,14 @@ const CertificatesPage = () => {
 
   const unlockedBadges = useMemo(() => {
     const base = (achievements || []).filter((a: any) => a.unlocked);
+    const badges: any[] = [];
+    
     try {
+      // Add Story Time Champion badge if eligible
       const idx = certificates.findIndex(c => c.id === 'story-time-champion');
       if (idx >= 0 && computed[idx]?.eligible) {
         const stc = certificates[idx] as any;
-        base.unshift({
+        badges.push({
           id: 'badge-story-time-champion',
           title: stc.title,
           name: stc.title,
@@ -502,10 +685,210 @@ const CertificatesPage = () => {
           image: stc.badgeSrc || '/story-time-champion-badge.png'
         });
       }
-    } catch (_) {}
-    return base;
+      
+      // Add badges for completed stories
+      try {
+        const enrolledStories = StoryWordsService.getEnrolledStories(userId);
+        const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
+          'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
+          'ai-ethics-explorer', 'digital-security-guardian'];
+        const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
+          'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
+          'rainbow-castle', 'jungle-explorer'];
+        
+        const targetStoryIds = isTeenKids ? teenStoryIds : youngStoryIds;
+        const completedStories = enrolledStories.filter(e => 
+          e.completed === true && 
+          e.wordsExtracted === true &&
+          targetStoryIds.includes(e.storyId)
+        );
+        
+        // Story title mapping
+        const storyTitles: Record<string, string> = {
+          'mystery-detective': 'Mystery Detective',
+          'space-explorer-teen': 'Space Explorer',
+          'environmental-hero': 'Environmental Hero',
+          'tech-innovator': 'Tech Innovator',
+          'global-citizen': 'Global Citizen',
+          'future-leader': 'Future Leader',
+          'scientific-discovery': 'Scientific Discovery',
+          'social-media-expert': 'Social Media Expert',
+          'ai-ethics-explorer': 'AI Ethics Explorer',
+          'digital-security-guardian': 'Digital Security Guardian',
+          'magic-forest': 'Magic Forest',
+          'space-adventure': 'Space Adventure',
+          'underwater-world': 'Underwater World',
+          'dinosaur-discovery': 'Dinosaur Discovery',
+          'unicorn-magic': 'Unicorn Magic',
+          'pirate-treasure': 'Pirate Treasure',
+          'superhero-school': 'Superhero School',
+          'fairy-garden': 'Fairy Garden',
+          'rainbow-castle': 'Rainbow Castle',
+          'jungle-explorer': 'Jungle Explorer',
+        };
+        
+        // Add badge for each completed story
+        completedStories.forEach(story => {
+          const storyTitle = storyTitles[story.storyId] || story.storyId;
+          badges.push({
+            id: `badge-story-${story.storyId}`,
+            title: `${storyTitle} Completed`,
+            name: `${storyTitle} Story Master`,
+            unlocked: true,
+            unlocked_at: story.completedAt || new Date().toISOString(),
+            image: '/story-time-champion-badge.png',
+            emoji: '📚'
+          });
+        });
+      } catch (error) {
+        console.error('Error loading story badges:', error);
+      }
+      
+      // Add badges for word mastery milestones
+      try {
+        const vocab = ctx.details?.vocabulary || {};
+        const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
+          'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
+          'ai-ethics-explorer', 'digital-security-guardian'];
+        const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
+          'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
+          'rainbow-castle', 'jungle-explorer'];
+        
+        const targetStoryIds = isTeenKids ? teenStoryIds : youngStoryIds;
+        const enrolledStories = StoryWordsService.getEnrolledStories(userId);
+        const completedStoryIds = enrolledStories
+          .filter(e => e.completed === true && e.wordsExtracted === true)
+          .map(e => e.storyId)
+          .filter(id => targetStoryIds.includes(id));
+        
+        const words = StoryWordsService.getWordsForStoryIds(completedStoryIds);
+        const storyWords = new Set<string>();
+        words.forEach(w => storyWords.add(w.word.toLowerCase()));
+        
+        const filteredVocab = Object.entries(vocab).filter(([word]) => 
+          storyWords.has(word.toLowerCase())
+        ).map(([, data]) => data as any);
+        
+        const masteredWords = filteredVocab.filter((r: any) => (r.attempts || 0) >= 2).length;
+        
+        // Add milestone badges for word mastery
+        if (masteredWords >= 10) {
+          badges.push({
+            id: 'badge-words-10',
+            title: 'Word Explorer',
+            name: 'Mastered 10 Words',
+            unlocked: true,
+            unlocked_at: new Date().toISOString(),
+            image: '/Word_wizard_badge.png',
+            emoji: '🪄'
+          });
+        }
+        if (masteredWords >= 50) {
+          badges.push({
+            id: 'badge-words-50',
+            title: 'Word Wizard',
+            name: 'Mastered 50 Words',
+            unlocked: true,
+            unlocked_at: new Date().toISOString(),
+            image: '/Word_wizard_badge.png',
+            emoji: '🪄'
+          });
+        }
+        if (masteredWords >= 100) {
+          badges.push({
+            id: 'badge-words-100',
+            title: 'Word Master',
+            name: 'Mastered 100 Words',
+            unlocked: true,
+            unlocked_at: new Date().toISOString(),
+            image: '/Word_wizard_badge.png',
+            emoji: '🪄'
+          });
+        }
+      } catch (error) {
+        console.error('Error loading word mastery badges:', error);
+      }
+      
+      // Add badges for pronunciation practice milestones
+      try {
+        const pron = ctx.details?.pronunciation || {};
+        const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
+          'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
+          'ai-ethics-explorer', 'digital-security-guardian'];
+        const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
+          'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
+          'rainbow-castle', 'jungle-explorer'];
+        
+        const targetStoryIds = isTeenKids ? teenStoryIds : youngStoryIds;
+        const enrolledStories = StoryWordsService.getEnrolledStories(userId);
+        const completedStoryIds = enrolledStories
+          .filter(e => e.completed === true && e.wordsExtracted === true)
+          .map(e => e.storyId)
+          .filter(id => targetStoryIds.includes(id));
+        
+        if (completedStoryIds.length > 0) {
+          const phrases = StoryWordsService.getPhrasesForStoryIds(completedStoryIds);
+          const storyPhrases = new Set<string>();
+          phrases.forEach(p => storyPhrases.add(p.phrase.toLowerCase()));
+          
+          const filteredSessions = Object.entries(pron).filter(([phrase]) => 
+            storyPhrases.has(phrase.toLowerCase())
+          ).map(([, data]) => data as any);
+          
+          const totalAttempts = filteredSessions.reduce((s: number, r: any) => s + (r.attempts || 0), 0);
+          
+          // Add milestone badges for pronunciation practice
+          if (totalAttempts >= 10) {
+            badges.push({
+              id: 'badge-pronunciation-10',
+              title: 'Speaking Starter',
+              name: '10 Pronunciation Practices',
+              unlocked: true,
+              unlocked_at: new Date().toISOString(),
+              image: '/Speaking_star_badge.png',
+              emoji: '🎤'
+            });
+          }
+          if (totalAttempts >= 25) {
+            badges.push({
+              id: 'badge-pronunciation-25',
+              title: 'Speaking Star',
+              name: '25 Pronunciation Practices',
+              unlocked: true,
+              unlocked_at: new Date().toISOString(),
+              image: '/Speaking_star_badge.png',
+              emoji: '🎤'
+            });
+          }
+          if (totalAttempts >= 50) {
+            badges.push({
+              id: 'badge-pronunciation-50',
+              title: 'Pronunciation Pro',
+              name: '50 Pronunciation Practices',
+              unlocked: true,
+              unlocked_at: new Date().toISOString(),
+              image: '/Speaking_star_badge.png',
+              emoji: '🎙️'
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error loading pronunciation badges:', error);
+      }
+      
+      // Combine API badges with dynamically created badges, removing duplicates
+      const allBadges = [...badges, ...base];
+      const uniqueBadges = Array.from(
+        new Map(allBadges.map(badge => [badge.id, badge])).values()
+      );
+      
+      return uniqueBadges;
+    } catch (error) {
+      console.error('Error computing badges:', error);
+      return base;
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [achievements, computed.map(c => c.eligible).join('|')]);
+  }, [achievements, computed.map(c => c.eligible).join('|'), ctx.details, userId, isTeenKids]);
 
   useEffect(() => {
     if (!isAuthenticated || !user?.id || !notificationsHydrated) return;
@@ -527,18 +910,19 @@ const CertificatesPage = () => {
     });
   }, [isAuthenticated, notificationsHydrated, notifyUnlock, unlockedBadges, user?.id]);
   const lockedBadges = useMemo(() => (achievements || []).filter((a: any) => !a.unlocked), [achievements]);
-  const trophySpecs = [
-    { id: 'consistency-hero', title: 'Consistency Hero', emoji: '🔥', desc: 'Maintain a 21-day learning streak', badgeSrc: '/Consistency_badge.png' },
-    { id: 'story-master', title: 'Story Master', emoji: '📖', desc: 'All 10 young stories at ≥80', badgeSrc: '/story-time-champion-badge.png' },
-    { id: 'pronunciation-pro', title: 'Pronunciation Pro', emoji: '🎙️', desc: '100 pron attempts, avg ≥80', badgeSrc: '/Speaking_star_badge.png' },
-    { id: 'vocab-builder', title: 'Vocabulary Builder', emoji: '🧠', desc: 'Learn 150 unique words', badgeSrc: '/Word_wizard_badge.png' },
-    { id: 'super-learner', title: 'Super Learner', emoji: '🏆', desc: 'Unlock any 3 certificates', badgeSrc: '/Super_Learner.png' },
-    { id: 'explorer', title: 'Explorer Trophy', emoji: '🗺️', desc: 'Try all games + 300 pts' }
-  ];
-
-  // Get userId for StoryWordsService (used in trophy calculations)
-  const userData = localStorage.getItem('speakbee_current_user');
-  const userId = userData ? (JSON.parse(userData)?.id || 'anonymous') : 'anonymous';
+  const trophySpecs = useMemo(() => {
+    const storyMasterDesc = isTeenKids 
+      ? 'All 10 teen stories at ≥80' 
+      : 'All 10 young stories at ≥80';
+    return [
+      { id: 'consistency-hero', title: 'Consistency Hero', emoji: '🔥', desc: 'Maintain a 21-day learning streak', badgeSrc: '/Consistency_badge.png' },
+      { id: 'story-master', title: 'Story Master', emoji: '📖', desc: storyMasterDesc, badgeSrc: '/story-time-champion-badge.png' },
+      { id: 'pronunciation-pro', title: 'Pronunciation Pro', emoji: '🎙️', desc: '100 pron attempts, avg ≥80', badgeSrc: '/Speaking_star_badge.png' },
+      { id: 'vocab-builder', title: 'Vocabulary Builder', emoji: '🧠', desc: 'Learn 150 unique words', badgeSrc: '/Word_wizard_badge.png' },
+      { id: 'super-learner', title: 'Super Learner', emoji: '🏆', desc: 'Unlock any 3 certificates', badgeSrc: '/Super_Learner.png' },
+      { id: 'explorer', title: 'Explorer Trophy', emoji: '🗺️', desc: 'Try all games + 300 pts' }
+    ];
+  }, [isTeenKids]);
   
   const computeTrophyProgress = (t: { id: string }) => {
     const d = ctx.details || {};
@@ -673,11 +1057,18 @@ const CertificatesPage = () => {
         return 0;
       }
       
+      // Only count games that were actually played (have attempts or scores), not just visited
+      // Check if games have actual gameplay data (attempts, scores, etc.)
       const tried = Array.isArray(games.types) && games.types.length > 0 ? new Set(games.types).size : 0;
-      const points = Number(games.points || 0);
       
-      // If no games tried and no points, return 0
-      if (tried === 0 && points === 0) {
+      // For points, only count points from actual gameplay
+      // Games points should only count if the user actually played, not just visited
+      // Check if there are actual game sessions/attempts recorded
+      const hasGameplay = games.attempts > 0 || games.sessions > 0 || (games.types && games.types.length > 0 && tried > 0);
+      const points = hasGameplay ? Number(games.points || 0) : 0;
+      
+      // If no games were actually played (not just visited), return 0
+      if (tried === 0 || !hasGameplay) {
         return 0;
       }
       
@@ -689,19 +1080,6 @@ const CertificatesPage = () => {
       // This ensures progress reflects the limiting factor
       const combinedProgress = Math.min(gameTypesProgress, pointsProgress);
       const result = Math.round(combinedProgress * 100);
-      
-      // Debug logging to help diagnose issues
-      console.log('Explorer Trophy calculation:', {
-        isTeenKids,
-        tried,
-        points,
-        requiredGameTypes,
-        gameTypesProgress: (gameTypesProgress * 100).toFixed(2) + '%',
-        pointsProgress: (pointsProgress * 100).toFixed(2) + '%',
-        combinedProgress: (combinedProgress * 100).toFixed(2) + '%',
-        result: result + '%',
-        gamesData: games
-      });
       
       return result;
     }
@@ -831,12 +1209,15 @@ const CertificatesPage = () => {
       // Only count if games data exists and is not empty for this audience
       if (!games || (Object.keys(games).length === 0)) {
         const requiredGameTypes = isTeenKids ? 7 : 5;
-        return `Games tried: 0/${requiredGameTypes}, Points: 0/300`;
+        return `Games played: 0/${requiredGameTypes}, Points: 0/300`;
       }
-      const tried = Array.isArray(games.types) && games.types.length > 0 ? new Set(games.types).size : 0;
-      const points = Number(games.points || 0);
+      
+      // Only count games that were actually played, not just visited
+      const hasGameplay = games.attempts > 0 || games.sessions > 0;
+      const tried = Array.isArray(games.types) && games.types.length > 0 && hasGameplay ? new Set(games.types).size : 0;
+      const points = hasGameplay ? Number(games.points || 0) : 0;
       const requiredGameTypes = isTeenKids ? 7 : 5;
-      return `Games tried: ${Math.min(tried, requiredGameTypes)}/${requiredGameTypes}, Points: ${Math.min(points, 300)}/300`;
+      return `Games played: ${Math.min(tried, requiredGameTypes)}/${requiredGameTypes}, Points: ${Math.min(points, 300)}/300`;
     }
     return '';
   };
@@ -849,7 +1230,7 @@ const CertificatesPage = () => {
     }
     return map;
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ctx.streak, ctx.points, mergedDetails, earnedCount, userId, isTeenKids, trophySpecs.map(t => t.id).join('|')]);
+  }, [ctx.streak, ctx.points, mergedDetails, earnedCount, userId, isTeenKids, trophySpecs]);
   const trophyHintMap = useMemo(() => {
     const map: Record<string, string> = {};
     for (const t of trophySpecs) {
@@ -857,7 +1238,7 @@ const CertificatesPage = () => {
     }
     return map;
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ctx.streak, ctx.points, mergedDetails, earnedCount, userId, isTeenKids, trophySpecs.map(t => t.id).join('|')]);
+  }, [ctx.streak, ctx.points, mergedDetails, earnedCount, userId, isTeenKids, trophySpecs]);
 
   const defaultLayout: CertificateLayout = {
     // No templatePath needed; styled backgrounds are drawn in code
@@ -1456,7 +1837,7 @@ const CertificatesPage = () => {
                         <div className="flex-1 min-w-0">
                           <div
                             className={`text-sm sm:text-base md:text-lg font-bold text-gray-800 dark:text-white leading-snug ${t.id === 'story-master' ? 'cursor-pointer hover:underline hover:text-[#FF6B6B]' : ''}`}
-                            onClick={t.id === 'story-master' ? () => navigate('/kids/young') : undefined}
+                            onClick={t.id === 'story-master' ? () => navigate(isTeenKids ? '/kids/teen' : '/kids/young') : undefined}
                           >
                             {t.title}
                           </div>
@@ -1536,7 +1917,9 @@ const CertificatesPage = () => {
                     <Printer className="h-4 w-4" />
                   </Button>
                   {t.id === 'story-master' && (
-                    <Button variant="outline" className="h-8 px-3 rounded-xl ml-auto" onClick={() => navigate('/kids/young')}>Go to Young Stories</Button>
+                    <Button variant="outline" className="h-8 px-3 rounded-xl ml-auto" onClick={() => navigate(isTeenKids ? '/kids/teen' : '/kids/young')}>
+                      {isTeenKids ? 'Go to Teen Stories' : 'Go to Young Stories'}
+                    </Button>
                   )}
                 </div>
               </CardContent>

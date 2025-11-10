@@ -723,6 +723,60 @@ class TeenAchievement(models.Model):
         return f"{self.user.username} - {self.key} ({status})"
 
 
+class TeenGameSession(models.Model):
+    """Track teen game sessions and scores"""
+    GAME_TYPES = [
+        ('debate-club', 'Debate Club'),
+        ('critical-thinking', 'Critical Thinking'),
+        ('research-challenge', 'Research Challenge'),
+        ('presentation-master', 'Presentation Master'),
+        ('ethics-discussion', 'Ethics Discussion'),
+        ('pronunciation-challenge', 'Advanced Pronunciation'),
+        ('conversation-practice', 'Professional Conversation'),
+        ('tongue-twister', 'Tongue Twisters'),
+        ('word-chain', 'Word Chain'),
+        ('story-telling', 'Story Telling'),
+        ('other', 'Other'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='teen_game_sessions')
+    game_type = models.CharField(max_length=50)
+    game_title = models.CharField(max_length=255, blank=True)
+    score = models.FloatField(default=0, validators=[MinValueValidator(0)])
+    points_earned = models.IntegerField(default=0)
+    rounds = models.IntegerField(default=0)
+    difficulty = models.CharField(max_length=20, default='beginner')
+    duration_seconds = models.IntegerField(default=0)
+    completed = models.BooleanField(default=False)
+    details = models.JSONField(default=dict)  # Additional game-specific data including conversation history
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['user', 'created_at']),
+            models.Index(fields=['game_type']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.game_type} ({self.score}%) - {self.created_at.date()}"
+
+
+class TeenCertificate(models.Model):
+    """Issued certificate record for teen users."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='teen_certificates')
+    cert_id = models.CharField(max_length=128)
+    title = models.CharField(max_length=255)
+    file_url = models.URLField(blank=True)
+    issued_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "cert_id")
+
+    def __str__(self):
+        return f"{self.user.username} - {self.cert_id} ({self.issued_at.date()})"
+
+
 class UserNotification(models.Model):
     """Notifications for end users."""
     TYPE_CHOICES = [

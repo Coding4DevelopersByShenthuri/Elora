@@ -8,6 +8,7 @@ from .models import (
     KidsVocabularyPractice, KidsPronunciationPractice, KidsGameSession,
     TeenProgress, TeenStoryProgress, TeenVocabularyPractice,
     TeenPronunciationPractice, TeenFavorite, TeenAchievement,
+    TeenGameSession, TeenCertificate,
     EmailVerificationToken, SurveyStepResponse, ParentalControlSettings,
     CookieConsent, PlatformSettings
 )
@@ -179,6 +180,25 @@ class TeenAchievementAdmin(admin.ModelAdmin):
     list_filter = ['unlocked']
     search_fields = ['user__username', 'key']
     readonly_fields = ['unlocked_at', 'updated_at']
+
+
+@admin.register(TeenGameSession)
+class TeenGameSessionAdmin(admin.ModelAdmin):
+    list_display = ['user', 'game_type', 'score', 'points_earned', 'duration_seconds', 'created_at']
+    list_filter = ['game_type', 'created_at']
+    search_fields = ['user__username']
+    readonly_fields = ['created_at', 'updated_at']
+    date_hierarchy = 'created_at'
+    ordering = ['-created_at']
+
+
+@admin.register(TeenCertificate)
+class TeenCertificateAdmin(admin.ModelAdmin):
+    list_display = ['user', 'cert_id', 'title', 'issued_at']
+    list_filter = ['issued_at']
+    search_fields = ['user__username', 'cert_id', 'title']
+    readonly_fields = ['issued_at']
+    date_hierarchy = 'issued_at'
 
 
 # ============= Kids Models Admin =============

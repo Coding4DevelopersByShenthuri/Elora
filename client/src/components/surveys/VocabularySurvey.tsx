@@ -80,9 +80,22 @@ const VocabularySurvey: React.FC<VocabularySurveyProps> = ({
     onComplete(surveyData);
   }, [onComplete, selectedWords]);
 
+  // Debug: Log when dialog opens/closes
+  React.useEffect(() => {
+    if (isOpen) {
+      console.log('✅ VocabularySurvey (Step 13) is now OPEN');
+    } else {
+      console.log('❌ VocabularySurvey (Step 13) is now CLOSED');
+    }
+  }, [isOpen]);
+
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
-      <DialogContent className="w-full h-full max-w-none max-h-none p-0 overflow-hidden border-0 bg-transparent m-0 rounded-none">
+      <DialogContent 
+        className="w-full h-full max-w-none max-h-none p-0 overflow-hidden border-0 bg-transparent m-0 rounded-none z-[9999]"
+        title="Vocabulary Survey"
+        description="Select vocabulary words"
+      >
         <div className="w-full h-screen bg-white flex flex-col md:flex-row relative">
           {/* Mobile layout */}
           <div className="md:hidden w-full h-full flex flex-col">

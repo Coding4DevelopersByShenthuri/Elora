@@ -85,9 +85,22 @@ const UserSurvey: React.FC<UserSurveyProps> = ({ isOpen, onComplete, currentStep
     onComplete(surveyData);
   };
 
+  // Debug: Log when dialog opens/closes
+  React.useEffect(() => {
+    if (isOpen) {
+      console.log('✅ UserSurvey (Step 1) is now OPEN');
+    } else {
+      console.log('❌ UserSurvey (Step 1) is now CLOSED');
+    }
+  }, [isOpen]);
+
   return (
     <Dialog open={isOpen} onOpenChange={() => { }}>
-      <DialogContent className="w-full h-full max-w-none max-h-none p-0 md:p-0 overflow-hidden border-0 bg-transparent m-0 rounded-none">
+      <DialogContent 
+        className="w-full h-full max-w-none max-h-none p-0 md:p-0 overflow-hidden border-0 bg-transparent m-0 rounded-none z-[9999]"
+        title="User Survey"
+        description="Select your age range"
+      >
         <div className="w-full min-h-screen md:h-screen bg-white flex flex-col md:flex-row relative">
           {/* Mobile Layout - REVISED HEADER */}
           <div className="md:hidden w-full flex flex-col flex-1 overflow-hidden">

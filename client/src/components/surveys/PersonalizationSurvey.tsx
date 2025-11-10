@@ -154,9 +154,22 @@ const PersonalizationSurvey: React.FC<PersonalizationSurveyProps> = ({
     };
   }, [showTimeDropdown]);
 
+  // Debug: Log when dialog opens/closes
+  React.useEffect(() => {
+    if (isOpen) {
+      console.log('✅ PersonalizationSurvey (Step 18) is now OPEN');
+    } else {
+      console.log('❌ PersonalizationSurvey (Step 18) is now CLOSED');
+    }
+  }, [isOpen]);
+
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
-      <DialogContent className="max-w-none w-full h-full p-0 border-0 bg-transparent overflow-hidden">
+      <DialogContent 
+        className="max-w-none w-full h-full p-0 border-0 bg-transparent overflow-hidden z-[9999]"
+        title="Personalization Survey"
+        description="Set your practice preferences"
+      >
         <div className="relative min-h-screen bg-gradient-to-br from-blue-50 via-slate-50 to-white">
           <button
             onClick={onBack}

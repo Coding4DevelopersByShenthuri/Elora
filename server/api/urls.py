@@ -51,6 +51,9 @@ urlpatterns = [
     path('teen/pronunciation/practice', views.teen_pronunciation_practice, name='teen-pronunciation-practice'),
     path('teen/favorite/toggle', views.teen_toggle_favorite, name='teen-toggle-favorite'),
     path('teen/quick-action', views.teen_quick_action, name='teen-quick-action'),
+    path('teen/games/session', views.teen_game_session, name='teen-game-session'),
+    path('teen/certificates/issue', views.teen_issue_certificate, name='teen-issue-certificate'),
+    path('teen/certificates/my', views.teen_my_certificates, name='teen-my-certificates'),
     
     # ============= Kids Specific =============
     path('kids/lessons', views.kids_lessons, name='kids-lessons'),

@@ -59,14 +59,20 @@ const InteractiveGames = ({ isTeenKids }: InteractiveGamesProps = {}) => {
   // Load game score from progress
   useEffect(() => {
     const loadScore = async () => {
-      if (!isAuthenticated) return;
+      if (!isAuthenticated) {
+        setGameScore(0);
+        return;
+      }
       try {
         const token = localStorage.getItem('speakbee_auth_token');
         if (token && token !== 'local-token') {
           if (isTeenContext) {
+            // For teen context, only show points from actual game completions
+            // Check if there are any completed games in the dashboard
             const dashboard = await TeenApi.getDashboard(token);
-            const points = (dashboard as any)?.points ?? (dashboard as any)?.progress?.points ?? 0;
-            setGameScore(Number(points));
+            // Only show game-specific points, not total points
+            // Since games don't award points separately in teen context, show 0 until games are implemented
+            setGameScore(0);
             return;
           }
           const progress = await KidsApi.getProgress(token);
@@ -81,10 +87,11 @@ const InteractiveGames = ({ isTeenKids }: InteractiveGamesProps = {}) => {
         }
       } catch (error) {
         console.error('Error loading game score:', error);
+        setGameScore(0);
       }
     };
     loadScore();
-  }, [isAuthenticated, userId]);
+  }, [isAuthenticated, userId, isTeenContext]);
 
   // Start a new game - navigate to the game page with context
   const startGame = (gameType: GameType) => {

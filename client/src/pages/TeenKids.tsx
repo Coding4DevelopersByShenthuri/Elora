@@ -840,20 +840,6 @@ const TeenKidsPage = () => {
     }
   };
 
-  const awardEngagementPoints = async (delta: number, source: string, options?: { incrementGames?: boolean }) => {
-    await callTeenApi(
-      (token) =>
-        TeenApi.recordQuickAction(token, {
-          action: source,
-          deltaPoints: delta,
-          incrementGames: options?.incrementGames,
-        }),
-      () => {
-        setPoints((prev) => prev + delta);
-      }
-    );
-  };
-
   const handleAuthSuccess = () => {
     setShowAuthModal(false);
   };
@@ -1359,9 +1345,8 @@ const TeenKidsPage = () => {
                 </div>
             <Button 
                   variant="secondary"
-                  onClick={async () => {
+                  onClick={() => {
                 handleCategoryClick('pronunciation');
-                    await awardEngagementPoints(10, 'quick-listen');
                   }}
                 >
                   Start practising
@@ -1382,9 +1367,8 @@ const TeenKidsPage = () => {
                 </div>
             <Button 
                   variant="secondary"
-                  onClick={async () => {
+                  onClick={() => {
                 handleCategoryClick('pronunciation');
-                    await awardEngagementPoints(10, 'quick-speak');
                   }}
                 >
                   Open studio
@@ -1405,8 +1389,7 @@ const TeenKidsPage = () => {
                 </div>
             <Button 
                   variant="secondary"
-                  onClick={async () => {
-                    await awardEngagementPoints(5, 'quick-favorites');
+                  onClick={() => {
                     navigate('/favorites');
                   }}
                 >

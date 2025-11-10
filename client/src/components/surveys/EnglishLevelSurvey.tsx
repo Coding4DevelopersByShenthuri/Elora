@@ -54,9 +54,22 @@ const EnglishLevelSurvey: React.FC<EnglishLevelSurveyProps> = ({ isOpen, onCompl
     onComplete(surveyData);
   };
 
+  // Debug: Log when dialog opens/closes
+  React.useEffect(() => {
+    if (isOpen) {
+      console.log('✅ EnglishLevelSurvey (Step 3) is now OPEN');
+    } else {
+      console.log('❌ EnglishLevelSurvey (Step 3) is now CLOSED');
+    }
+  }, [isOpen]);
+
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
-      <DialogContent className="w-full h-full max-w-none max-h-none p-0 overflow-hidden border-0 bg-transparent m-0 rounded-none">
+      <DialogContent 
+        className="w-full h-full max-w-none max-h-none p-0 overflow-hidden border-0 bg-transparent m-0 rounded-none z-[9999]"
+        title="English Level Survey"
+        description="Select your English proficiency level"
+      >
         <div className="w-full h-screen bg-white flex flex-col md:flex-row relative">
           {/* Mobile */}
           <div className="md:hidden w-full h-full flex flex-col">
