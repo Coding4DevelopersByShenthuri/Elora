@@ -289,13 +289,55 @@ const CertificatesPage = () => {
       description: isTeenKids ? '50 Advanced Speaking sessions with average ≥ 75' : '50 Speak & Repeat sessions with average ≥ 75',
       criteria: (c) => {
         const pron = c.details?.pronunciation || {};
-        const sessions = Object.values(pron) as any[];
-        const total = sessions.reduce((s: number, r: any) => s + (r.attempts || 0), 0);
-        const avg = sessions.length ? (sessions.reduce((s: number, r: any) => s + (r.bestScore || 0), 0) / sessions.length) : 0;
-        const progress = Math.min(100, Math.round(((Math.min(total, 50) / 50) * 50) + (Math.min(avg, 100) / 2)));
-        const eligible = total >= 50 && avg >= 75;
-        const hint = eligible ? 'Ready to download!' : `Sessions: ${Math.min(total, 50)}/50, Avg: ${avg.toFixed(0)}%`;
-        return { progress, eligible, hint };
+        const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
+          'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
+          'ai-ethics-explorer', 'digital-security-guardian'];
+        const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
+          'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
+          'rainbow-castle', 'jungle-explorer'];
+        
+        // Only count phrases from completed stories
+        const targetStoryIds = isTeenKids ? teenStoryIds : youngStoryIds;
+        try {
+          const userId = localStorage.getItem('speakbee_current_user') 
+            ? JSON.parse(localStorage.getItem('speakbee_current_user')!).id || 'anonymous'
+            : 'anonymous';
+          const enrolledStories = StoryWordsService.getEnrolledStories(userId);
+          
+          // Get only completed stories from the correct audience
+          const completedStoryIds = enrolledStories
+            .filter(e => 
+              e.completed === true && 
+              e.wordsExtracted === true &&
+              targetStoryIds.includes(e.storyId)
+            )
+            .map(e => e.storyId);
+          
+          // If no completed stories, return 0 progress
+          if (completedStoryIds.length === 0) {
+            return { progress: 0, eligible: false, hint: 'Sessions: 0/50, Avg: 0%' };
+          }
+          
+          // Get phrases only from completed stories
+          const phrases = StoryWordsService.getPhrasesForStoryIds(completedStoryIds);
+          const storyPhrases = new Set<string>();
+          phrases.forEach(p => storyPhrases.add(p.phrase.toLowerCase()));
+          
+          // Filter pronunciation sessions by story phrases from completed stories only
+          const filteredSessions = Object.entries(pron).filter(([phrase]) => 
+            storyPhrases.has(phrase.toLowerCase())
+          ).map(([, data]) => data as any);
+          
+          const total = filteredSessions.reduce((s: number, r: any) => s + (r.attempts || 0), 0);
+          const avg = filteredSessions.length ? (filteredSessions.reduce((s: number, r: any) => s + (r.bestScore || 0), 0) / filteredSessions.length) : 0;
+          const progress = Math.min(100, Math.round(((Math.min(total, 50) / 50) * 50) + (Math.min(avg, 100) / 2)));
+          const eligible = total >= 50 && avg >= 75;
+          const hint = eligible ? 'Ready to download!' : `Sessions: ${Math.min(total, 50)}/50, Avg: ${avg.toFixed(0)}%`;
+          return { progress, eligible, hint };
+        } catch (error) {
+          console.error('Error computing speaking-star certificate:', error);
+          return { progress: 0, eligible: false, hint: 'Sessions: 0/50, Avg: 0%' };
+        }
       }
     },
     {
@@ -306,12 +348,54 @@ const CertificatesPage = () => {
       description: isTeenKids ? 'Master 100 advanced words (≥ 2 practices each)' : 'Master 100 unique words (≥ 2 practices each)',
       criteria: (c) => {
         const vocab = c.details?.vocabulary || {};
-        const practiced = Object.values(vocab) as any[];
-        const mastered = practiced.filter((r: any) => (r.attempts || 0) >= 2).length;
-        const progress = Math.min(100, Math.round((Math.min(mastered, 100) / 100) * 100));
-        const eligible = mastered >= 100;
-        const hint = eligible ? 'Ready to download!' : `Mastered: ${mastered}/100`;
-        return { progress, eligible, hint };
+        const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
+          'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
+          'ai-ethics-explorer', 'digital-security-guardian'];
+        const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
+          'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
+          'rainbow-castle', 'jungle-explorer'];
+        
+        // Only count words from completed stories
+        const targetStoryIds = isTeenKids ? teenStoryIds : youngStoryIds;
+        try {
+          const userId = localStorage.getItem('speakbee_current_user') 
+            ? JSON.parse(localStorage.getItem('speakbee_current_user')!).id || 'anonymous'
+            : 'anonymous';
+          const enrolledStories = StoryWordsService.getEnrolledStories(userId);
+          
+          // Get only completed stories from the correct audience
+          const completedStoryIds = enrolledStories
+            .filter(e => 
+              e.completed === true && 
+              e.wordsExtracted === true &&
+              targetStoryIds.includes(e.storyId)
+            )
+            .map(e => e.storyId);
+          
+          // If no completed stories, return 0 progress
+          if (completedStoryIds.length === 0) {
+            return { progress: 0, eligible: false, hint: 'Mastered: 0/100' };
+          }
+          
+          // Get words only from completed stories
+          const words = StoryWordsService.getWordsForStoryIds(completedStoryIds);
+          const storyWords = new Set<string>();
+          words.forEach(w => storyWords.add(w.word.toLowerCase()));
+          
+          // Filter vocabulary by story words from completed stories only
+          const filteredVocab = Object.entries(vocab).filter(([word]) => 
+            storyWords.has(word.toLowerCase())
+          ).map(([, data]) => data as any);
+          
+          const mastered = filteredVocab.filter((r: any) => (r.attempts || 0) >= 2).length;
+          const progress = Math.min(100, Math.round((Math.min(mastered, 100) / 100) * 100));
+          const eligible = mastered >= 100;
+          const hint = eligible ? 'Ready to download!' : `Mastered: ${mastered}/100`;
+          return { progress, eligible, hint };
+        } catch (error) {
+          console.error('Error computing word-wizard certificate:', error);
+          return { progress: 0, eligible: false, hint: 'Mastered: 0/100' };
+        }
       }
     },
     {
@@ -496,18 +580,74 @@ const CertificatesPage = () => {
     }
     if (t.id === 'pronunciation-pro') {
       const pron = d.pronunciation || {};
-      const vals = Object.values(pron) as any[];
-      const attempts = vals.reduce((s, r) => s + (r.attempts || 0), 0);
-      const avg = vals.length ? (vals.reduce((s, r) => s + (r.bestScore || 0), 0) / vals.length) : 0;
-      // Strict thresholds: attempts >= 100 AND avg >= 80 to unlock
-      const attemptsPct = Math.min(attempts, 100) / 100; // 0..1
-      const avgTo80Pct = Math.min(Math.max(avg, 0), 80) / 80; // reach 1.0 at 80
-      return Math.round(Math.min(attemptsPct, avgTo80Pct) * 100);
+      const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
+        'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
+        'ai-ethics-explorer', 'digital-security-guardian'];
+      const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
+        'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
+        'rainbow-castle', 'jungle-explorer'];
+      
+      // Only count phrases from completed stories
+      const targetStoryIds = isTeenKids ? teenStoryIds : youngStoryIds;
+      try {
+        const userId = localStorage.getItem('speakbee_current_user') 
+          ? JSON.parse(localStorage.getItem('speakbee_current_user')!).id || 'anonymous'
+          : 'anonymous';
+        const enrolledStories = StoryWordsService.getEnrolledStories(userId);
+        
+        // Get only completed stories from the correct audience
+        const completedStoryIds = enrolledStories
+          .filter(e => 
+            e.completed === true && 
+            e.wordsExtracted === true &&
+            targetStoryIds.includes(e.storyId)
+          )
+          .map(e => e.storyId);
+        
+        // If no completed stories, return 0
+        if (completedStoryIds.length === 0) {
+          return 0;
+        }
+        
+        // Get phrases only from completed stories
+        const phrases = StoryWordsService.getPhrasesForStoryIds(completedStoryIds);
+        const storyPhrases = new Set<string>();
+        phrases.forEach(p => storyPhrases.add(p.phrase.toLowerCase()));
+        
+        // Filter pronunciation sessions by story phrases from completed stories only
+        const filteredSessions = Object.entries(pron).filter(([phrase]) => 
+          storyPhrases.has(phrase.toLowerCase())
+        ).map(([, data]) => data as any);
+        
+        const attempts = filteredSessions.reduce((s, r) => s + (r.attempts || 0), 0);
+        const avg = filteredSessions.length ? (filteredSessions.reduce((s, r) => s + (r.bestScore || 0), 0) / filteredSessions.length) : 0;
+        // Strict thresholds: attempts >= 100 AND avg >= 80 to unlock
+        const attemptsPct = Math.min(attempts, 100) / 100; // 0..1
+        const avgTo80Pct = Math.min(Math.max(avg, 0), 80) / 80; // reach 1.0 at 80
+        return Math.round(Math.min(attemptsPct, avgTo80Pct) * 100);
+      } catch (error) {
+        console.error('Error computing pronunciation-pro trophy:', error);
+        return 0;
+      }
     }
     if (t.id === 'vocab-builder') {
-      // Use actual words from completed stories only
+      // Use actual words from completed stories only, filtered by audience
       try {
-        const words = StoryWordsService.getWordsFromEnrolledStories(userId);
+        const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
+          'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
+          'ai-ethics-explorer', 'digital-security-guardian'];
+        const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
+          'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
+          'rainbow-castle', 'jungle-explorer'];
+        
+        const targetStoryIds = isTeenKids ? teenStoryIds : youngStoryIds;
+        const enrolledStories = StoryWordsService.getEnrolledStories(userId);
+        const completedStoryIds = enrolledStories
+          .filter(e => e.completed === true && e.wordsExtracted === true)
+          .map(e => e.storyId)
+          .filter(id => targetStoryIds.includes(id));
+        
+        const words = StoryWordsService.getWordsForStoryIds(completedStoryIds);
         const uniqueWords = new Set(words.map(w => w.word.toLowerCase())).size;
         return Math.round((Math.min(uniqueWords, 150) / 150) * 100);
       } catch (error) {
@@ -520,14 +660,50 @@ const CertificatesPage = () => {
       return Math.round((Math.min(earned, 3) / 3) * 100);
     }
     if (t.id === 'explorer') {
-      const games = d.games || {};
-      const tried = Array.isArray(games.types) ? new Set(games.types).size : 0; // expect ['tongue-twister','word-chain',...]
+      // Check if games data exists in audience-specific stats first
+      const audienceStats = d.audienceStats || {};
+      const targetAudienceStats = isTeenKids ? (audienceStats.teen || {}) : (audienceStats.young || {});
+      
+      // Only use games data from the correct audience to avoid mixing teen/young data
+      // If no audience-specific games data exists, return 0 (don't use general games data)
+      const games = targetAudienceStats.games;
+      
+      // Only count if games data exists and is not empty for this audience
+      if (!games || (Object.keys(games).length === 0)) {
+        return 0;
+      }
+      
+      const tried = Array.isArray(games.types) && games.types.length > 0 ? new Set(games.types).size : 0;
       const points = Number(games.points || 0);
+      
+      // If no games tried and no points, return 0
+      if (tried === 0 && points === 0) {
+        return 0;
+      }
+      
       const requiredGameTypes = isTeenKids ? 7 : 5;
-      const cappedGameTypes = requiredGameTypes > 0 ? Math.min(tried, requiredGameTypes) / requiredGameTypes : 0;
-      const cappedPoints = Math.min(points, 300) / 300;
-      const combinedProgress = (cappedGameTypes + cappedPoints) / 2; // average the two goals
-      return Math.round(combinedProgress * 100);
+      const gameTypesProgress = requiredGameTypes > 0 ? Math.min(tried, requiredGameTypes) / requiredGameTypes : 0;
+      const pointsProgress = Math.min(points, 300) / 300;
+      
+      // Use minimum of both requirements since both must be met (not average)
+      // This ensures progress reflects the limiting factor
+      const combinedProgress = Math.min(gameTypesProgress, pointsProgress);
+      const result = Math.round(combinedProgress * 100);
+      
+      // Debug logging to help diagnose issues
+      console.log('Explorer Trophy calculation:', {
+        isTeenKids,
+        tried,
+        points,
+        requiredGameTypes,
+        gameTypesProgress: (gameTypesProgress * 100).toFixed(2) + '%',
+        pointsProgress: (pointsProgress * 100).toFixed(2) + '%',
+        combinedProgress: (combinedProgress * 100).toFixed(2) + '%',
+        result: result + '%',
+        gamesData: games
+      });
+      
+      return result;
     }
     return 0;
   };
@@ -569,15 +745,71 @@ const CertificatesPage = () => {
     }
     if (t.id === 'pronunciation-pro') {
       const pron = d.pronunciation || {};
-      const vals = Object.values(pron) as any[];
-      const attempts = vals.reduce((s, r) => s + (r.attempts || 0), 0);
-      const avg = vals.length ? (vals.reduce((s, r) => s + (r.bestScore || 0), 0) / vals.length) : 0;
-      return `Attempts: ${Math.min(attempts, 100)}/100, Avg: ${avg.toFixed(0)}%`;
+      const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
+        'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
+        'ai-ethics-explorer', 'digital-security-guardian'];
+      const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
+        'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
+        'rainbow-castle', 'jungle-explorer'];
+      
+      // Only count phrases from completed stories
+      const targetStoryIds = isTeenKids ? teenStoryIds : youngStoryIds;
+      try {
+        const userId = localStorage.getItem('speakbee_current_user') 
+          ? JSON.parse(localStorage.getItem('speakbee_current_user')!).id || 'anonymous'
+          : 'anonymous';
+        const enrolledStories = StoryWordsService.getEnrolledStories(userId);
+        
+        // Get only completed stories from the correct audience
+        const completedStoryIds = enrolledStories
+          .filter(e => 
+            e.completed === true && 
+            e.wordsExtracted === true &&
+            targetStoryIds.includes(e.storyId)
+          )
+          .map(e => e.storyId);
+        
+        // If no completed stories, return 0
+        if (completedStoryIds.length === 0) {
+          return 'Attempts: 0/100, Avg: 0%';
+        }
+        
+        // Get phrases only from completed stories
+        const phrases = StoryWordsService.getPhrasesForStoryIds(completedStoryIds);
+        const storyPhrases = new Set<string>();
+        phrases.forEach(p => storyPhrases.add(p.phrase.toLowerCase()));
+        
+        // Filter pronunciation sessions by story phrases from completed stories only
+        const filteredSessions = Object.entries(pron).filter(([phrase]) => 
+          storyPhrases.has(phrase.toLowerCase())
+        ).map(([, data]) => data as any);
+        
+        const attempts = filteredSessions.reduce((s, r) => s + (r.attempts || 0), 0);
+        const avg = filteredSessions.length ? (filteredSessions.reduce((s, r) => s + (r.bestScore || 0), 0) / filteredSessions.length) : 0;
+        return `Attempts: ${Math.min(attempts, 100)}/100, Avg: ${avg.toFixed(0)}%`;
+      } catch (error) {
+        console.error('Error getting pronunciation-pro hint:', error);
+        return 'Attempts: 0/100, Avg: 0%';
+      }
     }
     if (t.id === 'vocab-builder') {
-      // Use actual words from completed stories only
+      // Use actual words from completed stories only, filtered by audience
       try {
-        const words = StoryWordsService.getWordsFromEnrolledStories(userId);
+        const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
+          'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
+          'ai-ethics-explorer', 'digital-security-guardian'];
+        const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
+          'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
+          'rainbow-castle', 'jungle-explorer'];
+        
+        const targetStoryIds = isTeenKids ? teenStoryIds : youngStoryIds;
+        const enrolledStories = StoryWordsService.getEnrolledStories(userId);
+        const completedStoryIds = enrolledStories
+          .filter(e => e.completed === true && e.wordsExtracted === true)
+          .map(e => e.storyId)
+          .filter(id => targetStoryIds.includes(id));
+        
+        const words = StoryWordsService.getWordsForStoryIds(completedStoryIds);
         const uniqueWords = new Set(words.map(w => w.word.toLowerCase())).size;
         return `Words: ${Math.min(uniqueWords, 150)}/150`;
       } catch (error) {
@@ -589,8 +821,19 @@ const CertificatesPage = () => {
       return `Certificates: ${Math.min(earnedCount, 3)}/3`;
     }
     if (t.id === 'explorer') {
-      const games = d.games || {};
-      const tried = Array.isArray(games.types) ? new Set(games.types).size : 0;
+      // Check if games data exists in audience-specific stats first
+      const audienceStats = d.audienceStats || {};
+      const targetAudienceStats = isTeenKids ? (audienceStats.teen || {}) : (audienceStats.young || {});
+      
+      // Only use games data from the correct audience to avoid mixing teen/young data
+      const games = targetAudienceStats.games;
+      
+      // Only count if games data exists and is not empty for this audience
+      if (!games || (Object.keys(games).length === 0)) {
+        const requiredGameTypes = isTeenKids ? 7 : 5;
+        return `Games tried: 0/${requiredGameTypes}, Points: 0/300`;
+      }
+      const tried = Array.isArray(games.types) && games.types.length > 0 ? new Set(games.types).size : 0;
       const points = Number(games.points || 0);
       const requiredGameTypes = isTeenKids ? 7 : 5;
       return `Games tried: ${Math.min(tried, requiredGameTypes)}/${requiredGameTypes}, Points: ${Math.min(points, 300)}/300`;
@@ -998,6 +1241,7 @@ const CertificatesPage = () => {
                             await KidsApi.issueCertificate(token, { 
                               cert_id: spec.id, 
                               title: spec.title,
+                              audience: isTeenKids ? 'teen' : 'young',
                               file_url: fileUrl 
                             });
                             

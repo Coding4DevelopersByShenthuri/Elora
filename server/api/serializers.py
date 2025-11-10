@@ -356,7 +356,7 @@ class KidsCertificateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = KidsCertificate
-        fields = ["user_id", "cert_id", "title", "file_url", "issued_at"]
+        fields = ["user_id", "cert_id", "audience", "title", "file_url", "issued_at"]
 
 
 # ============= Kids Story Management Serializers =============

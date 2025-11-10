@@ -90,7 +90,7 @@ class KidsApi {
 
   static async issueCertificate(
     token: string,
-    payload: { cert_id: string; title: string; file_url?: string }
+    payload: { cert_id: string; title: string; audience?: 'young' | 'teen'; file_url?: string }
   ) {
     this.ensureToken(token);
     this.ensureOnline();

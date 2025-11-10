@@ -3,7 +3,7 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Trophy, Loader2, AlertCircle, ArrowLeft, Volume2, RotateCcw, Star, Award } from 'lucide-react';
+import { Trophy, Loader2, AlertCircle, ArrowLeft, Volume2, RotateCcw, Star, Award, StopCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import EnhancedTTS from '@/services/EnhancedTTS';
 import { WhisperService } from '@/services/WhisperService';
@@ -137,6 +137,8 @@ const KidsGamePage = () => {
   const [sessionStartTime, setSessionStartTime] = useState<number>(0);
   const [sessionAge, setSessionAge] = useState<number | null>(null); // Store age for consistency during session
   const [gameTimeLimit] = useState<number>(8 * 60 * 1000); // 8 minutes in milliseconds
+  const [timeRemaining, setTimeRemaining] = useState<number>(8 * 60 * 1000); // Time remaining in milliseconds
+  const [gameEndReason, setGameEndReason] = useState<'time-up' | 'user-requested' | 'ai-ended' | 'completed' | null>(null);
   const conversationEndRef = useRef<HTMLDivElement>(null);
   const conversationContainerRef = useRef<HTMLDivElement>(null);
 
@@ -230,63 +232,108 @@ const KidsGamePage = () => {
     }
   };
 
-  // Handle time-based game ending (defined early for use in useEffect)
-  const handleTimeBasedGameEnd = async () => {
+  // Handle game ending with proportional points calculation
+  const handleGameEnd = async (reason: 'time-up' | 'user-requested' | 'ai-ended' | 'completed') => {
     if (gameCompleted) return;
     
     setGameCompleted(true);
+    setGameEndReason(reason);
     
-    // Award completion bonus
-    const completionBonus = Math.max(50, currentRound * 3);
+    const currentTime = Date.now();
+    const timeElapsed = currentTime - sessionStartTime;
+    const timePlayedRatio = Math.min(1, timeElapsed / gameTimeLimit);
+    const isFullCompletion = reason === 'time-up' || reason === 'completed';
+    
+    // Calculate points based on completion status
+    let finalScore = gameScore;
+    let completionBonus = 0;
+    
+    if (isFullCompletion) {
+      // Full completion: award full bonus points
+      completionBonus = Math.max(50, currentRound * 3);
+      finalScore = gameScore + completionBonus;
+    } else {
+      // Early end: calculate proportional points based on time played
+      const basePoints = gameScore;
+      const fullCompletionBonus = Math.max(50, currentRound * 3);
+      const proportionalBonus = Math.round(fullCompletionBonus * timePlayedRatio);
+      completionBonus = proportionalBonus;
+      finalScore = basePoints + proportionalBonus;
+    }
+    
+    // Update score if there's a bonus
     if (completionBonus > 0) {
       await handleScoreUpdate(completionBonus, currentGame);
     }
     
-    // Save completed game history
+    // Save game history
     if (isAuthenticated && currentSessionId) {
       const gameTitles = isTeenContext ? teenGameTitles : youngGameTitles;
       const gameInfo = gameTitles[currentGame];
       
-      const finalScore = gameScore + completionBonus;
       const session: GameSession = {
         id: currentSessionId,
         gameType: currentGame,
         gameTitle: gameInfo?.title || currentGame,
         startTime: sessionStartTime || Date.now() - (currentRound * 30000),
-        endTime: Date.now(),
+        endTime: currentTime,
         score: finalScore,
         rounds: currentRound,
         difficulty: currentDifficulty,
         conversationHistory: conversationHistory,
-        completed: true
+        completed: isFullCompletion
       };
       
       try {
         await GameHistoryService.saveGameSession(userId, session);
-        console.log('✅ Time-based game end - session saved:', session.id);
+        console.log(`✅ Game end (${reason}) - session saved:`, session.id);
       } catch (error) {
-        console.error('Error saving time-based game end:', error);
+        console.error('Error saving game end:', error);
       }
     }
     
-    // Add ending message to conversation
-    const endingMessage: ConversationMessage = {
-      role: 'assistant',
-      content: `Great job playing today! You practiced for 8 minutes and earned ${gameScore + completionBonus} points! Let's play again soon!`,
-      timestamp: Date.now()
-    };
+    // Generate appropriate ending message
+    let endingMessage: ConversationMessage;
+    const minutesPlayed = Math.floor(timeElapsed / 60000);
+    const secondsPlayed = Math.floor((timeElapsed % 60000) / 1000);
+    
+    if (isFullCompletion) {
+      endingMessage = {
+        role: 'assistant',
+        content: `🎉 Excellent work! You completed the full game session and earned ${finalScore} points! You played for the full ${Math.floor(gameTimeLimit / 60000)} minutes. Great job!`,
+        timestamp: Date.now()
+      };
+    } else {
+      endingMessage = {
+        role: 'assistant',
+        content: `Good effort! You played for ${minutesPlayed} minute${minutesPlayed !== 1 ? 's' : ''} and ${secondsPlayed} second${secondsPlayed !== 1 ? 's' : ''}, earning ${finalScore} points. ${reason === 'user-requested' ? 'Thanks for playing!' : 'Keep practicing to earn more points!'}`,
+        timestamp: Date.now()
+      };
+    }
+    
     setConversationHistory(prev => [...prev, endingMessage]);
     
     // Play completion message
     if (isSoundEnabled) {
-      const finalScore = gameScore + completionBonus;
-      const completionMessage = `Time's up! Great job! You earned ${finalScore} points today!`;
+      const completionMessage = isFullCompletion
+        ? `Time's up! Great job completing the full game! You earned ${finalScore} points!`
+        : `You played for ${minutesPlayed} minute${minutesPlayed !== 1 ? 's' : ''} and earned ${finalScore} points. Great effort!`;
       EnhancedTTS.speak(completionMessage, { 
         voice: findFemaleVoiceId(),
         rate: 0.9, 
         emotion: 'excited' 
       }).catch(() => {});
     }
+  };
+
+  // Handle time-based game ending (for backward compatibility)
+  const handleTimeBasedGameEnd = async () => {
+    await handleGameEnd('time-up');
+  };
+
+  // Handle user-requested game ending
+  const handleUserRequestedEnd = async () => {
+    await handleGameEnd('user-requested');
   };
 
   // Start game automatically when component mounts
@@ -301,23 +348,25 @@ const KidsGamePage = () => {
   useEffect(() => {
     if (!sessionStartTime || gameCompleted) return;
 
-    const timeElapsed = Date.now() - sessionStartTime;
-    const timeRemaining = gameTimeLimit - timeElapsed;
+    const updateTimer = () => {
+      const timeElapsed = Date.now() - sessionStartTime;
+      const remaining = gameTimeLimit - timeElapsed;
 
-    if (timeRemaining <= 0) {
-      // Time limit reached - end the game
-      handleTimeBasedGameEnd();
-      return;
-    }
-
-    // Set up timer to end game when time limit is reached
-    const timer = setTimeout(() => {
-      if (!gameCompleted) {
+      if (remaining <= 0) {
+        // Time limit reached - end the game
         handleTimeBasedGameEnd();
+        setTimeRemaining(0);
+        return;
       }
-    }, timeRemaining);
 
-    return () => clearTimeout(timer);
+      setTimeRemaining(remaining);
+    };
+
+    // Update timer every second
+    const interval = setInterval(updateTimer, 1000);
+    updateTimer(); // Initial update
+
+    return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionStartTime, gameCompleted, gameTimeLimit]);
 
@@ -389,6 +438,8 @@ const KidsGamePage = () => {
     setGameCompleted(false);
     setGameScore(0); // Reset game score for new game
     setSessionAge(null); // Reset age for new game session
+    setTimeRemaining(gameTimeLimit); // Reset time remaining
+    setGameEndReason(null); // Reset end reason
     
     // Create new session ID and track start time
     const sessionId = `game-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -605,62 +656,40 @@ const KidsGamePage = () => {
       }
       
       // Check if user requested to end the game
-      const endGamePhrases = ['end game', 'finish', 'stop', 'done', 'done for today', "i'm done", "let's stop", 'finish game', 'end this game', 'i want to stop', 'can we stop'];
+      const endGamePhrases = [
+        'end game', 'finish', 'stop', 'done', 'done for today', "i'm done", "let's stop", 
+        'finish game', 'end this game', 'i want to stop', 'can we stop', 'i want to end',
+        'end the game', 'stop playing', 'finish playing', 'i am done', 'we are done',
+        'can you end', 'please end', 'end now', 'stop now', 'finish now'
+      ];
       const userRequestedEnd = endGamePhrases.some(phrase => input.toLowerCase().includes(phrase));
       
-      // Check if game should end (max rounds, explicit end signal, or user request)
-      const shouldEndGame = response.gameEnd || userRequestedEnd || currentRound >= 20 || 
-        (formattedContent.toLowerCase().includes('great job') && formattedContent.toLowerCase().includes('completed')) ||
-        (formattedContent.toLowerCase().includes('excellent') && formattedContent.toLowerCase().includes('finished'));
+      // Check if AI wants to end the game
+      const aiEndIndicators = [
+        'great job', 'completed', 'excellent', 'finished', 'well done', 'congratulations',
+        'game over', 'session complete', 'that\'s all', 'we\'re done'
+      ];
+      const aiWantsToEnd = aiEndIndicators.some(indicator => 
+        formattedContent.toLowerCase().includes(indicator) && 
+        (formattedContent.toLowerCase().includes('completed') || 
+         formattedContent.toLowerCase().includes('finished') ||
+         formattedContent.toLowerCase().includes('done'))
+      );
+      
+      // Check if game should end (max rounds, explicit end signal, user request, or AI decision)
+      const shouldEndGame = response.gameEnd || userRequestedEnd || aiWantsToEnd || currentRound >= 20;
       
       if (shouldEndGame && !gameCompleted) {
-        // Award completion bonus first
-        const completionBonus = Math.max(50, currentRound * 3);
-        if (completionBonus > 0) {
-          await handleScoreUpdate(completionBonus, currentGame);
+        // Determine end reason
+        let endReason: 'user-requested' | 'ai-ended' | 'completed' = 'completed';
+        if (userRequestedEnd) {
+          endReason = 'user-requested';
+        } else if (aiWantsToEnd || response.gameEnd) {
+          endReason = 'ai-ended';
         }
         
-        setGameCompleted(true);
-        
-        // Save completed game history
-        if (isAuthenticated && currentSessionId) {
-          const gameTitles = isTeenContext ? teenGameTitles : youngGameTitles;
-          const gameInfo = gameTitles[currentGame];
-          
-          const finalScore = gameScore + completionBonus;
-          const session: GameSession = {
-            id: currentSessionId,
-            gameType: currentGame,
-            gameTitle: gameInfo?.title || currentGame,
-            startTime: sessionStartTime || Date.now() - (currentRound * 30000),
-            endTime: Date.now(),
-            score: finalScore,
-            rounds: currentRound,
-            difficulty: currentDifficulty,
-            conversationHistory: [...conversationHistory, assistantMessage],
-            completed: true
-          };
-          
-          try {
-            await GameHistoryService.saveGameSession(userId, session);
-            console.log('✅ Completed game session saved:', session.id);
-          } catch (error) {
-            console.error('Error saving completed game history:', error);
-          }
-        }
-        
-        // Play completion message with updated score
-        setTimeout(() => {
-          const finalScore = gameScore + completionBonus;
-          if (isSoundEnabled) {
-            const completionMessage = `Congratulations! You completed the game with ${finalScore} points! Great job!`;
-            EnhancedTTS.speak(completionMessage, { 
-              voice: findFemaleVoiceId(),
-              rate: 0.9, 
-              emotion: 'excited' 
-            }).catch(() => {});
-          }
-        }, 500);
+        // End the game with appropriate reason
+        await handleGameEnd(endReason);
       }
 
       if (isSoundEnabled && formattedContent) {
@@ -839,6 +868,19 @@ const KidsGamePage = () => {
                 <span className="text-base sm:text-lg md:text-xl">{gameInfo.title}</span>
               </div>
               <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto flex-wrap">
+                {!gameCompleted && sessionStartTime > 0 && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handleUserRequestedEnd}
+                    className="rounded-xl text-red-600 hover:bg-red-50 text-xs sm:text-sm flex-1 sm:flex-initial"
+                    disabled={isLoading || gameCompleted}
+                  >
+                    <StopCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-2" />
+                    <span className="hidden sm:inline">End Game</span>
+                    <span className="sm:hidden">End</span>
+                  </Button>
+                )}
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -908,6 +950,31 @@ const KidsGamePage = () => {
                   </div>
                 )}
               </div>
+              {/* Time Remaining Display */}
+              {!gameCompleted && sessionStartTime > 0 && (
+                <div className="mt-3 pt-3 border-t border-yellow-300 dark:border-yellow-700">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-medium">
+                      Time Remaining:
+                    </span>
+                    <span className={cn(
+                      "text-xs sm:text-sm font-bold",
+                      timeRemaining <= 60000 ? "text-red-600 dark:text-red-400" : "text-gray-800 dark:text-gray-200"
+                    )}>
+                      {Math.floor(timeRemaining / 60000)}:{(Math.floor((timeRemaining % 60000) / 1000)).toString().padStart(2, '0')}
+                    </span>
+                  </div>
+                  <div className="mt-2 w-full bg-yellow-200 dark:bg-yellow-800 rounded-full h-2">
+                    <div 
+                      className={cn(
+                        "h-2 rounded-full transition-all duration-1000",
+                        timeRemaining <= 60000 ? "bg-red-500" : "bg-yellow-500"
+                      )}
+                      style={{ width: `${Math.min(100, (timeRemaining / gameTimeLimit) * 100)}%` }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Error Display */}

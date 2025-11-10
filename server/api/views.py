@@ -1824,13 +1824,22 @@ def kids_issue_certificate(request):
     """Record an issued certificate (optional file_url for share)."""
     cert_id = request.data.get('cert_id')
     title = request.data.get('title')
+    audience = request.data.get('audience', 'young')  # Default to 'young' for backward compatibility
     file_url = request.data.get('file_url', '')
     if not cert_id or not title:
         return Response({"message": "cert_id and title are required"}, status=status.HTTP_400_BAD_REQUEST)
-    obj, _ = KidsCertificate.objects.get_or_create(user=request.user, cert_id=cert_id, defaults={
-        'title': title,
-        'file_url': file_url
-    })
+    if audience not in ['young', 'teen']:
+        return Response({"message": "audience must be 'young' or 'teen'"}, status=status.HTTP_400_BAD_REQUEST)
+    obj, _ = KidsCertificate.objects.get_or_create(
+        user=request.user, 
+        cert_id=cert_id, 
+        audience=audience,
+        defaults={
+            'title': title,
+            'file_url': file_url,
+            'audience': audience
+        }
+    )
     # Update title/url if provided later
     updated = False
     if title and obj.title != title:

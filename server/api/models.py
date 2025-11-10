@@ -370,14 +370,20 @@ class KidsAchievement(models.Model):
 
 class KidsCertificate(models.Model):
     """Issued certificate record for kids."""
+    AUDIENCE_CHOICES = [
+        ('young', 'Young Kids (4-10)'),
+        ('teen', 'Teen Kids (11-17)'),
+    ]
+    
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='kids_certificates')
     cert_id = models.CharField(max_length=128)
+    audience = models.CharField(max_length=10, choices=AUDIENCE_CHOICES, default='young', help_text="Target audience: young or teen")
     title = models.CharField(max_length=255)
     file_url = models.URLField(blank=True)
     issued_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ("user", "cert_id")
+        unique_together = ("user", "cert_id", "audience")
 
 
 # ============= Kids Story Management =============
