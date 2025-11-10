@@ -234,6 +234,30 @@ export const AuthAPI = {
   },
 
   /**
+   * Save individual survey step
+   */
+  saveSurveyStep: async (stepName: string, stepNumber: number, responseData: any) => {
+    try {
+      const payload = {
+        step_name: stepName,
+        step_number: stepNumber,
+        response_data: responseData
+      };
+      const result = await fetchWithAuth('survey/step', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
    * Get current user info
    */
   getUserInfo: async () => {

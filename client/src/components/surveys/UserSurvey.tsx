@@ -21,6 +21,12 @@ interface UserSurveyProps {
 
 const ageOptions = [
   {
+    id: '4-17',
+    range: '4-17',
+    character: '/kid.png',
+    description: 'Young child with a backpack'
+  },
+  {
     id: '18-24',
     range: '18-24',
     character: '/man.png',
@@ -76,44 +82,44 @@ const UserSurvey: React.FC<UserSurveyProps> = ({ isOpen, onComplete, currentStep
 
   return (
     <Dialog open={isOpen} onOpenChange={() => { }}>
-      <DialogContent className="w-full h-full max-w-none max-h-none p-0 overflow-hidden border-0 bg-transparent m-0 rounded-none">
-        <div className="w-full h-screen bg-white flex flex-col md:flex-row relative">
+      <DialogContent className="w-full h-full max-w-none max-h-none p-0 md:p-0 overflow-hidden border-0 bg-transparent m-0 rounded-none">
+        <div className="w-full min-h-screen md:h-screen bg-white flex flex-col md:flex-row relative">
           {/* Mobile Layout - REVISED HEADER */}
-          <div className="md:hidden w-full h-full flex flex-col">
+          <div className="md:hidden w-full flex flex-col flex-1 overflow-hidden">
             {/* Mobile Header (Top Section) - Logo background removed, logo size increased */}
-            <div className="bg-blue-50 p-6 pb-0 flex flex-col relative">
-              <div className='flex items-center w-full mb-4 relative'>
+            <div className="bg-blue-50 px-5 pt-5 pb-3 flex flex-col relative">
+              <div className='flex items-center w-full mb-3 relative justify-between'>
                 {/* Logo - Positioned on the left */}
                 <img
                   src="/logo01.png"
                   alt="Elora Logo"
-                  className="w-20 h-20 object-contain ml-2"
+                  className="w-16 h-16 object-contain ml-1.5"
                 />
                 
                 {/* Calendar Icon - Centered */}
                 <img
                   src="/calender.png"
                   alt="Calendar"
-                  className={`w-32 h-32 object-contain absolute left-1/2 transform -translate-x-1/2 ${
+                  className={`w-28 h-28 object-contain absolute left-1/2 transform -translate-x-1/2 ${
                     shouldAnimate ? 'animate-calendar-bounce' : ''
                   }`}
                 />
               </div>
-              <div className="w-full h-[1px] bg-gray-300 mx-auto mt-2 mb-8"></div> {/* Dividing line */}
+              <div className="w-full h-[1px] bg-gray-300 mx-auto mt-1 mb-6"></div> {/* Dividing line */}
             </div>
             
-            {/* Mobile Survey Content - NO CHANGES TO CONTENT BLOCK */}
-            <div className="flex-1 bg-white px-4 flex flex-col items-center">
-              <div className="text-center w-full">
+            {/* Mobile Survey Content */}
+            <div className="flex-1 bg-white px-4 pb-6 flex flex-col items-center">
+              <div className="text-center w-full max-w-md mx-auto">
                 {/* Progress Indicator */}
                 <SurveyProgress currentStep={currentStep} totalSteps={totalSteps} variant="mobile" />
                 
-                <h1 className="text-2xl font-bold text-blue-900 mb-8">
+                <h1 className="text-xl font-bold text-blue-900 mb-6">
                   What is your age?
                 </h1>
 
-                {/* Grid container to match the image layout */}
-                <div className="grid grid-cols-2 gap-4 place-items-center w-full max-w-sm mx-auto">
+                {/* Age options */}
+                <div className="flex flex-wrap justify-center gap-3 sm:gap-4 w-full">
                   {ageOptions.map((option) => {
                     const isSelected = selectedAge === option.id;
 
@@ -122,7 +128,8 @@ const UserSurvey: React.FC<UserSurveyProps> = ({ isOpen, onComplete, currentStep
                         key={option.id}
                         onClick={() => handleSelect(option.id)}
                         className={`
-                          rounded-xl border-2 transition-all duration-200 overflow-hidden w-full text-left aspect-[1/1] flex flex-col shadow-lg
+                          basis-[45%] sm:basis-[28%] max-w-[140px] sm:max-w-[150px] min-h-[150px]
+                          rounded-xl border-2 transition-all duration-200 overflow-hidden text-left flex flex-col shadow-lg
                           ${
                             isSelected
                               ? 'border-[#4D8FCE]' // Using the button bar color for selection border
@@ -130,21 +137,20 @@ const UserSurvey: React.FC<UserSurveyProps> = ({ isOpen, onComplete, currentStep
                           }
                           bg-white
                         `}
-                        style={{ maxWidth: '160px' }} 
                       >
                         <div className="flex flex-col w-full h-full">
                           {/* Top part with character and light blue background */}
-                          <div className="flex-1 bg-blue-50 flex items-end justify-center pt-2">
+                          <div className="flex-1 bg-blue-50 flex items-center justify-center py-3">
                             <img
                               src={option.character}
                               alt={option.description}
-                              className="w-3/4 h-3/4 object-contain mb-[-10px]" 
+                              className="w-20 h-20 object-contain"
                             />
                           </div>
                           {/* Bottom part with age range and dark blue background/text */}
                           <div 
                             className={`
-                              bg-[#4D8FCE] text-white px-3 py-2 flex items-center justify-between
+                              bg-[#4D8FCE] text-white px-3 py-2 flex items-center justify-between min-h-[44px]
                               ${isSelected ? 'bg-[#3A70B0]' : ''}
                             `}
                           >
@@ -173,9 +179,9 @@ const UserSurvey: React.FC<UserSurveyProps> = ({ isOpen, onComplete, currentStep
           </div>
 
           {/* Desktop Layout - NO CHANGES MADE */}
-          <div className="hidden md:flex w-full h-full">
+          <div className="hidden md:flex w-full h-full flex-1">
             {/* Left Panel - Calendar Section */}
-            <div className="w-1/2 bg-blue-50 flex items-center justify-center p-8 relative">
+            <div className="md:w-5/12 lg:w-1/2 bg-blue-50 flex items-center justify-center p-6 lg:p-12 relative">
               <div className="text-center">
                 <img
                   src="/calender.png"
@@ -197,19 +203,19 @@ const UserSurvey: React.FC<UserSurveyProps> = ({ isOpen, onComplete, currentStep
             </div>
 
             {/* Right Panel - Survey Section */}
-            <div className="w-1/2 bg-white p-8 lg:p-35 flex flex-col justify-center">
-              <div className="max-w-lg mx-auto w-full">
+            <div className="md:w-7/12 lg:w-1/2 bg-white px-8 lg:px-16 py-10 lg:py-14 flex flex-col justify-center overflow-y-auto">
+              <div className="max-w-2xl mx-auto w-full">
                 {/* Progress Indicator */}
                 <SurveyProgress currentStep={currentStep} totalSteps={totalSteps} variant="desktop" />
                 
-                <h1 className="text-4xl font-bold text-blue-900 mb-10 text-center">
+                <h1 className="text-3xl lg:text-4xl font-bold text-blue-900 mb-10 text-center">
                   What is your age?
                 </h1>
               </div>
               
               <div className="text-center mb-8">
 
-                <div className="grid grid-cols-2 gap-4 gap-y-2 mb-6 place-items-center max-w-lg mx-auto px-4">
+                <div className="flex flex-wrap justify-center gap-5 gap-y-6 mb-6 max-w-3xl mx-auto px-4">
                   {ageOptions.map((option) => {
                     const isSelected = selectedAge === option.id;
 
@@ -217,11 +223,10 @@ const UserSurvey: React.FC<UserSurveyProps> = ({ isOpen, onComplete, currentStep
                       <button
                         key={option.id}
                         onClick={() => handleSelect(option.id)}
-                        className={`rounded-3xl border-2 border-blue-400 transition-all duration-200 overflow-hidden w-full max-w-[208px] text-left aspect-square flex flex-col ${
-                          isSelected
-                            ? 'border-blue-600 shadow-lg'
-                            : 'hover:shadow-md'
-                        }`}
+                        className={`rounded-3xl border-2 transition-all duration-200 overflow-hidden text-left flex flex-col
+                          basis-[22%] max-w-[180px] min-w-[160px] aspect-[4/5] xl:max-w-[200px] xl:min-w-[180px]
+                          ${isSelected ? 'border-blue-600 shadow-lg' : 'border-blue-300 hover:shadow-md'}
+                        `}
                       >
                         <div className="flex flex-col w-full h-full">
                           <div className="flex-1 bg-blue-50 flex items-end justify-center pb-0">

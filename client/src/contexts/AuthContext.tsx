@@ -37,7 +37,7 @@ interface AuthContextType {
   registerWithServer: (data: { name: string; email: string; password: string; confirm_password: string }) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
   updateUserProfile: (updates: Partial<User['profile']>) => void;
-  updateUserSurveyData: (surveyData: User['surveyData']) => Promise<void>;
+  updateUserSurveyData: (surveyData: User['surveyData'], stepName?: string, stepNumber?: number) => Promise<void>;
   syncWithServer: () => Promise<void>;
   isAuthenticated: boolean;
   isOnline: boolean;
@@ -163,6 +163,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (response.success && 'data' in response && response.data) {
         const userData = response.data.user;
         const authToken = response.data.token || localStorage.getItem('speakbee_auth_token') || '';
+        const surveyCompletedAt = userData.profile?.survey_completed_at;
+        const surveyData = surveyCompletedAt ? {
+          ageRange: userData.profile?.age_range,
+          nativeLanguage: userData.profile?.native_language,
+          englishLevel: userData.profile?.english_level,
+          learningPurpose: userData.profile?.learning_purpose,
+          interests: userData.profile?.interests,
+          completedAt: surveyCompletedAt
+        } : undefined;
         const transformedUser: User = {
           id: userData.id.toString(),
           username: userData.username,
@@ -176,13 +185,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             streak: userData.profile?.current_streak || 0,
             avatar: userData.profile?.avatar
           },
-          surveyData: userData.profile ? {
-            ageRange: userData.profile.age_range,
-            nativeLanguage: userData.profile.native_language,
-            englishLevel: userData.profile.english_level,
-            learningPurpose: userData.profile.learning_purpose,
-            completedAt: userData.profile.survey_completed_at
-          } : undefined
+          surveyData
         };
         
         login(transformedUser, { token: authToken || undefined });

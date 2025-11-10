@@ -616,9 +616,34 @@ const AppRoutes = () => {
 
               let target = '/';
               // Kids buckets by age
-              if (age.includes('4-10') || age.includes('4 – 10') || age.includes('4–10') || age.includes('4 to 10')) {
+              if (
+                age.includes('4-17') ||
+                age.includes('4 – 17') ||
+                age.includes('4–17') ||
+                age.includes('4 to 17')
+              ) {
+                target = '/kids';
+              } else if (
+                age.includes('4-11') ||
+                age.includes('4 – 11') ||
+                age.includes('4–11') ||
+                age.includes('4 to 11') ||
+                age.includes('4-10') || // legacy support
+                age.includes('4 – 10') ||
+                age.includes('4–10') ||
+                age.includes('4 to 10')
+              ) {
                 target = '/kids/young';
-              } else if (age.includes('11-17') || age.includes('11 – 17') || age.includes('11–17') || age.includes('11 to 17')) {
+              } else if (
+                age.includes('11-17') ||
+                age.includes('11 – 17') ||
+                age.includes('11–17') ||
+                age.includes('11 to 17') ||
+                age.includes('12-17') ||
+                age.includes('12 – 17') ||
+                age.includes('12–17') ||
+                age.includes('12 to 17')
+              ) {
                 target = '/kids/teen';
               } else if (purposes.includes('ielts') || purposes.includes('pte')) {
                 target = '/ielts-pte';

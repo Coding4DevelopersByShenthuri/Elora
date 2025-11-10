@@ -18,7 +18,20 @@ const SurveyManager: React.FC<SurveyManagerProps> = ({ onShowSurvey }) => {
     // 4. User is on an admin route - even if not marked as admin, if accessing admin portal, skip survey
     const isAdminRoute = location.pathname.startsWith('/admin');
     const isAdminUser = user && (user.is_staff || user.is_superuser);
-    const hasCompletedSurvey = user && user.surveyData;
+    const surveyData = user?.surveyData;
+    const hasCompletedSurvey = Boolean(
+      surveyData &&
+      (
+        surveyData.completedAt ||
+        (
+          surveyData.ageRange &&
+          surveyData.nativeLanguage &&
+          surveyData.englishLevel &&
+          Array.isArray(surveyData.learningPurpose) &&
+          surveyData.learningPurpose.length > 0
+        )
+      )
+    );
     
     // Only show survey to regular users (not admins) on non-admin routes who haven't completed it
     if (user && !hasCompletedSurvey && !isAdminUser && !isAdminRoute) {
