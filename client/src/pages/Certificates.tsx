@@ -838,17 +838,6 @@ const CertificatesPage = () => {
           const totalAttempts = filteredSessions.reduce((s: number, r: any) => s + (r.attempts || 0), 0);
           
           // Add milestone badges for pronunciation practice
-          if (totalAttempts >= 10) {
-            badges.push({
-              id: 'badge-pronunciation-10',
-              title: 'Speaking Starter',
-              name: '10 Pronunciation Practices',
-              unlocked: true,
-              unlocked_at: new Date().toISOString(),
-              image: '/Speaking_star_badge.png',
-              emoji: '🎤'
-            });
-          }
           if (totalAttempts >= 25) {
             badges.push({
               id: 'badge-pronunciation-25',

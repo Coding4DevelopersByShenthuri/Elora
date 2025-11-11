@@ -366,6 +366,21 @@ const TeenKidsPage = () => {
             return [...prevPhrases, ...toAdd];
           });
           
+          // Sync completed stories to StoryWordsService so they appear in badges section
+          mergedArray.forEach((id: string) => {
+            const story = allTeenStories.find((s) => s.id === id);
+            if (story) {
+              const internalId = getInternalStoryId(story.type);
+              // Check if already enrolled to avoid duplicate saves
+              const existingEnrollments = StoryWordsService.getEnrolledStories(userId);
+              if (!existingEnrollments.some(e => e.storyId === internalId && e.completed)) {
+                StoryWordsService.enrollInStory(userId, internalId, story.title, story.type, 100).catch(err => {
+                  console.warn('Failed to sync story enrollment:', err);
+                });
+              }
+            }
+          });
+          
           return mergedArray;
         });
       } else {
@@ -401,9 +416,24 @@ const TeenKidsPage = () => {
           storyTitle: p.storyTitle,
         }));
         setEnrolledStoryPhrasesDetailed(phraseDetails);
+        
+        // Sync completed stories to StoryWordsService so they appear in badges section
+        completedIds.forEach((id: string) => {
+          const story = allTeenStories.find((s) => s.id === id);
+          if (story) {
+            const internalId = getInternalStoryId(story.type);
+            // Check if already enrolled to avoid duplicate saves
+            const existingEnrollments = StoryWordsService.getEnrolledStories(userId);
+            if (!existingEnrollments.some(e => e.storyId === internalId && e.completed)) {
+              StoryWordsService.enrollInStory(userId, internalId, story.title, story.type, 100).catch(err => {
+                console.warn('Failed to sync story enrollment:', err);
+              });
+            }
+          }
+        });
       }
     },
-    [getInternalStoryId]
+    [getInternalStoryId, userId]
   );
 
   const callTeenApi = useCallback(
@@ -771,6 +801,9 @@ const TeenKidsPage = () => {
 
     // Immediately mark story as completed locally for instant badge display
     const internalId = getInternalStoryId(story.type);
+    
+    // Save story enrollment to StoryWordsService so it appears in badges section
+    await StoryWordsService.enrollInStory(userId, internalId, story.title, story.type, score);
     
     // Add to completed story IDs immediately (this triggers badge display)
     setCompletedStoryIds((prev) => {
