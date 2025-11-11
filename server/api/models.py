@@ -1004,3 +1004,73 @@ class PlatformSettings(models.Model):
 
     def __str__(self):
         return f"PlatformSettings(id={self.id or 'singleton'})"
+
+
+# ============= Page Eligibility & Unlocking System =============
+class PageEligibility(models.Model):
+    """Track which pages users have unlocked based on progress"""
+    PAGE_CHOICES = [
+        ('/kids/young', 'Young Kids (4-10)'),
+        ('/kids/teen', 'Teen Kids (11-17)'),
+        ('/adults/beginners', 'Adults Beginners'),
+        ('/adults/intermediates', 'Adults Intermediates'),
+        ('/adults/advanced', 'Adults Advanced'),
+        ('/ielts-pte', 'IELTS/PTE'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='page_eligibilities')
+    page_path = models.CharField(max_length=100, choices=PAGE_CHOICES)
+    
+    # Eligibility criteria (stored as JSON for flexibility)
+    # Example: {"stories_completed": 3, "points": 500, "streak": 5}
+    required_criteria = models.JSONField(default=dict)
+    
+    # Current progress towards eligibility
+    current_progress = models.JSONField(default=dict)
+    
+    # Whether the page is unlocked
+    is_unlocked = models.BooleanField(default=False)
+    unlocked_at = models.DateTimeField(null=True, blank=True)
+    
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['user', 'page_path']
+        indexes = [
+            models.Index(fields=['user', 'page_path']),
+            models.Index(fields=['user', 'is_unlocked']),
+        ]
+        verbose_name = "Page Eligibility"
+        verbose_name_plural = "Page Eligibilities"
+    
+    def __str__(self):
+        status = "Unlocked" if self.is_unlocked else "Locked"
+        return f"{self.user.username} - {self.page_path} ({status})"
+    
+    def check_eligibility(self, user_progress_data: dict):
+        """
+        Check if user meets eligibility criteria based on their progress.
+        Returns (is_eligible, progress_details)
+        """
+        if self.is_unlocked:
+            return True, {"message": "Already unlocked"}
+        
+        progress_details = {}
+        all_met = True
+        
+        # Check each required criterion
+        for criterion, required_value in self.required_criteria.items():
+            current_value = user_progress_data.get(criterion, 0)
+            progress_details[criterion] = {
+                "required": required_value,
+                "current": current_value,
+                "met": current_value >= required_value,
+                "progress_percent": min(100, (current_value / required_value * 100)) if required_value > 0 else 0
+            }
+            
+            if current_value < required_value:
+                all_met = False
+        
+        return all_met, progress_details

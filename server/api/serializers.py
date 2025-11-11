@@ -10,7 +10,8 @@ from .models import (
     KidsVocabularyPractice, KidsPronunciationPractice, KidsGameSession,
     ParentalControlSettings, TeenProgress, TeenStoryProgress,
     TeenVocabularyPractice, TeenPronunciationPractice, TeenFavorite,
-    TeenAchievement, TeenGameSession, TeenCertificate
+    TeenAchievement, TeenGameSession, TeenCertificate,
+    PageEligibility
 )
 from django.contrib.auth.password_validation import validate_password
 
@@ -546,3 +547,34 @@ class UserStatsSerializer(serializers.Serializer):
     vocabulary_count = serializers.IntegerField()
     achievements_unlocked = serializers.IntegerField()
     average_score = serializers.FloatField()
+
+
+# ============= Page Eligibility Serializers =============
+class PageEligibilitySerializer(serializers.ModelSerializer):
+    """Serializer for page eligibility tracking"""
+    progress_percent = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = PageEligibility
+        fields = [
+            'id', 'page_path', 'required_criteria', 'current_progress',
+            'is_unlocked', 'unlocked_at', 'created_at', 'updated_at',
+            'progress_percent'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at', 'unlocked_at', 'progress_percent']
+    
+    def get_progress_percent(self, obj):
+        """Calculate overall progress percentage"""
+        if not obj.current_progress:
+            return 0
+        
+        progress_values = [
+            p.get('progress_percent', 0) 
+            for p in obj.current_progress.values() 
+            if isinstance(p, dict)
+        ]
+        
+        if not progress_values:
+            return 0
+        
+        return sum(progress_values) / len(progress_values)

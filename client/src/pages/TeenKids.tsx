@@ -31,6 +31,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/auth/AuthModal';
+import { PageBlockedModal } from '@/components/common/PageBlockedModal';
+import InitialRouteService from '@/services/InitialRouteService';
+import PageEligibilityService from '@/services/PageEligibilityService';
 import Vocabulary from '@/components/kids/Vocabulary';
 import Pronunciation from '@/components/kids/Pronunciation';
 import InteractiveGames from '@/components/kids/InteractiveGames';
@@ -255,6 +258,9 @@ const TeenKidsPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Track if page should be blocked
+  const [isPageBlocked, setIsPageBlocked] = useState(false);
 
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
   const [isMusicEnabled, setIsMusicEnabled] = useState(false);
@@ -590,6 +596,36 @@ const TeenKidsPage = () => {
     }
   }, [isAuthenticated]);
 
+  // Check page eligibility on mount and show modal if locked
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    
+    const checkEligibility = async () => {
+      const requiresCheck = InitialRouteService.requiresEligibilityCheck('/kids/teen' as any);
+      if (requiresCheck) {
+        try {
+          const eligibility = await PageEligibilityService.getEligibility('/kids/teen', true);
+          setPageEligibility(eligibility);
+          
+          // If page is locked, show the blocked modal immediately and block the page
+          if (!eligibility?.is_unlocked) {
+            console.log('🚫 TeenKids page is locked - showing blocked modal');
+            setIsPageBlocked(true);
+            setShowPageBlockedModal(true);
+          } else {
+            setIsPageBlocked(false);
+          }
+        } catch (error) {
+          console.error('Error checking page eligibility:', error);
+        }
+      } else {
+        setIsPageBlocked(false);
+      }
+    };
+    
+    checkEligibility();
+  }, [isAuthenticated]);
+
   useEffect(() => {
     if (location.state?.startStory && location.state?.storyType) {
       const { startStory } = location.state;
@@ -711,6 +747,8 @@ const TeenKidsPage = () => {
   const [showSocialMediaExpert, setShowSocialMediaExpert] = useState(false);
   const [showAIEthics, setShowAIEthics] = useState(false);
   const [showDigitalSecurity, setShowDigitalSecurity] = useState(false);
+  const [showPageBlockedModal, setShowPageBlockedModal] = useState(false);
+  const [pageEligibility, setPageEligibility] = useState<any>(null);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
@@ -762,6 +800,21 @@ const TeenKidsPage = () => {
     if (!isAuthenticated) {
       setShowAuthModal(true);
       return;
+    }
+    
+    // Check if user is eligible to access TeenKids page
+    const requiresCheck = InitialRouteService.requiresEligibilityCheck('/kids/teen' as any);
+    
+    if (requiresCheck) {
+      // Check if page is unlocked
+      const eligibility = await PageEligibilityService.getEligibility('/kids/teen', true);
+      
+      if (!eligibility?.is_unlocked) {
+        // Show blocked modal instead of allowing enrollment
+        console.log('🚫 TeenKids page is locked - showing blocked modal');
+        setShowPageBlockedModal(true);
+        return;
+      }
     }
     
     const story = allTeenStories.find((s) => s.id === storyId);
@@ -1121,6 +1174,19 @@ const TeenKidsPage = () => {
                           <Play className="mr-2 h-4 w-4" />
                           {isPlaying && currentStory === story.id ? 'Starting…' : 'Start mission'}
                         </Button>
+                        {/* Show lock indicator if page is blocked */}
+                        {(() => {
+                          const requiresCheck = InitialRouteService.requiresEligibilityCheck('/kids/teen' as any);
+                          if (requiresCheck && !pageEligibility?.is_unlocked) {
+                            return (
+                              <div className="mt-2 text-xs text-muted-foreground text-center">
+                                <Lock className="h-3 w-3 inline mr-1" />
+                                Page locked - complete requirements to unlock
+                              </div>
+                            );
+                          }
+                          return null;
+                        })()}
                     </CardContent>
                   </Card>
                 );
@@ -1209,6 +1275,16 @@ const TeenKidsPage = () => {
                   key={`${selectedStoryFilter}-${vocabularyWordsToUse.length}`}
                   words={vocabularyWordsToUse}
                   onWordPracticed={async (word: string) => {
+                    // Check eligibility before allowing practice
+                    const requiresCheck = InitialRouteService.requiresEligibilityCheck('/kids/teen' as any);
+                    if (requiresCheck) {
+                      const eligibility = await PageEligibilityService.getEligibility('/kids/teen', true);
+                      if (!eligibility?.is_unlocked) {
+                        setShowPageBlockedModal(true);
+                        return;
+                      }
+                    }
+                    
                     const wordDetail = enrolledStoryWordsDetailed.find((w) => w.word === word);
                     await callTeenApi(
                       (token) =>
@@ -1282,6 +1358,16 @@ const TeenKidsPage = () => {
                   key={`${selectedPhraseFilter}-${pronunciationItems.length}`}
                   items={pronunciationItems}
                   onPhrasePracticed={async (phrase: string) => {
+                    // Check eligibility before allowing practice
+                    const requiresCheck = InitialRouteService.requiresEligibilityCheck('/kids/teen' as any);
+                    if (requiresCheck) {
+                      const eligibility = await PageEligibilityService.getEligibility('/kids/teen', true);
+                      if (!eligibility?.is_unlocked) {
+                        setShowPageBlockedModal(true);
+                        return;
+                      }
+                    }
+                    
                     const phraseDetail = enrolledStoryPhrasesDetailed.find((p) => p.phrase === phrase);
                     await callTeenApi(
                       (token) =>
@@ -1551,6 +1637,14 @@ const TeenKidsPage = () => {
           }}
         />
       )}
+
+      {/* Page Blocked Modal */}
+      <PageBlockedModal
+        isOpen={showPageBlockedModal}
+        onClose={() => setShowPageBlockedModal(false)}
+        pagePath="/kids/teen"
+        fallbackPage="/kids/young"
+      />
     </div>
   );
 };

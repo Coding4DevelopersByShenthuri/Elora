@@ -45,6 +45,11 @@ urlpatterns = [
     
     # ============= Teen Specific =============
     path('teen/dashboard', views.teen_dashboard, name='teen-dashboard'),
+    
+    # ============= Page Eligibility =============
+    path('page-eligibility/', views.get_all_page_eligibilities, name='get-all-page-eligibilities'),
+    path('page-eligibility/<str:page_path>', views.get_page_eligibility, name='get-page-eligibility'),
+    path('page-eligibility/<str:page_path>/check', views.check_page_eligibility, name='check-page-eligibility'),
     path('teen/story/start', views.teen_story_start, name='teen-story-start'),
     path('teen/story/complete', views.teen_story_complete, name='teen-story-complete'),
     path('teen/vocabulary/practice', views.teen_vocabulary_practice, name='teen-vocabulary-practice'),

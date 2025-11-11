@@ -1202,6 +1202,36 @@ export const WaitlistAPI = {
 };
 
 
+// ============= Page Eligibility API =============
+const PageEligibilityAPI = {
+  /**
+   * Get eligibility status for a specific page
+   */
+  getEligibility: async (pagePath: string) => {
+    return fetchWithAuth(`page-eligibility/${encodeURIComponent(pagePath)}`, {
+      method: 'GET',
+    });
+  },
+
+  /**
+   * Get eligibility status for all pages
+   */
+  getAllEligibilities: async () => {
+    return fetchWithAuth('page-eligibility/', {
+      method: 'GET',
+    });
+  },
+
+  /**
+   * Check and update eligibility (called after progress updates)
+   */
+  checkEligibility: async (pagePath: string) => {
+    return fetchWithAuth(`page-eligibility/${encodeURIComponent(pagePath)}/check`, {
+      method: 'POST',
+    });
+  },
+};
+
 // ============= Export all APIs =============
 export const API = {
   auth: AuthAPI,
@@ -1213,7 +1243,8 @@ export const API = {
   kids: KidsAPI,
   parentalControls: ParentalControlsAPI,
   cookieConsent: CookieConsentAPI,
-  waitlist: WaitlistAPI
+  waitlist: WaitlistAPI,
+  pageEligibility: PageEligibilityAPI,
 };
 
 export default API;

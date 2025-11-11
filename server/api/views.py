@@ -39,7 +39,8 @@ from .serializers import (
     KidsVocabularyPracticeSerializer, KidsPronunciationPracticeSerializer, KidsGameSessionSerializer,
     ParentalControlSettingsSerializer, TeenProgressSerializer, TeenStoryProgressSerializer,
     TeenVocabularyPracticeSerializer, TeenPronunciationPracticeSerializer, TeenFavoriteSerializer,
-    TeenAchievementSerializer, TeenGameSessionSerializer, TeenCertificateSerializer
+    TeenAchievementSerializer, TeenGameSessionSerializer, TeenCertificateSerializer,
+    PageEligibilitySerializer
 )
 from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
@@ -51,7 +52,8 @@ from .models import (
     KidsVocabularyPractice, KidsPronunciationPractice, KidsGameSession,
     ParentalControlSettings, TeenProgress, TeenStoryProgress,
     TeenVocabularyPractice, TeenPronunciationPractice, TeenFavorite,
-    TeenAchievement, TeenGameSession, TeenCertificate
+    TeenAchievement, TeenGameSession, TeenCertificate,
+    PageEligibility, KidsProgress
 )
 
 logger = logging.getLogger(__name__)
@@ -6894,4 +6896,226 @@ def kids_analytics(request):
         return Response({
             "message": "An error occurred"
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# ============= Page Eligibility Views =============
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_page_eligibility(request, page_path):
+    """Get eligibility status for a specific page"""
+    try:
+        user = request.user
+        page_path_decoded = page_path.replace('%2F', '/')
+        
+        # Get or create eligibility record
+        eligibility, created = PageEligibility.objects.get_or_create(
+            user=user,
+            page_path=page_path_decoded,
+            defaults={
+                'required_criteria': {},
+                'current_progress': {},
+                'is_unlocked': False
+            }
+        )
+        
+        # If newly created, set default criteria based on page
+        if created:
+            default_criteria = get_default_eligibility_criteria(page_path_decoded)
+            eligibility.required_criteria = default_criteria
+            eligibility.save()
+        
+        # Get user progress data
+        progress_data = get_user_progress_data(user, page_path_decoded)
+        
+        # Check eligibility
+        is_eligible, progress_details = eligibility.check_eligibility(progress_data)
+        
+        # Update current progress
+        eligibility.current_progress = progress_details
+        
+        # If eligible and not yet unlocked, unlock it
+        if is_eligible and not eligibility.is_unlocked:
+            eligibility.is_unlocked = True
+            eligibility.unlocked_at = timezone.now()
+        
+        eligibility.save()
+        
+        serializer = PageEligibilitySerializer(eligibility)
+        return Response(serializer.data)
+    
+    except Exception as e:
+        logger.error(f"Page eligibility error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_all_page_eligibilities(request):
+    """Get eligibility status for all pages"""
+    try:
+        user = request.user
+        eligibilities = PageEligibility.objects.filter(user=user)
+        
+        # Get user progress data once
+        progress_data = get_user_progress_data(user, None)
+        
+        # Update all eligibilities
+        results = []
+        for eligibility in eligibilities:
+            is_eligible, progress_details = eligibility.check_eligibility(progress_data)
+            eligibility.current_progress = progress_details
+            
+            if is_eligible and not eligibility.is_unlocked:
+                eligibility.is_unlocked = True
+                eligibility.unlocked_at = timezone.now()
+            
+            eligibility.save()
+            serializer = PageEligibilitySerializer(eligibility)
+            results.append(serializer.data)
+        
+        return Response(results)
+    
+    except Exception as e:
+        logger.error(f"All page eligibilities error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def check_page_eligibility(request, page_path):
+    """Check and update eligibility for a page (called after progress updates)"""
+    try:
+        user = request.user
+        page_path_decoded = page_path.replace('%2F', '/')
+        
+        eligibility, created = PageEligibility.objects.get_or_create(
+            user=user,
+            page_path=page_path_decoded,
+            defaults={
+                'required_criteria': get_default_eligibility_criteria(page_path_decoded),
+                'current_progress': {},
+                'is_unlocked': False
+            }
+        )
+        
+        # Get fresh progress data
+        progress_data = get_user_progress_data(user, page_path_decoded)
+        
+        # Check eligibility
+        is_eligible, progress_details = eligibility.check_eligibility(progress_data)
+        eligibility.current_progress = progress_details
+        
+        if is_eligible and not eligibility.is_unlocked:
+            eligibility.is_unlocked = True
+            eligibility.unlocked_at = timezone.now()
+        
+        eligibility.save()
+        
+        serializer = PageEligibilitySerializer(eligibility)
+        return Response(serializer.data)
+    
+    except Exception as e:
+        logger.error(f"Check page eligibility error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+def get_default_eligibility_criteria(page_path: str) -> dict:
+    """Get default eligibility criteria for a page"""
+    criteria_map = {
+        '/kids/young': {
+            'stories_completed': 0,  # Always unlocked (entry point)
+        },
+        '/kids/teen': {
+            'stories_completed': 3,  # Complete 3 stories in YoungKids
+            'points': 200,
+        },
+        '/adults/beginners': {
+            'points': 0,  # Unlocked after survey
+        },
+        '/adults/intermediates': {
+            'points': 500,  # Earn 500 points in beginners
+        },
+        '/adults/advanced': {
+            'points': 1000,  # Earn 1000 points in intermediates
+        },
+        '/ielts-pte': {
+            'points': 0,  # Unlocked if survey indicates exam prep
+        },
+    }
+    return criteria_map.get(page_path, {})
+
+
+def get_user_progress_data(user: User, page_path: str = None) -> dict:
+    """Get user's progress data for eligibility checking"""
+    try:
+        data = {}
+        
+        # Get kids progress if checking kids pages
+        if page_path and '/kids' in page_path:
+            try:
+                kids_progress = KidsProgress.objects.filter(user=user).first()
+                if kids_progress:
+                    details = kids_progress.details or {}
+                    
+                    # Count completed stories
+                    story_enrollments = details.get('storyEnrollments', [])
+                    completed_stories = sum(1 for s in story_enrollments if s.get('completed', False))
+                    
+                    data['stories_completed'] = completed_stories
+                    data['points'] = kids_progress.points or 0
+                    data['streak'] = kids_progress.streak or 0
+                    data['vocabulary_words'] = len(details.get('vocabulary', {}))
+                    data['pronunciation_practices'] = len(details.get('pronunciation', {}))
+                    data['games_played'] = details.get('games', {}).get('attempts', 0)
+            except Exception as e:
+                logger.warn(f"Error getting kids progress: {e}")
+        
+        # Get teen progress if checking teen pages
+        if page_path and '/kids/teen' in page_path:
+            try:
+                teen_progress = TeenProgress.objects.filter(user=user).first()
+                if teen_progress:
+                    data['stories_completed'] = teen_progress.stories_completed or 0
+                    data['points'] = teen_progress.points or 0
+                    data['streak'] = teen_progress.streak or 0
+                    data['vocabulary_words'] = teen_progress.vocabulary_words_practiced or 0
+                    data['pronunciation_practices'] = teen_progress.pronunciation_practices or 0
+            except Exception as e:
+                logger.warn(f"Error getting teen progress: {e}")
+        
+        # Get general progress for adults pages
+        if page_path and '/adults' in page_path:
+            try:
+                profile = UserProfile.objects.filter(user=user).first()
+                if profile:
+                    data['points'] = profile.points or 0
+                    data['streak'] = profile.current_streak or 0
+                
+                # Count lessons completed
+                lessons_completed = LessonProgress.objects.filter(
+                    user=user,
+                    completed=True
+                ).count()
+                data['lessons_completed'] = lessons_completed
+                
+                # Count vocabulary words
+                vocab_count = VocabularyWord.objects.filter(user=user).count()
+                data['vocabulary_words'] = vocab_count
+            except Exception as e:
+                logger.warn(f"Error getting adult progress: {e}")
+        
+        return data
+    
+    except Exception as e:
+        logger.error(f"Error getting user progress data: {e}")
+        return {}
 

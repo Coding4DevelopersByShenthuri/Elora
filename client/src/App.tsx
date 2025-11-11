@@ -62,6 +62,7 @@ import AdminAchievements from "@/pages/admin/AdminAchievements";
 import AdminSurveys from "@/pages/admin/AdminSurveys";
 import { Analytics } from "@/components/common/Analytics";
 import { AdminRouteGuard } from "@/components/admin/AdminRouteGuard";
+import { PageEligibilityGuard } from "@/components/common/PageEligibilityGuard";
 import type { ReactNode } from 'react';
 
 // ✅ Import AuthModal, UserSurvey, and SurveyManager
@@ -666,8 +667,26 @@ const AppRoutes = () => {
         <Route path="/help" element={<PageTransition><HelpPage /></PageTransition>} />
         <Route path="/contact" element={<PageTransition><ContactPage /></PageTransition>} />
         <Route path="/kids" element={<PageTransition><KidsPage /></PageTransition>} />
-        <Route path="/kids/young" element={<PageTransition><YoungKidsPage /></PageTransition>} />
-        <Route path="/kids/teen" element={<PageTransition><TeenKidsPage /></PageTransition>} />
+        <Route 
+          path="/kids/young" 
+          element={
+            <PageTransition>
+              <PageEligibilityGuard pagePath="/kids/young">
+                <YoungKidsPage />
+              </PageEligibilityGuard>
+            </PageTransition>
+          } 
+        />
+        <Route 
+          path="/kids/teen" 
+          element={
+            <PageTransition>
+              <PageEligibilityGuard pagePath="/kids/teen" fallbackPage="/kids/young">
+                <TeenKidsPage />
+              </PageEligibilityGuard>
+            </PageTransition>
+          } 
+        />
         <Route path="/kids/games/:gameId" element={<PageTransition><KidsGamePage /></PageTransition>} />
         <Route path="/kids/games/history" element={<PageTransition><GameHistoryPage /></PageTransition>} />
         <Route path="/favorites" element={<PageTransition><FavoritesPage /></PageTransition>} />
@@ -675,9 +694,36 @@ const AppRoutes = () => {
         <Route path="/favorites/teen" element={<PageTransition><TeenKidsFavoritesPage /></PageTransition>} />
         <Route path="/parental-controls" element={<PageTransition><ParentalControlsPage /></PageTransition>} />
         <Route path="/adults" element={<PageTransition><Adults /></PageTransition>} />
-        <Route path="/adults/beginners" element={<PageTransition><Beginners /></PageTransition>} />
-        <Route path="/adults/intermediates" element={<PageTransition><Intermediates /></PageTransition>} />
-        <Route path="/adults/advanced" element={<PageTransition><Advanced /></PageTransition>} />
+        <Route 
+          path="/adults/beginners" 
+          element={
+            <PageTransition>
+              <PageEligibilityGuard pagePath="/adults/beginners">
+                <Beginners />
+              </PageEligibilityGuard>
+            </PageTransition>
+          } 
+        />
+        <Route 
+          path="/adults/intermediates" 
+          element={
+            <PageTransition>
+              <PageEligibilityGuard pagePath="/adults/intermediates" fallbackPage="/adults/beginners">
+                <Intermediates />
+              </PageEligibilityGuard>
+            </PageTransition>
+          } 
+        />
+        <Route 
+          path="/adults/advanced" 
+          element={
+            <PageTransition>
+              <PageEligibilityGuard pagePath="/adults/advanced" fallbackPage="/adults/intermediates">
+                <Advanced />
+              </PageEligibilityGuard>
+            </PageTransition>
+          } 
+        />
         <Route path="/ielts-pte" element={<PageTransition><IeltsPte /></PageTransition>} />
         <Route path="/pricing" element={<PageTransition><PricingPage /></PageTransition>} />
         <Route path="/verify-email/:token" element={<PageTransition><VerifyEmail /></PageTransition>} />
@@ -1218,6 +1264,10 @@ const AppRoutes = () => {
             // Determine the appropriate learning page based on survey responses
             const learningPage = getLearningPageFromSurvey(allSurveyData);
             
+            // Store the initial route for eligibility checking
+            const { InitialRouteService } = await import('@/services/InitialRouteService');
+            InitialRouteService.setInitialRoute(learningPage as any);
+            
             // Clear survey progress state
             setSurveyInProgress(false);
             sessionStorage.removeItem('speakbee_survey_in_progress');
@@ -1249,6 +1299,15 @@ const AppRoutes = () => {
               }
             }
             const learningPage = getLearningPageFromSurvey(fallbackSurveyData);
+            
+            // Store the initial route for eligibility checking (even on error)
+            try {
+              const { InitialRouteService } = await import('@/services/InitialRouteService');
+              InitialRouteService.setInitialRoute(learningPage as any);
+            } catch (e) {
+              console.error('Error setting initial route:', e);
+            }
+            
             setTimeout(() => {
               setIsPersonalizationOpen(false);
               navigate(learningPage);
