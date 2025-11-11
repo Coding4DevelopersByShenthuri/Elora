@@ -1037,11 +1037,17 @@ const CertificatesPage = () => {
       const audienceStats = d.audienceStats || {};
       const targetAudienceStats = isTeenKids ? (audienceStats.teen || {}) : (audienceStats.young || {});
       
-      // Only use games data from the correct audience to avoid mixing teen/young data
-      // If no audience-specific games data exists, return 0 (don't use general games data)
-      const games = targetAudienceStats.games;
+      // Try to get games data from audience-specific stats first, then fall back to general games data
+      // This handles both the new structure (audienceStats.young.games) and the legacy structure (details.games)
+      let games = targetAudienceStats.games;
       
-      // Only count if games data exists and is not empty for this audience
+      // For young kids, if no audience-specific games data exists, fall back to general games data
+      // This is important because games data might be stored at details.games for young kids
+      if ((!games || Object.keys(games).length === 0) && !isTeenKids) {
+        games = d.games;
+      }
+      
+      // Only count if games data exists and is not empty
       if (!games || (Object.keys(games).length === 0)) {
         return 0;
       }
@@ -1049,15 +1055,16 @@ const CertificatesPage = () => {
       // Only count games that were actually played (have attempts or scores), not just visited
       // Check if games have actual gameplay data (attempts, scores, etc.)
       const tried = Array.isArray(games.types) && games.types.length > 0 ? new Set(games.types).size : 0;
+      const points = Number(games.points || 0);
       
       // For points, only count points from actual gameplay
       // Games points should only count if the user actually played, not just visited
       // Check if there are actual game sessions/attempts recorded
-      const hasGameplay = games.attempts > 0 || games.sessions > 0 || (games.types && games.types.length > 0 && tried > 0);
-      const points = hasGameplay ? Number(games.points || 0) : 0;
+      // If user has points, that's a clear indicator of gameplay
+      const hasGameplay = points > 0 || games.attempts > 0 || games.sessions > 0 || (games.types && games.types.length > 0 && tried > 0);
       
       // If no games were actually played (not just visited), return 0
-      if (tried === 0 || !hasGameplay) {
+      if (!hasGameplay) {
         return 0;
       }
       
@@ -1192,19 +1199,26 @@ const CertificatesPage = () => {
       const audienceStats = d.audienceStats || {};
       const targetAudienceStats = isTeenKids ? (audienceStats.teen || {}) : (audienceStats.young || {});
       
-      // Only use games data from the correct audience to avoid mixing teen/young data
-      const games = targetAudienceStats.games;
+      // Try to get games data from audience-specific stats first, then fall back to general games data
+      // This handles both the new structure (audienceStats.young.games) and the legacy structure (details.games)
+      let games = targetAudienceStats.games;
       
-      // Only count if games data exists and is not empty for this audience
+      // For young kids, if no audience-specific games data exists, fall back to general games data
+      // This is important because games data might be stored at details.games for young kids
+      if ((!games || Object.keys(games).length === 0) && !isTeenKids) {
+        games = d.games;
+      }
+      
+      // Only count if games data exists and is not empty
       if (!games || (Object.keys(games).length === 0)) {
         const requiredGameTypes = isTeenKids ? 7 : 5;
         return `Games played: 0/${requiredGameTypes}, Points: 0/300`;
       }
       
       // Only count games that were actually played, not just visited
-      const hasGameplay = games.attempts > 0 || games.sessions > 0;
+      const points = Number(games.points || 0);
+      const hasGameplay = points > 0 || games.attempts > 0 || games.sessions > 0 || (games.types && games.types.length > 0);
       const tried = Array.isArray(games.types) && games.types.length > 0 && hasGameplay ? new Set(games.types).size : 0;
-      const points = hasGameplay ? Number(games.points || 0) : 0;
       const requiredGameTypes = isTeenKids ? 7 : 5;
       return `Games played: ${Math.min(tried, requiredGameTypes)}/${requiredGameTypes}, Points: ${Math.min(points, 300)}/300`;
     }
