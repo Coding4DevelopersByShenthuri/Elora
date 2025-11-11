@@ -46,6 +46,7 @@ import { WhisperService } from '@/services/WhisperService';
 import { TransformersService } from '@/services/TransformersService';
 import { TimeTracker } from '@/services/TimeTracker';
 import EnhancedTTS from '@/services/EnhancedTTS';
+import { StoryDatasetService, type DatasetStory } from '@/services/StoryDatasetService';
 import MysteryDetectiveAdventure from '@/components/kids/stories/MysteryDetectiveAdventure';
 import SpaceExplorerAdventure from '@/components/kids/stories/SpaceExplorerAdventure';
 import EnvironmentalHeroAdventure from '@/components/kids/stories/EnvironmentalHeroAdventure';
@@ -280,6 +281,7 @@ const TeenKidsPage = () => {
   const [selectedStoryFilter, setSelectedStoryFilter] = useState<string>('all');
   const [selectedPhraseFilter, setSelectedPhraseFilter] = useState<string>('all');
   const [completedStoryIds, setCompletedStoryIds] = useState<string[]>([]);
+  const [datasetStories, setDatasetStories] = useState<DatasetStory[]>([]);
 
   const teenFavorites = useMemo(
     () => favorites.filter((id) => id.startsWith('teen-')),
@@ -640,12 +642,70 @@ const TeenKidsPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.state]);
 
-  const paginatedStories = useMemo(() => {
-  const startIndex = (currentPage - 1) * storiesPerPage;
-    return allTeenStories.slice(startIndex, startIndex + storiesPerPage);
-  }, [currentPage, storiesPerPage]);
+  // Load stories 11-20 from dataset
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    
+    const loadDatasetStories = async () => {
+      try {
+        // Try loading from JSON first (easier to maintain), fallback to CSV
+        const stories = await StoryDatasetService.loadStoriesFromJSON('/datasets/teen-kids-stories.json', 'teen');
+        if (stories.length === 0) {
+          // Fallback to CSV if JSON doesn't exist
+          const csvStories = await StoryDatasetService.loadStoriesFromCSV('/datasets/teen-kids-stories.csv', 'teen');
+          setDatasetStories(csvStories);
+        } else {
+          setDatasetStories(stories);
+        }
+      } catch (error) {
+        console.error('Error loading dataset stories:', error);
+        setDatasetStories([]);
+      }
+    };
+    
+    loadDatasetStories();
+  }, [isAuthenticated]);
 
-  const totalPages = Math.ceil(allTeenStories.length / storiesPerPage);
+  // Merge base stories with dataset stories
+  const allTeenStoriesWithDataset = useMemo(() => {
+    const datasetStoriesMapped = datasetStories.map((ds) => {
+      // Map dataset story to TeenStory format
+      const CharacterIcon = ds.character ? 
+        (ds.character === 'Target' ? Target :
+         ds.character === 'Globe' ? Globe :
+         ds.character === 'Brain' ? Brain :
+         ds.character === 'Cpu' ? Cpu :
+         ds.character === 'Crown' ? Crown :
+         ds.character === 'MessageSquare' ? MessageSquare :
+         ds.character === 'Lock' ? Lock : Target) : Target;
+      
+      return {
+        title: ds.title,
+        description: ds.description,
+        difficulty: ds.difficulty,
+        duration: ds.duration,
+        words: ds.words,
+        image: ds.image,
+        character: CharacterIcon,
+        gradient: ds.gradient || 'from-slate-500 to-slate-700',
+        bgGradient: ds.bgGradient || 'from-slate-200 to-slate-300 dark:from-slate-900 dark:to-slate-950',
+        animation: ds.animation || 'animate-float-slow',
+        type: ds.type as keyof typeof TEEN_STORY_TYPE_TO_INTERNAL,
+        id: `teen-${ds.storyNumber - 1}`, // Convert to 0-based index (story 11 = teen-10)
+        isFromDataset: true,
+        datasetStory: ds
+      };
+    });
+    
+    return [...allTeenStories, ...datasetStoriesMapped];
+  }, [allTeenStories, datasetStories]);
+
+  const paginatedStories = useMemo(() => {
+    const startIndex = (currentPage - 1) * storiesPerPage;
+    return allTeenStoriesWithDataset.slice(startIndex, startIndex + storiesPerPage);
+  }, [currentPage, storiesPerPage, allTeenStoriesWithDataset]);
+
+  const totalPages = Math.ceil(allTeenStoriesWithDataset.length / storiesPerPage);
 
   const achievements = useMemo(() => {
     const achievementList = [
@@ -1129,8 +1189,47 @@ const TeenKidsPage = () => {
                   // Check if enrolled: either through words/phrases (internal ID) OR through completed story IDs
                   const isEnrolled = enrolledInternalStoryIds.has(internalId) || completedStoryIds.includes(story.id) || allEnrolledStoryIds.has(internalId);
                 const CharacterIcon = story.character;
+                
+                // Check if story is from dataset and if it's unlocked
+                const storyIndex = parseInt(story.id.replace('teen-', ''), 10);
+                const isDatasetStory = storyIndex >= 10; // Stories 11-20 (indices 10-19)
+                
+                let isUnlocked = true; // Base stories 1-10 are always unlocked
+                
+                if (isDatasetStory) {
+                  // For story 11 (index 10), check if story 10 (index 9) is completed
+                  // For story 12 (index 11), check if story 11 (index 10) is completed, etc.
+                  const previousStoryIndex = storyIndex - 1;
+                  
+                  if (previousStoryIndex < 10) {
+                    // Previous story is in base stories (1-10)
+                    const previousStory = allTeenStories[previousStoryIndex];
+                    if (previousStory) {
+                      const previousInternalId = getInternalStoryId(previousStory.type);
+                      isUnlocked = completedStoryIds.includes(previousStory.id) || 
+                                  enrolledInternalStoryIds.has(previousInternalId) ||
+                                  allEnrolledStoryIds.has(previousInternalId);
+                    }
+                  } else {
+                    // Previous story is also a dataset story (11-20)
+                    // Check if previous dataset story is completed
+                    const previousDatasetStory = datasetStories.find(
+                      ds => ds.storyNumber - 1 === previousStoryIndex
+                    );
+                    if (previousDatasetStory) {
+                      const previousInternalId = getInternalStoryId(previousDatasetStory.type);
+                      isUnlocked = completedStoryIds.includes(`teen-${previousStoryIndex}`) || 
+                                  enrolledInternalStoryIds.has(previousInternalId) ||
+                                  allEnrolledStoryIds.has(previousInternalId);
+                    }
+                  }
+                }
+                
                 return (
-                    <Card key={story.id} className="flex h-full flex-col overflow-hidden border border-muted shadow-sm transition hover:shadow-lg">
+                    <Card key={story.id} className={cn(
+                      "flex h-full flex-col overflow-hidden border border-muted shadow-sm transition hover:shadow-lg",
+                      !isUnlocked && "opacity-60"
+                    )}>
                       <div className={cn('relative overflow-hidden bg-gradient-to-br p-4 text-white', story.bgGradient)}>
                         <div className="flex items-start justify-between gap-2">
                           <span className={cn('text-4xl sm:text-5xl', story.animation)}>{story.image}</span>
@@ -1139,6 +1238,7 @@ const TeenKidsPage = () => {
                             size="icon"
                             onClick={() => toggleFavorite(story.id)}
                             className="rounded-full bg-black/15 text-white hover:bg-black/25"
+                            disabled={!isUnlocked}
                           >
                             <Heart
                               className={cn('h-4 w-4', favorites.includes(story.id) && 'fill-current text-rose-400')}
@@ -1160,20 +1260,42 @@ const TeenKidsPage = () => {
                             <CheckCircle className="mr-1 h-3 w-3" /> Enrolled
                           </Badge>
                         )}
+                        {!isUnlocked && (
+                          <Badge className="absolute right-3 top-3 bg-black/50 text-white">
+                            <Lock className="mr-1 h-3 w-3" />
+                            Locked
+                          </Badge>
+                        )}
                       </div>
                       <CardContent className="flex flex-1 flex-col justify-between space-y-3 p-4">
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <CharacterIcon className="h-4 w-4 text-muted-foreground" />
                           <span className="truncate capitalize">Focus: {story.type.replace('-', ' ')}</span>
                         </div>
+                        {!isUnlocked ? (
+                          <div className="space-y-2">
+                            <Button
+                              disabled
+                              className="w-full py-2 text-sm"
+                              variant="secondary"
+                            >
+                              <Lock className="mr-2 h-4 w-4" />
+                              Complete previous story to unlock
+                            </Button>
+                            <p className="text-xs text-center text-muted-foreground">
+                              Finish story {storyIndex} to unlock this mission
+                            </p>
+                          </div>
+                        ) : (
                           <Button 
-                          onClick={() => handleStartLesson(story.id)}
-                          disabled={isPlaying && currentStory === story.id}
-                          className="w-full py-2 text-sm"
-                        >
-                          <Play className="mr-2 h-4 w-4" />
-                          {isPlaying && currentStory === story.id ? 'Starting…' : 'Start mission'}
-                        </Button>
+                            onClick={() => handleStartLesson(story.id)}
+                            disabled={isPlaying && currentStory === story.id}
+                            className="w-full py-2 text-sm"
+                          >
+                            <Play className="mr-2 h-4 w-4" />
+                            {isPlaying && currentStory === story.id ? 'Starting…' : 'Start mission'}
+                          </Button>
+                        )}
                         {/* Show lock indicator if page is blocked */}
                         {(() => {
                           const requiresCheck = InitialRouteService.requiresEligibilityCheck('/kids/teen' as any);
@@ -1196,7 +1318,7 @@ const TeenKidsPage = () => {
                 <div className="flex items-center justify-between gap-4 rounded-xl border border-dashed border-muted px-4 py-3">
                   <span className="text-sm text-muted-foreground">
                     Showing {(currentPage - 1) * storiesPerPage + 1}-
-                    {Math.min(currentPage * storiesPerPage, allTeenStories.length)} of {allTeenStories.length} missions
+                    {Math.min(currentPage * storiesPerPage, allTeenStoriesWithDataset.length)} of {allTeenStoriesWithDataset.length} missions
                   </span>
                   <div className="flex items-center gap-2">
                 <Button

@@ -6,7 +6,7 @@ import {
   Sun, Footprints,
   ChevronLeft, ChevronRight, Anchor,
   Shield, Loader2, Crown, Compass,
-  Music, VolumeX, HelpCircle, CheckCircle
+  Music, VolumeX, HelpCircle, CheckCircle, Lock
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -40,6 +40,7 @@ import { WhisperService } from '@/services/WhisperService';
 import { TransformersService } from '@/services/TransformersService';
 import { TimeTracker } from '@/services/TimeTracker';
 import EnhancedTTS from '@/services/EnhancedTTS';
+import { StoryDatasetService, type DatasetStory } from '@/services/StoryDatasetService';
 
 const YoungKidsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -79,6 +80,7 @@ const YoungKidsPage = () => {
   const location = useLocation();
   const [dynamicStories, setDynamicStories] = useState<typeof allStories | null>(null);
   const [serverAchievements, setServerAchievements] = useState<any[]>([]);
+  const [datasetStories, setDatasetStories] = useState<DatasetStory[]>([]);
 
   // Enrolled internal story IDs, derived from enrolled words/phrases (populated after completion)
   const enrolledInternalStoryIds = useMemo(() => {
@@ -182,11 +184,10 @@ const YoungKidsPage = () => {
       try {
         // 1. Initialize HybridServiceManager
         await HybridServiceManager.initialize({
-          mode: 'hybrid',
-          preferOffline: false,
+          mode: 'hybrid' as any,
           autoSync: true,
           syncInterval: 15
-        });
+        } as any);
 
         // 2. Check system health
         const health = await HybridServiceManager.getSystemHealth();
@@ -600,6 +601,30 @@ const YoungKidsPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
+  // Load stories 11-20 from dataset
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    
+    const loadDatasetStories = async () => {
+      try {
+        // Try loading from JSON first (easier to maintain), fallback to CSV
+        const stories = await StoryDatasetService.loadStoriesFromJSON('/datasets/young-kids-stories.json', 'young');
+        if (stories.length === 0) {
+          // Fallback to CSV if JSON doesn't exist
+          const csvStories = await StoryDatasetService.loadStoriesFromCSV('/datasets/young-kids-stories.csv', 'young');
+          setDatasetStories(csvStories);
+        } else {
+          setDatasetStories(stories);
+        }
+      } catch (error) {
+        console.error('Error loading dataset stories:', error);
+        setDatasetStories([]);
+      }
+    };
+    
+    loadDatasetStories();
+  }, [isAuthenticated]);
+
   // Handle story opening from Favorites page
   useEffect(() => {
     if (location.state?.startStory && location.state?.storyType) {
@@ -644,8 +669,62 @@ const YoungKidsPage = () => {
     }
   }, [location.state, dynamicStories, allStories, navigate, location.pathname]);
 
+  // Helper function to map story type to internal StoryWordsService ID
+  const getInternalStoryId = (storyType: string): string => {
+    const mapping: Record<string, string> = {
+      'forest': 'magic-forest',
+      'space': 'space-adventure',
+      'ocean': 'underwater-world',
+      'dinosaur': 'dinosaur-discovery',
+      'unicorn': 'unicorn-magic',
+      'pirate': 'pirate-treasure',
+      'superhero': 'superhero-school',
+      'fairy': 'fairy-garden',
+      'rainbow': 'rainbow-castle',
+      'jungle': 'jungle-explorer'
+    };
+    return mapping[storyType] || storyType;
+  };
+
+  // Merge base stories with dataset stories
+  const allStoriesWithDataset = useMemo(() => {
+    const baseStories = dynamicStories || allStories;
+    const datasetStoriesMapped = datasetStories.map((ds) => {
+      // Map dataset story to story format
+      const CharacterIcon = ds.character ? 
+        (ds.character === 'Rabbit' ? Rabbit :
+         ds.character === 'Rocket' ? Rocket :
+         ds.character === 'Fish' ? Fish :
+         ds.character === 'Footprints' ? Footprints :
+         ds.character === 'Sparkles' ? Sparkles :
+         ds.character === 'Anchor' ? Anchor :
+         ds.character === 'Shield' ? Shield :
+         ds.character === 'Crown' ? Crown :
+         ds.character === 'Compass' ? Compass : Rabbit) : Rabbit;
+      
+      return {
+        title: ds.title,
+        description: ds.description,
+        difficulty: ds.difficulty,
+        duration: ds.duration,
+        words: ds.words,
+        image: ds.image,
+        character: CharacterIcon,
+        gradient: ds.gradient || 'from-blue-400 to-cyan-400',
+        bgGradient: ds.bgGradient || 'from-blue-200 to-cyan-300 dark:from-blue-900 dark:to-cyan-900',
+        animation: ds.animation || 'animate-float-slow',
+        type: ds.type,
+        id: `young-${ds.storyNumber - 1}`, // Convert to 0-based index (story 11 = young-10)
+        isFromDataset: true,
+        datasetStory: ds
+      };
+    });
+    
+    return [...baseStories, ...datasetStoriesMapped];
+  }, [dynamicStories, allStories, datasetStories]);
+
   // Calculate pagination
-  const effectiveStories = dynamicStories || allStories;
+  const effectiveStories = allStoriesWithDataset;
   const startIndex = (currentPage - 1) * storiesPerPage;
   const paginatedStories = effectiveStories.slice(startIndex, startIndex + storiesPerPage);
   const totalPages = Math.ceil(effectiveStories.length / storiesPerPage);
@@ -838,23 +917,6 @@ const YoungKidsPage = () => {
     } catch (error) {
       console.error('Error updating favorites:', error);
     }
-  };
-
-  // Helper function to map story type to internal StoryWordsService ID
-  const getInternalStoryId = (storyType: string): string => {
-    const mapping: Record<string, string> = {
-      'forest': 'magic-forest',
-      'space': 'space-adventure',
-      'ocean': 'underwater-world',
-      'dinosaur': 'dinosaur-discovery',
-      'unicorn': 'unicorn-magic',
-      'pirate': 'pirate-treasure',
-      'superhero': 'superhero-school',
-      'fairy': 'fairy-garden',
-      'rainbow': 'rainbow-castle',
-      'jungle': 'jungle-explorer'
-    };
-    return mapping[storyType] || storyType;
   };
 
   const handleAdventureComplete = async (storyId: string, score: number) => {
@@ -1289,9 +1351,45 @@ const YoungKidsPage = () => {
                   const CharacterIcon = story.character;
                   const internalId = getInternalStoryId(story.type);
                   const isEnrolled = enrolledInternalStoryIds.has(internalId) || completedStoryIds.has(internalId);
+                  
+                  // Check if story is from dataset and if it's unlocked
+                  const storyIndex = parseInt(story.id.replace('young-', ''), 10);
+                  const isDatasetStory = storyIndex >= 10; // Stories 11-20 (indices 10-19)
+                  
+                  let isUnlocked = true; // Base stories 1-10 are always unlocked
+                  
+                  if (isDatasetStory) {
+                    // For story 11 (index 10), check if story 10 (index 9) is completed
+                    // For story 12 (index 11), check if story 11 (index 10) is completed, etc.
+                    const previousStoryIndex = storyIndex - 1;
+                    
+                    if (previousStoryIndex < 10) {
+                      // Previous story is in base stories (1-10)
+                      const previousStory = (dynamicStories || allStories)[previousStoryIndex];
+                      if (previousStory) {
+                        const previousInternalId = getInternalStoryId(previousStory.type);
+                        isUnlocked = completedStoryIds.has(previousInternalId) || 
+                                    enrolledInternalStoryIds.has(previousInternalId);
+                      }
+                    } else {
+                      // Previous story is also a dataset story (11-20)
+                      // Check if previous dataset story is completed
+                      const previousDatasetStory = datasetStories.find(
+                        ds => ds.storyNumber - 1 === previousStoryIndex
+                      );
+                      if (previousDatasetStory) {
+                        const previousInternalId = getInternalStoryId(previousDatasetStory.type);
+                        isUnlocked = completedStoryIds.has(previousInternalId) || 
+                                    enrolledInternalStoryIds.has(previousInternalId);
+                      }
+                    }
+                  }
 
                   return (
-                    <Card key={story.id} className="flex h-full flex-col overflow-hidden border border-muted shadow-sm transition hover:shadow-lg">
+                    <Card key={story.id} className={cn(
+                      "flex h-full flex-col overflow-hidden border border-muted shadow-sm transition hover:shadow-lg",
+                      !isUnlocked && "opacity-60"
+                    )}>
                       <div className={cn('relative overflow-hidden bg-gradient-to-br p-4 text-white', story.bgGradient)}>
                         <div className="flex items-start justify-between gap-2">
                           <span className={cn('text-3xl', story.animation)}>{story.image}</span>
@@ -1300,6 +1398,7 @@ const YoungKidsPage = () => {
                             size="icon"
                             onClick={() => toggleFavorite(story.id)}
                             className="rounded-full bg-black/15 text-white hover:bg-black/25"
+                            disabled={!isUnlocked}
                           >
                             <Heart className={cn('h-4 w-4', favorites.includes(story.id) && 'fill-current')} />
                           </Button>
@@ -1325,20 +1424,42 @@ const YoungKidsPage = () => {
                             Enrolled
                           </Badge>
                         )}
+                        {!isUnlocked && (
+                          <Badge className="absolute right-3 top-3 bg-black/50 text-white">
+                            <Lock className="mr-1 h-3 w-3" />
+                            Locked
+                          </Badge>
+                        )}
                       </div>
                       <CardContent className="flex flex-1 flex-col justify-between space-y-3 p-4">
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <CharacterIcon className="h-4 w-4 text-muted-foreground" />
                           <span className="truncate">Adventure type: {story.type.replace('-', ' ')}</span>
                         </div>
-                        <Button
-                          onClick={() => handleStartLesson(story.id)}
-                          disabled={isPlaying && currentStory === story.id}
-                          className="w-full py-2 text-sm"
-                        >
-                          <Play className="mr-2 h-4 w-4" />
-                          {isPlaying && currentStory === story.id ? 'Starting...' : 'Start adventure'}
-                        </Button>
+                        {!isUnlocked ? (
+                          <div className="space-y-2">
+                            <Button
+                              disabled
+                              className="w-full py-2 text-sm"
+                              variant="secondary"
+                            >
+                              <Lock className="mr-2 h-4 w-4" />
+                              Complete previous story to unlock
+                            </Button>
+                            <p className="text-xs text-center text-muted-foreground">
+                              Finish story {storyIndex} to unlock this adventure
+                            </p>
+                          </div>
+                        ) : (
+                          <Button
+                            onClick={() => handleStartLesson(story.id)}
+                            disabled={isPlaying && currentStory === story.id}
+                            className="w-full py-2 text-sm"
+                          >
+                            <Play className="mr-2 h-4 w-4" />
+                            {isPlaying && currentStory === story.id ? 'Starting...' : 'Start adventure'}
+                          </Button>
+                        )}
                       </CardContent>
                     </Card>
                   );
