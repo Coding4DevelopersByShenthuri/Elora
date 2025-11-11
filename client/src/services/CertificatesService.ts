@@ -197,10 +197,11 @@ export class CertificatesService {
     }
     ctx.fillText(displayName, namePos.x, namePos.y);
 
-    // Date string
-    const dateStr = issueDate.toLocaleDateString(undefined, {
-      year: 'numeric', month: 'long', day: 'numeric'
-    });
+    // Date string - ensure year is always included
+    const year = issueDate.getFullYear();
+    const month = issueDate.toLocaleDateString(undefined, { month: 'long' });
+    const day = issueDate.getDate();
+    const dateStr = `${month} ${day}, ${year}`;
     const datePos = resolvePos(layout.datePosition as any, layout.datePositionRel as any, { x: Math.round(canvas.width * 0.75), y: Math.round(canvas.height * 0.85) });
     ctx.font = layout.dateFont || '500 28px system-ui, sans-serif';
     ctx.fillStyle = layout.dateColor || '#374151';

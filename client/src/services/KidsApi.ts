@@ -105,7 +105,7 @@ class KidsApi {
 
   static async unlockTrophy(
     token: string,
-    payload: { trophy_id: string; title: string }
+    payload: { trophy_id: string; title: string; audience?: 'young' | 'teen' }
   ) {
     this.ensureToken(token);
     this.ensureOnline();

@@ -50,6 +50,12 @@ urlpatterns = [
     path('page-eligibility/', views.get_all_page_eligibilities, name='get-all-page-eligibilities'),
     path('page-eligibility/<str:page_path>', views.get_page_eligibility, name='get-page-eligibility'),
     path('page-eligibility/<str:page_path>/check', views.check_page_eligibility, name='check-page-eligibility'),
+    
+    # ============= Multi-Category Progress =============
+    path('user/multi-category-progress/', views.get_all_category_progress, name='get-all-category-progress'),
+    path('user/multi-category-progress/aggregated/', views.get_aggregated_progress, name='get-aggregated-progress'),
+    path('user/multi-category-progress/<str:category>/', views.get_category_progress, name='get-category-progress'),
+    path('user/multi-category-progress/<str:category>/update/', views.update_category_progress, name='update-category-progress'),
     path('teen/story/start', views.teen_story_start, name='teen-story-start'),
     path('teen/story/complete', views.teen_story_complete, name='teen-story-complete'),
     path('teen/vocabulary/practice', views.teen_vocabulary_practice, name='teen-vocabulary-practice'),
@@ -67,6 +73,7 @@ urlpatterns = [
     path('kids/achievements', views.kids_achievements_list, name='kids-achievements'),
     path('kids/certificates/issue', views.kids_issue_certificate, name='kids-issue-certificate'),
     path('kids/certificates/my', views.kids_my_certificates, name='kids-my-certificates'),
+    path('kids/trophies/unlock', views.kids_unlock_trophy, name='kids-unlock-trophy'),
     path('kids/parental-controls', views.kids_parental_controls_overview, name='kids-parental-controls-overview'),
     path('kids/parental-controls/unlock', views.kids_parental_controls_unlock, name='kids-parental-controls-unlock'),
     path('kids/parental-controls/settings', views.kids_parental_controls_settings, name='kids-parental-controls-settings'),

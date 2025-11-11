@@ -1247,11 +1247,11 @@ const CertificatesPage = () => {
       // Use custom template image for Story Time Champion
       templatePath: (import.meta as any).env.VITE_STORY_CERT_TEMPLATE_URL || '/story-time-champion-template.png',
       // Fine-tuned positions for your template:
-      // Name - moved down more (increased y significantly)
-      namePositionRel: { x: 0.5, y: 0.52 },
-      // Issued Date - moved up more (decreased y further)
-      datePositionRel: { x: 0.72, y: 0.75 },
-      nameFont: '700 56px system-ui, sans-serif',
+      // Name - moved down a bit
+      namePositionRel: { x: 0.5, y: 0.50 },
+      // Issued Date - moved up and slightly to the right
+      datePositionRel: { x: 0.72, y: 0.80 },
+      nameFont: '700 72px "Playfair Display", "Georgia", "Times New Roman", serif',
       dateFont: '700 28px system-ui, sans-serif',
       nameColor: '#111827',
       dateColor: '#111827'
@@ -1260,9 +1260,9 @@ const CertificatesPage = () => {
       // Use custom template image for Speaking Star
       templatePath: (import.meta as any).env.VITE_SPEAKING_STAR_TEMPLATE_URL || '/Speaking_Star_Template.png',
       // Positions tuned for the provided template
-      namePositionRel: { x: 0.5, y: 0.56 },
-      datePositionRel: { x: 0.70, y: 0.78 },
-      nameFont: '700 56px system-ui, sans-serif',
+      namePositionRel: { x: 0.5, y: 0.54 },
+      datePositionRel: { x: 0.70, y: 0.82 },
+      nameFont: '700 72px "Playfair Display", "Georgia", "Times New Roman", serif',
       dateFont: '700 28px system-ui, sans-serif',
       nameColor: '#111827',
       dateColor: '#111827'
@@ -1271,9 +1271,9 @@ const CertificatesPage = () => {
       // Use custom template image for Word Wizard
       templatePath: (import.meta as any).env.VITE_WORD_WIZARD_TEMPLATE_URL || '/Word Wizard_Template.png',
       // Positions tuned for the provided template
-      namePositionRel: { x: 0.5, y: 0.56 },
-      datePositionRel: { x: 0.70, y: 0.78 },
-      nameFont: '700 56px system-ui, sans-serif',
+      namePositionRel: { x: 0.5, y: 0.54 },
+      datePositionRel: { x: 0.70, y: 0.82 },
+      nameFont: '700 72px "Playfair Display", "Georgia", "Times New Roman", serif',
       dateFont: '700 28px system-ui, sans-serif',
       nameColor: '#111827',
       dateColor: '#111827'
@@ -1282,9 +1282,9 @@ const CertificatesPage = () => {
       // Use custom template image for Consistency Hero
       templatePath: (import.meta as any).env.VITE_CONSISTENCY_HERO_TEMPLATE_URL || '/Consistency Hero_Template.png',
       // Positions tuned for the provided template
-      namePositionRel: { x: 0.5, y: 0.56 },
-      datePositionRel: { x: 0.70, y: 0.78 },
-      nameFont: '700 56px system-ui, sans-serif',
+      namePositionRel: { x: 0.5, y: 0.54 },
+      datePositionRel: { x: 0.70, y: 0.82 },
+      nameFont: '700 72px "Playfair Display", "Georgia", "Times New Roman", serif',
       dateFont: '700 28px system-ui, sans-serif',
       nameColor: '#111827',
       dateColor: '#111827',
@@ -1295,9 +1295,9 @@ const CertificatesPage = () => {
       // Use custom template image for Super Learner
       templatePath: (import.meta as any).env.VITE_SUPER_LEARNER_TEMPLATE_URL || '/Super_Learner_Template.png',
       // Positions tuned for the provided template
-      namePositionRel: { x: 0.5, y: 0.56 },
-      datePositionRel: { x: 0.70, y: 0.78 },
-      nameFont: '700 60px system-ui, sans-serif',
+      namePositionRel: { x: 0.5, y: 0.54 },
+      datePositionRel: { x: 0.70, y: 0.82 },
+      nameFont: '700 76px "Playfair Display", "Georgia", "Times New Roman", serif',
       dateFont: '500 26px system-ui, sans-serif',
       nameColor: '#111827',
       dateColor: '#374151'
@@ -1343,7 +1343,11 @@ const CertificatesPage = () => {
             try { localStorage.setItem('speakbee_pending_trophy_unlocks', JSON.stringify(queued)); } catch {}
           } else {
             newlyUnlocked.forEach(item => {
-              KidsApi.unlockTrophy(token as string, { trophy_id: item.id, title: item.title })
+              KidsApi.unlockTrophy(token as string, { 
+                trophy_id: item.id, 
+                title: item.title,
+                audience: isTeenKids ? 'teen' : 'young'
+              })
                 .catch(() => {
                   // Keep for retry on failure
                   const queued = [...pendingUnlocks, item];
@@ -1368,7 +1372,11 @@ const CertificatesPage = () => {
       const remaining: { id: string; title: string; date: string }[] = [];
       for (const item of pendingUnlocks) {
         try {
-          await KidsApi.unlockTrophy(token as string, { trophy_id: item.id, title: item.title });
+          await KidsApi.unlockTrophy(token as string, { 
+            trophy_id: item.id, 
+            title: item.title,
+            audience: isTeenKids ? 'teen' : 'young'
+          });
         } catch {
           remaining.push(item);
         }
@@ -1576,14 +1584,12 @@ const CertificatesPage = () => {
 
                         // Upload to storage if online and Supabase configured
                         let fileUrl: string | undefined;
-                        let uploadedFilePath: string | undefined;
                         const isSupabaseConfigured = StorageService.isSupabaseConfigured();
                         
                         if (isOnline && isSupabaseConfigured) {
                           try {
                             const uploadResult = await StorageService.uploadCertificateBlob(png, `${spec.id}-${Date.now()}.png`, userId);
                             fileUrl = uploadResult.publicUrl;
-                            uploadedFilePath = uploadResult.path;
                             console.log('Certificate uploaded to storage:', fileUrl);
                           } catch (uploadError: any) {
                             console.warn('Failed to upload certificate to storage:', uploadError);
@@ -1605,46 +1611,45 @@ const CertificatesPage = () => {
                         // Download PDF
                       await CertificatesService.generateAndDownloadPDF(png, `${spec.id}.pdf`);
 
-                        // Record certificate in database
-                        if (isOnline) {
+                        // Always record certificate in database when online (even if file upload failed)
+                        if (isOnline && token) {
                           try {
+                            // Record certificate in database - this should always succeed even if file upload failed
                             await KidsApi.issueCertificate(token, { 
                               cert_id: spec.id, 
                               title: spec.title,
                               audience: isTeenKids ? 'teen' : 'young',
-                              file_url: fileUrl 
+                              file_url: fileUrl || '' // Use empty string if upload failed, but still record the certificate
                             });
+                            
+                            console.log(`Certificate ${spec.id} recorded in database for user ${userId}`);
                             
                             toast({
                               title: 'Certificate Generated! 🎉',
                               description: fileUrl 
                                 ? 'Your certificate has been downloaded and saved to the cloud.'
-                                : 'Your certificate has been downloaded.',
+                                : 'Your certificate has been downloaded and recorded.',
                             });
                           } catch (apiError: any) {
-                            console.error('Failed to record certificate:', apiError);
+                            console.error('Failed to record certificate in database:', apiError);
                             
-                            // Rollback: Delete uploaded file if API call failed
-                            if (fileUrl && uploadedFilePath && isSupabaseConfigured) {
-                              try {
-                                await StorageService.deleteFile(uploadedFilePath);
-                                console.log('Rollback: Deleted orphaned certificate file from storage');
-                              } catch (deleteError) {
-                                console.error('Failed to delete orphaned file during rollback:', deleteError);
-                                // Log but don't throw - file remains but at least we tried
-                              }
-                            }
-                            
+                            // Don't rollback file upload - the file might still be useful
+                            // Just log the error and inform the user
                             toast({
                               title: 'Certificate Downloaded',
-                              description: 'Certificate downloaded, but could not be saved to your account. You may need to sign in again.',
+                              description: 'Certificate downloaded, but could not be saved to your account. Please try again or contact support.',
                               variant: 'destructive',
                             });
                           }
-                        } else {
+                        } else if (!isOnline) {
                           toast({
                             title: 'Certificate Downloaded! 📄',
                             description: 'Sign in to save your certificate to the cloud.',
+                          });
+                        } else {
+                          toast({
+                            title: 'Certificate Downloaded! 📄',
+                            description: 'Please sign in to record your certificate.',
                           });
                         }
                       } catch (error: any) {

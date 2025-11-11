@@ -386,6 +386,29 @@ class KidsCertificate(models.Model):
         unique_together = ("user", "cert_id", "audience")
 
 
+class KidsTrophy(models.Model):
+    """Unlocked trophy record for kids."""
+    AUDIENCE_CHOICES = [
+        ('young', 'Young Kids (4-10)'),
+        ('teen', 'Teen Kids (11-17)'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='kids_trophies')
+    trophy_id = models.CharField(max_length=128)
+    audience = models.CharField(max_length=10, choices=AUDIENCE_CHOICES, default='young', help_text="Target audience: young or teen")
+    title = models.CharField(max_length=255)
+    unlocked_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "trophy_id", "audience")
+        indexes = [
+            models.Index(fields=['user', 'trophy_id']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.title} ({self.audience})"
+
+
 # ============= Kids Story Management =============
 class StoryEnrollment(models.Model):
     """Track which stories a user has completed/enrolled in"""
@@ -1004,6 +1027,86 @@ class PlatformSettings(models.Model):
 
     def __str__(self):
         return f"PlatformSettings(id={self.id or 'singleton'})"
+
+
+# ============= Multi-Category Progress Tracking =============
+class CategoryProgress(models.Model):
+    """Track progress for each learning category"""
+    CATEGORY_CHOICES = [
+        ('young_kids', 'Young Kids (4-10)'),
+        ('teen_kids', 'Teen Kids (11-17)'),
+        ('adults_beginner', 'Adults Beginner'),
+        ('adults_intermediate', 'Adults Intermediate'),
+        ('adults_advanced', 'Adults Advanced'),
+        ('ielts_pte', 'IELTS/PTE'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='category_progress')
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+    
+    # Metrics
+    total_points = models.IntegerField(default=0)
+    total_streak = models.IntegerField(default=0)
+    lessons_completed = models.IntegerField(default=0)
+    practice_time_minutes = models.IntegerField(default=0)
+    average_score = models.FloatField(default=0.0)
+    
+    # Engagement
+    last_activity = models.DateTimeField(null=True, blank=True)
+    first_access = models.DateTimeField(auto_now_add=True)
+    days_active = models.IntegerField(default=0)
+    
+    # Progress tracking
+    progress_percentage = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    level = models.IntegerField(default=1)
+    
+    # Additional metrics
+    stories_completed = models.IntegerField(default=0)  # For kids categories
+    vocabulary_words = models.IntegerField(default=0)
+    pronunciation_attempts = models.IntegerField(default=0)
+    games_completed = models.IntegerField(default=0)
+    
+    # Metadata
+    details = models.JSONField(default=dict)  # Category-specific data
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['user', 'category']
+        indexes = [
+            models.Index(fields=['user', 'category']),
+            models.Index(fields=['user', 'last_activity']),
+            models.Index(fields=['category', 'total_points']),
+        ]
+        verbose_name = "Category Progress"
+        verbose_name_plural = "Category Progress"
+        ordering = ['-last_activity', '-total_points']
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.get_category_display()} ({self.total_points} points)"
+    
+    def update_from_activity(self, points=0, time_minutes=0, score=0, lessons=0):
+        """Update progress from a new activity"""
+        self.total_points += points
+        self.practice_time_minutes += time_minutes
+        self.lessons_completed += lessons
+        
+        # Update average score
+        if score > 0:
+            total_scores = self.details.get('total_scores', 0) + 1
+            current_avg = self.average_score
+            self.average_score = ((current_avg * (total_scores - 1)) + score) / total_scores
+            self.details['total_scores'] = total_scores
+        
+        # Update last activity
+        from django.utils import timezone
+        self.last_activity = timezone.now()
+        
+        # Update days active (simplified - could be enhanced)
+        if self.last_activity:
+            days_since_first = (timezone.now() - self.first_access).days
+            self.days_active = max(self.days_active, min(days_since_first + 1, 365))
+        
+        self.save()
 
 
 # ============= Page Eligibility & Unlocking System =============

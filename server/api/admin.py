@@ -3,14 +3,14 @@ from django.utils import timezone
 from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
     VocabularyWord, Achievement, UserAchievement,
-    KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, WaitlistEntry,
+    KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, KidsTrophy, WaitlistEntry,
     UserNotification, AdminNotification, StoryEnrollment, StoryWord, StoryPhrase, KidsFavorite,
     KidsVocabularyPractice, KidsPronunciationPractice, KidsGameSession,
     TeenProgress, TeenStoryProgress, TeenVocabularyPractice,
     TeenPronunciationPractice, TeenFavorite, TeenAchievement,
     TeenGameSession, TeenCertificate,
     EmailVerificationToken, SurveyStepResponse, ParentalControlSettings,
-    CookieConsent, PlatformSettings
+    CookieConsent, PlatformSettings, CategoryProgress, PageEligibility
 )
 
 
@@ -230,6 +230,15 @@ class KidsCertificateAdmin(admin.ModelAdmin):
     search_fields = ['user__username', 'cert_id', 'title']
     readonly_fields = ['issued_at']
     date_hierarchy = 'issued_at'
+
+
+@admin.register(KidsTrophy)
+class KidsTrophyAdmin(admin.ModelAdmin):
+    list_display = ['user', 'trophy_id', 'title', 'audience', 'unlocked_at']
+    list_filter = ['audience', 'unlocked_at']
+    search_fields = ['user__username', 'trophy_id', 'title']
+    readonly_fields = ['unlocked_at']
+    date_hierarchy = 'unlocked_at'
 
 
 # ============= Kids Story Management Admin =============
@@ -480,3 +489,57 @@ class PlatformSettingsAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         # Prevent deletion of platform settings
         return False
+
+
+# ============= Category Progress Admin =============
+@admin.register(CategoryProgress)
+class CategoryProgressAdmin(admin.ModelAdmin):
+    list_display = ['user', 'category', 'total_points', 'lessons_completed', 'average_score', 'last_activity', 'updated_at']
+    list_filter = ['category', 'level', 'last_activity', 'updated_at']
+    search_fields = ['user__username', 'user__email', 'category']
+    readonly_fields = ['first_access', 'updated_at', 'last_activity']
+    date_hierarchy = 'last_activity'
+    ordering = ['-last_activity', '-total_points']
+    
+    fieldsets = (
+        ('User & Category', {
+            'fields': ('user', 'category')
+        }),
+        ('Progress Metrics', {
+            'fields': ('total_points', 'total_streak', 'lessons_completed', 'practice_time_minutes', 'average_score')
+        }),
+        ('Engagement', {
+            'fields': ('last_activity', 'first_access', 'days_active')
+        }),
+        ('Additional Metrics', {
+            'fields': ('stories_completed', 'vocabulary_words', 'pronunciation_attempts', 'games_completed')
+        }),
+        ('Progress Tracking', {
+            'fields': ('progress_percentage', 'level', 'details')
+        }),
+        ('Timestamps', {
+            'fields': ('updated_at',)
+        }),
+    )
+
+
+# ============= Page Eligibility Admin =============
+@admin.register(PageEligibility)
+class PageEligibilityAdmin(admin.ModelAdmin):
+    list_display = ['user', 'page_path', 'is_unlocked', 'unlocked_at', 'updated_at']
+    list_filter = ['page_path', 'is_unlocked', 'unlocked_at', 'updated_at']
+    search_fields = ['user__username', 'user__email', 'page_path']
+    readonly_fields = ['created_at', 'updated_at', 'unlocked_at']
+    date_hierarchy = 'unlocked_at'
+    
+    fieldsets = (
+        ('User & Page', {
+            'fields': ('user', 'page_path')
+        }),
+        ('Eligibility', {
+            'fields': ('is_unlocked', 'unlocked_at', 'required_criteria', 'current_progress')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )

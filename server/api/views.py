@@ -31,7 +31,7 @@ from .serializers import (
     RegisterSerializer, LoginSerializer, UserSerializer, UserProfileSerializer,
     LessonSerializer, LessonProgressSerializer, PracticeSessionSerializer,
     VocabularyWordSerializer, AchievementSerializer, UserAchievementSerializer,
-    KidsLessonSerializer, KidsProgressSerializer, KidsAchievementSerializer, KidsCertificateSerializer,
+    KidsLessonSerializer, KidsProgressSerializer, KidsAchievementSerializer, KidsCertificateSerializer, KidsTrophySerializer,
     WaitlistSerializer, DailyProgressSerializer, WeeklyStatsSerializer, UserStatsSerializer,
     UserNotificationSerializer, AdminNotificationSerializer, SurveyStepResponseSerializer, PlatformSettingsSerializer,
     CookieConsentDetailSerializer, CookieConsentPreferencesSerializer,
@@ -40,12 +40,12 @@ from .serializers import (
     ParentalControlSettingsSerializer, TeenProgressSerializer, TeenStoryProgressSerializer,
     TeenVocabularyPracticeSerializer, TeenPronunciationPracticeSerializer, TeenFavoriteSerializer,
     TeenAchievementSerializer, TeenGameSessionSerializer, TeenCertificateSerializer,
-    PageEligibilitySerializer
+    PageEligibilitySerializer, CategoryProgressSerializer, AggregatedProgressSerializer
 )
 from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
     VocabularyWord, Achievement, UserAchievement,
-    KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, WaitlistEntry,
+    KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, KidsTrophy, WaitlistEntry,
     EmailVerificationToken, UserNotification, AdminNotification, SurveyStepResponse, PlatformSettings,
     CookieConsent,
     StoryEnrollment, StoryWord, StoryPhrase, KidsFavorite,
@@ -53,7 +53,7 @@ from .models import (
     ParentalControlSettings, TeenProgress, TeenStoryProgress,
     TeenVocabularyPractice, TeenPronunciationPractice, TeenFavorite,
     TeenAchievement, TeenGameSession, TeenCertificate,
-    PageEligibility, KidsProgress
+    PageEligibility, CategoryProgress
 )
 
 logger = logging.getLogger(__name__)
@@ -67,6 +67,311 @@ def get_tokens_for_user(user):
         'refresh': str(refresh),
         'token': str(refresh.access_token),
     }
+
+
+def get_category_from_lesson_type(lesson_type: str) -> str:
+    """Map lesson type to category"""
+    mapping = {
+        'kids_4_10': 'young_kids',
+        'kids_11_17': 'teen_kids',
+        'beginner': 'adults_beginner',
+        'intermediate': 'adults_intermediate',
+        'advanced': 'adults_advanced',
+        'ielts': 'ielts_pte',
+        'pte': 'ielts_pte',
+    }
+    return mapping.get(lesson_type, 'adults_beginner')
+
+
+def sync_category_progress(user, category, category_progress):
+    """Sync category progress with existing progress data from source tables - SAVES TO MYSQL"""
+    try:
+        from django.utils import timezone
+        
+        logger.info(f"Syncing category progress for user {user.id}, category {category}")
+        
+        if category == 'young_kids':
+            kids_progress = KidsProgress.objects.filter(user=user).first()
+            logger.info(f"YoungKids: Found KidsProgress: {kids_progress is not None}")
+            if kids_progress:
+                logger.info(f"YoungKids: Points={kids_progress.points}, Streak={kids_progress.streak}")
+                category_progress.total_points = kids_progress.points or 0
+                category_progress.total_streak = kids_progress.streak or 0
+                details = kids_progress.details or {}
+                
+                # Count completed stories
+                story_enrollments = details.get('storyEnrollments', [])
+                if not story_enrollments:
+                    # Also check StoryEnrollment table
+                    story_enrollments_db = StoryEnrollment.objects.filter(user=user, completed=True)
+                    stories_count = story_enrollments_db.count()
+                    logger.info(f"YoungKids: Found {stories_count} completed stories from StoryEnrollment table")
+                    category_progress.stories_completed = stories_count
+                else:
+                    stories_completed_count = len([
+                        s for s in story_enrollments
+                        if s.get('completed', False)
+                    ])
+                    logger.info(f"YoungKids: Found {stories_completed_count} completed stories from details")
+                    category_progress.stories_completed = stories_completed_count
+                category_progress.lessons_completed = category_progress.stories_completed  # Also set lessons_completed for consistency
+                
+                # Count vocabulary words
+                vocab_dict = details.get('vocabulary', {})
+                if not vocab_dict:
+                    # Also check KidsVocabularyPractice table
+                    vocab_count = KidsVocabularyPractice.objects.filter(user=user).count()
+                    logger.info(f"YoungKids: Found {vocab_count} vocabulary words from KidsVocabularyPractice table")
+                    category_progress.vocabulary_words = vocab_count
+                else:
+                    vocab_count = len(vocab_dict)
+                    logger.info(f"YoungKids: Found {vocab_count} vocabulary words from details")
+                    category_progress.vocabulary_words = vocab_count
+                
+                # Count pronunciation attempts
+                pron_dict = details.get('pronunciation', {})
+                if not pron_dict:
+                    # Also check KidsPronunciationPractice table
+                    pron_count = KidsPronunciationPractice.objects.filter(user=user).count()
+                    logger.info(f"YoungKids: Found {pron_count} pronunciation attempts from KidsPronunciationPractice table")
+                    category_progress.pronunciation_attempts = pron_count
+                else:
+                    pron_count = len(pron_dict)
+                    logger.info(f"YoungKids: Found {pron_count} pronunciation attempts from details")
+                    category_progress.pronunciation_attempts = pron_count
+                
+                # Count games
+                games_dict = details.get('games', {})
+                if games_dict:
+                    games_count = games_dict.get('attempts', 0)
+                    logger.info(f"YoungKids: Found {games_count} games from details")
+                    category_progress.games_completed = games_count
+                else:
+                    # Also check KidsGameSession table
+                    games_count = KidsGameSession.objects.filter(user=user, completed=True).count()
+                    logger.info(f"YoungKids: Found {games_count} games from KidsGameSession table")
+                    category_progress.games_completed = games_count
+                
+                # Update last activity if there's any progress
+                if category_progress.total_points > 0 or category_progress.stories_completed > 0:
+                    category_progress.last_activity = timezone.now()
+                
+                # Calculate average score from practice sessions
+                if category_progress.pronunciation_attempts > 0:
+                    pron_practices = KidsPronunciationPractice.objects.filter(user=user)
+                    if pron_practices.exists():
+                        scores = [p.best_score for p in pron_practices if p.best_score > 0]
+                        if scores:
+                            category_progress.average_score = sum(scores) / len(scores)
+                            logger.info(f"YoungKids: Calculated average score: {category_progress.average_score}")
+                
+                logger.info(f"YoungKids: Saving - Points={category_progress.total_points}, Stories={category_progress.stories_completed}, Vocab={category_progress.vocabulary_words}")
+                category_progress.save()  # ← SAVE TO MYSQL
+            else:
+                logger.warning(f"YoungKids: No KidsProgress found for user {user.id}")
+        
+        elif category == 'teen_kids':
+            teen_progress = TeenProgress.objects.filter(user=user).first()
+            logger.info(f"TeenKids: Found TeenProgress: {teen_progress is not None}")
+            if teen_progress:
+                logger.info(f"TeenKids: Points={teen_progress.points}, Streak={teen_progress.streak}, Missions={teen_progress.missions_completed}")
+                category_progress.total_points = teen_progress.points or 0
+                category_progress.total_streak = teen_progress.streak or 0
+                category_progress.stories_completed = teen_progress.missions_completed or 0
+                category_progress.lessons_completed = teen_progress.missions_completed or 0  # Also set lessons_completed for consistency
+                category_progress.vocabulary_words = teen_progress.vocabulary_attempts or 0
+                category_progress.pronunciation_attempts = teen_progress.pronunciation_attempts or 0
+                category_progress.games_completed = teen_progress.games_attempts or 0
+                
+                # Calculate average score from practice sessions
+                if category_progress.pronunciation_attempts > 0:
+                    pron_practices = TeenPronunciationPractice.objects.filter(user=user)
+                    if pron_practices.exists():
+                        scores = [p.best_score for p in pron_practices if p.best_score > 0]
+                        if scores:
+                            category_progress.average_score = sum(scores) / len(scores)
+                            logger.info(f"TeenKids: Calculated average score: {category_progress.average_score}")
+                
+                # Update last activity
+                if category_progress.total_points > 0 or category_progress.stories_completed > 0:
+                    category_progress.last_activity = timezone.now()
+                
+                logger.info(f"TeenKids: Saving - Points={category_progress.total_points}, Missions={category_progress.stories_completed}, Vocab={category_progress.vocabulary_words}")
+                category_progress.save()  # ← SAVE TO MYSQL
+            else:
+                logger.warning(f"TeenKids: No TeenProgress found for user {user.id}")
+        
+        # For adult categories, sync from LessonProgress
+        elif category in ['adults_beginner', 'adults_intermediate', 'adults_advanced']:
+            lesson_type_map = {
+                'adults_beginner': 'beginner',
+                'adults_intermediate': 'intermediate',
+                'adults_advanced': 'advanced'
+            }
+            lesson_type = lesson_type_map.get(category)
+            if lesson_type:
+                lessons = LessonProgress.objects.filter(
+                    user=user,
+                    lesson__lesson_type=lesson_type
+                )
+                completed_lessons = lessons.filter(completed=True)
+                category_progress.lessons_completed = completed_lessons.count()
+                
+                # Calculate points from completed lessons
+                points_from_lessons = 0
+                for lesson in completed_lessons:
+                    if lesson.score:
+                        points_from_lessons += int(lesson.score / 10)
+                        if lesson.score == 100:
+                            points_from_lessons += 20  # Perfect score bonus
+                    points_from_lessons += min(10, lesson.time_spent_minutes // 5)  # Time bonus
+                
+                category_progress.total_points = points_from_lessons
+                category_progress.practice_time_minutes = sum(l.time_spent_minutes for l in lessons)
+                
+                # Calculate average score
+                scores = [l.score for l in completed_lessons if l.score > 0]
+                if scores:
+                    category_progress.average_score = sum(scores) / len(scores)
+                
+                # Count vocabulary words for this level
+                vocab_count = VocabularyWord.objects.filter(user=user).count()
+                category_progress.vocabulary_words = vocab_count
+                
+                # Update last activity
+                if category_progress.lessons_completed > 0:
+                    last_lesson = completed_lessons.order_by('-last_attempt').first()
+                    if last_lesson:
+                        category_progress.last_activity = last_lesson.last_attempt
+                    else:
+                        category_progress.last_activity = timezone.now()
+                
+                category_progress.save()  # ← SAVE TO MYSQL
+        
+        # For IELTS/PTE category
+        elif category == 'ielts_pte':
+            # Check if user has any IELTS/PTE lessons
+            ielts_lessons = LessonProgress.objects.filter(
+                user=user,
+                lesson__lesson_type__in=['ielts', 'pte']
+            )
+            completed_ielts = ielts_lessons.filter(completed=True)
+            category_progress.lessons_completed = completed_ielts.count()
+            
+            if completed_ielts.exists():
+                points_from_lessons = 0
+                for lesson in completed_ielts:
+                    if lesson.score:
+                        points_from_lessons += int(lesson.score / 10)
+                    points_from_lessons += min(10, lesson.time_spent_minutes // 5)
+                
+                category_progress.total_points = points_from_lessons
+                category_progress.practice_time_minutes = sum(l.time_spent_minutes for l in ielts_lessons)
+                
+                scores = [l.score for l in completed_ielts if l.score > 0]
+                if scores:
+                    category_progress.average_score = sum(scores) / len(scores)
+                
+                last_lesson = completed_ielts.order_by('-last_attempt').first()
+                if last_lesson:
+                    category_progress.last_activity = last_lesson.last_attempt
+                else:
+                    category_progress.last_activity = timezone.now()
+                
+                category_progress.save()  # ← SAVE TO MYSQL
+        
+        logger.info(f"Synced category progress for user {user.id}, category {category}")
+    except Exception as e:
+        logger.error(f"Error syncing category progress: {str(e)}")
+        import traceback
+        traceback.print_exc()
+
+
+def update_category_progress_from_activity(
+    user,
+    category: str,
+    points: int = 0,
+    time_minutes: int = 0,
+    score: float = 0,
+    lessons: int = 0,
+    stories: int = 0,
+    vocabulary_words: int = 0,
+    pronunciation_attempts: int = 0,
+    games: int = 0,
+    streak: int = None
+):
+    """
+    Update CategoryProgress in MySQL database from any activity.
+    This function ensures all progress is saved to the database.
+    """
+    try:
+        category_progress, created = CategoryProgress.objects.get_or_create(
+            user=user,
+            category=category,
+            defaults={
+                'total_points': 0,
+                'total_streak': 0,
+                'lessons_completed': 0,
+                'practice_time_minutes': 0,
+                'average_score': 0.0,
+                'progress_percentage': 0.0,
+                'level': 1,
+                'stories_completed': 0,
+                'vocabulary_words': 0,
+                'pronunciation_attempts': 0,
+                'games_completed': 0,
+            }
+        )
+        
+        # If newly created, sync with existing data first
+        if created:
+            sync_category_progress(user, category, category_progress)
+            # Reload to get synced data
+            category_progress.refresh_from_db()
+        
+        # Update metrics - ALL CHANGES ARE SAVED TO MYSQL
+        from django.utils import timezone
+        
+        if points > 0:
+            category_progress.total_points = (category_progress.total_points or 0) + points
+        if time_minutes > 0:
+            category_progress.practice_time_minutes = (category_progress.practice_time_minutes or 0) + time_minutes
+        if lessons > 0:
+            category_progress.lessons_completed = (category_progress.lessons_completed or 0) + lessons
+        if stories > 0:
+            category_progress.stories_completed = (category_progress.stories_completed or 0) + stories
+        if vocabulary_words > 0:
+            category_progress.vocabulary_words = (category_progress.vocabulary_words or 0) + vocabulary_words
+        if pronunciation_attempts > 0:
+            category_progress.pronunciation_attempts = (category_progress.pronunciation_attempts or 0) + pronunciation_attempts
+        if games > 0:
+            category_progress.games_completed = (category_progress.games_completed or 0) + games
+        if streak is not None:
+            category_progress.total_streak = max(category_progress.total_streak or 0, streak)
+        
+        # Update average score if score provided
+        if score > 0:
+            total_scores = category_progress.details.get('total_scores', 0) + 1
+            current_avg = category_progress.average_score or 0.0
+            # Calculate new average: (old_avg * (n-1) + new_score) / n
+            if total_scores == 1:
+                category_progress.average_score = score
+            else:
+                category_progress.average_score = ((current_avg * (total_scores - 1)) + score) / total_scores
+            category_progress.details['total_scores'] = total_scores
+        
+        # Always update last activity timestamp
+        category_progress.last_activity = timezone.now()
+        
+        # SAVE TO MYSQL DATABASE - This executes UPDATE SQL statement
+        category_progress.save()  # ← WRITES TO MYSQL DATABASE TABLE
+        
+        logger.info(f"CategoryProgress updated for user {user.id}, category {category}: {points} points, {lessons} lessons")
+        
+    except Exception as e:
+        logger.error(f"Error updating CategoryProgress: {str(e)}")
+        # Don't fail the main operation if category progress update fails
+        pass
 
 
 def calculate_level(points):
@@ -820,6 +1125,18 @@ def record_lesson_progress(request):
             
             profile.longest_streak = max(profile.longest_streak, profile.current_streak)
             profile.save()
+            
+            # Update CategoryProgress in MySQL database
+            category = get_category_from_lesson_type(lesson.lesson_type)
+            update_category_progress_from_activity(
+                user=request.user,
+                category=category,
+                points=points,
+                time_minutes=time_spent,
+                score=score,
+                lessons=1 if request.data.get('completed', False) else 0,
+                streak=profile.current_streak
+            )
             
             return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
         
@@ -1637,6 +1954,16 @@ def teen_story_complete(request):
         progress.missions_completed = (progress.missions_completed or 0) + 1
         _update_teen_streak(progress)
         progress.save()
+        
+        # Update CategoryProgress in MySQL database
+        update_category_progress_from_activity(
+            user=request.user,
+            category='teen_kids',
+            points=points_to_add,
+            score=score,
+            stories=1,
+            streak=progress.streak or 0
+        )
 
     payload = _build_teen_dashboard_payload(request.user)
     payload['reward'] = {'points_awarded': points_to_add}
@@ -1683,6 +2010,16 @@ def teen_vocabulary_practice(request):
         progress.points = max(0, (progress.points or 0) + points_awarded)
         _update_teen_streak(progress)
         progress.save()
+        
+        # Update CategoryProgress in MySQL database
+        update_category_progress_from_activity(
+            user=request.user,
+            category='teen_kids',
+            points=points_awarded,
+            score=score,
+            vocabulary_words=1,
+            streak=progress.streak or 0
+        )
 
     payload = _build_teen_dashboard_payload(request.user)
     payload['reward'] = {'points_awarded': points_awarded}
@@ -1729,6 +2066,16 @@ def teen_pronunciation_practice(request):
         progress.points = max(0, (progress.points or 0) + points_awarded)
         _update_teen_streak(progress)
         progress.save()
+        
+        # Update CategoryProgress in MySQL database
+        update_category_progress_from_activity(
+            user=request.user,
+            category='teen_kids',
+            points=points_awarded,
+            score=score,
+            pronunciation_attempts=1,
+            streak=progress.streak or 0
+        )
 
     payload = _build_teen_dashboard_payload(request.user)
     payload['reward'] = {'points_awarded': points_awarded}
@@ -1822,6 +2169,17 @@ def teen_game_session(request):
         details=details
     )
     
+    # Update CategoryProgress in MySQL database
+    time_minutes = round(duration_seconds / 60) if duration_seconds else 0
+    update_category_progress_from_activity(
+        user=request.user,
+        category='teen_kids',
+        points=points_earned,
+        time_minutes=time_minutes,
+        score=score,
+        games=1 if completed else 0
+    )
+    
     serializer = TeenGameSessionSerializer(session)
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -1884,6 +2242,27 @@ def kids_progress_update(request):
     serializer = KidsProgressSerializer(instance=obj, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
+        
+        # Update CategoryProgress in MySQL database
+        # Sync all data from KidsProgress to CategoryProgress
+        details = obj.details or {}
+        stories_completed = len([
+            s for s in details.get('storyEnrollments', [])
+            if s.get('completed', False)
+        ])
+        vocabulary_words = len(details.get('vocabulary', {}))
+        pronunciation_attempts = len(details.get('pronunciation', {}))
+        
+        update_category_progress_from_activity(
+            user=request.user,
+            category='young_kids',
+            points=obj.points or 0,
+            streak=obj.streak or 0,
+            stories=stories_completed,
+            vocabulary_words=vocabulary_words,
+            pronunciation_attempts=pronunciation_attempts
+        )
+        
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1958,6 +2337,55 @@ def kids_my_certificates(request):
     return Response(KidsCertificateSerializer(qs, many=True).data)
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def kids_unlock_trophy(request):
+    """Record an unlocked trophy."""
+    trophy_id = request.data.get('trophy_id')
+    title = request.data.get('title')
+    audience = request.data.get('audience', 'young')  # Default to 'young' for backward compatibility
+    
+    if not trophy_id or not title:
+        return Response({"message": "trophy_id and title are required"}, status=status.HTTP_400_BAD_REQUEST)
+    if audience not in ['young', 'teen']:
+        return Response({"message": "audience must be 'young' or 'teen'"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    obj, created = KidsTrophy.objects.get_or_create(
+        user=request.user, 
+        trophy_id=trophy_id, 
+        audience=audience,
+        defaults={
+            'title': title,
+            'audience': audience
+        }
+    )
+    
+    # Update title if provided later
+    if title and obj.title != title:
+        obj.title = title
+        obj.save()
+    
+    # Create notification if newly created
+    if created:
+        frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:5173').rstrip('/')
+        action_url = f"{frontend_url}/certificates"
+        create_or_update_user_notification(
+            request.user,
+            notification_type='trophy',
+            title=f"{obj.title} trophy unlocked",
+            message="You just earned a trophy! Keep the momentum going!",
+            icon='🏆',
+            action_url=action_url,
+            event_key=f"trophy:{obj.trophy_id}",
+            metadata={
+                'trophy_id': obj.trophy_id,
+                'title': obj.title,
+            }
+        )
+    
+    return Response(KidsTrophySerializer(obj).data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+
+
 # ============= Kids Story Management Endpoints =============
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -2002,6 +2430,17 @@ def kids_story_enroll(request):
         enrollment.score = max(enrollment.score, score)
         enrollment.words_extracted = True
         enrollment.save()
+    
+    # Update CategoryProgress in MySQL database
+    # Calculate points from story completion
+    points_awarded = max(0, round(score / 10)) + 50  # Base points + completion bonus
+    update_category_progress_from_activity(
+        user=request.user,
+        category='young_kids',
+        points=points_awarded if created else 0,  # Only add points if newly completed
+        score=score,
+        stories=1 if created else 0
+    )
     
     serializer = StoryEnrollmentSerializer(enrollment)
     return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
@@ -2121,6 +2560,16 @@ def kids_vocabulary_practice(request):
         practice.attempts += 1
         practice.save()
     
+    # Update CategoryProgress in MySQL database
+    points_awarded = 25 if created else 0  # Award points for new vocabulary word
+    update_category_progress_from_activity(
+        user=request.user,
+        category='young_kids',
+        points=points_awarded,
+        score=score,
+        vocabulary_words=1 if created else 0
+    )
+    
     serializer = KidsVocabularyPracticeSerializer(practice)
     return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
 
@@ -2153,6 +2602,16 @@ def kids_pronunciation_practice(request):
         practice.best_score = max(practice.best_score, score)
         practice.attempts += 1
         practice.save()
+    
+    # Update CategoryProgress in MySQL database
+    points_awarded = 30 if created else 0  # Award points for new pronunciation practice
+    update_category_progress_from_activity(
+        user=request.user,
+        category='young_kids',
+        points=points_awarded,
+        score=score,
+        pronunciation_attempts=1 if created else 0
+    )
     
     serializer = KidsPronunciationPracticeSerializer(practice)
     return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
@@ -2196,6 +2655,17 @@ def kids_game_session(request):
         duration_seconds=duration_seconds,
         completed=completed,
         details=details
+    )
+    
+    # Update CategoryProgress in MySQL database
+    time_minutes = round(duration_seconds / 60) if duration_seconds else 0
+    update_category_progress_from_activity(
+        user=request.user,
+        category='young_kids',
+        points=points_earned,
+        time_minutes=time_minutes,
+        score=score,
+        games=1 if completed else 0
     )
     
     serializer = KidsGameSessionSerializer(session)
@@ -7118,4 +7588,286 @@ def get_user_progress_data(user: User, page_path: str = None) -> dict:
     except Exception as e:
         logger.error(f"Error getting user progress data: {e}")
         return {}
+
+
+# ============= Multi-Category Progress Views =============
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_all_category_progress(request):
+    """Get progress for all learning categories - Automatically syncs and creates records from existing data"""
+    try:
+        user = request.user
+        logger.info(f"Getting category progress for user: {user.id} ({user.username})")
+        
+        # Get all existing CategoryProgress records
+        try:
+            existing_categories = CategoryProgress.objects.filter(user=user)
+            existing_category_names = set(c.category for c in existing_categories)
+            logger.info(f"Found {len(existing_categories)} existing category progress records")
+        except Exception as e:
+            logger.error(f"Error querying CategoryProgress: {str(e)}")
+            # If table doesn't exist, return empty array with error message
+            return Response({
+                "message": "CategoryProgress table not found. Please run migrations.",
+                "error": str(e),
+                "data": []
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        # Define all possible categories
+        all_categories = [
+            'young_kids',
+            'teen_kids',
+            'adults_beginner',
+            'adults_intermediate',
+            'adults_advanced',
+            'ielts_pte'
+        ]
+        
+        # For each category, ensure a record exists and is synced with latest data
+        for category in all_categories:
+            try:
+                if category not in existing_category_names:
+                    # Create new CategoryProgress record
+                    logger.info(f"Creating new CategoryProgress for category: {category}")
+                    category_progress, created = CategoryProgress.objects.get_or_create(
+                        user=user,
+                        category=category,
+                        defaults={
+                            'total_points': 0,
+                            'total_streak': 0,
+                            'lessons_completed': 0,
+                            'practice_time_minutes': 0,
+                            'average_score': 0.0,
+                            'progress_percentage': 0.0,
+                            'level': 1,
+                            'stories_completed': 0,
+                            'vocabulary_words': 0,
+                            'pronunciation_attempts': 0,
+                            'games_completed': 0,
+                        }
+                    )
+                    # Sync with existing data
+                    logger.info(f"Syncing data for category: {category}")
+                    sync_category_progress(user, category, category_progress)
+                    logger.info(f"Synced {category}: {category_progress.total_points} points, {category_progress.stories_completed} stories")
+                else:
+                    # Update existing record with latest data from source tables
+                    logger.info(f"Updating existing CategoryProgress for category: {category}")
+                    category_progress = CategoryProgress.objects.get(user=user, category=category)
+                    sync_category_progress(user, category, category_progress)
+                    category_progress.save()  # Save synced data to MySQL
+                    logger.info(f"Updated {category}: {category_progress.total_points} points, {category_progress.stories_completed} stories")
+            except Exception as e:
+                logger.error(f"Error processing category {category}: {str(e)}")
+                import traceback
+                traceback.print_exc()
+                # Continue with other categories even if one fails
+        
+        # Get all categories (including newly created ones)
+        try:
+            categories = CategoryProgress.objects.filter(user=user).order_by('-last_activity', '-total_points')
+            logger.info(f"Returning {categories.count()} category progress records")
+            serializer = CategoryProgressSerializer(categories, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            logger.error(f"Error serializing category progress: {str(e)}")
+            return Response({
+                "message": "Error retrieving category progress",
+                "error": str(e),
+                "data": []
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except Exception as e:
+        logger.error(f"Error getting category progress: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_category_progress(request, category):
+    """Get progress for a specific category"""
+    try:
+        user = request.user
+        category_progress, created = CategoryProgress.objects.get_or_create(
+            user=user,
+            category=category,
+            defaults={
+                'total_points': 0,
+                'total_streak': 0,
+                'lessons_completed': 0,
+                'practice_time_minutes': 0,
+                'average_score': 0.0,
+                'progress_percentage': 0.0,
+                'level': 1
+            }
+        )
+        
+        # Sync with existing progress data if newly created
+        if created:
+            sync_category_progress(user, category, category_progress)
+        
+        serializer = CategoryProgressSerializer(category_progress)
+        return Response(serializer.data)
+    except Exception as e:
+        logger.error(f"Error getting category progress: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_category_progress(request, category):
+    """Update progress for a specific category - SAVES TO MYSQL DATABASE"""
+    try:
+        user = request.user
+        data = request.data
+        
+        # Use the helper function which ensures MySQL save
+        update_category_progress_from_activity(
+            user=user,
+            category=category,
+            points=int(data.get('points', 0)),
+            time_minutes=int(data.get('time_minutes', 0)),
+            score=float(data.get('score', 0)),
+            lessons=int(data.get('lessons', 0)),
+            stories=int(data.get('stories_completed', 0)),
+            vocabulary_words=int(data.get('vocabulary_words', 0)),
+            pronunciation_attempts=int(data.get('pronunciation_attempts', 0)),
+            games=int(data.get('games_completed', 0)),
+            streak=int(data.get('streak', 0)) if 'streak' in data else None
+        )
+        
+        # Get the updated progress to return
+        category_progress = CategoryProgress.objects.get(user=user, category=category)
+        serializer = CategoryProgressSerializer(category_progress)
+        return Response(serializer.data)
+    except CategoryProgress.DoesNotExist:
+        # If doesn't exist, the helper function should have created it
+        category_progress = CategoryProgress.objects.get(user=user, category=category)
+        serializer = CategoryProgressSerializer(category_progress)
+        return Response(serializer.data)
+    except Exception as e:
+        logger.error(f"Error updating category progress: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_aggregated_progress(request):
+    """Get aggregated progress across all categories with recommendations"""
+    try:
+        user = request.user
+        categories = CategoryProgress.objects.filter(user=user)
+        
+        # Calculate aggregated metrics
+        total_points = sum(c.total_points for c in categories)
+        total_streak = max((c.total_streak for c in categories), default=0)
+        # For kids categories, count stories_completed; for others, count lessons_completed
+        total_lessons = sum(
+            (c.stories_completed if c.category in ['young_kids', 'teen_kids'] else c.lessons_completed)
+            for c in categories
+        )
+        total_time = sum(c.practice_time_minutes for c in categories)
+        
+        # Calculate average score
+        scores = [c.average_score for c in categories if c.average_score > 0]
+        avg_score = sum(scores) / len(scores) if scores else 0.0
+        
+        # Find most active category
+        most_active = None
+        if categories:
+            most_active = max(categories, key=lambda c: c.last_activity or c.first_access)
+            most_active = most_active.category if most_active.last_activity else None
+        
+        # Get recommended category
+        recommended = get_recommended_category(user, categories)
+        
+        # Count active categories (have activity in last 30 days)
+        from django.utils import timezone
+        from datetime import timedelta
+        thirty_days_ago = timezone.now() - timedelta(days=30)
+        active_categories = [c for c in categories if c.last_activity and c.last_activity >= thirty_days_ago]
+        
+        data = {
+            'total_points': total_points,
+            'total_streak': total_streak,
+            'total_lessons_completed': total_lessons,
+            'total_practice_time': total_time,
+            'average_score': avg_score,
+            'categories_count': categories.count(),
+            'active_categories_count': len(active_categories),
+            'categories': CategoryProgressSerializer(categories, many=True).data,
+            'most_active_category': most_active,
+            'recommended_category': recommended
+        }
+        
+        serializer = AggregatedProgressSerializer(data)
+        return Response(serializer.data)
+    except Exception as e:
+        logger.error(f"Error getting aggregated progress: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
+def get_recommended_category(user, categories):
+    """Get recommended next category based on user progress"""
+    try:
+        # Category progression order
+        progression = [
+            'young_kids',
+            'teen_kids',
+            'adults_beginner',
+            'adults_intermediate',
+            'adults_advanced',
+            'ielts_pte'
+        ]
+        
+        # Find user's current highest category
+        category_map = {c.category: c for c in categories}
+        
+        # Check if user has completed prerequisites for next category
+        for i, cat in enumerate(progression):
+            if cat not in category_map:
+                # Category not started, check if prerequisites met
+                if i == 0:
+                    return cat  # Always recommend starting category
+                
+                prev_cat = progression[i - 1]
+                if prev_cat in category_map:
+                    prev_progress = category_map[prev_cat]
+                    # Check if ready for next level
+                    if prev_progress.lessons_completed >= 5 or prev_progress.total_points >= 200:
+                        return cat
+        
+        # If all categories started, recommend based on performance
+        # Find category with lowest completion or highest engagement
+        if categories:
+            # Recommend category with good progress but room for improvement
+            for cat in progression:
+                if cat in category_map:
+                    progress = category_map[cat]
+                    if progress.average_score >= 70 and progress.progress_percentage < 80:
+                        return cat
+            
+            # Default to most active category
+            most_active = max(categories, key=lambda c: c.last_activity or c.first_access)
+            return most_active.category
+        
+        return 'young_kids'  # Default recommendation
+    except Exception as e:
+        logger.error(f"Error getting recommended category: {str(e)}")
+        return None
 

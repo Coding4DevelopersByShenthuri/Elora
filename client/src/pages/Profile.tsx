@@ -60,6 +60,8 @@ import { useAnimateIn } from '@/lib/animations';
 import KidsProgressService from '@/services/KidsProgressService';
 import KidsApi from '@/services/KidsApi';
 import StoryWordsService from '@/services/StoryWordsService';
+import MultiCategoryProgressService, { type CategoryProgress, type AggregatedProgress } from '@/services/MultiCategoryProgressService';
+import LearningPathRecommendationService, { type CategoryRecommendation } from '@/services/LearningPathRecommendationService';
 
 const FALLBACK_PROFILE: UserProfile = {
   name: 'Learner',
@@ -106,6 +108,11 @@ const Profile = () => {
     pronunciationAttempts: 0,
     hasData: false,
   });
+
+  const [categoryProgress, setCategoryProgress] = useState<CategoryProgress[]>([]);
+  const [aggregatedProgress, setAggregatedProgress] = useState<AggregatedProgress | null>(null);
+  const [recommendedCategory, setRecommendedCategory] = useState<CategoryRecommendation | null>(null);
+  const [loadingCategoryProgress, setLoadingCategoryProgress] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -170,29 +177,93 @@ const Profile = () => {
     }
   }, [location.hash]);
 
+  // Use aggregated progress from all categories if available, otherwise calculate from categoryProgress or fallback to old data
   const aggregatedPoints = useMemo(
-    () =>
-      Math.max(
-        kidsStats.points,
+    () => {
+      // First try aggregated progress
+      if (aggregatedProgress?.total_points !== undefined && aggregatedProgress.total_points > 0) {
+        return aggregatedProgress.total_points;
+      }
+      // Then try calculating from categoryProgress array
+      if (categoryProgress.length > 0) {
+        const total = categoryProgress.reduce((sum, cat) => sum + (cat.total_points || 0), 0);
+        if (total > 0) return total;
+      }
+      // Fallback to old data sources
+      return Math.max(
+        kidsStats.points || 0,
         userProgress?.totalPoints ?? 0,
-        user?.profile.points ?? 0
-      ),
-    [kidsStats.points, user?.profile.points, userProgress?.totalPoints]
+        user?.profile?.points ?? 0,
+        0
+      );
+    },
+    [aggregatedProgress?.total_points, categoryProgress, kidsStats.points, user?.profile?.points, userProgress?.totalPoints]
   );
 
   const aggregatedStreak = useMemo(
-    () =>
-      Math.max(
-        kidsStats.streak,
+    () => {
+      // First try aggregated progress
+      if (aggregatedProgress?.total_streak !== undefined && aggregatedProgress.total_streak > 0) {
+        return aggregatedProgress.total_streak;
+      }
+      // Then try calculating from categoryProgress array
+      if (categoryProgress.length > 0) {
+        const maxStreak = Math.max(...categoryProgress.map(cat => cat.total_streak || 0), 0);
+        if (maxStreak > 0) return maxStreak;
+      }
+      // Fallback to old data sources
+      return Math.max(
+        kidsStats.streak || 0,
         userProgress?.currentStreak ?? 0,
-        user?.profile.streak ?? 0
-      ),
-    [kidsStats.streak, user?.profile.streak, userProgress?.currentStreak]
+        user?.profile?.streak ?? 0,
+        0
+      );
+    },
+    [aggregatedProgress?.total_streak, categoryProgress, kidsStats.streak, user?.profile?.streak, userProgress?.currentStreak]
   );
 
   const aggregatedLessons = useMemo(
-    () => Math.max(kidsStats.storiesCompleted, userProgress?.lessonsCompleted ?? 0),
-    [kidsStats.storiesCompleted, userProgress?.lessonsCompleted]
+    () => {
+      // First try aggregated progress
+      if (aggregatedProgress?.total_lessons_completed !== undefined && aggregatedProgress.total_lessons_completed > 0) {
+        return aggregatedProgress.total_lessons_completed;
+      }
+      // Then try calculating from categoryProgress array
+      if (categoryProgress.length > 0) {
+        const total = categoryProgress.reduce((sum, cat) => {
+          // For kids categories, use stories_completed; for others use lessons_completed
+          const lessons = cat.category.includes('kids') 
+            ? (cat.stories_completed || cat.lessons_completed || 0)
+            : (cat.lessons_completed || 0);
+          return sum + lessons;
+        }, 0);
+        if (total > 0) return total;
+      }
+      // Fallback to old data sources
+      return Math.max(
+        kidsStats.storiesCompleted || 0,
+        userProgress?.lessonsCompleted ?? 0,
+        0
+      );
+    },
+    [aggregatedProgress?.total_lessons_completed, categoryProgress, kidsStats.storiesCompleted, userProgress?.lessonsCompleted]
+  );
+
+  const aggregatedPracticeTime = useMemo(
+    () => {
+      // First try aggregated progress
+      if (aggregatedProgress?.total_practice_time !== undefined && aggregatedProgress.total_practice_time > 0) {
+        return aggregatedProgress.total_practice_time;
+      }
+      // Then try calculating from categoryProgress array
+      if (categoryProgress.length > 0) {
+        const total = categoryProgress.reduce((sum, cat) => sum + (cat.practice_time_minutes || 0), 0);
+        if (total > 0) return total;
+      }
+      // Fallback to old data sources
+      return userProgress?.practiceTime ?? 0;
+    },
+    [aggregatedProgress?.total_practice_time, categoryProgress, userProgress?.practiceTime]
   );
 
   const levelProgress = useMemo(() => {
@@ -278,7 +349,7 @@ const Profile = () => {
     {
       label: 'Sparkle Points',
       value: aggregatedPoints.toLocaleString(),
-      description: 'Earn points by exploring stories, practice sessions, and games.',
+      description: `Total points earned across all ${aggregatedProgress?.categories_count || categoryProgress.length || 1} learning ${(aggregatedProgress?.categories_count || categoryProgress.length || 1) === 1 ? 'category' : 'categories'}.`,
       icon: <Trophy className="h-5 w-5 text-amber-500" />,
     },
     {
@@ -289,19 +360,64 @@ const Profile = () => {
     },
     {
       label: 'Practice Time',
-      value: `${Math.round(userProgress?.practiceTime ?? 0)} mins`,
-      description: 'Dedicated minutes spent honing your skills.',
+      value: `${Math.round(aggregatedPracticeTime)} mins`,
+      description: 'Dedicated minutes spent across all learning categories.',
       icon: <Clock className="h-5 w-5 text-sky-500" />,
     },
     {
       label: 'Lessons Completed',
       value: aggregatedLessons.toString(),
-      description: 'Milestones across stories, vocabulary, and pronunciation.',
+      description: `Completed across ${aggregatedProgress?.categories_count || categoryProgress.length || 1} learning ${(aggregatedProgress?.categories_count || categoryProgress.length || 1) === 1 ? 'category' : 'categories'}.`,
       icon: <BookOpen className="h-5 w-5 text-emerald-500" />,
     },
   ];
   
   const showContent = useAnimateIn(false, 300);
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const loadCategoryProgress = async () => {
+      setLoadingCategoryProgress(true);
+      try {
+        const userId = String(user.id);
+        console.log('Loading category progress for user:', userId);
+        
+        const [categories, aggregated, recommendation] = await Promise.all([
+          MultiCategoryProgressService.getAllCategoriesProgress(userId, true).catch(err => {
+            console.error('Error loading categories:', err);
+            return [];
+          }),
+          MultiCategoryProgressService.getAggregatedProgress(userId, true).catch(err => {
+            console.error('Error loading aggregated progress:', err);
+            return null;
+          }),
+          LearningPathRecommendationService.getRecommendedCategory(userId).catch(err => {
+            console.error('Error loading recommendation:', err);
+            return null;
+          }),
+        ]);
+
+        console.log('Loaded categories:', categories);
+        console.log('Loaded aggregated:', aggregated);
+        console.log('Loaded recommendation:', recommendation);
+
+        setCategoryProgress(categories || []);
+        setAggregatedProgress(aggregated);
+        setRecommendedCategory(recommendation);
+      } catch (error) {
+        console.error('Error loading category progress:', error);
+        // Set empty arrays to prevent undefined errors
+        setCategoryProgress([]);
+        setAggregatedProgress(null);
+        setRecommendedCategory(null);
+      } finally {
+        setLoadingCategoryProgress(false);
+      }
+    };
+
+    loadCategoryProgress();
+  }, [user?.id]);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -514,22 +630,43 @@ const Profile = () => {
           </Card>
         </section>
 
+        {/* Stats Cards - Always show, even if data is loading or zero */}
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {stats.map((stat) => (
-            <Card
-              key={stat.label}
-              className="shadow-sm transition-transform duration-300 ease-out hover:-translate-y-1 hover:shadow-xl"
-            >
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">{stat.label}</CardTitle>
-                {stat.icon}
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-semibold text-foreground">{stat.value}</div>
-                <p className="mt-1 text-xs text-muted-foreground">{stat.description}</p>
-              </CardContent>
-            </Card>
-          ))}
+          {loadingCategoryProgress ? (
+            // Show loading state
+            Array.from({ length: 4 }).map((_, index) => (
+              <Card
+                key={`loading-${index}`}
+                className="shadow-sm"
+              >
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Loading...</CardTitle>
+                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-semibold text-foreground">...</div>
+                  <p className="mt-1 text-xs text-muted-foreground">Loading your progress...</p>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            // Show stats
+            stats.map((stat) => (
+              <Card
+                key={stat.label}
+                className="shadow-sm transition-transform duration-300 ease-out hover:-translate-y-1 hover:shadow-xl"
+              >
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">{stat.label}</CardTitle>
+                  {stat.icon}
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-semibold text-foreground">{stat.value}</div>
+                  <p className="mt-1 text-xs text-muted-foreground">{stat.description}</p>
+                </CardContent>
+              </Card>
+            ))
+          )}
         </section>
 
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)}>
@@ -549,6 +686,185 @@ const Profile = () => {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6 pt-6">
+            {/* Recommended Category Card */}
+            {recommendedCategory && (
+              <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Sparkles className="h-5 w-5 text-primary" />
+                    Recommended Next Category
+                  </CardTitle>
+                  <CardDescription>
+                    Based on your performance, we recommend exploring this category next
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-xl font-semibold">
+                        {recommendedCategory.category_display}
+                      </h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {recommendedCategory.reason}
+                      </p>
+                    </div>
+                    <Button
+                      onClick={() => navigate(recommendedCategory.route)}
+                      className="bg-primary text-primary-foreground hover:bg-primary/90"
+                    >
+                      Start Learning
+                    </Button>
+                  </div>
+                  {recommendedCategory.progress_towards_unlock && !recommendedCategory.is_unlocked && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span>Progress towards unlock</span>
+                        <span>{recommendedCategory.progress_towards_unlock.percentage}%</span>
+                      </div>
+                      <Progress value={recommendedCategory.progress_towards_unlock.percentage} className="h-2" />
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Category Progress Overview */}
+            {loadingCategoryProgress ? (
+              <Card>
+                <CardContent className="py-8">
+                  <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Loading your progress across all categories...
+                  </div>
+                </CardContent>
+              </Card>
+            ) : categoryProgress.length > 0 ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">All Learning Categories</CardTitle>
+                  <CardDescription>
+                    Your progress across all learning paths. Data is automatically saved when you complete activities in any category.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {categoryProgress
+                      .filter(cat => cat.total_points > 0 || cat.lessons_completed > 0 || cat.last_activity)
+                      .map((category) => (
+                      <Card key={category.category} className="hover:shadow-md transition-shadow border-primary/10">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-base flex items-center justify-between">
+                            <span>{category.category_display}</span>
+                            {category.total_points > 0 && (
+                              <Badge variant="secondary" className="text-xs">
+                                {category.total_points} pts
+                              </Badge>
+                            )}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Points</span>
+                            <span className="font-semibold">{category.total_points.toLocaleString()}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">
+                              {category.category.includes('kids') ? 'Stories' : 'Lessons'}
+                            </span>
+                            <span className="font-semibold">
+                              {category.category.includes('kids') 
+                                ? category.stories_completed || category.lessons_completed
+                                : category.lessons_completed}
+                            </span>
+                          </div>
+                          {category.vocabulary_words > 0 && (
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-muted-foreground">Vocabulary</span>
+                              <span className="font-semibold">{category.vocabulary_words}</span>
+                            </div>
+                          )}
+                          {category.pronunciation_attempts > 0 && (
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-muted-foreground">Pronunciation</span>
+                              <span className="font-semibold">{category.pronunciation_attempts}</span>
+                            </div>
+                          )}
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Avg Score</span>
+                            <span className="font-semibold">
+                              {category.average_score > 0 ? `${Math.round(category.average_score)}%` : 'N/A'}
+                            </span>
+                          </div>
+                          {category.last_activity && (
+                            <div className="text-xs text-muted-foreground pt-2 border-t">
+                              Last active: {new Date(category.last_activity).toLocaleDateString()}
+                            </div>
+                          )}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full"
+                            onClick={() => navigate(MultiCategoryProgressService.getCategoryRoute(category.category))}
+                          >
+                            Continue Learning
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                  {categoryProgress.filter(cat => cat.total_points === 0 && cat.lessons_completed === 0 && !cat.last_activity).length > 0 && (
+                    <div className="mt-4 p-4 bg-muted/30 rounded-lg">
+                      <p className="text-sm text-muted-foreground mb-2">
+                        <strong>Available Categories:</strong> Start learning in these categories to see your progress here:
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {categoryProgress
+                          .filter(cat => cat.total_points === 0 && cat.lessons_completed === 0 && !cat.last_activity)
+                          .map((category) => (
+                            <Button
+                              key={category.category}
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => navigate(MultiCategoryProgressService.getCategoryRoute(category.category))}
+                            >
+                              {category.category_display}
+                            </Button>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardContent className="py-8">
+                  <div className="text-center text-muted-foreground space-y-3">
+                    <p className="mb-2 font-medium">No category progress found.</p>
+                    <p className="text-sm">
+                      {loadingCategoryProgress 
+                        ? "Loading your progress..."
+                        : "Start learning in any category to see your progress here!"
+                      }
+                    </p>
+                    {!loadingCategoryProgress && (
+                      <div className="pt-4">
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            // Force refresh
+                            window.location.reload();
+                          }}
+                        >
+                          <RefreshCw className="mr-2 h-4 w-4" />
+                          Refresh Progress
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             <div className="grid gap-6 lg:grid-cols-3">
               <Card className="lg:col-span-2">
                 <CardHeader>
@@ -685,69 +1001,151 @@ const Profile = () => {
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Sparkles className="h-5 w-5 text-primary" />
-                    Young Explorers
-                  </CardTitle>
-                  <CardDescription>
-                    Highlights from kids adventures, pronunciation quests, and vocabulary missions.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {kidsStats.hasData ? (
-                    <>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="rounded-lg border bg-muted/30 p-3">
-                          <p className="text-xs uppercase tracking-wide text-muted-foreground">Sparkle points</p>
-                          <p className="text-xl font-semibold text-foreground">
-                            {kidsStats.points.toLocaleString()}
-                          </p>
+              {/* Kids Categories Summary - Shows both YoungKids and TeenKids */}
+              {(() => {
+                const kidsCategories = categoryProgress.filter(cat => 
+                  cat.category === 'young_kids' || cat.category === 'teen_kids'
+                );
+                const hasKidsData = kidsCategories.some(cat => 
+                  cat.total_points > 0 || cat.stories_completed > 0 || cat.last_activity
+                ) || kidsStats.hasData;
+                
+                const youngKidsData = categoryProgress.find(cat => cat.category === 'young_kids') || 
+                  (kidsStats.hasData ? {
+                    total_points: kidsStats.points,
+                    total_streak: kidsStats.streak,
+                    stories_completed: kidsStats.storiesCompleted,
+                    vocabulary_words: kidsStats.vocabularyWords,
+                    pronunciation_attempts: kidsStats.pronunciationAttempts,
+                    category_display: 'Young Kids (4-10)'
+                  } : null);
+                
+                const teenKidsData = categoryProgress.find(cat => cat.category === 'teen_kids');
+
+                return (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <Sparkles className="h-5 w-5 text-primary" />
+                        Kids Learning Progress
+                      </CardTitle>
+                      <CardDescription>
+                        Your progress across Young Kids and Teen Kids categories
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {hasKidsData ? (
+                        <>
+                          {/* Young Kids Section */}
+                          {youngKidsData && (youngKidsData.total_points > 0 || youngKidsData.stories_completed > 0 || kidsStats.hasData) && (
+                            <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+                              <h4 className="text-sm font-semibold text-foreground">Young Kids (4-10)</h4>
+                              <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                  <p className="text-xs uppercase tracking-wide text-muted-foreground">Points</p>
+                                  <p className="text-lg font-semibold text-foreground">
+                                    {(youngKidsData.total_points || kidsStats.points || 0).toLocaleString()}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-xs uppercase tracking-wide text-muted-foreground">Stories</p>
+                                  <p className="text-lg font-semibold text-foreground">
+                                    {youngKidsData.stories_completed || kidsStats.storiesCompleted || 0}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-xs uppercase tracking-wide text-muted-foreground">Vocabulary</p>
+                                  <p className="text-lg font-semibold text-foreground">
+                                    {youngKidsData.vocabulary_words || kidsStats.vocabularyWords || 0}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-xs uppercase tracking-wide text-muted-foreground">Pronunciation</p>
+                                  <p className="text-lg font-semibold text-foreground">
+                                    {youngKidsData.pronunciation_attempts || kidsStats.pronunciationAttempts || 0}
+                                  </p>
+                                </div>
+                              </div>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-full"
+                                onClick={() => navigate('/kids/young')}
+                              >
+                                Continue Young Kids
+                              </Button>
+                            </div>
+                          )}
+                          
+                          {/* Teen Kids Section */}
+                          {teenKidsData && (teenKidsData.total_points > 0 || teenKidsData.stories_completed > 0) && (
+                            <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+                              <h4 className="text-sm font-semibold text-foreground">Teen Kids (11-17)</h4>
+                              <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                  <p className="text-xs uppercase tracking-wide text-muted-foreground">Points</p>
+                                  <p className="text-lg font-semibold text-foreground">
+                                    {teenKidsData.total_points.toLocaleString()}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-xs uppercase tracking-wide text-muted-foreground">Missions</p>
+                                  <p className="text-lg font-semibold text-foreground">
+                                    {teenKidsData.stories_completed || teenKidsData.lessons_completed || 0}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-xs uppercase tracking-wide text-muted-foreground">Vocabulary</p>
+                                  <p className="text-lg font-semibold text-foreground">
+                                    {teenKidsData.vocabulary_words || 0}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-xs uppercase tracking-wide text-muted-foreground">Games</p>
+                                  <p className="text-lg font-semibold text-foreground">
+                                    {teenKidsData.games_completed || 0}
+                                  </p>
+                                </div>
+                              </div>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-full"
+                                onClick={() => navigate('/kids/teen')}
+                              >
+                                Continue Teen Kids
+                              </Button>
+                            </div>
+                          )}
+                          
+                          {!youngKidsData && !teenKidsData && (
+                            <div className="rounded-lg border bg-muted/20 p-4">
+                              <p className="text-sm text-muted-foreground">
+                                Keep the momentum going! Jump back to the kids hub to unlock more badges, stories, and
+                                achievements.
+                              </p>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <div className="rounded-lg border bg-muted/30 p-4 text-sm text-muted-foreground">
+                          Start an adventure in the kids hub to see personalised progress, sparkle points, and story
+                          highlights here.
                         </div>
-                        <div className="rounded-lg border bg-muted/30 p-3">
-                          <p className="text-xs uppercase tracking-wide text-muted-foreground">Daily streak</p>
-                          <p className="text-xl font-semibold text-foreground">
-                            {kidsStats.streak} day{kidsStats.streak === 1 ? '' : 's'}
-                          </p>
-                        </div>
-                        <div className="rounded-lg border bg-muted/30 p-3">
-                          <p className="text-xs uppercase tracking-wide text-muted-foreground">Stories completed</p>
-                          <p className="text-xl font-semibold text-foreground">{kidsStats.storiesCompleted}</p>
-                        </div>
-                        <div className="rounded-lg border bg-muted/30 p-3">
-                          <p className="text-xs uppercase tracking-wide text-muted-foreground">Vocabulary words</p>
-                          <p className="text-xl font-semibold text-foreground">{kidsStats.vocabularyWords}</p>
-                        </div>
-                      </div>
-                      <div className="rounded-lg border bg-muted/30 p-3">
-                        <p className="text-xs uppercase tracking-wide text-muted-foreground">Pronunciation sessions</p>
-                        <p className="text-xl font-semibold text-foreground">
-                          {kidsStats.pronunciationAttempts}
-                        </p>
-                      </div>
-                      <div className="rounded-lg border bg-muted/20 p-4">
-                        <p className="text-sm text-muted-foreground">
-                          Keep the momentum going! Jump back to the kids hub to unlock more badges, stories, and
-                          achievements tailored for young learners.
-                        </p>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="rounded-lg border bg-muted/30 p-4 text-sm text-muted-foreground">
-                      Start an adventure in the kids hub to see personalised progress, sparkle points, and story
-                      highlights here.
-                    </div>
-                  )}
-                  <Button
-                    variant="secondary"
-                    className="w-full"
-                    onClick={() => navigate('/kids/young')}
-                  >
-                    Continue in Young Explorers
-                  </Button>
-                </CardContent>
-              </Card>
+                      )}
+                      {!hasKidsData && (
+                        <Button
+                          variant="secondary"
+                          className="w-full"
+                          onClick={() => navigate('/kids')}
+                        >
+                          Explore Kids Categories
+                        </Button>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })()}
             </div>
           </TabsContent>
 

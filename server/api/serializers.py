@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
     VocabularyWord, Achievement, UserAchievement,
-    KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, WaitlistEntry,
+    KidsLesson, KidsProgress, KidsAchievement, KidsCertificate, KidsTrophy, WaitlistEntry,
     UserNotification, AdminNotification, SurveyStepResponse, PlatformSettings,
     CookieConsent,
     StoryEnrollment, StoryWord, StoryPhrase, KidsFavorite,
@@ -11,7 +11,7 @@ from .models import (
     ParentalControlSettings, TeenProgress, TeenStoryProgress,
     TeenVocabularyPractice, TeenPronunciationPractice, TeenFavorite,
     TeenAchievement, TeenGameSession, TeenCertificate,
-    PageEligibility
+    PageEligibility, CategoryProgress
 )
 from django.contrib.auth.password_validation import validate_password
 
@@ -374,6 +374,15 @@ class KidsAchievementSerializer(serializers.ModelSerializer):
         fields = ["user_id", "name", "icon", "progress", "unlocked", "updated_at"]
 
 
+class KidsTrophySerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+
+    class Meta:
+        model = KidsTrophy
+        fields = ['id', 'user_id', 'trophy_id', 'audience', 'title', 'unlocked_at']
+        read_only_fields = ['unlocked_at']
+
+
 class KidsCertificateSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(source='user.id', read_only=True)
 
@@ -547,6 +556,48 @@ class UserStatsSerializer(serializers.Serializer):
     vocabulary_count = serializers.IntegerField()
     achievements_unlocked = serializers.IntegerField()
     average_score = serializers.FloatField()
+
+
+# ============= Category Progress Serializers =============
+class CategoryProgressSerializer(serializers.ModelSerializer):
+    """Serializer for category progress tracking"""
+    category_display = serializers.CharField(source='get_category_display', read_only=True)
+    last_activity_formatted = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = CategoryProgress
+        fields = [
+            'id', 'category', 'category_display', 'total_points', 'total_streak',
+            'lessons_completed', 'practice_time_minutes', 'average_score',
+            'last_activity', 'last_activity_formatted', 'first_access',
+            'days_active', 'progress_percentage', 'level',
+            'stories_completed', 'vocabulary_words', 'pronunciation_attempts',
+            'games_completed', 'details', 'updated_at'
+        ]
+        read_only_fields = [
+            'id', 'first_access', 'last_activity', 'last_activity_formatted',
+            'updated_at', 'category_display'
+        ]
+    
+    def get_last_activity_formatted(self, obj):
+        """Format last activity timestamp"""
+        if not obj.last_activity:
+            return None
+        return obj.last_activity.isoformat()
+
+
+class AggregatedProgressSerializer(serializers.Serializer):
+    """Serializer for aggregated progress across all categories"""
+    total_points = serializers.IntegerField()
+    total_streak = serializers.IntegerField()
+    total_lessons_completed = serializers.IntegerField()
+    total_practice_time = serializers.IntegerField()
+    average_score = serializers.FloatField()
+    categories_count = serializers.IntegerField()
+    active_categories_count = serializers.IntegerField()
+    categories = CategoryProgressSerializer(many=True)
+    most_active_category = serializers.CharField(allow_null=True)
+    recommended_category = serializers.CharField(allow_null=True)
 
 
 # ============= Page Eligibility Serializers =============
