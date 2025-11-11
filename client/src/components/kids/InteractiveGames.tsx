@@ -22,10 +22,24 @@ const InteractiveGames = ({ isTeenKids }: InteractiveGamesProps = {}) => {
   const location = useLocation();
   
   // Auto-detect if we're in teen kids context
+  // Priority: explicit prop > current pathname > referrer > enrolled stories
   const isTeenContext = isTeenKids !== undefined ? isTeenKids : 
-    location.pathname.includes('/kids/teen') || 
-    document.referrer.includes('/kids/teen') ||
     (() => {
+      // First check current pathname - most reliable indicator
+      if (location.pathname.includes('/kids/young')) {
+        return false; // Explicitly young kids page
+      }
+      if (location.pathname.includes('/kids/teen')) {
+        return true; // Explicitly teen kids page
+      }
+      // Check referrer as secondary indicator
+      if (document.referrer.includes('/kids/teen')) {
+        return true;
+      }
+      if (document.referrer.includes('/kids/young')) {
+        return false;
+      }
+      // Last resort: check enrolled stories (less reliable, as users can have both)
       try {
         const userId = localStorage.getItem('speakbee_current_user') 
           ? JSON.parse(localStorage.getItem('speakbee_current_user')!).id || 'anonymous'
@@ -34,9 +48,21 @@ const InteractiveGames = ({ isTeenKids }: InteractiveGamesProps = {}) => {
         const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
           'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
           'ai-ethics-explorer', 'digital-security-guardian'];
-        return enrolledStories.some(e => teenStoryIds.includes(e.storyId));
-      } catch {
+        const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
+          'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden', 'rainbow-castle', 'jungle-explorer'];
+        
+        // Check if user has more teen stories enrolled than young stories
+        const hasTeenStories = enrolledStories.some((e: any) => teenStoryIds.includes(e.storyId));
+        const hasYoungStories = enrolledStories.some((e: any) => youngStoryIds.includes(e.storyId));
+        
+        // Only use enrolled stories as tiebreaker if we have teen stories but no young stories
+        if (hasTeenStories && !hasYoungStories) {
+          return true;
+        }
+        // Default to young kids if we have young stories or no clear indication
         return false;
+      } catch {
+        return false; // Default to young kids on error
       }
     })();
   const navigate = useNavigate();

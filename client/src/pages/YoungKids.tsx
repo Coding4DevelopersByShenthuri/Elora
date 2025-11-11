@@ -1588,7 +1588,7 @@ const YoungKidsPage = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <InteractiveGames />
+                  <InteractiveGames isTeenKids={false} />
                 </CardContent>
               </Card>
             </TabsContent>

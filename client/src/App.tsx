@@ -49,6 +49,7 @@ import PricingPage from "@/pages/PricingPage";
 import VerifyEmail from "@/pages/VerifyEmail";
 import TermsAndConditionsPage from "@/pages/TermsAndConditionsPage";
 import CertificatesPage from "@/pages/Certificates";
+import AllCertificatesPage from "@/pages/AllCertificates";
 import AdminLogin from "@/pages/admin/AdminLogin";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminUsers from "@/pages/admin/AdminUsers";
@@ -729,6 +730,7 @@ const AppRoutes = () => {
         <Route path="/verify-email/:token" element={<PageTransition><VerifyEmail /></PageTransition>} />
         <Route path="/terms-and-conditions" element={<PageTransition><TermsAndConditionsPage /></PageTransition>} />
         <Route path="/certificates" element={<PageTransition><CertificatesPage /></PageTransition>} />
+        <Route path="/my-certificates" element={<PageTransition><AllCertificatesPage /></PageTransition>} />
         
         {/* Admin Routes - Must come before catch-all route */}
         <Route path="/admin/login" element={<AdminLogin />} />

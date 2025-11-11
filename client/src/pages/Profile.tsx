@@ -611,7 +611,7 @@ const Profile = () => {
                   <Button
                     variant="outline"
                     className="w-full border-white/30 bg-white/10 text-white transition hover:bg-white/20 sm:w-auto"
-                    onClick={() => navigate('/certificates')}
+                    onClick={() => navigate('/my-certificates')}
                   >
                     <Award className="mr-2 h-4 w-4" />
                     View certificates
