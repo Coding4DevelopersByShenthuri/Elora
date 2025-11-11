@@ -24,10 +24,16 @@ interface UserSurveyProps {
 
 const ageOptions = [
   {
-    id: '4-17',
-    range: '4-17',
-    character: '/kid.png',
+    id: '4-10',
+    range: '4-10',
+    character: '/small.png',
     description: 'Young child with a backpack'
+  },
+  {
+    id: '11-17',
+    range: '11-17',
+    character: '/kid.png',
+    description: 'Teenager with a backpack'
   },
   {
     id: '18-24',

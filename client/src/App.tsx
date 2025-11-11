@@ -155,14 +155,157 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+// ✅ Helper function to analyze vocabulary selections and determine user level
+const analyzeVocabularyLevel = (surveyData: any): 'beginner' | 'intermediate' | 'advanced' | null => {
+  // Extract vocabulary arrays from survey data
+  const beginnerWords = Array.isArray(surveyData?.vocabulary) ? surveyData.vocabulary : [];
+  const intermediateWords = Array.isArray(surveyData?.intermediateVocabulary) ? surveyData.intermediateVocabulary : [];
+  const advancedWords = Array.isArray(surveyData?.advancedVocabulary) ? surveyData.advancedVocabulary : [];
+
+  // Count words selected from each level
+  const beginnerCount = beginnerWords.length;
+  const intermediateCount = intermediateWords.length;
+  const advancedCount = advancedWords.length;
+
+  console.log('📊 Vocabulary Analysis:', {
+    beginner: beginnerCount,
+    intermediate: intermediateCount,
+    advanced: advancedCount,
+    total: beginnerCount + intermediateCount + advancedCount
+  });
+
+  // If no vocabulary data, return null
+  if (beginnerCount === 0 && intermediateCount === 0 && advancedCount === 0) {
+    return null;
+  }
+
+  // Find the maximum count
+  const maxCount = Math.max(beginnerCount, intermediateCount, advancedCount);
+
+  // Check for clear winner (more than 2 words difference or at least 50% more)
+  const counts = [
+    { level: 'beginner' as const, count: beginnerCount },
+    { level: 'intermediate' as const, count: intermediateCount },
+    { level: 'advanced' as const, count: advancedCount }
+  ].sort((a, b) => b.count - a.count);
+
+  // If there's a clear winner (top count is significantly higher)
+  if (counts[0].count > counts[1].count + 1 && counts[0].count >= 3) {
+    return counts[0].level;
+  }
+
+  // Handle ties: Use intelligent tie-breaking
+  const tiedLevels = counts.filter(c => c.count === maxCount && c.count > 0);
+  
+  if (tiedLevels.length === 1) {
+    return tiedLevels[0].level;
+  }
+
+  // Multiple levels tied - use intelligent decision making
+  console.log('🤔 Tie detected, using intelligent analysis...');
+  
+  // Get English level from earlier survey
+  const englishLevel = surveyData?.englishLevel?.toLowerCase() || '';
+  
+  // Tie-breaking logic based on English level
+  if (englishLevel) {
+    const lowerLevels = ['beginner', 'pre-intermediate'];
+    const midLevels = ['intermediate', 'upper-intermediate'];
+    const higherLevels = ['advanced', 'proficient'];
+    
+    // If tied between beginner and intermediate
+    if (tiedLevels.some(t => t.level === 'beginner') && tiedLevels.some(t => t.level === 'intermediate')) {
+      if (lowerLevels.includes(englishLevel)) {
+        return 'beginner';
+      } else if (midLevels.includes(englishLevel) || higherLevels.includes(englishLevel)) {
+        return 'intermediate';
+      }
+    }
+    
+    // If tied between intermediate and advanced
+    if (tiedLevels.some(t => t.level === 'intermediate') && tiedLevels.some(t => t.level === 'advanced')) {
+      if (lowerLevels.includes(englishLevel) || midLevels.includes(englishLevel)) {
+        return 'intermediate';
+      } else if (higherLevels.includes(englishLevel)) {
+        return 'advanced';
+      }
+    }
+    
+    // If tied between beginner and advanced (unlikely but handle it)
+    if (tiedLevels.some(t => t.level === 'beginner') && tiedLevels.some(t => t.level === 'advanced')) {
+      // This is unusual - default to intermediate as middle ground
+      return 'intermediate';
+    }
+  }
+
+  // Additional tie-breaking: Use percentage of total words
+  const totalWords = beginnerCount + intermediateCount + advancedCount;
+  if (totalWords > 0) {
+    const beginnerPercent = (beginnerCount / totalWords) * 100;
+    const intermediatePercent = (intermediateCount / totalWords) * 100;
+    const advancedPercent = (advancedCount / totalWords) * 100;
+
+    // If one level has significantly higher percentage (>= 40%)
+    if (beginnerPercent >= 40 && beginnerPercent > intermediatePercent + 10 && beginnerPercent > advancedPercent + 10) {
+      return 'beginner';
+    }
+    if (intermediatePercent >= 40 && intermediatePercent > beginnerPercent + 10 && intermediatePercent > advancedPercent + 10) {
+      return 'intermediate';
+    }
+    if (advancedPercent >= 40 && advancedPercent > beginnerPercent + 10 && advancedPercent > intermediatePercent + 10) {
+      return 'advanced';
+    }
+  }
+
+  // Final fallback: Prefer intermediate as middle ground, or the first tied level
+  if (tiedLevels.length > 0) {
+    // Prefer intermediate if it's in the tie
+    const intermediateTied = tiedLevels.find(t => t.level === 'intermediate');
+    if (intermediateTied) {
+      return 'intermediate';
+    }
+    // Otherwise return the first (highest) tied level
+    return tiedLevels[0].level;
+  }
+
+  // Ultimate fallback: Return the level with highest count
+  return counts[0].level;
+};
+
 // ✅ Helper function to determine learning page based on survey responses
 const getLearningPageFromSurvey = (surveyData: any): string => {
   const ageRange = surveyData?.ageRange;
   const englishLevel = surveyData?.englishLevel;
   const learningPurpose = surveyData?.learningPurpose || [];
 
-  // If user is a kid (age 4-17), redirect to kids page
+  // Route kids to appropriate page based on age range
+  // YoungKids: Ages 4-10
+  if (ageRange === '4-10') {
+    return '/kids/young';
+  }
+  
+  // TeenKids: Ages 11-17
+  if (ageRange === '11-17') {
+    return '/kids/teen';
+  }
+
+  // Backward compatibility: If user has old '4-17' age range, 
+  // we'll need to determine based on other factors or default to YoungKids
+  // For now, defaulting to /kids page which will let them choose
   if (ageRange === '4-17') {
+    // Try to determine based on English level if available
+    // Younger kids typically have lower English levels
+    if (englishLevel) {
+      const lowerLevels = ['beginner', 'pre-intermediate'];
+      const higherLevels = ['intermediate', 'upper-intermediate', 'advanced', 'proficient'];
+      
+      if (lowerLevels.includes(englishLevel.toLowerCase())) {
+        return '/kids/young';
+      } else if (higherLevels.includes(englishLevel.toLowerCase())) {
+        return '/kids/teen';
+      }
+    }
+    // Default to /kids page for backward compatibility (user can choose)
     return '/kids';
   }
 
@@ -171,15 +314,35 @@ const getLearningPageFromSurvey = (surveyData: any): string => {
     return '/ielts-pte';
   }
 
-  // For adults, determine level based on English proficiency
-  if (englishLevel) {
-    if (englishLevel === 'beginner' || englishLevel === 'pre-intermediate') {
+  // For adults: Use vocabulary analysis as primary method, fallback to English level
+  // Step 13: A1-A2 Beginner vocabulary
+  // Step 14: B1-B2 Intermediate vocabulary  
+  // Step 15: C1-C2 Advanced vocabulary
+  const vocabularyLevel = analyzeVocabularyLevel(surveyData);
+  
+  if (vocabularyLevel) {
+    console.log(`✅ Vocabulary analysis determined level: ${vocabularyLevel}`);
+    if (vocabularyLevel === 'beginner') {
       return '/adults/beginners';
     }
-    if (englishLevel === 'intermediate' || englishLevel === 'upper-intermediate') {
+    if (vocabularyLevel === 'intermediate') {
       return '/adults/intermediates';
     }
-    if (englishLevel === 'advanced' || englishLevel === 'proficient') {
+    if (vocabularyLevel === 'advanced') {
+      return '/adults/advanced';
+    }
+  }
+
+  // Fallback to English level if vocabulary analysis didn't provide a result
+  if (englishLevel) {
+    const levelLower = englishLevel.toLowerCase();
+    if (levelLower === 'beginner' || levelLower === 'pre-intermediate') {
+      return '/adults/beginners';
+    }
+    if (levelLower === 'intermediate' || levelLower === 'upper-intermediate') {
+      return '/adults/intermediates';
+    }
+    if (levelLower === 'advanced' || levelLower === 'proficient') {
       return '/adults/advanced';
     }
   }
