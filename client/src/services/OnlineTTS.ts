@@ -488,6 +488,106 @@ export const STORY_VOICES: Record<string, VoiceProfile> = {
     // Unique Microsoft online voice not used elsewhere in the project
     voiceName: 'Microsoft Guy Online (Natural) - English (United States)',
     description: 'Confident, trustworthy cybersecurity guide voice for teens'
+  },
+
+  // Story 11: Enchanted Garden - Petal (sweet 6-year-old flower)
+  GardenFlower: {
+    name: 'Petal',
+    pitch: 1.5,        // Higher pitch for sweet, gentle flower
+    rate: 0.88,       // Gentle, flowing pace like petals in the wind
+    volume: 0.9,      // Soft and delicate
+    voiceName: 'Google US English Female',
+    description: 'Sweet, gentle flower voice with magical garden wonder - high pitch, gentle pace'
+  },
+
+  // Story 12: Dragon's Treasure - Spark (friendly 7-year-old dragon)
+  DragonGuard: {
+    name: 'Spark',
+    pitch: 1.3,       // Slightly higher for friendly dragon
+    rate: 0.95,       // Confident but warm pace
+    volume: 0.95,     // Strong but friendly
+    voiceName: 'Google UK English Male',
+    description: 'Friendly, protective dragon voice with warm wisdom - confident pace'
+  },
+
+  // Story 13: Magic School - Wizard (wise 8-year-old student)
+  MagicWizard: {
+    name: 'Wizard',
+    pitch: 1.2,       // Bright and magical
+    rate: 1.0,        // Enthusiastic learning pace
+    volume: 1.0,      // Clear and present
+    voiceName: 'Microsoft David - English (United States)',
+    description: 'Enthusiastic, magical student voice with learning wonder'
+  },
+
+  // Story 14: Ocean Explorer - Coral (adventurous 7-year-old explorer)
+  OceanExplorer: {
+    name: 'Coral',
+    pitch: 1.4,       // Bubbly and adventurous
+    rate: 0.9,        // Deep ocean flow pace
+    volume: 0.92,     // Clear underwater voice
+    voiceName: 'Google US English Female',
+    description: 'Bubbly, adventurous ocean explorer voice with deep sea wonder'
+  },
+
+  // Story 15: Time Machine - Chrono (curious 8-year-old time traveler)
+  TimeTraveler: {
+    name: 'Chrono',
+    pitch: 1.1,       // Curious and thoughtful
+    rate: 0.92,       // Thoughtful time-travel pace
+    volume: 0.98,     // Clear through time
+    voiceName: 'Microsoft Mark - English (United States)',
+    description: 'Curious, thoughtful time traveler voice with temporal wonder'
+  },
+
+  // Story 16: Friendly Robot - Robo (helpful 6-year-old robot)
+  FriendlyRobot: {
+    name: 'Robo',
+    pitch: 1.3,       // Friendly and mechanical
+    rate: 0.85,       // Steady robot pace
+    volume: 0.9,      // Clear mechanical voice
+    voiceName: 'Google UK English Male',
+    description: 'Friendly, helpful robot voice with mechanical warmth'
+  },
+
+  // Story 17: Secret Cave - Crystal (mysterious 7-year-old explorer)
+  CaveExplorer: {
+    name: 'Crystal',
+    pitch: 1.2,       // Mysterious but friendly
+    rate: 0.88,       // Careful cave exploration pace
+    volume: 0.93,     // Echoing cave voice
+    voiceName: 'Google US English Female',
+    description: 'Mysterious, adventurous cave explorer voice with crystalline wonder'
+  },
+
+  // Story 18: Flying Carpet - Sky (free-spirited 6-year-old)
+  FlyingAdventurer: {
+    name: 'Sky',
+    pitch: 1.5,       // High and free-spirited
+    rate: 1.05,       // Fast flying pace
+    volume: 0.95,     // Clear in the sky
+    voiceName: 'Microsoft Zira - English (United States)',
+    description: 'Free-spirited, soaring flying carpet voice with sky-high wonder'
+  },
+
+  // Story 19: Lost Kingdom - Royal (noble 8-year-old prince/princess)
+  KingdomRoyal: {
+    name: 'Royal',
+    pitch: 1.0,       // Noble and regal
+    rate: 0.9,        // Royal, measured pace
+    volume: 1.0,      // Commanding but kind
+    voiceName: 'Google UK English Female',
+    description: 'Noble, regal kingdom voice with royal wisdom and kindness'
+  },
+
+  // Story 20: Grand Adventure - Hero (brave 8-year-old ultimate hero)
+  GrandHero: {
+    name: 'Hero',
+    pitch: 1.15,      // Brave and inspiring
+    rate: 1.0,        // Epic adventure pace
+    volume: 1.0,      // Powerful and inspiring
+    voiceName: 'Microsoft Mark - English (United States)',
+    description: 'Brave, inspiring ultimate hero voice with epic adventure spirit'
   }
 };
 

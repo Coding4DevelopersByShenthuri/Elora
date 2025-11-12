@@ -188,6 +188,32 @@ class StoryDatasetServiceClass {
   }
 
   /**
+   * Load full story templates with complete story content
+   */
+  async loadStoryTemplates(filePath: string, ageGroup: 'young' | 'teen'): Promise<DatasetStory[]> {
+    try {
+      const response = await fetch(filePath);
+      if (!response.ok) {
+        console.warn(`Could not load story templates from ${filePath}, using empty array`);
+        return [];
+      }
+
+      const data = await response.json();
+      const stories = Array.isArray(data) ? data : [];
+      
+      // Filter and validate stories 11-20
+      const validStories = stories
+        .filter((s: any) => s.storyNumber >= 11 && s.storyNumber <= 20)
+        .sort((a: DatasetStory, b: DatasetStory) => a.storyNumber - b.storyNumber);
+      
+      return validStories;
+    } catch (error) {
+      console.error(`Error loading story templates for ${ageGroup}:`, error);
+      return [];
+    }
+  }
+
+  /**
    * Clear cache (useful for reloading)
    */
   clearCache(ageGroup?: 'young' | 'teen') {

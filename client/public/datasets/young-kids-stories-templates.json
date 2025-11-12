@@ -1,0 +1,235 @@
+[
+  {
+    "storyNumber": 11,
+    "title": "The Enchanted Garden",
+    "description": "Discover magical flowers and friendly creatures in an enchanted garden!",
+    "difficulty": "Easy",
+    "duration": "6 min",
+    "words": 380,
+    "image": "🌸",
+    "type": "garden",
+    "character": "Sparkles",
+    "gradient": "from-pink-400 to-rose-400",
+    "bgGradient": "from-pink-200 to-rose-300 dark:from-pink-900 dark:to-rose-900",
+    "animation": "animate-float-slow",
+    "voiceProfile": "GardenFlower",
+    "storySteps": [
+      {
+        "id": "intro",
+        "title": "🌸 Welcome to the Enchanted Garden!",
+        "text": "Hello little explorer! I am Petal the magical flower, and I'm so happy you're here! Today, we're going on a special listening adventure through my enchanted garden. You will meet talking flowers, singing bees, and wise butterflies. Your mission is to listen very carefully to what they say, and answer questions to collect THREE magic stars! Are you ready? Let's begin our magical journey together!",
+        "emoji": "🌸",
+        "character": "Petal",
+        "bgColor": "from-pink-100 to-rose-100 dark:from-pink-900 dark:to-rose-900",
+        "interactive": false,
+        "wordCount": 60,
+        "duration": 35
+      },
+      {
+        "id": "singing_bees",
+        "title": "🐝 Singing Bees",
+        "emoji": "🐝",
+        "character": "Petal",
+        "bgColor": "from-yellow-200 to-amber-200 dark:from-yellow-800 dark:to-amber-800",
+        "interactive": true,
+        "listeningFirst": true,
+        "audioText": "We work together to make honey",
+        "audioInstruction": "Listen to what the bees are singing!",
+        "question": "What do the bees do together?",
+        "hint": "Think about what bees create when they work as a team",
+        "choices": [
+          { "text": "We play games all day", "emoji": "🐝🎮", "meaning": "playful activity" },
+          { "text": "We work together to make honey", "emoji": "🐝🍯", "meaning": "cooperative work" },
+          { "text": "We sleep in the flowers", "emoji": "🐝😴", "meaning": "resting activity" }
+        ],
+        "revealText": "Wonderful! The bees are singing about working together to make sweet honey! They show us that when we help each other, we can create something beautiful!",
+        "maxReplays": 5,
+        "wordCount": 25,
+        "duration": 35
+      },
+      {
+        "id": "wise_butterfly",
+        "title": "🦋 Wise Butterfly",
+        "emoji": "🦋",
+        "character": "Petal",
+        "bgColor": "from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900",
+        "interactive": true,
+        "listeningFirst": true,
+        "audioText": "Every flower has its own special color",
+        "audioInstruction": "Listen to the butterfly's wisdom!",
+        "question": "What does the wise butterfly tell us about flowers?",
+        "hint": "Think about what makes each flower unique",
+        "choices": [
+          { "text": "All flowers look the same", "emoji": "🦋🌼", "meaning": "similar appearance" },
+          { "text": "Flowers need lots of water", "emoji": "🦋💧", "meaning": "care requirement" },
+          { "text": "Every flower has its own special color", "emoji": "🦋🌈", "meaning": "unique beauty" }
+        ],
+        "revealText": "Amazing! The butterfly teaches us that every flower is special in its own way, just like you! Each one has its own beautiful color and brings joy to the garden!",
+        "maxReplays": 5,
+        "wordCount": 28,
+        "duration": 38
+      },
+      {
+        "id": "magical_rainbow",
+        "title": "🌈 Magical Rainbow",
+        "emoji": "🌈",
+        "character": "Petal",
+        "bgColor": "from-cyan-100 to-blue-100 dark:from-cyan-900 dark:to-blue-900",
+        "interactive": true,
+        "listeningFirst": true,
+        "audioText": "Rainbows appear after the rain brings new life",
+        "audioInstruction": "Listen to the rainbow's magical message!",
+        "question": "When do rainbows appear according to the garden?",
+        "hint": "Think about what happens after rain",
+        "choices": [
+          { "text": "Rainbows appear at night", "emoji": "🌈🌙", "meaning": "nighttime appearance" },
+          { "text": "Rainbows appear after the rain brings new life", "emoji": "🌈🌧️", "meaning": "after rain" },
+          { "text": "Rainbows appear in winter", "emoji": "🌈❄️", "meaning": "seasonal appearance" }
+        ],
+        "revealText": "Perfect! Rainbows appear after rain, bringing new life and color to our garden! They remind us that beautiful things can come after challenges!",
+        "maxReplays": 5,
+        "wordCount": 26,
+        "duration": 30
+      },
+      {
+        "id": "final_star",
+        "title": "🌟 Garden Magic",
+        "text": "The garden is filled with so much magic! All the flowers and creatures are happy because you listened so carefully to their messages. You have learned so much about working together, being unique, and finding beauty in nature!",
+        "emoji": "🌟",
+        "character": "Petal",
+        "bgColor": "from-yellow-100 to-orange-100 dark:from-yellow-900 dark:to-orange-900",
+        "interactive": false,
+        "wordCount": 23,
+        "duration": 30
+      },
+      {
+        "id": "grand_celebration",
+        "title": "🎉 Garden Celebration!",
+        "text": "Congratulations superstar! The WHOLE garden is celebrating YOU! Flowers are dancing, bees are buzzing with joy, and magic sparkles everywhere! You made the garden happy with your wonderful listening! You should feel SO proud! Give yourself a BIG clap!",
+        "emoji": "🎉",
+        "character": "Petal",
+        "bgColor": "from-rainbow-100 to-sparkle-100 dark:from-rainbow-900 dark:to-sparkle-900",
+        "interactive": false,
+        "wordCount": 22,
+        "duration": 40
+      }
+    ]
+  },
+  {
+    "storyNumber": 12,
+    "title": "Dragon's Treasure",
+    "description": "Help a friendly dragon protect its treasure from sneaky thieves!",
+    "difficulty": "Medium",
+    "duration": "7 min",
+    "words": 420,
+    "image": "🐉",
+    "type": "dragon",
+    "character": "Shield",
+    "gradient": "from-red-400 to-orange-400",
+    "bgGradient": "from-red-200 to-orange-300 dark:from-red-900 dark:to-orange-900",
+    "animation": "animate-float-medium",
+    "voiceProfile": "DragonGuard",
+    "storySteps": [
+      {
+        "id": "intro",
+        "title": "🐉 Welcome to Dragon's Lair!",
+        "text": "Hello brave friend! I am Spark the friendly dragon, and I need your help! My treasure is being watched by sneaky thieves, and I need a smart listener like you to help protect it. You will meet wise guardians, clever puzzles, and magical keys. Your mission is to listen very carefully and answer questions to collect THREE magic stars! Are you ready for this adventure?",
+        "emoji": "🐉",
+        "character": "Spark",
+        "bgColor": "from-red-100 to-orange-100 dark:from-red-900 dark:to-orange-900",
+        "interactive": false,
+        "wordCount": 65,
+        "duration": 40
+      },
+      {
+        "id": "wise_guardian",
+        "title": "🛡️ Wise Guardian",
+        "emoji": "🛡️",
+        "character": "Spark",
+        "bgColor": "from-gray-200 to-slate-200 dark:from-gray-800 dark:to-slate-800",
+        "interactive": true,
+        "listeningFirst": true,
+        "audioText": "Protection means keeping safe what we care about",
+        "audioInstruction": "Listen to the guardian's important message!",
+        "question": "What does protection mean according to the guardian?",
+        "hint": "Think about what protection is really about",
+        "choices": [
+          { "text": "Protection means hiding everything", "emoji": "🛡️🙈", "meaning": "hiding things" },
+          { "text": "Protection means keeping safe what we care about", "emoji": "🛡️💎", "meaning": "keeping safe" },
+          { "text": "Protection means fighting everyone", "emoji": "🛡️⚔️", "meaning": "aggressive action" }
+        ],
+        "revealText": "Excellent! Protection is about keeping safe what we care about, not about fighting. The guardian teaches us that true protection comes from wisdom and care!",
+        "maxReplays": 5,
+        "wordCount": 28,
+        "duration": 38
+      },
+      {
+        "id": "magical_keys",
+        "title": "🗝️ Magical Keys",
+        "emoji": "🗝️",
+        "character": "Spark",
+        "bgColor": "from-amber-200 to-yellow-200 dark:from-amber-800 dark:to-yellow-800",
+        "interactive": true,
+        "listeningFirst": true,
+        "audioText": "Keys unlock doors when we use them with kindness",
+        "audioInstruction": "Listen to what the keys tell us!",
+        "question": "How do keys unlock doors according to the magic?",
+        "hint": "Think about what makes keys work",
+        "choices": [
+          { "text": "Keys unlock doors when we force them", "emoji": "🗝️💪", "meaning": "using force" },
+          { "text": "Keys unlock doors when we use them with kindness", "emoji": "🗝️❤️", "meaning": "using kindness" },
+          { "text": "Keys unlock doors only at night", "emoji": "🗝️🌙", "meaning": "time-based" }
+        ],
+        "revealText": "Wonderful! The magical keys teach us that kindness is the true power that unlocks doors! When we are kind, we can open any door in our hearts!",
+        "maxReplays": 5,
+        "wordCount": 26,
+        "duration": 30
+      },
+      {
+        "id": "treasure_chest",
+        "title": "💎 Treasure Chest",
+        "emoji": "💎",
+        "character": "Spark",
+        "bgColor": "from-yellow-200 to-amber-200 dark:from-yellow-800 dark:to-amber-800",
+        "interactive": true,
+        "listeningFirst": true,
+        "audioText": "True treasure is friendship and helping others",
+        "audioInstruction": "Listen to what the treasure chest reveals!",
+        "question": "What is the true treasure according to the chest?",
+        "hint": "Think about what really matters most",
+        "choices": [
+          { "text": "True treasure is gold and jewels", "emoji": "💎💰", "meaning": "material wealth" },
+          { "text": "True treasure is friendship and helping others", "emoji": "💎🤝", "meaning": "friendship" },
+          { "text": "True treasure is being alone", "emoji": "💎😢", "meaning": "isolation" }
+        ],
+        "revealText": "Perfect! The treasure chest reveals that true treasure is friendship and helping others! That's the most valuable treasure of all!",
+        "maxReplays": 5,
+        "wordCount": 24,
+        "duration": 32
+      },
+      {
+        "id": "final_star",
+        "title": "🌟 Dragon's Wisdom",
+        "text": "The dragon's lair is filled with so much wisdom! All the guardians and treasures are safe because you listened so carefully. You have learned so much about protection, kindness, and true friendship!",
+        "emoji": "🌟",
+        "character": "Spark",
+        "bgColor": "from-yellow-100 to-orange-100 dark:from-yellow-900 dark:to-orange-900",
+        "interactive": false,
+        "wordCount": 23,
+        "duration": 30
+      },
+      {
+        "id": "grand_celebration",
+        "title": "🎉 Dragon Celebration!",
+        "text": "Congratulations hero! The friendly dragon is celebrating YOU! The treasure is safe, the guardians are happy, and magic sparkles everywhere! You protected the treasure with your wonderful listening! You should feel SO proud! Give yourself a BIG clap!",
+        "emoji": "🎉",
+        "character": "Spark",
+        "bgColor": "from-rainbow-100 to-sparkle-100 dark:from-rainbow-900 dark:to-sparkle-900",
+        "interactive": false,
+        "wordCount": 22,
+        "duration": 40
+      }
+    ]
+  }
+]
+

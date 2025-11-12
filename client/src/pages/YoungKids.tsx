@@ -32,6 +32,7 @@ import SuperheroAdventure from '@/components/kids/stories/SuperheroSchoolAdventu
 import FairyGardenAdventure from '@/components/kids/stories/FairyGardenAdventure';
 import RainbowCastleAdventure from '@/components/kids/stories/RainbowCastleAdventure';
 import JungleExplorerAdventure from '@/components/kids/stories/JungleExplorerAdventure';
+import DynamicStoryAdventure from '@/components/kids/stories/DynamicStoryAdventure';
 import AuthModal from '@/components/auth/AuthModal';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import HybridServiceManager from '@/services/HybridServiceManager';
@@ -82,6 +83,8 @@ const YoungKidsPage = () => {
   const [dynamicStories, setDynamicStories] = useState<typeof allStories | null>(null);
   const [serverAchievements, setServerAchievements] = useState<any[]>([]);
   const [datasetStories, setDatasetStories] = useState<DatasetStory[]>([]);
+  const [storyTemplates, setStoryTemplates] = useState<any[]>([]);
+  const [currentTemplateStory, setCurrentTemplateStory] = useState<any | null>(null);
 
   // Enrolled internal story IDs, derived from enrolled words/phrases (populated after completion)
   const enrolledInternalStoryIds = useMemo(() => {
@@ -635,7 +638,7 @@ const YoungKidsPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
-  // Load stories 11-20 from dataset
+  // Load stories 11-20 from dataset (metadata only)
   useEffect(() => {
     if (!isAuthenticated) return;
     
@@ -657,6 +660,24 @@ const YoungKidsPage = () => {
     };
     
     loadDatasetStories();
+  }, [isAuthenticated]);
+
+  // Load full story templates (with complete story content)
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    
+    const loadTemplates = async () => {
+      try {
+        const templates = await StoryDatasetService.loadStoryTemplates('/datasets/young-kids-stories-templates.json', 'young');
+        setStoryTemplates(templates);
+        console.log(`📚 Loaded ${templates.length} story templates`);
+      } catch (error) {
+        console.error('Error loading story templates:', error);
+        setStoryTemplates([]);
+      }
+    };
+    
+    loadTemplates();
   }, [isAuthenticated]);
 
   // Handle story opening from Favorites page
@@ -715,7 +736,18 @@ const YoungKidsPage = () => {
       'superhero': 'superhero-school',
       'fairy': 'fairy-garden',
       'rainbow': 'rainbow-castle',
-      'jungle': 'jungle-explorer'
+      'jungle': 'jungle-explorer',
+      // Template story types (11-20)
+      'garden': 'enchanted-garden',
+      'dragon': 'dragons-treasure',
+      'school': 'magic-school',
+      'ocean-deep': 'ocean-explorer',
+      'time-travel': 'time-machine',
+      'robot': 'friendly-robot',
+      'cave': 'secret-cave',
+      'flying': 'flying-carpet',
+      'kingdom': 'lost-kingdom',
+      'grand-finale': 'grand-adventure'
     };
     return mapping[storyType] || storyType;
   };
@@ -864,7 +896,27 @@ const YoungKidsPage = () => {
       }
     }
     
-    // Open appropriate adventure module
+    // Check if this is a template story (11-20)
+    const storyNumber = parseInt(storyId.replace('young-', ''), 10);
+    if (storyNumber >= 10) {
+      // This is a template story (11-20), use DynamicStoryAdventure
+      const template = storyTemplates.find(t => t.storyNumber === storyNumber + 1);
+      if (template && template.storySteps) {
+        setCurrentTemplateStory({
+          title: template.title,
+          storySteps: template.storySteps,
+          voiceProfile: template.voiceProfile || `Story${storyNumber + 1}`,
+          characterName: template.character || 'Character',
+          storyId: internalId
+        });
+        setIsPlaying(false);
+        return;
+      } else {
+        console.warn(`Template not found for story ${storyNumber + 1}`);
+      }
+    }
+    
+    // Open appropriate adventure module for hardcoded stories (1-10)
     const storyType = story.type;
     if (storyType === 'forest') {
       setShowMagicForest(true);
@@ -991,8 +1043,12 @@ const YoungKidsPage = () => {
   const handleAdventureComplete = async (storyId: string, score: number) => {
     if (!isAuthenticated) return;
 
-    const storyIndex = (dynamicStories || allStories).findIndex(s => s.id === storyId);
-    if (storyIndex === -1) return;
+    // Find story in all available stories (including dataset stories)
+    const storyIndex = effectiveStories.findIndex(s => s.id === storyId);
+    if (storyIndex === -1) {
+      console.warn(`Story ${storyId} not found in effectiveStories`);
+      return;
+    }
 
     // Calculate points based on score: base points from score + completion bonus
     const basePoints = Math.round(score / 10);
@@ -1005,7 +1061,7 @@ const YoungKidsPage = () => {
     await incrementStreakIfNeeded('story-complete');
     
     // Get story information for enrollment
-    const story = (dynamicStories || allStories)[storyIndex];
+    const story = effectiveStories[storyIndex];
     const storyType = story.type;
     const storyTitle = story.title;
     
@@ -2056,6 +2112,27 @@ const YoungKidsPage = () => {
             setShowJungleExplorerAdventure(false);
             handleAdventureComplete('young-9', score);
           }}
+        />
+      )}
+
+      {/* Dynamic Story Adventure for template stories (11-20) */}
+      {currentTemplateStory && (
+        <DynamicStoryAdventure
+          onClose={() => {
+            setCurrentTemplateStory(null);
+            setIsPlaying(false);
+          }}
+          onComplete={(score) => {
+            // Find the story ID from the template
+            const template = storyTemplates.find(t => t.title === currentTemplateStory.title);
+            if (template) {
+              const storyId = `young-${template.storyNumber - 1}`;
+              handleAdventureComplete(storyId, score);
+            }
+            setCurrentTemplateStory(null);
+            setIsPlaying(false);
+          }}
+          storyData={currentTemplateStory}
         />
       )}
 
