@@ -59,6 +59,7 @@ import { AnimatedTransition } from '@/components/common/AnimatedTransition';
 import { useAnimateIn } from '@/lib/animations';
 import KidsProgressService from '@/services/KidsProgressService';
 import KidsApi from '@/services/KidsApi';
+import TeenApi from '@/services/TeenApi';
 import StoryWordsService from '@/services/StoryWordsService';
 import MultiCategoryProgressService, { type CategoryProgress, type AggregatedProgress } from '@/services/MultiCategoryProgressService';
 import LearningPathRecommendationService, { type CategoryRecommendation } from '@/services/LearningPathRecommendationService';
@@ -106,6 +107,16 @@ const Profile = () => {
     storiesCompleted: 0,
     vocabularyWords: 0,
     pronunciationAttempts: 0,
+    hasData: false,
+  });
+
+  const [teenKidsStats, setTeenKidsStats] = useState({
+    points: 0,
+    streak: 0,
+    storiesCompleted: 0,
+    vocabularyWords: 0,
+    pronunciationAttempts: 0,
+    gamesCompleted: 0,
     hasData: false,
   });
 
@@ -538,6 +549,66 @@ const Profile = () => {
     };
 
     loadKidsProgress();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+
+    const loadTeenKidsProgress = async () => {
+      try {
+        const token = localStorage.getItem('speakbee_auth_token');
+
+        let serverProgress: any = null;
+        if (token && token !== 'local-token') {
+          try {
+            serverProgress = await TeenApi.getDashboard(token);
+          } catch {
+            serverProgress = null;
+          }
+        }
+
+        if (!cancelled && serverProgress) {
+          const points = typeof serverProgress.points === 'number' ? serverProgress.points : 0;
+          const streak = typeof serverProgress.streak === 'number' ? serverProgress.streak : 0;
+          const completedStoryIds = Array.isArray(serverProgress.completed_story_ids) 
+            ? serverProgress.completed_story_ids 
+            : [];
+          const vocabularyAttempts = typeof serverProgress.vocabulary_attempts === 'number' 
+            ? serverProgress.vocabulary_attempts 
+            : 0;
+          const pronunciationAttempts = typeof serverProgress.pronunciation_attempts === 'number' 
+            ? serverProgress.pronunciation_attempts 
+            : 0;
+          const gamesAttempts = typeof serverProgress.games_attempts === 'number' 
+            ? serverProgress.games_attempts 
+            : 0;
+
+          setTeenKidsStats({
+            points,
+            streak,
+            storiesCompleted: completedStoryIds.length,
+            vocabularyWords: vocabularyAttempts,
+            pronunciationAttempts,
+            gamesCompleted: gamesAttempts,
+            hasData: points > 0 || streak > 0 || completedStoryIds.length > 0 || vocabularyAttempts > 0 || pronunciationAttempts > 0 || gamesAttempts > 0,
+          });
+        }
+      } catch {
+        if (!cancelled) {
+          setTeenKidsStats((prev) => ({
+            ...prev,
+            hasData: prev.hasData,
+          }));
+        }
+      }
+    };
+
+    loadTeenKidsProgress();
 
     return () => {
       cancelled = true;
@@ -1008,7 +1079,7 @@ const Profile = () => {
                 );
                 const hasKidsData = kidsCategories.some(cat => 
                   cat.total_points > 0 || cat.stories_completed > 0 || cat.last_activity
-                ) || kidsStats.hasData;
+                ) || kidsStats.hasData || teenKidsStats.hasData;
                 
                 const youngKidsData = categoryProgress.find(cat => cat.category === 'young_kids') || 
                   (kidsStats.hasData ? {
@@ -1020,7 +1091,17 @@ const Profile = () => {
                     category_display: 'Young Kids (4-10)'
                   } : null);
                 
-                const teenKidsData = categoryProgress.find(cat => cat.category === 'teen_kids');
+                const teenKidsData = categoryProgress.find(cat => cat.category === 'teen_kids') ||
+                  (teenKidsStats.hasData ? {
+                    total_points: teenKidsStats.points,
+                    total_streak: teenKidsStats.streak,
+                    stories_completed: teenKidsStats.storiesCompleted,
+                    lessons_completed: teenKidsStats.storiesCompleted,
+                    vocabulary_words: teenKidsStats.vocabularyWords,
+                    pronunciation_attempts: teenKidsStats.pronunciationAttempts,
+                    games_completed: teenKidsStats.gamesCompleted,
+                    category_display: 'Teen Kids (11-17)'
+                  } : null);
 
                 return (
                   <Card>
@@ -1078,32 +1159,32 @@ const Profile = () => {
                           )}
                           
                           {/* Teen Kids Section */}
-                          {teenKidsData && (teenKidsData.total_points > 0 || teenKidsData.stories_completed > 0) && (
+                          {teenKidsData && (teenKidsData.total_points > 0 || teenKidsData.stories_completed > 0 || teenKidsData.lessons_completed > 0 || teenKidsData.vocabulary_words > 0 || teenKidsData.pronunciation_attempts > 0 || teenKidsData.games_completed > 0 || teenKidsStats.hasData) && (
                             <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
                               <h4 className="text-sm font-semibold text-foreground">Teen Kids (11-17)</h4>
                               <div className="grid grid-cols-2 gap-3">
                                 <div>
                                   <p className="text-xs uppercase tracking-wide text-muted-foreground">Points</p>
                                   <p className="text-lg font-semibold text-foreground">
-                                    {teenKidsData.total_points.toLocaleString()}
+                                    {(teenKidsData.total_points || teenKidsStats.points || 0).toLocaleString()}
                                   </p>
                                 </div>
                                 <div>
                                   <p className="text-xs uppercase tracking-wide text-muted-foreground">Missions</p>
                                   <p className="text-lg font-semibold text-foreground">
-                                    {teenKidsData.stories_completed || teenKidsData.lessons_completed || 0}
+                                    {teenKidsData.stories_completed || teenKidsData.lessons_completed || teenKidsStats.storiesCompleted || 0}
                                   </p>
                                 </div>
                                 <div>
                                   <p className="text-xs uppercase tracking-wide text-muted-foreground">Vocabulary</p>
                                   <p className="text-lg font-semibold text-foreground">
-                                    {teenKidsData.vocabulary_words || 0}
+                                    {teenKidsData.vocabulary_words || teenKidsStats.vocabularyWords || 0}
                                   </p>
                                 </div>
                                 <div>
                                   <p className="text-xs uppercase tracking-wide text-muted-foreground">Games</p>
                                   <p className="text-lg font-semibold text-foreground">
-                                    {teenKidsData.games_completed || 0}
+                                    {teenKidsData.games_completed || teenKidsStats.gamesCompleted || 0}
                                   </p>
                                 </div>
                               </div>

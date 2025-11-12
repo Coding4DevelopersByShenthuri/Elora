@@ -47,6 +47,7 @@ import { TransformersService } from '@/services/TransformersService';
 import { TimeTracker } from '@/services/TimeTracker';
 import EnhancedTTS from '@/services/EnhancedTTS';
 import { StoryDatasetService, type DatasetStory } from '@/services/StoryDatasetService';
+import MultiCategoryProgressService from '@/services/MultiCategoryProgressService';
 import MysteryDetectiveAdventure from '@/components/kids/stories/MysteryDetectiveAdventure';
 import SpaceExplorerAdventure from '@/components/kids/stories/SpaceExplorerAdventure';
 import EnvironmentalHeroAdventure from '@/components/kids/stories/EnvironmentalHeroAdventure';
@@ -579,6 +580,20 @@ const TeenKidsPage = () => {
   useEffect(() => {
     if (!isAuthenticated) return;
     const token = localStorage.getItem('speakbee_auth_token');
+    
+    // Load favorites from local storage as fallback
+    try {
+      const localFavorites = localStorage.getItem(`teen_favorites_${userId}`);
+      if (localFavorites) {
+        const parsed = JSON.parse(localFavorites);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setFavorites(parsed);
+        }
+      }
+    } catch (error) {
+      console.warn('Error loading local favorites:', error);
+    }
+    
     if (!token || token === 'local-token') {
       return;
     }
@@ -587,7 +602,7 @@ const TeenKidsPage = () => {
       .catch((error) => {
         console.error('Error loading teen dashboard:', error);
       });
-  }, [isAuthenticated, applyDashboard]);
+  }, [isAuthenticated, applyDashboard, userId]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -846,14 +861,34 @@ const TeenKidsPage = () => {
 
     const willAdd = !favorites.includes(storyId);
     const previousFavorites = favorites;
-    setFavorites(
-      willAdd ? [...favorites, storyId] : favorites.filter((id) => id !== storyId)
-    );
+    const updatedFavorites = willAdd 
+      ? [...favorites, storyId] 
+      : favorites.filter((id) => id !== storyId);
+    setFavorites(updatedFavorites);
 
-    await callTeenApi(
-      (token) => TeenApi.toggleFavorite(token, { storyId, add: willAdd }),
-      () => setFavorites(previousFavorites)
-    );
+    try {
+      const token = localStorage.getItem('speakbee_auth_token');
+      if (token && token !== 'local-token') {
+        // Use TeenApi for teen stories
+        await TeenApi.toggleFavorite(token, { storyId, add: willAdd });
+      } else {
+        // Fallback to local storage if offline
+        try {
+          const { API } = await import('@/services/ApiService');
+          await API.kids.toggleFavorite(storyId, willAdd).catch(() => {
+            // If API fails, save locally
+            localStorage.setItem(`teen_favorites_${userId}`, JSON.stringify(updatedFavorites));
+          });
+        } catch (error) {
+          // Save to local storage as fallback
+          localStorage.setItem(`teen_favorites_${userId}`, JSON.stringify(updatedFavorites));
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      // Revert on error
+      setFavorites(previousFavorites);
+    }
   };
 
   const handleStartLesson = async (storyId: string) => {
@@ -892,6 +927,32 @@ const TeenKidsPage = () => {
 
     if (isOpeningFromFavorites) {
       setIsOpeningFromFavorites(false);
+    }
+
+    // Mark story as enrolled when started (not completed, but enrolled for tracking)
+    const internalId = getInternalStoryId(story.type);
+    const storyEnrollments = StoryWordsService.getEnrolledStories(userId);
+    const isAlreadyEnrolled = storyEnrollments.some(e => e.storyId === internalId);
+    
+    // If not already enrolled, create a pending enrollment (completed: false)
+    // This will make the enrolled badge appear immediately
+    if (!isAlreadyEnrolled) {
+      try {
+        // Create enrollment with completed: false to track that user started the story
+        const enrollment = {
+          storyId: internalId,
+          storyTitle: story.title,
+          storyType: story.type,
+          completed: false,
+          wordsExtracted: false,
+          completedAt: undefined,
+          score: undefined
+        };
+        const updatedEnrollments = [...storyEnrollments, enrollment];
+        localStorage.setItem(`speakbee_story_enrollments_${userId}`, JSON.stringify(updatedEnrollments));
+      } catch (error) {
+        console.warn('Failed to track story enrollment:', error);
+      }
     }
 
     void callTeenApi((token) =>
@@ -974,6 +1035,8 @@ const TeenKidsPage = () => {
             if (dashboardData) {
               // Merge server data with our immediate updates (preserves badge and points)
               applyDashboard(dashboardData, true);
+              // Clear category progress cache so Profile page shows updated data
+              MultiCategoryProgressService.clearCache();
             }
           } catch (error) {
             console.error('Error refreshing dashboard after completion:', error);
@@ -1187,7 +1250,13 @@ const TeenKidsPage = () => {
               {paginatedStories.map((story) => {
                   const internalId = getInternalStoryId(story.type);
                   // Check if enrolled: either through words/phrases (internal ID) OR through completed story IDs
-                  const isEnrolled = enrolledInternalStoryIds.has(internalId) || completedStoryIds.includes(story.id) || allEnrolledStoryIds.has(internalId);
+                  // Also check StoryWordsService directly for enrolled stories (both started and completed)
+                  const storyEnrollments = StoryWordsService.getEnrolledStories(userId);
+                  const isEnrolledInService = storyEnrollments.some(e => e.storyId === internalId);
+                  const isEnrolled = enrolledInternalStoryIds.has(internalId) || 
+                                    completedStoryIds.includes(story.id) || 
+                                    allEnrolledStoryIds.has(internalId) ||
+                                    isEnrolledInService;
                 const CharacterIcon = story.character;
                 
                 // Check if story is from dataset and if it's unlocked
@@ -1238,7 +1307,6 @@ const TeenKidsPage = () => {
                             size="icon"
                             onClick={() => toggleFavorite(story.id)}
                             className="rounded-full bg-black/15 text-white hover:bg-black/25"
-                            disabled={!isUnlocked}
                           >
                             <Heart
                               className={cn('h-4 w-4', favorites.includes(story.id) && 'fill-current text-rose-400')}
@@ -1420,6 +1488,8 @@ const TeenKidsPage = () => {
                       () => {
                         setVocabularyAttempts((prev) => prev + 1);
                         setPoints((prev) => prev + 25);
+                        // Clear category progress cache so Profile page shows updated data
+                        MultiCategoryProgressService.clearCache();
                       }
                     );
                   }}
@@ -1503,6 +1573,8 @@ const TeenKidsPage = () => {
                       () => {
                         setPronunciationAttempts((prev) => prev + 1);
                         setPoints((prev) => prev + 35);
+                        // Clear category progress cache so Profile page shows updated data
+                        MultiCategoryProgressService.clearCache();
                       }
                     );
                   }}

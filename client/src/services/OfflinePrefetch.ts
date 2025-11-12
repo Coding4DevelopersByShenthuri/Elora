@@ -5,8 +5,8 @@ const resolveHealthUrl = () => {
   if (DEFAULT_HEALTH_ENDPOINT) {
     return DEFAULT_HEALTH_ENDPOINT;
   }
-  // Fall back to a conventional Django health endpoint
-  return `${API_BASE_URL.replace(/\/$/, '')}/health/`;
+  // Fall back to a conventional Django health endpoint (no trailing slash)
+  return `${API_BASE_URL.replace(/\/$/, '')}/health`;
 };
 
 /**

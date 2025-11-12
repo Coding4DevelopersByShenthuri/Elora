@@ -81,6 +81,16 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}, timeou
     });
 
     if (!response.ok) {
+      // Handle 401 Unauthorized - token is invalid or expired
+      if (response.status === 401) {
+        // Clear invalid token
+        if (token && token !== 'local-token') {
+          localStorage.removeItem('speakbee_auth_token');
+          console.warn('Authentication token expired or invalid. Please sign in again.');
+        }
+        const error = await response.json().catch(() => ({ message: 'Authentication required. Please sign in again.' }));
+        throw { response: { data: error, status: response.status } };
+      }
       const error = await response.json().catch(() => ({ message: 'Request failed' }));
       throw { response: { data: error, status: response.status } };
     }

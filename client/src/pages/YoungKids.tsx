@@ -280,8 +280,13 @@ const YoungKidsPage = () => {
         if (token && token !== 'local-token') {
           try {
             serverProgress = await KidsApi.getProgress(token);
-          } catch {
-            // Fallback to local
+          } catch (error: any) {
+            // If 401, token is invalid - clear it and fallback to local
+            if (error?.message?.includes('token not valid') || error?.message?.includes('401')) {
+              localStorage.removeItem('speakbee_auth_token');
+              console.warn('Token expired, falling back to local progress');
+            }
+            // Fallback to local for any error
           }
         }
         
@@ -305,7 +310,23 @@ const YoungKidsPage = () => {
         setStreak(Math.max(serverStreak, localStreak));
         
         // Favorites: Merge and convert
-        const fav = (serverDetails.favorites || localDetails.favorites || []);
+        let fav = (serverDetails.favorites || localDetails.favorites || []);
+        
+        // Also check local storage as fallback
+        if (!fav || fav.length === 0) {
+          try {
+            const localFavorites = localStorage.getItem(`young_favorites_${userId}`);
+            if (localFavorites) {
+              const parsed = JSON.parse(localFavorites);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                fav = parsed;
+              }
+            }
+          } catch (error) {
+            console.warn('Error loading local favorites:', error);
+          }
+        }
+        
         const convertedFavorites = Array.isArray(fav) ? fav.map((f: any) => {
           if (typeof f === 'number') {
             return `young-${f}`;
@@ -803,8 +824,35 @@ const YoungKidsPage = () => {
     setCurrentStory(storyId);
     setIsPlaying(true);
     
+    // Mark story as enrolled when started (not completed, but enrolled for tracking)
+    const story = effectiveStories[storyIndex];
+    const internalId = getInternalStoryId(story.type);
+    const storyEnrollments = StoryWordsService.getEnrolledStories(userId);
+    const isAlreadyEnrolled = storyEnrollments.some(e => e.storyId === internalId);
+    
+    // If not already enrolled, create a pending enrollment (completed: false)
+    // This will make the enrolled badge appear immediately
+    if (!isAlreadyEnrolled) {
+      try {
+        // Create enrollment with completed: false to track that user started the story
+        const enrollment = {
+          storyId: internalId,
+          storyTitle: story.title,
+          storyType: story.type,
+          completed: false,
+          wordsExtracted: false,
+          completedAt: undefined,
+          score: undefined
+        };
+        const updatedEnrollments = [...storyEnrollments, enrollment];
+        localStorage.setItem(`speakbee_story_enrollments_${userId}`, JSON.stringify(updatedEnrollments));
+      } catch (error) {
+        console.warn('Failed to track story enrollment:', error);
+      }
+    }
+    
     // Open appropriate adventure module
-    const storyType = effectiveStories[storyIndex].type;
+    const storyType = story.type;
     if (storyType === 'forest') {
       setShowMagicForest(true);
     } else if (storyType === 'space') {
@@ -886,10 +934,12 @@ const YoungKidsPage = () => {
       return;
     }
 
-    const next = favorites.includes(storyId)
-      ? favorites.filter(id => id !== storyId)
-      : [...favorites, storyId];
-    setFavorites(next);
+    const willAdd = !favorites.includes(storyId);
+    const previousFavorites = favorites;
+    const updatedFavorites = willAdd 
+      ? [...favorites, storyId] 
+      : favorites.filter((id) => id !== storyId);
+    setFavorites(updatedFavorites);
     
     try {
       const token = localStorage.getItem('speakbee_auth_token');
@@ -897,25 +947,31 @@ const YoungKidsPage = () => {
         try {
           // Use the new API endpoint for favorites (saves to MySQL)
           const { API } = await import('@/services/ApiService');
-          await API.kids.toggleFavorite(storyId, !favorites.includes(storyId));
+          await API.kids.toggleFavorite(storyId, willAdd);
           
           // Also update progress for backward compatibility
           const current = await KidsApi.getProgress(token);
-          const details = { ...((current as any).details || {}), favorites: next };
+          const details = { ...((current as any).details || {}), favorites: updatedFavorites };
           await KidsApi.updateProgress(token, { details });
-          return;
         } catch (error) {
           console.error('Error updating favorites on server:', error);
+          // Save to local storage as fallback
+          localStorage.setItem(`young_favorites_${userId}`, JSON.stringify(updatedFavorites));
         }
+      } else {
+        // Fallback to local storage if offline
+        await KidsProgressService.update(userId, (p) => {
+          const details = { ...(p as any).details };
+          details.favorites = updatedFavorites;
+          return { ...p, details } as any;
+        });
+        // Also save to local storage
+        localStorage.setItem(`young_favorites_${userId}`, JSON.stringify(updatedFavorites));
       }
-      
-      await KidsProgressService.update(userId, (p) => {
-        const details = { ...(p as any).details };
-        details.favorites = next;
-        return { ...p, details } as any;
-      });
     } catch (error) {
       console.error('Error updating favorites:', error);
+      // Revert on error
+      setFavorites(previousFavorites);
     }
   };
 
@@ -1103,47 +1159,69 @@ const YoungKidsPage = () => {
       // Calculate new streak based on last practice date
       if (last === yesterdayKey) {
         // Continued streak - user practiced yesterday
-        newStreak = currentStreak + 1;
+        newStreak = Math.max(1, currentStreak) + 1;
       } else if (!last) {
-        // First time practicing
-        newStreak = 1;
+        // First time practicing or no record
+        newStreak = Math.max(1, currentStreak);
       } else {
         // Streak broken - user didn't practice yesterday (or it's been more than 1 day)
         newStreak = 1;
       }
 
       if (token && token !== 'local-token') {
-        const current = await KidsApi.getProgress(token);
-        currentStreak = (current as any)?.streak ?? 0;
-        
-        // Recalculate if we have server data
-        const serverLastDate = (current as any)?.details?.engagement?.lastStreakDate;
-        if (serverLastDate === yesterdayKey) {
-          newStreak = currentStreak + 1;
-        } else if (!serverLastDate || serverLastDate !== todayKey) {
-          newStreak = 1;
-        } else {
-          return; // Already counted today
-        }
-        
-        const details = { ...((current as any)?.details || {}) };
-        details.engagement = details.engagement || {};
-        details.engagement.lastStreakDate = todayKey;
-        details.engagement.source = source;
-        await KidsApi.updateProgress(token, { streak: newStreak, details });
-      } else {
-        await KidsProgressService.update(userId, (p) => {
-          const anyP: any = p as any;
-          const details = { ...(anyP.details || {}) };
+        try {
+          const current = await KidsApi.getProgress(token);
+          currentStreak = (current as any)?.streak ?? 0;
+          
+          // Recalculate if we have server data
+          const serverLastDate = (current as any)?.details?.engagement?.lastStreakDate;
+          if (serverLastDate === yesterdayKey) {
+            // Continued streak - user practiced yesterday
+            newStreak = Math.max(1, currentStreak) + 1;
+          } else if (serverLastDate === todayKey) {
+            // Already counted today - don't increment
+            return;
+          } else if (!serverLastDate) {
+            // No server record - use calculated value
+            newStreak = Math.max(1, currentStreak);
+          } else {
+            // Streak broken
+            newStreak = 1;
+          }
+          
+          const details = { ...((current as any)?.details || {}) };
           details.engagement = details.engagement || {};
           details.engagement.lastStreakDate = todayKey;
           details.engagement.source = source;
-          return { ...(p as any), streak: newStreak, details } as any;
-        });
+          await KidsApi.updateProgress(token, { streak: newStreak, details });
+        } catch (error: any) {
+          // If 401, token is invalid - fallback to local
+          if (error?.message?.includes('token not valid') || error?.message?.includes('401')) {
+            localStorage.removeItem('speakbee_auth_token');
+            console.warn('Token expired during streak update, using local storage');
+            // Continue with local update
+          } else {
+            throw error; // Re-throw other errors
+          }
+        }
       }
+      
+      // Always update local storage
+      await KidsProgressService.update(userId, (p) => {
+        const anyP: any = p as any;
+        const details = { ...(anyP.details || {}) };
+        details.engagement = details.engagement || {};
+        details.engagement.lastStreakDate = todayKey;
+        details.engagement.source = source;
+        return { ...(p as any), streak: newStreak, details } as any;
+      });
+      
       setStreak(newStreak);
       localStorage.setItem(localKey, todayKey);
-    } catch (_) {}
+    } catch (error) {
+      console.error('Error updating streak:', error);
+      // Don't fail silently - at least log the error
+    }
   };
 
 
@@ -1350,7 +1428,13 @@ const YoungKidsPage = () => {
                 {paginatedStories.map((story) => {
                   const CharacterIcon = story.character;
                   const internalId = getInternalStoryId(story.type);
-                  const isEnrolled = enrolledInternalStoryIds.has(internalId) || completedStoryIds.has(internalId);
+                  // Check if enrolled: either through words/phrases (internal ID) OR through completed story IDs
+                  // Also check StoryWordsService directly for enrolled stories (both started and completed)
+                  const storyEnrollments = StoryWordsService.getEnrolledStories(userId);
+                  const isEnrolledInService = storyEnrollments.some(e => e.storyId === internalId);
+                  const isEnrolled = enrolledInternalStoryIds.has(internalId) || 
+                                    completedStoryIds.has(internalId) ||
+                                    isEnrolledInService;
                   
                   // Check if story is from dataset and if it's unlocked
                   const storyIndex = parseInt(story.id.replace('young-', ''), 10);
@@ -1398,7 +1482,6 @@ const YoungKidsPage = () => {
                             size="icon"
                             onClick={() => toggleFavorite(story.id)}
                             className="rounded-full bg-black/15 text-white hover:bg-black/25"
-                            disabled={!isUnlocked}
                           >
                             <Heart className={cn('h-4 w-4', favorites.includes(story.id) && 'fill-current')} />
                           </Button>

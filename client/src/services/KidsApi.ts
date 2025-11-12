@@ -27,6 +27,16 @@ class KidsApi {
 
   private static async handleResponse<T>(response: Response, fallbackMessage: string): Promise<T> {
     if (!response.ok) {
+      // Handle 401 Unauthorized - token is invalid or expired
+      if (response.status === 401) {
+        // Clear invalid token
+        const token = localStorage.getItem('speakbee_auth_token');
+        if (token && token !== 'local-token') {
+          localStorage.removeItem('speakbee_auth_token');
+          console.warn('Authentication token expired or invalid. Please sign in again.');
+        }
+        throw new Error('Given token not valid for any token type. Please sign in again.');
+      }
       const errorBody = await response.json().catch(() => ({}));
       const detail = (errorBody && (errorBody.message || errorBody.detail)) || fallbackMessage;
       throw new Error(detail);

@@ -1860,6 +1860,35 @@ def _build_teen_dashboard_payload(user) -> dict:
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def teen_dashboard(request):
+    # Sync CategoryProgress with TeenProgress to ensure data is always in sync
+    try:
+        category_progress, created = CategoryProgress.objects.get_or_create(
+            user=request.user,
+            category='teen_kids',
+            defaults={
+                'total_points': 0,
+                'total_streak': 0,
+                'lessons_completed': 0,
+                'practice_time_minutes': 0,
+                'average_score': 0.0,
+                'progress_percentage': 0.0,
+                'level': 1,
+                'stories_completed': 0,
+                'vocabulary_words': 0,
+                'pronunciation_attempts': 0,
+                'games_completed': 0,
+            }
+        )
+        # Always sync to ensure data is up to date
+        sync_category_progress(request.user, 'teen_kids', category_progress)
+        category_progress.save()
+        logger.info(f"Synced teen_kids CategoryProgress for user {request.user.id}: {category_progress.total_points} points, {category_progress.stories_completed} stories")
+    except Exception as e:
+        logger.error(f"Error syncing teen_kids CategoryProgress: {str(e)}")
+        # Continue even if sync fails
+        import traceback
+        traceback.print_exc()
+    
     payload = _build_teen_dashboard_payload(request.user)
     return Response(payload)
 
