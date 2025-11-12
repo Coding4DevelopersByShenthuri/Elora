@@ -910,6 +910,58 @@ const YoungKidsPage = () => {
           storyId: internalId
         });
         setIsPlaying(false);
+        
+        // Award points for starting a story (same as hardcoded stories)
+        const pointsToAdd = 50;
+        const newPoints = points + pointsToAdd;
+        setPoints(newPoints);
+        
+        // Update streak correctly (check if user practiced yesterday)
+        await incrementStreakIfNeeded('story-start');
+        
+        // Persist to server first, fallback to local
+        try {
+          const token = localStorage.getItem('speakbee_auth_token');
+          const updateDetails = (details: any) => {
+            details.readAloud = details.readAloud || {};
+            const key = `story-${storyId}`;
+            const prev = details.readAloud[key] || { bestScore: 0, attempts: 0 };
+            details.readAloud[key] = { 
+              bestScore: Math.max(prev.bestScore, 80), 
+              attempts: prev.attempts + 1 
+            };
+            return details;
+          };
+          
+          if (token && token !== 'local-token') {
+            const current = await KidsApi.getProgress(token);
+            const details = updateDetails((current as any).details || {});
+            const currentPoints = (current as any)?.points ?? 0;
+            const currentStreak = (current as any)?.streak ?? 0;
+            await KidsApi.updateProgress(token, { 
+              points: currentPoints + pointsToAdd, 
+              streak: currentStreak, // Streak already updated by incrementStreakIfNeeded
+              details 
+            });
+            // Check and refresh achievements after update
+            await (KidsApi as any).checkAchievements(token);
+            const ach = await (KidsApi as any).getAchievements(token);
+            if (Array.isArray(ach)) setServerAchievements(ach);
+          } else {
+            await KidsProgressService.update(userId, (p) => {
+              const details = updateDetails((p as any).details || {});
+              return { 
+                ...p, 
+                points: p.points + pointsToAdd, 
+                streak: p.streak, // Streak already updated by incrementStreakIfNeeded
+                details 
+              } as any;
+            });
+          }
+        } catch (error) {
+          console.error('Error updating progress:', error);
+        }
+        
         return;
       } else {
         console.warn(`Template not found for story ${storyNumber + 1}`);
@@ -2123,11 +2175,21 @@ const YoungKidsPage = () => {
             setIsPlaying(false);
           }}
           onComplete={(score) => {
-            // Find the story ID from the template
-            const template = storyTemplates.find(t => t.title === currentTemplateStory.title);
-            if (template) {
-              const storyId = `young-${template.storyNumber - 1}`;
-              handleAdventureComplete(storyId, score);
+            // Find the story in effectiveStories by matching the title
+            // This ensures we use the correct storyId format (young-10, young-11, etc.)
+            const story = effectiveStories.find(s => s.title === currentTemplateStory.title);
+            
+            if (story) {
+              handleAdventureComplete(story.id, score);
+            } else {
+              // Fallback: construct storyId from template
+              const template = storyTemplates.find(t => t.title === currentTemplateStory.title);
+              if (template) {
+                const storyId = `young-${template.storyNumber - 1}`;
+                handleAdventureComplete(storyId, score);
+              } else {
+                console.warn('Could not find story for completion:', currentTemplateStory);
+              }
             }
             setCurrentTemplateStory(null);
             setIsPlaying(false);
