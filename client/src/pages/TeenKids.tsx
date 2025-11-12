@@ -962,6 +962,10 @@ const TeenKidsPage = () => {
 
         const internalId = getInternalStoryId(story.type);
         
+        // Check if points were already awarded for this story enrollment
+        const enrollmentPointsKey = `story_enrollment_points_${userId}_${internalId}`;
+        const pointsAlreadyAwarded = localStorage.getItem(enrollmentPointsKey) === 'true';
+        
         setCurrentTemplateStory({
           title: template.title,
           storySteps: template.storySteps,
@@ -994,6 +998,30 @@ const TeenKidsPage = () => {
           } catch (error) {
             console.warn('Failed to track story enrollment:', error);
           }
+        }
+
+        // Auto-add unlocked story to favorites if not already favorited
+        if (!favorites.includes(storyId)) {
+          const updatedFavorites = [...favorites, storyId];
+          setFavorites(updatedFavorites);
+          try {
+            const token = localStorage.getItem('speakbee_auth_token');
+            if (token && token !== 'local-token') {
+              try {
+                await TeenApi.toggleFavorite(token, { storyId, add: true }).catch(() => {});
+              } catch (error) {
+                console.warn('Error auto-adding to favorites:', error);
+              }
+            }
+            localStorage.setItem(`teen_favorites_${userId}`, JSON.stringify(updatedFavorites));
+          } catch (error) {
+            console.warn('Error auto-adding story to favorites:', error);
+          }
+        }
+
+        // Award points only if not already awarded
+        if (!pointsAlreadyAwarded) {
+          localStorage.setItem(enrollmentPointsKey, 'true');
         }
 
         void callTeenApi((token) =>
@@ -1033,6 +1061,10 @@ const TeenKidsPage = () => {
     const storyEnrollments = StoryWordsService.getEnrolledStories(userId);
     const isAlreadyEnrolled = storyEnrollments.some(e => e.storyId === internalId);
     
+    // Check if points were already awarded for this story enrollment
+    const enrollmentPointsKey = `story_enrollment_points_${userId}_${internalId}`;
+    const pointsAlreadyAwarded = localStorage.getItem(enrollmentPointsKey) === 'true';
+    
     // If not already enrolled, create a pending enrollment (completed: false)
     // This will make the enrolled badge appear immediately
     if (!isAlreadyEnrolled) {
@@ -1052,6 +1084,30 @@ const TeenKidsPage = () => {
       } catch (error) {
         console.warn('Failed to track story enrollment:', error);
       }
+    }
+
+    // Auto-add unlocked story to favorites if not already favorited
+    if (!favorites.includes(storyId)) {
+      const updatedFavorites = [...favorites, storyId];
+      setFavorites(updatedFavorites);
+      try {
+        const token = localStorage.getItem('speakbee_auth_token');
+        if (token && token !== 'local-token') {
+          try {
+            await TeenApi.toggleFavorite(token, { storyId, add: true }).catch(() => {});
+          } catch (error) {
+            console.warn('Error auto-adding to favorites:', error);
+          }
+        }
+        localStorage.setItem(`teen_favorites_${userId}`, JSON.stringify(updatedFavorites));
+      } catch (error) {
+        console.warn('Error auto-adding story to favorites:', error);
+      }
+    }
+
+    // Award points only if not already awarded
+    if (!pointsAlreadyAwarded) {
+      localStorage.setItem(enrollmentPointsKey, 'true');
     }
 
     void callTeenApi((token) =>
@@ -1582,23 +1638,51 @@ const TeenKidsPage = () => {
                       }
                     }
                     
+                    // Check if points were already awarded for this word
+                    const wordPointsKey = `vocab_points_${userId}_${word}`;
+                    const pointsAlreadyAwarded = localStorage.getItem(wordPointsKey) === 'true';
+                    
+                    // Only increment attempts if not already mastered
+                    if (!pointsAlreadyAwarded) {
+                      setVocabularyAttempts((prev) => prev + 1);
+                    }
+                    
                     const wordDetail = enrolledStoryWordsDetailed.find((w) => w.word === word);
-                    await callTeenApi(
-                      (token) =>
-                        TeenApi.recordVocabularyPractice(token, {
-                          word,
-                          storyId: wordDetail?.storyId,
-                          storyTitle: wordDetail?.storyTitle,
-                          score: 100,
-                          pointsAwarded: 25,
-                        }),
-                      () => {
-                        setVocabularyAttempts((prev) => prev + 1);
-                        setPoints((prev) => prev + 25);
-                        // Clear category progress cache so Profile page shows updated data
-                        MultiCategoryProgressService.clearCache();
-                      }
-                    );
+                    
+                    // Only award points once per word
+                    if (!pointsAlreadyAwarded) {
+                      await callTeenApi(
+                        (token) =>
+                          TeenApi.recordVocabularyPractice(token, {
+                            word,
+                            storyId: wordDetail?.storyId,
+                            storyTitle: wordDetail?.storyTitle,
+                            score: 100,
+                            pointsAwarded: 25,
+                          }),
+                        () => {
+                          setPoints((prev) => prev + 25);
+                          localStorage.setItem(wordPointsKey, 'true');
+                          // Clear category progress cache so Profile page shows updated data
+                          MultiCategoryProgressService.clearCache();
+                        }
+                      );
+                    } else {
+                      // Still record practice but without points
+                      await callTeenApi(
+                        (token) =>
+                          TeenApi.recordVocabularyPractice(token, {
+                            word,
+                            storyId: wordDetail?.storyId,
+                            storyTitle: wordDetail?.storyTitle,
+                            score: 100,
+                            pointsAwarded: 0,
+                          }),
+                        () => {
+                          MultiCategoryProgressService.clearCache();
+                        }
+                      );
+                    }
                   }}
                 />
               </div>
@@ -1667,23 +1751,51 @@ const TeenKidsPage = () => {
                       }
                     }
                     
+                    // Check if points were already awarded for this phrase
+                    const phrasePointsKey = `pronunciation_points_${userId}_${phrase}`;
+                    const pointsAlreadyAwarded = localStorage.getItem(phrasePointsKey) === 'true';
+                    
+                    // Only increment attempts if not already mastered
+                    if (!pointsAlreadyAwarded) {
+                      setPronunciationAttempts((prev) => prev + 1);
+                    }
+                    
                     const phraseDetail = enrolledStoryPhrasesDetailed.find((p) => p.phrase === phrase);
-                    await callTeenApi(
-                      (token) =>
-                        TeenApi.recordPronunciationPractice(token, {
-                          phrase,
-                          storyId: phraseDetail?.storyId,
-                          storyTitle: phraseDetail?.storyTitle,
-                          score: 100,
-                          pointsAwarded: 35,
-                        }),
-                      () => {
-                        setPronunciationAttempts((prev) => prev + 1);
-                        setPoints((prev) => prev + 35);
-                        // Clear category progress cache so Profile page shows updated data
-                        MultiCategoryProgressService.clearCache();
-                      }
-                    );
+                    
+                    // Only award points once per phrase
+                    if (!pointsAlreadyAwarded) {
+                      await callTeenApi(
+                        (token) =>
+                          TeenApi.recordPronunciationPractice(token, {
+                            phrase,
+                            storyId: phraseDetail?.storyId,
+                            storyTitle: phraseDetail?.storyTitle,
+                            score: 100,
+                            pointsAwarded: 35,
+                          }),
+                        () => {
+                          setPoints((prev) => prev + 35);
+                          localStorage.setItem(phrasePointsKey, 'true');
+                          // Clear category progress cache so Profile page shows updated data
+                          MultiCategoryProgressService.clearCache();
+                        }
+                      );
+                    } else {
+                      // Still record practice but without points
+                      await callTeenApi(
+                        (token) =>
+                          TeenApi.recordPronunciationPractice(token, {
+                            phrase,
+                            storyId: phraseDetail?.storyId,
+                            storyTitle: phraseDetail?.storyTitle,
+                            score: 100,
+                            pointsAwarded: 0,
+                          }),
+                        () => {
+                          MultiCategoryProgressService.clearCache();
+                        }
+                      );
+                    }
                   }}
                 />
               </div>
@@ -1767,6 +1879,7 @@ const TeenKidsPage = () => {
                   variant="secondary"
                   onClick={() => {
                 handleCategoryClick('pronunciation');
+                setSearchParams({ section: 'pronunciation' }, { replace: true });
                   }}
                 >
                   Start practising
@@ -1788,7 +1901,8 @@ const TeenKidsPage = () => {
             <Button 
                   variant="secondary"
                   onClick={() => {
-                handleCategoryClick('pronunciation');
+                handleCategoryClick('vocabulary');
+                setSearchParams({ section: 'vocabulary' }, { replace: true });
                   }}
                 >
                   Open studio

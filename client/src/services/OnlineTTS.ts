@@ -137,6 +137,27 @@ export class OnlineTTS {
   }
 
   /**
+   * Strip emojis from text before TTS
+   */
+  private static stripEmojis(text: string): string {
+    // Remove all emoji characters and emoji-related text
+    return text
+      .replace(/[\u{1F600}-\u{1F64F}]/gu, '') // Emoticons
+      .replace(/[\u{1F300}-\u{1F5FF}]/gu, '') // Misc Symbols and Pictographs
+      .replace(/[\u{1F680}-\u{1F6FF}]/gu, '') // Transport and Map
+      .replace(/[\u{1F1E0}-\u{1F1FF}]/gu, '') // Flags
+      .replace(/[\u{2600}-\u{26FF}]/gu, '') // Misc symbols
+      .replace(/[\u{2700}-\u{27BF}]/gu, '') // Dingbats
+      .replace(/[\u{1F900}-\u{1F9FF}]/gu, '') // Supplemental Symbols and Pictographs
+      .replace(/[\u{1FA00}-\u{1FA6F}]/gu, '') // Chess Symbols
+      .replace(/[\u{1FA70}-\u{1FAFF}]/gu, '') // Symbols and Pictographs Extended-A
+      .replace(/[\u{FE00}-\u{FE0F}]/gu, '') // Variation Selectors
+      .replace(/[\u{E0020}-\u{E007F}]/gu, '') // Tag Characters
+      .replace(/\s{2,}/g, ' ') // Replace multiple spaces with single space
+      .trim();
+  }
+
+  /**
    * Speak text using a specific voice profile
    */
   static async speak(
@@ -148,10 +169,18 @@ export class OnlineTTS {
       throw new Error('TTS not initialized');
     }
 
+    // Strip emojis from text before speaking
+    const cleanText = this.stripEmojis(text);
+    
+    if (!cleanText) {
+      console.warn('⚠️ Text is empty after emoji removal, skipping TTS');
+      return Promise.resolve();
+    }
+
     const speed = options?.speed || 'normal';
     const adjustedRate = this.getAdjustedRate(voiceProfile.rate, speed);
 
-    // Show caption if requested
+    // Show caption if requested (use original text for display, but speak clean text)
     if (options?.showCaptions && options?.onCaptionUpdate) {
       options.onCaptionUpdate(text);
     }
@@ -165,7 +194,7 @@ export class OnlineTTS {
         this.isStopping = false;
       }, 50);
 
-      const utterance = new SpeechSynthesisUtterance(text);
+      const utterance = new SpeechSynthesisUtterance(cleanText);
       
       // Set voice if specified - with fallback logic
       if (voiceProfile.voiceName) {
@@ -265,7 +294,7 @@ export class OnlineTTS {
           error: error.error,
           type: error.type,
           charIndex: error.charIndex,
-          utterance: utterance.text.substring(0, 100) + '...'
+            utterance: cleanText.substring(0, 100) + '...'
         });
         
         // Try to recover from common TTS errors

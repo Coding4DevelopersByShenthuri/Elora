@@ -875,6 +875,10 @@ const YoungKidsPage = () => {
     const storyEnrollments = StoryWordsService.getEnrolledStories(userId);
     const isAlreadyEnrolled = storyEnrollments.some(e => e.storyId === internalId);
     
+    // Check if points were already awarded for this story enrollment
+    const enrollmentPointsKey = `story_enrollment_points_${userId}_${internalId}`;
+    const pointsAlreadyAwarded = localStorage.getItem(enrollmentPointsKey) === 'true';
+    
     // If not already enrolled, create a pending enrollment (completed: false)
     // This will make the enrolled badge appear immediately
     if (!isAlreadyEnrolled) {
@@ -896,6 +900,26 @@ const YoungKidsPage = () => {
       }
     }
     
+    // Auto-add unlocked story to favorites if not already favorited
+    if (!favorites.includes(storyId)) {
+      const updatedFavorites = [...favorites, storyId];
+      setFavorites(updatedFavorites);
+      try {
+        const token = localStorage.getItem('speakbee_auth_token');
+        if (token && token !== 'local-token') {
+          try {
+            const { API } = await import('@/services/ApiService');
+            await API.kids.toggleFavorite(storyId, true).catch(() => {});
+          } catch (error) {
+            console.warn('Error auto-adding to favorites:', error);
+          }
+        }
+        localStorage.setItem(`young_favorites_${userId}`, JSON.stringify(updatedFavorites));
+      } catch (error) {
+        console.warn('Error auto-adding story to favorites:', error);
+      }
+    }
+    
     // Check if this is a template story (11-20)
     const storyNumber = parseInt(storyId.replace('young-', ''), 10);
     if (storyNumber >= 10) {
@@ -912,55 +936,60 @@ const YoungKidsPage = () => {
         });
         setIsPlaying(false);
         
-        // Award points for starting a story (same as hardcoded stories)
-        const pointsToAdd = 50;
-        const newPoints = points + pointsToAdd;
-        setPoints(newPoints);
-        
-        // Update streak correctly (check if user practiced yesterday)
-        await incrementStreakIfNeeded('story-start');
-        
-        // Persist to server first, fallback to local
-        try {
-          const token = localStorage.getItem('speakbee_auth_token');
-          const updateDetails = (details: any) => {
-            details.readAloud = details.readAloud || {};
-            const key = `story-${storyId}`;
-            const prev = details.readAloud[key] || { bestScore: 0, attempts: 0 };
-            details.readAloud[key] = { 
-              bestScore: Math.max(prev.bestScore, 80), 
-              attempts: prev.attempts + 1 
-            };
-            return details;
-          };
+        // Award points for starting a story ONLY if not already awarded
+        if (!pointsAlreadyAwarded) {
+          const pointsToAdd = 50;
+          const newPoints = points + pointsToAdd;
+          setPoints(newPoints);
           
-          if (token && token !== 'local-token') {
-            const current = await KidsApi.getProgress(token);
-            const details = updateDetails((current as any).details || {});
-            const currentPoints = (current as any)?.points ?? 0;
-            const currentStreak = (current as any)?.streak ?? 0;
-            await KidsApi.updateProgress(token, { 
-              points: currentPoints + pointsToAdd, 
-              streak: currentStreak, // Streak already updated by incrementStreakIfNeeded
-              details 
-            });
-            // Check and refresh achievements after update
-            await (KidsApi as any).checkAchievements(token);
-            const ach = await (KidsApi as any).getAchievements(token);
-            if (Array.isArray(ach)) setServerAchievements(ach);
-          } else {
-            await KidsProgressService.update(userId, (p) => {
-              const details = updateDetails((p as any).details || {});
-              return { 
-                ...p, 
-                points: p.points + pointsToAdd, 
-                streak: p.streak, // Streak already updated by incrementStreakIfNeeded
+          // Mark that points were awarded
+          localStorage.setItem(enrollmentPointsKey, 'true');
+          
+          // Update streak correctly (check if user practiced yesterday)
+          await incrementStreakIfNeeded('story-start');
+          
+          // Persist to server first, fallback to local
+          try {
+            const token = localStorage.getItem('speakbee_auth_token');
+            const updateDetails = (details: any) => {
+              details.readAloud = details.readAloud || {};
+              const key = `story-${storyId}`;
+              const prev = details.readAloud[key] || { bestScore: 0, attempts: 0 };
+              details.readAloud[key] = { 
+                bestScore: Math.max(prev.bestScore, 80), 
+                attempts: prev.attempts + 1 
+              };
+              return details;
+            };
+            
+            if (token && token !== 'local-token') {
+              const current = await KidsApi.getProgress(token);
+              const details = updateDetails((current as any).details || {});
+              const currentPoints = (current as any)?.points ?? 0;
+              const currentStreak = (current as any)?.streak ?? 0;
+              await KidsApi.updateProgress(token, { 
+                points: currentPoints + pointsToAdd, 
+                streak: currentStreak, // Streak already updated by incrementStreakIfNeeded
                 details 
-              } as any;
-            });
+              });
+              // Check and refresh achievements after update
+              await (KidsApi as any).checkAchievements(token);
+              const ach = await (KidsApi as any).getAchievements(token);
+              if (Array.isArray(ach)) setServerAchievements(ach);
+            } else {
+              await KidsProgressService.update(userId, (p) => {
+                const details = updateDetails((p as any).details || {});
+                return { 
+                  ...p, 
+                  points: p.points + pointsToAdd, 
+                  streak: p.streak, // Streak already updated by incrementStreakIfNeeded
+                  details 
+                } as any;
+              });
+            }
+          } catch (error) {
+            console.error('Error updating progress:', error);
           }
-        } catch (error) {
-          console.error('Error updating progress:', error);
         }
         
         return;
@@ -993,55 +1022,60 @@ const YoungKidsPage = () => {
       setShowJungleExplorerAdventure(true);
     }
     
-    // Add celebration effects - award points for starting a story
-    const pointsToAdd = 50;
-    const newPoints = points + pointsToAdd;
-    setPoints(newPoints);
-    
-    // Update streak correctly (check if user practiced yesterday)
-    await incrementStreakIfNeeded('story-start');
-    
-    // Persist to server first, fallback to local
-    try {
-      const token = localStorage.getItem('speakbee_auth_token');
-      const updateDetails = (details: any) => {
-        details.readAloud = details.readAloud || {};
-        const key = `story-${storyId}`;
-        const prev = details.readAloud[key] || { bestScore: 0, attempts: 0 };
-        details.readAloud[key] = { 
-          bestScore: Math.max(prev.bestScore, 80), 
-          attempts: prev.attempts + 1 
-        };
-        return details;
-      };
+    // Add celebration effects - award points for starting a story ONLY if not already awarded
+    if (!pointsAlreadyAwarded) {
+      const pointsToAdd = 50;
+      const newPoints = points + pointsToAdd;
+      setPoints(newPoints);
       
-      if (token && token !== 'local-token') {
-        const current = await KidsApi.getProgress(token);
-        const details = updateDetails((current as any).details || {});
-        const currentPoints = (current as any)?.points ?? 0;
-        const currentStreak = (current as any)?.streak ?? 0;
-        await KidsApi.updateProgress(token, { 
-          points: currentPoints + pointsToAdd, 
-          streak: currentStreak, // Streak already updated by incrementStreakIfNeeded
-          details 
-        });
-        // Check and refresh achievements after update
-        await (KidsApi as any).checkAchievements(token);
-        const ach = await (KidsApi as any).getAchievements(token);
-        if (Array.isArray(ach)) setServerAchievements(ach);
-      } else {
-        await KidsProgressService.update(userId, (p) => {
-          const details = updateDetails((p as any).details || {});
-          return { 
-            ...p, 
-            points: p.points + pointsToAdd, 
-            streak: p.streak, // Streak already updated by incrementStreakIfNeeded
+      // Mark that points were awarded
+      localStorage.setItem(enrollmentPointsKey, 'true');
+      
+      // Update streak correctly (check if user practiced yesterday)
+      await incrementStreakIfNeeded('story-start');
+      
+      // Persist to server first, fallback to local
+      try {
+        const token = localStorage.getItem('speakbee_auth_token');
+        const updateDetails = (details: any) => {
+          details.readAloud = details.readAloud || {};
+          const key = `story-${storyId}`;
+          const prev = details.readAloud[key] || { bestScore: 0, attempts: 0 };
+          details.readAloud[key] = { 
+            bestScore: Math.max(prev.bestScore, 80), 
+            attempts: prev.attempts + 1 
+          };
+          return details;
+        };
+        
+        if (token && token !== 'local-token') {
+          const current = await KidsApi.getProgress(token);
+          const details = updateDetails((current as any).details || {});
+          const currentPoints = (current as any)?.points ?? 0;
+          const currentStreak = (current as any)?.streak ?? 0;
+          await KidsApi.updateProgress(token, { 
+            points: currentPoints + pointsToAdd, 
+            streak: currentStreak, // Streak already updated by incrementStreakIfNeeded
             details 
-          } as any;
-        });
+          });
+          // Check and refresh achievements after update
+          await (KidsApi as any).checkAchievements(token);
+          const ach = await (KidsApi as any).getAchievements(token);
+          if (Array.isArray(ach)) setServerAchievements(ach);
+        } else {
+          await KidsProgressService.update(userId, (p) => {
+            const details = updateDetails((p as any).details || {});
+            return { 
+              ...p, 
+              points: p.points + pointsToAdd, 
+              streak: p.streak, // Streak already updated by incrementStreakIfNeeded
+              details 
+            } as any;
+          });
+        }
+      } catch (error) {
+        console.error('Error updating progress:', error);
       }
-    } catch (error) {
-      console.error('Error updating progress:', error);
     }
     setIsPlaying(false);
   };
@@ -1753,8 +1787,15 @@ const YoungKidsPage = () => {
                     key={`${selectedStoryFilter}-${vocabularyWordsToUse.length}`}
                     words={vocabularyWordsToUse}
                     onWordPracticed={async (word: string) => {
-                      const newAttempts = vocabularyAttempts + 1;
-                      setVocabularyAttempts(newAttempts);
+                      // Check if points were already awarded for this word
+                      const wordPointsKey = `vocab_points_${userId}_${word}`;
+                      const pointsAlreadyAwarded = localStorage.getItem(wordPointsKey) === 'true';
+                      
+                      // Only increment attempts if not already mastered
+                      if (!pointsAlreadyAwarded) {
+                        const newAttempts = vocabularyAttempts + 1;
+                        setVocabularyAttempts(newAttempts);
+                      }
 
                       const wordDetail = enrolledStoryWordsDetailed.find(w => w.word === word);
                       const storyId = wordDetail?.storyId;
@@ -1795,8 +1836,12 @@ const YoungKidsPage = () => {
                         console.error('Error saving vocabulary progress:', error);
                       }
 
-                      await awardEngagementPoints(20);
-                      await incrementStreakIfNeeded('vocabulary');
+                      // Only award points once per word
+                      if (!pointsAlreadyAwarded) {
+                        await awardEngagementPoints(20);
+                        localStorage.setItem(wordPointsKey, 'true');
+                        await incrementStreakIfNeeded('vocabulary');
+                      }
                     }}
                   />
                 </div>
@@ -1855,8 +1900,15 @@ const YoungKidsPage = () => {
                     key={`${selectedPhraseFilter}-${pronunciationItems.length}`}
                     items={pronunciationItems}
                     onPhrasePracticed={async (phrase: string) => {
-                      const newAttempts = pronunciationAttempts + 1;
-                      setPronunciationAttempts(newAttempts);
+                      // Check if points were already awarded for this phrase
+                      const phrasePointsKey = `pronunciation_points_${userId}_${phrase}`;
+                      const pointsAlreadyAwarded = localStorage.getItem(phrasePointsKey) === 'true';
+                      
+                      // Only increment attempts if not already mastered
+                      if (!pointsAlreadyAwarded) {
+                        const newAttempts = pronunciationAttempts + 1;
+                        setPronunciationAttempts(newAttempts);
+                      }
 
                       const phraseDetail = enrolledStoryPhrasesDetailed.find(p => p.phrase === phrase);
                       const storyId = phraseDetail?.storyId;
@@ -1897,8 +1949,12 @@ const YoungKidsPage = () => {
                         console.error('Error saving pronunciation progress:', error);
                       }
 
-                      await awardEngagementPoints(30);
-                      await incrementStreakIfNeeded('pronunciation');
+                      // Only award points once per phrase
+                      if (!pointsAlreadyAwarded) {
+                        await awardEngagementPoints(30);
+                        localStorage.setItem(phrasePointsKey, 'true');
+                        await incrementStreakIfNeeded('pronunciation');
+                      }
                     }}
                   />
                 </div>
@@ -1982,8 +2038,7 @@ const YoungKidsPage = () => {
                   variant="secondary"
                   onClick={async () => {
                     handleCategoryClick('pronunciation');
-                    await awardEngagementPoints(5);
-                    await incrementStreakIfNeeded('quick-listen');
+                    setSearchParams({ section: 'pronunciation' }, { replace: true });
                   }}
                 >
                   Start practising
@@ -2005,9 +2060,8 @@ const YoungKidsPage = () => {
                 <Button
                   variant="secondary"
                   onClick={async () => {
-                    handleCategoryClick('pronunciation');
-                    await awardEngagementPoints(5);
-                    await incrementStreakIfNeeded('quick-speak');
+                    handleCategoryClick('vocabulary');
+                    setSearchParams({ section: 'vocabulary' }, { replace: true });
                   }}
                 >
                   Open studio

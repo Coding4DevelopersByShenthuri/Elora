@@ -602,7 +602,7 @@ const TechInnovatorAdventure = ({ onClose, onComplete }: Props) => {
                         <Volume2 className="w-4 h-4" />
                       </Button>
                     </h3>
-                    <p className="text-sm text-gray-700 dark:text-gray-200 leading-relaxed">{(current as any).revealText}</p>
+                    <p className="text-base md:text-lg lg:text-xl text-gray-700 dark:text-gray-200 leading-relaxed font-medium">{(current as any).revealText}</p>
                     <div className="mt-4 flex justify-center"><Button onClick={handleNext} className="bg-purple-500 hover:bg-purple-600 text-white rounded-xl px-8 py-3">Continue Adventure! 🚀</Button></div>
                   </div>
                 </div>
@@ -729,7 +729,7 @@ const TechInnovatorAdventure = ({ onClose, onComplete }: Props) => {
                 {(current as any).listeningFirst && listeningPhase === 'reveal' && (
                   <div className="bg-green-100/80 dark:bg-green-900/40 rounded-xl p-5 border-2 border-green-300 shadow-xl">
                     <h3 className="text-sm md:text-base font-bold mb-2 text-gray-800 dark:text-white">{current.title}</h3>
-                    <p className="text-xs md:text-sm text-gray-700 dark:text-gray-200 leading-relaxed px-2">{(current as any).revealText}</p>
+                    <p className="text-base md:text-lg lg:text-xl text-gray-700 dark:text-gray-200 leading-relaxed px-2 font-medium">{(current as any).revealText}</p>
                     <div className="mt-3 flex justify-center"><Button onClick={handleNext} className="bg-purple-500 hover:bg-purple-600 text-white rounded-xl px-5 md:px-6 py-2 md:py-2.5 text-sm md:text-base">Continue Adventure! 🚀</Button></div>
                   </div>
                 )}

@@ -734,7 +734,7 @@ const SpaceExplorerAdventure = ({ onClose, onComplete }: Props) => {
                         <Volume2 className="w-4 h-4" />
                   </Button>
                 </h3>
-                <p className="text-sm sm:text-base text-gray-700 dark:text-gray-200 leading-relaxed">
+                <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-700 dark:text-gray-200 leading-relaxed font-medium">
                   {current.id === 'celebrate' ? getCelebrationText() : (current.revealText || current.text)}
                 </p>
                 <div className="flex justify-center gap-3 mt-4 text-sm text-gray-500 dark:text-gray-400">
@@ -896,7 +896,7 @@ const SpaceExplorerAdventure = ({ onClose, onComplete }: Props) => {
                           <Volume2 className="w-4 h-4" />
                         </Button>
                       </h3>
-                      <p className="text-sm md:text-base text-gray-700 dark:text-gray-200 leading-relaxed px-2">
+                      <p className="text-base md:text-lg lg:text-xl text-gray-700 dark:text-gray-200 leading-relaxed px-2 font-medium">
                         {current.id === 'celebrate' ? getCelebrationText() : (current.revealText || current.text)}
                       </p>
                       <div className="flex justify-center gap-2 mt-2 text-xs text-gray-500 dark:text-gray-400">

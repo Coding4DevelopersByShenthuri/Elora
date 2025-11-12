@@ -537,7 +537,7 @@ const AIEthicsExplorerAdventure = ({ onClose, onComplete }: Props) => {
                         <Volume2 className="w-4 h-4" />
                       </Button>
                     </h3>
-                    <p className="text-sm text-gray-700 dark:text-gray-200 leading-relaxed">{(current as any).revealText}</p>
+                    <p className="text-base md:text-lg lg:text-xl text-gray-700 dark:text-gray-200 leading-relaxed font-medium">{(current as any).revealText}</p>
                     <div className="mt-4 flex justify-center"><Button onClick={handleNext} disabled={!canContinue} className={cn("bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl px-8 py-3", !canContinue && "opacity-60 cursor-not-allowed")}>Continue Mission! 🚀</Button></div>
                   </div>
                 </div>
@@ -669,7 +669,7 @@ const AIEthicsExplorerAdventure = ({ onClose, onComplete }: Props) => {
                         <Volume2 className="w-4 h-4" />
                       </Button>
                     </h3>
-                    <p className="text-xs md:text-sm text-gray-700 dark:text-gray-200 leading-relaxed px-2">{(current as any).revealText}</p>
+                    <p className="text-base md:text-lg lg:text-xl text-gray-700 dark:text-gray-200 leading-relaxed px-2 font-medium">{(current as any).revealText}</p>
                     <div className="mt-3 flex justify-center"><Button onClick={handleNext} disabled={!canContinue} className={cn("bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl px-5 md:px-6 py-2 md:py-2.5 text-sm md:text-base", !canContinue && "opacity-60 cursor-not-allowed")}>Continue Mission! 🚀</Button></div>
                   </div>
                 )}

@@ -1213,7 +1213,7 @@ const FairyGardenAdventure = ({ onClose, onComplete }: Props) => {
                         <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </Button>
                     </h3>
-                    <p className="text-sm sm:text-sm md:text-base lg:text-lg text-gray-700 dark:text-gray-200 leading-relaxed sm:leading-relaxed mx-auto max-w-3xl">
+                    <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-700 dark:text-gray-200 leading-relaxed sm:leading-relaxed mx-auto max-w-3xl font-medium">
                       {(current as any).revealText}
                     </p>
                     
@@ -1528,7 +1528,7 @@ const FairyGardenAdventure = ({ onClose, onComplete }: Props) => {
                           <Volume2 className="w-4 h-4" />
                         </Button>
                       </h3>
-                      <p className="text-xs md:text-sm text-gray-700 dark:text-gray-200 leading-relaxed px-2">
+                      <p className="text-base md:text-lg lg:text-xl text-gray-700 dark:text-gray-200 leading-relaxed px-2 font-medium">
                         {(current as any).revealText}
                       </p>
                       
