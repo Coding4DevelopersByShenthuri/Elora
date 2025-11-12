@@ -41,6 +41,7 @@ import { TransformersService } from '@/services/TransformersService';
 import { TimeTracker } from '@/services/TimeTracker';
 import EnhancedTTS from '@/services/EnhancedTTS';
 import { StoryDatasetService, type DatasetStory } from '@/services/StoryDatasetService';
+import { useRealTimeData } from '@/hooks/useRealTimeData';
 
 const YoungKidsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -392,12 +393,24 @@ const YoungKidsPage = () => {
         setServerAchievements([]);
       }
     })();
-
-    // Set up real-time polling for progress updates every 3 seconds
-    const progressInterval = setInterval(loadProgress, 3000);
-    
-    return () => clearInterval(progressInterval);
   }, [userId, isAuthenticated]);
+
+  // Real-time kids progress updates (5 second interval for active learning)
+  const { data: realTimeKidsProgress } = useRealTimeData('kids_progress', {
+    enabled: isAuthenticated && !!userId,
+    immediate: false, // Don't fetch immediately, use initial load above
+    interval: 5000, // 5 seconds for active learning page
+  });
+
+  // Update progress when real-time data arrives
+  useEffect(() => {
+    if (realTimeKidsProgress) {
+      const progress = realTimeKidsProgress as any;
+      if (progress.points !== undefined) setPoints(progress.points);
+      if (progress.streak !== undefined) setStreak(progress.streak);
+      // Update other fields as needed from realTimeKidsProgress
+    }
+  }, [realTimeKidsProgress]);
 
   // Load vocabulary words and phrases from enrolled stories
   useEffect(() => {

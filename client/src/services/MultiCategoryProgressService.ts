@@ -6,7 +6,31 @@
  * unified progress views.
  */
 
-import ApiService from './ApiService';
+// Import fetchWithAuth helper - we'll need to create a wrapper since it's not exported
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+
+const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
+  const token = localStorage.getItem('speakbee_auth_token');
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...((options.headers as Record<string, string>) || {}),
+  };
+
+  if (token && token !== 'local-token') {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
+    ...options,
+    headers,
+  });
+
+  if (!response.ok) {
+    throw new Error(`API request failed: ${response.statusText}`);
+  }
+
+  return response.json();
+};
 
 export type LearningCategory = 
   | 'young_kids' 
@@ -66,7 +90,7 @@ export interface CategoryProgressUpdate {
 
 class MultiCategoryProgressServiceClass {
   private cache: Map<string, { data: any; timestamp: number }> = new Map();
-  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+  private readonly CACHE_DURATION = 30 * 1000; // 30 seconds (reduced to ensure fresh practice time data)
 
   /**
    * Get progress for all categories
@@ -85,16 +109,18 @@ class MultiCategoryProgressServiceClass {
         return this.getLocalCategoriesProgress(userId);
       }
 
-      const response = await ApiService.get('/user/multi-category-progress/');
+      const response = await fetchWithAuth('user/multi-category-progress/');
       
       // Handle both array response and object with data property
       let data: CategoryProgress[];
-      if (Array.isArray(response.data)) {
+      if (Array.isArray(response)) {
+        data = response;
+      } else if (response.data && Array.isArray(response.data)) {
         data = response.data;
-      } else if (response.data && Array.isArray(response.data.data)) {
+      } else if (Array.isArray(response.data?.data)) {
         data = response.data.data;
       } else {
-        console.warn('Unexpected response format:', response.data);
+        console.warn('Unexpected response format:', response);
         data = [];
       }
       
@@ -140,8 +166,8 @@ class MultiCategoryProgressServiceClass {
         return this.getLocalCategoryProgress(userId, category);
       }
 
-      const response = await ApiService.get(`/user/multi-category-progress/${category}/`);
-      const data = response.data as CategoryProgress;
+      const response = await fetchWithAuth(`user/multi-category-progress/${category}/`);
+      const data = (response.data || response) as CategoryProgress;
       
       this.cache.set(cacheKey, {
         data,
@@ -178,16 +204,20 @@ class MultiCategoryProgressServiceClass {
         return this.getLocalAggregatedProgress(userId);
       }
 
-      const response = await ApiService.get('/user/multi-category-progress/aggregated/');
-      const data = response.data as AggregatedProgress;
+      const response = await fetchWithAuth('user/multi-category-progress/aggregated/', {
+        method: 'GET',
+      });
+      const data = response as AggregatedProgress;
       
-      // Log for debugging
-      console.log('Aggregated progress:', {
+      // Log for debugging - especially practice time
+      console.log('[MultiCategoryProgressService] Aggregated progress loaded:', {
         total_points: data.total_points,
         total_streak: data.total_streak,
+        total_practice_time: data.total_practice_time,
         categories_count: data.categories_count,
         categories: data.categories?.map(c => c.category_display) || []
       });
+      console.log('[MultiCategoryProgressService] Practice time source: PracticeSession table (actual recorded time)');
       
       this.cache.set(cacheKey, {
         data,
@@ -215,18 +245,25 @@ class MultiCategoryProgressServiceClass {
       // Update local storage immediately for instant feedback
       const localProgress = this.getLocalCategoryProgress(userId, category);
       const updatedLocal: CategoryProgress = {
-        ...localProgress,
+        category, // Ensure category is set
+        category_display: this.getCategoryDisplayName(category),
         total_points: (localProgress?.total_points || 0) + (update.points || 0),
         total_streak: Math.max(localProgress?.total_streak || 0, update.streak || 0),
         lessons_completed: (localProgress?.lessons_completed || 0) + (update.lessons || 0),
         practice_time_minutes: (localProgress?.practice_time_minutes || 0) + (update.time_minutes || 0),
+        average_score: localProgress?.average_score || 0,
+        last_activity: new Date().toISOString(),
+        last_activity_formatted: new Date().toISOString(),
+        first_access: localProgress?.first_access || new Date().toISOString(),
+        days_active: localProgress?.days_active || 0,
+        progress_percentage: localProgress?.progress_percentage || 0,
+        level: localProgress?.level || 1,
         stories_completed: (localProgress?.stories_completed || 0) + (update.stories_completed || 0),
         vocabulary_words: update.vocabulary_words ?? localProgress?.vocabulary_words ?? 0,
         pronunciation_attempts: (localProgress?.pronunciation_attempts || 0) + (update.pronunciation_attempts || 0),
         games_completed: (localProgress?.games_completed || 0) + (update.games_completed || 0),
-        last_activity: new Date().toISOString(),
-        last_activity_formatted: new Date().toISOString(),
-        category_display: this.getCategoryDisplayName(category),
+        details: localProgress?.details || {},
+        updated_at: new Date().toISOString(),
       };
 
       // Update local storage
@@ -247,11 +284,11 @@ class MultiCategoryProgressServiceClass {
       // Sync to server if online
       if (token && token !== 'local-token') {
         try {
-          const response = await ApiService.post(
-            `/user/multi-category-progress/${category}/update/`,
-            update
-          );
-          return response.data as CategoryProgress;
+          const response = await fetchWithAuth(`user/multi-category-progress/${category}/update/`, {
+            method: 'POST',
+            body: JSON.stringify(update),
+          });
+          return (response.data || response) as CategoryProgress;
         } catch (error) {
           console.error('Error syncing category progress to server:', error);
           // Continue with local update even if server sync fails

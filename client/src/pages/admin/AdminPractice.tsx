@@ -15,14 +15,9 @@ import {
   AlertCircle,
   Eye,
   Clock,
-  TrendingUp,
   Users,
   Award,
-  Activity,
-  BarChart3,
-  Calendar,
-  Filter,
-  Download
+  Activity
 } from 'lucide-react';
 import AdminAPI from '@/services/AdminApiService';
 import { useToast } from '@/hooks/use-toast';
@@ -95,7 +90,28 @@ export default function AdminPractice() {
   const [sessionTypeFilter, setSessionTypeFilter] = useState('');
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState<any>(null);
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<any>({
+    overall: {
+      total_sessions: 0,
+      total_time_minutes: 0,
+      total_time_hours: 0,
+      avg_score: 0,
+      avg_duration_minutes: 0,
+    },
+    recent: {
+      sessions_last_7: 0,
+      sessions_last_30: 0,
+      time_last_7_minutes: 0,
+      time_last_7_hours: 0,
+      time_last_30_minutes: 0,
+      time_last_30_hours: 0,
+      active_users_7: 0,
+      active_users_30: 0,
+    },
+    type_distribution: [],
+    daily_stats: [],
+    active_users: [],
+  });
   const [selectedSession, setSelectedSession] = useState<any>(null);
   const [showDetailDialog, setShowDetailDialog] = useState(false);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
@@ -111,6 +127,14 @@ export default function AdminPractice() {
       }
       setError(null);
       
+      console.log('[AdminPractice] Loading sessions with params:', {
+        search: debouncedSearch,
+        page,
+        page_size: 20,
+        session_type: sessionTypeFilter || undefined,
+      });
+      
+      console.log('[AdminPractice] Calling AdminAPI.getPracticeSessions...');
       const response = await AdminAPI.getPracticeSessions({
         search: debouncedSearch,
         page,
@@ -118,12 +142,33 @@ export default function AdminPractice() {
         session_type: sessionTypeFilter || undefined,
       });
 
+      console.log('[AdminPractice] Full Response:', JSON.stringify(response, null, 2));
+
       if (response.success) {
         const data = response.data;
-        setSessions(data.sessions || []);
-        setPagination(data.pagination || null);
+        console.log('[AdminPractice] Data received:', {
+          sessionsCount: data.sessions?.length || 0,
+          pagination: data.pagination,
+          sessions: data.sessions,
+          fullData: data,
+        });
+        
+        // Handle both direct response and nested data structure
+        const sessions = data.sessions || data?.data?.sessions || [];
+        const pagination = data.pagination || data?.data?.pagination || null;
+        
+        setSessions(sessions);
+        setPagination(pagination);
+        
+        if (sessions.length === 0) {
+          console.log('[AdminPractice] No sessions found. This could mean:');
+          console.log('1. No practice sessions exist in the database');
+          console.log('2. User is not authenticated as admin');
+          console.log('3. API returned empty result');
+        }
       } else {
         const errorMessage = response.message || 'Failed to load practice sessions';
+        console.error('[AdminPractice] Error response:', response);
         if (!silent) {
           setError(errorMessage);
           toast({
@@ -135,6 +180,12 @@ export default function AdminPractice() {
       }
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message || error?.message || 'An error occurred while loading practice sessions';
+      console.error('[AdminPractice] Exception:', error);
+      console.error('[AdminPractice] Error details:', {
+        message: errorMessage,
+        status: error?.response?.status,
+        data: error?.response?.data,
+      });
       if (!silent) {
         setError(errorMessage);
         toast({
@@ -153,34 +204,120 @@ export default function AdminPractice() {
   const loadStats = useCallback(async () => {
     try {
       setStatsLoading(true);
+      console.log('[AdminPractice] Loading stats...');
+      console.log('[AdminPractice] Calling AdminAPI.getPracticeStats...');
       const response = await AdminAPI.getPracticeStats();
-      if (response.success) {
-        setStats(response.data);
+      console.log('[AdminPractice] Stats response:', JSON.stringify(response, null, 2));
+      if (response.success && response.data) {
+        console.log('[AdminPractice] Stats data:', response.data);
+        // Ensure we have the proper structure even if some fields are missing
+        const statsData = {
+          overall: {
+            total_sessions: response.data.overall?.total_sessions || 0,
+            total_time_minutes: response.data.overall?.total_time_minutes || 0,
+            total_time_hours: response.data.overall?.total_time_hours || 0,
+            avg_score: response.data.overall?.avg_score || 0,
+            avg_duration_minutes: response.data.overall?.avg_duration_minutes || 0,
+          },
+          recent: {
+            sessions_last_7: response.data.recent?.sessions_last_7 || 0,
+            sessions_last_30: response.data.recent?.sessions_last_30 || 0,
+            time_last_7_minutes: response.data.recent?.time_last_7_minutes || 0,
+            time_last_7_hours: response.data.recent?.time_last_7_hours || 0,
+            time_last_30_minutes: response.data.recent?.time_last_30_minutes || 0,
+            time_last_30_hours: response.data.recent?.time_last_30_hours || 0,
+            active_users_7: response.data.recent?.active_users_7 || 0,
+            active_users_30: response.data.recent?.active_users_30 || 0,
+          },
+          type_distribution: response.data.type_distribution || [],
+          daily_stats: response.data.daily_stats || [],
+          active_users: response.data.active_users || [],
+        };
+        setStats(statsData);
+      } else {
+        console.error('[AdminPractice] Stats error:', response.message);
+        // Set default empty stats structure
+        setStats({
+          overall: {
+            total_sessions: 0,
+            total_time_minutes: 0,
+            total_time_hours: 0,
+            avg_score: 0,
+            avg_duration_minutes: 0,
+          },
+          recent: {
+            sessions_last_7: 0,
+            sessions_last_30: 0,
+            time_last_7_minutes: 0,
+            time_last_7_hours: 0,
+            time_last_30_minutes: 0,
+            time_last_30_hours: 0,
+            active_users_7: 0,
+            active_users_30: 0,
+          },
+          type_distribution: [],
+          daily_stats: [],
+          active_users: [],
+        });
       }
     } catch (error: any) {
-      console.error('Failed to load stats:', error);
+      console.error('[AdminPractice] Stats exception:', error);
+      console.error('[AdminPractice] Stats error details:', {
+        message: error?.response?.data?.message || error?.message,
+        status: error?.response?.status,
+        data: error?.response?.data,
+      });
+      // Set default empty stats structure on error
+      setStats({
+        overall: {
+          total_sessions: 0,
+          total_time_minutes: 0,
+          total_time_hours: 0,
+          avg_score: 0,
+          avg_duration_minutes: 0,
+        },
+        recent: {
+          sessions_last_7: 0,
+          sessions_last_30: 0,
+          time_last_7_minutes: 0,
+          time_last_7_hours: 0,
+          time_last_30_minutes: 0,
+          time_last_30_hours: 0,
+          active_users_7: 0,
+          active_users_30: 0,
+        },
+        type_distribution: [],
+        daily_stats: [],
+      });
     } finally {
       setStatsLoading(false);
     }
   }, []);
 
   useEffect(() => {
+    console.log('[AdminPractice] Component mounted, loading data...');
     loadSessions();
   }, [loadSessions]);
 
   useEffect(() => {
+    console.log('[AdminPractice] Loading stats...');
     loadStats();
   }, [loadStats]);
 
   // Auto-refresh every 30 seconds for real-time data
   useEffect(() => {
+    console.log('[AdminPractice] Setting up auto-refresh interval (30s)');
     const refreshInterval = setInterval(() => {
+      console.log('[AdminPractice] Auto-refreshing data...');
       loadSessions(true);
       loadStats();
     }, 30000); // 30 seconds
     
-    return () => clearInterval(refreshInterval);
-  }, [search, sessionTypeFilter, page]);
+    return () => {
+      console.log('[AdminPractice] Cleaning up auto-refresh interval');
+      clearInterval(refreshInterval);
+    };
+  }, [loadSessions, loadStats]); // Use the callback functions directly
 
   const handleViewSession = async (sessionId: number) => {
     setActionLoading(sessionId);
@@ -248,7 +385,7 @@ export default function AdminPractice() {
               <Skeleton key={i} className="h-32" />
             ))}
           </div>
-        ) : stats && (
+        ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -256,9 +393,9 @@ export default function AdminPractice() {
                 <Activity className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.overall?.total_sessions?.toLocaleString() || 0}</div>
+                <div className="text-2xl font-bold">{(stats?.overall?.total_sessions ?? 0).toLocaleString()}</div>
                 <p className="text-xs text-muted-foreground">
-                  {stats.recent?.sessions_last_30 || 0} in last 30 days
+                  {stats?.recent?.sessions_last_30 ?? 0} in last 30 days
                 </p>
               </CardContent>
             </Card>
@@ -268,9 +405,9 @@ export default function AdminPractice() {
                 <Clock className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.overall?.total_time_hours?.toFixed(1) || 0}h</div>
+                <div className="text-2xl font-bold">{((stats?.overall?.total_time_hours ?? 0) as number).toFixed(1)}h</div>
                 <p className="text-xs text-muted-foreground">
-                  {stats.recent?.time_last_30_hours?.toFixed(1) || 0}h in last 30 days
+                  {((stats?.recent?.time_last_30_hours ?? 0) as number).toFixed(1)}h in last 30 days
                 </p>
               </CardContent>
             </Card>
@@ -280,9 +417,9 @@ export default function AdminPractice() {
                 <Award className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.overall?.avg_score?.toFixed(1) || 0}%</div>
+                <div className="text-2xl font-bold">{((stats?.overall?.avg_score ?? 0) as number).toFixed(1)}%</div>
                 <p className="text-xs text-muted-foreground">
-                  Avg duration: {stats.overall?.avg_duration_minutes?.toFixed(1) || 0}m
+                  Avg duration: {((stats?.overall?.avg_duration_minutes ?? 0) as number).toFixed(1)}m
                 </p>
               </CardContent>
             </Card>
@@ -292,9 +429,9 @@ export default function AdminPractice() {
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.recent?.active_users_30 || 0}</div>
+                <div className="text-2xl font-bold">{stats?.recent?.active_users_30 ?? 0}</div>
                 <p className="text-xs text-muted-foreground">
-                  {stats.recent?.active_users_7 || 0} in last 7 days
+                  {stats?.recent?.active_users_7 ?? 0} in last 7 days
                 </p>
               </CardContent>
             </Card>
@@ -321,6 +458,125 @@ export default function AdminPractice() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Active Users Section */}
+        {stats && stats.active_users && stats.active_users.length > 0 && (
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Active Users</CardTitle>
+                  <CardDescription>
+                    All users with practice sessions ({stats.active_users.length} total)
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>User</TableHead>
+                      <TableHead>Profile</TableHead>
+                      <TableHead>Total Sessions</TableHead>
+                      <TableHead>Practice Time</TableHead>
+                      <TableHead>Average Score</TableHead>
+                      <TableHead>Last 30 Days</TableHead>
+                      <TableHead>Last Session</TableHead>
+                      <TableHead>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {stats.active_users.map((user: any) => (
+                      <TableRow key={user.id}>
+                        <TableCell className="font-medium">
+                          <div className="flex flex-col">
+                            <span>{user.name || user.username}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {user.email}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              @{user.username}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-col gap-1 text-xs">
+                            {user.profile?.level && (
+                              <Badge variant="outline" className="w-fit capitalize">
+                                {user.profile.level}
+                              </Badge>
+                            )}
+                            {user.profile?.age_range && (
+                              <span className="text-muted-foreground">
+                                Age: {user.profile.age_range}
+                              </span>
+                            )}
+                            {user.profile?.points !== undefined && (
+                              <span className="text-muted-foreground">
+                                {user.profile.points} pts
+                              </span>
+                            )}
+                            {user.profile?.current_streak > 0 && (
+                              <span className="text-orange-600 dark:text-orange-400">
+                                🔥 {user.profile.current_streak} day streak
+                              </span>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="font-semibold">
+                            {user.practice_stats?.total_sessions || 0}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1 text-sm">
+                            <Clock className="h-3 w-3 text-muted-foreground" />
+                            {((user.practice_stats?.total_time_hours ?? 0) as number).toFixed(1)}h
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            ({user.practice_stats?.total_time_minutes || 0} min)
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <span className={cn('font-semibold', getScoreColor(user.practice_stats?.avg_score || 0))}>
+                            {((user.practice_stats?.avg_score ?? 0) as number).toFixed(1)}%
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-col text-sm">
+                            <span>{user.practice_stats?.sessions_last_30 || 0} sessions</span>
+                            <span className="text-xs text-muted-foreground">
+                              {((user.practice_stats?.time_last_30_hours ?? 0) as number).toFixed(1)}h
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm">
+                            {user.last_session_date ? formatDate(user.last_session_date) : 'Never'}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge 
+                            variant={user.is_active ? "default" : "secondary"}
+                            className={cn(
+                              user.is_active 
+                                ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400"
+                                : "bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400"
+                            )}
+                          >
+                            {user.is_active ? 'Active' : 'Inactive'}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             </CardContent>
           </Card>
@@ -371,17 +627,46 @@ export default function AdminPractice() {
         {error && (
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription className="flex items-center justify-between">
+            <AlertDescription className="flex flex-col gap-2">
+              <span className="font-semibold">Error loading practice sessions:</span>
               <span>{error}</span>
-              <div className="flex gap-2 mt-2 sm:mt-0">
+              <div className="flex gap-2 mt-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={loadSessions}
+                  onClick={() => loadSessions()}
                 >
                   <RefreshCw className="h-4 w-4 mr-2" />
                   Retry
                 </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    console.log('=== DEBUG INFO ===');
+                    console.log('Current user token:', localStorage.getItem('speakbee_auth_token')?.substring(0, 20) + '...');
+                    console.log('Is admin:', localStorage.getItem('speakbee_is_admin'));
+                    console.log('API Base URL:', import.meta.env.VITE_API_URL || 'http://localhost:8000/api');
+                  }}
+                >
+                  Debug Info
+                </Button>
+              </div>
+            </AlertDescription>
+          </Alert>
+        )}
+        
+        {/* Debug Info - Show in development */}
+        {import.meta.env.DEV && (
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              <div className="text-xs space-y-1">
+                <div><strong>API URL:</strong> {import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}</div>
+                <div><strong>Has Token:</strong> {localStorage.getItem('speakbee_auth_token') ? 'Yes' : 'No'}</div>
+                <div><strong>Is Admin:</strong> {localStorage.getItem('speakbee_is_admin') || 'Unknown'}</div>
+                <div><strong>Total Sessions:</strong> {pagination?.total ?? 'Loading...'}</div>
+                <div><strong>Stats Loaded:</strong> {stats ? 'Yes' : 'No'}</div>
               </div>
             </AlertDescription>
           </Alert>

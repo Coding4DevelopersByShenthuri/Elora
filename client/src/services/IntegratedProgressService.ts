@@ -108,15 +108,18 @@ class IntegratedProgressServiceClass {
   }
 
   /**
-   * Record practice session (hybrid)
+   * Record practice session (hybrid) - saves to MySQL via API
    */
   async recordPracticeSession(
     userId: string,
     sessionData: {
-      type: 'pronunciation' | 'conversation' | 'vocabulary' | 'grammar';
+      type: 'pronunciation' | 'conversation' | 'vocabulary' | 'grammar' | 'listening' | 'reading' | 'exam_practice';
       lessonId?: string;
       duration: number;
       score: number;
+      words_practiced?: number;
+      sentences_practiced?: number;
+      mistakes_count?: number;
       details?: any;
     }
   ): Promise<{ success: boolean; message?: string }> {
@@ -133,23 +136,39 @@ class IntegratedProgressServiceClass {
       
       await userDataService.savePracticeSession(session);
 
-      // If online, save to server (non-blocking)
+      // If online, save to server (MySQL) - this is important for admin portal
       if (this.isOnline) {
         const token = localStorage.getItem('speakbee_auth_token');
         const serverEnabled = import.meta.env.VITE_ENABLE_SERVER_AUTH !== 'false';
         if (serverEnabled && token && token !== 'local-token') {
-          // Async save to server - don't wait or fail on error
+          // Calculate points
           const points = Math.round(sessionData.score / 10);
-          API.progress.recordPractice({
+          
+          // Prepare complete session data for MySQL
+          const practiceData = {
             session_type: sessionData.type,
             lesson: sessionData.lessonId ? parseInt(sessionData.lessonId) : undefined,
             duration_minutes: sessionData.duration,
             score: sessionData.score,
             points_earned: points,
-            details: sessionData.details
-          }).catch(error => {
-            console.log('Server save queued for later sync:', error);
-          });
+            words_practiced: sessionData.words_practiced || 0,
+            sentences_practiced: sessionData.sentences_practiced || 0,
+            mistakes_count: sessionData.mistakes_count || 0,
+            details: sessionData.details || {}
+          };
+          
+          // Save to server (MySQL) - await to ensure it's saved
+          try {
+            const result = await API.progress.recordPractice(practiceData);
+            if (result.success) {
+              console.log('Practice session saved to MySQL successfully');
+            } else {
+              console.warn('Practice session save to MySQL failed:', result.message);
+            }
+          } catch (error) {
+            console.error('Error saving practice session to MySQL:', error);
+            // Don't fail the whole operation, but log the error
+          }
         }
       }
 

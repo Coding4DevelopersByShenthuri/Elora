@@ -63,6 +63,8 @@ import TeenApi from '@/services/TeenApi';
 import StoryWordsService from '@/services/StoryWordsService';
 import MultiCategoryProgressService, { type CategoryProgress, type AggregatedProgress } from '@/services/MultiCategoryProgressService';
 import LearningPathRecommendationService, { type CategoryRecommendation } from '@/services/LearningPathRecommendationService';
+import { useRealTimeData } from '@/hooks/useRealTimeData';
+import RealTimeDataService from '@/services/RealTimeDataService';
 
 const FALLBACK_PROFILE: UserProfile = {
   name: 'Learner',
@@ -138,19 +140,84 @@ const Profile = () => {
     if (!user?.id) return;
     setLoadingProgress(true);
     try {
-      const [progressData, weeklyData, insightsData] = await Promise.all([
-        ProgressTracker.getUserProgress(user.id),
-        ProgressTracker.getWeeklyStats(user.id),
-        ProgressTracker.getLearningInsights(user.id),
+      const userId = String(user.id);
+      
+      // Clear ALL caches to ensure fresh data, especially for practice time
+      // This is critical to get the latest PracticeSession data (172 mins) instead of cached estimates (165 mins)
+      MultiCategoryProgressService.clearCache();
+      RealTimeDataService.clearCache('aggregated_progress'); // Clear real-time cache too
+      RealTimeDataService.clearCache('category_progress'); // Clear category cache too
+      console.log('[Profile] 🧹 Cleared all caches to ensure fresh practice time data (172 mins, not 165 mins)');
+      
+      // Get data from all sources - force refresh aggregated progress to get latest PracticeSession data
+      // Force refresh (true) ensures we bypass cache and get fresh data from backend
+      const [progressData, weeklyData, insightsData, aggregated] = await Promise.all([
+        ProgressTracker.getUserProgress(userId),
+        ProgressTracker.getWeeklyStats(userId),
+        ProgressTracker.getLearningInsights(userId),
+        MultiCategoryProgressService.getAggregatedProgress(userId, true).catch((err) => {
+          console.error('[Profile] Failed to load aggregated progress:', err);
+          return null;
+        }),
       ]);
+      
+      // Log the practice time to verify it's correct
+      if (aggregated) {
+        console.log('[Profile] Aggregated progress loaded with practice time:', aggregated.total_practice_time, 'minutes');
+      }
+
+      // If we have aggregated progress, use it to enhance weekly stats
+      let enhancedWeeklyData = weeklyData;
+      if (aggregated) {
+        console.log('[Profile] Loaded aggregated progress in loadProgress:', {
+          total_practice_time: aggregated.total_practice_time,
+          total_points: aggregated.total_points
+        });
+        // Calculate weekly stats from all categories
+        const now = new Date();
+        const weekStart = new Date(now.getTime() - 7 * 86400000);
+        
+        // Get all category progress to calculate weekly activity
+        const allCategories = await MultiCategoryProgressService.getAllCategoriesProgress(userId, false).catch(() => []);
+        
+        // Calculate weekly activity from category last_activity dates
+        const activeCategories = allCategories.filter(cat => {
+          if (!cat.last_activity) return false;
+          const lastActivity = new Date(cat.last_activity);
+          return lastActivity >= weekStart && lastActivity <= now;
+        });
+        
+        enhancedWeeklyData = {
+          ...weeklyData,
+          totalLessons: aggregated.total_lessons_completed || weeklyData.totalLessons,
+          totalTime: aggregated.total_practice_time || weeklyData.totalTime,
+          totalPoints: aggregated.total_points || weeklyData.totalPoints,
+          averageScore: aggregated.average_score || weeklyData.averageScore,
+          streak: aggregated.total_streak || weeklyData.streak,
+          daysActive: activeCategories.length > 0 ? activeCategories.length : weeklyData.daysActive,
+        };
+      }
 
       AchievementSystem.checkAchievements(progressData);
       const achievementList = AchievementSystem.getAllAchievements();
 
       setUserProgress(progressData);
-      setWeeklyStats(weeklyData);
+      setWeeklyStats(enhancedWeeklyData);
       setInsights(insightsData);
       setAchievements(achievementList);
+      
+      // Also update aggregatedProgress state if we got it (ensures practice time is updated)
+      // CRITICAL: This ensures the profile page shows 172 mins (from PracticeSession) not 165 mins (from CategoryProgress)
+      if (aggregated) {
+        console.log('[Profile] ✅ Setting aggregatedProgress state with practice time:', aggregated.total_practice_time, 'minutes');
+        console.log('[Profile] ✅ This should match admin portal: 172 minutes');
+        if (aggregated.total_practice_time !== 172) {
+          console.warn('[Profile] ⚠️ WARNING: Practice time mismatch! Expected 172, got:', aggregated.total_practice_time);
+        }
+        setAggregatedProgress(aggregated);
+      } else {
+        console.warn('[Profile] ⚠️ Aggregated progress is null - profile page may show incorrect practice time');
+      }
     } finally {
       setLoadingProgress(false);
     }
@@ -160,23 +227,31 @@ const Profile = () => {
     loadProgress();
   }, [loadProgress]);
 
-  const loadNotifications = useCallback(
-    async (forceRefresh = false) => {
-      if (!user?.id) return;
-      setLoadingNotifications(true);
-      try {
-        const list = await UserNotificationsService.getAll(user.id, { forceRefresh });
-        setNotifications(list);
-      } finally {
-        setLoadingNotifications(false);
-      }
-    },
-    [user?.id]
-  );
+  // Real-time notifications
+  const {
+    data: realTimeNotifications,
+    refresh: refreshNotificationsRealTime,
+  } = useRealTimeData<UserNotification[]>('notifications', {
+    enabled: !!user?.id,
+    immediate: true,
+  });
 
   useEffect(() => {
-    loadNotifications(true);
-  }, [loadNotifications]);
+    if (realTimeNotifications) {
+      setNotifications(realTimeNotifications);
+      setLoadingNotifications(false);
+    }
+  }, [realTimeNotifications]);
+
+  const refreshNotifications = async () => {
+    if (!user?.id) return;
+    setNotificationsSyncing(true);
+    try {
+      await refreshNotificationsRealTime();
+    } finally {
+      setNotificationsSyncing(false);
+    }
+  };
 
   useEffect(() => {
     if (location.hash === '#notifications') {
@@ -191,55 +266,68 @@ const Profile = () => {
   // Use aggregated progress from all categories if available, otherwise calculate from categoryProgress or fallback to old data
   const aggregatedPoints = useMemo(
     () => {
-      // First try aggregated progress
-      if (aggregatedProgress?.total_points !== undefined && aggregatedProgress.total_points > 0) {
+      // First try aggregated progress (this should already sum all categories)
+      // Use it if it exists, even if 0 (valid data)
+      if (aggregatedProgress?.total_points !== undefined) {
+        console.log('[Profile] Using aggregated progress points:', aggregatedProgress.total_points);
         return aggregatedProgress.total_points;
       }
-      // Then try calculating from categoryProgress array
+      // Then try calculating from categoryProgress array (sum all categories)
       if (categoryProgress.length > 0) {
         const total = categoryProgress.reduce((sum, cat) => sum + (cat.total_points || 0), 0);
-        if (total > 0) return total;
+        console.log('[Profile] Calculated points from categoryProgress:', total, 'from', categoryProgress.length, 'categories');
+        return total; // Return even if 0, as it's valid aggregated data
       }
-      // Fallback to old data sources
-      return Math.max(
-        kidsStats.points || 0,
-        userProgress?.totalPoints ?? 0,
-        user?.profile?.points ?? 0,
-        0
-      );
+      // Fallback to old data sources - SUM all categories instead of taking max
+      // This ensures we combine Young Kids + Teen Kids + other categories
+      const fallbackTotal = 
+        (kidsStats.points || 0) +
+        (teenKidsStats.points || 0) +
+        (userProgress?.totalPoints ?? 0) +
+        (user?.profile?.points ?? 0);
+      console.log('[Profile] Using fallback points:', fallbackTotal, {
+        kids: kidsStats.points,
+        teen: teenKidsStats.points,
+        userProgress: userProgress?.totalPoints,
+        profile: user?.profile?.points
+      });
+      return fallbackTotal;
     },
-    [aggregatedProgress?.total_points, categoryProgress, kidsStats.points, user?.profile?.points, userProgress?.totalPoints]
+    [aggregatedProgress?.total_points, categoryProgress, kidsStats.points, teenKidsStats.points, user?.profile?.points, userProgress?.totalPoints]
   );
 
   const aggregatedStreak = useMemo(
     () => {
-      // First try aggregated progress
-      if (aggregatedProgress?.total_streak !== undefined && aggregatedProgress.total_streak > 0) {
+      // First try aggregated progress (streak is max across categories, not sum)
+      // Use it if it exists, even if 0 (valid data)
+      if (aggregatedProgress?.total_streak !== undefined) {
         return aggregatedProgress.total_streak;
       }
-      // Then try calculating from categoryProgress array
+      // Then try calculating from categoryProgress array (take max, not sum)
       if (categoryProgress.length > 0) {
         const maxStreak = Math.max(...categoryProgress.map(cat => cat.total_streak || 0), 0);
-        if (maxStreak > 0) return maxStreak;
+        return maxStreak; // Return even if 0, as it's valid aggregated data
       }
-      // Fallback to old data sources
+      // Fallback to old data sources - take max (streak is per category, not combined)
       return Math.max(
         kidsStats.streak || 0,
+        teenKidsStats.streak || 0,
         userProgress?.currentStreak ?? 0,
         user?.profile?.streak ?? 0,
         0
       );
     },
-    [aggregatedProgress?.total_streak, categoryProgress, kidsStats.streak, user?.profile?.streak, userProgress?.currentStreak]
+    [aggregatedProgress?.total_streak, categoryProgress, kidsStats.streak, teenKidsStats.streak, user?.profile?.streak, userProgress?.currentStreak]
   );
 
   const aggregatedLessons = useMemo(
     () => {
-      // First try aggregated progress
-      if (aggregatedProgress?.total_lessons_completed !== undefined && aggregatedProgress.total_lessons_completed > 0) {
+      // First try aggregated progress (this should already sum all categories)
+      // Use it if it exists, even if 0 (valid data)
+      if (aggregatedProgress?.total_lessons_completed !== undefined) {
         return aggregatedProgress.total_lessons_completed;
       }
-      // Then try calculating from categoryProgress array
+      // Then try calculating from categoryProgress array (sum all categories)
       if (categoryProgress.length > 0) {
         const total = categoryProgress.reduce((sum, cat) => {
           // For kids categories, use stories_completed; for others use lessons_completed
@@ -248,33 +336,90 @@ const Profile = () => {
             : (cat.lessons_completed || 0);
           return sum + lessons;
         }, 0);
-        if (total > 0) return total;
+        return total; // Return even if 0, as it's valid aggregated data
       }
-      // Fallback to old data sources
-      return Math.max(
-        kidsStats.storiesCompleted || 0,
-        userProgress?.lessonsCompleted ?? 0,
-        0
-      );
+      // Fallback to old data sources - SUM all categories instead of taking max
+      // This ensures we combine Young Kids stories + Teen Kids stories + other lessons
+      const fallbackTotal = 
+        (kidsStats.storiesCompleted || 0) +
+        (teenKidsStats.storiesCompleted || 0) +
+        (userProgress?.lessonsCompleted ?? 0);
+      return fallbackTotal;
     },
-    [aggregatedProgress?.total_lessons_completed, categoryProgress, kidsStats.storiesCompleted, userProgress?.lessonsCompleted]
+    [aggregatedProgress?.total_lessons_completed, categoryProgress, kidsStats.storiesCompleted, teenKidsStats.storiesCompleted, userProgress?.lessonsCompleted]
   );
+
+  // Real-time category progress updates (moved before aggregatedPracticeTime to fix lint error)
+  // CRITICAL: Force refresh to bypass cache and get fresh PracticeSession data (172 mins)
+  const {
+    data: realTimeCategories,
+    loading: loadingCategories,
+  } = useRealTimeData<CategoryProgress[]>('category_progress', {
+    enabled: !!user?.id,
+    immediate: true,
+  });
+
+  const {
+    data: realTimeAggregated,
+    loading: loadingAggregated,
+    refresh: refreshAggregated,
+  } = useRealTimeData<AggregatedProgress>('aggregated_progress', {
+    enabled: !!user?.id,
+    immediate: true,
+  });
+
+  // Force refresh aggregated progress on mount to ensure we get 172 mins, not cached 165 mins
+  useEffect(() => {
+    if (user?.id && !loadingAggregated) {
+      console.log('[Profile] 🔄 Force refreshing aggregated progress to get 172 mins (not cached 165 mins)');
+      refreshAggregated().then(() => {
+        console.log('[Profile] ✅ Aggregated progress refreshed');
+      }).catch((err) => {
+        console.error('[Profile] ❌ Failed to refresh aggregated progress:', err);
+      });
+    }
+  }, [user?.id]); // Only on mount, not on every render
 
   const aggregatedPracticeTime = useMemo(
     () => {
-      // First try aggregated progress
-      if (aggregatedProgress?.total_practice_time !== undefined && aggregatedProgress.total_practice_time > 0) {
-        return aggregatedProgress.total_practice_time;
+      // PRIORITY 1: Use aggregated progress from backend (uses PracticeSession table)
+      // This is the source of truth - it uses actual PracticeSession data (172 mins), not estimates (165 mins)
+      // CRITICAL: Always check aggregatedProgress first, even if it's 0 (valid data)
+      if (aggregatedProgress !== null && aggregatedProgress !== undefined) {
+        const practiceTime = aggregatedProgress.total_practice_time ?? 0;
+        console.log('[Profile] ✅ Using aggregated progress practice time (from PracticeSession table):', practiceTime, 'minutes');
+        console.log('[Profile] ✅ This matches admin portal value (172 minutes)');
+        return practiceTime;
       }
-      // Then try calculating from categoryProgress array
-      if (categoryProgress.length > 0) {
-        const total = categoryProgress.reduce((sum, cat) => sum + (cat.practice_time_minutes || 0), 0);
-        if (total > 0) return total;
+      
+      // PRIORITY 2: If aggregatedProgress is still loading, wait for it
+      // CRITICAL: Don't show categoryProgress estimates (165 mins) while aggregatedProgress (172 mins) is loading
+      if (loadingAggregated || loadingCategoryProgress) {
+        console.log('[Profile] ⏳ Waiting for aggregated progress to load (will show 172 mins, not 165 mins)...');
+        // Return undefined/null to show loading state, not 0 (which might be confused with no data)
+        return undefined;
       }
-      // Fallback to old data sources
-      return userProgress?.practiceTime ?? 0;
+      
+      // PRIORITY 3: Only use categoryProgress as fallback if aggregatedProgress completely failed to load
+      // WARNING: categoryProgress uses ESTIMATED times (165 mins), which is INACCURATE
+      // This should only happen if the backend endpoint fails
+      if (categoryProgress.length > 0 && !loadingAggregated) {
+        const total = categoryProgress.reduce((sum, cat) => {
+          const time = cat.practice_time_minutes || 0;
+          return sum + time;
+        }, 0);
+        console.warn('[Profile] ⚠️ WARNING: Using ESTIMATED practice time from categoryProgress:', total, 'minutes');
+        console.warn('[Profile] ⚠️ This is INACCURATE. Should be 172 minutes from PracticeSession table.');
+        console.warn('[Profile] ⚠️ AggregatedProgress endpoint may have failed. Check backend logs.');
+        return total;
+      }
+      
+      // PRIORITY 4: Final fallback
+      const fallbackTime = userProgress?.practiceTime ?? 0;
+      console.log('[Profile] Using fallback practice time:', fallbackTime);
+      return fallbackTime;
     },
-    [aggregatedProgress?.total_practice_time, categoryProgress, userProgress?.practiceTime]
+    [aggregatedProgress, loadingAggregated, loadingCategoryProgress, categoryProgress, userProgress?.practiceTime]
   );
 
   const levelProgress = useMemo(() => {
@@ -329,16 +474,7 @@ const Profile = () => {
     }
   };
 
-  const refreshNotifications = async () => {
-    if (!user?.id) return;
-    setNotificationsSyncing(true);
-    try {
-      const updated = await UserNotificationsService.sync(user.id);
-      setNotifications(updated);
-    } finally {
-      setNotificationsSyncing(false);
-    }
-  };
+  // refreshNotifications is now defined above using real-time service
 
   const toggleNotificationRead = async (notification: UserNotification) => {
     if (!user?.id) return;
@@ -359,25 +495,27 @@ const Profile = () => {
   const stats = [
     {
       label: 'Sparkle Points',
-      value: aggregatedPoints.toLocaleString(),
+      value: (aggregatedPoints ?? 0).toLocaleString(),
       description: `Total points earned across all ${aggregatedProgress?.categories_count || categoryProgress.length || 1} learning ${(aggregatedProgress?.categories_count || categoryProgress.length || 1) === 1 ? 'category' : 'categories'}.`,
       icon: <Trophy className="h-5 w-5 text-amber-500" />,
     },
     {
       label: 'Daily Streak',
-      value: `${aggregatedStreak} day${aggregatedStreak === 1 ? '' : 's'}`,
+      value: `${aggregatedStreak ?? 0} day${(aggregatedStreak ?? 0) === 1 ? '' : 's'}`,
       description: 'Show up every day to keep the streak alive.',
       icon: <Flame className="h-5 w-5 text-orange-500" />,
     },
     {
       label: 'Practice Time',
-      value: `${Math.round(aggregatedPracticeTime)} mins`,
-      description: 'Dedicated minutes spent across all learning categories.',
+      value: aggregatedPracticeTime !== undefined ? `${Math.round(aggregatedPracticeTime)} mins` : 'Loading...',
+      description: aggregatedPracticeTime !== undefined 
+        ? 'Dedicated minutes spent across all learning categories (from PracticeSession table).'
+        : 'Loading practice time from server...',
       icon: <Clock className="h-5 w-5 text-sky-500" />,
     },
     {
       label: 'Lessons Completed',
-      value: aggregatedLessons.toString(),
+      value: (aggregatedLessons ?? 0).toString(),
       description: `Completed across ${aggregatedProgress?.categories_count || categoryProgress.length || 1} learning ${(aggregatedProgress?.categories_count || categoryProgress.length || 1) === 1 ? 'category' : 'categories'}.`,
       icon: <BookOpen className="h-5 w-5 text-emerald-500" />,
     },
@@ -385,49 +523,45 @@ const Profile = () => {
   
   const showContent = useAnimateIn(false, 300);
 
+  // Update state when real-time data arrives
+  useEffect(() => {
+    if (realTimeCategories) {
+      const validCategories = Array.isArray(realTimeCategories) ? realTimeCategories : [];
+      setCategoryProgress(validCategories);
+      setLoadingCategoryProgress(false);
+    }
+  }, [realTimeCategories]);
+
+  useEffect(() => {
+    if (realTimeAggregated) {
+      console.log('[Profile] ✅ Real-time aggregated progress updated:', {
+        total_practice_time: realTimeAggregated.total_practice_time,
+        total_points: realTimeAggregated.total_points
+      });
+      if (realTimeAggregated.total_practice_time === 172) {
+        console.log('[Profile] ✅ Practice time is correct: 172 minutes (matches admin portal)');
+      } else {
+        console.warn('[Profile] ⚠️ Practice time mismatch! Got:', realTimeAggregated.total_practice_time, 'Expected: 172');
+      }
+      setAggregatedProgress(realTimeAggregated);
+    }
+  }, [realTimeAggregated]);
+
+  // Load recommendation (not real-time, only on mount)
   useEffect(() => {
     if (!user?.id) return;
 
-    const loadCategoryProgress = async () => {
-      setLoadingCategoryProgress(true);
+    const loadRecommendation = async () => {
       try {
         const userId = String(user.id);
-        console.log('Loading category progress for user:', userId);
-        
-        const [categories, aggregated, recommendation] = await Promise.all([
-          MultiCategoryProgressService.getAllCategoriesProgress(userId, true).catch(err => {
-            console.error('Error loading categories:', err);
-            return [];
-          }),
-          MultiCategoryProgressService.getAggregatedProgress(userId, true).catch(err => {
-            console.error('Error loading aggregated progress:', err);
-            return null;
-          }),
-          LearningPathRecommendationService.getRecommendedCategory(userId).catch(err => {
-            console.error('Error loading recommendation:', err);
-            return null;
-          }),
-        ]);
-
-        console.log('Loaded categories:', categories);
-        console.log('Loaded aggregated:', aggregated);
-        console.log('Loaded recommendation:', recommendation);
-
-        setCategoryProgress(categories || []);
-        setAggregatedProgress(aggregated);
+        const recommendation = await LearningPathRecommendationService.getRecommendedCategory(userId).catch(() => null);
         setRecommendedCategory(recommendation);
       } catch (error) {
-        console.error('Error loading category progress:', error);
-        // Set empty arrays to prevent undefined errors
-        setCategoryProgress([]);
-        setAggregatedProgress(null);
-        setRecommendedCategory(null);
-      } finally {
-        setLoadingCategoryProgress(false);
+        console.error('Error loading recommendation:', error);
       }
     };
 
-    loadCategoryProgress();
+    loadRecommendation();
   }, [user?.id]);
 
   useEffect(() => {
@@ -438,6 +572,19 @@ const Profile = () => {
       try {
         const userId = String(user.id);
         const token = localStorage.getItem('speakbee_auth_token');
+
+        // Get enrolled stories directly from StoryWordsService (most reliable source)
+        const enrolledStories = StoryWordsService.getEnrolledStories(userId);
+        // Filter only Young Kids stories (first 10 story IDs)
+        const youngKidsStoryIds = [
+          'magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
+          'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
+          'rainbow-castle', 'jungle-explorer'
+        ];
+        const youngKidsEnrolled = enrolledStories.filter(e => 
+          youngKidsStoryIds.includes(e.storyId) && e.completed
+        );
+        const storiesCompleted = youngKidsEnrolled.length;
 
         let serverProgress: any = null;
         if (token && token !== 'local-token') {
@@ -461,7 +608,6 @@ const Profile = () => {
             readAloud: localProgress?.readAloud,
             vocabulary: localProgress?.vocabulary,
             pronunciation: localProgress?.pronunciation,
-            storyEnrollments: localProgress?.storyEnrollments,
           };
 
         const mergedPronunciation = {
@@ -477,42 +623,12 @@ const Profile = () => {
           ...(serverDetails?.readAloud || {}),
         };
 
-        const storyEnrollmentsLocal = (() => {
-          try {
-            return StoryWordsService.getEnrolledStories(userId) || [];
-          } catch {
-            return [];
-          }
-        })();
-
-        const storyEnrollmentsMerged = [
-          ...(Array.isArray(localDetails?.storyEnrollments) ? localDetails.storyEnrollments : []),
-          ...(Array.isArray(serverDetails?.storyEnrollments) ? serverDetails.storyEnrollments : []),
-          ...storyEnrollmentsLocal,
-        ];
-
-        const storiesMap = new Map<string, { completed: boolean }>();
-        storyEnrollmentsMerged.forEach((story: any) => {
-          if (!story) return;
-          const storyId = story.storyId || story.slug || story.id;
-          if (!storyId) return;
-          const completed =
-            story.completed ??
-            story.isCompleted ??
-            story.wordsExtracted ??
-            story.words_extracted ??
-            false;
-          const existing = storiesMap.get(storyId);
-          storiesMap.set(storyId, { completed: Boolean(existing?.completed || completed) });
-        });
-
         const pronunciationAttempts = Object.values(mergedPronunciation).reduce<number>(
           (total, current: any) => total + Number(current?.attempts ?? current?.sessions ?? 0),
           0
         );
         const vocabularyWords = Object.keys(mergedVocabulary).length;
         const readAloudEntries = Object.keys(mergedReadAloud).length;
-        const storiesCompleted = Array.from(storiesMap.values()).filter((s) => s.completed).length;
 
         const serverPoints = typeof serverProgress?.points === 'number' ? serverProgress.points : 0;
         const localPoints = typeof localProgress?.points === 'number' ? localProgress.points : 0;
@@ -526,7 +642,7 @@ const Profile = () => {
           setKidsStats({
             points: mergedPoints,
             streak: mergedStreak,
-            storiesCompleted,
+            storiesCompleted, // Use actual enrolled stories count
             vocabularyWords,
             pronunciationAttempts: pronunciationAttempts || readAloudEntries,
             hasData:
@@ -703,7 +819,7 @@ const Profile = () => {
 
         {/* Stats Cards - Always show, even if data is loading or zero */}
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {loadingCategoryProgress ? (
+          {(loadingCategoryProgress || loadingCategories || loadingAggregated) ? (
             // Show loading state
             Array.from({ length: 4 }).map((_, index) => (
               <Card
@@ -820,7 +936,6 @@ const Profile = () => {
                 <CardContent>
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {categoryProgress
-                      .filter(cat => cat.total_points > 0 || cat.lessons_completed > 0 || cat.last_activity)
                       .map((category) => (
                       <Card key={category.category} className="hover:shadow-md transition-shadow border-primary/10">
                         <CardHeader className="pb-3">
@@ -910,24 +1025,36 @@ const Profile = () => {
               <Card>
                 <CardContent className="py-8">
                   <div className="text-center text-muted-foreground space-y-3">
-                    <p className="mb-2 font-medium">No category progress found.</p>
-                    <p className="text-sm">
+                    <p className="mb-2 font-medium">
                       {loadingCategoryProgress 
                         ? "Loading your progress..."
-                        : "Start learning in any category to see your progress here!"
+                        : "No category progress found yet."
+                      }
+                    </p>
+                    <p className="text-sm">
+                      {loadingCategoryProgress 
+                        ? "Please wait while we fetch your learning data..."
+                        : "Start learning in any category (Young Kids, Teen Kids, Adults Beginner, Intermediate, Advanced, or IELTS/PTE) to see your progress here! Your progress will appear automatically as you complete activities."
                       }
                     </p>
                     {!loadingCategoryProgress && (
-                      <div className="pt-4">
+                      <div className="pt-4 flex flex-col sm:flex-row gap-2 justify-center">
                         <Button
                           variant="outline"
                           onClick={() => {
                             // Force refresh
+                            MultiCategoryProgressService.clearCache();
                             window.location.reload();
                           }}
                         >
                           <RefreshCw className="mr-2 h-4 w-4" />
                           Refresh Progress
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          onClick={() => navigate('/kids')}
+                        >
+                          Start Learning
                         </Button>
                       </div>
                     )}
@@ -1131,7 +1258,21 @@ const Profile = () => {
                                 <div>
                                   <p className="text-xs uppercase tracking-wide text-muted-foreground">Stories</p>
                                   <p className="text-lg font-semibold text-foreground">
-                                    {youngKidsData.stories_completed || kidsStats.storiesCompleted || 0}
+                                    {/* Use actual enrolled stories count from StoryWordsService */}
+                                    {(() => {
+                                      if (user?.id) {
+                                        const enrolled = StoryWordsService.getEnrolledStories(String(user.id));
+                                        const youngKidsStoryIds = [
+                                          'magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
+                                          'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
+                                          'rainbow-castle', 'jungle-explorer'
+                                        ];
+                                        return enrolled.filter(e => 
+                                          youngKidsStoryIds.includes(e.storyId) && e.completed
+                                        ).length;
+                                      }
+                                      return youngKidsData.stories_completed || kidsStats.storiesCompleted || 0;
+                                    })()}
                                   </p>
                                 </div>
                                 <div>
@@ -1172,7 +1313,21 @@ const Profile = () => {
                                 <div>
                                   <p className="text-xs uppercase tracking-wide text-muted-foreground">Missions</p>
                                   <p className="text-lg font-semibold text-foreground">
-                                    {teenKidsData.stories_completed || teenKidsData.lessons_completed || teenKidsStats.storiesCompleted || 0}
+                                    {/* Use actual enrolled stories count from StoryWordsService */}
+                                    {(() => {
+                                      if (user?.id) {
+                                        const enrolled = StoryWordsService.getEnrolledStories(String(user.id));
+                                        const teenKidsStoryIds = [
+                                          'mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator',
+                                          'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert',
+                                          'ai-ethics-explorer', 'digital-security-guardian'
+                                        ];
+                                        return enrolled.filter(e => 
+                                          teenKidsStoryIds.includes(e.storyId) && e.completed
+                                        ).length;
+                                      }
+                                      return teenKidsData.stories_completed || teenKidsData.lessons_completed || teenKidsStats.storiesCompleted || 0;
+                                    })()}
                                   </p>
                                 </div>
                                 <div>

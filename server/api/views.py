@@ -165,7 +165,37 @@ def sync_category_progress(user, category, category_progress):
                             category_progress.average_score = sum(scores) / len(scores)
                             logger.info(f"YoungKids: Calculated average score: {category_progress.average_score}")
                 
-                logger.info(f"YoungKids: Saving - Points={category_progress.total_points}, Stories={category_progress.stories_completed}, Vocab={category_progress.vocabulary_words}")
+                # Calculate practice time from various sources
+                practice_time_minutes = 0
+                
+                # 1. From game sessions (duration_seconds converted to minutes)
+                game_sessions = KidsGameSession.objects.filter(user=user)
+                game_time_seconds = sum(g.duration_seconds for g in game_sessions if g.duration_seconds)
+                practice_time_minutes += game_time_seconds // 60
+                logger.info(f"YoungKids: Game sessions time: {game_time_seconds // 60} minutes")
+                
+                # 2. Estimate from pronunciation attempts (2 minutes per attempt)
+                if category_progress.pronunciation_attempts > 0:
+                    pron_time = category_progress.pronunciation_attempts * 2
+                    practice_time_minutes += pron_time
+                    logger.info(f"YoungKids: Pronunciation time estimate: {pron_time} minutes")
+                
+                # 3. Estimate from story completions (5 minutes per story)
+                if category_progress.stories_completed > 0:
+                    story_time = category_progress.stories_completed * 5
+                    practice_time_minutes += story_time
+                    logger.info(f"YoungKids: Story time estimate: {story_time} minutes")
+                
+                # 4. Estimate from vocabulary practice (1 minute per word)
+                if category_progress.vocabulary_words > 0:
+                    vocab_time = min(category_progress.vocabulary_words * 1, 60)  # Cap at 60 minutes
+                    practice_time_minutes += vocab_time
+                    logger.info(f"YoungKids: Vocabulary time estimate: {vocab_time} minutes")
+                
+                category_progress.practice_time_minutes = practice_time_minutes
+                logger.info(f"YoungKids: Total practice time: {practice_time_minutes} minutes")
+                
+                logger.info(f"YoungKids: Saving - Points={category_progress.total_points}, Stories={category_progress.stories_completed}, Vocab={category_progress.vocabulary_words}, Time={practice_time_minutes}min")
                 category_progress.save()  # ← SAVE TO MYSQL
             else:
                 logger.warning(f"YoungKids: No KidsProgress found for user {user.id}")
@@ -192,11 +222,51 @@ def sync_category_progress(user, category, category_progress):
                             category_progress.average_score = sum(scores) / len(scores)
                             logger.info(f"TeenKids: Calculated average score: {category_progress.average_score}")
                 
+                # Calculate practice time from various sources
+                practice_time_minutes = 0
+                
+                # 1. From game sessions (if TeenGameSession exists, use it; otherwise estimate)
+                # Check if TeenGameSession model exists
+                try:
+                    from api.models import TeenGameSession
+                    game_sessions = TeenGameSession.objects.filter(user=user)
+                    if hasattr(TeenGameSession, 'duration_seconds'):
+                        game_time_seconds = sum(g.duration_seconds for g in game_sessions if g.duration_seconds)
+                        practice_time_minutes += game_time_seconds // 60
+                        logger.info(f"TeenKids: Game sessions time: {game_time_seconds // 60} minutes")
+                except (ImportError, AttributeError):
+                    # If TeenGameSession doesn't exist, estimate from games_attempts
+                    if category_progress.games_completed > 0:
+                        game_time = category_progress.games_completed * 3  # 3 minutes per game
+                        practice_time_minutes += game_time
+                        logger.info(f"TeenKids: Game time estimate: {game_time} minutes")
+                
+                # 2. Estimate from pronunciation attempts (2.5 minutes per attempt for teens)
+                if category_progress.pronunciation_attempts > 0:
+                    pron_time = category_progress.pronunciation_attempts * 2.5
+                    practice_time_minutes += int(pron_time)
+                    logger.info(f"TeenKids: Pronunciation time estimate: {int(pron_time)} minutes")
+                
+                # 3. Estimate from story/mission completions (7 minutes per mission for teens)
+                if category_progress.stories_completed > 0:
+                    story_time = category_progress.stories_completed * 7
+                    practice_time_minutes += story_time
+                    logger.info(f"TeenKids: Mission time estimate: {story_time} minutes")
+                
+                # 4. Estimate from vocabulary practice (1.5 minutes per word for teens)
+                if category_progress.vocabulary_words > 0:
+                    vocab_time = min(int(category_progress.vocabulary_words * 1.5), 90)  # Cap at 90 minutes
+                    practice_time_minutes += vocab_time
+                    logger.info(f"TeenKids: Vocabulary time estimate: {vocab_time} minutes")
+                
+                category_progress.practice_time_minutes = practice_time_minutes
+                logger.info(f"TeenKids: Total practice time: {practice_time_minutes} minutes")
+                
                 # Update last activity
                 if category_progress.total_points > 0 or category_progress.stories_completed > 0:
                     category_progress.last_activity = timezone.now()
                 
-                logger.info(f"TeenKids: Saving - Points={category_progress.total_points}, Missions={category_progress.stories_completed}, Vocab={category_progress.vocabulary_words}")
+                logger.info(f"TeenKids: Saving - Points={category_progress.total_points}, Missions={category_progress.stories_completed}, Vocab={category_progress.vocabulary_words}, Time={practice_time_minutes}min")
                 category_progress.save()  # ← SAVE TO MYSQL
             else:
                 logger.warning(f"TeenKids: No TeenProgress found for user {user.id}")
@@ -1153,22 +1223,86 @@ def record_lesson_progress(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def record_practice_session(request):
-    """Record a practice session"""
+    """Record a practice session to MySQL database"""
     try:
-        # Add user to request data
+        user = request.user
         data = request.data.copy()
         
-        serializer = PracticeSessionSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # Extract all fields with defaults
+        session_type = data.get('session_type', '')
+        lesson_id = data.get('lesson')
+        duration_minutes = int(data.get('duration_minutes', 0))
+        score = float(data.get('score', 0))
+        points_earned = int(data.get('points_earned', 0))
+        words_practiced = int(data.get('words_practiced', 0))
+        sentences_practiced = int(data.get('sentences_practiced', 0))
+        mistakes_count = int(data.get('mistakes_count', 0))
+        details = data.get('details', {})
         
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Validate required fields
+        if not session_type:
+            return Response({
+                "message": "session_type is required",
+                "success": False
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate session_type is one of the allowed values
+        allowed_types = ['pronunciation', 'conversation', 'vocabulary', 'grammar', 
+                        'listening', 'reading', 'exam_practice']
+        if session_type not in allowed_types:
+            return Response({
+                "message": f"Invalid session_type. Must be one of: {', '.join(allowed_types)}",
+                "success": False
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get lesson if provided
+        lesson = None
+        if lesson_id:
+            try:
+                lesson = Lesson.objects.get(id=lesson_id)
+            except Lesson.DoesNotExist:
+                logger.warning(f"Lesson {lesson_id} not found, creating session without lesson")
+        
+        # Create practice session directly to ensure all fields are saved to MySQL
+        practice_session = PracticeSession.objects.create(
+            user=user,
+            session_type=session_type,
+            lesson=lesson,
+            duration_minutes=duration_minutes,
+            score=score,
+            points_earned=points_earned,
+            words_practiced=words_practiced,
+            sentences_practiced=sentences_practiced,
+            mistakes_count=mistakes_count,
+            details=details
+        )
+        
+        # Log successful save
+        logger.info(f"Practice session saved to MySQL: ID={practice_session.id}, User={user.id}, "
+                   f"Type={session_type}, Score={score}, Duration={duration_minutes}min")
+        
+        # Serialize and return
+        serializer = PracticeSessionSerializer(practice_session)
+        return Response({
+            "message": "Practice session recorded successfully",
+            "success": True,
+            "data": serializer.data
+        }, status=status.HTTP_201_CREATED)
     
+    except ValueError as e:
+        logger.error(f"Practice session validation error: {str(e)}")
+        return Response({
+            "message": f"Invalid data: {str(e)}",
+            "success": False
+        }, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         logger.error(f"Practice session error: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
         return Response({
-            "message": "An error occurred"
+            "message": "An error occurred while saving practice session",
+            "success": False,
+            "error": str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -2049,6 +2183,30 @@ def teen_vocabulary_practice(request):
             vocabulary_words=1,
             streak=progress.streak or 0
         )
+        
+        # Also save to PracticeSession table for admin portal visibility
+        try:
+            PracticeSession.objects.create(
+                user=request.user,
+                session_type='vocabulary',
+                duration_minutes=2,  # Estimated duration for vocabulary practice
+                score=score,
+                points_earned=points_awarded,
+                words_practiced=1,
+                sentences_practiced=0,
+                mistakes_count=0 if score >= 80 else 1,
+                details={
+                    'source': 'teen_kids',
+                    'word': word,
+                    'story_id': story_id,
+                    'story_title': story_title,
+                    'practice_id': practice.id,
+                    'attempts': practice.attempts
+                }
+            )
+            logger.info(f"Teen vocabulary practice synced to PracticeSession for user {request.user.id}")
+        except Exception as e:
+            logger.error(f"Failed to sync teen vocabulary practice to PracticeSession: {str(e)}")
 
     payload = _build_teen_dashboard_payload(request.user)
     payload['reward'] = {'points_awarded': points_awarded}
@@ -2105,6 +2263,30 @@ def teen_pronunciation_practice(request):
             pronunciation_attempts=1,
             streak=progress.streak or 0
         )
+        
+        # Also save to PracticeSession table for admin portal visibility
+        try:
+            PracticeSession.objects.create(
+                user=request.user,
+                session_type='pronunciation',
+                duration_minutes=3,  # Estimated duration for pronunciation practice
+                score=score,
+                points_earned=points_awarded,
+                words_practiced=0,
+                sentences_practiced=1,
+                mistakes_count=0 if score >= 80 else 1,
+                details={
+                    'source': 'teen_kids',
+                    'phrase': phrase[:100],  # Truncate if too long
+                    'story_id': story_id,
+                    'story_title': story_title,
+                    'practice_id': practice.id,
+                    'attempts': practice.attempts
+                }
+            )
+            logger.info(f"Teen pronunciation practice synced to PracticeSession for user {request.user.id}")
+        except Exception as e:
+            logger.error(f"Failed to sync teen pronunciation practice to PracticeSession: {str(e)}")
 
     payload = _build_teen_dashboard_payload(request.user)
     payload['reward'] = {'points_awarded': points_awarded}
@@ -2197,6 +2379,46 @@ def teen_game_session(request):
         completed=completed,
         details=details
     )
+    
+    # Also save to PracticeSession table for admin portal visibility
+    try:
+        # Map game types to session types
+        session_type_map = {
+            'pronunciation-challenge': 'pronunciation',
+            'conversation-practice': 'conversation',
+            'word-chain': 'vocabulary',
+            'tongue-twister': 'pronunciation',
+            'debate-club': 'conversation',
+            'critical-thinking': 'conversation',
+            'research-challenge': 'reading',
+            'presentation-master': 'conversation',
+            'ethics-discussion': 'conversation',
+        }
+        practice_session_type = session_type_map.get(game_type, 'conversation')
+        duration_minutes = max(1, int(duration_seconds / 60)) if duration_seconds > 0 else 5
+        
+        PracticeSession.objects.create(
+            user=request.user,
+            session_type=practice_session_type,
+            duration_minutes=duration_minutes,
+            score=score,
+            points_earned=points_earned,
+            words_practiced=rounds if 'word' in game_type or 'vocabulary' in game_type else 0,
+            sentences_practiced=rounds if 'sentence' in game_type or 'conversation' in game_type or 'debate' in game_type else 0,
+            mistakes_count=max(0, rounds - int(score / 100 * rounds)) if rounds > 0 else 0,
+            details={
+                'source': 'teen_kids',
+                'game_type': game_type,
+                'game_title': game_title,
+                'game_session_id': session.id,
+                'rounds': rounds,
+                'difficulty': difficulty,
+                'completed': completed
+            }
+        )
+        logger.info(f"Teen game session synced to PracticeSession for user {request.user.id}")
+    except Exception as e:
+        logger.error(f"Failed to sync teen game session to PracticeSession: {str(e)}")
     
     # Update CategoryProgress in MySQL database
     time_minutes = round(duration_seconds / 60) if duration_seconds else 0
@@ -2599,6 +2821,29 @@ def kids_vocabulary_practice(request):
         vocabulary_words=1 if created else 0
     )
     
+    # Also save to PracticeSession table for admin portal visibility
+    try:
+        PracticeSession.objects.create(
+            user=request.user,
+            session_type='vocabulary',
+            duration_minutes=2,  # Estimated duration for vocabulary practice
+            score=score,
+            points_earned=points_awarded,
+            words_practiced=1,
+            sentences_practiced=0,
+            mistakes_count=0 if score >= 80 else 1,
+            details={
+                'source': 'young_kids',
+                'word': word,
+                'story_id': story_id,
+                'practice_id': practice.id,
+                'is_new_word': created
+            }
+        )
+        logger.info(f"Kids vocabulary practice synced to PracticeSession for user {request.user.id}")
+    except Exception as e:
+        logger.error(f"Failed to sync kids vocabulary practice to PracticeSession: {str(e)}")
+    
     serializer = KidsVocabularyPracticeSerializer(practice)
     return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
 
@@ -2641,6 +2886,29 @@ def kids_pronunciation_practice(request):
         score=score,
         pronunciation_attempts=1 if created else 0
     )
+    
+    # Also save to PracticeSession table for admin portal visibility
+    try:
+        PracticeSession.objects.create(
+            user=request.user,
+            session_type='pronunciation',
+            duration_minutes=3,  # Estimated duration for pronunciation practice
+            score=score,
+            points_earned=points_awarded,
+            words_practiced=0,
+            sentences_practiced=1,
+            mistakes_count=0 if score >= 80 else 1,
+            details={
+                'source': 'young_kids',
+                'phrase': phrase[:100],  # Truncate if too long
+                'story_id': story_id,
+                'practice_id': practice.id,
+                'is_new_phrase': created
+            }
+        )
+        logger.info(f"Kids pronunciation practice synced to PracticeSession for user {request.user.id}")
+    except Exception as e:
+        logger.error(f"Failed to sync kids pronunciation practice to PracticeSession: {str(e)}")
     
     serializer = KidsPronunciationPracticeSerializer(practice)
     return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
@@ -2685,6 +2953,46 @@ def kids_game_session(request):
         completed=completed,
         details=details
     )
+    
+    # Also save to PracticeSession table for admin portal visibility
+    try:
+        # Map game types to session types
+        session_type_map = {
+            'pronunciation-challenge': 'pronunciation',
+            'conversation-practice': 'conversation',
+            'word-chain': 'vocabulary',
+            'tongue-twister': 'pronunciation',
+            'rhyme': 'vocabulary',
+            'sentence': 'grammar',
+            'echo': 'pronunciation',
+            'memory': 'vocabulary',
+            'word_match': 'vocabulary',
+        }
+        practice_session_type = session_type_map.get(game_type, 'conversation')
+        duration_minutes = max(1, int(duration_seconds / 60)) if duration_seconds > 0 else 5
+        
+        PracticeSession.objects.create(
+            user=request.user,
+            session_type=practice_session_type,
+            duration_minutes=duration_minutes,
+            score=score,
+            points_earned=points_earned,
+            words_practiced=rounds if 'word' in game_type or 'vocabulary' in game_type else 0,
+            sentences_practiced=rounds if 'sentence' in game_type or 'conversation' in game_type else 0,
+            mistakes_count=max(0, rounds - int(score / 100 * rounds)) if rounds > 0 else 0,
+            details={
+                'source': 'young_kids',
+                'game_type': game_type,
+                'game_title': game_title,
+                'game_session_id': session.id,
+                'rounds': rounds,
+                'difficulty': difficulty,
+                'completed': completed
+            }
+        )
+        logger.info(f"Kids game session synced to PracticeSession for user {request.user.id}")
+    except Exception as e:
+        logger.error(f"Failed to sync kids game session to PracticeSession: {str(e)}")
     
     # Update CategoryProgress in MySQL database
     time_minutes = round(duration_seconds / 60) if duration_seconds else 0
@@ -5742,7 +6050,10 @@ def admin_lesson_create(request):
 @permission_classes([IsAuthenticated])
 def admin_practice_list(request):
     """Get list of practice sessions for admin"""
+    logger.info(f"Admin practice list request from user: {request.user.username} (ID: {request.user.id}, is_staff: {request.user.is_staff}, is_superuser: {request.user.is_superuser})")
+    
     if not is_admin_user(request.user):
+        logger.warning(f"Unauthorized admin practice list request from user: {request.user.username}")
         return Response({
             "message": "Unauthorized. Admin access required."
         }, status=status.HTTP_403_FORBIDDEN)
@@ -5755,6 +6066,10 @@ def admin_practice_list(request):
         user_id = request.query_params.get('user_id', '')
         date_from = request.query_params.get('date_from', '')
         date_to = request.query_params.get('date_to', '')
+        
+        # Log total count before filtering
+        total_before_filter = PracticeSession.objects.count()
+        logger.info(f"Total practice sessions in database: {total_before_filter}")
         
         queryset = PracticeSession.objects.select_related('user', 'lesson').all()
         
@@ -5794,9 +6109,11 @@ def admin_practice_list(request):
         
         # Pagination
         total = queryset.count()
+        logger.info(f"Practice sessions after filtering: {total}")
         start = (page - 1) * page_size
         end = start + page_size
         sessions = queryset[start:end]
+        logger.info(f"Returning sessions {start} to {end} (page {page}, page_size {page_size})")
         
         serializer = PracticeSessionSerializer(sessions, many=True)
         
@@ -5844,7 +6161,10 @@ def admin_practice_list(request):
 @permission_classes([IsAuthenticated])
 def admin_practice_stats(request):
     """Get practice session statistics for admin"""
+    logger.info(f"Admin practice stats request from user: {request.user.username} (ID: {request.user.id})")
+    
     if not is_admin_user(request.user):
+        logger.warning(f"Unauthorized admin practice stats request from user: {request.user.username}")
         return Response({
             "message": "Unauthorized. Admin access required."
         }, status=status.HTTP_403_FORBIDDEN)
@@ -5856,15 +6176,18 @@ def admin_practice_stats(request):
         
         # Overall stats
         total_sessions = PracticeSession.objects.count()
+        logger.info(f"Calculating stats for {total_sessions} total practice sessions")
         total_time = PracticeSession.objects.aggregate(
             total=Sum('duration_minutes')
         )['total'] or 0
-        avg_score = PracticeSession.objects.aggregate(
+        avg_score_result = PracticeSession.objects.aggregate(
             avg=Avg('score')
-        )['avg'] or 0
-        avg_duration = PracticeSession.objects.aggregate(
+        )['avg']
+        avg_score = float(avg_score_result) if avg_score_result is not None else 0.0
+        avg_duration_result = PracticeSession.objects.aggregate(
             avg=Avg('duration_minutes')
-        )['avg'] or 0
+        )['avg']
+        avg_duration = float(avg_duration_result) if avg_duration_result is not None else 0.0
         
         # Recent stats
         sessions_last_7 = PracticeSession.objects.filter(session_date__date__gte=last7).count()
@@ -5904,26 +6227,79 @@ def admin_practice_stats(request):
                 'active_users': day_sessions.values('user_id').distinct().count()
             })
         
+        # Get active users with practice statistics
+        active_users_data = []
+        users_with_sessions = User.objects.filter(
+            practice_sessions__isnull=False
+        ).distinct().select_related('profile')
+        
+        for user in users_with_sessions:
+            user_sessions = PracticeSession.objects.filter(user=user)
+            user_total_sessions = user_sessions.count()
+            user_total_time = user_sessions.aggregate(total=Sum('duration_minutes'))['total'] or 0
+            user_avg_score = user_sessions.aggregate(avg=Avg('score'))['avg']
+            user_avg_score = float(user_avg_score) if user_avg_score is not None else 0.0
+            
+            # Recent activity (last 30 days)
+            user_sessions_30 = user_sessions.filter(session_date__date__gte=last30)
+            user_sessions_30_count = user_sessions_30.count()
+            user_time_30 = user_sessions_30.aggregate(total=Sum('duration_minutes'))['total'] or 0
+            
+            # Last session date
+            last_session = user_sessions.order_by('-session_date').first()
+            last_session_date = last_session.session_date if last_session else None
+            
+            profile = getattr(user, 'profile', None)
+            active_users_data.append({
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'name': f"{user.first_name} {user.last_name}".strip() or user.username,
+                'is_active': user.is_active,
+                'date_joined': user.date_joined.isoformat() if user.date_joined else None,
+                'last_login': user.last_login.isoformat() if user.last_login else None,
+                'last_session_date': last_session_date.isoformat() if last_session_date else None,
+                'profile': {
+                    'level': profile.level if profile else 'beginner',
+                    'age_range': profile.age_range if profile else None,
+                    'points': profile.points if profile else 0,
+                    'current_streak': profile.current_streak if profile else 0,
+                } if profile else None,
+                'practice_stats': {
+                    'total_sessions': user_total_sessions,
+                    'total_time_minutes': int(user_total_time),
+                    'total_time_hours': round(float(user_total_time) / 60, 2) if user_total_time > 0 else 0.0,
+                    'avg_score': round(user_avg_score, 2),
+                    'sessions_last_30': user_sessions_30_count,
+                    'time_last_30_minutes': int(user_time_30),
+                    'time_last_30_hours': round(float(user_time_30) / 60, 2) if user_time_30 > 0 else 0.0,
+                }
+            })
+        
+        # Sort by total sessions (descending)
+        active_users_data.sort(key=lambda x: x['practice_stats']['total_sessions'], reverse=True)
+        
         return Response({
             'overall': {
                 'total_sessions': total_sessions,
-                'total_time_minutes': total_time,
-                'total_time_hours': round(total_time / 60, 2),
+                'total_time_minutes': int(total_time),
+                'total_time_hours': round(float(total_time) / 60, 2) if total_time > 0 else 0.0,
                 'avg_score': round(avg_score, 2),
                 'avg_duration_minutes': round(avg_duration, 2)
             },
             'recent': {
                 'sessions_last_7': sessions_last_7,
                 'sessions_last_30': sessions_last_30,
-                'time_last_7_minutes': time_last_7,
-                'time_last_7_hours': round(time_last_7 / 60, 2),
-                'time_last_30_minutes': time_last_30,
-                'time_last_30_hours': round(time_last_30 / 60, 2),
+                'time_last_7_minutes': int(time_last_7),
+                'time_last_7_hours': round(float(time_last_7) / 60, 2) if time_last_7 > 0 else 0.0,
+                'time_last_30_minutes': int(time_last_30),
+                'time_last_30_hours': round(float(time_last_30) / 60, 2) if time_last_30 > 0 else 0.0,
                 'active_users_7': active_users_7,
                 'active_users_30': active_users_30
             },
             'type_distribution': list(type_distribution),
-            'daily_stats': daily_stats
+            'daily_stats': daily_stats,
+            'active_users': active_users_data
         })
     
     except Exception as e:
@@ -7805,7 +8181,25 @@ def get_aggregated_progress(request):
             (c.stories_completed if c.category in ['young_kids', 'teen_kids'] else c.lessons_completed)
             for c in categories
         )
-        total_time = sum(c.practice_time_minutes for c in categories)
+        # Use actual practice time from PracticeSession table instead of estimated times
+        # This ensures consistency with admin portal
+        # ALWAYS use PracticeSession data as the source of truth
+        from django.db.models import Sum
+        practice_sessions_time = PracticeSession.objects.filter(user=user).aggregate(
+            total=Sum('duration_minutes')
+        )['total'] or 0
+        
+        # ALWAYS use PracticeSession time, even if 0 (it's the accurate source)
+        # Only fallback to estimates if user has NO practice sessions at all
+        total_time = practice_sessions_time
+        if practice_sessions_time == 0:
+            # Check if user actually has any sessions
+            has_sessions = PracticeSession.objects.filter(user=user).exists()
+            if not has_sessions:
+                # User has no sessions, use estimated time as fallback
+                estimated_time = sum(c.practice_time_minutes for c in categories)
+                total_time = estimated_time
+            # If has_sessions is True but time is 0, keep total_time as 0 (valid data)
         
         # Calculate average score
         scores = [c.average_score for c in categories if c.average_score > 0]
@@ -7826,11 +8220,16 @@ def get_aggregated_progress(request):
         thirty_days_ago = timezone.now() - timedelta(days=30)
         active_categories = [c for c in categories if c.last_activity and c.last_activity >= thirty_days_ago]
         
+        # Log the practice time to help debug frontend issues
+        logger.info(f"Aggregated progress for user {user.id} ({user.email}): practice_time={total_time} minutes (from PracticeSession table)")
+        if total_time != practice_sessions_time:
+            logger.warning(f"Practice time mismatch for user {user.id}: PracticeSession={practice_sessions_time}, returned={total_time}")
+        
         data = {
             'total_points': total_points,
             'total_streak': total_streak,
             'total_lessons_completed': total_lessons,
-            'total_practice_time': total_time,
+            'total_practice_time': total_time,  # This should be 172 minutes from PracticeSession table
             'average_score': avg_score,
             'categories_count': categories.count(),
             'active_categories_count': len(active_categories),
