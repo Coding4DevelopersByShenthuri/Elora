@@ -58,6 +58,7 @@ import FutureLeaderAdventure from '@/components/kids/stories/FutureLeaderAdventu
 import ScientificDiscoveryAdventure from '@/components/kids/stories/ScientificDiscoveryAdventure';
 import AIEthicsExplorerAdventure from '@/components/kids/stories/AIEthicsExplorerAdventure';
 import DigitalSecurityGuardianAdventure from '@/components/kids/stories/DigitalSecurityGuardianAdventure';
+import DynamicStoryAdventure from '@/components/kids/stories/DynamicStoryAdventure';
 
 const TEEN_STORY_TYPE_TO_INTERNAL: Record<string, string> = {
   mystery: 'mystery-detective',
@@ -70,6 +71,17 @@ const TEEN_STORY_TYPE_TO_INTERNAL: Record<string, string> = {
   digital: 'social-media-expert',
   ai: 'ai-ethics-explorer',
   cybersecurity: 'digital-security-guardian',
+  // Template stories (11-20)
+  'climate-action': 'climate-action',
+  'startup': 'startup',
+  'diplomacy': 'diplomacy',
+  'medical-research': 'medical-research',
+  'social-impact': 'social-impact',
+  'data-science': 'data-science',
+  'engineering': 'engineering',
+  'content-strategy': 'content-strategy',
+  'ethical-ai': 'ethical-ai',
+  'innovation-summit': 'innovation-summit',
 };
 
 type TeenStory = {
@@ -283,6 +295,8 @@ const TeenKidsPage = () => {
   const [selectedPhraseFilter, setSelectedPhraseFilter] = useState<string>('all');
   const [completedStoryIds, setCompletedStoryIds] = useState<string[]>([]);
   const [datasetStories, setDatasetStories] = useState<DatasetStory[]>([]);
+  const [storyTemplates, setStoryTemplates] = useState<any[]>([]);
+  const [currentTemplateStory, setCurrentTemplateStory] = useState<any | null>(null);
 
   const teenFavorites = useMemo(
     () => favorites.filter((id) => id.startsWith('teen-')),
@@ -681,6 +695,30 @@ const TeenKidsPage = () => {
     loadDatasetStories();
   }, [isAuthenticated]);
 
+  // Load story templates for stories 11-20
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    
+    const loadStoryTemplates = async () => {
+      try {
+        const response = await fetch('/datasets/teen-kids-stories-templates.json');
+        if (response.ok) {
+          const templates = await response.json();
+          setStoryTemplates(templates);
+          console.log(`✅ Loaded ${templates.length} teen story templates`);
+        } else {
+          console.warn('Teen story templates file not found, template stories will not be available');
+          setStoryTemplates([]);
+        }
+      } catch (error) {
+        console.error('Error loading teen story templates:', error);
+        setStoryTemplates([]);
+      }
+    };
+    
+    loadStoryTemplates();
+  }, [isAuthenticated]);
+
   // Merge base stories with dataset stories
   const allTeenStoriesWithDataset = useMemo(() => {
     const datasetStoriesMapped = datasetStories.map((ds) => {
@@ -912,6 +950,67 @@ const TeenKidsPage = () => {
       }
     }
     
+    // Check if this is a template story (11-20)
+    const storyNumber = parseInt(storyId.replace('teen-', ''), 10);
+    if (storyNumber >= 10) {
+      // This is a template story (11-20), use DynamicStoryAdventure
+      const template = storyTemplates.find(t => t.storyNumber === storyNumber + 1);
+      if (template && template.storySteps) {
+        // Find the story from allTeenStoriesWithDataset to get the full story info
+        const story = allTeenStoriesWithDataset.find((s) => s.id === storyId);
+        if (!story) return;
+
+        const internalId = getInternalStoryId(story.type);
+        
+        setCurrentTemplateStory({
+          title: template.title,
+          storySteps: template.storySteps,
+          voiceProfile: template.voiceProfile || 'ClimateLeader',
+          characterName: template.character || 'Leader',
+          storyId: internalId,
+          milestoneStepIds: template.milestoneStepIds || []
+        });
+        
+        setCurrentStory(storyId);
+        setIsPlaying(false);
+        
+        // Mark story as enrolled when started
+        const storyEnrollments = StoryWordsService.getEnrolledStories(userId);
+        const isAlreadyEnrolled = storyEnrollments.some(e => e.storyId === internalId);
+        
+        if (!isAlreadyEnrolled) {
+          try {
+            const enrollment = {
+              storyId: internalId,
+              storyTitle: story.title,
+              storyType: story.type,
+              completed: false,
+              wordsExtracted: false,
+              completedAt: undefined,
+              score: undefined
+            };
+            const updatedEnrollments = [...storyEnrollments, enrollment];
+            localStorage.setItem(`speakbee_story_enrollments_${userId}`, JSON.stringify(updatedEnrollments));
+          } catch (error) {
+            console.warn('Failed to track story enrollment:', error);
+          }
+        }
+
+        void callTeenApi((token) =>
+          TeenApi.startStory(token, {
+            storyId,
+            storyTitle: story.title,
+            storyType: story.type,
+          })
+        );
+        
+        return;
+      } else {
+        console.warn(`Template not found for story ${storyNumber + 1}`);
+      }
+    }
+    
+    // Handle hardcoded stories (1-10)
     const story = allTeenStories.find((s) => s.id === storyId);
     if (!story) return;
 
@@ -970,7 +1069,15 @@ const TeenKidsPage = () => {
   const handleAdventureComplete = async (storyId: string, score: number) => {
     if (!isAuthenticated) return;
 
-    const story = allTeenStories.find((s) => s.id === storyId);
+    // Check if this is a template story (11-20)
+    const storyNumber = parseInt(storyId.replace('teen-', ''), 10);
+    let story = allTeenStories.find((s) => s.id === storyId);
+    
+    // If not found in hardcoded stories, try dataset stories
+    if (!story) {
+      story = allTeenStoriesWithDataset.find((s) => s.id === storyId);
+    }
+    
     if (!story) return;
 
     // Immediately mark story as completed locally for instant badge display
@@ -1829,6 +1936,23 @@ const TeenKidsPage = () => {
             setShowDigitalSecurity(false);
             await handleAdventureComplete('teen-9', score);
           }}
+        />
+      )}
+
+      {/* Template Stories (11-20) using DynamicStoryAdventure */}
+      {currentTemplateStory && (
+        <DynamicStoryAdventure
+          onClose={() => {
+            setCurrentTemplateStory(null);
+            setCurrentStory('');
+          }}
+          onComplete={async (score) => {
+            const storyId = currentStory;
+            setCurrentTemplateStory(null);
+            setCurrentStory('');
+            await handleAdventureComplete(storyId, score);
+          }}
+          storyData={currentTemplateStory}
         />
       )}
 

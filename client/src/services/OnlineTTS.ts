@@ -490,6 +490,106 @@ export const STORY_VOICES: Record<string, VoiceProfile> = {
     description: 'Confident, trustworthy cybersecurity guide voice for teens'
   },
 
+  // Teen Story 11: Climate Action Leader - ClimateLeader (passionate 16-year-old environmental leader)
+  ClimateLeader: {
+    name: 'ClimateLeader',
+    pitch: 1.05,      // Passionate, inspiring tone
+    rate: 0.95,       // Measured, impactful pace for climate discussions
+    volume: 1.0,      // Clear and inspiring
+    voiceName: 'Google US English Female',
+    description: 'Passionate, inspiring climate action leader voice with environmental determination'
+  },
+
+  // Teen Story 12: Startup Founder - StartupFounder (dynamic 17-year-old entrepreneur)
+  StartupFounder: {
+    name: 'StartupFounder',
+    pitch: 1.08,      // Dynamic, forward-thinking tone
+    rate: 1.05,       // Quick, innovative pace for startup pitch
+    volume: 1.0,      // Confident and energetic
+    voiceName: 'Google US English Male',
+    description: 'Dynamic, entrepreneurial startup founder voice with innovative energy'
+  },
+
+  // Teen Story 13: International Diplomat - Diplomat (diplomatic 16-year-old negotiator)
+  Diplomat: {
+    name: 'Diplomat',
+    pitch: 1.0,       // Balanced, diplomatic tone
+    rate: 0.92,       // Thoughtful, respectful pace for negotiations
+    volume: 0.98,     // Clear and professional
+    voiceName: 'Google UK English Female',
+    description: 'Diplomatic, culturally aware international negotiator voice with global perspective'
+  },
+
+  // Teen Story 14: Medical Researcher - MedicalResearcher (analytical 16-year-old scientist)
+  MedicalResearcher: {
+    name: 'MedicalResearcher',
+    pitch: 0.98,      // Professional, analytical tone
+    rate: 0.93,       // Methodical, precise pace for medical research
+    volume: 0.99,     // Clear and authoritative
+    voiceName: 'Microsoft Zira - English (United States)',
+    description: 'Analytical, precision-focused medical researcher voice with scientific clarity'
+  },
+
+  // Teen Story 15: Social Impact Innovator - SocialInnovator (compassionate 15-year-old changemaker)
+  SocialInnovator: {
+    name: 'SocialInnovator',
+    pitch: 1.06,      // Warm, compassionate tone
+    rate: 0.94,       // Thoughtful, empathetic pace for social impact
+    volume: 0.97,     // Warm and inspiring
+    voiceName: 'Google US English Female',
+    description: 'Compassionate, empathetic social impact innovator voice with community focus'
+  },
+
+  // Teen Story 16: Data Science Analyst - DataAnalyst (analytical 16-year-old data expert)
+  DataAnalyst: {
+    name: 'DataAnalyst',
+    pitch: 0.97,      // Professional, analytical tone
+    rate: 0.96,       // Clear, data-driven pace for analytics
+    volume: 1.0,      // Precise and engaging
+    voiceName: 'Microsoft David - English (United States)',
+    description: 'Analytical, data-driven analyst voice with technical precision'
+  },
+
+  // Teen Story 17: Environmental Engineer - EnvironmentalEngineer (innovative 16-year-old engineer)
+  EnvironmentalEngineer: {
+    name: 'EnvironmentalEngineer',
+    pitch: 1.03,      // Innovative, solution-focused tone
+    rate: 0.95,       // Methodical, engineering pace
+    volume: 1.0,      // Clear and technical
+    voiceName: 'Google UK English Male',
+    description: 'Innovative, solution-focused environmental engineer voice with technical expertise'
+  },
+
+  // Teen Story 18: Content Creator Strategist - ContentCreator (creative 15-year-old strategist)
+  ContentCreator: {
+    name: 'ContentCreator',
+    pitch: 1.1,       // Creative, engaging tone
+    rate: 1.02,       // Dynamic, content-focused pace
+    volume: 0.95,     // Bright and modern
+    voiceName: 'Microsoft Mark - English (United States)',
+    description: 'Creative, engaging content creator voice with modern digital intelligence'
+  },
+
+  // Teen Story 19: Ethical AI Developer - AIEthicsDeveloper (uses existing AIEthicsTeen)
+  AIEthicsDeveloper: {
+    name: 'AIEthicsDeveloper',
+    pitch: 1.02,      // Balanced, professional teen tone
+    rate: 0.96,       // Thoughtful, clear pacing for ethics topics
+    volume: 1.0,      // Present and clear
+    voiceName: 'Microsoft Aria Online (Natural) - English (United States)',
+    description: 'Calm, trustworthy narrator voice for responsible AI development'
+  },
+
+  // Teen Story 20: Global Innovation Summit - InnovationSummit (inspiring 17-year-old presenter)
+  InnovationSummit: {
+    name: 'InnovationSummit',
+    pitch: 1.04,      // Inspiring, global tone
+    rate: 0.98,       // Confident, summit-level pace
+    volume: 1.0,      // Powerful and inspiring
+    voiceName: 'Google US English Male',
+    description: 'Inspiring, global innovation summit presenter voice with breakthrough energy'
+  },
+
   // Story 11: Enchanted Garden - Petal (sweet 6-year-old flower)
   GardenFlower: {
     name: 'Petal',

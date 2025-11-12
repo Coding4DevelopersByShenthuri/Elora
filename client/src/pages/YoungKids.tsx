@@ -907,7 +907,8 @@ const YoungKidsPage = () => {
           storySteps: template.storySteps,
           voiceProfile: template.voiceProfile || `Story${storyNumber + 1}`,
           characterName: template.character || 'Character',
-          storyId: internalId
+          storyId: internalId,
+          milestoneStepIds: template.milestoneStepIds || [] // Pass milestone step IDs for star awards
         });
         setIsPlaying(false);
         

@@ -37,6 +37,7 @@ type Props = {
     voiceProfile: string; // Key from STORY_VOICES
     characterName: string;
     storyId: string; // For analytics
+    milestoneStepIds?: string[]; // Step IDs where stars are awarded (3 milestones)
   };
 };
 
@@ -358,13 +359,31 @@ const DynamicStoryAdventure = ({ onClose, onComplete, storyData }: Props) => {
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
       
-      // Award stars for interactive steps (typically every 2nd interactive step)
-      const interactiveSteps = storySteps.filter(s => s.interactive && s.listeningFirst);
-      const currentInteractiveIndex = interactiveSteps.findIndex(s => s.id === current.id);
-      if (currentInteractiveIndex >= 0 && (currentInteractiveIndex + 1) % 2 === 0) {
-        const newStars = Math.min(3, Math.floor((currentInteractiveIndex + 1) / 2));
-        setStars(newStars);
-        console.log(`⭐ Star awarded! (${newStars}/3)`);
+      // Award stars based on milestone step IDs from template (like MagicForestAdventure)
+      const milestoneStepIds = storyData.milestoneStepIds || [];
+      if (milestoneStepIds.length >= 3) {
+        if (current.id === milestoneStepIds[0]) {
+          // First star - first milestone
+          setStars(1);
+          console.log(`⭐ First star awarded! (1/3) - Step: ${current.title}`);
+        } else if (current.id === milestoneStepIds[1]) {
+          // Second star - second milestone
+          setStars(2);
+          console.log(`⭐ Second star awarded! (2/3) - Step: ${current.title}`);
+        } else if (current.id === milestoneStepIds[2]) {
+          // Third star - third milestone
+          setStars(3);
+          console.log(`⭐ Third star awarded! (3/3) - Step: ${current.title}`);
+        }
+      } else {
+        // Fallback: Award stars for interactive steps (typically every 2nd interactive step)
+        const interactiveSteps = storySteps.filter(s => s.interactive && s.listeningFirst);
+        const currentInteractiveIndex = interactiveSteps.findIndex(s => s.id === current.id);
+        if (currentInteractiveIndex >= 0 && (currentInteractiveIndex + 1) % 2 === 0) {
+          const newStars = Math.min(3, Math.floor((currentInteractiveIndex + 1) / 2));
+          setStars(newStars);
+          console.log(`⭐ Star awarded! (${newStars}/3)`);
+        }
       }
     
       setShowFeedback(true);
