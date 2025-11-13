@@ -297,7 +297,84 @@ class RealTimeDataServiceClass {
 
       case 'kids_progress': {
         const { default: KidsProgressService } = await import('./KidsProgressService');
-        return KidsProgressService.get(String(userId));
+        const { default: KidsApi } = await import('./KidsApi');
+        
+        // Try to get server data first, then merge with local data
+        let serverProgress: any = null;
+        const token = localStorage.getItem('speakbee_auth_token');
+        
+        if (token && token !== 'local-token') {
+          try {
+            serverProgress = await KidsApi.getProgress(token);
+          } catch (error: unknown) {
+            // If 401, token is invalid - clear it and fallback to local
+            if (typeof error === 'object' && error !== null && 'message' in error && typeof (error as { message: unknown }).message === 'string') {
+              const msg = (error as { message: string }).message;
+              if (msg.includes('token not valid') || msg.includes('401')) {
+                localStorage.removeItem('speakbee_auth_token');
+                console.warn('[RealTimeData] Token expired, falling back to local progress');
+              }
+            }
+            // Fallback to local for any error
+          }
+        }
+        
+        // Always get local data as fallback/merge source
+        let localProgress: any = null;
+        try {
+          localProgress = await KidsProgressService.get(String(userId));
+        } catch (error) {
+          console.warn('[RealTimeData] Error loading local progress:', error);
+        }
+        
+        // Merge server and local data - prefer maximum values for points/streak
+        const serverDetails = serverProgress?.details || {};
+        const localDetails = localProgress?.details || {};
+        
+        // Points: Use the maximum of server and local (to account for offline progress)
+        const serverPoints = serverProgress?.points ?? 0;
+        const localPoints = localProgress?.points ?? 0;
+        const mergedPoints = Math.max(serverPoints, localPoints);
+        
+        // Streak: Use the maximum of server and local
+        const serverStreak = serverProgress?.streak ?? 0;
+        const localStreak = localProgress?.streak ?? 0;
+        const mergedStreak = Math.max(serverStreak, localStreak);
+        
+        // Merge other details (pronunciation, vocabulary, games, etc.)
+        const mergedDetails = {
+          ...localDetails,
+          ...serverDetails,
+          pronunciation: { ...(localDetails.pronunciation || {}), ...(serverDetails.pronunciation || {}) },
+          vocabulary: { ...(localDetails.vocabulary || {}), ...(serverDetails.vocabulary || {}) },
+          games: {
+            ...(localDetails.games || {}),
+            ...(serverDetails.games || {}),
+            points: Math.max(
+              Number(localDetails.games?.points || 0),
+              Number(serverDetails.games?.points || 0)
+            ),
+            attempts: Math.max(
+              Number(localDetails.games?.attempts || 0),
+              Number(serverDetails.games?.attempts || 0)
+            ),
+            types: Array.from(new Set([
+              ...(Array.isArray(localDetails.games?.types) ? localDetails.games.types : []),
+              ...(Array.isArray(serverDetails.games?.types) ? serverDetails.games.types : [])
+            ]))
+          },
+          readAloud: { ...(localDetails.readAloud || {}), ...(serverDetails.readAloud || {}) },
+          favorites: serverDetails.favorites || localDetails.favorites || []
+        };
+        
+        // Return merged progress
+        return {
+          userId: String(userId),
+          points: mergedPoints,
+          streak: mergedStreak,
+          details: mergedDetails,
+          ...(localProgress?.storyEnrollments ? { storyEnrollments: localProgress.storyEnrollments } : {})
+        };
       }
 
       case 'teen_progress': {

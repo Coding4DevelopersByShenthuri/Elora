@@ -440,11 +440,16 @@ const YoungKidsPage = () => {
   });
 
   // Update progress when real-time data arrives
+  // Use Math.max to prevent overwriting with lower values (safeguard)
   useEffect(() => {
     if (realTimeKidsProgress) {
       const progress = realTimeKidsProgress as any;
-      if (progress.points !== undefined) setPoints(progress.points);
-      if (progress.streak !== undefined) setStreak(progress.streak);
+      if (progress.points !== undefined) {
+        setPoints(prev => Math.max(prev, progress.points));
+      }
+      if (progress.streak !== undefined) {
+        setStreak(prev => Math.max(prev, progress.streak));
+      }
       // Update other fields as needed from realTimeKidsProgress
     }
   }, [realTimeKidsProgress]);
