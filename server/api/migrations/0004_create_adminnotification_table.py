@@ -34,16 +34,40 @@ class Migration(migrations.Migration):
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
                 """,
                 """
-                CREATE INDEX `api_adminno_user_id_d97447_idx` 
-                    ON `api_adminnotification` (`user_id`, `is_read`, `created_at`);
+                SET @exist := (SELECT COUNT(*) FROM information_schema.statistics 
+                    WHERE table_schema = DATABASE() 
+                    AND table_name = 'api_adminnotification' 
+                    AND index_name = 'api_adminno_user_id_d97447_idx');
+                SET @sqlstmt := IF(@exist = 0, 
+                    'CREATE INDEX `api_adminno_user_id_d97447_idx` ON `api_adminnotification` (`user_id`, `is_read`, `created_at`)', 
+                    'SELECT ''Index already exists''');
+                PREPARE stmt FROM @sqlstmt;
+                EXECUTE stmt;
+                DEALLOCATE PREPARE stmt;
                 """,
                 """
-                CREATE INDEX `api_adminno_is_read_5856b7_idx` 
-                    ON `api_adminnotification` (`is_read`, `created_at`);
+                SET @exist := (SELECT COUNT(*) FROM information_schema.statistics 
+                    WHERE table_schema = DATABASE() 
+                    AND table_name = 'api_adminnotification' 
+                    AND index_name = 'api_adminno_is_read_5856b7_idx');
+                SET @sqlstmt := IF(@exist = 0, 
+                    'CREATE INDEX `api_adminno_is_read_5856b7_idx` ON `api_adminnotification` (`is_read`, `created_at`)', 
+                    'SELECT ''Index already exists''');
+                PREPARE stmt FROM @sqlstmt;
+                EXECUTE stmt;
+                DEALLOCATE PREPARE stmt;
                 """,
                 """
-                CREATE INDEX `api_adminno_expires_c52829_idx` 
-                    ON `api_adminnotification` (`expires_at`);
+                SET @exist := (SELECT COUNT(*) FROM information_schema.statistics 
+                    WHERE table_schema = DATABASE() 
+                    AND table_name = 'api_adminnotification' 
+                    AND index_name = 'api_adminno_expires_c52829_idx');
+                SET @sqlstmt := IF(@exist = 0, 
+                    'CREATE INDEX `api_adminno_expires_c52829_idx` ON `api_adminnotification` (`expires_at`)', 
+                    'SELECT ''Index already exists''');
+                PREPARE stmt FROM @sqlstmt;
+                EXECUTE stmt;
+                DEALLOCATE PREPARE stmt;
                 """
             ],
             reverse_sql="DROP TABLE IF EXISTS `api_adminnotification`;"

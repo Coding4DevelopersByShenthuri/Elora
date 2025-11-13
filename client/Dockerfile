@@ -10,6 +10,10 @@ RUN apt-get update && apt-get install -y \
     g++ \
     && rm -rf /var/lib/apt/lists/*
 
+# Accept build argument for API URL
+ARG VITE_API_URL=http://54.179.120.126:8000/api
+ENV VITE_API_URL=$VITE_API_URL
+
 # Copy only package.json first to generate a fresh lock file
 COPY package.json ./
 
@@ -24,6 +28,9 @@ RUN npm run build
 
 # Step 2: Serve the built app using nginx
 FROM nginx:alpine
+
+# Install wget for health checks
+RUN apk add --no-cache wget
 
 COPY --from=build /app/dist /usr/share/nginx/html
 

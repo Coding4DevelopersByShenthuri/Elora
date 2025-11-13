@@ -1,0 +1,26 @@
+version: '3.8'
+
+# Development override file
+# Use with: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  backend:
+    volumes:
+      - ./server:/app
+    environment:
+      - DEBUG=True
+    command: python manage.py runserver 0.0.0.0:8000
+    # Remove health check dependency for faster dev startup
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      args:
+        - VITE_API_URL=http://localhost:8000/api
+    ports:
+      - "8080:80"  # Different port for dev
+    # Remove health check dependency for faster dev startup
+    depends_on:
+      - backend
+

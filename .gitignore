@@ -28,6 +28,12 @@ wheels/
 .installed.cfg
 *.egg
 
+# Python cache
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
 # Django
 *.log
 db.sqlite3
