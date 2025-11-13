@@ -632,7 +632,7 @@ const TeenKidsPage = () => {
       return;
     }
     TeenApi.getDashboard(token)
-      .then(applyDashboard)
+      .then((data: any) => applyDashboard(data))
       .catch((error) => {
         console.error('Error loading teen dashboard:', error);
       });
@@ -646,6 +646,52 @@ const TeenKidsPage = () => {
       return;
     }
   }, [isAuthenticated]);
+
+  // Load vocabulary words and phrases from enrolled stories (TEEN KIDS ONLY)
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const loadVocabularyWordsAndPhrases = () => {
+      try {
+        // Get words from enrolled stories - FILTERED TO TEEN KIDS ONLY
+        const storyWords = StoryWordsService.getWordsFromEnrolledStoriesByAge(userId, 'teen');
+        // Save detailed for filtering; do NOT fallback to defaults for Advanced Vocabulary
+        const detailed = storyWords.map(sw => ({
+          word: sw.word,
+          hint: sw.hint,
+          storyId: sw.storyId,
+          storyTitle: sw.storyTitle
+        }));
+        setEnrolledStoryWordsDetailed(detailed);
+        const filtered = selectedStoryFilter === 'all' 
+          ? detailed
+          : detailed.filter(w => w.storyId === selectedStoryFilter);
+        console.log(`📚 Loaded ${filtered.length} words from enrolled TEEN stories${selectedStoryFilter !== 'all' ? ' (filtered)' : ''}`);
+
+        // Get phrases from enrolled stories - FILTERED TO TEEN KIDS ONLY
+        const storyPhrases = StoryWordsService.getPhrasesFromEnrolledStoriesByAge(userId, 'teen');
+        // Save detailed for filtering; do NOT fallback to defaults for Speaking Lab
+        const detailedPhrases = storyPhrases.map(sp => ({
+          phrase: sp.phrase,
+          phonemes: sp.phonemes,
+          storyId: sp.storyId,
+          storyTitle: sp.storyTitle
+        }));
+        setEnrolledStoryPhrasesDetailed(detailedPhrases);
+        const filteredPhrases = selectedPhraseFilter === 'all' 
+          ? detailedPhrases
+          : detailedPhrases.filter(p => p.storyId === selectedPhraseFilter);
+        console.log(`🎤 Loaded ${filteredPhrases.length} phrases from enrolled TEEN stories${selectedPhraseFilter !== 'all' ? ' (filtered)' : ''}`);
+      } catch (error) {
+        console.error('Error loading vocabulary words and phrases:', error);
+        // For Advanced Vocabulary and Speaking Lab, do not fallback to defaults; show empty state
+        setEnrolledStoryWordsDetailed([]);
+        setEnrolledStoryPhrasesDetailed([]);
+      }
+    };
+
+    loadVocabularyWordsAndPhrases();
+  }, [userId, isAuthenticated, selectedStoryFilter, selectedPhraseFilter]);
 
   // Check page eligibility on mount and show modal if locked
   useEffect(() => {
@@ -662,12 +708,11 @@ const TeenKidsPage = () => {
           if (!eligibility?.is_unlocked) {
             console.log('🚫 TeenKids page is locked - showing blocked modal');
             setShowPageBlockedModal(true);
-          } else {
-            setIsPageBlocked(false);
-          }
+      } else {
+        // Page is unlocked
+      }
         } catch (error) {
           console.error('Error checking page eligibility:', error);
-          setIsPageBlocked(false);
         }
       }
     };
@@ -880,7 +925,6 @@ const TeenKidsPage = () => {
   const [showDigitalSecurity, setShowDigitalSecurity] = useState(false);
   const [showPageBlockedModal, setShowPageBlockedModal] = useState(false);
   const [pageEligibility, setPageEligibility] = useState<any>(null);
-  const [isPageBlocked, setIsPageBlocked] = useState(false);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
@@ -970,10 +1014,10 @@ const TeenKidsPage = () => {
     }
     
     // Check if this is a template story (11-20)
-    const storyNumber = parseInt(storyId.replace('teen-', ''), 10);
-    if (storyNumber >= 10) {
+    const storyIndex = parseInt(storyId.replace('teen-', ''), 10);
+    if (storyIndex >= 10) {
       // This is a template story (11-20), use DynamicStoryAdventure
-      const template = storyTemplates.find(t => t.storyNumber === storyNumber + 1);
+      const template = storyTemplates.find(t => t.storyNumber === storyIndex + 1);
       if (template && template.storySteps) {
         // Find the story from allTeenStoriesWithDataset to get the full story info
         const story = allTeenStoriesWithDataset.find((s) => s.id === storyId);
@@ -1014,6 +1058,30 @@ const TeenKidsPage = () => {
             };
             const updatedEnrollments = [...storyEnrollments, enrollment];
             localStorage.setItem(`speakbee_story_enrollments_${userId}`, JSON.stringify(updatedEnrollments));
+            
+            // Immediately reload words and phrases for this enrolled story (TEEN KIDS ONLY)
+            const storyWords = StoryWordsService.getWordsForStoryIdsByAge([internalId], 'teen');
+            const storyPhrases = StoryWordsService.getPhrasesForStoryIdsByAge([internalId], 'teen');
+            
+            if (storyWords.length > 0 || storyPhrases.length > 0) {
+              setEnrolledStoryWordsDetailed(prev => {
+                const existing = new Set(prev.map(w => `${w.storyId}-${w.word}`));
+                const toAdd = storyWords
+                  .map(w => ({ word: w.word, hint: w.hint, storyId: w.storyId, storyTitle: w.storyTitle }))
+                  .filter(w => !existing.has(`${w.storyId}-${w.word}`));
+                return [...prev, ...toAdd];
+              });
+              
+              setEnrolledStoryPhrasesDetailed(prev => {
+                const existing = new Set(prev.map(p => `${p.storyId}-${p.phrase}`));
+                const toAdd = storyPhrases
+                  .map(p => ({ phrase: p.phrase, phonemes: p.phonemes, storyId: p.storyId, storyTitle: p.storyTitle }))
+                  .filter(p => !existing.has(`${p.storyId}-${p.phrase}`));
+                return [...prev, ...toAdd];
+              });
+              
+              console.log(`✅ Immediately loaded ${storyWords.length} words and ${storyPhrases.length} phrases from enrolled TEEN story: ${story.title}`);
+            }
           } catch (error) {
             console.warn('Failed to track story enrollment:', error);
           }
@@ -1053,7 +1121,7 @@ const TeenKidsPage = () => {
         
         return;
       } else {
-        console.warn(`Template not found for story ${storyNumber + 1}`);
+        console.warn(`Template not found for story ${storyIndex + 1}`);
       }
     }
     
@@ -1100,6 +1168,30 @@ const TeenKidsPage = () => {
         };
         const updatedEnrollments = [...storyEnrollments, enrollment];
         localStorage.setItem(`speakbee_story_enrollments_${userId}`, JSON.stringify(updatedEnrollments));
+        
+        // Immediately reload words and phrases for this enrolled story (TEEN KIDS ONLY)
+        const storyWords = StoryWordsService.getWordsForStoryIdsByAge([internalId], 'teen');
+        const storyPhrases = StoryWordsService.getPhrasesForStoryIdsByAge([internalId], 'teen');
+        
+        if (storyWords.length > 0 || storyPhrases.length > 0) {
+          setEnrolledStoryWordsDetailed(prev => {
+            const existing = new Set(prev.map(w => `${w.storyId}-${w.word}`));
+            const toAdd = storyWords
+              .map(w => ({ word: w.word, hint: w.hint, storyId: w.storyId, storyTitle: w.storyTitle }))
+              .filter(w => !existing.has(`${w.storyId}-${w.word}`));
+            return [...prev, ...toAdd];
+          });
+          
+          setEnrolledStoryPhrasesDetailed(prev => {
+            const existing = new Set(prev.map(p => `${p.storyId}-${p.phrase}`));
+            const toAdd = storyPhrases
+              .map(p => ({ phrase: p.phrase, phonemes: p.phonemes, storyId: p.storyId, storyTitle: p.storyTitle }))
+              .filter(p => !existing.has(`${p.storyId}-${p.phrase}`));
+            return [...prev, ...toAdd];
+          });
+          
+          console.log(`✅ Immediately loaded ${storyWords.length} words and ${storyPhrases.length} phrases from enrolled TEEN story: ${story.title}`);
+        }
       } catch (error) {
         console.warn('Failed to track story enrollment:', error);
       }
@@ -1144,8 +1236,6 @@ const TeenKidsPage = () => {
   const handleAdventureComplete = async (storyId: string, score: number) => {
     if (!isAuthenticated) return;
 
-    // Check if this is a template story (11-20)
-    const storyNumber = parseInt(storyId.replace('teen-', ''), 10);
     let story = allTeenStories.find((s) => s.id === storyId);
     
     // If not found in hardcoded stories, try dataset stories
@@ -1190,6 +1280,62 @@ const TeenKidsPage = () => {
         .filter((p) => !existing.has(`${p.storyId}-${p.phrase}`));
       return [...prev, ...toAdd];
     });
+    
+    // Check if this is a story 11-19, and if so, unlock the next story (12-20)
+    const completedStoryIndex = parseInt(storyId.replace('teen-', ''), 10);
+    if (completedStoryIndex >= 10 && completedStoryIndex < 19) {
+      // This is a story 11-19, unlock the next story
+      const nextStoryNumber = completedStoryIndex + 2; // Story 11 (index 10) unlocks story 12 (number 12)
+      const nextStory = datasetStories.find(ds => ds.storyNumber === nextStoryNumber);
+      if (nextStory) {
+        const nextStoryInternalId = getInternalStoryId(nextStory.type);
+        const nextStoryEnrollments = StoryWordsService.getEnrolledStories(userId);
+        const isNextStoryEnrolled = nextStoryEnrollments.some(e => e.storyId === nextStoryInternalId);
+        
+        if (!isNextStoryEnrolled) {
+          // Auto-enroll in next story
+          try {
+            const enrollment = {
+              storyId: nextStoryInternalId,
+              storyTitle: nextStory.title,
+              storyType: nextStory.type,
+              completed: false,
+              wordsExtracted: false,
+              completedAt: undefined,
+              score: undefined
+            };
+            const updatedEnrollments = [...nextStoryEnrollments, enrollment];
+            localStorage.setItem(`speakbee_story_enrollments_${userId}`, JSON.stringify(updatedEnrollments));
+            
+            // Load words/phrases for next story
+            const nextStoryWords = StoryWordsService.getWordsForStoryIdsByAge([nextStoryInternalId], 'teen');
+            const nextStoryPhrases = StoryWordsService.getPhrasesForStoryIdsByAge([nextStoryInternalId], 'teen');
+            
+            if (nextStoryWords.length > 0 || nextStoryPhrases.length > 0) {
+              setEnrolledStoryWordsDetailed(prev => {
+                const existing = new Set(prev.map(w => `${w.storyId}-${w.word}`));
+                const toAdd = nextStoryWords
+                  .map(w => ({ word: w.word, hint: w.hint, storyId: w.storyId, storyTitle: w.storyTitle }))
+                  .filter(w => !existing.has(`${w.storyId}-${w.word}`));
+                return [...prev, ...toAdd];
+              });
+              
+              setEnrolledStoryPhrasesDetailed(prev => {
+                const existing = new Set(prev.map(p => `${p.storyId}-${p.phrase}`));
+                const toAdd = nextStoryPhrases
+                  .map(p => ({ phrase: p.phrase, phonemes: p.phonemes, storyId: p.storyId, storyTitle: p.storyTitle }))
+                  .filter(p => !existing.has(`${p.storyId}-${p.phrase}`));
+                return [...prev, ...toAdd];
+              });
+              
+              console.log(`✅ Auto-unlocked next teen story ${nextStoryNumber}: ${nextStory.title}`);
+            }
+          } catch (error) {
+            console.warn(`Failed to auto-unlock teen story ${nextStoryNumber}:`, error);
+          }
+        }
+      }
+    }
 
     // Call API to sync with server and update points
     try {
@@ -1470,9 +1616,12 @@ const TeenKidsPage = () => {
                     );
                     if (previousDatasetStory) {
                       const previousInternalId = getInternalStoryId(previousDatasetStory.type);
+                      const storyEnrollments = StoryWordsService.getEnrolledStories(userId);
+                      const isPreviousEnrolled = storyEnrollments.some(e => e.storyId === previousInternalId);
                       isUnlocked = completedStoryIds.includes(`teen-${previousStoryIndex}`) || 
                                   enrolledInternalStoryIds.has(previousInternalId) ||
-                                  allEnrolledStoryIds.has(previousInternalId);
+                                  allEnrolledStoryIds.has(previousInternalId) ||
+                                  isPreviousEnrolled;
                     }
                   }
                 }
@@ -1641,24 +1790,22 @@ const TeenKidsPage = () => {
                             </option>
                           )
                         )}
-                        {/* Logic to unlock stories 11-20 based on completion of previous stories */}
-                        {(() => {
-                          const unlockStories = (completedStories: number) => {
-                            return completedStories >= 10 ? Array.from({ length: 10 }, (_, i) => i + 11) : [];
-                          };
-                          const completedStories = completedStoryIds.filter(id => id.startsWith('teen-')).length;
-                          const unlockedStories = unlockStories(completedStories);
-                          
-                          return unlockedStories.map((storyNumber) => {
-                            const storyId = `teen-${storyNumber - 1}`;
-                            const storyTitle = allTeenStories.find(story => story.id === storyId)?.title || `Story ${storyNumber}`;
+                        {/* Include enrolled stories 11-20 in filter */}
+                        {Array.from(allEnrolledStoryIds).map(internalId => {
+                          // Check if this is a story 11-20 by finding it in dataset stories
+                          const datasetStory = datasetStories.find(ds => {
+                            const mappedType = getInternalStoryId(ds.type);
+                            return mappedType === internalId;
+                          });
+                          if (datasetStory) {
                             return (
-                              <option key={storyId} value={storyId}>
-                                {storyTitle}
+                              <option key={internalId} value={internalId}>
+                                {datasetStory.title}
                               </option>
                             );
-                          });
-                        })()}
+                          }
+                          return null;
+                        }).filter(Boolean)}
                       </select>
                     </div>
                   </div>
@@ -1772,6 +1919,22 @@ const TeenKidsPage = () => {
                             </option>
                           )
                         )}
+                        {/* Include enrolled stories 11-20 in filter */}
+                        {Array.from(allEnrolledStoryIds).map(internalId => {
+                          // Check if this is a story 11-20 by finding it in dataset stories
+                          const datasetStory = datasetStories.find(ds => {
+                            const mappedType = getInternalStoryId(ds.type);
+                            return mappedType === internalId;
+                          });
+                          if (datasetStory) {
+                            return (
+                              <option key={internalId} value={internalId}>
+                                {datasetStory.title}
+                              </option>
+                            );
+                          }
+                          return null;
+                        }).filter(Boolean)}
                       </select>
                     </div>
                   </div>
@@ -2104,7 +2267,14 @@ const TeenKidsPage = () => {
             setCurrentStory('');
             await handleAdventureComplete(storyId, score);
           }}
-          storyData={currentTemplateStory}
+          storyData={{
+            title: currentTemplateStory.title,
+            storySteps: currentTemplateStory.storySteps as any, // Cast to StoryStep[] - the JSON structure matches at runtime
+            voiceProfile: currentTemplateStory.voiceProfile || 'ClimateLeader',
+            characterName: currentTemplateStory.characterName || 'Leader',
+            storyId: currentTemplateStory.storyId,
+            milestoneStepIds: currentTemplateStory.milestoneStepIds || []
+          } as any}
         />
       )}
 

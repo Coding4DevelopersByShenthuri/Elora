@@ -409,7 +409,8 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
   }, []);
 
   const stripEmojis = (text: string): string => {
-    return text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{FE00}-\u{FE0F}]|[\u{E0020}-\u{E007F}]/gu, '').trim();
+    // Remove ALL emoji characters to prevent TTS from reading emojis (including stars ⭐, 🌟, etc.)
+    return text.replace(/[\p{Extended_Pictographic}\p{Emoji_Presentation}]/gu, '').trim();
   };
 
   // Enhanced audio playback (OnlineTTS: Web Speech API only)
@@ -517,11 +518,18 @@ const UnderwaterWorld = ({ onClose, onComplete }: Props) => {
         setIsPlaying(true);
         setIsRevealTextPlaying(true);
         try {
-          await playAudioWithCaptions((current as any).revealText);
+          const revealText = (current as any).revealText || '';
+          await playAudioWithCaptions(revealText);
           console.log('✅ Auto reveal text playback completed');
           
-          // Wait a bit more after TTS completes to ensure full reading
-          await new Promise(resolve => setTimeout(resolve, 3000));
+          // Calculate reading time based on full text length to ensure full reading
+          const textLength = revealText.length;
+          const wordsPerMinute = playbackSpeed === 'slow' ? 120 : playbackSpeed === 'slower' ? 80 : 160;
+          // Calculate reading time: (textLength / 5 chars per word) * (ms per word) + buffer
+          const estimatedReadingTime = Math.max(10000, (textLength / 5) * (60000 / wordsPerMinute) + 2000);
+          
+          // Wait for full reading time after TTS completes
+          await new Promise(resolve => setTimeout(resolve, estimatedReadingTime));
         } catch (error) {
           console.error('❌ Auto reveal text playback failed:', error);
         } finally {

@@ -221,9 +221,7 @@ const YoungKidsPage = () => {
       try {
         // 1. Initialize HybridServiceManager
         await HybridServiceManager.initialize({
-          mode: 'online',
-          autoSync: true,
-          syncInterval: 15
+          mode: 'online'
         });
 
         // 2. Check system health
@@ -705,7 +703,9 @@ const YoungKidsPage = () => {
     const loadTemplates = async () => {
       try {
         const templates = await StoryDatasetService.loadStoryTemplates('/datasets/young-kids-stories-templates.json', 'young');
-        setStoryTemplates(templates);
+        // Cast to StoryTemplate[] since the JSON structure matches (has storySteps property)
+        // The runtime data has storySteps, but DatasetStory type doesn't include it
+        setStoryTemplates(templates as unknown as StoryTemplate[]);
         console.log(`📚 Loaded ${templates.length} story templates`);
       } catch (error) {
         console.error('Error loading story templates:', error);
@@ -878,11 +878,6 @@ const YoungKidsPage = () => {
     ? serverAchievements.filter((a: any) => a.unlocked === true).length
     : achievements.filter(a => a.progress === 100).length;
 
-  // Logic to unlock stories 11-20 based on completion of previous stories
-  const unlockStories = (completedStories: number) => {
-    return completedStories >= 10 ? Array.from({ length: 10 }, (_, i) => i + 11) : [];
-  };
-  const unlockedStories = unlockStories(completedAchievements);
 
   const handleStartLesson = async (storyId: string) => {
     if (!isAuthenticated) {
@@ -937,6 +932,85 @@ const YoungKidsPage = () => {
         };
         const updatedEnrollments = [...storyEnrollments, enrollment];
         localStorage.setItem(`speakbee_story_enrollments_${userId}`, JSON.stringify(updatedEnrollments));
+        
+        // Immediately reload words and phrases for this enrolled story (YOUNG KIDS ONLY)
+        // This works for both base stories (1-10) and template stories (11-20)
+        const storyWords = StoryWordsService.getWordsForStoryIdsByAge([internalId], 'young');
+        const storyPhrases = StoryWordsService.getPhrasesForStoryIdsByAge([internalId], 'young');
+        
+        if (storyWords.length > 0 || storyPhrases.length > 0) {
+          setEnrolledStoryWordsDetailed(prev => {
+            const existing = new Set(prev.map(w => `${w.storyId}-${w.word}`));
+            const toAdd = storyWords
+              .map(w => ({ word: w.word, hint: w.hint, storyId: w.storyId, storyTitle: w.storyTitle }))
+              .filter(w => !existing.has(`${w.storyId}-${w.word}`));
+            return [...prev, ...toAdd];
+          });
+          
+          setEnrolledStoryPhrasesDetailed(prev => {
+            const existing = new Set(prev.map(p => `${p.storyId}-${p.phrase}`));
+            const toAdd = storyPhrases
+              .map(p => ({ phrase: p.phrase, phonemes: p.phonemes, storyId: p.storyId, storyTitle: p.storyTitle }))
+              .filter(p => !existing.has(`${p.storyId}-${p.phrase}`));
+            return [...prev, ...toAdd];
+          });
+          
+          console.log(`✅ Immediately loaded ${storyWords.length} words and ${storyPhrases.length} phrases from enrolled YOUNG story: ${story.title}`);
+        }
+        
+        // If this is story 10 (index 9), unlock story 11 immediately
+        if (storyIndex === 9) {
+          // Story 10 completed, unlock story 11
+          const story11 = datasetStories.find(ds => ds.storyNumber === 11);
+          if (story11) {
+            const story11InternalId = getInternalStoryId(story11.type);
+            const story11Enrollments = StoryWordsService.getEnrolledStories(userId);
+            const isStory11Enrolled = story11Enrollments.some(e => e.storyId === story11InternalId);
+            
+            if (!isStory11Enrolled) {
+              // Auto-enroll in story 11 when story 10 is completed
+              try {
+                const enrollment = {
+                  storyId: story11InternalId,
+                  storyTitle: story11.title,
+                  storyType: story11.type,
+                  completed: false,
+                  wordsExtracted: false,
+                  completedAt: undefined,
+                  score: undefined
+                };
+                const updatedEnrollments = [...story11Enrollments, enrollment];
+                localStorage.setItem(`speakbee_story_enrollments_${userId}`, JSON.stringify(updatedEnrollments));
+                
+                // Load words/phrases for story 11
+                const story11Words = StoryWordsService.getWordsForStoryIdsByAge([story11InternalId], 'young');
+                const story11Phrases = StoryWordsService.getPhrasesForStoryIdsByAge([story11InternalId], 'young');
+                
+                if (story11Words.length > 0 || story11Phrases.length > 0) {
+                  setEnrolledStoryWordsDetailed(prev => {
+                    const existing = new Set(prev.map(w => `${w.storyId}-${w.word}`));
+                    const toAdd = story11Words
+                      .map(w => ({ word: w.word, hint: w.hint, storyId: w.storyId, storyTitle: w.storyTitle }))
+                      .filter(w => !existing.has(`${w.storyId}-${w.word}`));
+                    return [...prev, ...toAdd];
+                  });
+                  
+                  setEnrolledStoryPhrasesDetailed(prev => {
+                    const existing = new Set(prev.map(p => `${p.storyId}-${p.phrase}`));
+                    const toAdd = story11Phrases
+                      .map(p => ({ phrase: p.phrase, phonemes: p.phonemes, storyId: p.storyId, storyTitle: p.storyTitle }))
+                      .filter(p => !existing.has(`${p.storyId}-${p.phrase}`));
+                    return [...prev, ...toAdd];
+                  });
+                  
+                  console.log(`✅ Auto-unlocked and loaded story 11: ${story11.title}`);
+                }
+              } catch (error) {
+                console.warn('Failed to auto-unlock story 11:', error);
+              }
+            }
+          }
+        }
       } catch (error) {
         console.warn('Failed to track story enrollment:', error);
       }
@@ -1238,6 +1312,62 @@ const YoungKidsPage = () => {
         ? detailedPhrases
         : detailedPhrases.filter(p => p.storyId === selectedPhraseFilter);
       console.log(`🎉 Story completed! Loaded ${relevantPhrases.length} total phrases from enrolled YOUNG stories${selectedPhraseFilter !== 'all' ? ' (filtered)' : ''}`);
+      
+      // Check if this is a story 11-19, and if so, unlock the next story (12-20)
+      const completedStoryIndex = parseInt(storyId.replace('young-', ''), 10);
+      if (completedStoryIndex >= 10 && completedStoryIndex < 19) {
+        // This is a story 11-19, unlock the next story
+        const nextStoryNumber = completedStoryIndex + 2; // Story 11 (index 10) unlocks story 12 (number 12)
+        const nextStory = datasetStories.find(ds => ds.storyNumber === nextStoryNumber);
+        if (nextStory) {
+          const nextStoryInternalId = getInternalStoryId(nextStory.type);
+          const nextStoryEnrollments = StoryWordsService.getEnrolledStories(userId);
+          const isNextStoryEnrolled = nextStoryEnrollments.some(e => e.storyId === nextStoryInternalId);
+          
+          if (!isNextStoryEnrolled) {
+            // Auto-enroll in next story
+            try {
+              const enrollment = {
+                storyId: nextStoryInternalId,
+                storyTitle: nextStory.title,
+                storyType: nextStory.type,
+                completed: false,
+                wordsExtracted: false,
+                completedAt: undefined,
+                score: undefined
+              };
+              const updatedEnrollments = [...nextStoryEnrollments, enrollment];
+              localStorage.setItem(`speakbee_story_enrollments_${userId}`, JSON.stringify(updatedEnrollments));
+              
+              // Load words/phrases for next story
+              const nextStoryWords = StoryWordsService.getWordsForStoryIdsByAge([nextStoryInternalId], 'young');
+              const nextStoryPhrases = StoryWordsService.getPhrasesForStoryIdsByAge([nextStoryInternalId], 'young');
+              
+              if (nextStoryWords.length > 0 || nextStoryPhrases.length > 0) {
+                setEnrolledStoryWordsDetailed(prev => {
+                  const existing = new Set(prev.map(w => `${w.storyId}-${w.word}`));
+                  const toAdd = nextStoryWords
+                    .map(w => ({ word: w.word, hint: w.hint, storyId: w.storyId, storyTitle: w.storyTitle }))
+                    .filter(w => !existing.has(`${w.storyId}-${w.word}`));
+                  return [...prev, ...toAdd];
+                });
+                
+                setEnrolledStoryPhrasesDetailed(prev => {
+                  const existing = new Set(prev.map(p => `${p.storyId}-${p.phrase}`));
+                  const toAdd = nextStoryPhrases
+                    .map(p => ({ phrase: p.phrase, phonemes: p.phonemes, storyId: p.storyId, storyTitle: p.storyTitle }))
+                    .filter(p => !existing.has(`${p.storyId}-${p.phrase}`));
+                  return [...prev, ...toAdd];
+                });
+                
+                console.log(`✅ Auto-unlocked next story ${nextStoryNumber}: ${nextStory.title}`);
+              }
+            } catch (error) {
+              console.warn(`Failed to auto-unlock story ${nextStoryNumber}:`, error);
+            }
+          }
+        }
+      }
       
       if (token && token !== 'local-token') {
         const current = await KidsApi.getProgress(token);
@@ -1652,8 +1782,11 @@ const YoungKidsPage = () => {
                       const previousStory = (dynamicStories || allStories)[previousStoryIndex];
                       if (previousStory) {
                         const previousInternalId = getInternalStoryId(previousStory.type);
+                        const storyEnrollments = StoryWordsService.getEnrolledStories(userId);
+                        const isPreviousEnrolled = storyEnrollments.some(e => e.storyId === previousInternalId);
                         isUnlocked = completedStoryIds.has(previousInternalId) || 
-                                    enrolledInternalStoryIds.has(previousInternalId);
+                                    enrolledInternalStoryIds.has(previousInternalId) ||
+                                    isPreviousEnrolled;
                       }
                     } else {
                       // Previous story is also a dataset story (11-20)
@@ -1663,8 +1796,11 @@ const YoungKidsPage = () => {
                       );
                       if (previousDatasetStory) {
                         const previousInternalId = getInternalStoryId(previousDatasetStory.type);
+                        const storyEnrollments = StoryWordsService.getEnrolledStories(userId);
+                        const isPreviousEnrolled = storyEnrollments.some(e => e.storyId === previousInternalId);
                         isUnlocked = completedStoryIds.has(previousInternalId) || 
-                                    enrolledInternalStoryIds.has(previousInternalId);
+                                    enrolledInternalStoryIds.has(previousInternalId) ||
+                                    isPreviousEnrolled;
                       }
                     }
                   }
@@ -1821,23 +1957,22 @@ const YoungKidsPage = () => {
                         onChange={(e) => setSelectedStoryFilter(e.target.value)}
                       >
                         <option value="all">All stories</option>
-                        {Array.from(new Map(enrolledStoryWordsDetailed.map(w => [w.storyId, w.storyTitle])).entries()).map(([id, title]) => (
-                          <option key={id} value={id}>{title}</option>
-                        ))}
-                        {unlockedStories.length > 0 && (
-                          <optgroup label="Unlocked stories">
-                            {unlockedStories.map(id => {
-                              const story = allStories.find(s => s.id === `young-${id - 1}`);
-                              return (
-                                story && (
-                                  <option key={id} value={story.id}>
-                                    {story.title}
-                                  </option>
-                                )
-                              );
-                            })}
-                          </optgroup>
-                        )}
+                        {/* Only show the 20 Young Kids stories in the filter */}
+                        {Array.from(new Map(enrolledStoryWordsDetailed.map(w => [w.storyId, w.storyTitle])).entries())
+                          .filter(([id]) => {
+                            // Only include stories that are in YOUNG_KIDS_STORIES set
+                            const YOUNG_KIDS_STORIES = new Set([
+                              'magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
+                              'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
+                              'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
+                              'magic-school', 'ocean-explorer', 'time-machine', 'friendly-robot',
+                              'secret-cave', 'flying-carpet', 'lost-kingdom', 'grand-adventure'
+                            ]);
+                            return YOUNG_KIDS_STORIES.has(id);
+                          })
+                          .map(([id, title]) => (
+                            <option key={id} value={id}>{title}</option>
+                          ))}
                       </select>
                     </div>
                   </div>
@@ -1948,23 +2083,22 @@ const YoungKidsPage = () => {
                         onChange={(e) => setSelectedPhraseFilter(e.target.value)}
                       >
                         <option value="all">All stories</option>
-                        {Array.from(new Map(enrolledStoryPhrasesDetailed.map(p => [p.storyId, p.storyTitle])).entries()).map(([id, title]) => (
-                          <option key={id} value={id}>{title}</option>
-                        ))}
-                        {unlockedStories.length > 0 && (
-                          <optgroup label="Unlocked stories">
-                            {unlockedStories.map(id => {
-                              const story = allStories.find(s => s.id === `young-${id - 1}`);
-                              return (
-                                story && (
-                                  <option key={id} value={story.id}>
-                                    {story.title}
-                                  </option>
-                                )
-                              );
-                            })}
-                          </optgroup>
-                        )}
+                        {/* Only show the 20 Young Kids stories in the filter */}
+                        {Array.from(new Map(enrolledStoryPhrasesDetailed.map(p => [p.storyId, p.storyTitle])).entries())
+                          .filter(([id]) => {
+                            // Only include stories that are in YOUNG_KIDS_STORIES set
+                            const YOUNG_KIDS_STORIES = new Set([
+                              'magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
+                              'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
+                              'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
+                              'magic-school', 'ocean-explorer', 'time-machine', 'friendly-robot',
+                              'secret-cave', 'flying-carpet', 'lost-kingdom', 'grand-adventure'
+                            ]);
+                            return YOUNG_KIDS_STORIES.has(id);
+                          })
+                          .map(([id, title]) => (
+                            <option key={id} value={id}>{title}</option>
+                          ))}
                       </select>
                     </div>
                   </div>
@@ -2321,7 +2455,14 @@ const YoungKidsPage = () => {
             setCurrentTemplateStory(null);
             setIsPlaying(false);
           }}
-          storyData={currentTemplateStory}
+          storyData={{
+            title: currentTemplateStory.title,
+            storySteps: currentTemplateStory.storySteps as any, // Cast to StoryStep[] - the JSON structure matches
+            voiceProfile: currentTemplateStory.voiceProfile || 'Story1',
+            characterName: currentTemplateStory.characterName || 'Character',
+            storyId: currentTemplateStory.storyId,
+            milestoneStepIds: currentTemplateStory.milestoneStepIds
+          }}
         />
       )}
 

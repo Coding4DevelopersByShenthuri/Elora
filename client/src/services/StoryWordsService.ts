@@ -36,28 +36,34 @@ export class StoryWordsService {
   private static STORAGE_KEY = 'speakbee_story_enrollments';
   
   // Define which stories belong to which age group
+  // YOUNG_KIDS_STORIES: ONLY these 20 stories appear in Young Kids Word Games & Speak & Repeat
+  // Stories 1-10: The Magic Forest, Space Adventure, Underwater World, Dinosaur Discovery,
+  //              Unicorn Magic, Pirate Treasure, Superhero School, Fairy Garden, Rainbow Castle, Jungle Explorer
+  // Stories 11-20: The Enchanted Garden, Dragon's Treasure, The Magic School, Ocean Explorer,
+  //                The Time Machine, The Friendly Robot, The Secret Cave, The Flying Carpet,
+  //                The Lost Kingdom, The Grand Adventure
   private static YOUNG_KIDS_STORIES = new Set([
-    'magic-forest',
-    'space-adventure',
-    'underwater-world',
-    'dinosaur-discovery',
-    'unicorn-magic',
-    'pirate-treasure',
-    'superhero-school',
-    'fairy-garden',
-    'rainbow-castle',
-    'jungle-explorer',
+    'magic-forest',           // 1. The Magic Forest
+    'space-adventure',        // 2. Space Adventure
+    'underwater-world',       // 3. Underwater World
+    'dinosaur-discovery',     // 4. Dinosaur Discovery
+    'unicorn-magic',          // 5. Unicorn Magic
+    'pirate-treasure',        // 6. Pirate Treasure
+    'superhero-school',       // 7. Superhero School
+    'fairy-garden',           // 8. Fairy Garden
+    'rainbow-castle',         // 9. Rainbow Castle
+    'jungle-explorer',        // 10. Jungle Explorer
     // Template stories (11-20) for young kids
-    'enchanted-garden',
-    'dragons-treasure',
-    'magic-school',
-    'ocean-explorer',
-    'time-machine',
-    'friendly-robot',
-    'secret-cave',
-    'flying-carpet',
-    'lost-kingdom',
-    'grand-adventure'
+    'enchanted-garden',       // 11. The Enchanted Garden
+    'dragons-treasure',       // 12. Dragon's Treasure
+    'magic-school',           // 13. The Magic School
+    'ocean-explorer',         // 14. Ocean Explorer
+    'time-machine',           // 15. The Time Machine
+    'friendly-robot',         // 16. The Friendly Robot
+    'secret-cave',            // 17. The Secret Cave
+    'flying-carpet',          // 18. The Flying Carpet
+    'lost-kingdom',           // 19. The Lost Kingdom
+    'grand-adventure'         // 20. The Grand Adventure
   ]);
 
   private static TEEN_KIDS_STORIES = new Set([
@@ -186,6 +192,107 @@ export class StoryWordsService {
       { word: 'adventure', hint: '🗺️ Say: ad-VEN-chur', emoji: '🗺️', storyId: 'jungle-explorer', storyTitle: 'Jungle Explorer Adventure', difficulty: 'medium', category: 'actions' },
       { word: 'brave', hint: '🦅 Say: BRAVE', emoji: '🦅', storyId: 'jungle-explorer', storyTitle: 'Jungle Explorer Adventure', difficulty: 'easy', category: 'descriptions' }
     ],
+    // Template stories (11-20) vocabulary for young kids
+    'enchanted-garden': [
+      { word: 'enchanted', hint: '✨ Say: en-CHANT-ed', emoji: '✨', storyId: 'enchanted-garden', storyTitle: 'The Enchanted Garden', difficulty: 'medium', category: 'fantasy' },
+      { word: 'garden', hint: '🌺 Say: GAR-den', emoji: '🌺', storyId: 'enchanted-garden', storyTitle: 'The Enchanted Garden', difficulty: 'easy', category: 'places' },
+      { word: 'bloom', hint: '🌸 Say: BLOOM', emoji: '🌸', storyId: 'enchanted-garden', storyTitle: 'The Enchanted Garden', difficulty: 'easy', category: 'actions' },
+      { word: 'butterfly', hint: '🦋 Say: BUT-er-fly', emoji: '🦋', storyId: 'enchanted-garden', storyTitle: 'The Enchanted Garden', difficulty: 'easy', category: 'animals' },
+      { word: 'wonder', hint: '🌟 Say: WUN-der', emoji: '🌟', storyId: 'enchanted-garden', storyTitle: 'The Enchanted Garden', difficulty: 'easy', category: 'emotions' },
+      { word: 'peaceful', hint: '🕊️ Say: PEES-ful', emoji: '🕊️', storyId: 'enchanted-garden', storyTitle: 'The Enchanted Garden', difficulty: 'medium', category: 'descriptions' },
+      { word: 'nature', hint: '🌿 Say: NAY-chur', emoji: '🌿', storyId: 'enchanted-garden', storyTitle: 'The Enchanted Garden', difficulty: 'medium', category: 'concepts' },
+      { word: 'beautiful', hint: '💐 Say: BYOO-ti-ful', emoji: '💐', storyId: 'enchanted-garden', storyTitle: 'The Enchanted Garden', difficulty: 'medium', category: 'descriptions' }
+    ],
+    'dragons-treasure': [
+      { word: 'dragon', hint: '🐉 Say: DRAG-un', emoji: '🐉', storyId: 'dragons-treasure', storyTitle: 'Dragon\'s Treasure', difficulty: 'easy', category: 'fantasy' },
+      { word: 'treasure', hint: '💎 Say: TREZH-ur', emoji: '💎', storyId: 'dragons-treasure', storyTitle: 'Dragon\'s Treasure', difficulty: 'medium', category: 'objects' },
+      { word: 'cave', hint: '🕳️ Say: KAYV', emoji: '🕳️', storyId: 'dragons-treasure', storyTitle: 'Dragon\'s Treasure', difficulty: 'easy', category: 'places' },
+      { word: 'sparkle', hint: '✨ Say: SPAR-kul', emoji: '✨', storyId: 'dragons-treasure', storyTitle: 'Dragon\'s Treasure', difficulty: 'easy', category: 'actions' },
+      { word: 'gold', hint: '🪙 Say: GOLD', emoji: '🪙', storyId: 'dragons-treasure', storyTitle: 'Dragon\'s Treasure', difficulty: 'easy', category: 'objects' },
+      { word: 'friend', hint: '🤝 Say: FREND', emoji: '🤝', storyId: 'dragons-treasure', storyTitle: 'Dragon\'s Treasure', difficulty: 'easy', category: 'concepts' },
+      { word: 'share', hint: '💝 Say: SHAIR', emoji: '💝', storyId: 'dragons-treasure', storyTitle: 'Dragon\'s Treasure', difficulty: 'easy', category: 'actions' },
+      { word: 'kindness', hint: '💖 Say: KIND-ness', emoji: '💖', storyId: 'dragons-treasure', storyTitle: 'Dragon\'s Treasure', difficulty: 'medium', category: 'values' }
+    ],
+    'magic-school': [
+      { word: 'school', hint: '🏫 Say: SKOOL', emoji: '🏫', storyId: 'magic-school', storyTitle: 'Magic School', difficulty: 'easy', category: 'places' },
+      { word: 'learn', hint: '📚 Say: LURN', emoji: '📚', storyId: 'magic-school', storyTitle: 'Magic School', difficulty: 'easy', category: 'actions' },
+      { word: 'teacher', hint: '👩‍🏫 Say: TEE-chur', emoji: '👩‍🏫', storyId: 'magic-school', storyTitle: 'Magic School', difficulty: 'easy', category: 'professions' },
+      { word: 'spell', hint: '✨ Say: SPEL', emoji: '✨', storyId: 'magic-school', storyTitle: 'Magic School', difficulty: 'easy', category: 'concepts' },
+      { word: 'book', hint: '📖 Say: BOOK', emoji: '📖', storyId: 'magic-school', storyTitle: 'Magic School', difficulty: 'easy', category: 'objects' },
+      { word: 'wisdom', hint: '🧠 Say: WIZ-dum', emoji: '🧠', storyId: 'magic-school', storyTitle: 'Magic School', difficulty: 'medium', category: 'concepts' },
+      { word: 'friends', hint: '👫 Say: FRENDZ', emoji: '👫', storyId: 'magic-school', storyTitle: 'Magic School', difficulty: 'easy', category: 'concepts' },
+      { word: 'discover', hint: '🔍 Say: dis-KUV-er', emoji: '🔍', storyId: 'magic-school', storyTitle: 'Magic School', difficulty: 'medium', category: 'actions' }
+    ],
+    'ocean-explorer': [
+      { word: 'ocean', hint: '🌊 Say: O-shun', emoji: '🌊', storyId: 'ocean-explorer', storyTitle: 'Ocean Explorer', difficulty: 'easy', category: 'places' },
+      { word: 'dive', hint: '🤿 Say: DIV', emoji: '🤿', storyId: 'ocean-explorer', storyTitle: 'Ocean Explorer', difficulty: 'easy', category: 'actions' },
+      { word: 'coral', hint: '🪸 Say: KOR-al', emoji: '🪸', storyId: 'ocean-explorer', storyTitle: 'Ocean Explorer', difficulty: 'easy', category: 'nature' },
+      { word: 'fish', hint: '🐠 Say: FISH', emoji: '🐠', storyId: 'ocean-explorer', storyTitle: 'Ocean Explorer', difficulty: 'easy', category: 'animals' },
+      { word: 'wave', hint: '🌊 Say: WAYV', emoji: '🌊', storyId: 'ocean-explorer', storyTitle: 'Ocean Explorer', difficulty: 'easy', category: 'nature' },
+      { word: 'swim', hint: '🏊 Say: SWIM', emoji: '🏊', storyId: 'ocean-explorer', storyTitle: 'Ocean Explorer', difficulty: 'easy', category: 'actions' },
+      { word: 'deep', hint: '🌑 Say: DEEP', emoji: '🌑', storyId: 'ocean-explorer', storyTitle: 'Ocean Explorer', difficulty: 'easy', category: 'descriptions' },
+      { word: 'explore', hint: '🗺️ Say: eks-PLOR', emoji: '🗺️', storyId: 'ocean-explorer', storyTitle: 'Ocean Explorer', difficulty: 'medium', category: 'actions' }
+    ],
+    'time-machine': [
+      { word: 'time', hint: '⏰ Say: TYM', emoji: '⏰', storyId: 'time-machine', storyTitle: 'Time Machine', difficulty: 'easy', category: 'concepts' },
+      { word: 'machine', hint: '⚙️ Say: ma-SHEEN', emoji: '⚙️', storyId: 'time-machine', storyTitle: 'Time Machine', difficulty: 'medium', category: 'objects' },
+      { word: 'past', hint: '⏪ Say: PAST', emoji: '⏪', storyId: 'time-machine', storyTitle: 'Time Machine', difficulty: 'easy', category: 'concepts' },
+      { word: 'future', hint: '⏩ Say: FYOO-chur', emoji: '⏩', storyId: 'time-machine', storyTitle: 'Time Machine', difficulty: 'medium', category: 'concepts' },
+      { word: 'journey', hint: '🚀 Say: JUR-nee', emoji: '🚀', storyId: 'time-machine', storyTitle: 'Time Machine', difficulty: 'medium', category: 'concepts' },
+      { word: 'history', hint: '📜 Say: HIS-tor-ee', emoji: '📜', storyId: 'time-machine', storyTitle: 'Time Machine', difficulty: 'medium', category: 'concepts' },
+      { word: 'adventure', hint: '🗺️ Say: ad-VEN-chur', emoji: '🗺️', storyId: 'time-machine', storyTitle: 'Time Machine', difficulty: 'medium', category: 'actions' },
+      { word: 'discover', hint: '🔍 Say: dis-KUV-er', emoji: '🔍', storyId: 'time-machine', storyTitle: 'Time Machine', difficulty: 'medium', category: 'actions' }
+    ],
+    'friendly-robot': [
+      { word: 'robot', hint: '🤖 Say: RO-bot', emoji: '🤖', storyId: 'friendly-robot', storyTitle: 'Friendly Robot', difficulty: 'easy', category: 'characters' },
+      { word: 'friend', hint: '🤝 Say: FREND', emoji: '🤝', storyId: 'friendly-robot', storyTitle: 'Friendly Robot', difficulty: 'easy', category: 'concepts' },
+      { word: 'help', hint: '🆘 Say: HELP', emoji: '🆘', storyId: 'friendly-robot', storyTitle: 'Friendly Robot', difficulty: 'easy', category: 'actions' },
+      { word: 'kind', hint: '💝 Say: KYND', emoji: '💝', storyId: 'friendly-robot', storyTitle: 'Friendly Robot', difficulty: 'easy', category: 'descriptions' },
+      { word: 'smart', hint: '🧠 Say: SMART', emoji: '🧠', storyId: 'friendly-robot', storyTitle: 'Friendly Robot', difficulty: 'easy', category: 'descriptions' },
+      { word: 'play', hint: '🎮 Say: PLAY', emoji: '🎮', storyId: 'friendly-robot', storyTitle: 'Friendly Robot', difficulty: 'easy', category: 'actions' },
+      { word: 'together', hint: '👥 Say: to-GETH-er', emoji: '👥', storyId: 'friendly-robot', storyTitle: 'Friendly Robot', difficulty: 'medium', category: 'concepts' },
+      { word: 'teamwork', hint: '🤝 Say: TEAM-work', emoji: '🤝', storyId: 'friendly-robot', storyTitle: 'Friendly Robot', difficulty: 'medium', category: 'values' }
+    ],
+    'secret-cave': [
+      { word: 'cave', hint: '🕳️ Say: KAYV', emoji: '🕳️', storyId: 'secret-cave', storyTitle: 'Secret Cave', difficulty: 'easy', category: 'places' },
+      { word: 'secret', hint: '🤫 Say: SEE-kret', emoji: '🤫', storyId: 'secret-cave', storyTitle: 'Secret Cave', difficulty: 'easy', category: 'concepts' },
+      { word: 'treasure', hint: '💎 Say: TREZH-ur', emoji: '💎', storyId: 'secret-cave', storyTitle: 'Secret Cave', difficulty: 'medium', category: 'objects' },
+      { word: 'map', hint: '🗺️ Say: MAP', emoji: '🗺️', storyId: 'secret-cave', storyTitle: 'Secret Cave', difficulty: 'easy', category: 'objects' },
+      { word: 'explore', hint: '🔍 Say: eks-PLOR', emoji: '🔍', storyId: 'secret-cave', storyTitle: 'Secret Cave', difficulty: 'medium', category: 'actions' },
+      { word: 'brave', hint: '🦅 Say: BRAVE', emoji: '🦅', storyId: 'secret-cave', storyTitle: 'Secret Cave', difficulty: 'easy', category: 'descriptions' },
+      { word: 'discover', hint: '🌟 Say: dis-KUV-er', emoji: '🌟', storyId: 'secret-cave', storyTitle: 'Secret Cave', difficulty: 'medium', category: 'actions' },
+      { word: 'adventure', hint: '🗺️ Say: ad-VEN-chur', emoji: '🗺️', storyId: 'secret-cave', storyTitle: 'Secret Cave', difficulty: 'medium', category: 'actions' }
+    ],
+    'flying-carpet': [
+      { word: 'carpet', hint: '毯 Say: KAR-pet', emoji: '毯', storyId: 'flying-carpet', storyTitle: 'Flying Carpet', difficulty: 'easy', category: 'objects' },
+      { word: 'fly', hint: '✈️ Say: FLY', emoji: '✈️', storyId: 'flying-carpet', storyTitle: 'Flying Carpet', difficulty: 'easy', category: 'actions' },
+      { word: 'sky', hint: '☁️ Say: SKY', emoji: '☁️', storyId: 'flying-carpet', storyTitle: 'Flying Carpet', difficulty: 'easy', category: 'places' },
+      { word: 'cloud', hint: '☁️ Say: KLOWD', emoji: '☁️', storyId: 'flying-carpet', storyTitle: 'Flying Carpet', difficulty: 'easy', category: 'nature' },
+      { word: 'wind', hint: '💨 Say: WIND', emoji: '💨', storyId: 'flying-carpet', storyTitle: 'Flying Carpet', difficulty: 'easy', category: 'nature' },
+      { word: 'magic', hint: '✨ Say: MAJ-ik', emoji: '✨', storyId: 'flying-carpet', storyTitle: 'Flying Carpet', difficulty: 'easy', category: 'fantasy' },
+      { word: 'journey', hint: '🚀 Say: JUR-nee', emoji: '🚀', storyId: 'flying-carpet', storyTitle: 'Flying Carpet', difficulty: 'medium', category: 'concepts' },
+      { word: 'freedom', hint: '🕊️ Say: FREE-dum', emoji: '🕊️', storyId: 'flying-carpet', storyTitle: 'Flying Carpet', difficulty: 'medium', category: 'concepts' }
+    ],
+    'lost-kingdom': [
+      { word: 'kingdom', hint: '🏰 Say: KING-dum', emoji: '🏰', storyId: 'lost-kingdom', storyTitle: 'Lost Kingdom', difficulty: 'medium', category: 'places' },
+      { word: 'king', hint: '👑 Say: KING', emoji: '👑', storyId: 'lost-kingdom', storyTitle: 'Lost Kingdom', difficulty: 'easy', category: 'characters' },
+      { word: 'queen', hint: '👸 Say: KWEEN', emoji: '👸', storyId: 'lost-kingdom', storyTitle: 'Lost Kingdom', difficulty: 'easy', category: 'characters' },
+      { word: 'castle', hint: '🏰 Say: KAS-ul', emoji: '🏰', storyId: 'lost-kingdom', storyTitle: 'Lost Kingdom', difficulty: 'easy', category: 'places' },
+      { word: 'find', hint: '🔍 Say: FYND', emoji: '🔍', storyId: 'lost-kingdom', storyTitle: 'Lost Kingdom', difficulty: 'easy', category: 'actions' },
+      { word: 'rescue', hint: '🚁 Say: RES-kyoo', emoji: '🚁', storyId: 'lost-kingdom', storyTitle: 'Lost Kingdom', difficulty: 'medium', category: 'actions' },
+      { word: 'brave', hint: '🦅 Say: BRAVE', emoji: '🦅', storyId: 'lost-kingdom', storyTitle: 'Lost Kingdom', difficulty: 'easy', category: 'descriptions' },
+      { word: 'hero', hint: '🦸 Say: HEER-oh', emoji: '🦸', storyId: 'lost-kingdom', storyTitle: 'Lost Kingdom', difficulty: 'easy', category: 'characters' }
+    ],
+    'grand-adventure': [
+      { word: 'adventure', hint: '🗺️ Say: ad-VEN-chur', emoji: '🗺️', storyId: 'grand-adventure', storyTitle: 'Grand Adventure', difficulty: 'medium', category: 'actions' },
+      { word: 'journey', hint: '🚀 Say: JUR-nee', emoji: '🚀', storyId: 'grand-adventure', storyTitle: 'Grand Adventure', difficulty: 'medium', category: 'concepts' },
+      { word: 'brave', hint: '🦅 Say: BRAVE', emoji: '🦅', storyId: 'grand-adventure', storyTitle: 'Grand Adventure', difficulty: 'easy', category: 'descriptions' },
+      { word: 'friends', hint: '👫 Say: FRENDZ', emoji: '👫', storyId: 'grand-adventure', storyTitle: 'Grand Adventure', difficulty: 'easy', category: 'concepts' },
+      { word: 'discover', hint: '🔍 Say: dis-KUV-er', emoji: '🔍', storyId: 'grand-adventure', storyTitle: 'Grand Adventure', difficulty: 'medium', category: 'actions' },
+      { word: 'explore', hint: '🗺️ Say: eks-PLOR', emoji: '🗺️', storyId: 'grand-adventure', storyTitle: 'Grand Adventure', difficulty: 'medium', category: 'actions' },
+      { word: 'victory', hint: '🏆 Say: VIK-tor-ee', emoji: '🏆', storyId: 'grand-adventure', storyTitle: 'Grand Adventure', difficulty: 'medium', category: 'concepts' },
+      { word: 'celebration', hint: '🎉 Say: sel-eh-BRAY-shun', emoji: '🎉', storyId: 'grand-adventure', storyTitle: 'Grand Adventure', difficulty: 'medium', category: 'concepts' }
+    ],
     // Teen stories vocabulary
     'mystery-detective': [
       { word: 'investigate', hint: '🔍 Say: in-VES-ti-gate', emoji: '🔍', storyId: 'mystery-detective', storyTitle: 'Mystery Detective', difficulty: 'hard', category: 'actions' },
@@ -286,6 +393,107 @@ export class StoryWordsService {
       { word: 'protection', hint: '🛡️ Say: pro-TEK-shun', emoji: '🛡️', storyId: 'digital-security-guardian', storyTitle: 'Digital Security Guardian', difficulty: 'medium', category: 'actions' },
       { word: 'cybersecurity', hint: '🔐 Say: sy-ber-se-KYUR-i-ty', emoji: '🔐', storyId: 'digital-security-guardian', storyTitle: 'Digital Security Guardian', difficulty: 'hard', category: 'concepts' },
       { word: 'firewall', hint: '🔥🧱 Say: FYR-wawl', emoji: '🔥🧱', storyId: 'digital-security-guardian', storyTitle: 'Digital Security Guardian', difficulty: 'hard', category: 'concepts' }
+    ],
+    // Template stories (11-20) vocabulary for teen kids
+    'climate-action': [
+      { word: 'climate', hint: '🌡️ Say: KLY-mit', emoji: '🌡️', storyId: 'climate-action', storyTitle: 'Climate Action', difficulty: 'medium', category: 'concepts' },
+      { word: 'sustainability', hint: '♻️ Say: sus-tain-a-BIL-i-ty', emoji: '♻️', storyId: 'climate-action', storyTitle: 'Climate Action', difficulty: 'hard', category: 'concepts' },
+      { word: 'environment', hint: '🌍 Say: en-VY-ron-ment', emoji: '🌍', storyId: 'climate-action', storyTitle: 'Climate Action', difficulty: 'medium', category: 'concepts' },
+      { word: 'conservation', hint: '🌳 Say: kon-ser-VAY-shun', emoji: '🌳', storyId: 'climate-action', storyTitle: 'Climate Action', difficulty: 'hard', category: 'actions' },
+      { word: 'renewable', hint: '⚡ Say: re-NYOO-a-bul', emoji: '⚡', storyId: 'climate-action', storyTitle: 'Climate Action', difficulty: 'hard', category: 'descriptions' },
+      { word: 'impact', hint: '💥 Say: IM-pakt', emoji: '💥', storyId: 'climate-action', storyTitle: 'Climate Action', difficulty: 'medium', category: 'concepts' },
+      { word: 'solution', hint: '💡 Say: so-LOO-shun', emoji: '💡', storyId: 'climate-action', storyTitle: 'Climate Action', difficulty: 'medium', category: 'concepts' },
+      { word: 'advocacy', hint: '📢 Say: AD-vo-ka-see', emoji: '📢', storyId: 'climate-action', storyTitle: 'Climate Action', difficulty: 'hard', category: 'actions' }
+    ],
+    'startup': [
+      { word: 'startup', hint: '🚀 Say: START-up', emoji: '🚀', storyId: 'startup', storyTitle: 'Startup', difficulty: 'medium', category: 'concepts' },
+      { word: 'entrepreneur', hint: '💼 Say: on-tre-pre-NUR', emoji: '💼', storyId: 'startup', storyTitle: 'Startup', difficulty: 'hard', category: 'professions' },
+      { word: 'innovation', hint: '💡 Say: in-no-VAY-shun', emoji: '💡', storyId: 'startup', storyTitle: 'Startup', difficulty: 'hard', category: 'concepts' },
+      { word: 'business', hint: '🏢 Say: BIZ-ness', emoji: '🏢', storyId: 'startup', storyTitle: 'Startup', difficulty: 'medium', category: 'concepts' },
+      { word: 'strategy', hint: '📊 Say: STRAT-e-jee', emoji: '📊', storyId: 'startup', storyTitle: 'Startup', difficulty: 'hard', category: 'concepts' },
+      { word: 'pitch', hint: '🎯 Say: PICH', emoji: '🎯', storyId: 'startup', storyTitle: 'Startup', difficulty: 'medium', category: 'actions' },
+      { word: 'investment', hint: '💰 Say: in-VEST-ment', emoji: '💰', storyId: 'startup', storyTitle: 'Startup', difficulty: 'hard', category: 'concepts' },
+      { word: 'growth', hint: '📈 Say: GROTH', emoji: '📈', storyId: 'startup', storyTitle: 'Startup', difficulty: 'medium', category: 'concepts' }
+    ],
+    'diplomacy': [
+      { word: 'diplomacy', hint: '🤝 Say: di-PLO-ma-see', emoji: '🤝', storyId: 'diplomacy', storyTitle: 'Diplomacy', difficulty: 'hard', category: 'concepts' },
+      { word: 'negotiation', hint: '💬 Say: ne-go-shi-AY-shun', emoji: '💬', storyId: 'diplomacy', storyTitle: 'Diplomacy', difficulty: 'hard', category: 'actions' },
+      { word: 'treaty', hint: '📜 Say: TREE-tee', emoji: '📜', storyId: 'diplomacy', storyTitle: 'Diplomacy', difficulty: 'medium', category: 'concepts' },
+      { word: 'alliance', hint: '🤝 Say: a-LY-ans', emoji: '🤝', storyId: 'diplomacy', storyTitle: 'Diplomacy', difficulty: 'hard', category: 'concepts' },
+      { word: 'mediation', hint: '⚖️ Say: mee-dee-AY-shun', emoji: '⚖️', storyId: 'diplomacy', storyTitle: 'Diplomacy', difficulty: 'hard', category: 'actions' },
+      { word: 'consensus', hint: '✅ Say: kon-SEN-sus', emoji: '✅', storyId: 'diplomacy', storyTitle: 'Diplomacy', difficulty: 'hard', category: 'concepts' },
+      { word: 'international', hint: '🌎 Say: in-ter-NASH-un-al', emoji: '🌎', storyId: 'diplomacy', storyTitle: 'Diplomacy', difficulty: 'hard', category: 'descriptions' },
+      { word: 'cooperation', hint: '🤲 Say: co-op-er-AY-shun', emoji: '🤲', storyId: 'diplomacy', storyTitle: 'Diplomacy', difficulty: 'hard', category: 'actions' }
+    ],
+    'medical-research': [
+      { word: 'medical', hint: '🏥 Say: MED-i-kal', emoji: '🏥', storyId: 'medical-research', storyTitle: 'Medical Research', difficulty: 'medium', category: 'descriptions' },
+      { word: 'research', hint: '📊 Say: re-SURCH', emoji: '📊', storyId: 'medical-research', storyTitle: 'Medical Research', difficulty: 'medium', category: 'actions' },
+      { word: 'treatment', hint: '💊 Say: TREET-ment', emoji: '💊', storyId: 'medical-research', storyTitle: 'Medical Research', difficulty: 'medium', category: 'concepts' },
+      { word: 'clinical', hint: '🔬 Say: KLIN-i-kal', emoji: '🔬', storyId: 'medical-research', storyTitle: 'Medical Research', difficulty: 'hard', category: 'descriptions' },
+      { word: 'diagnosis', hint: '🩺 Say: dy-ag-NO-sis', emoji: '🩺', storyId: 'medical-research', storyTitle: 'Medical Research', difficulty: 'hard', category: 'concepts' },
+      { word: 'therapy', hint: '💉 Say: THER-a-pee', emoji: '💉', storyId: 'medical-research', storyTitle: 'Medical Research', difficulty: 'medium', category: 'concepts' },
+      { word: 'patient', hint: '👤 Say: PAY-shunt', emoji: '👤', storyId: 'medical-research', storyTitle: 'Medical Research', difficulty: 'medium', category: 'concepts' },
+      { word: 'discovery', hint: '🌟 Say: dis-KUV-er-ee', emoji: '🌟', storyId: 'medical-research', storyTitle: 'Medical Research', difficulty: 'medium', category: 'concepts' }
+    ],
+    'social-impact': [
+      { word: 'social', hint: '👥 Say: SO-shul', emoji: '👥', storyId: 'social-impact', storyTitle: 'Social Impact', difficulty: 'medium', category: 'descriptions' },
+      { word: 'impact', hint: '💥 Say: IM-pakt', emoji: '💥', storyId: 'social-impact', storyTitle: 'Social Impact', difficulty: 'medium', category: 'concepts' },
+      { word: 'community', hint: '🏘️ Say: kom-YOO-ni-tee', emoji: '🏘️', storyId: 'social-impact', storyTitle: 'Social Impact', difficulty: 'medium', category: 'concepts' },
+      { word: 'initiative', hint: '🚀 Say: in-ISH-ee-a-tiv', emoji: '🚀', storyId: 'social-impact', storyTitle: 'Social Impact', difficulty: 'hard', category: 'concepts' },
+      { word: 'volunteer', hint: '🤝 Say: vol-un-TEER', emoji: '🤝', storyId: 'social-impact', storyTitle: 'Social Impact', difficulty: 'medium', category: 'actions' },
+      { word: 'empowerment', hint: '⚡ Say: em-POW-er-ment', emoji: '⚡', storyId: 'social-impact', storyTitle: 'Social Impact', difficulty: 'hard', category: 'concepts' },
+      { word: 'advocacy', hint: '📢 Say: AD-vo-ka-see', emoji: '📢', storyId: 'social-impact', storyTitle: 'Social Impact', difficulty: 'hard', category: 'actions' },
+      { word: 'change', hint: '🔄 Say: CHAYNJ', emoji: '🔄', storyId: 'social-impact', storyTitle: 'Social Impact', difficulty: 'easy', category: 'concepts' }
+    ],
+    'data-science': [
+      { word: 'data', hint: '📊 Say: DAY-ta', emoji: '📊', storyId: 'data-science', storyTitle: 'Data Science', difficulty: 'medium', category: 'concepts' },
+      { word: 'science', hint: '🔬 Say: SY-ens', emoji: '🔬', storyId: 'data-science', storyTitle: 'Data Science', difficulty: 'medium', category: 'concepts' },
+      { word: 'analysis', hint: '📈 Say: a-NAL-i-sis', emoji: '📈', storyId: 'data-science', storyTitle: 'Data Science', difficulty: 'hard', category: 'actions' },
+      { word: 'algorithm', hint: '⚙️ Say: AL-go-rith-um', emoji: '⚙️', storyId: 'data-science', storyTitle: 'Data Science', difficulty: 'hard', category: 'concepts' },
+      { word: 'statistics', hint: '📉 Say: sta-TIS-tiks', emoji: '📉', storyId: 'data-science', storyTitle: 'Data Science', difficulty: 'hard', category: 'concepts' },
+      { word: 'insight', hint: '💡 Say: IN-syt', emoji: '💡', storyId: 'data-science', storyTitle: 'Data Science', difficulty: 'medium', category: 'concepts' },
+      { word: 'pattern', hint: '🔍 Say: PAT-ern', emoji: '🔍', storyId: 'data-science', storyTitle: 'Data Science', difficulty: 'medium', category: 'concepts' },
+      { word: 'prediction', hint: '🔮 Say: pre-DIK-shun', emoji: '🔮', storyId: 'data-science', storyTitle: 'Data Science', difficulty: 'hard', category: 'concepts' }
+    ],
+    'engineering': [
+      { word: 'engineering', hint: '⚙️ Say: en-jin-EER-ing', emoji: '⚙️', storyId: 'engineering', storyTitle: 'Engineering', difficulty: 'hard', category: 'concepts' },
+      { word: 'design', hint: '📐 Say: de-ZYN', emoji: '📐', storyId: 'engineering', storyTitle: 'Engineering', difficulty: 'medium', category: 'actions' },
+      { word: 'construction', hint: '🏗️ Say: kon-STRUK-shun', emoji: '🏗️', storyId: 'engineering', storyTitle: 'Engineering', difficulty: 'hard', category: 'concepts' },
+      { word: 'structure', hint: '🏛️ Say: STRUK-chur', emoji: '🏛️', storyId: 'engineering', storyTitle: 'Engineering', difficulty: 'medium', category: 'concepts' },
+      { word: 'innovation', hint: '💡 Say: in-no-VAY-shun', emoji: '💡', storyId: 'engineering', storyTitle: 'Engineering', difficulty: 'hard', category: 'concepts' },
+      { word: 'prototype', hint: '🔧 Say: PRO-to-typ', emoji: '🔧', storyId: 'engineering', storyTitle: 'Engineering', difficulty: 'hard', category: 'concepts' },
+      { word: 'solution', hint: '💡 Say: so-LOO-shun', emoji: '💡', storyId: 'engineering', storyTitle: 'Engineering', difficulty: 'medium', category: 'concepts' },
+      { word: 'technical', hint: '🔧 Say: TEK-ni-kal', emoji: '🔧', storyId: 'engineering', storyTitle: 'Engineering', difficulty: 'hard', category: 'descriptions' }
+    ],
+    'content-strategy': [
+      { word: 'content', hint: '📝 Say: KON-tent', emoji: '📝', storyId: 'content-strategy', storyTitle: 'Content Strategy', difficulty: 'medium', category: 'concepts' },
+      { word: 'strategy', hint: '📊 Say: STRAT-e-jee', emoji: '📊', storyId: 'content-strategy', storyTitle: 'Content Strategy', difficulty: 'hard', category: 'concepts' },
+      { word: 'marketing', hint: '📢 Say: MAR-ket-ing', emoji: '📢', storyId: 'content-strategy', storyTitle: 'Content Strategy', difficulty: 'medium', category: 'concepts' },
+      { word: 'audience', hint: '👥 Say: AW-dee-ens', emoji: '👥', storyId: 'content-strategy', storyTitle: 'Content Strategy', difficulty: 'medium', category: 'concepts' },
+      { word: 'engagement', hint: '💬 Say: en-GAYJ-ment', emoji: '💬', storyId: 'content-strategy', storyTitle: 'Content Strategy', difficulty: 'hard', category: 'concepts' },
+      { word: 'brand', hint: '🏷️ Say: BRAND', emoji: '🏷️', storyId: 'content-strategy', storyTitle: 'Content Strategy', difficulty: 'medium', category: 'concepts' },
+      { word: 'campaign', hint: '📣 Say: kam-PAYN', emoji: '📣', storyId: 'content-strategy', storyTitle: 'Content Strategy', difficulty: 'medium', category: 'concepts' },
+      { word: 'message', hint: '💬 Say: MES-ij', emoji: '💬', storyId: 'content-strategy', storyTitle: 'Content Strategy', difficulty: 'medium', category: 'concepts' }
+    ],
+    'ethical-ai': [
+      { word: 'ethical', hint: '⚖️ Say: ETH-i-kal', emoji: '⚖️', storyId: 'ethical-ai', storyTitle: 'Ethical AI', difficulty: 'hard', category: 'descriptions' },
+      { word: 'artificial', hint: '🤖 Say: ar-ti-FISH-al', emoji: '🤖', storyId: 'ethical-ai', storyTitle: 'Ethical AI', difficulty: 'hard', category: 'descriptions' },
+      { word: 'intelligence', hint: '🧠 Say: in-TEL-i-jens', emoji: '🧠', storyId: 'ethical-ai', storyTitle: 'Ethical AI', difficulty: 'hard', category: 'concepts' },
+      { word: 'responsibility', hint: '⚖️ Say: re-spon-si-BIL-i-ty', emoji: '⚖️', storyId: 'ethical-ai', storyTitle: 'Ethical AI', difficulty: 'hard', category: 'values' },
+      { word: 'transparency', hint: '🔍 Say: trans-PAIR-en-see', emoji: '🔍', storyId: 'ethical-ai', storyTitle: 'Ethical AI', difficulty: 'hard', category: 'concepts' },
+      { word: 'fairness', hint: '⚖️ Say: FAIR-ness', emoji: '⚖️', storyId: 'ethical-ai', storyTitle: 'Ethical AI', difficulty: 'medium', category: 'concepts' },
+      { word: 'accountability', hint: '📋 Say: a-kown-ta-BIL-i-ty', emoji: '📋', storyId: 'ethical-ai', storyTitle: 'Ethical AI', difficulty: 'hard', category: 'concepts' },
+      { word: 'governance', hint: '🏛️ Say: GUV-ern-ans', emoji: '🏛️', storyId: 'ethical-ai', storyTitle: 'Ethical AI', difficulty: 'hard', category: 'concepts' }
+    ],
+    'innovation-summit': [
+      { word: 'innovation', hint: '💡 Say: in-no-VAY-shun', emoji: '💡', storyId: 'innovation-summit', storyTitle: 'Innovation Summit', difficulty: 'hard', category: 'concepts' },
+      { word: 'summit', hint: '⛰️ Say: SUM-it', emoji: '⛰️', storyId: 'innovation-summit', storyTitle: 'Innovation Summit', difficulty: 'medium', category: 'concepts' },
+      { word: 'collaboration', hint: '🤝 Say: kol-ab-or-AY-shun', emoji: '🤝', storyId: 'innovation-summit', storyTitle: 'Innovation Summit', difficulty: 'hard', category: 'actions' },
+      { word: 'technology', hint: '💻 Say: tek-NOL-o-gy', emoji: '💻', storyId: 'innovation-summit', storyTitle: 'Innovation Summit', difficulty: 'medium', category: 'concepts' },
+      { word: 'networking', hint: '🌐 Say: NET-work-ing', emoji: '🌐', storyId: 'innovation-summit', storyTitle: 'Innovation Summit', difficulty: 'hard', category: 'actions' },
+      { word: 'partnership', hint: '🤝 Say: PART-ner-ship', emoji: '🤝', storyId: 'innovation-summit', storyTitle: 'Innovation Summit', difficulty: 'hard', category: 'concepts' },
+      { word: 'breakthrough', hint: '💥 Say: BRAYK-throo', emoji: '💥', storyId: 'innovation-summit', storyTitle: 'Innovation Summit', difficulty: 'hard', category: 'concepts' },
+      { word: 'future', hint: '⏩ Say: FYOO-chur', emoji: '⏩', storyId: 'innovation-summit', storyTitle: 'Innovation Summit', difficulty: 'medium', category: 'concepts' }
     ]
   };
   
@@ -388,6 +596,77 @@ export class StoryWordsService {
       { phrase: 'I have lived here for many years', phonemes: '🌳⏰ Say: I HAV LIVD HERE FOR MEN-ee YEARZ', emoji: '🌳⏰', storyId: 'jungle-explorer', storyTitle: 'Jungle Explorer Adventure', difficulty: 'medium' },
       { phrase: 'Nature teaches us to be patient', phonemes: '🔍⏳ Say: NAY-chur TEE-chez US TO BE PA-shunt', emoji: '🔍⏳', storyId: 'jungle-explorer', storyTitle: 'Jungle Explorer Adventure', difficulty: 'hard' }
     ],
+    // Template stories (11-20) phrases for young kids
+    'enchanted-garden': [
+      { phrase: 'Welcome to the enchanted garden', phonemes: '🌺 Say: WEL-kum TO THE en-CHANT-ed GAR-den', emoji: '🌺', storyId: 'enchanted-garden', storyTitle: 'The Enchanted Garden', difficulty: 'medium' },
+      { phrase: 'Flowers bloom everywhere', phonemes: '🌸 Say: FLOW-urz BLOOM EV-ree-wair', emoji: '🌸', storyId: 'enchanted-garden', storyTitle: 'The Enchanted Garden', difficulty: 'medium' },
+      { phrase: 'Butterflies dance in the air', phonemes: '🦋 Say: BUT-er-flyz DANS IN THE AIR', emoji: '🦋', storyId: 'enchanted-garden', storyTitle: 'The Enchanted Garden', difficulty: 'medium' },
+      { phrase: 'Nature is peaceful and beautiful', phonemes: '🌿 Say: NAY-chur IS PEES-ful AND BYOO-ti-ful', emoji: '🌿', storyId: 'enchanted-garden', storyTitle: 'The Enchanted Garden', difficulty: 'hard' },
+      { phrase: 'The garden is full of wonder', phonemes: '✨ Say: THE GAR-den IS FUL OF WUN-der', emoji: '✨', storyId: 'enchanted-garden', storyTitle: 'The Enchanted Garden', difficulty: 'medium' }
+    ],
+    'dragons-treasure': [
+      { phrase: 'Dragon\'s treasure sparkles', phonemes: '🐉💎 Say: DRAG-unz TREZH-ur SPAR-kulz', emoji: '🐉💎', storyId: 'dragons-treasure', storyTitle: 'Dragon\'s Treasure', difficulty: 'medium' },
+      { phrase: 'Friends share everything', phonemes: '🤝 Say: FRENDZ SHAIR EV-ree-thing', emoji: '🤝', storyId: 'dragons-treasure', storyTitle: 'Dragon\'s Treasure', difficulty: 'medium' },
+      { phrase: 'Kindness is the greatest treasure', phonemes: '💖 Say: KIND-ness IS THE GRAT-est TREZH-ur', emoji: '💖', storyId: 'dragons-treasure', storyTitle: 'Dragon\'s Treasure', difficulty: 'hard' },
+      { phrase: 'Gold and jewels shine bright', phonemes: '🪙 Say: GOLD AND JOO-ulz SHIYN BRYT', emoji: '🪙', storyId: 'dragons-treasure', storyTitle: 'Dragon\'s Treasure', difficulty: 'medium' },
+      { phrase: 'Sharing makes us happy', phonemes: '💝 Say: SHAIR-ing MAKS US HAP-ee', emoji: '💝', storyId: 'dragons-treasure', storyTitle: 'Dragon\'s Treasure', difficulty: 'medium' }
+    ],
+    'magic-school': [
+      { phrase: 'Welcome to magic school', phonemes: '🏫 Say: WEL-kum TO MAJ-ik SKOOL', emoji: '🏫', storyId: 'magic-school', storyTitle: 'Magic School', difficulty: 'easy' },
+      { phrase: 'We learn new spells together', phonemes: '📚 Say: WE LURN NYOO SPELZ to-GETH-er', emoji: '📚', storyId: 'magic-school', storyTitle: 'Magic School', difficulty: 'medium' },
+      { phrase: 'Books hold great wisdom', phonemes: '📖 Say: BOOKS HOLD GRAT WIZ-dum', emoji: '📖', storyId: 'magic-school', storyTitle: 'Magic School', difficulty: 'medium' },
+      { phrase: 'Friends help each other learn', phonemes: '👫 Say: FRENDZ HELP EECH UTH-er LURN', emoji: '👫', storyId: 'magic-school', storyTitle: 'Magic School', difficulty: 'medium' },
+      { phrase: 'Discover the magic of learning', phonemes: '🔍 Say: dis-KUV-er THE MAJ-ik OF LURN-ing', emoji: '🔍', storyId: 'magic-school', storyTitle: 'Magic School', difficulty: 'hard' }
+    ],
+    'ocean-explorer': [
+      { phrase: 'Dive deep into the ocean', phonemes: '🤿 Say: DIV DEEP IN-to THE O-shun', emoji: '🤿', storyId: 'ocean-explorer', storyTitle: 'Ocean Explorer', difficulty: 'medium' },
+      { phrase: 'Colorful coral reefs', phonemes: '🪸 Say: KUL-er-ful KOR-al REEFS', emoji: '🪸', storyId: 'ocean-explorer', storyTitle: 'Ocean Explorer', difficulty: 'medium' },
+      { phrase: 'Fish swim all around', phonemes: '🐠 Say: FISH SWIM AL a-ROWND', emoji: '🐠', storyId: 'ocean-explorer', storyTitle: 'Ocean Explorer', difficulty: 'easy' },
+      { phrase: 'Waves move gently', phonemes: '🌊 Say: WAYVZ MOOV JENT-lee', emoji: '🌊', storyId: 'ocean-explorer', storyTitle: 'Ocean Explorer', difficulty: 'easy' },
+      { phrase: 'Explore the deep blue sea', phonemes: '🗺️ Say: eks-PLOR THE DEEP BLOO SEE', emoji: '🗺️', storyId: 'ocean-explorer', storyTitle: 'Ocean Explorer', difficulty: 'medium' }
+    ],
+    'time-machine': [
+      { phrase: 'Travel through time', phonemes: '⏰ Say: TRAV-ul THROO TYM', emoji: '⏰', storyId: 'time-machine', storyTitle: 'Time Machine', difficulty: 'medium' },
+      { phrase: 'Visit the past and future', phonemes: '⏪⏩ Say: VIZ-it THE PAST AND FYOO-chur', emoji: '⏪⏩', storyId: 'time-machine', storyTitle: 'Time Machine', difficulty: 'medium' },
+      { phrase: 'History comes alive', phonemes: '📜 Say: HIS-tor-ee KUMZ a-LYV', emoji: '📜', storyId: 'time-machine', storyTitle: 'Time Machine', difficulty: 'medium' },
+      { phrase: 'Journey through different times', phonemes: '🚀 Say: JUR-nee THROO DIF-er-ent TYMZ', emoji: '🚀', storyId: 'time-machine', storyTitle: 'Time Machine', difficulty: 'hard' },
+      { phrase: 'Discover amazing adventures', phonemes: '🔍 Say: dis-KUV-er a-MAZ-ing ad-VEN-churz', emoji: '🔍', storyId: 'time-machine', storyTitle: 'Time Machine', difficulty: 'hard' }
+    ],
+    'friendly-robot': [
+      { phrase: 'Hello friendly robot', phonemes: '🤖 Say: heh-LOW FREND-lee RO-bot', emoji: '🤖', storyId: 'friendly-robot', storyTitle: 'Friendly Robot', difficulty: 'easy' },
+      { phrase: 'Robots help us learn', phonemes: '🧠 Say: RO-bots HELP US LURN', emoji: '🧠', storyId: 'friendly-robot', storyTitle: 'Friendly Robot', difficulty: 'easy' },
+      { phrase: 'Kind and smart friend', phonemes: '💝 Say: KYND AND SMART FREND', emoji: '💝', storyId: 'friendly-robot', storyTitle: 'Friendly Robot', difficulty: 'easy' },
+      { phrase: 'Play together every day', phonemes: '🎮 Say: PLAY to-GETH-er EV-ree DAY', emoji: '🎮', storyId: 'friendly-robot', storyTitle: 'Friendly Robot', difficulty: 'medium' },
+      { phrase: 'Teamwork makes everything fun', phonemes: '🤝 Say: TEAM-work MAKS EV-ree-thing FUN', emoji: '🤝', storyId: 'friendly-robot', storyTitle: 'Friendly Robot', difficulty: 'hard' }
+    ],
+    'secret-cave': [
+      { phrase: 'Enter the secret cave', phonemes: '🕳️ Say: EN-ter THE SEE-kret KAYV', emoji: '🕳️', storyId: 'secret-cave', storyTitle: 'Secret Cave', difficulty: 'medium' },
+      { phrase: 'Treasure hidden inside', phonemes: '💎 Say: TREZH-ur HID-en IN-SYD', emoji: '💎', storyId: 'secret-cave', storyTitle: 'Secret Cave', difficulty: 'medium' },
+      { phrase: 'Follow the map carefully', phonemes: '🗺️ Say: FOL-ow THE MAP KAYR-ful-lee', emoji: '🗺️', storyId: 'secret-cave', storyTitle: 'Secret Cave', difficulty: 'medium' },
+      { phrase: 'Brave explorers discover secrets', phonemes: '🦅 Say: BRAVE eks-PLOR-urz dis-KUV-er SEE-kretz', emoji: '🦅', storyId: 'secret-cave', storyTitle: 'Secret Cave', difficulty: 'hard' },
+      { phrase: 'Adventure awaits inside', phonemes: '🗺️ Say: ad-VEN-chur a-WAYTS IN-SYD', emoji: '🗺️', storyId: 'secret-cave', storyTitle: 'Secret Cave', difficulty: 'medium' }
+    ],
+    'flying-carpet': [
+      { phrase: 'Ride the flying carpet', phonemes: '毯 Say: RYD THE FLY-ing KAR-pet', emoji: '毯', storyId: 'flying-carpet', storyTitle: 'Flying Carpet', difficulty: 'medium' },
+      { phrase: 'Soar high in the sky', phonemes: '☁️ Say: SOR HY IN THE SKY', emoji: '☁️', storyId: 'flying-carpet', storyTitle: 'Flying Carpet', difficulty: 'easy' },
+      { phrase: 'Clouds float by gently', phonemes: '☁️ Say: KLOWDZ FLOT BY JENT-lee', emoji: '☁️', storyId: 'flying-carpet', storyTitle: 'Flying Carpet', difficulty: 'medium' },
+      { phrase: 'Wind carries us away', phonemes: '💨 Say: WIND KAYR-eez US a-WAY', emoji: '💨', storyId: 'flying-carpet', storyTitle: 'Flying Carpet', difficulty: 'medium' },
+      { phrase: 'Magic journey through the clouds', phonemes: '✨ Say: MAJ-ik JUR-nee THROO THE KLOWDZ', emoji: '✨', storyId: 'flying-carpet', storyTitle: 'Flying Carpet', difficulty: 'hard' }
+    ],
+    'lost-kingdom': [
+      { phrase: 'Find the lost kingdom', phonemes: '🏰 Say: FYND THE LOST KING-dum', emoji: '🏰', storyId: 'lost-kingdom', storyTitle: 'Lost Kingdom', difficulty: 'medium' },
+      { phrase: 'King and queen need help', phonemes: '👑 Say: KING AND KWEEN NEED HELP', emoji: '👑', storyId: 'lost-kingdom', storyTitle: 'Lost Kingdom', difficulty: 'easy' },
+      { phrase: 'Rescue the royal family', phonemes: '🚁 Say: RES-kyoo THE ROY-ul FAM-i-lee', emoji: '🚁', storyId: 'lost-kingdom', storyTitle: 'Lost Kingdom', difficulty: 'medium' },
+      { phrase: 'Brave heroes save the day', phonemes: '🦸 Say: BRAVE HEER-ohz SAV THE DAY', emoji: '🦸', storyId: 'lost-kingdom', storyTitle: 'Lost Kingdom', difficulty: 'medium' },
+      { phrase: 'Castle stands tall and proud', phonemes: '🏰 Say: KAS-ul STANDZ TAL AND PROWD', emoji: '🏰', storyId: 'lost-kingdom', storyTitle: 'Lost Kingdom', difficulty: 'hard' }
+    ],
+    'grand-adventure': [
+      { phrase: 'The grand adventure begins', phonemes: '🗺️ Say: THE GRAND ad-VEN-chur be-GINZ', emoji: '🗺️', storyId: 'grand-adventure', storyTitle: 'Grand Adventure', difficulty: 'medium' },
+      { phrase: 'Journey with brave friends', phonemes: '🚀 Say: JUR-nee WITH BRAVE FRENDZ', emoji: '🚀', storyId: 'grand-adventure', storyTitle: 'Grand Adventure', difficulty: 'medium' },
+      { phrase: 'Discover amazing places', phonemes: '🔍 Say: dis-KUV-er a-MAZ-ing PLAYS-ez', emoji: '🔍', storyId: 'grand-adventure', storyTitle: 'Grand Adventure', difficulty: 'medium' },
+      { phrase: 'Explore together as a team', phonemes: '🗺️ Say: eks-PLOR to-GETH-er AZ A TEAM', emoji: '🗺️', storyId: 'grand-adventure', storyTitle: 'Grand Adventure', difficulty: 'hard' },
+      { phrase: 'Victory and celebration await', phonemes: '🏆 Say: VIK-tor-ee AND sel-eh-BRAY-shun a-WAYT', emoji: '🏆', storyId: 'grand-adventure', storyTitle: 'Grand Adventure', difficulty: 'hard' }
+    ],
     // Teen stories phrases
     'mystery-detective': [
       { phrase: 'Critical thinking skills', phonemes: '🧠 Say: KRIT-i-kal THINK-ing skilz', emoji: '🧠', storyId: 'mystery-detective', storyTitle: 'Mystery Detective', difficulty: 'hard' },
@@ -448,6 +727,77 @@ export class StoryWordsService {
       { phrase: 'Encryption and authentication', phonemes: '🔒 Say: en-KRIP-shun AND aw-then-ti-KAY-shun', emoji: '🔒', storyId: 'digital-security-guardian', storyTitle: 'Digital Security Guardian', difficulty: 'hard' },
       { phrase: 'Password protection strategy', phonemes: '🔑 Say: PAS-wurd pro-TEK-shun STRAT-e-jee', emoji: '🔑', storyId: 'digital-security-guardian', storyTitle: 'Digital Security Guardian', difficulty: 'hard' },
       { phrase: 'Firewall and vulnerability management', phonemes: '🔥🧱 Say: FYR-wawl AND vul-ner-a-BIL-i-ty MAN-ij-ment', emoji: '🔥🧱', storyId: 'digital-security-guardian', storyTitle: 'Digital Security Guardian', difficulty: 'hard' }
+    ],
+    // Template stories (11-20) phrases for teen kids
+    'climate-action': [
+      { phrase: 'Climate action and sustainability', phonemes: '🌡️ Say: KLY-mit AK-shun AND sus-tain-a-BIL-i-ty', emoji: '🌡️', storyId: 'climate-action', storyTitle: 'Climate Action', difficulty: 'hard' },
+      { phrase: 'Environmental conservation efforts', phonemes: '🌍 Say: en-vy-ron-MEN-tal kon-ser-VAY-shun ef-FURTS', emoji: '🌍', storyId: 'climate-action', storyTitle: 'Climate Action', difficulty: 'hard' },
+      { phrase: 'Renewable energy solutions', phonemes: '⚡ Say: re-NYOO-a-bul EN-er-jee so-LOO-shunz', emoji: '⚡', storyId: 'climate-action', storyTitle: 'Climate Action', difficulty: 'hard' },
+      { phrase: 'Advocacy for positive impact', phonemes: '📢 Say: AD-vo-ka-see FOR POZ-i-tiv IM-pakt', emoji: '📢', storyId: 'climate-action', storyTitle: 'Climate Action', difficulty: 'hard' },
+      { phrase: 'Sustainable future planning', phonemes: '♻️ Say: sus-TAIN-a-bul FYOO-chur PLAN-ing', emoji: '♻️', storyId: 'climate-action', storyTitle: 'Climate Action', difficulty: 'hard' }
+    ],
+    'startup': [
+      { phrase: 'Startup innovation and growth', phonemes: '🚀 Say: START-up in-no-VAY-shun AND GROTH', emoji: '🚀', storyId: 'startup', storyTitle: 'Startup', difficulty: 'hard' },
+      { phrase: 'Entrepreneurial business strategy', phonemes: '💼 Say: on-tre-pre-NUR-ee-al BIZ-ness STRAT-e-jee', emoji: '💼', storyId: 'startup', storyTitle: 'Startup', difficulty: 'hard' },
+      { phrase: 'Pitch your innovative idea', phonemes: '🎯 Say: PICH YOR in-no-VAY-tiv eye-DEE-ah', emoji: '🎯', storyId: 'startup', storyTitle: 'Startup', difficulty: 'hard' },
+      { phrase: 'Investment and business growth', phonemes: '💰 Say: in-VEST-ment AND BIZ-ness GROTH', emoji: '💰', storyId: 'startup', storyTitle: 'Startup', difficulty: 'hard' },
+      { phrase: 'Strategic planning for success', phonemes: '📊 Say: stra-TEJ-ik PLAN-ing FOR suk-SES', emoji: '📊', storyId: 'startup', storyTitle: 'Startup', difficulty: 'hard' }
+    ],
+    'diplomacy': [
+      { phrase: 'International diplomacy and negotiation', phonemes: '🤝 Say: in-ter-NASH-un-al di-PLO-ma-see AND ne-go-shi-AY-shun', emoji: '🤝', storyId: 'diplomacy', storyTitle: 'Diplomacy', difficulty: 'hard' },
+      { phrase: 'Treaty and alliance building', phonemes: '📜 Say: TREE-tee AND a-LY-ans BIL-ding', emoji: '📜', storyId: 'diplomacy', storyTitle: 'Diplomacy', difficulty: 'hard' },
+      { phrase: 'Mediation and conflict resolution', phonemes: '⚖️ Say: mee-dee-AY-shun AND KON-flict rez-o-LOO-shun', emoji: '⚖️', storyId: 'diplomacy', storyTitle: 'Diplomacy', difficulty: 'hard' },
+      { phrase: 'Building consensus through cooperation', phonemes: '✅ Say: BIL-ding kon-SEN-sus THROO co-op-er-AY-shun', emoji: '✅', storyId: 'diplomacy', storyTitle: 'Diplomacy', difficulty: 'hard' },
+      { phrase: 'International relations and peace', phonemes: '🌎 Say: in-ter-NASH-un-al re-LAY-shunz AND PEES', emoji: '🌎', storyId: 'diplomacy', storyTitle: 'Diplomacy', difficulty: 'hard' }
+    ],
+    'medical-research': [
+      { phrase: 'Medical research and treatment', phonemes: '🏥 Say: MED-i-kal re-SURCH AND TREET-ment', emoji: '🏥', storyId: 'medical-research', storyTitle: 'Medical Research', difficulty: 'hard' },
+      { phrase: 'Clinical trials and diagnosis', phonemes: '🔬 Say: KLIN-i-kal TRY-alz AND dy-ag-NO-sis', emoji: '🔬', storyId: 'medical-research', storyTitle: 'Medical Research', difficulty: 'hard' },
+      { phrase: 'Patient care and therapy', phonemes: '💉 Say: PAY-shunt KAYR AND THER-a-pee', emoji: '💉', storyId: 'medical-research', storyTitle: 'Medical Research', difficulty: 'hard' },
+      { phrase: 'Medical discovery and innovation', phonemes: '🌟 Say: MED-i-kal dis-KUV-er-ee AND in-no-VAY-shun', emoji: '🌟', storyId: 'medical-research', storyTitle: 'Medical Research', difficulty: 'hard' },
+      { phrase: 'Advancing healthcare through research', phonemes: '📊 Say: ad-VANS-ing HELTH-kayr THROO re-SURCH', emoji: '📊', storyId: 'medical-research', storyTitle: 'Medical Research', difficulty: 'hard' }
+    ],
+    'social-impact': [
+      { phrase: 'Social impact and community change', phonemes: '👥 Say: SO-shul IM-pakt AND kom-YOO-ni-tee CHAYNJ', emoji: '👥', storyId: 'social-impact', storyTitle: 'Social Impact', difficulty: 'hard' },
+      { phrase: 'Community initiative and volunteer work', phonemes: '🏘️ Say: kom-YOO-ni-tee in-ISH-ee-a-tiv AND vol-un-TEER WURK', emoji: '🏘️', storyId: 'social-impact', storyTitle: 'Social Impact', difficulty: 'hard' },
+      { phrase: 'Empowerment through advocacy', phonemes: '⚡ Say: em-POW-er-ment THROO AD-vo-ka-see', emoji: '⚡', storyId: 'social-impact', storyTitle: 'Social Impact', difficulty: 'hard' },
+      { phrase: 'Creating positive social change', phonemes: '🔄 Say: cree-AT-ing POZ-i-tiv SO-shul CHAYNJ', emoji: '🔄', storyId: 'social-impact', storyTitle: 'Social Impact', difficulty: 'hard' },
+      { phrase: 'Building stronger communities together', phonemes: '🤝 Say: BIL-ding STRONG-er kom-YOO-ni-teez to-GETH-er', emoji: '🤝', storyId: 'social-impact', storyTitle: 'Social Impact', difficulty: 'hard' }
+    ],
+    'data-science': [
+      { phrase: 'Data science and analysis', phonemes: '📊 Say: DAY-ta SY-ens AND a-NAL-i-sis', emoji: '📊', storyId: 'data-science', storyTitle: 'Data Science', difficulty: 'hard' },
+      { phrase: 'Algorithm and statistical analysis', phonemes: '⚙️ Say: AL-go-rith-um AND sta-TIS-ti-kal a-NAL-i-sis', emoji: '⚙️', storyId: 'data-science', storyTitle: 'Data Science', difficulty: 'hard' },
+      { phrase: 'Pattern recognition and insights', phonemes: '🔍 Say: PAT-ern rek-og-NISH-un AND IN-syts', emoji: '🔍', storyId: 'data-science', storyTitle: 'Data Science', difficulty: 'hard' },
+      { phrase: 'Data-driven prediction and forecasting', phonemes: '🔮 Say: DAY-ta-DRIV-en pre-DIK-shun AND FOR-kast-ing', emoji: '🔮', storyId: 'data-science', storyTitle: 'Data Science', difficulty: 'hard' },
+      { phrase: 'Scientific analysis of complex data', phonemes: '📈 Say: sy-en-TIF-ik a-NAL-i-sis OF kom-PLEKS DAY-ta', emoji: '📈', storyId: 'data-science', storyTitle: 'Data Science', difficulty: 'hard' }
+    ],
+    'engineering': [
+      { phrase: 'Engineering design and construction', phonemes: '⚙️ Say: en-jin-EER-ing de-ZYN AND kon-STRUK-shun', emoji: '⚙️', storyId: 'engineering', storyTitle: 'Engineering', difficulty: 'hard' },
+      { phrase: 'Structural innovation and solutions', phonemes: '🏛️ Say: STRUK-chur-al in-no-VAY-shun AND so-LOO-shunz', emoji: '🏛️', storyId: 'engineering', storyTitle: 'Engineering', difficulty: 'hard' },
+      { phrase: 'Prototype development and testing', phonemes: '🔧 Say: PRO-to-typ de-VEL-op-ment AND TEST-ing', emoji: '🔧', storyId: 'engineering', storyTitle: 'Engineering', difficulty: 'hard' },
+      { phrase: 'Technical problem-solving approach', phonemes: '🔧 Say: TEK-ni-kal PROB-ulm-SOLV-ing a-PROCH', emoji: '🔧', storyId: 'engineering', storyTitle: 'Engineering', difficulty: 'hard' },
+      { phrase: 'Innovative engineering solutions', phonemes: '💡 Say: in-no-VAY-tiv en-jin-EER-ing so-LOO-shunz', emoji: '💡', storyId: 'engineering', storyTitle: 'Engineering', difficulty: 'hard' }
+    ],
+    'content-strategy': [
+      { phrase: 'Content strategy and marketing', phonemes: '📝 Say: KON-tent STRAT-e-jee AND MAR-ket-ing', emoji: '📝', storyId: 'content-strategy', storyTitle: 'Content Strategy', difficulty: 'hard' },
+      { phrase: 'Audience engagement and brand messaging', phonemes: '👥 Say: AW-dee-ens en-GAYJ-ment AND BRAND MES-ij-ing', emoji: '👥', storyId: 'content-strategy', storyTitle: 'Content Strategy', difficulty: 'hard' },
+      { phrase: 'Marketing campaign development', phonemes: '📣 Say: MAR-ket-ing kam-PAYN de-VEL-op-ment', emoji: '📣', storyId: 'content-strategy', storyTitle: 'Content Strategy', difficulty: 'hard' },
+      { phrase: 'Strategic content planning', phonemes: '📊 Say: stra-TEJ-ik KON-tent PLAN-ing', emoji: '📊', storyId: 'content-strategy', storyTitle: 'Content Strategy', difficulty: 'hard' },
+      { phrase: 'Effective brand communication', phonemes: '🏷️ Say: ef-EK-tiv BRAND kom-mu-ni-KAY-shun', emoji: '🏷️', storyId: 'content-strategy', storyTitle: 'Content Strategy', difficulty: 'hard' }
+    ],
+    'ethical-ai': [
+      { phrase: 'Ethical artificial intelligence', phonemes: '⚖️ Say: ETH-i-kal ar-ti-FISH-al in-TEL-i-jens', emoji: '⚖️', storyId: 'ethical-ai', storyTitle: 'Ethical AI', difficulty: 'hard' },
+      { phrase: 'Responsibility and transparency in AI', phonemes: '📋 Say: re-spon-si-BIL-i-ty AND trans-PAIR-en-see IN AI', emoji: '📋', storyId: 'ethical-ai', storyTitle: 'Ethical AI', difficulty: 'hard' },
+      { phrase: 'Fairness and accountability standards', phonemes: '⚖️ Say: FAIR-ness AND a-kown-ta-BIL-i-ty STAN-derdz', emoji: '⚖️', storyId: 'ethical-ai', storyTitle: 'Ethical AI', difficulty: 'hard' },
+      { phrase: 'AI governance and ethical frameworks', phonemes: '🏛️ Say: AI GUV-ern-ans AND ETH-i-kal FRAM-wurks', emoji: '🏛️', storyId: 'ethical-ai', storyTitle: 'Ethical AI', difficulty: 'hard' },
+      { phrase: 'Responsible technology development', phonemes: '🤖 Say: re-SPON-si-bul tek-NOL-o-gy de-VEL-op-ment', emoji: '🤖', storyId: 'ethical-ai', storyTitle: 'Ethical AI', difficulty: 'hard' }
+    ],
+    'innovation-summit': [
+      { phrase: 'Innovation summit and collaboration', phonemes: '💡 Say: in-no-VAY-shun SUM-it AND kol-ab-or-AY-shun', emoji: '💡', storyId: 'innovation-summit', storyTitle: 'Innovation Summit', difficulty: 'hard' },
+      { phrase: 'Technology networking and partnerships', phonemes: '💻 Say: tek-NOL-o-gy NET-work-ing AND PART-ner-shipz', emoji: '💻', storyId: 'innovation-summit', storyTitle: 'Innovation Summit', difficulty: 'hard' },
+      { phrase: 'Breakthrough innovation and future planning', phonemes: '💥 Say: BRAYK-throo in-no-VAY-shun AND FYOO-chur PLAN-ing', emoji: '💥', storyId: 'innovation-summit', storyTitle: 'Innovation Summit', difficulty: 'hard' },
+      { phrase: 'Collaborative technology development', phonemes: '🤝 Say: kol-AB-or-a-tiv tek-NOL-o-gy de-VEL-op-ment', emoji: '🤝', storyId: 'innovation-summit', storyTitle: 'Innovation Summit', difficulty: 'hard' },
+      { phrase: 'Building the future through innovation', phonemes: '⏩ Say: BIL-ding THE FYOO-chur THROO in-no-VAY-shun', emoji: '⏩', storyId: 'innovation-summit', storyTitle: 'Innovation Summit', difficulty: 'hard' }
     ]
   };
 
@@ -684,20 +1034,31 @@ export class StoryWordsService {
 
   /**
    * Get words from enrolled stories filtered by age group
+   * Includes both completed and enrolled (started) stories
    */
   static getWordsFromEnrolledStoriesByAge(userId: string, ageGroup: 'young' | 'teen'): StoryWord[] {
     const enrollments = this.getEnrolledStories(userId);
     const allowedStories = ageGroup === 'young' ? this.YOUNG_KIDS_STORIES : this.TEEN_KIDS_STORIES;
     
+    // STRICT FILTERING: Only include stories that belong to the specified age group
+    // For 'young': Only stories from YOUNG_KIDS_STORIES (the 20 Young Kids stories)
+    // For 'teen': Only stories from TEEN_KIDS_STORIES (the 20 Teen Kids stories)
     const filteredEnrollments = enrollments.filter(
-      e => e.completed && e.wordsExtracted && allowedStories.has(e.storyId)
+      e => allowedStories.has(e.storyId) // Only include stories from the correct age group set
     );
 
     const allWords: StoryWord[] = [];
+    const seen = new Set<string>();
     
     filteredEnrollments.forEach(enrollment => {
       const storyWords = this.STORY_VOCABULARY[enrollment.storyId] || [];
-      allWords.push(...storyWords);
+      storyWords.forEach(word => {
+        const key = `${enrollment.storyId}-${word.word}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          allWords.push(word);
+        }
+      });
     });
 
     return allWords;
@@ -705,20 +1066,30 @@ export class StoryWordsService {
 
   /**
    * Get phrases from enrolled stories filtered by age group
+   * Includes both completed and enrolled (started) stories
    */
   static getPhrasesFromEnrolledStoriesByAge(userId: string, ageGroup: 'young' | 'teen'): StoryPhrase[] {
     const enrollments = this.getEnrolledStories(userId);
     const allowedStories = ageGroup === 'young' ? this.YOUNG_KIDS_STORIES : this.TEEN_KIDS_STORIES;
     
+    // Include all enrolled stories (both completed and started) to show phrases immediately
+    // STRICT FILTERING: Only include stories that belong to the specified age group
     const filteredEnrollments = enrollments.filter(
-      e => e.completed && e.wordsExtracted && allowedStories.has(e.storyId)
+      e => allowedStories.has(e.storyId) // Only include stories from the correct age group
     );
 
     const allPhrases: StoryPhrase[] = [];
+    const seen = new Set<string>();
     
     filteredEnrollments.forEach(enrollment => {
       const storyPhrases = this.STORY_PHRASES[enrollment.storyId] || [];
-      allPhrases.push(...storyPhrases);
+      storyPhrases.forEach(phrase => {
+        const key = `${enrollment.storyId}-${phrase.phrase}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          allPhrases.push(phrase);
+        }
+      });
     });
 
     return allPhrases;
