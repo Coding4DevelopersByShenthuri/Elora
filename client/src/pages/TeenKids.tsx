@@ -91,7 +91,7 @@ type TeenStory = {
   duration: string;
   words: number;
   image: string;
-  character: any;
+  character: React.ComponentType<{ className?: string }>;
   gradient: string;
   bgGradient: string;
   animation: string;
@@ -272,9 +272,6 @@ const TeenKidsPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const containerRef = useRef<HTMLDivElement>(null);
-  
-  // Track if page should be blocked
-  const [isPageBlocked, setIsPageBlocked] = useState(false);
 
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
   const [isMusicEnabled, setIsMusicEnabled] = useState(false);
@@ -296,7 +293,16 @@ const TeenKidsPage = () => {
   const [completedStoryIds, setCompletedStoryIds] = useState<string[]>([]);
   const [datasetStories, setDatasetStories] = useState<DatasetStory[]>([]);
   const [storyTemplates, setStoryTemplates] = useState<any[]>([]);
-  const [currentTemplateStory, setCurrentTemplateStory] = useState<any | null>(null);
+  interface TemplateStory {
+    title: string;
+    storySteps: Array<{ id: string; content: string; [key: string]: unknown }>;
+    voiceProfile: string;
+    characterName: string;
+    storyId: string;
+    milestoneStepIds: string[];
+  }
+
+  const [currentTemplateStory, setCurrentTemplateStory] = useState<TemplateStory | null>(null);
 
   const teenFavorites = useMemo(
     () => favorites.filter((id) => id.startsWith('teen-')),
@@ -330,8 +336,22 @@ const TeenKidsPage = () => {
     return combined;
   }, [enrolledInternalStoryIds, completedStoryIds, getInternalStoryId]);
 
+  interface DashboardData {
+    points?: number;
+    streak?: number;
+    progress?: {
+      points?: number;
+      streak?: number;
+    };
+    pronunciation_attempts?: number;
+    vocabulary_attempts?: number;
+    games_attempts?: number;
+    favorites?: string[];
+    completed_story_ids?: string[];
+  }
+
   const applyDashboard = useCallback(
-    (data: any, mergeMode: boolean = false) => {
+    (data: DashboardData | null, mergeMode: boolean = false) => {
       if (!data) return;
 
       const pointsFromPayload = data.points ?? data.progress?.points ?? 0;
@@ -369,9 +389,9 @@ const TeenKidsPage = () => {
             })
             .filter((id: string | null): id is string => id !== null);
 
-          // Update words and phrases based on merged completed stories
-          const wordDetails = StoryWordsService.getWordsForStoryIds(internalStoryIds);
-          const phraseDetails = StoryWordsService.getPhrasesForStoryIds(internalStoryIds);
+          // Update words and phrases based on merged completed stories - FILTERED TO TEEN ONLY
+          const wordDetails = StoryWordsService.getWordsForStoryIdsByAge(internalStoryIds, 'teen');
+          const phraseDetails = StoryWordsService.getPhrasesForStoryIdsByAge(internalStoryIds, 'teen');
           
           setEnrolledStoryWordsDetailed((prevWords) => {
             const existing = new Set(prevWords.map((w) => `${w.storyId}-${w.word}`));
@@ -424,7 +444,7 @@ const TeenKidsPage = () => {
           })
           .filter((id: string | null): id is string => id !== null);
 
-        const wordDetails = StoryWordsService.getWordsForStoryIds(internalStoryIds).map((w) => ({
+        const wordDetails = StoryWordsService.getWordsForStoryIdsByAge(internalStoryIds, 'teen').map((w) => ({
           word: w.word,
           hint: w.hint,
           storyId: w.storyId,
@@ -432,7 +452,7 @@ const TeenKidsPage = () => {
         }));
         setEnrolledStoryWordsDetailed(wordDetails);
 
-        const phraseDetails = StoryWordsService.getPhrasesForStoryIds(internalStoryIds).map((p) => ({
+        const phraseDetails = StoryWordsService.getPhrasesForStoryIdsByAge(internalStoryIds, 'teen').map((p) => ({
           phrase: p.phrase,
           phonemes: p.phonemes,
           storyId: p.storyId,
@@ -641,16 +661,14 @@ const TeenKidsPage = () => {
           // If page is locked, show the blocked modal immediately and block the page
           if (!eligibility?.is_unlocked) {
             console.log('🚫 TeenKids page is locked - showing blocked modal');
-            setIsPageBlocked(true);
             setShowPageBlockedModal(true);
           } else {
             setIsPageBlocked(false);
           }
         } catch (error) {
           console.error('Error checking page eligibility:', error);
+          setIsPageBlocked(false);
         }
-      } else {
-        setIsPageBlocked(false);
       }
     };
     
@@ -862,6 +880,7 @@ const TeenKidsPage = () => {
   const [showDigitalSecurity, setShowDigitalSecurity] = useState(false);
   const [showPageBlockedModal, setShowPageBlockedModal] = useState(false);
   const [pageEligibility, setPageEligibility] = useState<any>(null);
+  const [isPageBlocked, setIsPageBlocked] = useState(false);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
@@ -1151,8 +1170,9 @@ const TeenKidsPage = () => {
     });
 
     // Immediately update enrolled words and phrases from the completed story
-    const newWords = StoryWordsService.getWordsForStoryIds([internalId]);
-    const newPhrases = StoryWordsService.getPhrasesForStoryIds([internalId]);
+    // FILTERED TO TEEN ONLY
+    const newWords = StoryWordsService.getWordsForStoryIdsByAge([internalId], 'teen');
+    const newPhrases = StoryWordsService.getPhrasesForStoryIdsByAge([internalId], 'teen');
 
     // Update enrolled words and phrases immediately
     setEnrolledStoryWordsDetailed((prev) => {
@@ -1621,6 +1641,24 @@ const TeenKidsPage = () => {
                             </option>
                           )
                         )}
+                        {/* Logic to unlock stories 11-20 based on completion of previous stories */}
+                        {(() => {
+                          const unlockStories = (completedStories: number) => {
+                            return completedStories >= 10 ? Array.from({ length: 10 }, (_, i) => i + 11) : [];
+                          };
+                          const completedStories = completedStoryIds.filter(id => id.startsWith('teen-')).length;
+                          const unlockedStories = unlockStories(completedStories);
+                          
+                          return unlockedStories.map((storyNumber) => {
+                            const storyId = `teen-${storyNumber - 1}`;
+                            const storyTitle = allTeenStories.find(story => story.id === storyId)?.title || `Story ${storyNumber}`;
+                            return (
+                              <option key={storyId} value={storyId}>
+                                {storyTitle}
+                              </option>
+                            );
+                          });
+                        })()}
                       </select>
                     </div>
                   </div>

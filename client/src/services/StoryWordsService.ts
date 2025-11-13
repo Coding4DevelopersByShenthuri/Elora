@@ -35,6 +35,55 @@ export interface StoryEnrollment {
 export class StoryWordsService {
   private static STORAGE_KEY = 'speakbee_story_enrollments';
   
+  // Define which stories belong to which age group
+  private static YOUNG_KIDS_STORIES = new Set([
+    'magic-forest',
+    'space-adventure',
+    'underwater-world',
+    'dinosaur-discovery',
+    'unicorn-magic',
+    'pirate-treasure',
+    'superhero-school',
+    'fairy-garden',
+    'rainbow-castle',
+    'jungle-explorer',
+    // Template stories (11-20) for young kids
+    'enchanted-garden',
+    'dragons-treasure',
+    'magic-school',
+    'ocean-explorer',
+    'time-machine',
+    'friendly-robot',
+    'secret-cave',
+    'flying-carpet',
+    'lost-kingdom',
+    'grand-adventure'
+  ]);
+
+  private static TEEN_KIDS_STORIES = new Set([
+    'mystery-detective',
+    'space-explorer-teen',
+    'environmental-hero',
+    'tech-innovator',
+    'global-citizen',
+    'future-leader',
+    'scientific-discovery',
+    'social-media-expert',
+    'ai-ethics-explorer',
+    'digital-security-guardian',
+    // Template stories (11-20) for teen
+    'climate-action',
+    'startup',
+    'diplomacy',
+    'medical-research',
+    'social-impact',
+    'data-science',
+    'engineering',
+    'content-strategy',
+    'ethical-ai',
+    'innovation-summit'
+  ]);
+  
   // Story vocabulary data - extracted from each story
   private static STORY_VOCABULARY: Record<string, StoryWord[]> = {
     'magic-forest': [
@@ -623,6 +672,104 @@ export class StoryWordsService {
       totalWords: words.length,
       storiesWithWords: completedStories.map(e => e.storyTitle)
     };
+  }
+
+  /**
+   * Filter stories by age group (young or teen)
+   */
+  static filterStoriesByAgeGroup(storyIds: string[], ageGroup: 'young' | 'teen'): string[] {
+    const allowedStories = ageGroup === 'young' ? this.YOUNG_KIDS_STORIES : this.TEEN_KIDS_STORIES;
+    return storyIds.filter(id => allowedStories.has(id));
+  }
+
+  /**
+   * Get words from enrolled stories filtered by age group
+   */
+  static getWordsFromEnrolledStoriesByAge(userId: string, ageGroup: 'young' | 'teen'): StoryWord[] {
+    const enrollments = this.getEnrolledStories(userId);
+    const allowedStories = ageGroup === 'young' ? this.YOUNG_KIDS_STORIES : this.TEEN_KIDS_STORIES;
+    
+    const filteredEnrollments = enrollments.filter(
+      e => e.completed && e.wordsExtracted && allowedStories.has(e.storyId)
+    );
+
+    const allWords: StoryWord[] = [];
+    
+    filteredEnrollments.forEach(enrollment => {
+      const storyWords = this.STORY_VOCABULARY[enrollment.storyId] || [];
+      allWords.push(...storyWords);
+    });
+
+    return allWords;
+  }
+
+  /**
+   * Get phrases from enrolled stories filtered by age group
+   */
+  static getPhrasesFromEnrolledStoriesByAge(userId: string, ageGroup: 'young' | 'teen'): StoryPhrase[] {
+    const enrollments = this.getEnrolledStories(userId);
+    const allowedStories = ageGroup === 'young' ? this.YOUNG_KIDS_STORIES : this.TEEN_KIDS_STORIES;
+    
+    const filteredEnrollments = enrollments.filter(
+      e => e.completed && e.wordsExtracted && allowedStories.has(e.storyId)
+    );
+
+    const allPhrases: StoryPhrase[] = [];
+    
+    filteredEnrollments.forEach(enrollment => {
+      const storyPhrases = this.STORY_PHRASES[enrollment.storyId] || [];
+      allPhrases.push(...storyPhrases);
+    });
+
+    return allPhrases;
+  }
+
+  /**
+   * Get words for story IDs filtered by age group
+   */
+  static getWordsForStoryIdsByAge(storyIds: string[], ageGroup: 'young' | 'teen'): StoryWord[] {
+    const allowedStories = ageGroup === 'young' ? this.YOUNG_KIDS_STORIES : this.TEEN_KIDS_STORIES;
+    const filteredIds = storyIds.filter(id => allowedStories.has(id));
+    
+    const result: StoryWord[] = [];
+    const seen = new Set<string>();
+
+    filteredIds.forEach((storyId) => {
+      const words = this.STORY_VOCABULARY[storyId] || [];
+      words.forEach((word) => {
+        const key = `${storyId}-${word.word}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          result.push(word);
+        }
+      });
+    });
+
+    return result;
+  }
+
+  /**
+   * Get phrases for story IDs filtered by age group
+   */
+  static getPhrasesForStoryIdsByAge(storyIds: string[], ageGroup: 'young' | 'teen'): StoryPhrase[] {
+    const allowedStories = ageGroup === 'young' ? this.YOUNG_KIDS_STORIES : this.TEEN_KIDS_STORIES;
+    const filteredIds = storyIds.filter(id => allowedStories.has(id));
+    
+    const result: StoryPhrase[] = [];
+    const seen = new Set<string>();
+
+    filteredIds.forEach((storyId) => {
+      const phrases = this.STORY_PHRASES[storyId] || [];
+      phrases.forEach((phrase) => {
+        const key = `${storyId}-${phrase.phrase}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          result.push(phrase);
+        }
+      });
+    });
+
+    return result;
   }
 }
 

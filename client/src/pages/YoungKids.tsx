@@ -80,11 +80,44 @@ const YoungKidsPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
+  // Type for server-provided achievement objects (avoid using `any`)
+  type ServerAchievement = {
+    unlocked?: boolean;
+    id?: string;
+    name?: string;
+    progress?: number;
+    [key: string]: unknown;
+  };
+
+  // Type for story templates
+  type StoryTemplate = {
+    title: string;
+    storyNumber: number;
+    storySteps: Array<{
+      [key: string]: unknown;
+    }>;
+    voiceProfile?: string;
+    character?: string;
+    milestoneStepIds?: string[];
+  };
+
+  // Type for current template story data
+  type CurrentTemplateStory = {
+    title: string;
+    storySteps: Array<{
+      [key: string]: unknown;
+    }>;
+    voiceProfile?: string;
+    characterName?: string;
+    storyId: string;
+    milestoneStepIds?: string[];
+  };
+
   const [dynamicStories, setDynamicStories] = useState<typeof allStories | null>(null);
-  const [serverAchievements, setServerAchievements] = useState<any[]>([]);
+  const [serverAchievements, setServerAchievements] = useState<ServerAchievement[]>([]);
   const [datasetStories, setDatasetStories] = useState<DatasetStory[]>([]);
-  const [storyTemplates, setStoryTemplates] = useState<any[]>([]);
-  const [currentTemplateStory, setCurrentTemplateStory] = useState<any | null>(null);
+  const [storyTemplates, setStoryTemplates] = useState<StoryTemplate[]>([]);
+  const [currentTemplateStory, setCurrentTemplateStory] = useState<CurrentTemplateStory | null>(null);
 
   // Enrolled internal story IDs, derived from enrolled words/phrases (populated after completion)
   const enrolledInternalStoryIds = useMemo(() => {
@@ -99,8 +132,8 @@ const YoungKidsPage = () => {
       const stories = StoryWordsService.getEnrolledStories(userId) || [];
       return new Set(
         stories
-          .filter((story: any) => story?.completed)
-          .map((story: any) => story.storyId)
+          .filter((story: { completed?: boolean; storyId?: string }) => story?.completed)
+          .map((story: { completed?: boolean; storyId?: string }) => story.storyId)
       );
     } catch {
       return new Set<string>();
@@ -188,10 +221,10 @@ const YoungKidsPage = () => {
       try {
         // 1. Initialize HybridServiceManager
         await HybridServiceManager.initialize({
-          mode: 'hybrid' as any,
+          mode: 'online',
           autoSync: true,
           syncInterval: 15
-        } as any);
+        });
 
         // 2. Check system health
         const health = await HybridServiceManager.getSystemHealth();
@@ -284,11 +317,14 @@ const YoungKidsPage = () => {
         if (token && token !== 'local-token') {
           try {
             serverProgress = await KidsApi.getProgress(token);
-          } catch (error: any) {
+          } catch (error: unknown) {
             // If 401, token is invalid - clear it and fallback to local
-            if (error?.message?.includes('token not valid') || error?.message?.includes('401')) {
-              localStorage.removeItem('speakbee_auth_token');
-              console.warn('Token expired, falling back to local progress');
+            if (typeof error === 'object' && error !== null && 'message' in error && typeof (error as { message: unknown }).message === 'string') {
+              const msg = (error as { message: string }).message;
+              if (msg.includes('token not valid') || msg.includes('401')) {
+                localStorage.removeItem('speakbee_auth_token');
+                console.warn('Token expired, falling back to local progress');
+              }
             }
             // Fallback to local for any error
           }
@@ -415,14 +451,14 @@ const YoungKidsPage = () => {
     }
   }, [realTimeKidsProgress]);
 
-  // Load vocabulary words and phrases from enrolled stories
+  // Load vocabulary words and phrases from enrolled stories (YOUNG KIDS ONLY)
   useEffect(() => {
     if (!isAuthenticated) return;
 
     const loadVocabularyWordsAndPhrases = () => {
       try {
-        // Get words from enrolled stories
-        const storyWords = StoryWordsService.getWordsFromEnrolledStories(userId);
+        // Get words from enrolled stories - FILTERED TO YOUNG KIDS ONLY
+        const storyWords = StoryWordsService.getWordsFromEnrolledStoriesByAge(userId, 'young');
         // Save detailed for filtering; do NOT fallback to defaults for Word Games
         const detailed = storyWords.map(sw => ({
           word: sw.word,
@@ -434,10 +470,10 @@ const YoungKidsPage = () => {
         const filtered = selectedStoryFilter === 'all' 
           ? detailed
           : detailed.filter(w => w.storyId === selectedStoryFilter);
-        console.log(`📚 Loaded ${filtered.length} words from enrolled stories${selectedStoryFilter !== 'all' ? ' (filtered)' : ''}`);
+        console.log(`📚 Loaded ${filtered.length} words from enrolled YOUNG stories${selectedStoryFilter !== 'all' ? ' (filtered)' : ''}`);
 
-        // Get phrases from enrolled stories
-        const storyPhrases = StoryWordsService.getPhrasesFromEnrolledStories(userId);
+        // Get phrases from enrolled stories - FILTERED TO YOUNG KIDS ONLY
+        const storyPhrases = StoryWordsService.getPhrasesFromEnrolledStoriesByAge(userId, 'young');
         // Save detailed for filtering; do NOT fallback to defaults for Speak & Repeat
         const detailedPhrases = storyPhrases.map(sp => ({
           phrase: sp.phrase,
@@ -449,7 +485,7 @@ const YoungKidsPage = () => {
         const filteredPhrases = selectedPhraseFilter === 'all' 
           ? detailedPhrases
           : detailedPhrases.filter(p => p.storyId === selectedPhraseFilter);
-        console.log(`🎤 Loaded ${filteredPhrases.length} phrases from enrolled stories${selectedPhraseFilter !== 'all' ? ' (filtered)' : ''}`);
+        console.log(`🎤 Loaded ${filteredPhrases.length} phrases from enrolled YOUNG stories${selectedPhraseFilter !== 'all' ? ' (filtered)' : ''}`);
       } catch (error) {
         console.error('Error loading vocabulary words and phrases:', error);
         // For Word Games and Speak & Repeat, do not fallback to defaults; show empty state
@@ -468,7 +504,7 @@ const YoungKidsPage = () => {
     { id: 'games', label: 'Fun Games', icon: Trophy, emoji: '🏆' },
   ];
 
-  const allStories = [
+  const allStories = useMemo(() => [
     {
       title: "The Magic Forest",
       description: "Join Luna the rabbit on a magical listening adventure!",
@@ -609,7 +645,7 @@ const YoungKidsPage = () => {
       type: 'jungle',
       id: 'young-9'
     }
-  ];
+  ], []);
 
   // Load dynamic kids lessons from server (fallback to defaults)
   useEffect(() => {
@@ -841,6 +877,12 @@ const YoungKidsPage = () => {
   const completedAchievements = serverAchievements.length > 0
     ? serverAchievements.filter((a: any) => a.unlocked === true).length
     : achievements.filter(a => a.progress === 100).length;
+
+  // Logic to unlock stories 11-20 based on completion of previous stories
+  const unlockStories = (completedStories: number) => {
+    return completedStories >= 10 ? Array.from({ length: 10 }, (_, i) => i + 11) : [];
+  };
+  const unlockedStories = unlockStories(completedAchievements);
 
   const handleStartLesson = async (storyId: string) => {
     if (!isAuthenticated) {
@@ -1103,7 +1145,8 @@ const YoungKidsPage = () => {
           
           // Also update progress for backward compatibility
           const current = await KidsApi.getProgress(token);
-          const details = { ...((current as any).details || {}), favorites: updatedFavorites };
+          const details = { ...((current as any).details || {}) };
+          details.favorites = updatedFavorites;
           await KidsApi.updateProgress(token, { details });
         } catch (error) {
           console.error('Error updating favorites on server:', error);
@@ -1169,7 +1212,8 @@ const YoungKidsPage = () => {
       );
       
       // Reload vocabulary words and phrases to include data from this newly completed story
-      const storyWords = StoryWordsService.getWordsFromEnrolledStories(userId);
+      // FILTERED TO YOUNG KIDS ONLY
+      const storyWords = StoryWordsService.getWordsFromEnrolledStoriesByAge(userId, 'young');
       const detailedWords = storyWords.map(sw => ({
         word: sw.word,
         hint: sw.hint,
@@ -1180,9 +1224,9 @@ const YoungKidsPage = () => {
       const relevantWords = selectedStoryFilter === 'all' 
         ? detailedWords
         : detailedWords.filter(w => w.storyId === selectedStoryFilter);
-      console.log(`🎉 Story completed! Loaded ${relevantWords.length} total words from enrolled stories${selectedStoryFilter !== 'all' ? ' (filtered)' : ''}`);
+      console.log(`🎉 Story completed! Loaded ${relevantWords.length} total words from enrolled YOUNG stories${selectedStoryFilter !== 'all' ? ' (filtered)' : ''}`);
 
-      const storyPhrases = StoryWordsService.getPhrasesFromEnrolledStories(userId);
+      const storyPhrases = StoryWordsService.getPhrasesFromEnrolledStoriesByAge(userId, 'young');
       const detailedPhrases = storyPhrases.map(sp => ({
         phrase: sp.phrase,
         phonemes: sp.phonemes,
@@ -1193,7 +1237,7 @@ const YoungKidsPage = () => {
       const relevantPhrases = selectedPhraseFilter === 'all' 
         ? detailedPhrases
         : detailedPhrases.filter(p => p.storyId === selectedPhraseFilter);
-      console.log(`🎉 Story completed! Loaded ${relevantPhrases.length} total phrases from enrolled stories${selectedPhraseFilter !== 'all' ? ' (filtered)' : ''}`);
+      console.log(`🎉 Story completed! Loaded ${relevantPhrases.length} total phrases from enrolled YOUNG stories${selectedPhraseFilter !== 'all' ? ' (filtered)' : ''}`);
       
       if (token && token !== 'local-token') {
         const current = await KidsApi.getProgress(token);
@@ -1780,6 +1824,20 @@ const YoungKidsPage = () => {
                         {Array.from(new Map(enrolledStoryWordsDetailed.map(w => [w.storyId, w.storyTitle])).entries()).map(([id, title]) => (
                           <option key={id} value={id}>{title}</option>
                         ))}
+                        {unlockedStories.length > 0 && (
+                          <optgroup label="Unlocked stories">
+                            {unlockedStories.map(id => {
+                              const story = allStories.find(s => s.id === `young-${id - 1}`);
+                              return (
+                                story && (
+                                  <option key={id} value={story.id}>
+                                    {story.title}
+                                  </option>
+                                )
+                              );
+                            })}
+                          </optgroup>
+                        )}
                       </select>
                     </div>
                   </div>
@@ -1893,6 +1951,20 @@ const YoungKidsPage = () => {
                         {Array.from(new Map(enrolledStoryPhrasesDetailed.map(p => [p.storyId, p.storyTitle])).entries()).map(([id, title]) => (
                           <option key={id} value={id}>{title}</option>
                         ))}
+                        {unlockedStories.length > 0 && (
+                          <optgroup label="Unlocked stories">
+                            {unlockedStories.map(id => {
+                              const story = allStories.find(s => s.id === `young-${id - 1}`);
+                              return (
+                                story && (
+                                  <option key={id} value={story.id}>
+                                    {story.title}
+                                  </option>
+                                )
+                              );
+                            })}
+                          </optgroup>
+                        )}
                       </select>
                     </div>
                   </div>
