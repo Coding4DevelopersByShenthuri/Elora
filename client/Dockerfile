@@ -24,6 +24,8 @@ RUN npm install
 # Copy the rest of the application files (excluding node_modules and package-lock.json via .dockerignore)
 COPY . .
 
+# Increase Node.js heap size to prevent out of memory errors during build
+ENV NODE_OPTIONS=--max-old-space-size=4096
 RUN npm run build
 
 # Step 2: Serve the built app using nginx
