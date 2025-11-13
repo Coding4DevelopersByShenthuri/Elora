@@ -66,28 +66,35 @@ export class StoryWordsService {
     'grand-adventure'         // 20. The Grand Adventure
   ]);
 
+  // TEEN_KIDS_STORIES: ONLY these 20 stories appear in Teen Kids Advanced Vocabulary & Speaking Lab
+  // Stories 1-10: Mystery Detective, Space Explorer, Environmental Hero, Tech Innovator,
+  //              Global Citizen, Future Leader, Scientific Discovery, Social Media Expert,
+  //              AI Ethics Explorer, Digital Security Guardian
+  // Stories 11-20: Climate Action Leader, Startup Founder, International Diplomat, Medical Researcher,
+  //                Social Impact Innovator, Data Science Analyst, Environmental Engineer,
+  //                Content Creator Strategist, Ethical AI Developer, Global Innovation Summit
   private static TEEN_KIDS_STORIES = new Set([
-    'mystery-detective',
-    'space-explorer-teen',
-    'environmental-hero',
-    'tech-innovator',
-    'global-citizen',
-    'future-leader',
-    'scientific-discovery',
-    'social-media-expert',
-    'ai-ethics-explorer',
-    'digital-security-guardian',
+    'mystery-detective',        // 1. Mystery Detective
+    'space-explorer-teen',       // 2. Space Explorer
+    'environmental-hero',        // 3. Environmental Hero
+    'tech-innovator',            // 4. Tech Innovator
+    'global-citizen',            // 5. Global Citizen
+    'future-leader',             // 6. Future Leader
+    'scientific-discovery',      // 7. Scientific Discovery
+    'social-media-expert',       // 8. Social Media Expert
+    'ai-ethics-explorer',        // 9. AI Ethics Explorer
+    'digital-security-guardian', // 10. Digital Security Guardian
     // Template stories (11-20) for teen
-    'climate-action',
-    'startup',
-    'diplomacy',
-    'medical-research',
-    'social-impact',
-    'data-science',
-    'engineering',
-    'content-strategy',
-    'ethical-ai',
-    'innovation-summit'
+    'climate-action',            // 11. Climate Action Leader
+    'startup',                   // 12. Startup Founder
+    'diplomacy',                 // 13. International Diplomat
+    'medical-research',          // 14. Medical Researcher
+    'social-impact',             // 15. Social Impact Innovator
+    'data-science',              // 16. Data Science Analyst
+    'engineering',               // 17. Environmental Engineer
+    'content-strategy',          // 18. Content Creator Strategist
+    'ethical-ai',                // 19. Ethical AI Developer
+    'innovation-summit'          // 20. Global Innovation Summit
   ]);
   
   // Story vocabulary data - extracted from each story

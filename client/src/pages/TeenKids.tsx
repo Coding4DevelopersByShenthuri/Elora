@@ -1783,29 +1783,24 @@ const TeenKidsPage = () => {
                         onChange={(e) => setSelectedStoryFilter(e.target.value)}
                       >
                         <option value="all">All stories</option>
-                        {Array.from(new Map(enrolledStoryWordsDetailed.map((w) => [w.storyId, w.storyTitle])).entries()).map(
-                          ([id, title]) => (
+                        {/* Only show the 20 Teen Kids stories in the filter */}
+                        {Array.from(new Map(enrolledStoryWordsDetailed.map((w) => [w.storyId, w.storyTitle])).entries())
+                          .filter(([id]) => {
+                            // Only include stories that are in TEEN_KIDS_STORIES set
+                            const TEEN_KIDS_STORIES = new Set([
+                              'mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator',
+                              'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert',
+                              'ai-ethics-explorer', 'digital-security-guardian', 'climate-action', 'startup',
+                              'diplomacy', 'medical-research', 'social-impact', 'data-science',
+                              'engineering', 'content-strategy', 'ethical-ai', 'innovation-summit'
+                            ]);
+                            return TEEN_KIDS_STORIES.has(id);
+                          })
+                          .map(([id, title]) => (
                             <option key={id} value={id}>
                               {title}
                             </option>
-                          )
-                        )}
-                        {/* Include enrolled stories 11-20 in filter */}
-                        {Array.from(allEnrolledStoryIds).map(internalId => {
-                          // Check if this is a story 11-20 by finding it in dataset stories
-                          const datasetStory = datasetStories.find(ds => {
-                            const mappedType = getInternalStoryId(ds.type);
-                            return mappedType === internalId;
-                          });
-                          if (datasetStory) {
-                            return (
-                              <option key={internalId} value={internalId}>
-                                {datasetStory.title}
-                              </option>
-                            );
-                          }
-                          return null;
-                        }).filter(Boolean)}
+                          ))}
                       </select>
                     </div>
                   </div>
@@ -1912,29 +1907,24 @@ const TeenKidsPage = () => {
                         onChange={(e) => setSelectedPhraseFilter(e.target.value)}
                       >
                         <option value="all">All stories</option>
-                        {Array.from(new Map(enrolledStoryPhrasesDetailed.map((p) => [p.storyId, p.storyTitle])).entries()).map(
-                          ([id, title]) => (
+                        {/* Only show the 20 Teen Kids stories in the filter */}
+                        {Array.from(new Map(enrolledStoryPhrasesDetailed.map((p) => [p.storyId, p.storyTitle])).entries())
+                          .filter(([id]) => {
+                            // Only include stories that are in TEEN_KIDS_STORIES set
+                            const TEEN_KIDS_STORIES = new Set([
+                              'mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator',
+                              'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert',
+                              'ai-ethics-explorer', 'digital-security-guardian', 'climate-action', 'startup',
+                              'diplomacy', 'medical-research', 'social-impact', 'data-science',
+                              'engineering', 'content-strategy', 'ethical-ai', 'innovation-summit'
+                            ]);
+                            return TEEN_KIDS_STORIES.has(id);
+                          })
+                          .map(([id, title]) => (
                             <option key={id} value={id}>
                               {title}
                             </option>
-                          )
-                        )}
-                        {/* Include enrolled stories 11-20 in filter */}
-                        {Array.from(allEnrolledStoryIds).map(internalId => {
-                          // Check if this is a story 11-20 by finding it in dataset stories
-                          const datasetStory = datasetStories.find(ds => {
-                            const mappedType = getInternalStoryId(ds.type);
-                            return mappedType === internalId;
-                          });
-                          if (datasetStory) {
-                            return (
-                              <option key={internalId} value={internalId}>
-                                {datasetStory.title}
-                              </option>
-                            );
-                          }
-                          return null;
-                        }).filter(Boolean)}
+                          ))}
                       </select>
                     </div>
                   </div>

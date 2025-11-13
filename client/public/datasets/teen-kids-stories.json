@@ -135,8 +135,8 @@
     "image": "🏆",
     "type": "innovation-summit",
     "character": "Crown",
-    "gradient": "from-rainbow-500 to-sparkle-600",
-    "bgGradient": "from-rainbow-200 to-sparkle-300 dark:from-rainbow-900 dark:to-sparkle-950",
+    "gradient": "from-amber-500 via-yellow-500 to-orange-500",
+    "bgGradient": "from-amber-200 via-yellow-300 to-orange-300 dark:from-amber-900 via-yellow-900 to-orange-900",
     "animation": "animate-float-fast"
   }
 ]
