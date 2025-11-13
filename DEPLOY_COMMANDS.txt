@@ -1,0 +1,56 @@
+=========================================
+DEPLOYMENT COMMANDS
+=========================================
+
+STEP 1: Connect to Server (Run in PowerShell)
+----------------------------------------------
+ssh -i "C:\Users\shent\Downloads\id_2025_11_01_intern_3.pem" ubuntu@54.179.120.126
+
+
+STEP 2: On Server (After SSH connection, run these commands)
+----------------------------------------------
+cd ~
+git clone https://github.com/Coding4DevelopersByShenthuri/Vocario.git Elora
+cd Elora
+~/deploy-elora.sh
+
+
+STEP 3: Create Superuser (On server, after deployment)
+----------------------------------------------
+docker compose exec backend python manage.py createsuperuser
+
+
+STEP 4: Verify Deployment (On server)
+----------------------------------------------
+docker compose ps
+curl http://localhost:8000/api/health
+curl http://localhost
+
+
+STEP 5: Access Your Application (From browser)
+----------------------------------------------
+Frontend: http://54.179.120.126
+API: http://54.179.120.126:8000/api
+Admin: http://54.179.120.126:8000/admin
+
+
+=========================================
+TROUBLESHOOTING
+=========================================
+
+Check logs:
+  docker compose logs -f
+
+Restart services:
+  docker compose restart
+
+Check status:
+  docker compose ps
+
+View specific service logs:
+  docker compose logs backend
+  docker compose logs frontend
+  docker compose logs db
+
+=========================================
+
