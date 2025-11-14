@@ -192,6 +192,22 @@ const KidsGamePage = () => {
   const handleScoreUpdate = async (points: number, gameType: string) => {
     setGameScore(prev => prev + points);
     
+    // Dispatch custom event to notify InteractiveGames component about points awarded
+    // This allows the "Current Session Points" to update in real-time
+    try {
+      const event = new CustomEvent('gamePointsAwarded', {
+        detail: { points, gameType, userId }
+      });
+      window.dispatchEvent(event);
+      
+      // Also update localStorage to trigger storage events (works across tabs)
+      const gamePointsKey = `speakbee_game_points_${userId}`;
+      const currentGamePoints = Number(localStorage.getItem(gamePointsKey) || '0');
+      localStorage.setItem(gamePointsKey, String(currentGamePoints + points));
+    } catch (error) {
+      console.warn('Error dispatching game points event:', error);
+    }
+    
     if (!isAuthenticated) return;
     
     try {

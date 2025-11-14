@@ -3482,7 +3482,7 @@ When ending game: {{ "content": "[Warm ending message]", "gameEnd": true, "point
                 }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
             else:
                 return Response({
-                    "message": "Yor Gamer temporarily unavailable. Please try again later.",
+                    "message": "Your Gamer temporarily unavailable. Please try again later.",
                     "error": "API_ERROR",
                     "details": error_message
                 }, status=status.HTTP_502_BAD_GATEWAY)

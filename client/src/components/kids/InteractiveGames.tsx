@@ -67,6 +67,8 @@ const InteractiveGames = ({ isTeenKids }: InteractiveGamesProps = {}) => {
     })();
   const navigate = useNavigate();
   const [gameScore, setGameScore] = useState(0);
+  const [sessionPoints, setSessionPoints] = useState(0); // Track current session points
+  const [sessionBaseline, setSessionBaseline] = useState(0); // Baseline points at session start
   const { user, isAuthenticated } = useAuth();
   const userId = user?.id ? String(user.id) : 'local-user';
 
@@ -82,7 +84,155 @@ const InteractiveGames = ({ isTeenKids }: InteractiveGamesProps = {}) => {
     initGemini();
   }, []);
 
-  // Load game score from progress
+  // Initialize session points - reset on mount and track baseline
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setSessionPoints(0);
+      setSessionBaseline(0);
+      return;
+    }
+
+    const initializeSession = async () => {
+      try {
+        const token = localStorage.getItem('speakbee_auth_token');
+        let baseline = 0;
+
+        if (token && token !== 'local-token') {
+          if (!isTeenContext) {
+            const progress = await KidsApi.getProgress(token);
+            baseline = (progress as any)?.details?.games?.points || 0;
+          }
+        } else if (!isTeenContext) {
+          const progress = await KidsProgressService.get(userId);
+          baseline = (progress as any)?.details?.games?.points || 0;
+        }
+
+        setSessionBaseline(Number(baseline));
+        setSessionPoints(0);
+      } catch (error) {
+        console.error('Error initializing session:', error);
+        setSessionBaseline(0);
+        setSessionPoints(0);
+      }
+    };
+
+    initializeSession();
+  }, [isAuthenticated, userId, isTeenContext]);
+
+  // Listen for game point updates from KidsGamePage
+  useEffect(() => {
+    if (!isAuthenticated || isTeenContext) return;
+
+    // Listen for custom events from KidsGamePage (works in same window/tab)
+    const handleGamePointsUpdate = ((e: CustomEvent) => {
+      const pointsAdded = e.detail?.points || 0;
+      const eventUserId = e.detail?.userId;
+      // Only update if the event is for the current user
+      if (pointsAdded > 0 && (!eventUserId || eventUserId === userId)) {
+        setSessionPoints(prev => prev + pointsAdded);
+      }
+    }) as EventListener;
+
+    // Listen for custom events (works within same window)
+    window.addEventListener('gamePointsAwarded', handleGamePointsUpdate);
+
+    // Check actual game points when component mounts or window gains focus
+    // This handles cases where events might not fire (user navigates back from game)
+    const checkGamePoints = async () => {
+      try {
+        const token = localStorage.getItem('speakbee_auth_token');
+        let currentTotal = 0;
+
+        if (token && token !== 'local-token') {
+          const progress = await KidsApi.getProgress(token);
+          currentTotal = (progress as any)?.details?.games?.points || 0;
+        } else {
+          const progress = await KidsProgressService.get(userId);
+          currentTotal = (progress as any)?.details?.games?.points || 0;
+        }
+
+        setSessionPoints(prev => {
+          const expectedTotal = sessionBaseline + prev;
+          const diff = currentTotal - expectedTotal;
+          if (diff > 0) {
+            return prev + diff;
+          }
+          return prev;
+        });
+      } catch (error) {
+        // Silently fail
+      }
+    };
+
+    // Check immediately and when window gains focus (user navigates back from game)
+    checkGamePoints();
+    const handleFocus = () => {
+      checkGamePoints();
+    };
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      window.removeEventListener('gamePointsAwarded', handleGamePointsUpdate);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [isAuthenticated, userId, isTeenContext, sessionBaseline]);
+
+  // Poll for game score changes when component becomes visible (as fallback if events don't work)
+  useEffect(() => {
+    if (!isAuthenticated || isTeenContext) return;
+
+    let lastCheck = Date.now();
+    let currentBaseline = sessionBaseline;
+
+    const pollGameScore = async () => {
+      try {
+        // Only poll if page is visible and at least 3 seconds have passed since last check
+        if (document.hidden || Date.now() - lastCheck < 3000) return;
+        
+        lastCheck = Date.now();
+        const token = localStorage.getItem('speakbee_auth_token');
+        let currentTotal = 0;
+
+        if (token && token !== 'local-token') {
+          const progress = await KidsApi.getProgress(token);
+          currentTotal = (progress as any)?.details?.games?.points || 0;
+        } else {
+          const progress = await KidsProgressService.get(userId);
+          currentTotal = (progress as any)?.details?.games?.points || 0;
+        }
+
+        // Get current session points state
+        setSessionPoints(prev => {
+          const expectedTotal = currentBaseline + prev;
+          const diff = currentTotal - expectedTotal;
+          if (diff > 0) {
+            return prev + diff;
+          }
+          return prev;
+        });
+      } catch (error) {
+        // Silently fail polling
+      }
+    };
+
+    // Poll every 3 seconds when component is visible
+    const interval = setInterval(pollGameScore, 3000);
+    
+    // Also check when page becomes visible (user navigates back from game)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        pollGameScore();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isAuthenticated, userId, isTeenContext, sessionBaseline]);
+
+  // Load game score from progress (for display purposes, but we'll use sessionPoints instead)
   useEffect(() => {
     const loadScore = async () => {
       if (!isAuthenticated) {
@@ -133,7 +283,7 @@ const InteractiveGames = ({ isTeenKids }: InteractiveGamesProps = {}) => {
     <div className="space-y-6">
       <GameMenu 
         onSelectGame={startGame}
-        totalScore={gameScore} 
+        totalScore={isTeenContext ? gameScore : sessionPoints} 
         isGeminiReady={GeminiService.isReady()}
         isTeenKids={isTeenContext}
       />
