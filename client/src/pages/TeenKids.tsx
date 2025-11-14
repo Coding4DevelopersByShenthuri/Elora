@@ -384,8 +384,16 @@ const TeenKidsPage = () => {
   }
 
   const applyDashboard = useCallback(
-    (data: DashboardData | null, mergeMode: boolean = false) => {
+    async (data: DashboardData | null, mergeMode: boolean = false) => {
       if (!data) return;
+
+      // Load category progress from MySQL first (most accurate source)
+      let categoryProgressData: CategoryProgress | null = null;
+      try {
+        categoryProgressData = await MultiCategoryProgressService.getCategoryProgress(userId, 'teen_kids', true);
+      } catch (error) {
+        console.warn('Error loading category progress:', error);
+      }
 
       const pointsFromPayload = data.points ?? data.progress?.points ?? 0;
       const streakFromPayload = data.streak ?? data.progress?.streak ?? 0;
@@ -397,12 +405,18 @@ const TeenKidsPage = () => {
       const achievementsFromPayload = Array.isArray(data.achievements) ? data.achievements : [];
 
       if (mergeMode) {
-        // Merge mode: take maximum values to preserve local progress
-        setPoints((prev) => Math.max(prev, Number(pointsFromPayload) || 0));
-        setStreak((prev) => Math.max(prev, Number(streakFromPayload) || 0));
-        setPronunciationAttempts((prev) => Math.max(prev, pronunciationAttemptsFromPayload));
-        setVocabularyAttempts((prev) => Math.max(prev, vocabularyAttemptsFromPayload));
-        setGamesAttempts((prev) => Math.max(prev, gamesAttemptsFromPayload));
+        // Merge mode: prioritize category progress, then take maximum values to preserve local progress
+        const categoryPoints = categoryProgressData?.total_points ?? 0;
+        const categoryStreak = categoryProgressData?.total_streak ?? 0;
+        const categoryPronAttempts = categoryProgressData?.pronunciation_attempts ?? 0;
+        const categoryVocabWords = categoryProgressData?.vocabulary_words ?? 0;
+        const categoryGamesCompleted = categoryProgressData?.games_completed ?? 0;
+        
+        setPoints((prev) => Math.max(prev, categoryPoints || Number(pointsFromPayload) || 0));
+        setStreak((prev) => Math.max(prev, categoryStreak || Number(streakFromPayload) || 0));
+        setPronunciationAttempts((prev) => Math.max(prev, categoryPronAttempts || pronunciationAttemptsFromPayload));
+        setVocabularyAttempts((prev) => Math.max(prev, categoryVocabWords || vocabularyAttemptsFromPayload));
+        setGamesAttempts((prev) => Math.max(prev, categoryGamesCompleted || gamesAttemptsFromPayload));
         
         // Merge favorites
         setFavorites((prev) => {
@@ -458,13 +472,24 @@ const TeenKidsPage = () => {
           }
         });
       } else {
-        // Replace mode: use server data as source of truth
-        setPoints(Number(pointsFromPayload) || 0);
-        setStreak(Number(streakFromPayload) || 0);
-        setPronunciationAttempts(pronunciationAttemptsFromPayload);
-        setVocabularyAttempts(vocabularyAttemptsFromPayload);
-        setGamesAttempts(gamesAttemptsFromPayload);
+        // Replace mode: prioritize category progress, then use payload values
+        const categoryPoints = categoryProgressData?.total_points ?? 0;
+        const categoryStreak = categoryProgressData?.total_streak ?? 0;
+        const categoryPronAttempts = categoryProgressData?.pronunciation_attempts ?? 0;
+        const categoryVocabWords = categoryProgressData?.vocabulary_words ?? 0;
+        const categoryGamesCompleted = categoryProgressData?.games_completed ?? 0;
+        
+        setPoints(categoryPoints || Number(pointsFromPayload) || 0);
+        setStreak(categoryStreak || Number(streakFromPayload) || 0);
+        setPronunciationAttempts(categoryPronAttempts || pronunciationAttemptsFromPayload);
+        setVocabularyAttempts(categoryVocabWords || vocabularyAttemptsFromPayload);
+        setGamesAttempts(categoryGamesCompleted || gamesAttemptsFromPayload);
         setFavorites(favoritesFromPayload);
+        
+        // Update category progress state
+        if (categoryProgressData) {
+          setCategoryProgress(categoryProgressData);
+        }
         
         // Update server achievements if available
         if (achievementsFromPayload.length > 0) {
@@ -673,6 +698,84 @@ const TeenKidsPage = () => {
       });
   }, [isAuthenticated, applyDashboard, userId]);
 
+  // Load category-specific progress (practice time and stories completed)
+  useEffect(() => {
+    if (!isAuthenticated || !userId) return;
+
+    const loadCategoryProgress = async () => {
+      setLoadingCategoryProgress(true);
+      try {
+        const progress = await MultiCategoryProgressService.getCategoryProgress(userId, 'teen_kids', true);
+        if (progress) {
+          setCategoryProgress(progress);
+          
+          // Update points and streak from category progress (most accurate source)
+          if (progress.total_points !== undefined) {
+            setPoints(prev => Math.max(prev, progress.total_points));
+          }
+          if (progress.total_streak !== undefined) {
+            setStreak(prev => Math.max(prev, progress.total_streak));
+          }
+          // Update pronunciation, vocabulary, and games from category progress
+          if (progress.pronunciation_attempts !== undefined) {
+            setPronunciationAttempts(prev => Math.max(prev, progress.pronunciation_attempts));
+          }
+          if (progress.vocabulary_words !== undefined) {
+            setVocabularyAttempts(prev => Math.max(prev, progress.vocabulary_words));
+          }
+          if (progress.games_completed !== undefined) {
+            setGamesAttempts(prev => Math.max(prev, progress.games_completed));
+          }
+        }
+      } catch (error) {
+        console.error('Error loading category progress:', error);
+        setCategoryProgress(null);
+      } finally {
+        setLoadingCategoryProgress(false);
+      }
+    };
+
+    loadCategoryProgress();
+  }, [userId, isAuthenticated]);
+
+  // Real-time category progress updates
+  const {
+    data: realTimeCategories,
+    loading: loadingCategoriesRealTime,
+  } = useRealTimeData<CategoryProgress[]>('category_progress', {
+    enabled: isAuthenticated && !!userId,
+    immediate: true,
+  });
+
+  // Update category progress when real-time data arrives
+  useEffect(() => {
+    if (realTimeCategories && Array.isArray(realTimeCategories)) {
+      const teenKidsProgress = realTimeCategories.find(cat => cat.category === 'teen_kids');
+      if (teenKidsProgress) {
+        setCategoryProgress(teenKidsProgress);
+        setLoadingCategoryProgress(false);
+        
+        // Update points and streak from category progress (most accurate source)
+        if (teenKidsProgress.total_points !== undefined) {
+          setPoints(prev => Math.max(prev, teenKidsProgress.total_points));
+        }
+        if (teenKidsProgress.total_streak !== undefined) {
+          setStreak(prev => Math.max(prev, teenKidsProgress.total_streak));
+        }
+        // Update pronunciation, vocabulary, and games from category progress
+        if (teenKidsProgress.pronunciation_attempts !== undefined) {
+          setPronunciationAttempts(prev => Math.max(prev, teenKidsProgress.pronunciation_attempts));
+        }
+        if (teenKidsProgress.vocabulary_words !== undefined) {
+          setVocabularyAttempts(prev => Math.max(prev, teenKidsProgress.vocabulary_words));
+        }
+        if (teenKidsProgress.games_completed !== undefined) {
+          setGamesAttempts(prev => Math.max(prev, teenKidsProgress.games_completed));
+        }
+      }
+    }
+  }, [realTimeCategories]);
+
   useEffect(() => {
     if (!isAuthenticated) {
       setEnrolledStoryWordsDetailed([]);
@@ -815,46 +918,6 @@ const TeenKidsPage = () => {
     
     loadStoryTemplates();
   }, [isAuthenticated]);
-
-  // Real-time category progress updates
-  const {
-    data: realTimeCategories,
-    loading: loadingCategoriesRealTime,
-  } = useRealTimeData<CategoryProgress[]>('category_progress', {
-    enabled: isAuthenticated && !!userId,
-    immediate: true,
-  });
-
-  // Load category-specific progress (practice time and lessons completed)
-  useEffect(() => {
-    if (!isAuthenticated || !userId) return;
-
-    const loadCategoryProgress = async () => {
-      setLoadingCategoryProgress(true);
-      try {
-        const progress = await MultiCategoryProgressService.getCategoryProgress(userId, 'teen_kids');
-        setCategoryProgress(progress);
-      } catch (error) {
-        console.error('Error loading category progress:', error);
-        setCategoryProgress(null);
-      } finally {
-        setLoadingCategoryProgress(false);
-      }
-    };
-
-    loadCategoryProgress();
-  }, [userId, isAuthenticated]);
-
-  // Update category progress when real-time data arrives
-  useEffect(() => {
-    if (realTimeCategories && Array.isArray(realTimeCategories)) {
-      const teenKidsProgress = realTimeCategories.find(cat => cat.category === 'teen_kids');
-      if (teenKidsProgress) {
-        setCategoryProgress(teenKidsProgress);
-        setLoadingCategoryProgress(false);
-      }
-    }
-  }, [realTimeCategories]);
 
   // Merge base stories with dataset stories
   const allTeenStoriesWithDataset = useMemo(() => {

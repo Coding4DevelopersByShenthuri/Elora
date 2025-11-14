@@ -75,6 +75,7 @@ const YoungKidsPage = () => {
   const [gamesAttempts, setGamesAttempts] = useState(0);
   const [categoryProgress, setCategoryProgress] = useState<CategoryProgress | null>(null);
   const [loadingCategoryProgress, setLoadingCategoryProgress] = useState(false);
+  const [progressDetails, setProgressDetails] = useState<any>({ pronunciation: {}, vocabulary: {} });
   const [enrolledStoryWordsDetailed, setEnrolledStoryWordsDetailed] = useState<Array<{ word: string; hint: string; storyId: string; storyTitle: string }>>([]);
   const [selectedStoryFilter, setSelectedStoryFilter] = useState<string>('all');
   const [enrolledStoryPhrasesDetailed, setEnrolledStoryPhrasesDetailed] = useState<Array<{ phrase: string; phonemes: string; storyId: string; storyTitle: string }>>([]);
@@ -316,6 +317,14 @@ const YoungKidsPage = () => {
         const token = localStorage.getItem('speakbee_auth_token');
         let serverProgress: any = null;
         let localProgress: any = null;
+        let categoryProgressData: CategoryProgress | null = null;
+        
+        // Load category progress from MySQL first (most accurate source)
+        try {
+          categoryProgressData = await MultiCategoryProgressService.getCategoryProgress(userId, 'young_kids', true);
+        } catch (error) {
+          console.warn('Error loading category progress:', error);
+        }
         
         // Try to load from server first
         if (token && token !== 'local-token') {
@@ -344,15 +353,32 @@ const YoungKidsPage = () => {
         const serverDetails = (serverProgress as any)?.details || {};
         const localDetails = (localProgress as any)?.details || {};
         
-        // Points: Use the maximum of server and local (to account for offline progress)
+        // Points: Prioritize category progress from MySQL, then server, then local
+        // Also include game points in the total
+        const categoryPoints = categoryProgressData?.total_points ?? 0;
         const serverPoints = (serverProgress as any)?.points ?? 0;
         const localPoints = localProgress?.points ?? 0;
-        setPoints(Math.max(serverPoints, localPoints));
         
-        // Streak: Use the maximum of server and local
+        // Get game points from details
+        const serverGamePoints = Number(serverDetails.games?.points || 0);
+        const localGamePoints = Number(localDetails.games?.points || 0);
+        const gamePoints = Math.max(serverGamePoints, localGamePoints);
+        
+        // Total points should include all points (stories, words, pronunciation, games)
+        // Category progress already includes all points, so use it if available
+        // Otherwise, add game points to the base points
+        const basePoints = Math.max(categoryPoints, serverPoints, localPoints);
+        const totalPoints = categoryPoints > 0 
+          ? categoryPoints  // Category progress already includes all points
+          : basePoints + gamePoints;  // Add game points if not in category progress
+        
+        setPoints(totalPoints);
+        
+        // Streak: Prioritize category progress from MySQL, then server, then local
+        const categoryStreak = categoryProgressData?.total_streak ?? 0;
         const serverStreak = (serverProgress as any)?.streak ?? 0;
         const localStreak = localProgress?.streak ?? 0;
-        setStreak(Math.max(serverStreak, localStreak));
+        setStreak(Math.max(categoryStreak, serverStreak, localStreak));
         
         // Favorites: Merge and convert
         let fav = (serverDetails.favorites || localDetails.favorites || []);
@@ -400,10 +426,27 @@ const YoungKidsPage = () => {
           ]))
         };
         
-        // Count attempts from merged data
-        const pronCount = Object.keys(mergedPron).length;
-        const vocabCount = Object.keys(mergedVocab).length;
-        const gamesAttemptsCount = Number(mergedGames.attempts || 0);
+        // Store progress details for achievement calculations
+        setProgressDetails({
+          pronunciation: mergedPron,
+          vocabulary: mergedVocab,
+          games: mergedGames
+        });
+        
+        // Count attempts from merged data - prioritize category progress from MySQL
+        const categoryPronAttempts = categoryProgressData?.pronunciation_attempts ?? 0;
+        const categoryVocabWords = categoryProgressData?.vocabulary_words ?? 0;
+        const categoryGamesCompleted = categoryProgressData?.games_completed ?? 0;
+        
+        const pronCount = categoryPronAttempts > 0 
+          ? categoryPronAttempts 
+          : Object.keys(mergedPron).length;
+        const vocabCount = categoryVocabWords > 0 
+          ? categoryVocabWords 
+          : Object.keys(mergedVocab).length;
+        const gamesAttemptsCount = categoryGamesCompleted > 0
+          ? categoryGamesCompleted
+          : Number(mergedGames.attempts || 0);
         const gamesPoints = Number(mergedGames.points || 0);
         const estimatedGamesAttempts = gamesAttemptsCount > 0 
           ? gamesAttemptsCount 
@@ -491,6 +534,25 @@ const YoungKidsPage = () => {
       if (youngKidsProgress) {
         setCategoryProgress(youngKidsProgress);
         setLoadingCategoryProgress(false);
+        
+        // Update points and streak from category progress (most accurate source)
+        // Category progress already includes all points (stories, words, pronunciation, games)
+        if (youngKidsProgress.total_points !== undefined) {
+          setPoints(prev => Math.max(prev, youngKidsProgress.total_points));
+        }
+        if (youngKidsProgress.total_streak !== undefined) {
+          setStreak(prev => Math.max(prev, youngKidsProgress.total_streak));
+        }
+        // Update pronunciation, vocabulary, and games from category progress
+        if (youngKidsProgress.pronunciation_attempts !== undefined) {
+          setPronunciationAttempts(prev => Math.max(prev, youngKidsProgress.pronunciation_attempts));
+        }
+        if (youngKidsProgress.vocabulary_words !== undefined) {
+          setVocabularyAttempts(prev => Math.max(prev, youngKidsProgress.vocabulary_words));
+        }
+        if (youngKidsProgress.games_completed !== undefined) {
+          setGamesAttempts(prev => Math.max(prev, youngKidsProgress.games_completed));
+        }
       }
     }
   }, [realTimeCategories]);
@@ -506,7 +568,36 @@ const YoungKidsPage = () => {
       if (progress.streak !== undefined) {
         setStreak(prev => Math.max(prev, progress.streak));
       }
-      // Update other fields as needed from realTimeKidsProgress
+      // Update pronunciation, vocabulary, and games attempts from real-time data
+      if (progress.details) {
+        const details = progress.details;
+        if (details.pronunciation) {
+          setPronunciationAttempts(prev => Math.max(prev, Object.keys(details.pronunciation).length));
+          // Update progress details for achievement calculations
+          setProgressDetails((prev: any) => ({
+            ...prev,
+            pronunciation: { ...prev.pronunciation, ...details.pronunciation }
+          }));
+        }
+        if (details.vocabulary) {
+          setVocabularyAttempts(prev => Math.max(prev, Object.keys(details.vocabulary).length));
+          // Update progress details for achievement calculations
+          setProgressDetails((prev: any) => ({
+            ...prev,
+            vocabulary: { ...prev.vocabulary, ...details.vocabulary }
+          }));
+        }
+        if (details.games) {
+          const gamesAttempts = details.games.attempts || 0;
+          const gamesTypes = details.games.types || [];
+          setGamesAttempts(prev => Math.max(prev, gamesAttempts || gamesTypes.length));
+          // Update progress details for achievement calculations
+          setProgressDetails((prev: any) => ({
+            ...prev,
+            games: { ...prev.games, ...details.games }
+          }));
+        }
+      }
     }
   }, [realTimeKidsProgress]);
 
@@ -900,7 +991,7 @@ const YoungKidsPage = () => {
       return serverAchievements.map((ach: ServerAchievement) => ({
         name: ach.name || 'Achievement',
         icon: Star, // Default icon, can be enhanced based on achievement type
-        progress: typeof ach.progress === 'number' ? Math.min(100, ach.progress) : 0,
+        progress: typeof ach.progress === 'number' ? Math.min(100, Math.max(0, ach.progress)) : 0,
         emoji: (ach.emoji as string) || '🌟', // Default emoji, can be enhanced based on achievement type
         description: (ach.description as string) || `${ach.progress || 0}% complete`,
         category: (ach.category as string) || 'general',
@@ -909,54 +1000,231 @@ const YoungKidsPage = () => {
     }
     
     // Fallback to local calculations if server data not available
+    // Use real-time data from category progress and enrolled stories
+    const completedStoriesCount = categoryProgress?.stories_completed || 0;
+    const enrolledStories = StoryWordsService.getEnrolledStories(userId);
+    const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
+      'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
+      'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
+      'magic-school', 'ocean-explorer', 'time-machine', 'friendly-robot',
+      'secret-cave', 'flying-carpet', 'lost-kingdom', 'grand-adventure'];
+    const completedYoungStories = enrolledStories.filter(e => 
+      e.completed === true && 
+      e.wordsExtracted === true &&
+      youngStoryIds.includes(e.storyId)
+    ).length;
+    
+    // Use actual completed stories count (from category progress or enrolled stories)
+    const actualStoriesCompleted = Math.max(completedStoriesCount, completedYoungStories);
+    
     return [
       { 
         name: 'First Words', 
         icon: Star, 
         progress: Math.min(100, Math.round((points / 1000) * 100)), 
         emoji: '🌟',
-        description: points >= 1000 ? '1000+ points' : `${points}/1000 points`,
+        description: points >= 1000 ? '1000+ points earned!' : `${points}/1000 points`,
         category: 'general',
         unlocked: points >= 1000,
       },
       { 
         name: 'Story Master', 
         icon: BookOpen, 
-        progress: Math.min(100, favorites.filter(f => f.startsWith('young-')).length * 10), 
+        progress: Math.min(100, Math.round((actualStoriesCompleted / 20) * 100)), 
         emoji: '📖',
-        description: `${favorites.filter(f => f.startsWith('young-')).length}/10 favorite stories`,
+        description: `${actualStoriesCompleted}/20 stories completed`,
         category: 'stories',
-        unlocked: favorites.filter(f => f.startsWith('young-')).length >= 10,
+        unlocked: actualStoriesCompleted >= 20,
       },
       { 
         name: 'Pronunciation Pro', 
         icon: Mic, 
-        progress: Math.min(100, Math.min(pronunciationAttempts, 14) * 7.14), 
+        progress: (() => {
+          // Get total available phrases from enrolled stories
+          const enrolledStories = StoryWordsService.getEnrolledStories(userId);
+          const enrolledStoryIds = enrolledStories
+            .filter(e => e.completed === true && e.wordsExtracted === true)
+            .map(e => e.storyId)
+            .filter(id => youngStoryIds.includes(id));
+          const totalPhrases = enrolledStoryIds.length > 0
+            ? StoryWordsService.getPhrasesForStoryIdsByAge(enrolledStoryIds, 'young').length
+            : 0;
+          
+          // Count unique phrases practiced from progress details
+          const pronunciationDetails = progressDetails.pronunciation || {};
+          const practicedPhrasesSet = new Set(Object.keys(pronunciationDetails));
+          
+          // Filter to only count phrases from enrolled stories
+          if (enrolledStoryIds.length > 0) {
+            const enrolledPhrases = StoryWordsService.getPhrasesForStoryIdsByAge(enrolledStoryIds, 'young');
+            const enrolledPhraseSet = new Set(enrolledPhrases.map(p => p.phrase.toLowerCase()));
+            const practicedPhrases = Array.from(practicedPhrasesSet).filter(phrase => 
+              enrolledPhraseSet.has(phrase.toLowerCase())
+            ).length;
+            
+            if (totalPhrases === 0) return 0;
+            return Math.min(100, Math.round((practicedPhrases / totalPhrases) * 100));
+          }
+          
+          return 0;
+        })(),
         emoji: '🎤',
-        description: `${pronunciationAttempts} practiced`,
+        description: (() => {
+          const enrolledStories = StoryWordsService.getEnrolledStories(userId);
+          const enrolledStoryIds = enrolledStories
+            .filter(e => e.completed === true && e.wordsExtracted === true)
+            .map(e => e.storyId)
+            .filter(id => youngStoryIds.includes(id));
+          const totalPhrases = enrolledStoryIds.length > 0
+            ? StoryWordsService.getPhrasesForStoryIdsByAge(enrolledStoryIds, 'young').length
+            : 0;
+          
+          // Count unique phrases practiced from progress details
+          const pronunciationDetails = progressDetails.pronunciation || {};
+          const practicedPhrasesSet = new Set(Object.keys(pronunciationDetails));
+          
+          // Filter to only count phrases from enrolled stories
+          if (enrolledStoryIds.length > 0) {
+            const enrolledPhrases = StoryWordsService.getPhrasesForStoryIdsByAge(enrolledStoryIds, 'young');
+            const enrolledPhraseSet = new Set(enrolledPhrases.map(p => p.phrase.toLowerCase()));
+            const practicedPhrases = Array.from(practicedPhrasesSet).filter(phrase => 
+              enrolledPhraseSet.has(phrase.toLowerCase())
+            ).length;
+            
+            return `${practicedPhrases}/${totalPhrases} phrases practiced`;
+          }
+          
+          return `0/${totalPhrases} phrases practiced`;
+        })(),
         category: 'pronunciation',
-        unlocked: pronunciationAttempts >= 14,
+        unlocked: (() => {
+          const enrolledStories = StoryWordsService.getEnrolledStories(userId);
+          const enrolledStoryIds = enrolledStories
+            .filter(e => e.completed === true && e.wordsExtracted === true)
+            .map(e => e.storyId)
+            .filter(id => youngStoryIds.includes(id));
+          const totalPhrases = enrolledStoryIds.length > 0
+            ? StoryWordsService.getPhrasesForStoryIdsByAge(enrolledStoryIds, 'young').length
+            : 0;
+          
+          // Count unique phrases practiced from progress details
+          const pronunciationDetails = progressDetails.pronunciation || {};
+          const practicedPhrasesSet = new Set(Object.keys(pronunciationDetails));
+          
+          // Filter to only count phrases from enrolled stories
+          if (enrolledStoryIds.length > 0) {
+            const enrolledPhrases = StoryWordsService.getPhrasesForStoryIdsByAge(enrolledStoryIds, 'young');
+            const enrolledPhraseSet = new Set(enrolledPhrases.map(p => p.phrase.toLowerCase()));
+            const practicedPhrases = Array.from(practicedPhrasesSet).filter(phrase => 
+              enrolledPhraseSet.has(phrase.toLowerCase())
+            ).length;
+            
+            return practicedPhrases >= totalPhrases && totalPhrases > 0;
+          }
+          
+          return false;
+        })(),
       },
       { 
         name: 'Vocabulary Builder', 
         icon: Zap, 
-        progress: Math.min(100, Math.min(vocabularyAttempts, 14) * 7.14), 
+        progress: (() => {
+          // Get total available words from enrolled stories
+          const enrolledStories = StoryWordsService.getEnrolledStories(userId);
+          const enrolledStoryIds = enrolledStories
+            .filter(e => e.completed === true && e.wordsExtracted === true)
+            .map(e => e.storyId)
+            .filter(id => youngStoryIds.includes(id));
+          const totalWords = enrolledStoryIds.length > 0
+            ? StoryWordsService.getWordsForStoryIdsByAge(enrolledStoryIds, 'young').length
+            : 0;
+          
+          // Count unique words practiced from progress details
+          const vocabularyDetails = progressDetails.vocabulary || {};
+          const practicedWordsSet = new Set(Object.keys(vocabularyDetails));
+          
+          // Filter to only count words from enrolled stories
+          if (enrolledStoryIds.length > 0) {
+            const enrolledWords = StoryWordsService.getWordsForStoryIdsByAge(enrolledStoryIds, 'young');
+            const enrolledWordSet = new Set(enrolledWords.map(w => w.word.toLowerCase()));
+            const practicedWords = Array.from(practicedWordsSet).filter(word => 
+              enrolledWordSet.has(word.toLowerCase())
+            ).length;
+            
+            if (totalWords === 0) return 0;
+            return Math.min(100, Math.round((practicedWords / totalWords) * 100));
+          }
+          
+          return 0;
+        })(),
         emoji: '⚡',
-        description: `${vocabularyAttempts} words learned`,
+        description: (() => {
+          const enrolledStories = StoryWordsService.getEnrolledStories(userId);
+          const enrolledStoryIds = enrolledStories
+            .filter(e => e.completed === true && e.wordsExtracted === true)
+            .map(e => e.storyId)
+            .filter(id => youngStoryIds.includes(id));
+          const totalWords = enrolledStoryIds.length > 0
+            ? StoryWordsService.getWordsForStoryIdsByAge(enrolledStoryIds, 'young').length
+            : 0;
+          
+          // Count unique words practiced from progress details
+          const vocabularyDetails = progressDetails.vocabulary || {};
+          const practicedWordsSet = new Set(Object.keys(vocabularyDetails));
+          
+          // Filter to only count words from enrolled stories
+          if (enrolledStoryIds.length > 0) {
+            const enrolledWords = StoryWordsService.getWordsForStoryIdsByAge(enrolledStoryIds, 'young');
+            const enrolledWordSet = new Set(enrolledWords.map(w => w.word.toLowerCase()));
+            const practicedWords = Array.from(practicedWordsSet).filter(word => 
+              enrolledWordSet.has(word.toLowerCase())
+            ).length;
+            
+            return `${practicedWords}/${totalWords} words learned`;
+          }
+          
+          return `0/${totalWords} words learned`;
+        })(),
         category: 'vocabulary',
-        unlocked: vocabularyAttempts >= 14,
+        unlocked: (() => {
+          const enrolledStories = StoryWordsService.getEnrolledStories(userId);
+          const enrolledStoryIds = enrolledStories
+            .filter(e => e.completed === true && e.wordsExtracted === true)
+            .map(e => e.storyId)
+            .filter(id => youngStoryIds.includes(id));
+          const totalWords = enrolledStoryIds.length > 0
+            ? StoryWordsService.getWordsForStoryIdsByAge(enrolledStoryIds, 'young').length
+            : 0;
+          
+          // Count unique words practiced from progress details
+          const vocabularyDetails = progressDetails.vocabulary || {};
+          const practicedWordsSet = new Set(Object.keys(vocabularyDetails));
+          
+          // Filter to only count words from enrolled stories
+          if (enrolledStoryIds.length > 0) {
+            const enrolledWords = StoryWordsService.getWordsForStoryIdsByAge(enrolledStoryIds, 'young');
+            const enrolledWordSet = new Set(enrolledWords.map(w => w.word.toLowerCase()));
+            const practicedWords = Array.from(practicedWordsSet).filter(word => 
+              enrolledWordSet.has(word.toLowerCase())
+            ).length;
+            
+            return practicedWords >= totalWords && totalWords > 0;
+          }
+          
+          return false;
+        })(),
       },
       { 
         name: 'Game Champion', 
         icon: Trophy, 
-        progress: Math.min(100, gamesAttempts * 20), 
+        progress: Math.min(100, Math.round((Math.min(gamesAttempts, 5) / 5) * 100)), 
         emoji: '🎮',
-        description: `${gamesAttempts}/5 games played`,
+        description: `${Math.min(gamesAttempts, 5)}/5 games played`,
         category: 'games',
         unlocked: gamesAttempts >= 5,
       },
     ];
-  }, [serverAchievements, points, favorites, pronunciationAttempts, vocabularyAttempts, gamesAttempts]);
+  }, [serverAchievements, points, pronunciationAttempts, vocabularyAttempts, gamesAttempts, categoryProgress, userId, progressDetails]);
   
   const completedAchievements = useMemo(() => {
     if (serverAchievements.length > 0) {
@@ -1914,9 +2182,12 @@ const YoungKidsPage = () => {
                   // Also check StoryWordsService directly for enrolled stories (both started and completed)
                   const storyEnrollments = StoryWordsService.getEnrolledStories(userId);
                   const isEnrolledInService = storyEnrollments.some(e => e.storyId === internalId);
-                  const isEnrolled = enrolledInternalStoryIds.has(internalId) || 
+                  // Check if story is enrolled (either started or completed)
+                  // A story is enrolled if it exists in StoryWordsService enrollments (regardless of completion status)
+                  const isEnrolled = isEnrolledInService || 
+                                    enrolledInternalStoryIds.has(internalId) || 
                                     completedStoryIds.has(internalId) ||
-                                    isEnrolledInService;
+                                    storyEnrollments.some(e => e.storyId === internalId);
                   
                   // Check if story is from dataset and if it's unlocked
                   const storyIndex = parseInt(story.id.replace('young-', ''), 10);
@@ -1935,10 +2206,9 @@ const YoungKidsPage = () => {
                       if (previousStory) {
                         const previousInternalId = getInternalStoryId(previousStory.type);
                         const storyEnrollments = StoryWordsService.getEnrolledStories(userId);
-                        const isPreviousEnrolled = storyEnrollments.some(e => e.storyId === previousInternalId);
-                        isUnlocked = completedStoryIds.has(previousInternalId) || 
-                                    enrolledInternalStoryIds.has(previousInternalId) ||
-                                    isPreviousEnrolled;
+                        const previousEnrollment = storyEnrollments.find(e => e.storyId === previousInternalId);
+                        // Story is unlocked if previous story is completed (not just enrolled)
+                        isUnlocked = previousEnrollment?.completed === true && previousEnrollment?.wordsExtracted === true;
                       }
                     } else {
                       // Previous story is also a dataset story (11-20)
@@ -1949,10 +2219,9 @@ const YoungKidsPage = () => {
                       if (previousDatasetStory) {
                         const previousInternalId = getInternalStoryId(previousDatasetStory.type);
                         const storyEnrollments = StoryWordsService.getEnrolledStories(userId);
-                        const isPreviousEnrolled = storyEnrollments.some(e => e.storyId === previousInternalId);
-                        isUnlocked = completedStoryIds.has(previousInternalId) || 
-                                    enrolledInternalStoryIds.has(previousInternalId) ||
-                                    isPreviousEnrolled;
+                        const previousEnrollment = storyEnrollments.find(e => e.storyId === previousInternalId);
+                        // Story is unlocked if previous story is completed (not just enrolled)
+                        isUnlocked = previousEnrollment?.completed === true && previousEnrollment?.wordsExtracted === true;
                       }
                     }
                   }
