@@ -6,7 +6,7 @@ import {
   Sun, Footprints,
   ChevronLeft, ChevronRight, Anchor,
   Shield, Loader2, Crown, Compass,
-  Music, VolumeX, HelpCircle, CheckCircle, Lock
+  Music, VolumeX, HelpCircle, CheckCircle, Lock, Clock
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -43,6 +43,7 @@ import { TimeTracker } from '@/services/TimeTracker';
 import EnhancedTTS from '@/services/EnhancedTTS';
 import { StoryDatasetService, type DatasetStory } from '@/services/StoryDatasetService';
 import { useRealTimeData } from '@/hooks/useRealTimeData';
+import MultiCategoryProgressService, { type CategoryProgress } from '@/services/MultiCategoryProgressService';
 
 const YoungKidsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -72,6 +73,8 @@ const YoungKidsPage = () => {
   const [pronunciationAttempts, setPronunciationAttempts] = useState(0);
   const [vocabularyAttempts, setVocabularyAttempts] = useState(0);
   const [gamesAttempts, setGamesAttempts] = useState(0);
+  const [categoryProgress, setCategoryProgress] = useState<CategoryProgress | null>(null);
+  const [loadingCategoryProgress, setLoadingCategoryProgress] = useState(false);
   const [enrolledStoryWordsDetailed, setEnrolledStoryWordsDetailed] = useState<Array<{ word: string; hint: string; storyId: string; storyTitle: string }>>([]);
   const [selectedStoryFilter, setSelectedStoryFilter] = useState<string>('all');
   const [enrolledStoryPhrasesDetailed, setEnrolledStoryPhrasesDetailed] = useState<Array<{ phrase: string; phonemes: string; storyId: string; storyTitle: string }>>([]);
@@ -86,6 +89,9 @@ const YoungKidsPage = () => {
     id?: string;
     name?: string;
     progress?: number;
+    description?: string;
+    emoji?: string;
+    category?: string;
     [key: string]: unknown;
   };
 
@@ -418,17 +424,26 @@ const YoungKidsPage = () => {
       try {
         const token = localStorage.getItem('speakbee_auth_token');
         if (token && token !== 'local-token') {
-          const ach = await (KidsApi as any).getAchievements(token);
-          if (Array.isArray(ach)) {
-            setServerAchievements(ach);
-          } else if (Array.isArray((ach as any)?.data)) {
-            setServerAchievements((ach as any).data);
+          try {
+            const ach = await KidsApi.getAchievements(token);
+            if (Array.isArray(ach)) {
+              setServerAchievements(ach);
+            } else if (Array.isArray((ach as any)?.data)) {
+              setServerAchievements((ach as any).data);
+            } else if (Array.isArray((ach as any)?.achievements)) {
+              setServerAchievements((ach as any).achievements);
+            }
+          } catch (error) {
+            console.warn('Error loading achievements from server:', error);
+            // Don't set empty array here - keep existing achievements if any
           }
         } else {
+          // No token, use local achievements only
           setServerAchievements([]);
         }
       } catch (e) {
-        setServerAchievements([]);
+        console.warn('Error in achievements loading:', e);
+        // Don't clear achievements on error - keep existing ones
       }
     })();
   }, [userId, isAuthenticated]);
@@ -439,6 +454,46 @@ const YoungKidsPage = () => {
     immediate: false, // Don't fetch immediately, use initial load above
     interval: 5000, // 5 seconds for active learning page
   });
+
+  // Real-time category progress updates
+  const {
+    data: realTimeCategories,
+    loading: loadingCategoriesRealTime,
+  } = useRealTimeData<CategoryProgress[]>('category_progress', {
+    enabled: isAuthenticated && !!userId,
+    immediate: true,
+  });
+
+  // Load category-specific progress (practice time and lessons completed)
+  useEffect(() => {
+    if (!isAuthenticated || !userId) return;
+
+    const loadCategoryProgress = async () => {
+      setLoadingCategoryProgress(true);
+      try {
+        const progress = await MultiCategoryProgressService.getCategoryProgress(userId, 'young_kids');
+        setCategoryProgress(progress);
+      } catch (error) {
+        console.error('Error loading category progress:', error);
+        setCategoryProgress(null);
+      } finally {
+        setLoadingCategoryProgress(false);
+      }
+    };
+
+    loadCategoryProgress();
+  }, [userId, isAuthenticated]);
+
+  // Update category progress when real-time data arrives
+  useEffect(() => {
+    if (realTimeCategories && Array.isArray(realTimeCategories)) {
+      const youngKidsProgress = realTimeCategories.find(cat => cat.category === 'young_kids');
+      if (youngKidsProgress) {
+        setCategoryProgress(youngKidsProgress);
+        setLoadingCategoryProgress(false);
+      }
+    }
+  }, [realTimeCategories]);
 
   // Update progress when real-time data arrives
   // Use Math.max to prevent overwriting with lower values (safeguard)
@@ -838,51 +893,79 @@ const YoungKidsPage = () => {
   const totalPages = Math.ceil(effectiveStories.length / storiesPerPage);
 
   // Dynamic achievements based on real-time progress
-  const achievements = [
-    { 
-      name: 'First Words', 
-      icon: Star, 
-      progress: Math.min(100, Math.round((points / 1000) * 100)), 
-      emoji: '🌟',
-      description: points >= 1000 ? '1000+ points' : `${points}/1000 points`,
-      category: 'general'
-    },
-    { 
-      name: 'Story Master', 
-      icon: BookOpen, 
-      progress: Math.min(100, favorites.filter(f => f.startsWith('young-')).length * 10), 
-      emoji: '📖',
-      description: `${favorites.filter(f => f.startsWith('young-')).length}/10 favorite stories`,
-      category: 'stories'
-    },
-    { 
-      name: 'Pronunciation Pro', 
-      icon: Mic, 
-      progress: Math.min(100, Math.min(pronunciationAttempts, 14) * 7.14), 
-      emoji: '🎤',
-      description: `${pronunciationAttempts} practiced`,
-      category: 'pronunciation'
-    },
-    { 
-      name: 'Vocabulary Builder', 
-      icon: Zap, 
-      progress: Math.min(100, Math.min(vocabularyAttempts, 14) * 7.14), 
-      emoji: '⚡',
-      description: `${vocabularyAttempts} words learned`,
-      category: 'vocabulary'
-    },
-    { 
-      name: 'Game Champion', 
-      icon: Trophy, 
-      progress: Math.min(100, gamesAttempts * 20), 
-      emoji: '🎮',
-      description: `${gamesAttempts}/5 games played`,
-      category: 'games'
-    },
-  ];
-  const completedAchievements = serverAchievements.length > 0
-    ? serverAchievements.filter((a: any) => a.unlocked === true).length
-    : achievements.filter(a => a.progress === 100).length;
+  // Use server achievements if available, otherwise calculate locally
+  const achievements = useMemo(() => {
+    // If server achievements are available, use them
+    if (serverAchievements.length > 0) {
+      return serverAchievements.map((ach: ServerAchievement) => ({
+        name: ach.name || 'Achievement',
+        icon: Star, // Default icon, can be enhanced based on achievement type
+        progress: typeof ach.progress === 'number' ? Math.min(100, ach.progress) : 0,
+        emoji: (ach.emoji as string) || '🌟', // Default emoji, can be enhanced based on achievement type
+        description: (ach.description as string) || `${ach.progress || 0}% complete`,
+        category: (ach.category as string) || 'general',
+        unlocked: ach.unlocked || false,
+      }));
+    }
+    
+    // Fallback to local calculations if server data not available
+    return [
+      { 
+        name: 'First Words', 
+        icon: Star, 
+        progress: Math.min(100, Math.round((points / 1000) * 100)), 
+        emoji: '🌟',
+        description: points >= 1000 ? '1000+ points' : `${points}/1000 points`,
+        category: 'general',
+        unlocked: points >= 1000,
+      },
+      { 
+        name: 'Story Master', 
+        icon: BookOpen, 
+        progress: Math.min(100, favorites.filter(f => f.startsWith('young-')).length * 10), 
+        emoji: '📖',
+        description: `${favorites.filter(f => f.startsWith('young-')).length}/10 favorite stories`,
+        category: 'stories',
+        unlocked: favorites.filter(f => f.startsWith('young-')).length >= 10,
+      },
+      { 
+        name: 'Pronunciation Pro', 
+        icon: Mic, 
+        progress: Math.min(100, Math.min(pronunciationAttempts, 14) * 7.14), 
+        emoji: '🎤',
+        description: `${pronunciationAttempts} practiced`,
+        category: 'pronunciation',
+        unlocked: pronunciationAttempts >= 14,
+      },
+      { 
+        name: 'Vocabulary Builder', 
+        icon: Zap, 
+        progress: Math.min(100, Math.min(vocabularyAttempts, 14) * 7.14), 
+        emoji: '⚡',
+        description: `${vocabularyAttempts} words learned`,
+        category: 'vocabulary',
+        unlocked: vocabularyAttempts >= 14,
+      },
+      { 
+        name: 'Game Champion', 
+        icon: Trophy, 
+        progress: Math.min(100, gamesAttempts * 20), 
+        emoji: '🎮',
+        description: `${gamesAttempts}/5 games played`,
+        category: 'games',
+        unlocked: gamesAttempts >= 5,
+      },
+    ];
+  }, [serverAchievements, points, favorites, pronunciationAttempts, vocabularyAttempts, gamesAttempts]);
+  
+  const completedAchievements = useMemo(() => {
+    if (serverAchievements.length > 0) {
+      // Use server unlocked status when available
+      return serverAchievements.filter((a: ServerAchievement) => a.unlocked === true).length;
+    }
+    // Fallback to progress-based calculation
+    return achievements.filter(a => a.progress >= 100).length;
+  }, [serverAchievements, achievements]);
 
 
   const handleStartLesson = async (storyId: string) => {
@@ -1094,25 +1177,35 @@ const YoungKidsPage = () => {
                 streak: currentStreak, // Streak already updated by incrementStreakIfNeeded
                 details 
               });
-              // Check and refresh achievements after update
-              await (KidsApi as any).checkAchievements(token);
-              const ach = await (KidsApi as any).getAchievements(token);
-              if (Array.isArray(ach)) setServerAchievements(ach);
-            } else {
-              await KidsProgressService.update(userId, (p) => {
-                const details = updateDetails((p as any).details || {});
-                return { 
-                  ...p, 
-                  points: p.points + pointsToAdd, 
-                  streak: p.streak, // Streak already updated by incrementStreakIfNeeded
-                  details 
-                } as any;
-              });
+          // Check and refresh achievements after update
+          try {
+            await KidsApi.checkAchievements(token);
+            const ach = await KidsApi.getAchievements(token);
+            if (Array.isArray(ach)) {
+              setServerAchievements(ach);
+            } else if (Array.isArray((ach as any)?.data)) {
+              setServerAchievements((ach as any).data);
+            } else if (Array.isArray((ach as any)?.achievements)) {
+              setServerAchievements((ach as any).achievements);
             }
           } catch (error) {
-            console.error('Error updating progress:', error);
+            console.warn('Error refreshing achievements:', error);
           }
+        } else {
+          await KidsProgressService.update(userId, (p) => {
+            const details = updateDetails((p as any).details || {});
+            return { 
+              ...p, 
+              points: p.points + pointsToAdd, 
+              streak: p.streak, // Streak already updated by incrementStreakIfNeeded
+              details 
+            } as any;
+          });
         }
+      } catch (error) {
+        console.error('Error updating progress:', error);
+      }
+    }
         
         return;
       } else {
@@ -1181,9 +1274,19 @@ const YoungKidsPage = () => {
             details 
           });
           // Check and refresh achievements after update
-          await (KidsApi as any).checkAchievements(token);
-          const ach = await (KidsApi as any).getAchievements(token);
-          if (Array.isArray(ach)) setServerAchievements(ach);
+          try {
+            await KidsApi.checkAchievements(token);
+            const ach = await KidsApi.getAchievements(token);
+            if (Array.isArray(ach)) {
+              setServerAchievements(ach);
+            } else if (Array.isArray((ach as any)?.data)) {
+              setServerAchievements((ach as any).data);
+            } else if (Array.isArray((ach as any)?.achievements)) {
+              setServerAchievements((ach as any).achievements);
+            }
+          } catch (error) {
+            console.warn('Error refreshing achievements:', error);
+          }
         } else {
           await KidsProgressService.update(userId, (p) => {
             const details = updateDetails((p as any).details || {});
@@ -1392,9 +1495,19 @@ const YoungKidsPage = () => {
           details 
         });
         // Check and refresh achievements after update
-        await (KidsApi as any).checkAchievements(token);
-        const ach = await (KidsApi as any).getAchievements(token);
-        if (Array.isArray(ach)) setServerAchievements(ach);
+        try {
+          await KidsApi.checkAchievements(token);
+          const ach = await KidsApi.getAchievements(token);
+          if (Array.isArray(ach)) {
+            setServerAchievements(ach);
+          } else if (Array.isArray((ach as any)?.data)) {
+            setServerAchievements((ach as any).data);
+          } else if (Array.isArray((ach as any)?.achievements)) {
+            setServerAchievements((ach as any).achievements);
+          }
+        } catch (error) {
+          console.warn('Error refreshing achievements:', error);
+        }
       } else {
         await KidsProgressService.update(userId, (p) => {
           const details = { ...(p as any).details };
@@ -1702,7 +1815,7 @@ const YoungKidsPage = () => {
               Updated continuously while you learn
             </span>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
             <Card className="shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">Sparkle points</CardTitle>
@@ -1721,6 +1834,38 @@ const YoungKidsPage = () => {
               <CardContent className="space-y-2">
                 <p className="text-3xl font-semibold text-foreground">{streak} days</p>
                 <p className="text-sm text-muted-foreground">Keep learning every day to unlock exclusive character rewards.</p>
+              </CardContent>
+            </Card>
+            <Card className="shadow-sm">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Practice Time</CardTitle>
+                <Clock className="h-5 w-5 text-sky-500" />
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-3xl font-semibold text-foreground">
+                  {(loadingCategoryProgress || loadingCategoriesRealTime) ? (
+                    <Loader2 className="h-6 w-6 animate-spin inline" />
+                  ) : (
+                    `${Math.round(categoryProgress?.practice_time_minutes || 0)} mins`
+                  )}
+                </p>
+                <p className="text-sm text-muted-foreground">Time spent practicing stories, words, and pronunciation.</p>
+              </CardContent>
+            </Card>
+            <Card className="shadow-sm">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Stories Completed</CardTitle>
+                <BookOpen className="h-5 w-5 text-emerald-500" />
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-3xl font-semibold text-foreground">
+                  {(loadingCategoryProgress || loadingCategoriesRealTime) ? (
+                    <Loader2 className="h-6 w-6 animate-spin inline" />
+                  ) : (
+                    categoryProgress?.stories_completed || 0
+                  )}
+                </p>
+                <p className="text-sm text-muted-foreground">Adventures completed in your learning journey.</p>
               </CardContent>
             </Card>
             <Card className="shadow-sm">
@@ -2212,7 +2357,7 @@ const YoungKidsPage = () => {
                           'flex h-10 w-10 items-center justify-center rounded-full',
                           isComplete ? 'bg-amber-100 text-amber-600' : 'bg-muted text-muted-foreground'
                         )}>
-                          {achievement.emoji}
+                          <span>{achievement.emoji || '🌟'}</span>
                         </div>
                         <div>
                           <p className="text-sm font-semibold text-foreground">{achievement.name}</p>

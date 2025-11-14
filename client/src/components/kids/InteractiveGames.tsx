@@ -194,54 +194,54 @@ const GameMenu = ({
     }
   ];
 
-  // Advanced games for teen kids
+  // Advanced games for teen kids with enhanced prompts
   const teenGames = [
     {
       id: 'debate-club' as GameType,
       title: 'Debate Club',
-      description: 'Engage in structured debates on real-world topics!',
+      description: 'Master persuasive arguments on current events, social issues, and global topics. Build confidence in structured debates with AI-powered feedback on your reasoning and delivery!',
       emoji: '⚖️',
       color: 'from-indigo-400 to-purple-400'
     },
     {
       id: 'critical-thinking' as GameType,
       title: 'Critical Thinking',
-      description: 'Solve complex problems and analyze arguments!',
+      description: 'Analyze complex scenarios, evaluate evidence, and solve real-world problems. Strengthen your logical reasoning and decision-making skills through challenging thought experiments!',
       emoji: '🧠',
       color: 'from-violet-400 to-fuchsia-400'
     },
     {
       id: 'research-challenge' as GameType,
       title: 'Research Challenge',
-      description: 'Present findings on advanced topics with AI feedback!',
+      description: 'Investigate advanced topics, synthesize information, and present your findings like a scholar. Practice academic research skills with AI guidance on structure and clarity!',
       emoji: '🔬',
       color: 'from-cyan-400 to-blue-400'
     },
     {
       id: 'presentation-master' as GameType,
       title: 'Presentation Master',
-      description: 'Practice professional presentations and public speaking!',
+      description: 'Perfect your public speaking with professional presentation practice. Get real-time feedback on pacing, clarity, and engagement for school projects and future career success!',
       emoji: '📊',
       color: 'from-emerald-400 to-teal-400'
     },
     {
       id: 'ethics-discussion' as GameType,
       title: 'Ethics Discussion',
-      description: 'Explore ethical dilemmas and moral reasoning!',
+      description: 'Explore moral dilemmas, ethical frameworks, and complex decision-making. Develop thoughtful perspectives on real-world issues that matter to your generation!',
       emoji: '🤔',
       color: 'from-rose-400 to-pink-400'
     },
     {
       id: 'pronunciation-challenge' as GameType,
       title: 'Advanced Pronunciation',
-      description: 'Master complex phrases and professional speech!',
+      description: 'Master complex academic and professional phrases with precision. Perfect your articulation for presentations, interviews, and confident communication in any setting!',
       emoji: '🎯',
       color: 'from-purple-400 to-indigo-400'
     },
     {
       id: 'conversation-practice' as GameType,
       title: 'Professional Conversation',
-      description: 'Practice business and academic conversations!',
+      description: 'Practice business networking, academic discussions, and professional interactions. Build confidence for job interviews, college admissions, and real-world communication!',
       emoji: '💼',
       color: 'from-orange-400 to-yellow-400'
     }

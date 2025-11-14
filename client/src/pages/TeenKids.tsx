@@ -21,6 +21,7 @@ import {
   CheckCircle,
   Play,
   Headphones,
+  Clock,
 } from 'lucide-react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
@@ -47,7 +48,8 @@ import { TransformersService } from '@/services/TransformersService';
 import { TimeTracker } from '@/services/TimeTracker';
 import EnhancedTTS from '@/services/EnhancedTTS';
 import { StoryDatasetService, type DatasetStory } from '@/services/StoryDatasetService';
-import MultiCategoryProgressService from '@/services/MultiCategoryProgressService';
+import MultiCategoryProgressService, { type CategoryProgress } from '@/services/MultiCategoryProgressService';
+import { useRealTimeData } from '@/hooks/useRealTimeData';
 import MysteryDetectiveAdventure from '@/components/kids/stories/MysteryDetectiveAdventure';
 import SpaceExplorerAdventure from '@/components/kids/stories/SpaceExplorerAdventure';
 import EnvironmentalHeroAdventure from '@/components/kids/stories/EnvironmentalHeroAdventure';
@@ -286,11 +288,34 @@ const TeenKidsPage = () => {
   const [pronunciationAttempts, setPronunciationAttempts] = useState(0);
   const [vocabularyAttempts, setVocabularyAttempts] = useState(0);
   const [gamesAttempts, setGamesAttempts] = useState(0);
+  const [categoryProgress, setCategoryProgress] = useState<CategoryProgress | null>(null);
+  const [loadingCategoryProgress, setLoadingCategoryProgress] = useState(false);
+  const [serverAchievements, setServerAchievements] = useState<Array<{
+    key: string;
+    name: string;
+    emoji: string;
+    description: string;
+    progress: number;
+    unlocked: boolean;
+  }>>([]);
   const [enrolledStoryWordsDetailed, setEnrolledStoryWordsDetailed] = useState<Array<{ word: string; hint: string; storyId: string; storyTitle: string }>>([]);
   const [enrolledStoryPhrasesDetailed, setEnrolledStoryPhrasesDetailed] = useState<Array<{ phrase: string; phonemes: string; storyId: string; storyTitle: string }>>([]);
   const [selectedStoryFilter, setSelectedStoryFilter] = useState<string>('all');
   const [selectedPhraseFilter, setSelectedPhraseFilter] = useState<string>('all');
-  const [completedStoryIds, setCompletedStoryIds] = useState<string[]>([]);
+  
+  // Completed story IDs (Set for efficient lookup)
+  const completedStoryIds = useMemo(() => {
+    try {
+      const stories = StoryWordsService.getEnrolledStories(userId) || [];
+      return new Set(
+        stories
+          .filter((story: { completed?: boolean; storyId?: string }) => story?.completed)
+          .map((story: { completed?: boolean; storyId?: string }) => story.storyId)
+      );
+    } catch {
+      return new Set<string>();
+    }
+  }, [userId, enrolledStoryWordsDetailed, enrolledStoryPhrasesDetailed]);
   const [datasetStories, setDatasetStories] = useState<DatasetStory[]>([]);
   const [storyTemplates, setStoryTemplates] = useState<any[]>([]);
   interface TemplateStory {
@@ -348,6 +373,14 @@ const TeenKidsPage = () => {
     games_attempts?: number;
     favorites?: string[];
     completed_story_ids?: string[];
+    achievements?: Array<{
+      key: string;
+      name: string;
+      emoji: string;
+      description: string;
+      progress: number;
+      unlocked: boolean;
+    }>;
   }
 
   const applyDashboard = useCallback(
@@ -361,6 +394,7 @@ const TeenKidsPage = () => {
       const gamesAttemptsFromPayload = Number(data.games_attempts ?? 0) || 0;
       const favoritesFromPayload = Array.isArray(data.favorites) ? data.favorites : [];
       const completedIds = Array.isArray(data.completed_story_ids) ? data.completed_story_ids : [];
+      const achievementsFromPayload = Array.isArray(data.achievements) ? data.achievements : [];
 
       if (mergeMode) {
         // Merge mode: take maximum values to preserve local progress
@@ -376,55 +410,52 @@ const TeenKidsPage = () => {
           return Array.from(merged);
         });
 
-        // Merge completed story IDs
-        setCompletedStoryIds((prev) => {
-          const merged = new Set([...prev, ...completedIds]);
-          const mergedArray = Array.from(merged);
-          
-          // Convert merged story IDs to internal IDs for words/phrases
-          const internalStoryIds = mergedArray
-            .map((id: string) => {
-              const story = allTeenStories.find((s) => s.id === id);
-              return story ? getInternalStoryId(story.type) : null;
-            })
-            .filter((id: string | null): id is string => id !== null);
+        // Update server achievements if available
+        if (achievementsFromPayload.length > 0) {
+          setServerAchievements(achievementsFromPayload);
+        }
 
-          // Update words and phrases based on merged completed stories - FILTERED TO TEEN ONLY
-          const wordDetails = StoryWordsService.getWordsForStoryIdsByAge(internalStoryIds, 'teen');
-          const phraseDetails = StoryWordsService.getPhrasesForStoryIdsByAge(internalStoryIds, 'teen');
-          
-          setEnrolledStoryWordsDetailed((prevWords) => {
-            const existing = new Set(prevWords.map((w) => `${w.storyId}-${w.word}`));
-            const toAdd = wordDetails
-              .map((w) => ({ word: w.word, hint: w.hint, storyId: w.storyId, storyTitle: w.storyTitle }))
-              .filter((w) => !existing.has(`${w.storyId}-${w.word}`));
-            return [...prevWords, ...toAdd];
-          });
-          
-          setEnrolledStoryPhrasesDetailed((prevPhrases) => {
-            const existing = new Set(prevPhrases.map((p) => `${p.storyId}-${p.phrase}`));
-            const toAdd = phraseDetails
-              .map((p) => ({ phrase: p.phrase, phonemes: p.phonemes, storyId: p.storyId, storyTitle: p.storyTitle }))
-              .filter((p) => !existing.has(`${p.storyId}-${p.phrase}`));
-            return [...prevPhrases, ...toAdd];
-          });
-          
-          // Sync completed stories to StoryWordsService so they appear in badges section
-          mergedArray.forEach((id: string) => {
+        // Convert completed story IDs to internal IDs for words/phrases
+        const internalStoryIds = completedIds
+          .map((id: string) => {
             const story = allTeenStories.find((s) => s.id === id);
-            if (story) {
-              const internalId = getInternalStoryId(story.type);
-              // Check if already enrolled to avoid duplicate saves
-              const existingEnrollments = StoryWordsService.getEnrolledStories(userId);
-              if (!existingEnrollments.some(e => e.storyId === internalId && e.completed)) {
-                StoryWordsService.enrollInStory(userId, internalId, story.title, story.type, 100).catch(err => {
-                  console.warn('Failed to sync story enrollment:', err);
-                });
-              }
+            return story ? getInternalStoryId(story.type) : null;
+          })
+          .filter((id: string | null): id is string => id !== null);
+
+        // Update words and phrases based on completed stories - FILTERED TO TEEN ONLY
+        const wordDetails = StoryWordsService.getWordsForStoryIdsByAge(internalStoryIds, 'teen');
+        const phraseDetails = StoryWordsService.getPhrasesForStoryIdsByAge(internalStoryIds, 'teen');
+        
+        setEnrolledStoryWordsDetailed((prevWords) => {
+          const existing = new Set(prevWords.map((w) => `${w.storyId}-${w.word}`));
+          const toAdd = wordDetails
+            .map((w) => ({ word: w.word, hint: w.hint, storyId: w.storyId, storyTitle: w.storyTitle }))
+            .filter((w) => !existing.has(`${w.storyId}-${w.word}`));
+          return [...prevWords, ...toAdd];
+        });
+        
+        setEnrolledStoryPhrasesDetailed((prevPhrases) => {
+          const existing = new Set(prevPhrases.map((p) => `${p.storyId}-${p.phrase}`));
+          const toAdd = phraseDetails
+            .map((p) => ({ phrase: p.phrase, phonemes: p.phonemes, storyId: p.storyId, storyTitle: p.storyTitle }))
+            .filter((p) => !existing.has(`${p.storyId}-${p.phrase}`));
+          return [...prevPhrases, ...toAdd];
+        });
+        
+        // Sync completed stories to StoryWordsService so they appear in badges section
+        completedIds.forEach((id: string) => {
+          const story = allTeenStories.find((s) => s.id === id);
+          if (story) {
+            const internalId = getInternalStoryId(story.type);
+            // Check if already enrolled to avoid duplicate saves
+            const existingEnrollments = StoryWordsService.getEnrolledStories(userId);
+            if (!existingEnrollments.some(e => e.storyId === internalId && e.completed)) {
+              StoryWordsService.enrollInStory(userId, internalId, story.title, story.type, 100).catch(err => {
+                console.warn('Failed to sync story enrollment:', err);
+              });
             }
-          });
-          
-          return mergedArray;
+          }
         });
       } else {
         // Replace mode: use server data as source of truth
@@ -434,7 +465,11 @@ const TeenKidsPage = () => {
         setVocabularyAttempts(vocabularyAttemptsFromPayload);
         setGamesAttempts(gamesAttemptsFromPayload);
         setFavorites(favoritesFromPayload);
-        setCompletedStoryIds(completedIds);
+        
+        // Update server achievements if available
+        if (achievementsFromPayload.length > 0) {
+          setServerAchievements(achievementsFromPayload);
+        }
         
         // Convert story IDs to internal IDs
         const internalStoryIds = completedIds
@@ -642,7 +677,6 @@ const TeenKidsPage = () => {
     if (!isAuthenticated) {
       setEnrolledStoryWordsDetailed([]);
       setEnrolledStoryPhrasesDetailed([]);
-      setCompletedStoryIds([]);
       return;
     }
   }, [isAuthenticated]);
@@ -782,6 +816,46 @@ const TeenKidsPage = () => {
     loadStoryTemplates();
   }, [isAuthenticated]);
 
+  // Real-time category progress updates
+  const {
+    data: realTimeCategories,
+    loading: loadingCategoriesRealTime,
+  } = useRealTimeData<CategoryProgress[]>('category_progress', {
+    enabled: isAuthenticated && !!userId,
+    immediate: true,
+  });
+
+  // Load category-specific progress (practice time and lessons completed)
+  useEffect(() => {
+    if (!isAuthenticated || !userId) return;
+
+    const loadCategoryProgress = async () => {
+      setLoadingCategoryProgress(true);
+      try {
+        const progress = await MultiCategoryProgressService.getCategoryProgress(userId, 'teen_kids');
+        setCategoryProgress(progress);
+      } catch (error) {
+        console.error('Error loading category progress:', error);
+        setCategoryProgress(null);
+      } finally {
+        setLoadingCategoryProgress(false);
+      }
+    };
+
+    loadCategoryProgress();
+  }, [userId, isAuthenticated]);
+
+  // Update category progress when real-time data arrives
+  useEffect(() => {
+    if (realTimeCategories && Array.isArray(realTimeCategories)) {
+      const teenKidsProgress = realTimeCategories.find(cat => cat.category === 'teen_kids');
+      if (teenKidsProgress) {
+        setCategoryProgress(teenKidsProgress);
+        setLoadingCategoryProgress(false);
+      }
+    }
+  }, [realTimeCategories]);
+
   // Merge base stories with dataset stories
   const allTeenStoriesWithDataset = useMemo(() => {
     const datasetStoriesMapped = datasetStories.map((ds) => {
@@ -824,6 +898,18 @@ const TeenKidsPage = () => {
   const totalPages = Math.ceil(allTeenStoriesWithDataset.length / storiesPerPage);
 
   const achievements = useMemo(() => {
+    // Use server achievements if available, otherwise calculate locally
+    if (serverAchievements.length > 0) {
+      return serverAchievements.map((ach) => ({
+        name: ach.name,
+        icon: Star, // Default icon, can be enhanced later
+        progress: ach.progress,
+        emoji: ach.emoji,
+        description: ach.description,
+      }));
+    }
+    
+    // Fallback to local calculations if server data not available
     const achievementList = [
     { 
       name: 'Advanced Learner', 
@@ -862,12 +948,16 @@ const TeenKidsPage = () => {
       },
     ];
     return achievementList;
-  }, [points, teenFavorites.length, pronunciationAttempts, vocabularyAttempts, gamesAttempts]);
+  }, [serverAchievements, points, teenFavorites.length, pronunciationAttempts, vocabularyAttempts, gamesAttempts]);
 
-  const completedAchievements = useMemo(
-    () => achievements.filter((a) => a.progress >= 100).length,
-    [achievements]
-  );
+  const completedAchievements = useMemo(() => {
+    if (serverAchievements.length > 0) {
+      // Use server unlocked status when available
+      return serverAchievements.filter((a) => a.unlocked).length;
+    }
+    // Fallback to progress-based calculation
+    return achievements.filter((a) => a.progress >= 100).length;
+  }, [serverAchievements, achievements]);
 
   const categories = [
     { id: 'stories', label: 'Adventure Stories', emoji: '📚' },
@@ -1249,15 +1339,8 @@ const TeenKidsPage = () => {
     const internalId = getInternalStoryId(story.type);
     
     // Save story enrollment to StoryWordsService so it appears in badges section
+    // This will automatically update completedStoryIds via useMemo
     await StoryWordsService.enrollInStory(userId, internalId, story.title, story.type, score);
-    
-    // Add to completed story IDs immediately (this triggers badge display)
-    setCompletedStoryIds((prev) => {
-      if (!prev.includes(storyId)) {
-        return [...prev, storyId];
-      }
-      return prev;
-    });
 
     // Immediately update enrolled words and phrases from the completed story
     // FILTERED TO TEEN ONLY
@@ -1363,6 +1446,7 @@ const TeenKidsPage = () => {
             const dashboardData = await TeenApi.getDashboard(token);
             if (dashboardData) {
               // Merge server data with our immediate updates (preserves badge and points)
+              // This will update achievements from server
               applyDashboard(dashboardData, true);
               // Clear category progress cache so Profile page shows updated data
               MultiCategoryProgressService.clearCache();
@@ -1514,7 +1598,7 @@ const TeenKidsPage = () => {
             <h2 className="text-lg font-semibold text-foreground">Progress snapshot</h2>
             <span className="text-sm text-muted-foreground">Teen metrics update automatically</span>
             </div>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
             <Card className="shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">Achievement Points ✨</CardTitle>
@@ -1539,6 +1623,38 @@ const TeenKidsPage = () => {
               </p>
             </CardContent>
           </Card>
+            <Card className="shadow-sm">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Practice Time</CardTitle>
+                <Clock className="h-5 w-5 text-sky-500" />
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-3xl font-semibold text-foreground">
+                  {(loadingCategoryProgress || loadingCategoriesRealTime) ? (
+                    <Loader2 className="h-6 w-6 animate-spin inline" />
+                  ) : (
+                    `${Math.round(categoryProgress?.practice_time_minutes || 0)} mins`
+                  )}
+                </p>
+                <p className="text-sm text-muted-foreground">Time spent on missions, vocabulary labs, and speaking practice.</p>
+              </CardContent>
+            </Card>
+            <Card className="shadow-sm">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Missions Completed</CardTitle>
+                <BookOpen className="h-5 w-5 text-emerald-500" />
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-3xl font-semibold text-foreground">
+                  {(loadingCategoryProgress || loadingCategoriesRealTime) ? (
+                    <Loader2 className="h-6 w-6 animate-spin inline" />
+                  ) : (
+                    categoryProgress?.stories_completed || categoryProgress?.lessons_completed || 0
+                  )}
+                </p>
+                <p className="text-sm text-muted-foreground">Story missions completed in your learning journey.</p>
+              </CardContent>
+            </Card>
             <Card className="shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">Advanced Achievements 🏆</CardTitle>
@@ -1583,7 +1699,7 @@ const TeenKidsPage = () => {
                   const storyEnrollments = StoryWordsService.getEnrolledStories(userId);
                   const isEnrolledInService = storyEnrollments.some(e => e.storyId === internalId);
                   const isEnrolled = enrolledInternalStoryIds.has(internalId) || 
-                                    completedStoryIds.includes(story.id) || 
+                                    completedStoryIds.has(internalId) || 
                                     allEnrolledStoryIds.has(internalId) ||
                                     isEnrolledInService;
                 const CharacterIcon = story.character;
@@ -1604,9 +1720,12 @@ const TeenKidsPage = () => {
                     const previousStory = allTeenStories[previousStoryIndex];
                     if (previousStory) {
                       const previousInternalId = getInternalStoryId(previousStory.type);
-                      isUnlocked = completedStoryIds.includes(previousStory.id) || 
+                      const storyEnrollmentsForUnlock = StoryWordsService.getEnrolledStories(userId);
+                      const isPreviousEnrolledForUnlock = storyEnrollmentsForUnlock.some(e => e.storyId === previousInternalId);
+                      isUnlocked = completedStoryIds.has(previousInternalId) || 
                                   enrolledInternalStoryIds.has(previousInternalId) ||
-                                  allEnrolledStoryIds.has(previousInternalId);
+                                  allEnrolledStoryIds.has(previousInternalId) ||
+                                  isPreviousEnrolledForUnlock;
                     }
                   } else {
                     // Previous story is also a dataset story (11-20)
@@ -1618,7 +1737,7 @@ const TeenKidsPage = () => {
                       const previousInternalId = getInternalStoryId(previousDatasetStory.type);
                       const storyEnrollments = StoryWordsService.getEnrolledStories(userId);
                       const isPreviousEnrolled = storyEnrollments.some(e => e.storyId === previousInternalId);
-                      isUnlocked = completedStoryIds.includes(`teen-${previousStoryIndex}`) || 
+                      isUnlocked = completedStoryIds.has(previousInternalId) || 
                                   enrolledInternalStoryIds.has(previousInternalId) ||
                                   allEnrolledStoryIds.has(previousInternalId) ||
                                   isPreviousEnrolled;
