@@ -79,7 +79,9 @@ const CertificatesPage = () => {
       const enrolledStories = StoryWordsService.getEnrolledStories(userId);
       const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
         'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
-        'ai-ethics-explorer', 'digital-security-guardian'];
+        'ai-ethics-explorer', 'digital-security-guardian', 'climate-action', 'startup',
+        'diplomacy', 'medical-research', 'social-impact', 'data-science',
+        'engineering', 'content-strategy', 'ethical-ai', 'innovation-summit'];
       const hasTeenStories = enrolledStories.some(e => teenStoryIds.includes(e.storyId));
       if (hasTeenStories) {
         return true;
@@ -148,95 +150,270 @@ const CertificatesPage = () => {
         } catch (_) {}
         if (isAuthenticated && token && token !== 'local-token') {
           if (isTeenKids) {
-            // For teen mode, fetch from TeenApi and merge with KidsApi data
+            // For teen mode, load from CategoryProgress (MySQL) first, then TeenApi
             try {
-              const [teenDashboard, kidsProgress, ach] = await Promise.all([
-                TeenApi.getDashboard(token).catch(() => null),
-                KidsApi.getProgress(token).catch(() => null),
-                (KidsApi as any).getAchievements(token).catch(() => [])
-              ]);
-              
-              // Merge teen dashboard data into progress structure
-              let mergedProgress: any = kidsProgress || {};
-              
-              if (teenDashboard) {
-                const dashboard = teenDashboard as any;
-                // Extract teen-specific data from dashboard
-                const teenPoints = dashboard.points ?? dashboard.progress?.points ?? 0;
-                const teenStreak = dashboard.streak ?? dashboard.progress?.streak ?? 0;
-                const teenPronunciationAttempts = Number(dashboard.pronunciation_attempts ?? 0) || 0;
-                const teenVocabularyAttempts = Number(dashboard.vocabulary_attempts ?? 0) || 0;
-                const teenGamesAttempts = Number(dashboard.games_attempts ?? 0) || 0;
-                const completedStoryIds = Array.isArray(dashboard.completed_story_ids) ? dashboard.completed_story_ids : [];
+              // Load category progress from MySQL (most accurate source)
+              const categoryProgressData = await MultiCategoryProgressService.getCategoryProgress(currentUserId, 'teen_kids', true);
+              if (categoryProgressData) {
+                setCategoryProgress(categoryProgressData);
                 
-                // Ensure audienceStats structure exists
-                if (!mergedProgress.details) {
-                  mergedProgress.details = {};
-                }
-                if (!mergedProgress.details.audienceStats) {
-                  mergedProgress.details.audienceStats = {};
-                }
-                
-                // Set teen-specific stats
-                mergedProgress.details.audienceStats.teen = {
-                  points: teenPoints,
-                  streak: teenStreak,
-                  pronunciation_attempts: teenPronunciationAttempts,
-                  vocabulary_attempts: teenVocabularyAttempts,
-                  games_attempts: teenGamesAttempts,
+                // Create progress object from category progress data
+                const progressFromCategory: any = {
+                  points: categoryProgressData.total_points || 0,
+                  streak: categoryProgressData.total_streak || 0,
+                  details: {
+                    storyEnrollments: [], // Will be populated from StoryWordsService
+                    vocabulary: {},
+                    pronunciation: {},
+                    games: {
+                      points: 0,
+                      attempts: categoryProgressData.games_completed || 0,
+                      types: []
+                    }
+                  }
                 };
                 
-                // Update story enrollments from completed stories
-                if (!mergedProgress.details.storyEnrollments) {
-                  mergedProgress.details.storyEnrollments = [];
+                // Load story enrollments from StoryWordsService
+                const enrolledStories = StoryWordsService.getEnrolledStories(currentUserId);
+                progressFromCategory.details.storyEnrollments = enrolledStories;
+                
+                // Also load from TeenApi and KidsApi to get vocabulary, pronunciation details, and achievements
+                try {
+                  const [teenDashboard, kidsProgress, ach] = await Promise.all([
+                    TeenApi.getDashboard(token).catch(() => null),
+                    KidsApi.getProgress(token).catch(() => null),
+                    (KidsApi as any).getAchievements(token).catch(() => [])
+                  ]);
+                  
+                  // Merge category progress (points, streak, counts) with API data (details)
+                  if (kidsProgress && (kidsProgress as any).details) {
+                    progressFromCategory.details = {
+                      ...(kidsProgress as any).details,
+                      storyEnrollments: enrolledStories, // Use StoryWordsService data
+                    };
+                  }
+                  
+                  // If teenDashboard exists, merge its data too
+                  if (teenDashboard) {
+                    const dashboard = teenDashboard as any;
+                    const teenPoints = dashboard.points ?? dashboard.progress?.points ?? 0;
+                    const teenStreak = dashboard.streak ?? dashboard.progress?.streak ?? 0;
+                    const teenPronunciationAttempts = Number(dashboard.pronunciation_attempts ?? 0) || 0;
+                    const teenVocabularyAttempts = Number(dashboard.vocabulary_attempts ?? 0) || 0;
+                    const teenGamesAttempts = Number(dashboard.games_attempts ?? 0) || 0;
+                    const completedStoryIds = Array.isArray(dashboard.completed_story_ids) ? dashboard.completed_story_ids : [];
+                    
+                    // Ensure audienceStats structure exists
+                    if (!progressFromCategory.details.audienceStats) {
+                      progressFromCategory.details.audienceStats = {};
+                    }
+                    
+                    // Set teen-specific stats
+                    progressFromCategory.details.audienceStats.teen = {
+                      points: teenPoints,
+                      streak: teenStreak,
+                      pronunciation_attempts: teenPronunciationAttempts,
+                      vocabulary_attempts: teenVocabularyAttempts,
+                      games_attempts: teenGamesAttempts,
+                    };
+                    
+                    // Add completed teen stories to enrollments if not already present
+                    const existingStoryIds = new Set(
+                      (progressFromCategory.details.storyEnrollments || []).map((s: any) => s.storyId)
+                    );
+                    
+                    completedStoryIds.forEach((storyId: string) => {
+                      if (!existingStoryIds.has(storyId)) {
+                        // Convert teen story ID (like 'teen-0') to internal story ID
+                        const teenStoryMapping: Record<string, string> = {
+                          'teen-0': 'mystery-detective',
+                          'teen-1': 'space-explorer-teen',
+                          'teen-2': 'environmental-hero',
+                          'teen-3': 'tech-innovator',
+                          'teen-4': 'global-citizen',
+                          'teen-5': 'future-leader',
+                          'teen-6': 'scientific-discovery',
+                          'teen-7': 'social-media-expert',
+                          'teen-8': 'ai-ethics-explorer',
+                          'teen-9': 'digital-security-guardian',
+                          'teen-10': 'climate-action',
+                          'teen-11': 'startup',
+                          'teen-12': 'diplomacy',
+                          'teen-13': 'medical-research',
+                          'teen-14': 'social-impact',
+                          'teen-15': 'data-science',
+                          'teen-16': 'engineering',
+                          'teen-17': 'content-strategy',
+                          'teen-18': 'ethical-ai',
+                          'teen-19': 'innovation-summit',
+                        };
+                        const internalStoryId = teenStoryMapping[storyId] || storyId;
+                        progressFromCategory.details.storyEnrollments.push({
+                          storyId: internalStoryId,
+                          completed: true,
+                          wordsExtracted: true,
+                          score: 100,
+                        });
+                      }
+                    });
+                    
+                    // Update points and streak at root level (prioritize category progress)
+                    progressFromCategory.points = categoryProgressData.total_points || teenPoints;
+                    progressFromCategory.streak = categoryProgressData.total_streak || teenStreak;
+                  } else {
+                    // Use category progress values
+                    progressFromCategory.points = categoryProgressData.total_points || 0;
+                    progressFromCategory.streak = categoryProgressData.total_streak || 0;
+                  }
+                  
+                  setProgress(progressFromCategory);
+                  if (Array.isArray(ach)) setAchievements(ach);
+                } catch (error) {
+                  // If API fails, still use category progress
+                  setProgress(progressFromCategory);
+                  setAchievements([]);
+                }
+              } else {
+                // Fallback to TeenApi if category progress not available
+                try {
+                  const [teenDashboard, kidsProgress, ach] = await Promise.all([
+                    TeenApi.getDashboard(token).catch(() => null),
+                    KidsApi.getProgress(token).catch(() => null),
+                    (KidsApi as any).getAchievements(token).catch(() => [])
+                  ]);
+                  
+                  // Merge teen dashboard data into progress structure
+                  let mergedProgress: any = kidsProgress || {};
+                  
+                  if (teenDashboard) {
+                    const dashboard = teenDashboard as any;
+                    // Extract teen-specific data from dashboard
+                    const teenPoints = dashboard.points ?? dashboard.progress?.points ?? 0;
+                    const teenStreak = dashboard.streak ?? dashboard.progress?.streak ?? 0;
+                    const teenPronunciationAttempts = Number(dashboard.pronunciation_attempts ?? 0) || 0;
+                    const teenVocabularyAttempts = Number(dashboard.vocabulary_attempts ?? 0) || 0;
+                    const teenGamesAttempts = Number(dashboard.games_attempts ?? 0) || 0;
+                    const completedStoryIds = Array.isArray(dashboard.completed_story_ids) ? dashboard.completed_story_ids : [];
+                    
+                    // Ensure audienceStats structure exists
+                    if (!mergedProgress.details) {
+                      mergedProgress.details = {};
+                    }
+                    if (!mergedProgress.details.audienceStats) {
+                      mergedProgress.details.audienceStats = {};
+                    }
+                    
+                    // Set teen-specific stats
+                    mergedProgress.details.audienceStats.teen = {
+                      points: teenPoints,
+                      streak: teenStreak,
+                      pronunciation_attempts: teenPronunciationAttempts,
+                      vocabulary_attempts: teenVocabularyAttempts,
+                      games_attempts: teenGamesAttempts,
+                    };
+                    
+                    // Update story enrollments from completed stories
+                    if (!mergedProgress.details.storyEnrollments) {
+                      mergedProgress.details.storyEnrollments = [];
+                    }
+                    
+                    // Add completed teen stories to enrollments if not already present
+                    const existingStoryIds = new Set(
+                      (mergedProgress.details.storyEnrollments || []).map((s: any) => s.storyId)
+                    );
+                    
+                    completedStoryIds.forEach((storyId: string) => {
+                      if (!existingStoryIds.has(storyId)) {
+                        // Convert teen story ID (like 'teen-0') to internal story ID
+                        const teenStoryMapping: Record<string, string> = {
+                          'teen-0': 'mystery-detective',
+                          'teen-1': 'space-explorer-teen',
+                          'teen-2': 'environmental-hero',
+                          'teen-3': 'tech-innovator',
+                          'teen-4': 'global-citizen',
+                          'teen-5': 'future-leader',
+                          'teen-6': 'scientific-discovery',
+                          'teen-7': 'social-media-expert',
+                          'teen-8': 'ai-ethics-explorer',
+                          'teen-9': 'digital-security-guardian',
+                          'teen-10': 'climate-action',
+                          'teen-11': 'startup',
+                          'teen-12': 'diplomacy',
+                          'teen-13': 'medical-research',
+                          'teen-14': 'social-impact',
+                          'teen-15': 'data-science',
+                          'teen-16': 'engineering',
+                          'teen-17': 'content-strategy',
+                          'teen-18': 'ethical-ai',
+                          'teen-19': 'innovation-summit',
+                        };
+                        const internalStoryId = teenStoryMapping[storyId] || storyId;
+                        mergedProgress.details.storyEnrollments.push({
+                          storyId: internalStoryId,
+                          completed: true,
+                          wordsExtracted: true,
+                          score: 100,
+                        });
+                      }
+                    });
+                    
+                    // Update points and streak at root level for backward compatibility
+                    mergedProgress.points = teenPoints;
+                    mergedProgress.streak = teenStreak;
+                  }
+                  
+                  setProgress(mergedProgress);
+                  if (Array.isArray(ach)) setAchievements(ach);
+                } catch (error) {
+                  console.error('Error loading teen progress:', error);
+                  // Fallback to regular kids progress
+                  try {
+                    const [pg, ach] = await Promise.all([
+                      KidsApi.getProgress(token),
+                      (KidsApi as any).getAchievements(token)
+                    ]);
+                    setProgress(pg);
+                    if (Array.isArray(ach)) setAchievements(ach);
+                  } catch (_) {}
+                }
+              }
+            } catch (error) {
+              console.error('Error loading teen category progress:', error);
+              // Fallback to TeenApi
+              try {
+                const [teenDashboard, kidsProgress, ach] = await Promise.all([
+                  TeenApi.getDashboard(token).catch(() => null),
+                  KidsApi.getProgress(token).catch(() => null),
+                  (KidsApi as any).getAchievements(token).catch(() => [])
+                ]);
+                
+                let mergedProgress: any = kidsProgress || {};
+                
+                if (teenDashboard) {
+                  const dashboard = teenDashboard as any;
+                  const teenPoints = dashboard.points ?? dashboard.progress?.points ?? 0;
+                  const teenStreak = dashboard.streak ?? dashboard.progress?.streak ?? 0;
+                  
+                  if (!mergedProgress.details) {
+                    mergedProgress.details = {};
+                  }
+                  if (!mergedProgress.details.audienceStats) {
+                    mergedProgress.details.audienceStats = {};
+                  }
+                  
+                  mergedProgress.details.audienceStats.teen = {
+                    points: teenPoints,
+                    streak: teenStreak,
+                    pronunciation_attempts: Number(dashboard.pronunciation_attempts ?? 0) || 0,
+                    vocabulary_attempts: Number(dashboard.vocabulary_attempts ?? 0) || 0,
+                    games_attempts: Number(dashboard.games_attempts ?? 0) || 0,
+                  };
+                  
+                  mergedProgress.points = teenPoints;
+                  mergedProgress.streak = teenStreak;
                 }
                 
-                // Add completed teen stories to enrollments if not already present
-                const existingStoryIds = new Set(
-                  (mergedProgress.details.storyEnrollments || []).map((s: any) => s.storyId)
-                );
-                
-                completedStoryIds.forEach((storyId: string) => {
-                  if (!existingStoryIds.has(storyId)) {
-                    // Convert teen story ID (like 'teen-0') to internal story ID
-                    const teenStoryMapping: Record<string, string> = {
-                      'teen-0': 'mystery-detective',
-                      'teen-1': 'space-explorer-teen',
-                      'teen-2': 'environmental-hero',
-                      'teen-3': 'tech-innovator',
-                      'teen-4': 'global-citizen',
-                      'teen-5': 'future-leader',
-                      'teen-6': 'scientific-discovery',
-                      'teen-7': 'social-media-expert',
-                      'teen-8': 'ai-ethics-explorer',
-                      'teen-9': 'digital-security-guardian',
-                    };
-                    const internalStoryId = teenStoryMapping[storyId] || storyId;
-                    mergedProgress.details.storyEnrollments.push({
-                      storyId: internalStoryId,
-                      completed: true,
-                      wordsExtracted: true,
-                      score: 100,
-                    });
-                  }
-                });
-                
-                // Update points and streak at root level for backward compatibility
-                mergedProgress.points = teenPoints;
-                mergedProgress.streak = teenStreak;
-              }
-              
-              setProgress(mergedProgress);
-              if (Array.isArray(ach)) setAchievements(ach);
-            } catch (error) {
-              console.error('Error loading teen progress:', error);
-              // Fallback to regular kids progress
-              try {
-                const [pg, ach] = await Promise.all([
-                  KidsApi.getProgress(token),
-                  (KidsApi as any).getAchievements(token)
-                ]);
-                setProgress(pg);
+                setProgress(mergedProgress);
                 if (Array.isArray(ach)) setAchievements(ach);
               } catch (_) {}
             }
@@ -320,20 +497,21 @@ const CertificatesPage = () => {
     load();
   }, [isAuthenticated, isTeenKids]);
 
-  // Real-time category progress updates for YoungKids mode
+  // Real-time category progress updates for both YoungKids and TeenKids modes
   const {
     data: realTimeCategories,
   } = useRealTimeData<CategoryProgress[]>('category_progress', {
-    enabled: isAuthenticated && !!userId && !isTeenKids,
+    enabled: isAuthenticated && !!userId,
     immediate: true,
   });
 
-  // Update category progress when real-time data arrives (YoungKids only)
+  // Update category progress when real-time data arrives (both YoungKids and TeenKids)
   useEffect(() => {
-    if (!isTeenKids && realTimeCategories && Array.isArray(realTimeCategories)) {
-      const youngKidsProgress = realTimeCategories.find(cat => cat.category === 'young_kids');
-      if (youngKidsProgress) {
-        setCategoryProgress(youngKidsProgress);
+    if (realTimeCategories && Array.isArray(realTimeCategories)) {
+      const targetCategory = isTeenKids ? 'teen_kids' : 'young_kids';
+      const categoryProgressData = realTimeCategories.find(cat => cat.category === targetCategory);
+      if (categoryProgressData) {
+        setCategoryProgress(categoryProgressData);
       }
     }
   }, [realTimeCategories, isTeenKids]);
@@ -397,9 +575,13 @@ const CertificatesPage = () => {
         return categoryProgress.total_points || 0;
       }
       
-      // For TeenKids mode, try to get from category progress or calculate
+      // For TeenKids mode, use category progress first (most accurate source)
+      if (isTeenKids && categoryProgress) {
+        return categoryProgress.total_points || 0;
+      }
+      
+      // Fallback: try to get from progress object (from TeenApi)
       if (isTeenKids) {
-        // Try to get from progress object first (from TeenApi)
         const teenPoints = (progress as any)?.points ?? (progress as any)?.progress?.points ?? 0;
         if (teenPoints > 0) {
           return teenPoints;
@@ -412,7 +594,9 @@ const CertificatesPage = () => {
       const pron = mergedDetails?.pronunciation || {};
       const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
         'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
-        'ai-ethics-explorer', 'digital-security-guardian'];
+        'ai-ethics-explorer', 'digital-security-guardian', 'climate-action', 'startup',
+        'diplomacy', 'medical-research', 'social-impact', 'data-science',
+        'engineering', 'content-strategy', 'ethical-ai', 'innovation-summit'];
       const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
         'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
         'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
@@ -480,9 +664,9 @@ const CertificatesPage = () => {
   // Use calculated learning points instead of total points (which includes games)
   const resolvedPoints = calculateLearningPoints;
 
-  // Use category progress streak for YoungKids (matches Progress snapshot)
+  // Use category progress streak for both YoungKids and TeenKids (matches Progress snapshot)
   const resolvedStreak = isTeenKids
-    ? teenAudienceStats.streak ?? (progress as any)?.streak ?? 0
+    ? (categoryProgress?.total_streak ?? teenAudienceStats.streak ?? (progress as any)?.streak ?? 0)
     : (categoryProgress?.total_streak ?? youngAudienceStats.streak ?? (progress as any)?.streak ?? 0);
 
   const ctx = {
@@ -499,13 +683,13 @@ const CertificatesPage = () => {
       title: isTeenKids ? 'Advanced Story Champion' : 'Story Time Champion',
       emoji: '📚',
       badgeSrc: '/story-time-champion-badge.png',
-      description: isTeenKids ? 'Completed 10 advanced teen stories' : 'Completed 20 stories',
+      description: isTeenKids ? 'Completed 20 advanced teen stories' : 'Completed 20 stories',
       criteria: (c) => {
-        // For YoungKids, use category progress stories_completed (matches Progress snapshot)
-        // YoungKids has 20 stories total, TeenKids has 10
-        if (!isTeenKids && c.categoryProgress) {
+        // For both YoungKids and TeenKids, use category progress stories_completed (matches Progress snapshot)
+        // Both YoungKids and TeenKids have 20 stories total
+        if (c.categoryProgress) {
+          const targetCount = 20;
           const completedCount = c.categoryProgress.stories_completed || 0;
-          const targetCount = 20; // YoungKids has 20 stories
           const total = Math.min(completedCount, targetCount);
           const progress = Math.min(100, Math.round((total / targetCount) * 100));
           const eligible = total >= targetCount;
@@ -519,7 +703,9 @@ const CertificatesPage = () => {
         // Filter by story type (teen vs young)
         const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
           'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
-          'ai-ethics-explorer', 'digital-security-guardian'];
+          'ai-ethics-explorer', 'digital-security-guardian', 'climate-action', 'startup',
+          'diplomacy', 'medical-research', 'social-impact', 'data-science',
+          'engineering', 'content-strategy', 'ethical-ai', 'innovation-summit'];
         const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
           'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
           'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
@@ -558,7 +744,7 @@ const CertificatesPage = () => {
           
           // Use the maximum of both sources
           const total = Math.max(completedCount, fullyCompleted.length);
-          const targetCount = isTeenKids ? 10 : 20; // YoungKids has 20 stories, TeenKids has 10
+          const targetCount = 20; // Both YoungKids and TeenKids have 20 stories
           
           const progress = Math.min(100, Math.round((Math.min(total, targetCount) / targetCount) * 100));
           const eligible = total >= targetCount;
@@ -567,7 +753,7 @@ const CertificatesPage = () => {
         } catch {
           // Fallback to details only
           const total = completedCount;
-          const targetCount = isTeenKids ? 10 : 20; // YoungKids has 20 stories, TeenKids has 10
+          const targetCount = 20; // Both YoungKids and TeenKids have 20 stories
           const progress = Math.min(100, Math.round((Math.min(total, targetCount) / targetCount) * 100));
           const eligible = total >= targetCount;
           const hint = eligible ? 'Ready to download!' : `Stories: ${Math.min(total, targetCount)}/${targetCount} completed`;
@@ -582,8 +768,8 @@ const CertificatesPage = () => {
       badgeSrc: '/Speaking_star_badge.png',
       description: isTeenKids ? '50 Advanced Speaking sessions with average ≥ 75' : '50 Speak & Repeat sessions with average ≥ 75',
       criteria: (c) => {
-        // For YoungKids, use category progress pronunciation_attempts (matches Progress snapshot)
-        if (!isTeenKids && c.categoryProgress) {
+        // For both YoungKids and TeenKids, use category progress pronunciation_attempts (matches Progress snapshot)
+        if (c.categoryProgress) {
           const attempts = c.categoryProgress.pronunciation_attempts || 0;
           // Estimate average score (can be improved if we track it in category progress)
           const avg = 75; // Default estimate
@@ -597,7 +783,9 @@ const CertificatesPage = () => {
         const pron = c.details?.pronunciation || {};
         const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
           'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
-          'ai-ethics-explorer', 'digital-security-guardian'];
+          'ai-ethics-explorer', 'digital-security-guardian', 'climate-action', 'startup',
+          'diplomacy', 'medical-research', 'social-impact', 'data-science',
+          'engineering', 'content-strategy', 'ethical-ai', 'innovation-summit'];
         const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
           'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
           'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
@@ -655,10 +843,10 @@ const CertificatesPage = () => {
       badgeSrc: '/Word_wizard_badge.png',
       description: isTeenKids ? 'Master 100 advanced words (≥ 2 practices each)' : 'Master 100 unique words (≥ 2 practices each)',
       criteria: (c) => {
-        // For YoungKids, use category progress vocabulary_words (matches Progress snapshot)
+        // For both YoungKids and TeenKids, use category progress vocabulary_words (matches Progress snapshot)
         // Note: We need to count mastered words (≥2 attempts), not just total words
         // For now, estimate based on vocabulary_words count
-        if (!isTeenKids && c.categoryProgress) {
+        if (c.categoryProgress) {
           const vocabWords = c.categoryProgress.vocabulary_words || 0;
           // Estimate mastered words (assuming ~70% of vocabulary words are mastered with ≥2 attempts)
           const mastered = Math.round(vocabWords * 0.7);
@@ -671,7 +859,9 @@ const CertificatesPage = () => {
         const vocab = c.details?.vocabulary || {};
         const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
           'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
-          'ai-ethics-explorer', 'digital-security-guardian'];
+          'ai-ethics-explorer', 'digital-security-guardian', 'climate-action', 'startup',
+          'diplomacy', 'medical-research', 'social-impact', 'data-science',
+          'engineering', 'content-strategy', 'ethical-ai', 'innovation-summit'];
         const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
           'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
           'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
@@ -835,7 +1025,9 @@ const CertificatesPage = () => {
         const enrolledStories = StoryWordsService.getEnrolledStories(userId);
         const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
           'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
-          'ai-ethics-explorer', 'digital-security-guardian'];
+          'ai-ethics-explorer', 'digital-security-guardian', 'climate-action', 'startup',
+          'diplomacy', 'medical-research', 'social-impact', 'data-science',
+          'engineering', 'content-strategy', 'ethical-ai', 'innovation-summit'];
         const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
           'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
           'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
@@ -861,6 +1053,16 @@ const CertificatesPage = () => {
           'social-media-expert': 'Social Media Expert',
           'ai-ethics-explorer': 'AI Ethics Explorer',
           'digital-security-guardian': 'Digital Security Guardian',
+          'climate-action': 'Climate Action',
+          'startup': 'Startup',
+          'diplomacy': 'Diplomacy',
+          'medical-research': 'Medical Research',
+          'social-impact': 'Social Impact',
+          'data-science': 'Data Science',
+          'engineering': 'Engineering',
+          'content-strategy': 'Content Strategy',
+          'ethical-ai': 'Ethical AI',
+          'innovation-summit': 'Innovation Summit',
           'magic-forest': 'Magic Forest',
           'space-adventure': 'Space Adventure',
           'underwater-world': 'Underwater World',
@@ -895,7 +1097,9 @@ const CertificatesPage = () => {
         const vocab = ctx.details?.vocabulary || {};
         const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
           'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
-          'ai-ethics-explorer', 'digital-security-guardian'];
+          'ai-ethics-explorer', 'digital-security-guardian', 'climate-action', 'startup',
+          'diplomacy', 'medical-research', 'social-impact', 'data-science',
+          'engineering', 'content-strategy', 'ethical-ai', 'innovation-summit'];
         const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
           'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
           'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
@@ -962,7 +1166,9 @@ const CertificatesPage = () => {
         const pron = ctx.details?.pronunciation || {};
         const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
           'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
-          'ai-ethics-explorer', 'digital-security-guardian'];
+          'ai-ethics-explorer', 'digital-security-guardian', 'climate-action', 'startup',
+          'diplomacy', 'medical-research', 'social-impact', 'data-science',
+          'engineering', 'content-strategy', 'ethical-ai', 'innovation-summit'];
         const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
           'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
           'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
@@ -1051,7 +1257,7 @@ const CertificatesPage = () => {
   const lockedBadges = useMemo(() => (achievements || []).filter((a: any) => !a.unlocked), [achievements]);
   const trophySpecs = useMemo(() => {
     const storyMasterDesc = isTeenKids 
-      ? 'All 10 teen stories at ≥80' 
+      ? 'All 20 teen stories at ≥80' 
       : 'All 20 young stories at ≥80';
     return [
       { id: 'consistency-hero', title: 'Consistency Hero', emoji: '🔥', desc: 'Maintain a 21-day learning streak', badgeSrc: '/Consistency_badge.png' },
@@ -1067,18 +1273,19 @@ const CertificatesPage = () => {
     const d = ctx.details || {};
     
     if (t.id === 'consistency-hero') {
-      // Use category progress streak for YoungKids (matches Progress snapshot)
-      const streak = !isTeenKids && categoryProgress
+      // Use category progress streak for both YoungKids and TeenKids (matches Progress snapshot)
+      const streak = categoryProgress
         ? categoryProgress.total_streak || 0
         : ctx.streak || 0;
       return Math.round((Math.min(streak, 21) / 21) * 100);
     }
     if (t.id === 'story-master') {
-      // For YoungKids, use category progress stories_completed (matches Progress snapshot)
-      // YoungKids has 20 stories total, TeenKids has 10
-      if (!isTeenKids && categoryProgress) {
-        const completedCount = Math.min(categoryProgress.stories_completed || 0, 20);
-        return Math.round((completedCount / 20) * 100);
+      // For both YoungKids and TeenKids, use category progress stories_completed (matches Progress snapshot)
+      // Both YoungKids and TeenKids have 20 stories total
+      if (categoryProgress) {
+        const targetCount = 20;
+        const completedCount = Math.min(categoryProgress.stories_completed || 0, targetCount);
+        return Math.round((completedCount / targetCount) * 100);
       }
       
       // Fallback: Use actual completed stories from StoryWordsService
@@ -1092,7 +1299,9 @@ const CertificatesPage = () => {
           'secret-cave', 'flying-carpet', 'lost-kingdom', 'grand-adventure'];
         const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
           'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
-          'ai-ethics-explorer', 'digital-security-guardian'];
+          'ai-ethics-explorer', 'digital-security-guardian', 'climate-action', 'startup',
+          'diplomacy', 'medical-research', 'social-impact', 'data-science',
+          'engineering', 'content-strategy', 'ethical-ai', 'innovation-summit'];
         
         // Count only fully completed stories (completed=true AND wordsExtracted=true AND score>=80)
         const completedStories = enrolledStories.filter(e => 
@@ -1106,7 +1315,7 @@ const CertificatesPage = () => {
           ? completedStories.filter(e => teenStoryIds.includes(e.storyId))
           : completedStories.filter(e => youngStoryIds.includes(e.storyId));
         
-        const targetCount = isTeenKids ? 10 : 20; // YoungKids has 20 stories, TeenKids has 10
+        const targetCount = 20; // Both YoungKids and TeenKids have 20 stories
         const completedCount = Math.min(filteredStories.length, targetCount);
         return Math.round((completedCount / targetCount) * 100);
       } catch (error) {
@@ -1163,10 +1372,22 @@ const CertificatesPage = () => {
         return Math.round(Math.min(phrasesPct, avgTo80Pct) * 100);
       }
       
+      // For TeenKids, use category progress pronunciation_attempts
+      if (categoryProgress && isTeenKids) {
+        const attempts = categoryProgress.pronunciation_attempts || 0;
+        // Estimate average score (can be improved if we track it in category progress)
+        const avg = 75; // Default estimate
+        const attemptsPct = Math.min(attempts, 100) / 100; // 0..1
+        const avgTo80Pct = Math.min(Math.max(avg, 0), 80) / 80; // reach 1.0 at 80
+        return Math.round(Math.min(attemptsPct, avgTo80Pct) * 100);
+      }
+      
       const pron = d.pronunciation || {};
       const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
         'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
-        'ai-ethics-explorer', 'digital-security-guardian'];
+        'ai-ethics-explorer', 'digital-security-guardian', 'climate-action', 'startup',
+        'diplomacy', 'medical-research', 'social-impact', 'data-science',
+        'engineering', 'content-strategy', 'ethical-ai', 'innovation-summit'];
       const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
         'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
         'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
@@ -1217,8 +1438,8 @@ const CertificatesPage = () => {
       }
     }
     if (t.id === 'vocab-builder') {
-      // For YoungKids, use category progress vocabulary_words (matches Progress snapshot)
-      if (!isTeenKids && categoryProgress) {
+      // For both YoungKids and TeenKids, use category progress vocabulary_words (matches Progress snapshot)
+      if (categoryProgress) {
         const uniqueWords = categoryProgress.vocabulary_words || 0;
         return Math.round((Math.min(uniqueWords, 150) / 150) * 100);
       }
@@ -1227,7 +1448,9 @@ const CertificatesPage = () => {
       try {
         const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
           'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
-          'ai-ethics-explorer', 'digital-security-guardian'];
+          'ai-ethics-explorer', 'digital-security-guardian', 'climate-action', 'startup',
+          'diplomacy', 'medical-research', 'social-impact', 'data-science',
+          'engineering', 'content-strategy', 'ethical-ai', 'innovation-summit'];
         const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
           'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
           'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
@@ -1254,15 +1477,15 @@ const CertificatesPage = () => {
       return Math.round((Math.min(earned, 3) / 3) * 100);
     }
     if (t.id === 'explorer') {
-      // For YoungKids, use category progress games_completed (matches Progress snapshot)
-      if (!isTeenKids && categoryProgress) {
+      // For both YoungKids and TeenKids, use category progress games_completed (matches Progress snapshot)
+      if (categoryProgress) {
         const gamesCompleted = categoryProgress.games_completed || 0;
         // Get game points from progress details - check both mergedDetails and progress
         const games = d.games || (progress as any)?.details?.games || {};
         const points = Number(games.points || 0);
-        const tried = Math.min(gamesCompleted, 5); // Cap at 5 games max
+        const requiredGameTypes = isTeenKids ? 7 : 5;
+        const tried = Math.min(gamesCompleted, requiredGameTypes);
         
-        const requiredGameTypes = 5;
         const gameTypesProgress = requiredGameTypes > 0 ? Math.min(tried, requiredGameTypes) / requiredGameTypes : 0;
         const pointsProgress = Math.min(points, 300) / 300;
         
@@ -1345,7 +1568,9 @@ const CertificatesPage = () => {
           'secret-cave', 'flying-carpet', 'lost-kingdom', 'grand-adventure'];
         const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
           'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
-          'ai-ethics-explorer', 'digital-security-guardian'];
+          'ai-ethics-explorer', 'digital-security-guardian', 'climate-action', 'startup',
+          'diplomacy', 'medical-research', 'social-impact', 'data-science',
+          'engineering', 'content-strategy', 'ethical-ai', 'innovation-summit'];
         
         const completedStories = enrolledStories.filter(e => 
           e.completed === true && 
@@ -1357,12 +1582,12 @@ const CertificatesPage = () => {
           ? completedStories.filter(e => teenStoryIds.includes(e.storyId))
           : completedStories.filter(e => youngStoryIds.includes(e.storyId));
         
-        const targetCount = isTeenKids ? 10 : 20; // YoungKids has 20 stories, TeenKids has 10
+        const targetCount = 20; // Both YoungKids and TeenKids have 20 stories
         const completedCount = Math.min(filteredStories.length, targetCount);
         return `Stories ≥80: ${completedCount}/${targetCount}`;
       } catch (error) {
         console.error('Error getting story-master hint:', error);
-        return isTeenKids ? `Stories ≥80: 0/10` : `Stories ≥80: 0/20`;
+        return `Stories ≥80: 0/20`;
       }
     }
     if (t.id === 'pronunciation-pro') {
@@ -1414,7 +1639,9 @@ const CertificatesPage = () => {
       const pron = d.pronunciation || {};
       const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
         'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
-        'ai-ethics-explorer', 'digital-security-guardian'];
+        'ai-ethics-explorer', 'digital-security-guardian', 'climate-action', 'startup',
+        'diplomacy', 'medical-research', 'social-impact', 'data-science',
+        'engineering', 'content-strategy', 'ethical-ai', 'innovation-summit'];
       const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
         'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
         'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
@@ -1472,7 +1699,9 @@ const CertificatesPage = () => {
       try {
         const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
           'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
-          'ai-ethics-explorer', 'digital-security-guardian'];
+          'ai-ethics-explorer', 'digital-security-guardian', 'climate-action', 'startup',
+          'diplomacy', 'medical-research', 'social-impact', 'data-science',
+          'engineering', 'content-strategy', 'ethical-ai', 'innovation-summit'];
         const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
           'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
           'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',

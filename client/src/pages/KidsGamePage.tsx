@@ -42,13 +42,17 @@ const formatAIResponse = (content: string): string => {
       const parsed = JSON.parse(formatted);
       const parts = [];
       
+      // Extract response field (common in Gemini responses) - prioritize this
+      if (parsed.response) parts.push(parsed.response);
+      // Also check other fields
       if (parsed.content) parts.push(parsed.content);
       if (parsed.feedback) parts.push(parsed.feedback);
       if (parsed.nextStep) parts.push(parsed.nextStep);
       if (parsed.gameInstruction) parts.push(parsed.gameInstruction);
       
       if (parts.length > 0) {
-        formatted = parts.join(' ');
+        // If response exists, use it alone; otherwise join all parts
+        formatted = parsed.response ? parsed.response : parts.join(' ');
       } else {
         // If no parts found, just remove JSON structure
         formatted = formatted.replace(/^\{\s*/, '').replace(/\s*\}$/, '');
@@ -58,18 +62,26 @@ const formatAIResponse = (content: string): string => {
       const stringMatches = formatted.match(/"([^"]+)":\s*"([^"]+)"/g);
       if (stringMatches) {
         const textParts: string[] = [];
+        let hasResponse = false;
         stringMatches.forEach(match => {
           const keyValue = match.match(/"([^"]+)":\s*"([^"]+)"/);
           if (keyValue) {
             const key = keyValue[1];
             const value = keyValue[2];
-            if (key === 'content' || key === 'feedback' || key === 'nextStep' || key === 'gameInstruction') {
-              textParts.push(value);
+            // Prioritize response field
+            if (key === 'response') {
+              textParts.unshift(value); // Put response first
+              hasResponse = true;
+            } else if (key === 'content' || key === 'feedback' || key === 'nextStep' || key === 'gameInstruction') {
+              if (!hasResponse) {
+                textParts.push(value);
+              }
             }
           }
         });
         if (textParts.length > 0) {
-          formatted = textParts.join(' ');
+          // If response exists, use only response; otherwise join all
+          formatted = hasResponse ? textParts[0] : textParts.join(' ');
         } else {
           formatted = formatted.replace(/^\{\s*/, '').replace(/\s*\}$/, '');
         }
@@ -78,6 +90,9 @@ const formatAIResponse = (content: string): string => {
       }
     }
   }
+  
+  // Also handle cases where content might have "response": at the start
+  formatted = formatted.replace(/^"?response"\s*:\s*"?/i, '').replace(/^"?/g, '').replace(/"?$/g, '');
   
   return formatted.trim();
 };
@@ -483,7 +498,21 @@ const KidsGamePage = () => {
 
       const formattedContent = formatAIResponse(response.content);
       
-      setGameContent(formattedContent);
+      // For all teen games, skip showing the initial AI greeting response
+      const teenGames: GameType[] = ['debate-club', 'critical-thinking', 'research-challenge', 'presentation-master', 'ethics-discussion'];
+      // Also skip for shared games when in teen context
+      const shouldSkipInitialResponse = isTeenContext && (
+        teenGames.includes(currentGame) || 
+        (currentGame === 'pronunciation-challenge' || currentGame === 'conversation-practice')
+      );
+      
+      if (!shouldSkipInitialResponse) {
+        setGameContent(formattedContent);
+      } else {
+        // For teen games, don't set gameContent so it won't be displayed
+        setGameContent('');
+      }
+      
       if (response.gameInstruction) {
         setGameInstruction(response.gameInstruction);
       }
@@ -491,7 +520,8 @@ const KidsGamePage = () => {
         setQuestions(response.questions);
       }
 
-      const initialHistory: ConversationMessage[] = [{
+      // For all teen games, don't add initial AI response to conversation history
+      const initialHistory: ConversationMessage[] = shouldSkipInitialResponse ? [] : [{
         role: 'assistant' as const,
         content: formattedContent,
         timestamp: Date.now()
@@ -522,7 +552,8 @@ const KidsGamePage = () => {
         });
       }
 
-      if (isSoundEnabled && formattedContent) {
+      // For all teen games, don't speak the initial greeting message
+      if (isSoundEnabled && formattedContent && !shouldSkipInitialResponse) {
         const femaleVoiceId = findFemaleVoiceId();
         await EnhancedTTS.speak(formattedContent, { 
           voice: femaleVoiceId,

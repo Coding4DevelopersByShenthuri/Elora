@@ -20,7 +20,9 @@ import {
   Crown,
   CheckCircle,
   Play,
-  Headphones,
+  Music,
+  HelpCircle,
+  Zap,
   Clock,
 } from 'lucide-react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
@@ -655,9 +657,9 @@ const TeenKidsPage = () => {
   useEffect(() => {
     if (isAuthenticated && isSoundEnabled) {
       const welcomeMessages = [
-        "Welcome back to Teen Explorer Zone! Ready for advanced challenges?",
-        "Let's elevate your English with real-world missions!",
-        'Great to see you! Prepare for professional-level practice!',
+        "Welcome back! Ready to learn?",
+        "Let's explore amazing stories together!",
+        'Great to see you! Let\'s have fun learning!',
       ];
       const timer = setTimeout(() => {
         if (!isOpeningFromFavorites) {
@@ -1023,10 +1025,10 @@ const TeenKidsPage = () => {
   }, [serverAchievements, achievements]);
 
   const categories = [
-    { id: 'stories', label: 'Adventure Stories', emoji: '📚' },
-    { id: 'vocabulary', label: 'Advanced Vocabulary', emoji: '🧠' },
-    { id: 'pronunciation', label: 'Speaking Lab', emoji: '🎤' },
-    { id: 'games', label: 'Challenge Arena', emoji: '🏆' },
+    { id: 'stories', label: 'Story Time', icon: BookOpen, emoji: '📚' },
+    { id: 'vocabulary', label: 'Word Games', icon: Zap, emoji: '🎮' },
+    { id: 'pronunciation', label: 'Speak & Repeat', icon: Mic, emoji: '🎤' },
+    { id: 'games', label: 'Fun Games', icon: Trophy, emoji: '🏆' },
   ];
 
   const openStoryModal = (storyType: keyof typeof TEEN_STORY_TYPE_TO_INTERNAL) => {
@@ -1090,21 +1092,25 @@ const TeenKidsPage = () => {
       return;
     }
 
-    const instructions: Record<string, string> = {
-      stories: "Let's tackle a new advanced story!",
-      vocabulary: 'Time to expand your academic vocabulary!',
-      pronunciation: 'Sharpen your pronunciation with real-world phrases!',
-      games: 'Challenge yourself with advanced speaking games!',
+    // Play category-specific voice instructions (matching YoungKids style)
+    const categoryInstructions = {
+      stories: "Let's read amazing stories together!",
+      vocabulary: "Time to learn new words!",
+      pronunciation: "Let's practice speaking!",
+      games: "Ready for some fun games?"
     };
-
+    
     if (isSoundEnabled) {
-      speakWithSanitizedText(instructions[categoryId] || "Let's keep learning!", {
-        rate: 1,
-        emotion: 'excited',
-      }).catch(() => undefined);
+      EnhancedTTS.speak(categoryInstructions[categoryId as keyof typeof categoryInstructions] || "Let's learn!", { 
+        rate: 1.0, 
+        emotion: 'happy' 
+      }).catch(() => {});
     }
-
+    
     setActiveCategory(categoryId);
+    
+    // Update URL to persist the section on refresh
+    setSearchParams({ section: categoryId });
   };
 
   const toggleFavorite = async (storyId: string) => {
@@ -1525,6 +1531,107 @@ const TeenKidsPage = () => {
     }
   };
 
+  const awardEngagementPoints = async (delta: number) => {
+    try {
+      const token = localStorage.getItem('speakbee_auth_token');
+      if (token && token !== 'local-token') {
+        // Use recordQuickAction to award engagement points
+        await TeenApi.recordQuickAction(token, { deltaPoints: delta });
+        // Refresh achievements after points update
+        try {
+          const dashboardData = await TeenApi.getDashboard(token);
+          if (dashboardData && (dashboardData as any).achievements) {
+            setServerAchievements((dashboardData as any).achievements);
+          }
+          // Update points from dashboard response
+          if (dashboardData && ((dashboardData as any).points !== undefined || (dashboardData as any).progress?.points !== undefined)) {
+            const newPoints = (dashboardData as any).points ?? (dashboardData as any).progress?.points ?? 0;
+            setPoints((p) => Math.max(p, newPoints));
+          }
+        } catch (error) {
+          console.warn('Failed to refresh achievements:', error);
+        }
+      }
+      setPoints((p) => p + delta);
+    } catch (error) {
+      console.error('Error awarding engagement points:', error);
+      // Still update locally even if server call fails
+      setPoints((p) => p + delta);
+    }
+  };
+
+  const incrementStreakIfNeeded = async (_source: string) => {
+    try {
+      const today = new Date();
+      const todayKey = today.toDateString();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayKey = yesterday.toDateString();
+      
+      const localKey = `teen_streak_last_engagement_${userId}`;
+      const last = localStorage.getItem(localKey);
+      
+      // Already counted today - don't increment again
+      if (last === todayKey) return;
+
+      const token = localStorage.getItem('speakbee_auth_token');
+      let currentStreak = streak;
+      let newStreak: number;
+      
+      // Calculate new streak based on last practice date
+      if (last === yesterdayKey) {
+        // Continued streak - user practiced yesterday
+        newStreak = Math.max(1, currentStreak) + 1;
+      } else if (!last) {
+        // First time practicing or no record
+        newStreak = Math.max(1, currentStreak);
+      } else {
+        // Streak broken - user didn't practice yesterday (or it's been more than 1 day)
+        newStreak = 1;
+      }
+
+      if (token && token !== 'local-token') {
+        try {
+          const current = await TeenApi.getDashboard(token);
+          currentStreak = (current as any)?.streak ?? (current as any)?.progress?.streak ?? 0;
+          
+          // Recalculate if we have server data
+          const serverLastDate = (current as any)?.details?.engagement?.lastStreakDate;
+          if (serverLastDate === yesterdayKey) {
+            // Continued streak - user practiced yesterday
+            newStreak = Math.max(1, currentStreak) + 1;
+          } else if (serverLastDate === todayKey) {
+            // Already counted today - don't increment
+            return;
+          } else if (!serverLastDate) {
+            // No server record - use calculated value
+            newStreak = Math.max(1, currentStreak);
+          } else {
+            // Streak broken
+            newStreak = 1;
+          }
+          
+          // Use recordQuickAction to update streak (TeenApi doesn't have direct updateProgress)
+          // The streak will be updated via getDashboard on next load
+          // For now, we'll track it locally and it will sync on next dashboard fetch
+        } catch (error: any) {
+          // If 401, token may be invalid - but don't clear it automatically
+          if (error?.message?.includes('token not valid') || error?.message?.includes('401')) {
+            console.warn('Token validation failed during streak update, using local storage. User session preserved.');
+          } else {
+            throw error;
+          }
+        }
+      }
+      
+      // Always update local storage
+      localStorage.setItem(localKey, todayKey);
+      setStreak(newStreak);
+    } catch (error) {
+      console.error('Error updating streak:', error);
+    }
+  };
+
   const handleAuthSuccess = () => {
     setShowAuthModal(false);
   };
@@ -1550,9 +1657,11 @@ const TeenKidsPage = () => {
               <Target className="h-8 w-8 text-primary" />
           </div>
             <div className="space-y-2">
-              <h1 className="text-3xl font-semibold text-foreground">Teen Explorer Zone</h1>
+              <h1 className="text-3xl font-semibold text-foreground">
+                Little Learners
+              </h1>
               <p className="text-base text-muted-foreground">
-                Advanced missions, debate-ready vocabulary, and professional speaking practice. Sign in to keep leveling up.
+                Magical stories, fun games, and exciting adventures for young minds. Sign in to keep learning where you left off.
               </p>
             </div>
             <Button onClick={() => setShowAuthModal(true)} size="lg" className="w-full">
@@ -1582,8 +1691,8 @@ const TeenKidsPage = () => {
               <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                 <div className="space-y-4 lg:max-w-2xl">
                   <div className="flex flex-wrap items-center gap-3">
-                    <Badge className="rounded-full bg-white/20 text-white uppercase tracking-wide">
-                      Teen Learners
+                    <Badge className="bg-white/25 text-white uppercase tracking-wide">
+                      Little Learners
                     </Badge>
                     <SyncStatusIndicator showDetails={false} className="bg-white/20 text-white backdrop-blur-sm" />
                     <Badge className="rounded-full bg-white/20 text-white">
@@ -1600,16 +1709,16 @@ const TeenKidsPage = () => {
                       )}
                     </Badge>
                     {isInitializing && (
-                      <Badge className="rounded-full bg-white/10 text-white">
-                        Initialising teen environment…
+                      <Badge className="bg-white/10 text-white">
+                        Initialising learning environment…
                       </Badge>
                     )}
         </div>
                   <CardTitle className="text-3xl md:text-4xl font-semibold text-white leading-tight">
-                    Modern English experiences for future leaders
+                    Magical stories, fun games, and exciting adventures for young minds
                   </CardTitle>
                   <CardDescription className="text-white/85 text-base md:text-lg leading-relaxed">
-                    Dive into mission-based stories, advanced vocabulary labs, and professional speaking practice designed for confident teens.
+                    Explore personalised lessons, practise new words, and celebrate progress with a calm, app-like experience made for young learners and their grown-ups.
                   </CardDescription>
         </div>
                 <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 sm:flex-nowrap">
@@ -1627,9 +1736,9 @@ const TeenKidsPage = () => {
                     size="icon"
                     onClick={() => setIsMusicEnabled((prev) => !prev)}
                     className="rounded-full bg-white/15 text-white hover:bg-white/25 focus-visible:ring-offset-0"
-                    title={isMusicEnabled ? 'Pause ambient sound' : 'Play ambient sound'}
+                    title={isMusicEnabled ? 'Pause background music' : 'Play background music'}
                   >
-                    <Headphones className="h-5 w-5" />
+                    <Music className="h-5 w-5" />
             </Button>
             <Button
               variant="ghost"
@@ -1638,16 +1747,16 @@ const TeenKidsPage = () => {
                     className="rounded-full bg-white/15 text-white hover:bg-white/25"
                     title="Show quick tips"
                   >
-                    <BookOpen className="h-5 w-5" />
+                    <HelpCircle className="h-5 w-5" />
             </Button>
           </div>
             </div>
               {showHelp && (
-                <Card className="bg-white/80 text-slate-900 backdrop-blur-md shadow-lg lg:absolute lg:right-6 lg:top-6 lg:max-w-sm">
+                <Card className="bg-white/80 text-slate-800 backdrop-blur-md shadow-lg md:absolute md:right-6 md:top-6 md:max-w-xs">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base font-semibold text-slate-900">Quick tips</CardTitle>
                     <CardDescription className="text-sm text-slate-600">
-                      Complete stories to unlock curated vocabulary and speaking labs. Track your streak to secure elite certificates.
+                      Tap a tile to start learning. Stories unlock new words and phrases automatically.
                     </CardDescription>
                   </CardHeader>
                 </Card>
@@ -1659,33 +1768,31 @@ const TeenKidsPage = () => {
         <section className="space-y-4">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-lg font-semibold text-foreground">Progress snapshot</h2>
-            <span className="text-sm text-muted-foreground">Teen metrics update automatically</span>
-            </div>
+            <span className="text-sm text-muted-foreground">
+              Updated continuously while you learn
+            </span>
+          </div>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
             <Card className="shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Achievement Points ✨</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">Sparkle points</CardTitle>
                 <Trophy className="h-5 w-5 text-amber-500" />
               </CardHeader>
               <CardContent className="space-y-2">
                 <p className="text-3xl font-semibold text-foreground">{points}</p>
-                <p className="text-sm text-muted-foreground">
-                  Earned exclusively from teen missions, vocabulary labs, speaking practice, and challenge arenas.
-              </p>
-            </CardContent>
-          </Card>
+                <p className="text-sm text-muted-foreground">Earn points by starting stories, practising words, and playing games.</p>
+              </CardContent>
+            </Card>
             <Card className="shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Learning Streak 🔥</CardTitle>
-                <Target className="h-5 w-5 text-emerald-500" />
+                <CardTitle className="text-sm font-medium text-muted-foreground">Daily streak</CardTitle>
+                <Zap className="h-5 w-5 text-emerald-500" />
               </CardHeader>
               <CardContent className="space-y-2">
                 <p className="text-3xl font-semibold text-foreground">{streak} days</p>
-                <p className="text-sm text-muted-foreground">
-                  Stay consistent with teen-focused practice to unlock elite certificates and badges.
-              </p>
-            </CardContent>
-          </Card>
+                <p className="text-sm text-muted-foreground">Keep learning every day to unlock exclusive character rewards.</p>
+              </CardContent>
+            </Card>
             <Card className="shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">Practice Time</CardTitle>
@@ -1699,12 +1806,12 @@ const TeenKidsPage = () => {
                     `${Math.round(categoryProgress?.practice_time_minutes || 0)} mins`
                   )}
                 </p>
-                <p className="text-sm text-muted-foreground">Time spent on missions, vocabulary labs, and speaking practice.</p>
+                <p className="text-sm text-muted-foreground">Time spent practicing stories, words, and pronunciation.</p>
               </CardContent>
             </Card>
             <Card className="shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Missions Completed</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">Stories Completed</CardTitle>
                 <BookOpen className="h-5 w-5 text-emerald-500" />
               </CardHeader>
               <CardContent className="space-y-2">
@@ -1715,18 +1822,18 @@ const TeenKidsPage = () => {
                     categoryProgress?.stories_completed || categoryProgress?.lessons_completed || 0
                   )}
                 </p>
-                <p className="text-sm text-muted-foreground">Story missions completed in your learning journey.</p>
+                <p className="text-sm text-muted-foreground">Adventures completed in your learning journey.</p>
               </CardContent>
             </Card>
             <Card className="shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Advanced Achievements 🏆</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">Achievements</CardTitle>
                 <Award className="h-5 w-5 text-sky-500" />
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-baseline gap-2">
                   <p className="text-3xl font-semibold text-foreground">{completedAchievements}</p>
-                  <p className="text-sm text-muted-foreground">of {achievements.length} unlocked</p>
+                  <p className="text-sm text-muted-foreground">of {achievements.length} milestones</p>
               </div>
                 <Progress value={(completedAchievements / achievements.length) * 100} />
             </CardContent>
@@ -1737,7 +1844,9 @@ const TeenKidsPage = () => {
         <section className="space-y-6">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-lg font-semibold text-foreground">Learning hub</h2>
-            <p className="text-sm text-muted-foreground">Switch between story campaigns, vocabulary labs, speaking practice, and challenge games.</p>
+            <p className="text-sm text-muted-foreground">
+              Switch between stories, practice, and games at any time.
+            </p>
           </div>
           <Tabs value={activeCategory} onValueChange={handleCategoryClick} className="space-y-6">
             <TabsList className="flex w-full gap-2 overflow-x-auto rounded-xl bg-muted/40 p-1 backdrop-blur sm:grid sm:grid-cols-4 sm:overflow-visible sm:bg-transparent sm:p-0">
@@ -1748,7 +1857,7 @@ const TeenKidsPage = () => {
                   className="min-w-[160px] rounded-lg px-3 py-2 text-sm font-semibold transition data-[state=active]:bg-background data-[state=active]:shadow sm:min-w-0"
                 >
                   <span className="mr-2 text-lg">{category.emoji}</span>
-                    {category.label}
+                  {category.label}
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -1931,17 +2040,17 @@ const TeenKidsPage = () => {
               {vocabularyWordsToUse.length === 0 ? (
                 <Card className="border-dashed">
                   <CardHeader>
-                    <CardTitle className="text-lg font-semibold text-foreground">Unlock advanced vocabulary</CardTitle>
+                    <CardTitle className="text-lg font-semibold text-foreground">Unlock word games</CardTitle>
                     <CardDescription className="text-sm text-muted-foreground">
-                      Finish teen story missions to automatically add their vocabulary here.
+                      Complete stories to automatically add their vocabulary here.
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <Button onClick={() => handleCategoryClick('stories')} variant="default">
-                      Browse missions
+                      Browse stories
                     </Button>
                     <p className="text-sm text-muted-foreground">
-                      Words appear instantly once you complete a teen story.
+                      Words unlock instantly once you complete a story.
                     </p>
                   </CardContent>
                 </Card>
@@ -1949,11 +2058,11 @@ const TeenKidsPage = () => {
                 <div className="space-y-4">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-center gap-3">
-                      <Brain className="h-5 w-5 text-primary" />
+                      <Zap className="h-5 w-5 text-primary" />
                     <div>
-                        <h3 className="text-base font-semibold text-foreground">Words from your teen missions</h3>
+                        <h3 className="text-base font-semibold text-foreground">Word games</h3>
                         <p className="text-sm text-muted-foreground">
-                          {vocabularyWordsToUse.length} advanced words available for practice
+                          {vocabularyWordsToUse.length} words ready for practice
                       </p>
                     </div>
                   </div>
@@ -2023,8 +2132,9 @@ const TeenKidsPage = () => {
                             pointsAwarded: 25,
                           }),
                         () => {
-                          setPoints((prev) => prev + 25);
+                          awardEngagementPoints(25);
                           localStorage.setItem(wordPointsKey, 'true');
+                          incrementStreakIfNeeded('vocabulary');
                           // Clear category progress cache so Profile page shows updated data
                           MultiCategoryProgressService.clearCache();
                         }
@@ -2055,17 +2165,17 @@ const TeenKidsPage = () => {
               {pronunciationItems.length === 0 ? (
                 <Card className="border-dashed">
                   <CardHeader>
-                    <CardTitle className="text-lg font-semibold text-foreground">Unlock the speaking lab</CardTitle>
+                    <CardTitle className="text-lg font-semibold text-foreground">Unlock speak & repeat</CardTitle>
                     <CardDescription className="text-sm text-muted-foreground">
-                      Complete teen stories to add their debate-worthy phrases here.
+                      Complete stories to add their phrases here.
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <Button onClick={() => handleCategoryClick('stories')} variant="default">
-                      Complete a mission
+                      Browse stories
                     </Button>
                     <p className="text-sm text-muted-foreground">
-                      Phrases unlock instantly after each adventure.
+                      Phrases unlock instantly once you complete a story.
                     </p>
                   </CardContent>
                 </Card>
@@ -2075,9 +2185,9 @@ const TeenKidsPage = () => {
                   <div className="flex items-center gap-3">
                       <Mic className="h-5 w-5 text-primary" />
                     <div>
-                        <h3 className="text-base font-semibold text-foreground">Professional speaking studio</h3>
+                        <h3 className="text-base font-semibold text-foreground">Speak & repeat studio</h3>
                         <p className="text-sm text-muted-foreground">
-                          {pronunciationItems.length} advanced phrases ready for practice
+                          {pronunciationItems.length} phrases ready for practice
                       </p>
                     </div>
                   </div>
@@ -2144,11 +2254,12 @@ const TeenKidsPage = () => {
                             storyId: phraseDetail?.storyId,
                             storyTitle: phraseDetail?.storyTitle,
                             score: 100,
-                            pointsAwarded: 35,
+                            pointsAwarded: 30,
                           }),
                         () => {
-                          setPoints((prev) => prev + 35);
+                          awardEngagementPoints(30);
                           localStorage.setItem(phrasePointsKey, 'true');
+                          incrementStreakIfNeeded('pronunciation');
                           // Clear category progress cache so Profile page shows updated data
                           MultiCategoryProgressService.clearCache();
                         }
@@ -2178,9 +2289,9 @@ const TeenKidsPage = () => {
             <TabsContent value="games" className="mt-0">
               <Card className="shadow-sm">
                 <CardHeader>
-                  <CardTitle className="text-lg font-semibold text-foreground">Interactive challenges</CardTitle>
+                  <CardTitle className="text-lg font-semibold text-foreground">Interactive games</CardTitle>
                   <CardDescription className="text-sm text-muted-foreground">
-                    Reinforce debate, storytelling, and critical thinking with high-energy mini games built for teens.
+                    Reinforce new skills with quick mini-games designed for short learning bursts.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -2193,8 +2304,10 @@ const TeenKidsPage = () => {
 
         <section className="space-y-4">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <h2 className="text-lg font-semibold text-foreground">Achievement roadmap</h2>
-            <p className="text-sm text-muted-foreground">Collect badges as you lead missions, master vocabulary, and speak with confidence.</p>
+            <h2 className="text-lg font-semibold text-foreground">Achievements</h2>
+            <p className="text-sm text-muted-foreground">
+              Collect badges as you explore stories, words, and games.
+            </p>
           </div>
           <Card className="shadow-sm">
             <CardContent className="space-y-4 p-6">
@@ -2242,21 +2355,21 @@ const TeenKidsPage = () => {
                 <div className="space-y-2">
                   <div className="flex items-center gap-3">
                     <Volume2 className="h-5 w-5 text-emerald-500" />
-                    <p className="text-sm font-semibold text-foreground">Listening lab</p>
+                    <p className="text-sm font-semibold text-foreground">Listen & repeat</p>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Jump straight into pronunciation recap for your unlocked teen phrases.
+                    Jump straight into pronunciation practice for unlocked phrases.
                   </p>
                 </div>
-            <Button 
+                <Button
                   variant="secondary"
-                  onClick={() => {
-                handleCategoryClick('pronunciation');
-                setSearchParams({ section: 'pronunciation' }, { replace: true });
+                  onClick={async () => {
+                    handleCategoryClick('pronunciation');
+                    setSearchParams({ section: 'pronunciation' }, { replace: true });
                   }}
                 >
                   Start practising
-            </Button>
+                </Button>
               </CardContent>
             </Card>
 
@@ -2268,18 +2381,18 @@ const TeenKidsPage = () => {
                     <p className="text-sm font-semibold text-foreground">Speak now</p>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Record a concise pitch to keep your streak alive and earn speaking badges.
+                    Record a quick pronunciation check-in to keep your streak alive.
                   </p>
                 </div>
-            <Button 
+                <Button
                   variant="secondary"
-                  onClick={() => {
-                handleCategoryClick('vocabulary');
-                setSearchParams({ section: 'vocabulary' }, { replace: true });
+                  onClick={async () => {
+                    handleCategoryClick('vocabulary');
+                    setSearchParams({ section: 'vocabulary' }, { replace: true });
                   }}
                 >
                   Open studio
-            </Button>
+                </Button>
               </CardContent>
             </Card>
 
@@ -2288,20 +2401,22 @@ const TeenKidsPage = () => {
                 <div className="space-y-2">
                   <div className="flex items-center gap-3">
                     <Heart className="h-5 w-5 text-rose-500" />
-                    <p className="text-sm font-semibold text-foreground">Favourite missions</p>
+                    <p className="text-sm font-semibold text-foreground">Favourite stories</p>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Review and launch the teen adventures you've saved for quick replay.
+                    Review and launch adventures you've saved for quick access.
                   </p>
                 </div>
-            <Button 
+                <Button
                   variant="secondary"
-                  onClick={() => {
-                    navigate('/favorites');
+                  onClick={async () => {
+                    await awardEngagementPoints(5);
+                    await incrementStreakIfNeeded('quick-favorites');
+                    navigate('/favorites/teen');
                   }}
                 >
                   View favourites
-            </Button>
+                </Button>
               </CardContent>
             </Card>
 
@@ -2313,22 +2428,20 @@ const TeenKidsPage = () => {
                     <p className="text-sm font-semibold text-foreground">Certificates</p>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Download personalised certificates that recognise your teen achievements.
+                    Download personalised completion certificates to celebrate milestones.
                   </p>
                 </div>
-            <Button 
+                <Button
                   variant="secondary"
-              onClick={() => {
+                  onClick={() => {
                     try {
                       sessionStorage.setItem('speakbee_certificates_audience', 'teen');
-                    } catch {
-                      // ignore
-                    }
+                    } catch {}
                     navigate('/certificates', { state: { audience: 'teen' } });
                   }}
                 >
                   Open certificates
-            </Button>
+                </Button>
               </CardContent>
             </Card>
           </div>
