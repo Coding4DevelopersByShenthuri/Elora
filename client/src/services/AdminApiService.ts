@@ -205,12 +205,14 @@ export const AdminAPI = {
     } catch (error: any) {
       // Handle 401 Unauthorized specifically
       if (error?.response?.status === 401) {
-        // Clear invalid token
-        localStorage.removeItem('speakbee_auth_token');
+        // Clear admin flag but preserve auth token to prevent unwanted logout
+        // The token might still be valid for regular user operations
+        // Only clear token if it's explicitly invalidated by the server
         localStorage.removeItem('speakbee_is_admin');
+        console.warn('Admin access denied - clearing admin flag but preserving user session');
         return {
           success: false,
-          message: 'Authentication expired. Please log in again.',
+          message: 'Admin access expired. Please log in again.',
           error: error,
           requiresLogin: true
         };

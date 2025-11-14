@@ -307,15 +307,16 @@ class RealTimeDataServiceClass {
           try {
             serverProgress = await KidsApi.getProgress(token);
           } catch (error: unknown) {
-            // If 401, token is invalid - clear it and fallback to local
+            // If 401, token may be invalid - but don't clear it automatically
+            // This prevents unwanted logouts during page refresh
+            // Just log the error and fallback to local data
             if (typeof error === 'object' && error !== null && 'message' in error && typeof (error as { message: unknown }).message === 'string') {
               const msg = (error as { message: string }).message;
               if (msg.includes('token not valid') || msg.includes('401')) {
-                localStorage.removeItem('speakbee_auth_token');
-                console.warn('[RealTimeData] Token expired, falling back to local progress');
+                console.warn('[RealTimeData] Token validation failed, falling back to local progress. User session preserved.');
               }
             }
-            // Fallback to local for any error
+            // Fallback to local for any error - preserve user session
           }
         }
         

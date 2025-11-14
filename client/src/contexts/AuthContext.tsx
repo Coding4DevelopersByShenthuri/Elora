@@ -72,24 +72,32 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const token = localStorage.getItem('speakbee_auth_token');
     const userData = localStorage.getItem('speakbee_current_user');
     
-    if (token && token !== 'local-token' && userData) {
-      try {
-        const parsedUser = JSON.parse(userData);
-        setUser(parsedUser);
-        
-        // Sync with server if online (non-blocking, won't fail app if server unavailable)
-        // Only sync once on mount, not on every online status change
-        if (navigator.onLine && token !== 'local-token') {
-          syncWithServerInternal().catch(err => {
-            console.log('Server sync failed - continuing with local data:', err);
-            // Don't logout on sync failure - preserve user session
-          });
+    if (token && token !== 'local-token') {
+      // If we have userData, restore it immediately
+      if (userData) {
+        try {
+          const parsedUser = JSON.parse(userData);
+          setUser(parsedUser);
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+          // If parsing fails, try to fetch from server instead
+          // Don't clear token - might be valid
         }
-      } catch (error) {
-        console.error('Error parsing user data:', error);
-        // Don't logout on parse error - could be temporary issue
+      }
+      
+      // Sync with server if online (non-blocking, won't fail app if server unavailable)
+      // This will restore user data if userData was missing or invalid
+      // Only sync once on mount, not on every online status change
+      if (navigator.onLine && token !== 'local-token') {
+        syncWithServerInternal().catch(err => {
+          console.log('Server sync failed - continuing with local data:', err);
+          // Don't logout on sync failure - preserve user session
+          // If userData was missing and sync failed, user will remain logged out
+          // but token is preserved for next successful sync
+        });
       }
     } else if (token === 'local-token') {
+      // Clean up local-token (offline-only token)
       localStorage.removeItem('speakbee_auth_token');
       localStorage.removeItem('speakbee_current_user');
       setUser(null);
@@ -304,7 +312,34 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         } : undefined;
 
         setUser(prev => {
-          if (!prev) return null;
+          // If prev is null, create new user from server data
+          // This handles the case where userData was missing on mount
+          if (!prev) {
+            const newUser: User = {
+              id: userData.id.toString(),
+              username: userData.username,
+              email: userData.email,
+              name: userData.name,
+              createdAt: userData.date_joined || new Date().toISOString(),
+              lastLogin: userData.last_login || new Date().toISOString(),
+              profile: {
+                level: userData.profile?.level || 'beginner',
+                points: userData.profile?.points || 0,
+                streak: userData.profile?.current_streak || 0,
+                avatar: userData.profile?.avatar
+              },
+              surveyData: serverSurveyData,
+              is_staff: userData.is_staff,
+              is_superuser: userData.is_superuser
+            };
+            
+            // Update localStorage with fresh user data
+            localStorage.setItem('speakbee_current_user', JSON.stringify(newUser));
+            
+            return newUser;
+          }
+          
+          // Update existing user with server data
           const updatedUser = {
             ...prev,
             profile: {

@@ -316,15 +316,16 @@ const YoungKidsPage = () => {
           try {
             serverProgress = await KidsApi.getProgress(token);
           } catch (error: unknown) {
-            // If 401, token is invalid - clear it and fallback to local
+            // If 401, token may be invalid - but don't clear it automatically
+            // This prevents unwanted logouts during page refresh
+            // Just log the error and fallback to local data
             if (typeof error === 'object' && error !== null && 'message' in error && typeof (error as { message: unknown }).message === 'string') {
               const msg = (error as { message: string }).message;
               if (msg.includes('token not valid') || msg.includes('401')) {
-                localStorage.removeItem('speakbee_auth_token');
-                console.warn('Token expired, falling back to local progress');
+                console.warn('Token validation failed, falling back to local progress. User session preserved.');
               }
             }
-            // Fallback to local for any error
+            // Fallback to local for any error - preserve user session
           }
         }
         
@@ -1530,10 +1531,11 @@ const YoungKidsPage = () => {
           details.engagement.source = source;
           await KidsApi.updateProgress(token, { streak: newStreak, details });
         } catch (error: any) {
-          // If 401, token is invalid - fallback to local
+          // If 401, token may be invalid - but don't clear it automatically
+          // This prevents unwanted logouts during page refresh
+          // Just log the error and continue with local update
           if (error?.message?.includes('token not valid') || error?.message?.includes('401')) {
-            localStorage.removeItem('speakbee_auth_token');
-            console.warn('Token expired during streak update, using local storage');
+            console.warn('Token validation failed during streak update, using local storage. User session preserved.');
             // Continue with local update
           } else {
             throw error; // Re-throw other errors
