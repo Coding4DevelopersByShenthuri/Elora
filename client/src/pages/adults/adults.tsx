@@ -827,7 +827,7 @@ const AdultsPage = () => {
                   <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 backdrop-blur-sm">
                     <ThumbsUp className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white" />
                   </div>
-                  <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Continue Your Progress</h3>
+                  <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-white">Continue Your Progress</h3>
                   <p className="text-cyan-100 text-sm sm:text-base md:text-lg mb-4 sm:mb-6 leading-relaxed">
                     Based on your learning pattern, we recommend advancing with professional communication skills
                   </p>

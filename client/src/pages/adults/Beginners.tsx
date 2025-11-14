@@ -409,7 +409,7 @@ const BeginnersPage = () => {
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        className="w-full border-cyan-400/30 text-cyan-300 hover:bg-cyan-500/20 hover:border-cyan-400/50 transition-all duration-300"
+                        className="w-full border-cyan-400/30 text-black hover:bg-cyan-500/20 hover:border-cyan-400/50 transition-all duration-300"
                       >
                         Start Exercise
                         <ArrowRight className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
@@ -569,7 +569,7 @@ const BeginnersPage = () => {
                 <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 backdrop-blur-sm">
                   <TrendingUp className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white" />
                 </div>
-                <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Excellent Progress!</h3>
+                <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-white">Excellent Progress!</h3>
                 <p className="text-cyan-100 text-sm sm:text-base md:text-lg mb-4 sm:mb-6 leading-relaxed px-2">
                   Your consistent effort is building a strong foundation for English mastery. 
                   Continue with daily practice to accelerate your learning journey.

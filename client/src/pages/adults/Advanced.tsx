@@ -712,7 +712,7 @@ const AdvancedPage = () => {
                 <div className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 backdrop-blur-sm">
                   <Medal className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 text-white" />
                 </div>
-                <h3 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">Expert English Certification</h3>
+                <h3 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-white">Expert English Certification</h3>
                 <p className="text-purple-100 text-sm sm:text-base md:text-lg mb-6 sm:mb-8 leading-relaxed max-w-2xl mx-auto px-2">
                   Earn professional recognition by demonstrating near-native fluency, executive communication skills, and sophisticated cultural intelligence
                 </p>
