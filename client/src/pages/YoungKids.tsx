@@ -2434,6 +2434,12 @@ const YoungKidsPage = () => {
                             attempts: (details.vocabulary[word]?.attempts || 0) + 1
                           };
                           await KidsApi.updateProgress(token, { details });
+                          
+                          // Update progressDetails for achievement calculations
+                          setProgressDetails((prev: any) => ({
+                            ...prev,
+                            vocabulary: { ...prev.vocabulary, [word]: details.vocabulary[word] }
+                          }));
                         } else {
                           await KidsProgressService.update(userId, (p) => {
                             const anyP: any = p as any;
@@ -2443,6 +2449,13 @@ const YoungKidsPage = () => {
                               bestScore: 100,
                               attempts: (details.vocabulary[word]?.attempts || 0) + 1
                             };
+                            
+                            // Update progressDetails for achievement calculations
+                            setProgressDetails((prev: any) => ({
+                              ...prev,
+                              vocabulary: { ...prev.vocabulary, [word]: details.vocabulary[word] }
+                            }));
+                            
                             return { ...p, details } as any;
                           });
                         }
@@ -2560,6 +2573,12 @@ const YoungKidsPage = () => {
                             attempts: (details.pronunciation[phrase]?.attempts || 0) + 1
                           };
                           await KidsApi.updateProgress(token, { details });
+                          
+                          // Update progressDetails for achievement calculations
+                          setProgressDetails((prev: any) => ({
+                            ...prev,
+                            pronunciation: { ...prev.pronunciation, [phrase]: details.pronunciation[phrase] }
+                          }));
                         } else {
                           await KidsProgressService.update(userId, (p) => {
                             const anyP: any = p as any;
@@ -2569,6 +2588,13 @@ const YoungKidsPage = () => {
                               bestScore: 100,
                               attempts: (details.pronunciation[phrase]?.attempts || 0) + 1
                             };
+                            
+                            // Update progressDetails for achievement calculations
+                            setProgressDetails((prev: any) => ({
+                              ...prev,
+                              pronunciation: { ...prev.pronunciation, [phrase]: details.pronunciation[phrase] }
+                            }));
+                            
                             return { ...p, details } as any;
                           });
                         }

@@ -415,7 +415,9 @@ const CertificatesPage = () => {
         'ai-ethics-explorer', 'digital-security-guardian'];
       const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
         'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
-        'rainbow-castle', 'jungle-explorer'];
+        'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
+        'magic-school', 'ocean-explorer', 'time-machine', 'friendly-robot',
+        'secret-cave', 'flying-carpet', 'lost-kingdom', 'grand-adventure'];
       
       const targetStoryIds = isTeenKids ? teenStoryIds : youngStoryIds;
       const enrolledStories = StoryWordsService.getEnrolledStories(userId);
@@ -497,15 +499,17 @@ const CertificatesPage = () => {
       title: isTeenKids ? 'Advanced Story Champion' : 'Story Time Champion',
       emoji: '📚',
       badgeSrc: '/story-time-champion-badge.png',
-      description: isTeenKids ? 'Completed 10 advanced teen stories' : 'Completed 10 stories',
+      description: isTeenKids ? 'Completed 10 advanced teen stories' : 'Completed 20 stories',
       criteria: (c) => {
         // For YoungKids, use category progress stories_completed (matches Progress snapshot)
+        // YoungKids has 20 stories total, TeenKids has 10
         if (!isTeenKids && c.categoryProgress) {
           const completedCount = c.categoryProgress.stories_completed || 0;
-          const total = Math.min(completedCount, 10);
-          const progress = Math.min(100, Math.round((total / 10) * 100));
-          const eligible = total >= 10;
-          const hint = eligible ? 'Ready to download!' : `Stories: ${total}/10 completed`;
+          const targetCount = 20; // YoungKids has 20 stories
+          const total = Math.min(completedCount, targetCount);
+          const progress = Math.min(100, Math.round((total / targetCount) * 100));
+          const eligible = total >= targetCount;
+          const hint = eligible ? 'Ready to download!' : `Stories: ${total}/${targetCount} completed`;
           return { progress, eligible, hint };
         }
         
@@ -518,7 +522,9 @@ const CertificatesPage = () => {
           'ai-ethics-explorer', 'digital-security-guardian'];
         const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
           'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
-          'rainbow-castle', 'jungle-explorer'];
+          'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
+          'magic-school', 'ocean-explorer', 'time-machine', 'friendly-robot',
+          'secret-cave', 'flying-carpet', 'lost-kingdom', 'grand-adventure'];
         
         let completedStories = storyEnrollments.filter((s: any) => 
           s.completed === true && s.wordsExtracted === true
@@ -552,17 +558,19 @@ const CertificatesPage = () => {
           
           // Use the maximum of both sources
           const total = Math.max(completedCount, fullyCompleted.length);
+          const targetCount = isTeenKids ? 10 : 20; // YoungKids has 20 stories, TeenKids has 10
           
-          const progress = Math.min(100, Math.round((Math.min(total, 10) / 10) * 100));
-          const eligible = total >= 10;
-          const hint = eligible ? 'Ready to download!' : `Stories: ${Math.min(total, 10)}/10 completed`;
+          const progress = Math.min(100, Math.round((Math.min(total, targetCount) / targetCount) * 100));
+          const eligible = total >= targetCount;
+          const hint = eligible ? 'Ready to download!' : `Stories: ${Math.min(total, targetCount)}/${targetCount} completed`;
           return { progress, eligible, hint };
         } catch {
           // Fallback to details only
           const total = completedCount;
-          const progress = Math.min(100, Math.round((Math.min(total, 10) / 10) * 100));
-          const eligible = total >= 10;
-          const hint = eligible ? 'Ready to download!' : `Stories: ${Math.min(total, 10)}/10 completed`;
+          const targetCount = isTeenKids ? 10 : 20; // YoungKids has 20 stories, TeenKids has 10
+          const progress = Math.min(100, Math.round((Math.min(total, targetCount) / targetCount) * 100));
+          const eligible = total >= targetCount;
+          const hint = eligible ? 'Ready to download!' : `Stories: ${Math.min(total, targetCount)}/${targetCount} completed`;
           return { progress, eligible, hint };
         }
       }
@@ -592,7 +600,9 @@ const CertificatesPage = () => {
           'ai-ethics-explorer', 'digital-security-guardian'];
         const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
           'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
-          'rainbow-castle', 'jungle-explorer'];
+          'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
+          'magic-school', 'ocean-explorer', 'time-machine', 'friendly-robot',
+          'secret-cave', 'flying-carpet', 'lost-kingdom', 'grand-adventure'];
         
         // Only count phrases from completed stories
         const targetStoryIds = isTeenKids ? teenStoryIds : youngStoryIds;
@@ -664,7 +674,9 @@ const CertificatesPage = () => {
           'ai-ethics-explorer', 'digital-security-guardian'];
         const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
           'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
-          'rainbow-castle', 'jungle-explorer'];
+          'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
+          'magic-school', 'ocean-explorer', 'time-machine', 'friendly-robot',
+          'secret-cave', 'flying-carpet', 'lost-kingdom', 'grand-adventure'];
         
         // Only count words from completed stories
         const targetStoryIds = isTeenKids ? teenStoryIds : youngStoryIds;
@@ -826,7 +838,9 @@ const CertificatesPage = () => {
           'ai-ethics-explorer', 'digital-security-guardian'];
         const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
           'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
-          'rainbow-castle', 'jungle-explorer'];
+          'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
+          'magic-school', 'ocean-explorer', 'time-machine', 'friendly-robot',
+          'secret-cave', 'flying-carpet', 'lost-kingdom', 'grand-adventure'];
         
         const targetStoryIds = isTeenKids ? teenStoryIds : youngStoryIds;
         const completedStories = enrolledStories.filter(e => 
@@ -884,7 +898,9 @@ const CertificatesPage = () => {
           'ai-ethics-explorer', 'digital-security-guardian'];
         const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
           'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
-          'rainbow-castle', 'jungle-explorer'];
+          'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
+          'magic-school', 'ocean-explorer', 'time-machine', 'friendly-robot',
+          'secret-cave', 'flying-carpet', 'lost-kingdom', 'grand-adventure'];
         
         const targetStoryIds = isTeenKids ? teenStoryIds : youngStoryIds;
         const enrolledStories = StoryWordsService.getEnrolledStories(userId);
@@ -949,7 +965,9 @@ const CertificatesPage = () => {
           'ai-ethics-explorer', 'digital-security-guardian'];
         const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
           'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
-          'rainbow-castle', 'jungle-explorer'];
+          'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
+          'magic-school', 'ocean-explorer', 'time-machine', 'friendly-robot',
+          'secret-cave', 'flying-carpet', 'lost-kingdom', 'grand-adventure'];
         
         const targetStoryIds = isTeenKids ? teenStoryIds : youngStoryIds;
         const enrolledStories = StoryWordsService.getEnrolledStories(userId);
@@ -1034,7 +1052,7 @@ const CertificatesPage = () => {
   const trophySpecs = useMemo(() => {
     const storyMasterDesc = isTeenKids 
       ? 'All 10 teen stories at ≥80' 
-      : 'All 10 young stories at ≥80';
+      : 'All 20 young stories at ≥80';
     return [
       { id: 'consistency-hero', title: 'Consistency Hero', emoji: '🔥', desc: 'Maintain a 21-day learning streak', badgeSrc: '/Consistency_badge.png' },
       { id: 'story-master', title: 'Story Master', emoji: '📖', desc: storyMasterDesc, badgeSrc: '/story-time-champion-badge.png' },
@@ -1069,7 +1087,9 @@ const CertificatesPage = () => {
         // Filter by story type (young vs teen)
         const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
           'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
-          'rainbow-castle', 'jungle-explorer'];
+          'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
+          'magic-school', 'ocean-explorer', 'time-machine', 'friendly-robot',
+          'secret-cave', 'flying-carpet', 'lost-kingdom', 'grand-adventure'];
         const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
           'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
           'ai-ethics-explorer', 'digital-security-guardian'];
@@ -1095,9 +1115,8 @@ const CertificatesPage = () => {
       }
     }
     if (t.id === 'pronunciation-pro') {
-      // For YoungKids, use category progress pronunciation_attempts (matches Progress snapshot)
+      // For YoungKids, count unique phrases practiced (not total attempts)
       if (!isTeenKids && categoryProgress) {
-        const attempts = categoryProgress.pronunciation_attempts || 0;
         // Get total available phrases from enrolled stories
         const enrolledStories = StoryWordsService.getEnrolledStories(userId);
         const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
@@ -1115,12 +1134,33 @@ const CertificatesPage = () => {
         const totalPhrases = completedStoryIds.length > 0
           ? StoryWordsService.getPhrasesForStoryIdsByAge(completedStoryIds, 'young').length
           : 0;
-        // Estimate average score (can be improved if we track it in category progress)
-        const avg = 75; // Default estimate
+        
         if (totalPhrases === 0) return 0;
-        const attemptsPct = Math.min(attempts, totalPhrases) / totalPhrases;
+        
+        // Count unique phrases practiced from pronunciation details
+        const pron = d.pronunciation || {};
+        const enrolledPhrases = completedStoryIds.length > 0
+          ? StoryWordsService.getPhrasesForStoryIdsByAge(completedStoryIds, 'young')
+          : [];
+        const enrolledPhraseSet = new Set(enrolledPhrases.map(p => p.phrase.toLowerCase()));
+        
+        // Count unique phrases practiced (filtered to only enrolled phrases)
+        const practicedPhrases = Object.keys(pron).filter(phrase => 
+          enrolledPhraseSet.has(phrase.toLowerCase())
+        ).length;
+        
+        // Calculate average score from practiced phrases
+        const practicedPhraseEntries = Object.entries(pron).filter(([phrase]) => 
+          enrolledPhraseSet.has(phrase.toLowerCase())
+        );
+        const avg = practicedPhraseEntries.length > 0
+          ? practicedPhraseEntries.reduce((sum, [, data]: any[]) => sum + (data.bestScore || 0), 0) / practicedPhraseEntries.length
+          : 0;
+        
+        // Progress is based on unique phrases practiced out of total, and average score
+        const phrasesPct = practicedPhrases / totalPhrases;
         const avgTo80Pct = Math.min(Math.max(avg, 0), 80) / 80;
-        return Math.round(Math.min(attemptsPct, avgTo80Pct) * 100);
+        return Math.round(Math.min(phrasesPct, avgTo80Pct) * 100);
       }
       
       const pron = d.pronunciation || {};
@@ -1129,7 +1169,9 @@ const CertificatesPage = () => {
         'ai-ethics-explorer', 'digital-security-guardian'];
       const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
         'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
-        'rainbow-castle', 'jungle-explorer'];
+        'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
+        'magic-school', 'ocean-explorer', 'time-machine', 'friendly-robot',
+        'secret-cave', 'flying-carpet', 'lost-kingdom', 'grand-adventure'];
       
       // Only count phrases from completed stories
       const targetStoryIds = isTeenKids ? teenStoryIds : youngStoryIds;
@@ -1188,7 +1230,9 @@ const CertificatesPage = () => {
           'ai-ethics-explorer', 'digital-security-guardian'];
         const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
           'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
-          'rainbow-castle', 'jungle-explorer'];
+          'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
+          'magic-school', 'ocean-explorer', 'time-machine', 'friendly-robot',
+          'secret-cave', 'flying-carpet', 'lost-kingdom', 'grand-adventure'];
         
         const targetStoryIds = isTeenKids ? teenStoryIds : youngStoryIds;
         const enrolledStories = StoryWordsService.getEnrolledStories(userId);
@@ -1296,7 +1340,9 @@ const CertificatesPage = () => {
         const enrolledStories = StoryWordsService.getEnrolledStories(userId);
         const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
           'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
-          'rainbow-castle', 'jungle-explorer'];
+          'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
+          'magic-school', 'ocean-explorer', 'time-machine', 'friendly-robot',
+          'secret-cave', 'flying-carpet', 'lost-kingdom', 'grand-adventure'];
         const teenStoryIds = ['mystery-detective', 'space-explorer-teen', 'environmental-hero', 'tech-innovator', 
           'global-citizen', 'future-leader', 'scientific-discovery', 'social-media-expert', 
           'ai-ethics-explorer', 'digital-security-guardian'];
@@ -1316,13 +1362,12 @@ const CertificatesPage = () => {
         return `Stories ≥80: ${completedCount}/${targetCount}`;
       } catch (error) {
         console.error('Error getting story-master hint:', error);
-        return `Stories ≥80: 0/10`;
+        return isTeenKids ? `Stories ≥80: 0/10` : `Stories ≥80: 0/20`;
       }
     }
     if (t.id === 'pronunciation-pro') {
-      // For YoungKids, use category progress pronunciation_attempts (matches Progress snapshot)
+      // For YoungKids, count unique phrases practiced (not total attempts)
       if (!isTeenKids && categoryProgress) {
-        const attempts = categoryProgress.pronunciation_attempts || 0;
         // Get total available phrases from enrolled stories
         const enrolledStories = StoryWordsService.getEnrolledStories(userId);
         const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
@@ -1340,9 +1385,30 @@ const CertificatesPage = () => {
         const totalPhrases = completedStoryIds.length > 0
           ? StoryWordsService.getPhrasesForStoryIdsByAge(completedStoryIds, 'young').length
           : 0;
-        // Estimate average score (can be improved if we track it in category progress)
-        const avg = 75; // Default estimate
-        return `Phrases: ${attempts}/${totalPhrases}, Avg: ${avg.toFixed(0)}%`;
+        
+        if (totalPhrases === 0) {
+          return `Phrases: 0/0, Avg: 0%`;
+        }
+        
+        // Count unique phrases practiced from pronunciation details
+        const pron = d.pronunciation || {};
+        const enrolledPhrases = StoryWordsService.getPhrasesForStoryIdsByAge(completedStoryIds, 'young');
+        const enrolledPhraseSet = new Set(enrolledPhrases.map(p => p.phrase.toLowerCase()));
+        
+        // Count unique phrases practiced (filtered to only enrolled phrases)
+        const practicedPhrases = Object.keys(pron).filter(phrase => 
+          enrolledPhraseSet.has(phrase.toLowerCase())
+        ).length;
+        
+        // Calculate average score from practiced phrases
+        const practicedPhraseEntries = Object.entries(pron).filter(([phrase]) => 
+          enrolledPhraseSet.has(phrase.toLowerCase())
+        );
+        const avg = practicedPhraseEntries.length > 0
+          ? practicedPhraseEntries.reduce((sum, [, data]: any[]) => sum + (data.bestScore || 0), 0) / practicedPhraseEntries.length
+          : 0;
+        
+        return `Phrases: ${practicedPhrases}/${totalPhrases}, Avg: ${avg.toFixed(0)}%`;
       }
       
       const pron = d.pronunciation || {};
@@ -1351,7 +1417,9 @@ const CertificatesPage = () => {
         'ai-ethics-explorer', 'digital-security-guardian'];
       const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
         'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
-        'rainbow-castle', 'jungle-explorer'];
+        'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
+        'magic-school', 'ocean-explorer', 'time-machine', 'friendly-robot',
+        'secret-cave', 'flying-carpet', 'lost-kingdom', 'grand-adventure'];
       
       // Only count phrases from completed stories
       const targetStoryIds = isTeenKids ? teenStoryIds : youngStoryIds;
@@ -1407,7 +1475,9 @@ const CertificatesPage = () => {
           'ai-ethics-explorer', 'digital-security-guardian'];
         const youngStoryIds = ['magic-forest', 'space-adventure', 'underwater-world', 'dinosaur-discovery',
           'unicorn-magic', 'pirate-treasure', 'superhero-school', 'fairy-garden',
-          'rainbow-castle', 'jungle-explorer'];
+          'rainbow-castle', 'jungle-explorer', 'enchanted-garden', 'dragons-treasure',
+          'magic-school', 'ocean-explorer', 'time-machine', 'friendly-robot',
+          'secret-cave', 'flying-carpet', 'lost-kingdom', 'grand-adventure'];
         
         const targetStoryIds = isTeenKids ? teenStoryIds : youngStoryIds;
         const enrolledStories = StoryWordsService.getEnrolledStories(userId);
