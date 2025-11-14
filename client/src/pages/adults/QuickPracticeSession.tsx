@@ -909,7 +909,7 @@ const QuickPracticeSession = () => {
                       <Button
                         variant="outline"
                         onClick={() => setSelectedTopic(null)}
-                        className="border-purple-400/30 text-purple-300 hover:bg-purple-500/20 w-full sm:w-auto"
+                        className="border-purple-400/30 text-purple-500 hover:bg-purple-500/20 w-full sm:w-auto"
                       >
                         Change Topic
                       </Button>
@@ -961,7 +961,7 @@ const QuickPracticeSession = () => {
                                     await new Promise(resolve => setTimeout(resolve, 500));
                                   }
                                 }}
-                                className="border-cyan-400/30 text-cyan-300 hover:bg-cyan-500/20"
+                                className="border-cyan-400/30 text-cyan-600 hover:bg-cyan-500/20"
                               >
                                 <PlayCircle className="w-4 h-4 mr-2" />
                                 Play All Dialogue
