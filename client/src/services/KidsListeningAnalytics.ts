@@ -176,16 +176,22 @@ export class KidsListeningAnalytics {
     stats.totalStoriesCompleted = completedSessions.length;
     stats.totalQuestionsAnswered = completedSessions.reduce((sum, s) => sum + s.totalQuestions, 0);
     
-    // Accuracy
+    // Accuracy (prevent division by zero)
     const totalCorrect = completedSessions.reduce((sum, s) => sum + s.correctAnswers, 0);
-    stats.overallAccuracy = (totalCorrect / stats.totalQuestionsAnswered) * 100;
+    stats.overallAccuracy = stats.totalQuestionsAnswered > 0 
+      ? (totalCorrect / stats.totalQuestionsAnswered) * 100 
+      : 0;
     
     const totalFirstAttempt = completedSessions.reduce((sum, s) => sum + s.firstAttemptCorrect, 0);
-    stats.firstAttemptAccuracy = (totalFirstAttempt / stats.totalQuestionsAnswered) * 100;
+    stats.firstAttemptAccuracy = stats.totalQuestionsAnswered > 0
+      ? (totalFirstAttempt / stats.totalQuestionsAnswered) * 100
+      : 0;
     
-    // Average replays
+    // Average replays (prevent division by zero)
     const totalReplays = completedSessions.reduce((sum, s) => sum + s.totalReplays, 0);
-    stats.averageReplaysPerQuestion = totalReplays / stats.totalQuestionsAnswered;
+    stats.averageReplaysPerQuestion = stats.totalQuestionsAnswered > 0
+      ? totalReplays / stats.totalQuestionsAnswered
+      : 0;
     
     // Time spent
     const totalTime = completedSessions.reduce((sum, s) => sum + (s.endTime - s.startTime), 0);

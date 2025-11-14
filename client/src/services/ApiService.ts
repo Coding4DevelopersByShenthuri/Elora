@@ -62,7 +62,12 @@ const handleApiError = (error: any) => {
 };
 
 // Helper function for fetch requests
-const fetchWithAuth = async (endpoint: string, options: RequestInit = {}, timeoutMs: number = 15000) => {
+const fetchWithAuth = async (
+  endpoint: string, 
+  options: RequestInit = {}, 
+  timeoutMs: number = 15000,
+  clearTokenOn401: boolean = true // Allow caller to control token clearing behavior
+) => {
   const token = getAuthToken();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -83,8 +88,9 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}, timeou
     if (!response.ok) {
       // Handle 401 Unauthorized - token is invalid or expired
       if (response.status === 401) {
-        // Clear invalid token
-        if (token && token !== 'local-token') {
+        // Only clear token if explicitly requested (for login/auth operations)
+        // Don't clear token during sync operations to prevent unwanted logouts
+        if (clearTokenOn401 && token && token !== 'local-token') {
           localStorage.removeItem('speakbee_auth_token');
           console.warn('Authentication token expired or invalid. Please sign in again.');
         }
@@ -95,7 +101,15 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}, timeou
       throw { response: { data: error, status: response.status } };
     }
 
-    return response.json();
+    return response.json().catch(() => {
+      // If response is not valid JSON, return empty object
+      throw {
+        response: {
+          data: { message: 'Invalid response format from server' },
+          status: response.status
+        }
+      };
+    });
   } catch (error: any) {
     // Handle timeout errors specifically
     if (error.name === 'AbortError' || error.name === 'TimeoutError') {
@@ -269,10 +283,11 @@ export const AuthAPI = {
 
   /**
    * Get current user info
+   * Don't clear token on 401 during sync - let AuthContext handle it gracefully
    */
   getUserInfo: async () => {
     try {
-      const result = await fetchWithAuth('auth/user');
+      const result = await fetchWithAuth('auth/user', {}, 15000, false); // Don't clear token on 401
       return {
         success: true,
         data: result
@@ -457,7 +472,8 @@ export const LessonsAPI = {
       if (filters?.content) params.append('content', filters.content);
       
       const query = params.toString() ? `?${params.toString()}` : '';
-      const result = await fetchWithAuth(`lessons/${query}`);
+      const endpoint = query ? `lessons${query}` : 'lessons/';
+      const result = await fetchWithAuth(endpoint);
       
       return {
         success: true,

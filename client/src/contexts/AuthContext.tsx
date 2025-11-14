@@ -68,6 +68,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   useEffect(() => {
     // Check if user is logged in on app start
+    // This should only run once on mount, not when isOnline changes
     const token = localStorage.getItem('speakbee_auth_token');
     const userData = localStorage.getItem('speakbee_current_user');
     
@@ -77,9 +78,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setUser(parsedUser);
         
         // Sync with server if online (non-blocking, won't fail app if server unavailable)
-        if (isOnline && token !== 'local-token') {
+        // Only sync once on mount, not on every online status change
+        if (navigator.onLine && token !== 'local-token') {
           syncWithServerInternal().catch(err => {
-            console.log('Server sync skipped - offline mode active:', err);
+            console.log('Server sync failed - continuing with local data:', err);
+            // Don't logout on sync failure - preserve user session
           });
         }
       } catch (error) {
@@ -91,7 +94,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       localStorage.removeItem('speakbee_current_user');
       setUser(null);
     }
-  }, [isOnline]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
 
   const login = (userData: User, options?: { token?: string }) => {
     const updatedUser = {
@@ -274,6 +278,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     
     try {
       const response = await API.auth.getUserInfo();
+      
+      // Handle 401 errors gracefully - don't logout user
+      if (!response.success && 'status' in response && response.status === 401) {
+        console.warn('Token validation failed during sync - keeping local session active');
+        // Don't clear token or logout - user might have valid local session
+        // Token might be expired but user data is still valid locally
+        return;
+      }
+      
       if (response.success && 'data' in response && response.data) {
         const userData = response.data;
         
@@ -292,7 +305,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
         setUser(prev => {
           if (!prev) return null;
-          return {
+          const updatedUser = {
             ...prev,
             profile: {
               ...prev.profile,
@@ -304,10 +317,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             // If server has survey data, use it (server is source of truth)
             surveyData: serverSurveyData || prev.surveyData
           };
+          
+          // Update localStorage with fresh user data
+          localStorage.setItem('speakbee_current_user', JSON.stringify(updatedUser));
+          
+          return updatedUser;
         });
       }
-    } catch (error) {
-      console.error('Sync error:', error);
+    } catch (error: any) {
+      // Only log network/connection errors, not auth errors
+      // Auth errors are handled above
+      if (error?.response?.status !== 401) {
+        console.error('Sync error (non-auth):', error);
+      }
+      // Don't logout on sync failure - preserve user session
     }
   };
 

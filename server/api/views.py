@@ -421,6 +421,9 @@ def update_category_progress_from_activity(
         
         # Update average score if score provided
         if score > 0:
+            # Ensure details is a dict (safety check)
+            if not isinstance(category_progress.details, dict):
+                category_progress.details = {}
             total_scores = category_progress.details.get('total_scores', 0) + 1
             current_avg = category_progress.average_score or 0.0
             # Calculate new average: (old_avg * (n-1) + new_score) / n
