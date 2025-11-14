@@ -43,6 +43,7 @@ import Adults from "@/pages/adults/adults";
 import Beginners from "@/pages/adults/Beginners";
 import Intermediates from "@/pages/adults/Intermediates";
 import Advanced from "@/pages/adults/Advanced";
+import QuickPracticeSession from "@/pages/adults/QuickPracticeSession";
 import IeltsPte from "@/pages/IeltsPte";
 import NotFound from "@/pages/NotFound";
 import PricingPage from "@/pages/PricingPage";
@@ -725,6 +726,8 @@ const AppRoutes = () => {
             </PageTransition>
           } 
         />
+        <Route path="/adults/practice" element={<PageTransition><QuickPracticeSession /></PageTransition>} />
+        <Route path="/adults/practice/:sessionType" element={<PageTransition><QuickPracticeSession /></PageTransition>} />
         <Route path="/ielts-pte" element={<PageTransition><IeltsPte /></PageTransition>} />
         <Route path="/pricing" element={<PageTransition><PricingPage /></PageTransition>} />
         <Route path="/verify-email/:token" element={<PageTransition><VerifyEmail /></PageTransition>} />

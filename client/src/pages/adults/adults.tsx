@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Play, Target, Award, BookOpen, MessageCircle,
   Mic, Volume2, CheckCircle, TrendingUp, Zap, Lightbulb, Crown, BarChart3,
@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 const AdultsPage = () => {
+  const navigate = useNavigate();
   const [progress, setProgress] = useState(42);
   const [streak, setStreak] = useState(7);
   const [fluencyScore, setFluencyScore] = useState(65);
@@ -143,7 +144,8 @@ const AdultsPage = () => {
       gradient: "from-cyan-500 to-blue-600",
       time: "10-15 min",
       level: "Foundation+",
-      difficulty: "Easy"
+      difficulty: "Easy",
+      sessionType: "daily-conversation"
     },
     {
       title: "Pronunciation Drill",
@@ -153,7 +155,8 @@ const AdultsPage = () => {
       gradient: "from-emerald-500 to-teal-600",
       time: "5-10 min",
       level: "All Levels",
-      difficulty: "Medium"
+      difficulty: "Medium",
+      sessionType: "pronunciation"
     },
     {
       title: "Grammar Challenge",
@@ -163,7 +166,8 @@ const AdultsPage = () => {
       gradient: "from-purple-500 to-pink-600",
       time: "8-12 min",
       level: "All Levels",
-      difficulty: "Medium"
+      difficulty: "Medium",
+      sessionType: "grammar"
     },
     {
       title: "Vocabulary Builder",
@@ -173,7 +177,8 @@ const AdultsPage = () => {
       gradient: "from-amber-500 to-orange-600",
       time: "6-8 min",
       level: "All Levels",
-      difficulty: "Easy"
+      difficulty: "Easy",
+      sessionType: "vocabulary"
     }
   ];
 
@@ -257,11 +262,6 @@ const AdultsPage = () => {
     }
   ];
 
-  const handleQuickStart = () => {
-    setProgress(prev => Math.min(prev + 2, 100));
-    setStreak(prev => prev + 1);
-    setFluencyScore(prev => Math.min(prev + 1, 100));
-  };
 
   const getScoreColor = (score: number) => {
     if (score >= 90) return 'text-emerald-400';
@@ -641,7 +641,7 @@ const AdultsPage = () => {
                   <Card
                     key={index}
                     className="group cursor-pointer bg-slate-900/60 backdrop-blur-xl border-purple-500/30 hover:border-purple-400/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-purple-500/20"
-                    onClick={handleQuickStart}
+                    onClick={() => navigate(`/adults/practice/${action.sessionType}`)}
                     onMouseEnter={() => setIsHovered(index)}
                     onMouseLeave={() => setIsHovered(null)}
                   >
@@ -679,6 +679,10 @@ const AdultsPage = () => {
                         variant="outline"
                         size="sm"
                         className="w-full border-purple-400/30 text-purple-300 hover:bg-purple-500/20 hover:border-purple-400/50 transition-all duration-300"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/adults/practice/${action.sessionType}`);
+                        }}
                       >
                         <Play className="w-4 h-4 mr-2 transition-transform duration-300 group-hover:scale-110" />
                         Start Session
