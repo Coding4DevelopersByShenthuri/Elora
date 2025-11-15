@@ -854,16 +854,18 @@ const QuickPracticeSession = () => {
 
         <div className="relative z-10 pb-12 pt-20 sm:pt-24 md:pt-28 lg:pt-32">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Header */}
-            <div className="mb-6 sm:mb-8">
-              <div className="text-center mb-6 sm:mb-8">
-                {/* Removed icon from title */}
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-3 sm:mb-4">
-                  {config.title}
-                </h1>
-                <p className="text-sm sm:text-base md:text-lg text-cyan-100/80 max-w-2xl mx-auto">{config.description}</p>
+            {/* Header - Only show when no topic is selected */}
+            {!selectedTopic && (
+              <div className="mb-6 sm:mb-8">
+                <div className="text-center mb-6 sm:mb-8">
+                  {/* Removed icon from title */}
+                  <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-3 sm:mb-4">
+                    {config.title}
+                  </h1>
+                  <p className="text-sm sm:text-base md:text-lg text-cyan-100/80 max-w-2xl mx-auto">{config.description}</p>
+                </div>
               </div>
-            </div>
+            )}
 
             {!selectedTopic ? (
               /* Topic Selection */
