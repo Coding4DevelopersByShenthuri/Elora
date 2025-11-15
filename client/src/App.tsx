@@ -44,6 +44,7 @@ import Beginners from "@/pages/adults/Beginners";
 import Intermediates from "@/pages/adults/Intermediates";
 import Advanced from "@/pages/adults/Advanced";
 import QuickPracticeSession from "@/pages/adults/QuickPracticeSession";
+import VideoLessons from "@/pages/adults/VideoLessons";
 import IeltsPte from "@/pages/IeltsPte";
 import NotFound from "@/pages/NotFound";
 import PricingPage from "@/pages/PricingPage";
@@ -696,6 +697,8 @@ const AppRoutes = () => {
         <Route path="/favorites/teen" element={<PageTransition><TeenKidsFavoritesPage /></PageTransition>} />
         <Route path="/parental-controls" element={<PageTransition><ParentalControlsPage /></PageTransition>} />
         <Route path="/adults" element={<PageTransition><Adults /></PageTransition>} />
+        <Route path="/adults/videos" element={<PageTransition><VideoLessons /></PageTransition>} />
+        <Route path="/adults/videos/:slug" element={<PageTransition><VideoLessons /></PageTransition>} />
         <Route 
           path="/adults/beginners" 
           element={
