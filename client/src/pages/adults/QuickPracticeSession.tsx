@@ -28,11 +28,13 @@ const dailyConversationTopics = [
     scenarios: [
       {
         title: 'Meeting Someone New',
+        partnerName: 'Alex',
         dialogue: [
-          { speaker: 'You', text: "Hello, I'm [Your Name]. Nice to meet you." },
-          { speaker: 'Partner', text: "Hi, I'm [Partner Name]. Pleasure to meet you too." },
-          { speaker: 'You', text: "What do you do for a living?" },
-          { speaker: 'Partner', text: "I work in marketing. How about you?" }
+          { speaker: 'Partner', text: "Hello! I'm Alex. Nice to meet you!" },
+          { speaker: 'You', text: "Hello, I'm [Your Name]. Nice to meet you too." },
+          { speaker: 'Partner', text: "What do you do for a living?" },
+          { speaker: 'You', text: "I work in [Your Field]. How about you?" },
+          { speaker: 'Partner', text: "I work in marketing. It's quite interesting!" }
         ],
         keyPhrases: [
           'Nice to meet you',
@@ -48,7 +50,9 @@ const dailyConversationTopics = [
       },
       {
         title: 'Casual Greetings',
+        partnerName: 'Sam',
         dialogue: [
+          { speaker: 'Partner', text: "Hey there! I'm Sam. How's it going?" },
           { speaker: 'You', text: "Hey, how's it going?" },
           { speaker: 'Partner', text: "Pretty good, thanks! How about you?" },
           { speaker: 'You', text: "Can't complain! What have you been up to?" },
@@ -79,7 +83,9 @@ const dailyConversationTopics = [
     scenarios: [
       {
         title: 'Discussing Your Job',
+        partnerName: 'Jordan',
         dialogue: [
+          { speaker: 'Partner', text: "Hi! I'm Jordan. Nice to meet you!" },
           { speaker: 'You', text: "I work as a software engineer at a tech company." },
           { speaker: 'Partner', text: "That sounds interesting! What does your typical day look like?" },
           { speaker: 'You', text: "I spend most of my time coding and attending meetings." },
@@ -99,8 +105,9 @@ const dailyConversationTopics = [
       },
       {
         title: 'Job Interview',
+        partnerName: 'Ms. Thompson',
         dialogue: [
-          { speaker: 'Interviewer', text: "Tell me about yourself." },
+          { speaker: 'Interviewer', text: "Good morning! I'm Ms. Thompson. Tell me about yourself." },
           { speaker: 'You', text: "I have five years of experience in project management." },
           { speaker: 'Interviewer', text: "What are your strengths?" },
           { speaker: 'You', text: "I'm organized, detail-oriented, and work well in teams." }
@@ -130,7 +137,9 @@ const dailyConversationTopics = [
     scenarios: [
       {
         title: 'Morning Routine',
+        partnerName: 'Taylor',
         dialogue: [
+          { speaker: 'Partner', text: "Hey! I'm Taylor. How's your morning going?" },
           { speaker: 'You', text: "I usually wake up at 6:30 AM." },
           { speaker: 'Partner', text: "That's early! What's your morning routine?" },
           { speaker: 'You', text: "I exercise, have breakfast, and then head to work." },
@@ -161,7 +170,9 @@ const dailyConversationTopics = [
     scenarios: [
       {
         title: 'Talking About Hobbies',
+        partnerName: 'Casey',
         dialogue: [
+          { speaker: 'Partner', text: "Hello! I'm Casey. What do you like to do in your free time?" },
           { speaker: 'You', text: "I love reading in my free time." },
           { speaker: 'Partner', text: "What kind of books do you like?" },
           { speaker: 'You', text: "I prefer science fiction and mystery novels." },
@@ -192,7 +203,9 @@ const dailyConversationTopics = [
     scenarios: [
       {
         title: 'Asking for Directions',
+        partnerName: 'Jamie',
         dialogue: [
+          { speaker: 'Partner', text: "Hi there! I'm Jamie. How can I help you?" },
           { speaker: 'You', text: "Excuse me, could you tell me how to get to the train station?" },
           { speaker: 'Partner', text: "Sure! Go straight for two blocks, then turn left." },
           { speaker: 'You', text: "Is it far?" },
@@ -223,8 +236,9 @@ const dailyConversationTopics = [
     scenarios: [
       {
         title: 'At a Restaurant',
+        partnerName: 'Marcus',
         dialogue: [
-          { speaker: 'Waiter', text: "Good evening! Do you have a reservation?" },
+          { speaker: 'Waiter', text: "Good evening! I'm Marcus, your server. Do you have a reservation?" },
           { speaker: 'You', text: "Yes, it's under Smith." },
           { speaker: 'Waiter', text: "Perfect. Would you like to see the menu?" },
           { speaker: 'You', text: "Yes, please. And could we have a table by the window?" }
@@ -1030,12 +1044,17 @@ const QuickPracticeSession = () => {
 
                           <div className="space-y-3 bg-slate-800/40 rounded-xl p-4 sm:p-6 border border-purple-500/20">
                             {currentScenarioData.dialogue.map((line, index) => {
-                              const isUser = line.speaker === 'You' || line.speaker === 'Interviewer' || line.speaker === 'Waiter';
-                              const isPartner = line.speaker === 'Partner';
+                              const isUser = line.speaker === 'You';
+                              const isPartner = line.speaker === 'Partner' || line.speaker === 'Interviewer' || line.speaker === 'Waiter';
                               const isUserLine = line.speaker === 'You';
                               const userResponse = userResponses[index] || '';
                               const lineScore = practiceScores[index];
                               const isCurrentlySpeaking = isSpeaking[index];
+                              
+                              // Get display name: use partner name if it's a partner/ai speaker and partnerName exists
+                              const displayName = isPartner && currentScenarioData.partnerName 
+                                ? currentScenarioData.partnerName 
+                                : line.speaker;
                               
                               return (
                                 <div key={index} className="space-y-2">
@@ -1072,7 +1091,7 @@ const QuickPracticeSession = () => {
                                         
                                         {/* Message Content */}
                                         <div className="flex-1 min-w-0">
-                                          <div className="font-semibold text-white mb-1 text-xs sm:text-sm">{line.speaker}</div>
+                                          <div className="font-semibold text-white mb-1 text-xs sm:text-sm">{displayName}</div>
                                           <div className="text-cyan-100/90 text-sm sm:text-base">{line.text}</div>
                                         </div>
                                         
