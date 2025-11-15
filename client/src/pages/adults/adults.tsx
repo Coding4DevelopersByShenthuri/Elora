@@ -597,6 +597,11 @@ const AdultsPage = () => {
                     className="group cursor-pointer bg-slate-900/60 backdrop-blur-xl border-purple-500/30 hover:border-purple-400/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-purple-500/20"
                     onMouseEnter={() => setIsHovered(index + 100)}
                     onMouseLeave={() => setIsHovered(null)}
+                    onClick={() => {
+                      if (resource.title === "Interactive Video Lessons") {
+                        navigate('/adults/videos');
+                      }
+                    }}
                   >
                     <CardContent className="p-6 relative overflow-hidden">
                       <div className={cn(
@@ -615,9 +620,24 @@ const AdultsPage = () => {
                       
                       <h4 className="font-semibold text-white mb-3 text-lg">{resource.title}</h4>
                       <p className="text-sm text-cyan-100/70 mb-4 leading-relaxed">{resource.description}</p>
-                      <Badge variant="outline" className="text-xs bg-purple-500/20 text-purple-300 border-purple-400/30">
-                        {resource.count}
-                      </Badge>
+                      <div className="flex items-center justify-between">
+                        <Badge variant="outline" className="text-xs bg-purple-500/20 text-purple-300 border-purple-400/30">
+                          {resource.count}
+                        </Badge>
+                        {resource.title === "Interactive Video Lessons" && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-cyan-300 hover:text-cyan-300 hover:bg-transparent p-0 h-auto"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate('/adults/videos');
+                            }}
+                          >
+                            Explore <ArrowRight className="w-3 h-3 ml-1" />
+                          </Button>
+                        )}
+                      </div>
                     </CardContent>
                   </Card>
                 );
