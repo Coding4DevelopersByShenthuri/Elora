@@ -50,9 +50,9 @@ const dailyConversationTopics = [
       },
       {
         title: 'Casual Greetings',
-        partnerName: 'Sam',
+        partnerName: 'Alex',
         dialogue: [
-          { speaker: 'Partner', text: "Hey there! I'm Sam. How's it going?" },
+          { speaker: 'Partner', text: "Hey there! I'm Alex. How's it going?" },
           { speaker: 'You', text: "Hey, how's it going?" },
           { speaker: 'Partner', text: "Pretty good, thanks! How about you?" },
           { speaker: 'You', text: "Can't complain! What have you been up to?" },
@@ -105,9 +105,9 @@ const dailyConversationTopics = [
       },
       {
         title: 'Job Interview',
-        partnerName: 'Ms. Thompson',
+        partnerName: 'Jordan',
         dialogue: [
-          { speaker: 'Interviewer', text: "Good morning! I'm Ms. Thompson. Tell me about yourself." },
+          { speaker: 'Interviewer', text: "Good morning! I'm Jordan. Tell me about yourself." },
           { speaker: 'You', text: "I have five years of experience in project management." },
           { speaker: 'Interviewer', text: "What are your strengths?" },
           { speaker: 'You', text: "I'm organized, detail-oriented, and work well in teams." }
