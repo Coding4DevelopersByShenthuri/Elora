@@ -226,7 +226,7 @@ const BeginnersPage = () => {
 
       {/* Large Planet/Moon Spheres - Main Visual Elements */}
       {/* Main Large Planet - Bottom Left - Reduced Size */}
-      <div className="fixed bottom-0 left-0 w-[140px] h-[140px] sm:w-[200px] sm:h-[200px] md:w-[280px] md:h-[280px] lg:w-[360px] lg:h-[360px] xl:w-[420px] xl:h-[420px] pointer-events-none opacity-60 sm:opacity-65 md:opacity-70 lg:opacity-75">
+      <div className="fixed bottom-0 left-0 w-[100px] h-[100px] sm:w-[140px] sm:h-[140px] md:w-[180px] md:h-[180px] lg:w-[220px] lg:h-[220px] xl:w-[260px] xl:h-[260px] pointer-events-none opacity-60 sm:opacity-65 md:opacity-70 lg:opacity-75">
         <div className="relative w-full h-full">
           <img 
             src="/planets/zu7XaNtVpYwIGWuPT910tDPzo.avif" 

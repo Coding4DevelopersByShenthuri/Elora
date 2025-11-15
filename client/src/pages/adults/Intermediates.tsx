@@ -262,7 +262,7 @@ const IntermediatesPage = () => {
 
       {/* Large Planet/Moon Spheres - Main Visual Elements */}
       {/* Main Large Planet - Bottom Left - Reduced Size */}
-      <div className="fixed bottom-0 left-0 w-[150px] h-[150px] sm:w-[220px] sm:h-[220px] md:w-[300px] md:h-[300px] lg:w-[380px] lg:h-[380px] xl:w-[450px] xl:h-[450px] pointer-events-none opacity-60 sm:opacity-65 md:opacity-70 lg:opacity-75">
+      <div className="fixed bottom-0 left-0 w-[100px] h-[100px] sm:w-[140px] sm:h-[140px] md:w-[180px] md:h-[180px] lg:w-[220px] lg:h-[220px] xl:w-[260px] xl:h-[260px] pointer-events-none opacity-60 sm:opacity-65 md:opacity-70 lg:opacity-75">
         <div className="relative w-full h-full">
           <img 
             src="/planets/YZWPZTXZtvH1iH4rCX0Uh48wmtQ.avif" 
