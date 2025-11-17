@@ -45,6 +45,7 @@ import Intermediates from "@/pages/adults/Intermediates";
 import Advanced from "@/pages/adults/Advanced";
 import QuickPracticeSession from "@/pages/adults/QuickPracticeSession";
 import VideoLessons from "@/pages/adults/VideoLessons";
+import Lesson1Video from "@/pages/Lesson1Video";
 import IeltsPte from "@/pages/IeltsPte";
 import NotFound from "@/pages/NotFound";
 import PricingPage from "@/pages/PricingPage";
@@ -57,6 +58,7 @@ import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminUsers from "@/pages/admin/AdminUsers";
 import AdminAnalytics from "@/pages/admin/AdminAnalytics";
 import AdminSettings from "@/pages/admin/AdminSettings";
+import AdminVideos from "@/pages/admin/AdminVideos";
 import AdminLessons from "@/pages/admin/AdminLessons";
 import AdminPractice from "@/pages/admin/AdminPractice";
 import AdminProgress from "@/pages/admin/AdminProgress";
@@ -699,6 +701,7 @@ const AppRoutes = () => {
         <Route path="/adults" element={<PageTransition><Adults /></PageTransition>} />
         <Route path="/adults/videos" element={<PageTransition><VideoLessons /></PageTransition>} />
         <Route path="/adults/videos/:slug" element={<PageTransition><VideoLessons /></PageTransition>} />
+        <Route path="/lessons/1" element={<PageTransition><Lesson1Video /></PageTransition>} />
         <Route 
           path="/adults/beginners" 
           element={
@@ -748,6 +751,7 @@ const AppRoutes = () => {
         <Route path="/admin/vocabulary" element={<PageTransition><AdminRouteGuard><AdminVocabulary /></AdminRouteGuard></PageTransition>} />
         <Route path="/admin/achievements" element={<PageTransition><AdminRouteGuard><AdminAchievements /></AdminRouteGuard></PageTransition>} />
         <Route path="/admin/surveys" element={<PageTransition><AdminRouteGuard><AdminSurveys /></AdminRouteGuard></PageTransition>} />
+        <Route path="/admin/videos" element={<PageTransition><AdminRouteGuard><AdminVideos /></AdminRouteGuard></PageTransition>} />
         <Route path="/admin/analytics" element={<PageTransition><AdminRouteGuard><AdminAnalytics /></AdminRouteGuard></PageTransition>} />
         <Route path="/admin/settings" element={<PageTransition><AdminRouteGuard><AdminSettings /></AdminRouteGuard></PageTransition>} />
         

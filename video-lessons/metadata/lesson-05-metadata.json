@@ -1,0 +1,83 @@
+{
+  "slug": "meetings-presentations",
+  "title": "Participating in Business Meetings & Presentations",
+  "description": "Master essential phrases for active participation in business meetings. Learn to share ideas, agree and disagree professionally, interrupt politely, and give effective presentations that make an impact.",
+  "lesson_type": "advanced",
+  "content_type": "conversation",
+  "difficulty_level": 8,
+  "duration_minutes": 9,
+  "duration_seconds": 540,
+  "thumbnail_url": "/video-thumbs/meetings-presentations.jpg",
+  "video_url_720p": "/videos/lesson-05-meetings-presentations-720p.mp4",
+  "video_url_1080p": "/videos/lesson-05-meetings-presentations-1080p.mp4",
+  "subtitles_url": "/subtitles/lesson-05-meetings-presentations.vtt",
+  "transcript_url": "/transcripts/lesson-05-meetings-presentations.txt",
+  "category": "business",
+  "tags": ["meetings", "presentations", "business", "professional", "communication", "public-speaking"],
+  "speaking_exercises": 7,
+  "quizzes": 1,
+  "hotspots": 1,
+  "total_points": 135,
+  "learning_objectives": [
+    "Participate actively in business discussions",
+    "Share opinions and ideas professionally",
+    "Agree and disagree diplomatically",
+    "Interrupt politely and ask clarifying questions",
+    "Give structured, effective presentations",
+    "Handle Q&A sessions confidently"
+  ],
+  "prerequisites": [
+    {
+      "slug": "job-interviews",
+      "reason": "Professional communication skills required"
+    },
+    {
+      "slug": "business-phone-calls",
+      "reason": "Business communication experience helpful"
+    }
+  ],
+  "next_lessons": [],
+  "related_lessons": [
+    {
+      "slug": "job-interviews",
+      "title": "Job Interview Skills",
+      "reason": "Similar professional communication context"
+    },
+    {
+      "slug": "business-phone-calls",
+      "title": "Business Phone Calls",
+      "reason": "Professional communication skills"
+    }
+  ],
+  "instructor": {
+    "name": "Professional English Instructor",
+    "accent": "American English",
+    "credentials": "TESOL Certified, 10+ years experience"
+  },
+  "target_audience": {
+    "level": "advanced",
+    "age_range": "adult",
+    "use_cases": [
+      "Business meetings",
+      "Team discussions",
+      "Presentations",
+      "Executive communication",
+      "Conference participation"
+    ]
+  },
+  "estimated_completion_time": {
+    "video": 9,
+    "with_practice": 30,
+    "total": 39
+  },
+  "ratings": {
+    "difficulty": 8,
+    "practical_value": 5,
+    "engagement": 5
+  },
+  "is_active": true,
+  "order": 5,
+  "created_at": "2024-01-01T00:00:00Z",
+  "updated_at": "2024-01-01T00:00:00Z"
+}
+

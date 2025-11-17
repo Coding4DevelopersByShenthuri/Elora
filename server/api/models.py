@@ -1177,3 +1177,54 @@ class PageEligibility(models.Model):
                 all_met = False
         
         return all_met, progress_details
+
+
+# ============= Video Lessons Management =============
+class VideoLesson(models.Model):
+    """Video lessons for adults learning path"""
+    DIFFICULTY_CHOICES = [
+        ('beginner', 'Beginner'),
+        ('intermediate', 'Intermediate'),
+        ('advanced', 'Advanced'),
+    ]
+    
+    CATEGORY_CHOICES = [
+        ('pronunciation', 'Pronunciation'),
+        ('conversation', 'Conversation'),
+        ('grammar', 'Grammar'),
+        ('business', 'Business'),
+        ('daily', 'Daily Life'),
+    ]
+    
+    slug = models.SlugField(unique=True)
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    thumbnail = models.ImageField(upload_to='video_thumbnails/', blank=True, null=True)
+    video_file = models.FileField(upload_to='videos/', blank=True, null=True)
+    video_url = models.URLField(blank=True, null=True, help_text="External video URL (YouTube, Vimeo, etc.)")
+    duration = models.IntegerField(default=0, help_text="Duration in seconds")
+    difficulty = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES, default='beginner')
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='conversation')
+    rating = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(5)])
+    views = models.IntegerField(default=0)
+    speaking_exercises = models.IntegerField(default=0)
+    tags = models.JSONField(default=list, blank=True)
+    is_active = models.BooleanField(default=True)
+    order = models.IntegerField(default=0)
+    
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['order', '-created_at']
+        indexes = [
+            models.Index(fields=['slug', 'is_active']),
+            models.Index(fields=['difficulty', 'category']),
+            models.Index(fields=['is_active', 'order']),
+        ]
+        verbose_name = "Video Lesson"
+        verbose_name_plural = "Video Lessons"
+    
+    def __str__(self):
+        return f"{self.title} ({self.difficulty} - {self.category})"

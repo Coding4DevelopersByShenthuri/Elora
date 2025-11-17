@@ -1,0 +1,83 @@
+{
+  "slug": "job-interviews",
+  "title": "Job Interview Skills - Essential Phrases",
+  "description": "Master essential phrases for job interviews. Learn to introduce yourself professionally, describe your experience, answer common questions, and ask intelligent questions that impress interviewers.",
+  "lesson_type": "intermediate",
+  "content_type": "conversation",
+  "difficulty_level": 5,
+  "duration_minutes": 8,
+  "duration_seconds": 480,
+  "thumbnail_url": "/video-thumbs/job-interviews.jpg",
+  "video_url_720p": "/videos/lesson-03-job-interviews-720p.mp4",
+  "video_url_1080p": "/videos/lesson-03-job-interviews-1080p.mp4",
+  "subtitles_url": "/subtitles/lesson-03-job-interviews.vtt",
+  "transcript_url": "/transcripts/lesson-03-job-interviews.txt",
+  "category": "business",
+  "tags": ["job-interview", "business", "career", "professional", "hiring", "employment"],
+  "speaking_exercises": 7,
+  "quizzes": 1,
+  "hotspots": 1,
+  "total_points": 125,
+  "learning_objectives": [
+    "Introduce yourself professionally in interview settings",
+    "Describe experience and achievements using the STAR method",
+    "Answer common interview questions with confidence",
+    "Ask intelligent questions that demonstrate interest",
+    "Handle difficult questions professionally"
+  ],
+  "prerequisites": [
+    {
+      "slug": "professional-greetings",
+      "reason": "Basic professional greeting skills required"
+    }
+  ],
+  "next_lessons": [
+    {
+      "slug": "business-phone-calls",
+      "title": "Business Phone Calls",
+      "reason": "Builds on professional communication skills"
+    }
+  ],
+  "related_lessons": [
+    {
+      "slug": "professional-greetings",
+      "title": "Professional Greetings & Introductions",
+      "reason": "Foundation for professional communication"
+    },
+    {
+      "slug": "business-meetings",
+      "title": "Participating in Business Meetings",
+      "reason": "Advanced professional communication"
+    }
+  ],
+  "instructor": {
+    "name": "Professional English Instructor",
+    "accent": "American English",
+    "credentials": "TESOL Certified, 10+ years experience"
+  },
+  "target_audience": {
+    "level": "intermediate",
+    "age_range": "adult",
+    "use_cases": [
+      "Job interviews",
+      "Career advancement",
+      "Professional networking",
+      "Hiring processes"
+    ]
+  },
+  "estimated_completion_time": {
+    "video": 8,
+    "with_practice": 25,
+    "total": 33
+  },
+  "ratings": {
+    "difficulty": 5,
+    "practical_value": 5,
+    "engagement": 4
+  },
+  "is_active": true,
+  "order": 3,
+  "created_at": "2024-01-01T00:00:00Z",
+  "updated_at": "2024-01-01T00:00:00Z"
+}
+

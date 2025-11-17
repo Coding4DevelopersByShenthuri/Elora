@@ -1,0 +1,172 @@
+{
+  "lesson_slug": "meetings-presentations",
+  "lesson_title": "Participating in Business Meetings & Presentations",
+  "video_duration": 540,
+  "interactions": [
+    {
+      "id": "hotspot_001",
+      "type": "hotspot",
+      "timestamp": 30.0,
+      "duration": 5000,
+      "position": {"x": 52, "y": 38},
+      "data": {
+        "title": "Vocabulary: Interrupting",
+        "content": "Interrupting in meetings means speaking before someone has finished. It should always be done politely with phrases like 'Sorry to interrupt' or 'If I could just jump in here' to show respect.",
+        "icon": "info",
+        "category": "vocabulary"
+      }
+    },
+    {
+      "id": "speak_001",
+      "type": "speaking",
+      "timestamp": 95.0,
+      "duration": 20,
+      "data": {
+        "type": "shadow_speaking",
+        "text": "I'd like to add something. In my opinion, we should consider this approach. For example, it worked well in our previous project.",
+        "native_audio_url": "/audio/lesson-05/participating-meeting.mp3",
+        "expected_transcript": "I'd like to add something in my opinion we should consider this approach for example it worked well in our previous project",
+        "speed": "normal",
+        "real_time_feedback": true,
+        "min_score_threshold": 75,
+        "allow_retry": true,
+        "max_attempts": 2,
+        "points": 20,
+        "feedback_type": "detailed",
+        "instruction": "Shadow speak this meeting contribution. Practice sharing ideas professionally in meetings."
+      }
+    },
+    {
+      "id": "speak_002",
+      "type": "speaking",
+      "timestamp": 160.0,
+      "duration": 0,
+      "data": {
+        "type": "repeat_after",
+        "target_phrase": "I see what you're saying, but I have a different perspective. From my experience, I think we should consider this alternative.",
+        "native_audio_url": "/audio/lesson-05/disagreeing-professionally.mp3",
+        "expected_transcript": "I see what you're saying but I have a different perspective from my experience I think we should consider this alternative",
+        "min_score_threshold": 75,
+        "allow_retry": true,
+        "max_attempts": 3,
+        "points": 20,
+        "feedback_type": "detailed",
+        "instruction": "Repeat after me. Practice disagreeing professionally - always acknowledge first, then share your perspective."
+      }
+    },
+    {
+      "id": "speak_003",
+      "type": "speaking",
+      "timestamp": 225.0,
+      "duration": 15,
+      "data": {
+        "type": "shadow_speaking",
+        "text": "Sorry to interrupt, but I have a question. Could you clarify what you mean by this approach?",
+        "native_audio_url": "/audio/lesson-05/interrupting-politely.mp3",
+        "expected_transcript": "Sorry to interrupt but I have a question could you clarify what you mean by this approach",
+        "speed": "normal",
+        "real_time_feedback": false,
+        "min_score_threshold": 75,
+        "allow_retry": true,
+        "max_attempts": 2,
+        "points": 15,
+        "feedback_type": "detailed",
+        "instruction": "Practice interrupting politely. Shadow speak along with me."
+      }
+    },
+    {
+      "id": "speak_004",
+      "type": "speaking",
+      "timestamp": 295.0,
+      "duration": 0,
+      "data": {
+        "type": "repeat_after",
+        "target_phrase": "Good morning, everyone. Today, I'll be presenting our quarterly results. I'll cover three main points: revenue, expenses, and future projections.",
+        "native_audio_url": "/audio/lesson-05/presentation-opening.mp3",
+        "expected_transcript": "Good morning everyone today I'll be presenting our quarterly results I'll cover three main points revenue expenses and future projections",
+        "min_score_threshold": 75,
+        "allow_retry": true,
+        "max_attempts": 3,
+        "points": 20,
+        "feedback_type": "detailed",
+        "instruction": "Repeat after me. Practice opening a presentation professionally with clear structure."
+      }
+    },
+    {
+      "id": "dialogue_001",
+      "type": "speaking",
+      "timestamp": 355.0,
+      "duration": 0,
+      "data": {
+        "type": "dialogue",
+        "scenario": "Presentation Q&A",
+        "role": "presenter",
+        "video_segments": {
+          "native_speaks": {"start": 355.0, "end": 360.0},
+          "user_response_time": {"duration": 25}
+        },
+        "expected_responses": [
+          "That's a great question",
+          "Thank you for that question",
+          "I'm glad you asked that"
+        ],
+        "evaluate_fluency": true,
+        "evaluate_pronunciation": true,
+        "evaluate_content": false,
+        "points": 20,
+        "instruction": "Someone asks a question during your presentation. Respond professionally and acknowledge the question."
+      }
+    },
+    {
+      "id": "dialogue_002",
+      "type": "speaking",
+      "timestamp": 415.0,
+      "duration": 0,
+      "data": {
+        "type": "dialogue",
+        "scenario": "Complete Meeting Participation",
+        "role": "meeting_participant",
+        "video_segments": {
+          "native_speaks": {"start": 415.0, "end": 445.0},
+          "user_response_time": {"duration": 50}
+        },
+        "expected_responses": [
+          "I'd like to add something in my opinion we should consider",
+          "I see your point however I think we can balance",
+          "I have a question could you clarify the timeline"
+        ],
+        "evaluate_fluency": true,
+        "evaluate_pronunciation": true,
+        "evaluate_content": false,
+        "points": 35,
+        "instruction": "Participate actively in a business meeting. Share your opinion, respond to disagreement, and ask a clarifying question.",
+        "multiple_responses": true
+      }
+    },
+    {
+      "id": "quiz_001",
+      "type": "quiz",
+      "timestamp": 455.0,
+      "duration": 0,
+      "data": {
+        "question": "What's the best way to disagree in a business meeting?",
+        "type": "multiple_choice",
+        "options": [
+          "Say 'You're wrong' directly",
+          "Ignore their point and state your opinion",
+          "Acknowledge their point first, then share your perspective"
+        ],
+        "correct_answer": 2,
+        "points": 5,
+        "explanation": "Always acknowledge the other person's point before disagreeing. This shows respect and professionalism, making your disagreement more acceptable. Phrases like 'I see what you're saying' or 'I understand your point' create a respectful tone.",
+        "feedback_type": "immediate"
+      }
+    }
+  ],
+  "total_interactions": 8,
+  "speaking_exercises": 7,
+  "quizzes": 1,
+  "hotspots": 1,
+  "total_points": 135
+}
+

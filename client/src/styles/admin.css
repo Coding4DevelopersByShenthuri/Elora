@@ -88,4 +88,17 @@
   color: #374151; /* gray-700 */
 }
 
+/* Hide scrollbar and disable scrolling on desktop for admin sidebar navigation */
+@media (min-width: 1024px) {
+  .admin-theme .admin-sidebar .admin-sidebar-nav {
+    overflow-y: visible !important;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+  
+  .admin-theme .admin-sidebar .admin-sidebar-nav::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+}
+
 

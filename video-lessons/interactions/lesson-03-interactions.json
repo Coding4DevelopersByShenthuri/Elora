@@ -1,0 +1,172 @@
+{
+  "lesson_slug": "job-interviews",
+  "lesson_title": "Job Interview Skills - Essential Phrases",
+  "video_duration": 480,
+  "interactions": [
+    {
+      "id": "hotspot_001",
+      "type": "hotspot",
+      "timestamp": 30.0,
+      "duration": 5000,
+      "position": {"x": 55, "y": 32},
+      "data": {
+        "title": "Vocabulary: Qualifications",
+        "content": "Qualifications refer to your education, skills, certifications, and experience that make you suitable for a job. Common qualifications include degrees, professional certifications, and years of experience.",
+        "icon": "info",
+        "category": "vocabulary"
+      }
+    },
+    {
+      "id": "speak_001",
+      "type": "speaking",
+      "timestamp": 85.0,
+      "duration": 0,
+      "data": {
+        "type": "repeat_after",
+        "target_phrase": "My name is [Your Name]. I'm a [Profession] with [Number] years of experience.",
+        "native_audio_url": "/audio/lesson-03/introduction-template.mp3",
+        "expected_transcript": "My name is I'm a with years of experience",
+        "min_score_threshold": 70,
+        "allow_retry": true,
+        "max_attempts": 3,
+        "points": 15,
+        "feedback_type": "detailed",
+        "instruction": "Repeat after me. Fill in [Your Name], [Profession], and [Number] with your own information.",
+        "note": "Flexible matching - focus on structure and pronunciation"
+      }
+    },
+    {
+      "id": "speak_002",
+      "type": "speaking",
+      "timestamp": 155.0,
+      "duration": 20,
+      "data": {
+        "type": "shadow_speaking",
+        "text": "In my previous role, I successfully managed a team of five people and increased sales by 20 percent.",
+        "native_audio_url": "/audio/lesson-03/experience-example.mp3",
+        "expected_transcript": "In my previous role I successfully managed a team of five people and increased sales by 20 percent",
+        "speed": "normal",
+        "real_time_feedback": true,
+        "min_score_threshold": 75,
+        "allow_retry": true,
+        "max_attempts": 2,
+        "points": 15,
+        "feedback_type": "detailed",
+        "instruction": "Shadow speak this experience example. Focus on clear pronunciation of numbers and professional terms."
+      }
+    },
+    {
+      "id": "speak_003",
+      "type": "speaking",
+      "timestamp": 225.0,
+      "duration": 0,
+      "data": {
+        "type": "repeat_after",
+        "target_phrase": "One of my key strengths is problem-solving. For example, I successfully resolved a major client issue last year.",
+        "native_audio_url": "/audio/lesson-03/strengths-answer.mp3",
+        "expected_transcript": "One of my key strengths is problem-solving for example I successfully resolved a major client issue last year",
+        "min_score_threshold": 70,
+        "allow_retry": true,
+        "max_attempts": 3,
+        "points": 15,
+        "feedback_type": "detailed",
+        "instruction": "Repeat after me. Practice answering the 'strengths' question professionally."
+      }
+    },
+    {
+      "id": "dialogue_001",
+      "type": "speaking",
+      "timestamp": 285.0,
+      "duration": 0,
+      "data": {
+        "type": "dialogue",
+        "scenario": "Interview Question - Weakness",
+        "role": "interviewee",
+        "video_segments": {
+          "native_speaks": {"start": 285.0, "end": 290.0},
+          "user_response_time": {"duration": 30}
+        },
+        "expected_responses": [
+          "One area I've been working on is however I've taken steps to improve",
+          "I've been focusing on improving my and I've taken action by",
+          "One weakness I'm addressing is I'm working on this by"
+        ],
+        "evaluate_fluency": true,
+        "evaluate_pronunciation": true,
+        "evaluate_content": false,
+        "points": 20,
+        "instruction": "The interviewer asks 'What would you say is your greatest weakness?' Respond professionally, showing you're working on improvement."
+      }
+    },
+    {
+      "id": "speak_004",
+      "type": "speaking",
+      "timestamp": 345.0,
+      "duration": 0,
+      "data": {
+        "type": "repeat_after",
+        "target_phrase": "What would a typical day look like in this position?",
+        "native_audio_url": "/audio/lesson-03/interview-question.mp3",
+        "expected_transcript": "What would a typical day look like in this position",
+        "min_score_threshold": 70,
+        "allow_retry": true,
+        "max_attempts": 3,
+        "points": 10,
+        "feedback_type": "detailed",
+        "instruction": "Repeat after me: 'What would a typical day look like in this position?' Practice asking intelligent interview questions."
+      }
+    },
+    {
+      "id": "dialogue_002",
+      "type": "speaking",
+      "timestamp": 385.0,
+      "duration": 0,
+      "data": {
+        "type": "dialogue",
+        "scenario": "Complete Interview Introduction",
+        "role": "interviewee",
+        "video_segments": {
+          "native_speaks": {"start": 385.0, "end": 410.0},
+          "user_response_time": {"duration": 45}
+        },
+        "expected_responses": [
+          "Good morning thank you for having me I'm very excited about this opportunity",
+          "Good morning thank you I'm excited to be here",
+          "My name is I'm a with years of experience I'm particularly interested in this role because",
+          "In my previous role I this experience has prepared me well for this position"
+        ],
+        "evaluate_fluency": true,
+        "evaluate_pronunciation": true,
+        "evaluate_content": false,
+        "points": 30,
+        "instruction": "Complete the interview scenario. Respond to greetings and answer 'Tell me about yourself' and 'Tell me about your experience'.",
+        "multiple_responses": true
+      }
+    },
+    {
+      "id": "quiz_001",
+      "type": "quiz",
+      "timestamp": 415.0,
+      "duration": 0,
+      "data": {
+        "question": "When asked 'What is your weakness?' in an interview, what should you do?",
+        "type": "multiple_choice",
+        "options": [
+          "Say you have no weaknesses",
+          "Name a real weakness and explain how you're improving it",
+          "Refuse to answer"
+        ],
+        "correct_answer": 1,
+        "points": 5,
+        "explanation": "It's better to be honest about a weakness while showing you're actively working to improve it. This demonstrates self-awareness and growth mindset, which employers value.",
+        "feedback_type": "immediate"
+      }
+    }
+  ],
+  "total_interactions": 8,
+  "speaking_exercises": 7,
+  "quizzes": 1,
+  "hotspots": 1,
+  "total_points": 125
+}
+

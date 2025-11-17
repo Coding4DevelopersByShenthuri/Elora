@@ -40,7 +40,8 @@ from .serializers import (
     ParentalControlSettingsSerializer, TeenProgressSerializer, TeenStoryProgressSerializer,
     TeenVocabularyPracticeSerializer, TeenPronunciationPracticeSerializer, TeenFavoriteSerializer,
     TeenAchievementSerializer, TeenGameSessionSerializer, TeenCertificateSerializer,
-    PageEligibilitySerializer, CategoryProgressSerializer, AggregatedProgressSerializer
+    PageEligibilitySerializer, CategoryProgressSerializer, AggregatedProgressSerializer,
+    VideoLessonSerializer
 )
 from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
@@ -53,7 +54,7 @@ from .models import (
     ParentalControlSettings, TeenProgress, TeenStoryProgress,
     TeenVocabularyPractice, TeenPronunciationPractice, TeenFavorite,
     TeenAchievement, TeenGameSession, TeenCertificate,
-    PageEligibility, CategoryProgress
+    PageEligibility, CategoryProgress, VideoLesson
 )
 
 logger = logging.getLogger(__name__)
@@ -8301,4 +8302,262 @@ def get_recommended_category(user, categories):
     except Exception as e:
         logger.error(f"Error getting recommended category: {str(e)}")
         return None
+
+
+# ============= Admin Video Lessons Management =============
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_videos_list(request):
+    """Get all video lessons for admin management with filtering and pagination"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        # Get query parameters
+        page = int(request.GET.get('page', 1))
+        page_size = int(request.GET.get('page_size', 50))
+        search = request.GET.get('search', '').strip()
+        difficulty = request.GET.get('difficulty', '').strip()
+        category = request.GET.get('category', '').strip()
+        is_active = request.GET.get('is_active', '').strip()
+        
+        # Build queryset
+        queryset = VideoLesson.objects.all()
+        
+        # Apply filters
+        if search:
+            queryset = queryset.filter(
+                Q(title__icontains=search) |
+                Q(description__icontains=search) |
+                Q(slug__icontains=search)
+            )
+        
+        if difficulty and difficulty != 'all':
+            queryset = queryset.filter(difficulty=difficulty)
+        
+        if category and category != 'all':
+            queryset = queryset.filter(category=category)
+        
+        if is_active and is_active != 'all':
+            queryset = queryset.filter(is_active=is_active.lower() == 'true')
+        
+        # Get total count before pagination
+        total = queryset.count()
+        
+        # Pagination
+        start = (page - 1) * page_size
+        end = start + page_size
+        videos = queryset[start:end]
+        
+        # Serialize
+        serializer = VideoLessonSerializer(videos, many=True, context={'request': request})
+        
+        return Response({
+            'videos': serializer.data,
+            'pagination': {
+                'page': page,
+                'page_size': page_size,
+                'total': total,
+                'pages': ceil(total / page_size) if total > 0 else 0
+            }
+        })
+    except Exception as e:
+        logger.error(f"Admin videos list error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_videos_stats(request):
+    """Get comprehensive statistics about video lessons for admin dashboard"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        total_videos = VideoLesson.objects.count()
+        active_videos = VideoLesson.objects.filter(is_active=True).count()
+        inactive_videos = VideoLesson.objects.filter(is_active=False).count()
+        
+        # Recent videos (last 30 days)
+        from datetime import timedelta
+        recent_videos = VideoLesson.objects.filter(
+            created_at__gte=timezone.now() - timedelta(days=30)
+        ).count()
+        
+        # Difficulty distribution
+        difficulty_dist = VideoLesson.objects.values('difficulty').annotate(
+            count=Count('id')
+        ).order_by('difficulty')
+        
+        # Category distribution
+        category_dist = VideoLesson.objects.values('category').annotate(
+            count=Count('id')
+        ).order_by('category')
+        
+        # Total views
+        total_views = VideoLesson.objects.aggregate(
+            total=Sum('views')
+        )['total'] or 0
+        
+        # Average rating
+        avg_rating = VideoLesson.objects.aggregate(
+            avg=Avg('rating')
+        )['avg'] or 0
+        
+        return Response({
+            'overall': {
+                'total': total_videos,
+                'active': active_videos,
+                'inactive': inactive_videos,
+                'recent': recent_videos
+            },
+            'engagement': {
+                'total_views': total_views,
+                'avg_rating': round(avg_rating, 2)
+            },
+            'difficulty_distribution': list(difficulty_dist),
+            'category_distribution': list(category_dist)
+        })
+    except Exception as e:
+        logger.error(f"Admin videos stats error: {str(e)}")
+        return Response({
+            "message": "An error occurred",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def admin_video_detail(request, video_id):
+    """Get, update, or delete a specific video lesson"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        video = VideoLesson.objects.get(id=video_id)
+    except VideoLesson.DoesNotExist:
+        return Response({
+            "message": "Video lesson not found"
+        }, status=status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'GET':
+        serializer = VideoLessonSerializer(video, context={'request': request})
+        return Response(serializer.data)
+    
+    elif request.method == 'PUT':
+        data = request.data.copy()
+        
+        # Handle file uploads
+        if 'thumbnail' in request.FILES:
+            data['thumbnail'] = request.FILES['thumbnail']
+        if 'video_file' in request.FILES:
+            data['video_file'] = request.FILES['video_file']
+        
+        # Auto-generate slug from title if not provided and title changed
+        if 'title' in data and data['title'] != video.title:
+            if not data.get('slug') or data.get('slug') == video.slug:
+                from django.utils.text import slugify
+                base_slug = slugify(data['title'])
+                slug = base_slug
+                counter = 1
+                while VideoLesson.objects.filter(slug=slug).exclude(id=video_id).exists():
+                    slug = f"{base_slug}-{counter}"
+                    counter += 1
+                data['slug'] = slug
+        
+        serializer = VideoLessonSerializer(video, data=data, partial=True, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response({
+            "message": "Validation failed",
+            "errors": serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    elif request.method == 'DELETE':
+        video.delete()
+        return Response({
+            "message": "Video lesson deleted successfully"
+        }, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def admin_video_create(request):
+    """Create a new video lesson with file upload support"""
+    if not is_admin_user(request.user):
+        return Response({
+            "message": "Unauthorized. Admin access required."
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        data = request.data.copy()
+        
+        # Handle file uploads
+        if 'thumbnail' in request.FILES:
+            data['thumbnail'] = request.FILES['thumbnail']
+        if 'video_file' in request.FILES:
+            data['video_file'] = request.FILES['video_file']
+        
+        # Auto-generate slug from title if not provided
+        if not data.get('slug') and data.get('title'):
+            from django.utils.text import slugify
+            base_slug = slugify(data['title'])
+            slug = base_slug
+            counter = 1
+            while VideoLesson.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            data['slug'] = slug
+        
+        # Validate difficulty
+        valid_difficulties = [choice[0] for choice in VideoLesson.DIFFICULTY_CHOICES]
+        if data.get('difficulty') and data['difficulty'] not in valid_difficulties:
+            return Response({
+                "message": f"Invalid difficulty. Must be one of: {', '.join(valid_difficulties)}"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate category
+        valid_categories = [choice[0] for choice in VideoLesson.CATEGORY_CHOICES]
+        if data.get('category') and data['category'] not in valid_categories:
+            return Response({
+                "message": f"Invalid category. Must be one of: {', '.join(valid_categories)}"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Parse tags if it's a string
+        if 'tags' in data and isinstance(data['tags'], str):
+            try:
+                import json
+                data['tags'] = json.loads(data['tags'])
+            except:
+                data['tags'] = [tag.strip() for tag in data['tags'].split(',') if tag.strip()]
+        
+        serializer = VideoLessonSerializer(data=data, context={'request': request})
+        if serializer.is_valid():
+            video = serializer.save()
+            return Response(
+                VideoLessonSerializer(video, context={'request': request}).data,
+                status=status.HTTP_201_CREATED
+            )
+        return Response({
+            "message": "Validation failed",
+            "errors": serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        logger.error(f"Admin video create error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return Response({
+            "message": "An error occurred while creating the video lesson",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

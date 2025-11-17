@@ -1,0 +1,84 @@
+{
+  "slug": "business-phone-calls",
+  "title": "Business Phone Calls - Making and Receiving Calls",
+  "description": "Master professional phone communication. Learn to answer calls, make outgoing calls, transfer calls, take messages, and handle difficult situations with confidence.",
+  "lesson_type": "intermediate",
+  "content_type": "conversation",
+  "difficulty_level": 5,
+  "duration_minutes": 8,
+  "duration_seconds": 510,
+  "thumbnail_url": "/video-thumbs/business-phone-calls.jpg",
+  "video_url_720p": "/videos/lesson-04-business-phone-calls-720p.mp4",
+  "video_url_1080p": "/videos/lesson-04-business-phone-calls-1080p.mp4",
+  "subtitles_url": "/subtitles/lesson-04-business-phone-calls.vtt",
+  "transcript_url": "/transcripts/lesson-04-business-phone-calls.txt",
+  "category": "business",
+  "tags": ["phone-calls", "business", "customer-service", "communication", "telephone"],
+  "speaking_exercises": 8,
+  "quizzes": 1,
+  "hotspots": 1,
+  "total_points": 130,
+  "learning_objectives": [
+    "Answer business phone calls professionally",
+    "Make outgoing calls with clear introductions",
+    "Transfer calls and take messages effectively",
+    "Confirm information accurately during calls",
+    "Handle difficult situations on phone calls",
+    "End phone calls politely and professionally"
+  ],
+  "prerequisites": [
+    {
+      "slug": "professional-greetings",
+      "reason": "Basic professional communication skills required"
+    }
+  ],
+  "next_lessons": [
+    {
+      "slug": "meetings-presentations",
+      "title": "Participating in Business Meetings",
+      "reason": "Builds on professional communication for meetings"
+    }
+  ],
+  "related_lessons": [
+    {
+      "slug": "job-interviews",
+      "title": "Job Interview Skills",
+      "reason": "Similar professional communication context"
+    },
+    {
+      "slug": "business-meetings",
+      "title": "Participating in Business Meetings",
+      "reason": "Face-to-face professional communication"
+    }
+  ],
+  "instructor": {
+    "name": "Professional English Instructor",
+    "accent": "American English",
+    "credentials": "TESOL Certified, 10+ years experience"
+  },
+  "target_audience": {
+    "level": "intermediate",
+    "age_range": "adult",
+    "use_cases": [
+      "Customer service",
+      "Client communication",
+      "Office phone calls",
+      "Business operations"
+    ]
+  },
+  "estimated_completion_time": {
+    "video": 8,
+    "with_practice": 22,
+    "total": 30
+  },
+  "ratings": {
+    "difficulty": 5,
+    "practical_value": 5,
+    "engagement": 4
+  },
+  "is_active": true,
+  "order": 4,
+  "created_at": "2024-01-01T00:00:00Z",
+  "updated_at": "2024-01-01T00:00:00Z"
+}
+

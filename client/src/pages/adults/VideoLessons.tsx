@@ -71,8 +71,8 @@ const VideoLessons = () => {
         slug: 'professional-greetings',
         title: 'Professional Greetings & Introductions',
         description: 'Master formal greetings for business meetings, job interviews, and professional networking events with native speakers.',
-        thumbnail: '/video-thumbs/greetings.jpg',
-        duration: 325, // 5:25
+        thumbnail: '/Lesson01_Thumb.png',
+        duration: 96, // 1:36
         difficulty: 'beginner',
         category: 'business',
         rating: 4.8,
@@ -537,7 +537,12 @@ const VideoLessons = () => {
                       'group cursor-pointer bg-slate-900/60 backdrop-blur-xl border-purple-500/30 hover:border-purple-400/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-purple-500/20 overflow-hidden',
                       viewMode === 'list' && 'flex flex-col sm:flex-row'
                     )}
-                    onClick={() => navigate(`/adults/videos/${lesson.slug}`)}
+                    onClick={() => {
+                      const targetPath = lesson.slug === 'professional-greetings'
+                        ? '/lessons/1'
+                        : `/adults/videos/${lesson.slug}`;
+                      navigate(targetPath);
+                    }}
                   >
                     {/* Thumbnail */}
                     <div
@@ -550,10 +555,22 @@ const VideoLessons = () => {
                           : ''
                       )}
                     >
-                      {/* Placeholder for video thumbnail */}
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="p-4 rounded-full bg-white/10 backdrop-blur-sm">
-                          <Play className="w-8 h-8 text-white" />
+                      {/* Thumbnail */}
+                      <img
+                        src={lesson.thumbnail}
+                        alt={lesson.title}
+                        className={cn(
+                          'absolute inset-0 w-full h-full object-cover',
+                          viewMode === 'list' ? 'object-cover' : 'object-cover'
+                        )}
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                      {/* Fallback play icon when image fails */}
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div className="p-4 rounded-full bg-black/30 backdrop-blur-sm">
+                          <Play className="w-8 h-8 text-white opacity-80" />
                         </div>
                       </div>
                       
@@ -654,7 +671,10 @@ const VideoLessons = () => {
                         )}
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate(`/adults/videos/${lesson.slug}`);
+                          const targetPath = lesson.slug === 'professional-greetings'
+                            ? '/lessons/1'
+                            : `/adults/videos/${lesson.slug}`;
+                          navigate(targetPath);
                         }}
                       >
                         {lesson.progress?.completed ? (

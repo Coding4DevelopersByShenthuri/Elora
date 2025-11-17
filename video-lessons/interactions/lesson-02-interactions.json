@@ -1,0 +1,174 @@
+{
+  "lesson_slug": "daily-conversations",
+  "lesson_title": "Daily Conversations - Coffee Shop Scenarios",
+  "video_duration": 420,
+  "interactions": [
+    {
+      "id": "hotspot_001",
+      "type": "hotspot",
+      "timestamp": 25.0,
+      "duration": 5000,
+      "position": {"x": 50, "y": 35},
+      "data": {
+        "title": "Vocabulary: Small Talk",
+        "content": "Small talk is light, casual conversation about everyday topics like weather, sports, or general observations. It helps build rapport and is common in English-speaking cultures.",
+        "icon": "info",
+        "category": "vocabulary"
+      }
+    },
+    {
+      "id": "speak_001",
+      "type": "speaking",
+      "timestamp": 75.0,
+      "duration": 0,
+      "data": {
+        "type": "repeat_after",
+        "target_phrase": "I'd like a cappuccino, please.",
+        "native_audio_url": "/audio/lesson-02/order-cappuccino.mp3",
+        "expected_transcript": "I'd like a cappuccino please",
+        "min_score_threshold": 70,
+        "allow_retry": true,
+        "max_attempts": 3,
+        "points": 10,
+        "feedback_type": "detailed",
+        "instruction": "Repeat after me: 'I'd like a cappuccino, please.'"
+      }
+    },
+    {
+      "id": "speak_002",
+      "type": "speaking",
+      "timestamp": 135.0,
+      "duration": 20,
+      "data": {
+        "type": "shadow_speaking",
+        "text": "Cappuccino. Latte. Americano. Espresso. Macchiato.",
+        "native_audio_url": "/audio/lesson-02/coffee-types.mp3",
+        "expected_transcript": "Cappuccino Latte Americano Espresso Macchiato",
+        "speed": "slow",
+        "real_time_feedback": true,
+        "min_score_threshold": 75,
+        "allow_retry": true,
+        "max_attempts": 2,
+        "points": 15,
+        "feedback_type": "detailed",
+        "instruction": "Repeat each coffee type after me. Focus on clear pronunciation."
+      }
+    },
+    {
+      "id": "dialogue_001",
+      "type": "speaking",
+      "timestamp": 195.0,
+      "duration": 0,
+      "data": {
+        "type": "dialogue",
+        "scenario": "Coffee Shop Ordering",
+        "role": "customer",
+        "video_segments": {
+          "native_speaks": {"start": 195.0, "end": 200.0},
+          "user_response_time": {"duration": 15}
+        },
+        "expected_responses": [
+          "I'd like a medium cappuccino please",
+          "Can I have a medium cappuccino please",
+          "Could I get a medium cappuccino please"
+        ],
+        "evaluate_fluency": true,
+        "evaluate_pronunciation": true,
+        "evaluate_content": false,
+        "points": 20,
+        "instruction": "The barista says 'What can I get for you today?' Place your order."
+      }
+    },
+    {
+      "id": "speak_003",
+      "type": "speaking",
+      "timestamp": 245.0,
+      "duration": 0,
+      "data": {
+        "type": "repeat_after",
+        "target_phrase": "Nice day, isn't it?",
+        "native_audio_url": "/audio/lesson-02/small-talk-weather.mp3",
+        "expected_transcript": "Nice day isn't it",
+        "min_score_threshold": 70,
+        "allow_retry": true,
+        "max_attempts": 3,
+        "points": 10,
+        "feedback_type": "detailed",
+        "instruction": "Repeat after me: 'Nice day, isn't it?' Notice the contraction 'isn't'."
+      }
+    },
+    {
+      "id": "speak_004",
+      "type": "speaking",
+      "timestamp": 295.0,
+      "duration": 25,
+      "data": {
+        "type": "shadow_speaking",
+        "text": "Excuse me, could you repeat that? I'm sorry, what does that mean?",
+        "native_audio_url": "/audio/lesson-02/asking-for-help.mp3",
+        "expected_transcript": "Excuse me could you repeat that I'm sorry what does that mean",
+        "speed": "normal",
+        "real_time_feedback": false,
+        "min_score_threshold": 75,
+        "allow_retry": true,
+        "max_attempts": 2,
+        "points": 15,
+        "feedback_type": "detailed",
+        "instruction": "Practice asking for help. Shadow speak along with me."
+      }
+    },
+    {
+      "id": "dialogue_002",
+      "type": "speaking",
+      "timestamp": 335.0,
+      "duration": 0,
+      "data": {
+        "type": "dialogue",
+        "scenario": "Complete Coffee Shop Visit",
+        "role": "customer",
+        "video_segments": {
+          "native_speaks": {"start": 335.0, "end": 350.0},
+          "user_response_time": {"duration": 25}
+        },
+        "expected_responses": [
+          "I'd like a large latte please for here",
+          "Can I have a large latte for here please",
+          "Large latte for here please",
+          "Yes it is beautiful weather",
+          "Yes perfect for coffee"
+        ],
+        "evaluate_fluency": true,
+        "evaluate_pronunciation": true,
+        "evaluate_content": false,
+        "points": 25,
+        "instruction": "Complete the coffee shop scenario. Order your drink and respond to small talk.",
+        "multiple_responses": true
+      }
+    },
+    {
+      "id": "quiz_001",
+      "type": "quiz",
+      "timestamp": 365.0,
+      "duration": 0,
+      "data": {
+        "question": "Which phrase is most polite when ordering coffee?",
+        "type": "multiple_choice",
+        "options": [
+          "Give me a coffee",
+          "I'd like a coffee, please",
+          "Coffee!"
+        ],
+        "correct_answer": 1,
+        "points": 5,
+        "explanation": "'I'd like a coffee, please' is polite because it uses 'I'd like' (polite request) and 'please' (courtesy word). 'Give me' and just 'Coffee!' are too direct and can sound rude.",
+        "feedback_type": "immediate"
+      }
+    }
+  ],
+  "total_interactions": 7,
+  "speaking_exercises": 6,
+  "quizzes": 1,
+  "hotspots": 1,
+  "total_points": 110
+}
+

@@ -1,0 +1,82 @@
+{
+  "slug": "daily-conversations",
+  "title": "Daily Conversations - Coffee Shop Scenarios",
+  "description": "Practice natural English conversations for ordering coffee, making small talk, and interacting in everyday situations. Build confidence for real-world interactions.",
+  "lesson_type": "beginner",
+  "content_type": "conversation",
+  "difficulty_level": 1,
+  "duration_minutes": 7,
+  "duration_seconds": 420,
+  "thumbnail_url": "/video-thumbs/daily-conversations.jpg",
+  "video_url_720p": "/videos/lesson-02-daily-conversations-720p.mp4",
+  "video_url_1080p": "/videos/lesson-02-daily-conversations-1080p.mp4",
+  "subtitles_url": "/subtitles/lesson-02-daily-conversations.vtt",
+  "transcript_url": "/transcripts/lesson-02-daily-conversations.txt",
+  "category": "daily",
+  "tags": ["daily", "conversation", "casual", "practice", "coffee", "small-talk", "ordering"],
+  "speaking_exercises": 6,
+  "quizzes": 1,
+  "hotspots": 1,
+  "total_points": 110,
+  "learning_objectives": [
+    "Order food and drinks politely in cafes and restaurants",
+    "Make appropriate small talk in casual settings",
+    "Ask for help or clarification using polite phrases",
+    "Use common everyday English phrases naturally"
+  ],
+  "prerequisites": [
+    {
+      "slug": "professional-greetings",
+      "reason": "Basic greeting skills helpful for this lesson"
+    }
+  ],
+  "next_lessons": [
+    {
+      "slug": "job-interview-skills",
+      "title": "Job Interview Skills",
+      "reason": "Builds on conversation skills for professional settings"
+    }
+  ],
+  "related_lessons": [
+    {
+      "slug": "professional-greetings",
+      "title": "Professional Greetings & Introductions",
+      "reason": "Complements formal greetings with casual conversations"
+    },
+    {
+      "slug": "business-phone-calls",
+      "title": "Business Phone Calls",
+      "reason": "More formal conversation practice"
+    }
+  ],
+  "instructor": {
+    "name": "Professional English Instructor",
+    "accent": "American English",
+    "credentials": "TESOL Certified, 10+ years experience"
+  },
+  "target_audience": {
+    "level": "beginner",
+    "age_range": "adult",
+    "use_cases": [
+      "Coffee shops and cafes",
+      "Restaurants",
+      "Everyday social interactions",
+      "Building conversational confidence"
+    ]
+  },
+  "estimated_completion_time": {
+    "video": 7,
+    "with_practice": 18,
+    "total": 25
+  },
+  "ratings": {
+    "difficulty": 1,
+    "practical_value": 5,
+    "engagement": 5
+  },
+  "is_active": true,
+  "order": 2,
+  "created_at": "2024-01-01T00:00:00Z",
+  "updated_at": "2024-01-01T00:00:00Z"
+}
+

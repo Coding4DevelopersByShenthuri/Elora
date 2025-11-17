@@ -11,7 +11,7 @@ from .models import (
     ParentalControlSettings, TeenProgress, TeenStoryProgress,
     TeenVocabularyPractice, TeenPronunciationPractice, TeenFavorite,
     TeenAchievement, TeenGameSession, TeenCertificate,
-    PageEligibility, CategoryProgress
+    PageEligibility, CategoryProgress, VideoLesson
 )
 from django.contrib.auth.password_validation import validate_password
 
@@ -629,3 +629,36 @@ class PageEligibilitySerializer(serializers.ModelSerializer):
             return 0
         
         return sum(progress_values) / len(progress_values)
+
+
+# ============= Video Lesson Serializers =============
+class VideoLessonSerializer(serializers.ModelSerializer):
+    """Serializer for video lessons"""
+    thumbnail_url = serializers.SerializerMethodField()
+    video_file_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = VideoLesson
+        fields = [
+            'id', 'slug', 'title', 'description', 'thumbnail', 'thumbnail_url',
+            'video_file', 'video_file_url', 'video_url', 'duration', 'difficulty',
+            'category', 'rating', 'views', 'speaking_exercises', 'tags',
+            'is_active', 'order', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at', 'views']
+    
+    def get_thumbnail_url(self, obj):
+        if obj.thumbnail:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.thumbnail.url)
+            return obj.thumbnail.url
+        return None
+    
+    def get_video_file_url(self, obj):
+        if obj.video_file:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.video_file.url)
+            return obj.video_file.url
+        return None

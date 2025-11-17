@@ -17,9 +17,13 @@ const getAuthToken = (): string | null => {
 const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
   const token = getAuthToken();
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
     ...((options.headers as Record<string, string>) || {}),
   };
+  
+  // Only set Content-Type if it's not FormData (for file uploads)
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   // Always add Authorization header if we have a valid token
   if (token) {
@@ -1369,6 +1373,191 @@ export const AdminAPI = {
       return {
         success: false,
         message: error?.response?.data?.message || 'Failed to fetch survey steps',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * ============= Video Lessons Management =============
+   */
+  
+  /**
+   * Get list of video lessons for admin
+   */
+  getVideos: async (params?: {
+    search?: string;
+    page?: number;
+    page_size?: number;
+    difficulty?: string;
+    category?: string;
+    is_active?: string;
+  }) => {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.search) queryParams.append('search', params.search);
+      if (params?.page) queryParams.append('page', params.page.toString());
+      if (params?.page_size) queryParams.append('page_size', params.page_size.toString());
+      if (params?.difficulty) queryParams.append('difficulty', params.difficulty);
+      if (params?.category) queryParams.append('category', params.category);
+      if (params?.is_active) queryParams.append('is_active', params.is_active);
+
+      const query = queryParams.toString() ? `?${queryParams.toString()}` : '';
+      const result = await fetchWithAuth(`admin/videos${query}`);
+      
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch videos',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Get video statistics
+   */
+  getVideosStats: async () => {
+    try {
+      const result = await fetchWithAuth('admin/videos/stats');
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch video statistics',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Get a specific video by ID
+   */
+  getVideo: async (videoId: number) => {
+    try {
+      const result = await fetchWithAuth(`admin/videos/${videoId}`);
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to fetch video',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Create a new video lesson (supports file uploads)
+   */
+  createVideo: async (data: any, files?: { thumbnail?: File; video_file?: File }) => {
+    try {
+      const formData = new FormData();
+      
+      // Add all data fields
+      Object.keys(data).forEach(key => {
+        if (data[key] !== null && data[key] !== undefined) {
+          if (key === 'tags' && Array.isArray(data[key])) {
+            formData.append(key, JSON.stringify(data[key]));
+          } else {
+            formData.append(key, data[key]);
+          }
+        }
+      });
+      
+      // Add files if provided
+      if (files?.thumbnail) {
+        formData.append('thumbnail', files.thumbnail);
+      }
+      if (files?.video_file) {
+        formData.append('video_file', files.video_file);
+      }
+      
+      const result = await fetchWithAuth('admin/videos/create', {
+        method: 'POST',
+        body: formData,
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to create video',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Update a video lesson (supports file uploads)
+   */
+  updateVideo: async (videoId: number, data: any, files?: { thumbnail?: File; video_file?: File }) => {
+    try {
+      const formData = new FormData();
+      
+      // Add all data fields
+      Object.keys(data).forEach(key => {
+        if (data[key] !== null && data[key] !== undefined) {
+          if (key === 'tags' && Array.isArray(data[key])) {
+            formData.append(key, JSON.stringify(data[key]));
+          } else {
+            formData.append(key, data[key]);
+          }
+        }
+      });
+      
+      // Add files if provided
+      if (files?.thumbnail) {
+        formData.append('thumbnail', files.thumbnail);
+      }
+      if (files?.video_file) {
+        formData.append('video_file', files.video_file);
+      }
+      
+      const result = await fetchWithAuth(`admin/videos/${videoId}`, {
+        method: 'PUT',
+        body: formData,
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to update video',
+        error: error
+      };
+    }
+  },
+
+  /**
+   * Delete a video lesson
+   */
+  deleteVideo: async (videoId: number) => {
+    try {
+      const result = await fetchWithAuth(`admin/videos/${videoId}`, {
+        method: 'DELETE',
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Failed to delete video',
         error: error
       };
     }

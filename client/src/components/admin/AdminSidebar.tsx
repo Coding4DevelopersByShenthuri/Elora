@@ -12,9 +12,9 @@ import {
   Clock,
   CheckCircle2,
   TrendingUp,
-  Shield,
   Trophy,
-  ClipboardList
+  ClipboardList,
+  Video
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -44,6 +44,7 @@ export function AdminSidebar({ isCollapsed = false, onToggle }: AdminSidebarProp
       path: '/admin/users',
     },
     { title: 'Lessons', icon: BookOpen, path: '/admin/lessons' },
+    { title: 'Videos', icon: Video, path: '/admin/videos' },
     { title: 'Practice', icon: Clock, path: '/admin/practice' },
     { title: 'Progress', icon: CheckCircle2, path: '/admin/progress' },
     { title: 'Vocabulary', icon: TrendingUp, path: '/admin/vocabulary' },
@@ -94,9 +95,9 @@ export function AdminSidebar({ isCollapsed = false, onToggle }: AdminSidebarProp
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full overflow-hidden">
           {/* Logo/Header */}
-          <div className={cn('flex items-center p-3 border-b border-white/10', isCollapsed ? 'justify-center' : 'justify-between')}> 
+          <div className={cn('flex items-center p-2.5 lg:p-3 border-b border-white/10 flex-shrink-0', isCollapsed ? 'justify-center' : 'justify-between')}> 
             <div className={cn('flex items-center gap-3', isCollapsed ? 'justify-center' : '')}>
               <img src="/logo01.png" alt="Elora" className={cn('rounded bg-white/10 p-1', isCollapsed ? 'h-14 w-14' : 'h-10 w-10')} />
               {!isCollapsed && (
@@ -120,7 +121,7 @@ export function AdminSidebar({ isCollapsed = false, onToggle }: AdminSidebarProp
           </div>
 
           {/* Upload action */}
-          <div className={cn('p-4 border-b border-white/10', isCollapsed ? 'flex justify-center' : '')}>
+          <div className={cn('p-2.5 lg:p-3 border-b border-white/10 flex-shrink-0', isCollapsed ? 'flex justify-center' : '')}>
             <label className={cn(
               'inline-flex items-center gap-2 rounded-lg cursor-pointer transition-colors',
               'bg-[var(--admin-yellow)] text-gray-800 hover:opacity-95',
@@ -142,8 +143,8 @@ export function AdminSidebar({ isCollapsed = false, onToggle }: AdminSidebarProp
             </label>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-1">
+          {/* Navigation - Scrollable on mobile only, all items visible on desktop */}
+          <nav className="flex-1 overflow-y-auto lg:overflow-visible admin-sidebar-nav p-2.5 lg:p-3 space-y-0.5 lg:space-y-1 min-h-0">
             {menuItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.path);
@@ -155,27 +156,27 @@ export function AdminSidebar({ isCollapsed = false, onToggle }: AdminSidebarProp
                   onClick={() => setMobileOpen(false)}
                   className={cn(
                     'flex items-center rounded-lg transition-colors admin-nav-link',
-                    isCollapsed ? 'justify-center px-2 py-3' : 'gap-3 px-4 py-3 justify-start',
+                    isCollapsed ? 'justify-center px-2 py-2.5' : 'gap-3 px-4 py-2.5 justify-start',
                     active ? 'active' : 'text-white/80'
                   )}
                   title={item.title}
                 >
-                  <Icon className={cn('h-5 w-5', active ? 'text-gray-800' : 'text-white')} />
-                  {!isCollapsed && <span className={cn('font-medium', active ? 'text-gray-800' : 'text-white')}>{item.title}</span>}
+                  <Icon className={cn('h-5 w-5 flex-shrink-0', active ? 'text-gray-800' : 'text-white')} />
+                  {!isCollapsed && <span className={cn('font-medium truncate text-sm', active ? 'text-gray-800' : 'text-white')}>{item.title}</span>}
                 </Link>
               );
             })}
           </nav>
 
-          {/* Logout */}
-          <div className="p-4 border-t border-white/10">
+          {/* Logout - Fixed at bottom */}
+          <div className="p-2.5 lg:p-3 border-t border-white/10 flex-shrink-0">
             <Button
               variant="ghost"
               className={cn('w-full', isCollapsed ? 'justify-center' : 'justify-start gap-3')}
               onClick={handleLogout}
               title="Logout"
             >
-              <LogOut className="h-5 w-5 text-white" />
+              <LogOut className="h-5 w-5 text-white flex-shrink-0" />
               {!isCollapsed && <span className="text-white">Logout</span>}
             </Button>
           </div>
