@@ -10,7 +10,8 @@ from .models import (
     TeenPronunciationPractice, TeenFavorite, TeenAchievement,
     TeenGameSession, TeenCertificate,
     EmailVerificationToken, SurveyStepResponse, ParentalControlSettings,
-    CookieConsent, PlatformSettings, CategoryProgress, PageEligibility
+    CookieConsent, PlatformSettings, CategoryProgress, PageEligibility,
+    VideoEngagement, ChannelSubscription, PracticeComment, VideoShareEvent
 )
 
 
@@ -198,7 +199,39 @@ class TeenCertificateAdmin(admin.ModelAdmin):
     list_filter = ['issued_at']
     search_fields = ['user__username', 'cert_id', 'title']
     readonly_fields = ['issued_at']
-    date_hierarchy = 'issued_at'
+
+
+@admin.register(VideoEngagement)
+class VideoEngagementAdmin(admin.ModelAdmin):
+    list_display = ['user', 'video', 'liked', 'saved', 'playlist_name', 'updated_at']
+    list_filter = ['liked', 'saved']
+    search_fields = ['user__username', 'video__title', 'playlist_name']
+    readonly_fields = ['created_at', 'updated_at']
+
+
+@admin.register(ChannelSubscription)
+class ChannelSubscriptionAdmin(admin.ModelAdmin):
+    list_display = ['user', 'channel_name', 'is_active', 'subscribed_at', 'unsubscribed_at']
+    list_filter = ['is_active', 'channel_slug']
+    search_fields = ['user__username', 'channel_name']
+    readonly_fields = ['subscribed_at', 'unsubscribed_at']
+
+
+@admin.register(PracticeComment)
+class PracticeCommentAdmin(admin.ModelAdmin):
+    list_display = ['user', 'video', 'is_approved', 'created_at']
+    list_filter = ['is_approved', 'video']
+    search_fields = ['user__username', 'video__title', 'content']
+    readonly_fields = ['created_at', 'updated_at']
+
+
+@admin.register(VideoShareEvent)
+class VideoShareEventAdmin(admin.ModelAdmin):
+    list_display = ['video', 'user', 'method', 'created_at']
+    list_filter = ['method']
+    search_fields = ['video__title', 'user__username']
+    readonly_fields = ['created_at']
+    date_hierarchy = 'created_at'
 
 
 # ============= Kids Models Admin =============

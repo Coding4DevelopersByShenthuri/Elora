@@ -11,7 +11,8 @@ from .models import (
     ParentalControlSettings, TeenProgress, TeenStoryProgress,
     TeenVocabularyPractice, TeenPronunciationPractice, TeenFavorite,
     TeenAchievement, TeenGameSession, TeenCertificate,
-    PageEligibility, CategoryProgress, VideoLesson
+    PageEligibility, CategoryProgress, VideoLesson,
+    PracticeComment
 )
 from django.contrib.auth.password_validation import validate_password
 
@@ -662,3 +663,24 @@ class VideoLessonSerializer(serializers.ModelSerializer):
                 return request.build_absolute_uri(obj.video_file.url)
             return obj.video_file.url
         return None
+
+
+class PracticeCommentSerializer(serializers.ModelSerializer):
+    """Serializer for practice comments under a video"""
+    author_name = serializers.SerializerMethodField()
+    is_own = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = PracticeComment
+        fields = ['id', 'content', 'author_name', 'is_own', 'is_approved', 'created_at']
+        read_only_fields = ['id', 'author_name', 'is_own', 'created_at']
+    
+    def get_author_name(self, obj):
+        full_name = obj.user.get_full_name()
+        return full_name if full_name else obj.user.username
+    
+    def get_is_own(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.user_id == request.user.id
+        return False

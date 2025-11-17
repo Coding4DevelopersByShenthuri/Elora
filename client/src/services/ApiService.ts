@@ -369,7 +369,84 @@ export const VideosAPI = {
     } catch (error) {
       return handleApiError(error);
     }
-  }
+  },
+  
+  getEngagement: async (slug: string) => {
+    try {
+      const result = await fetchWithAuth(`videos/${slug}/engagement`, {}, 15000, false);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+  
+  updateEngagement: async (slug: string, data: { action: 'like' | 'save' | 'playlist' | 'share'; playlist_name?: string | null; method?: string }) => {
+    try {
+      const result = await fetchWithAuth(`videos/${slug}/engagement`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+  
+  recordShare: async (slug: string, method?: string) => {
+    try {
+      const result = await fetchWithAuth(`videos/${slug}/share`, {
+        method: 'POST',
+        body: JSON.stringify({ method }),
+      }, 15000, false);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+  
+  getPracticeComments: async (slug: string) => {
+    try {
+      const result = await fetchWithAuth(`videos/${slug}/comments`, {}, 15000, false);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+  
+  postPracticeComment: async (slug: string, content: string) => {
+    try {
+      const result = await fetchWithAuth(`videos/${slug}/comments`, {
+        method: 'POST',
+        body: JSON.stringify({ content }),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+};
+
+export const ChannelAPI = {
+  getSubscriptionStatus: async (channelSlug: string = 'elora-english') => {
+    try {
+      const result = await fetchWithAuth(`channel/subscription?channel_slug=${channelSlug}`, {}, 15000, false);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+  
+  updateSubscription: async (data: { channel_slug?: string; channel_name?: string; subscribe: boolean }) => {
+    try {
+      const result = await fetchWithAuth('channel/subscription', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
 };
 
 // ============= Admin API =============

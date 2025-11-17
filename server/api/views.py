@@ -41,7 +41,7 @@ from .serializers import (
     TeenVocabularyPracticeSerializer, TeenPronunciationPracticeSerializer, TeenFavoriteSerializer,
     TeenAchievementSerializer, TeenGameSessionSerializer, TeenCertificateSerializer,
     PageEligibilitySerializer, CategoryProgressSerializer, AggregatedProgressSerializer,
-    VideoLessonSerializer
+    VideoLessonSerializer, PracticeCommentSerializer
 )
 from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
@@ -54,7 +54,8 @@ from .models import (
     ParentalControlSettings, TeenProgress, TeenStoryProgress,
     TeenVocabularyPractice, TeenPronunciationPractice, TeenFavorite,
     TeenAchievement, TeenGameSession, TeenCertificate,
-    PageEligibility, CategoryProgress, VideoLesson
+    PageEligibility, CategoryProgress, VideoLesson,
+    VideoEngagement, ChannelSubscription, PracticeComment, VideoShareEvent
 )
 
 logger = logging.getLogger(__name__)
@@ -8364,10 +8365,14 @@ def admin_videos_list(request):
             }
         })
     except Exception as e:
+        import traceback
+        error_traceback = traceback.format_exc()
         logger.error(f"Admin videos list error: {str(e)}")
+        logger.error(f"Traceback: {error_traceback}")
         return Response({
-            "message": "An error occurred",
-            "error": str(e)
+            "message": "An error occurred while fetching videos",
+            "error": str(e),
+            "detail": error_traceback if settings.DEBUG else None
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -8782,3 +8787,189 @@ def video_detail(request, slug):
             "error": str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+@api_view(['GET', 'POST'])
+@permission_classes([AllowAny])
+def video_engagement(request, slug):
+    """Get or update engagement stats (likes, saves, playlist, shares) for a video"""
+    try:
+        video = VideoLesson.objects.get(slug=slug, is_active=True)
+    except VideoLesson.DoesNotExist:
+        return Response({"message": "Video lesson not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    def serialize_response():
+        engagements = VideoEngagement.objects.filter(video=video)
+        likes = engagements.filter(liked=True).count()
+        saves = engagements.filter(saved=True).count()
+        playlists = engagements.exclude(playlist_name__isnull=True).exclude(playlist_name__exact='').count()
+        shares = video.share_events.count()
+        user_state = {
+            'liked': False,
+            'saved': False,
+            'playlist_name': None,
+        }
+        if request.user.is_authenticated:
+            engagement = engagements.filter(user=request.user).first()
+            if engagement:
+                user_state = {
+                    'liked': engagement.liked,
+                    'saved': engagement.saved,
+                    'playlist_name': engagement.playlist_name,
+                }
+        subscriber_count = ChannelSubscription.objects.filter(channel_slug='elora-english', is_active=True).count()
+        is_subscribed = False
+        if request.user.is_authenticated:
+            is_subscribed = ChannelSubscription.objects.filter(
+                user=request.user,
+                channel_slug='elora-english',
+                is_active=True
+            ).exists()
+        
+        return {
+            'video_id': video.id,
+            'counts': {
+                'likes': likes,
+                'saves': saves,
+                'playlists': playlists,
+                'shares': shares,
+                'subscribers': subscriber_count,
+            },
+            'user_state': user_state,
+            'subscribed': is_subscribed,
+        }
+    
+    if request.method == 'GET':
+        return Response({'success': True, **serialize_response()})
+    
+    if not request.user.is_authenticated:
+        return Response({"message": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    action = request.data.get('action')
+    playlist_name = request.data.get('playlist_name', '').strip() or None
+    
+    engagement, _ = VideoEngagement.objects.get_or_create(user=request.user, video=video)
+    
+    if action == 'like':
+        engagement.liked = not engagement.liked
+    elif action == 'save':
+        engagement.saved = not engagement.saved
+    elif action == 'playlist':
+        if engagement.playlist_name and playlist_name is None:
+            # toggle off existing playlist
+            engagement.playlist_name = None
+        else:
+            engagement.playlist_name = playlist_name or 'Watch Later'
+    elif action == 'share':
+        method = request.data.get('method')
+        VideoShareEvent.objects.create(video=video, user=request.user, method=method)
+    else:
+        return Response({"message": "Unknown engagement action"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    engagement.save()
+    return Response({'success': True, **serialize_response()})
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([AllowAny])
+def channel_subscription(request):
+    """Get or toggle channel subscription for the authenticated user"""
+    channel_slug = request.data.get('channel_slug') or request.GET.get('channel_slug') or 'elora-english'
+    channel_name = request.data.get('channel_name') or 'Elora English'
+    
+    total = ChannelSubscription.objects.filter(channel_slug=channel_slug, is_active=True).count()
+    is_subscribed = False
+    if request.user.is_authenticated:
+        is_subscribed = ChannelSubscription.objects.filter(
+            user=request.user,
+            channel_slug=channel_slug,
+            is_active=True
+        ).exists()
+    
+    if request.method == 'GET':
+        return Response({
+            'success': True,
+            'channel_slug': channel_slug,
+            'channel_name': channel_name,
+            'subscribers': total,
+            'subscribed': is_subscribed,
+        })
+    
+    if not request.user.is_authenticated:
+        return Response({"message": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    subscribe = request.data.get('subscribe')
+    record, _ = ChannelSubscription.objects.get_or_create(
+        user=request.user,
+        channel_slug=channel_slug,
+        defaults={'channel_name': channel_name}
+    )
+    
+    if subscribe is False or (subscribe is None and record.is_active):
+        record.is_active = False
+        record.unsubscribed_at = timezone.now()
+    else:
+        record.is_active = True
+        record.channel_name = channel_name
+        record.unsubscribed_at = None
+    record.save()
+    
+    total = ChannelSubscription.objects.filter(channel_slug=channel_slug, is_active=True).count()
+    return Response({
+        'success': True,
+        'subscribed': record.is_active,
+        'subscribers': total,
+    })
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([AllowAny])
+def video_practice_comments(request, slug):
+    """List or create practice comments for a video"""
+    try:
+        video = VideoLesson.objects.get(slug=slug, is_active=True)
+    except VideoLesson.DoesNotExist:
+        return Response({"message": "Video lesson not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'GET':
+        comments = PracticeComment.objects.filter(video=video)
+        if not request.user.is_authenticated:
+            comments = comments.filter(is_approved=True)
+        elif not request.user.is_staff:
+            comments = comments.filter(Q(is_approved=True) | Q(user=request.user))
+        serializer = PracticeCommentSerializer(
+            comments.order_by('-created_at')[:50],
+            many=True,
+            context={'request': request}
+        )
+        return Response({'success': True, 'comments': serializer.data})
+    
+    if not request.user.is_authenticated:
+        return Response({"message": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    content = request.data.get('content', '').strip()
+    if not content:
+        return Response({"message": "Comment cannot be empty"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    comment = PracticeComment.objects.create(
+        video=video,
+        user=request.user,
+        content=content,
+        is_approved=True  # auto-approve for now
+    )
+    serializer = PracticeCommentSerializer(comment, context={'request': request})
+    return Response({'success': True, 'comment': serializer.data}, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def video_share_event(request, slug):
+    """Record a share event for analytics purposes"""
+    try:
+        video = VideoLesson.objects.get(slug=slug, is_active=True)
+    except VideoLesson.DoesNotExist:
+        return Response({"message": "Video lesson not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    method = request.data.get('method')
+    user = request.user if request.user.is_authenticated else None
+    VideoShareEvent.objects.create(video=video, user=user, method=method)
+    return Response({'success': True, 'message': 'Share recorded'})

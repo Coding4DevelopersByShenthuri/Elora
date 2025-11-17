@@ -305,6 +305,40 @@ const VideoLessons = () => {
             </p>
           </div>
 
+          {/* Topics Filter Bar */}
+          <div className="mb-6 flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            {[
+              { label: 'All', value: 'all' },
+              { label: 'Conversation', value: 'conversation' },
+              { label: 'Pronunciation', value: 'pronunciation' },
+              { label: 'Grammar', value: 'grammar' },
+              { label: 'Business', value: 'business' },
+              { label: 'Daily Life', value: 'daily' },
+            ].map((topic) => (
+              <button
+                key={topic.value}
+                onClick={() => {
+                  setSelectedCategory(topic.value);
+                  const newParams = new URLSearchParams(searchParams);
+                  if (topic.value === 'all') {
+                    newParams.delete('category');
+                  } else {
+                    newParams.set('category', topic.value);
+                  }
+                  setSearchParams(newParams);
+                }}
+                className={cn(
+                  'px-4 py-1.5 rounded-full border text-sm text-white whitespace-nowrap transition-colors',
+                  selectedCategory === topic.value
+                    ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200'
+                    : 'border-white/10 bg-white/5 hover:bg-white/15'
+                )}
+              >
+                {topic.label}
+              </button>
+            ))}
+          </div>
+
           {/* Search and Filters */}
           <div className="mb-6 sm:mb-8 space-y-3 sm:space-y-4">
             {/* Search Bar */}

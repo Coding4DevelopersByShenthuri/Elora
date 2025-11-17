@@ -162,6 +162,10 @@ urlpatterns = [
     # ============= Public Video Lessons =============
     path('videos', views.videos_list, name='videos-list'),
     path('videos/<str:slug>', views.video_detail, name='video-detail'),
+    path('videos/<str:slug>/engagement', views.video_engagement, name='video-engagement'),
+    path('videos/<str:slug>/comments', views.video_practice_comments, name='video-comments'),
+    path('videos/<str:slug>/share', views.video_share_event, name='video-share'),
+    path('channel/subscription', views.channel_subscription, name='channel-subscription'),
     
     # ============= Admin Video Lessons Management =============
     path('admin/videos', views.admin_videos_list, name='admin-videos-list'),

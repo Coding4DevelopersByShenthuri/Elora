@@ -1233,3 +1233,79 @@ class VideoLesson(models.Model):
     
     def __str__(self):
         return f"{self.title} ({self.difficulty} - {self.category})"
+
+
+class VideoEngagement(models.Model):
+    """Store per-user engagement (like/save/playlist) for video lessons"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='video_engagements')
+    video = models.ForeignKey(VideoLesson, on_delete=models.CASCADE, related_name='engagements')
+    liked = models.BooleanField(default=False)
+    saved = models.BooleanField(default=False)
+    playlist_name = models.CharField(max_length=150, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ('user', 'video')
+        indexes = [
+            models.Index(fields=['video', 'liked']),
+            models.Index(fields=['video', 'saved']),
+        ]
+    
+    def __str__(self):
+        return f"{self.user.username} -> {self.video.title}"
+
+
+class ChannelSubscription(models.Model):
+    """Track channel subscriptions for adult video lessons"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='channel_subscriptions')
+    channel_slug = models.SlugField(max_length=120, default='elora-english')
+    channel_name = models.CharField(max_length=150, default='Elora English')
+    is_active = models.BooleanField(default=True)
+    subscribed_at = models.DateTimeField(auto_now_add=True)
+    unsubscribed_at = models.DateTimeField(blank=True, null=True)
+    
+    class Meta:
+        unique_together = ('user', 'channel_slug')
+        indexes = [
+            models.Index(fields=['channel_slug', 'is_active']),
+        ]
+    
+    def __str__(self):
+        return f"{self.user.username} -> {self.channel_name} ({'active' if self.is_active else 'inactive'})"
+
+
+class PracticeComment(models.Model):
+    """Community practice comments under each video"""
+    video = models.ForeignKey(VideoLesson, on_delete=models.CASCADE, related_name='practice_comments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='practice_comments')
+    content = models.TextField()
+    is_approved = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['video', 'is_approved']),
+        ]
+    
+    def __str__(self):
+        return f"Practice comment by {self.user.username} on {self.video.title}"
+
+
+class VideoShareEvent(models.Model):
+    """Track share events for analytics"""
+    video = models.ForeignKey(VideoLesson, on_delete=models.CASCADE, related_name='share_events')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='video_share_events')
+    method = models.CharField(max_length=50, blank=True, null=True, help_text="copy_link, web_share, etc.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['video']),
+        ]
+    
+    def __str__(self):
+        return f"Share event on {self.video.title} via {self.method or 'unknown'}"

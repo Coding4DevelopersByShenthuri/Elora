@@ -178,14 +178,22 @@ export default function AdminVideos() {
 
       const response = await AdminAPI.getVideos(params);
       if (response.success && response.data) {
-        setVideos(response.data.videos || []);
-        setPagination(response.data.pagination || pagination);
+        // Handle both direct response and nested data structure
+        const videosData = response.data.videos || response.data || [];
+        const paginationData = response.data.pagination || pagination;
+        setVideos(Array.isArray(videosData) ? videosData : []);
+        setPagination(paginationData);
+        setError(''); // Clear any previous errors
       } else {
-        setError(response.message || 'Failed to load videos');
+        const errorMsg = response.message || 'Failed to load videos';
+        console.error('Admin videos API error:', { response, params });
+        setError(errorMsg);
         setVideos([]);
       }
     } catch (err: any) {
-      setError(err?.message || 'An error occurred while loading videos');
+      const errorMsg = err?.message || err?.response?.data?.message || 'An error occurred while loading videos';
+      console.error('Admin videos fetch error:', err);
+      setError(errorMsg);
       setVideos([]);
     } finally {
       if (!silent) {
@@ -199,11 +207,14 @@ export default function AdminVideos() {
   const loadStats = async () => {
     try {
       const response = await AdminAPI.getVideosStats();
-      if (response.success) {
+      if (response.success && response.data) {
         setStats(response.data);
+      } else {
+        console.warn('Failed to fetch video stats:', response.message || 'Unknown error');
       }
-    } catch (err) {
-      console.warn('Failed to fetch video stats', err);
+    } catch (err: any) {
+      console.error('Error fetching video stats:', err);
+      // Don't set error state for stats - it's not critical
     }
   };
 
