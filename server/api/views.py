@@ -8454,9 +8454,23 @@ def admin_video_detail(request, video_id):
         return Response(serializer.data)
     
     elif request.method == 'PUT':
-        data = request.data.copy()
+        # Build a mutable dict without deep-copying file streams
+        # For FormData, request.data is a QueryDict - convert to regular dict
+        if hasattr(request.data, 'dict'):
+            data = request.data.dict()
+        else:
+            # Fallback: manually extract non-file fields
+            data = {}
+            for key in request.data:
+                if key not in ['thumbnail', 'video_file']:  # Skip file fields
+                    value = request.data.get(key)
+                    # Handle list values
+                    if isinstance(value, list) and len(value) == 1:
+                        data[key] = value[0]
+                    else:
+                        data[key] = value
         
-        # Handle file uploads
+        # Handle file uploads from request.FILES
         if 'thumbnail' in request.FILES:
             data['thumbnail'] = request.FILES['thumbnail']
         if 'video_file' in request.FILES:
@@ -8473,6 +8487,46 @@ def admin_video_detail(request, video_id):
                     slug = f"{base_slug}-{counter}"
                     counter += 1
                 data['slug'] = slug
+        
+        # Parse tags, hashtags, and chapters (same as create function)
+        # Parse tags if it's a string
+        if 'tags' in data:
+            if isinstance(data['tags'], str):
+                try:
+                    import json
+                    data['tags'] = json.loads(data['tags'])
+                except (json.JSONDecodeError, ValueError):
+                    if data['tags'].strip():
+                        data['tags'] = [tag.strip() for tag in data['tags'].split(',') if tag.strip()]
+                    else:
+                        data['tags'] = []
+            elif not isinstance(data['tags'], list):
+                data['tags'] = []
+        
+        # Parse hashtags if it's a string
+        if 'hashtags' in data:
+            if isinstance(data['hashtags'], str):
+                try:
+                    import json
+                    data['hashtags'] = json.loads(data['hashtags'])
+                except (json.JSONDecodeError, ValueError):
+                    if data['hashtags'].strip():
+                        data['hashtags'] = [tag.strip().lstrip('#') for tag in data['hashtags'].split(',') if tag.strip()]
+                    else:
+                        data['hashtags'] = []
+            elif not isinstance(data['hashtags'], list):
+                data['hashtags'] = []
+        
+        # Parse chapters if it's a string
+        if 'chapters' in data:
+            if isinstance(data['chapters'], str):
+                try:
+                    import json
+                    data['chapters'] = json.loads(data['chapters'])
+                except (json.JSONDecodeError, ValueError):
+                    data['chapters'] = []
+            elif not isinstance(data['chapters'], list):
+                data['chapters'] = []
         
         serializer = VideoLessonSerializer(video, data=data, partial=True, context={'request': request})
         if serializer.is_valid():
@@ -8500,24 +8554,76 @@ def admin_video_create(request):
         }, status=status.HTTP_403_FORBIDDEN)
     
     try:
-        data = request.data.copy()
+        # Build a mutable dict without deep-copying file streams
+        # For FormData, request.data is a QueryDict - convert to regular dict
+        if hasattr(request.data, 'dict'):
+            data = request.data.dict()
+        else:
+            # Fallback: manually extract non-file fields
+            data = {}
+            for key in request.data:
+                if key not in ['thumbnail', 'video_file']:  # Skip file fields
+                    value = request.data.get(key)
+                    # Handle list values (like tags as JSON string)
+                    if isinstance(value, list) and len(value) == 1:
+                        data[key] = value[0]
+                    else:
+                        data[key] = value
         
-        # Handle file uploads
+        # Attach uploaded files explicitly from request.FILES
         if 'thumbnail' in request.FILES:
             data['thumbnail'] = request.FILES['thumbnail']
         if 'video_file' in request.FILES:
             data['video_file'] = request.FILES['video_file']
         
-        # Auto-generate slug from title if not provided
-        if not data.get('slug') and data.get('title'):
+        # Convert empty strings to None for optional fields (but not slug - it will be auto-generated)
+        for field in ['description', 'video_url']:
+            if field in data and data[field] == '':
+                data[field] = None
+        
+        # Validate title is provided first
+        if not data.get('title') or not data.get('title').strip():
+            return Response({
+                "message": "Title is required"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Auto-generate slug from title if not provided or empty
+        if not data.get('slug') or (isinstance(data.get('slug'), str) and not data.get('slug').strip()):
             from django.utils.text import slugify
             base_slug = slugify(data['title'])
+            if not base_slug:  # If slugify returns empty, use a default
+                base_slug = 'video-lesson'
             slug = base_slug
             counter = 1
             while VideoLesson.objects.filter(slug=slug).exists():
                 slug = f"{base_slug}-{counter}"
                 counter += 1
             data['slug'] = slug
+        
+        # Convert numeric fields
+        numeric_fields = {
+            'duration': int,
+            'speaking_exercises': int,
+            'rating': float,
+            'views': int,
+            'order': int
+        }
+        for field, field_type in numeric_fields.items():
+            if field in data:
+                try:
+                    if data[field] == '' or data[field] is None:
+                        data[field] = 0 if field_type == int else 0.0
+                    else:
+                        data[field] = field_type(data[field])
+                except (ValueError, TypeError):
+                    data[field] = 0 if field_type == int else 0.0
+        
+        # Convert boolean fields
+        if 'is_active' in data:
+            if isinstance(data['is_active'], str):
+                data['is_active'] = data['is_active'].lower() in ('true', '1', 'yes')
+            elif data['is_active'] is None:
+                data['is_active'] = True
         
         # Validate difficulty
         valid_difficulties = [choice[0] for choice in VideoLesson.DIFFICULTY_CHOICES]
@@ -8534,12 +8640,46 @@ def admin_video_create(request):
             }, status=status.HTTP_400_BAD_REQUEST)
         
         # Parse tags if it's a string
-        if 'tags' in data and isinstance(data['tags'], str):
-            try:
-                import json
-                data['tags'] = json.loads(data['tags'])
-            except:
-                data['tags'] = [tag.strip() for tag in data['tags'].split(',') if tag.strip()]
+        if 'tags' in data:
+            if isinstance(data['tags'], str):
+                try:
+                    # Try to parse as JSON first
+                    import json
+                    data['tags'] = json.loads(data['tags'])
+                except (json.JSONDecodeError, ValueError):
+                    # If not JSON, split by comma
+                    if data['tags'].strip():
+                        data['tags'] = [tag.strip() for tag in data['tags'].split(',') if tag.strip()]
+                    else:
+                        data['tags'] = []
+            elif not isinstance(data['tags'], list):
+                data['tags'] = []
+        
+        # Parse hashtags if it's a string
+        if 'hashtags' in data:
+            if isinstance(data['hashtags'], str):
+                try:
+                    import json
+                    data['hashtags'] = json.loads(data['hashtags'])
+                except (json.JSONDecodeError, ValueError):
+                    if data['hashtags'].strip():
+                        # Remove # if present and split by comma
+                        data['hashtags'] = [tag.strip().lstrip('#') for tag in data['hashtags'].split(',') if tag.strip()]
+                    else:
+                        data['hashtags'] = []
+            elif not isinstance(data['hashtags'], list):
+                data['hashtags'] = []
+        
+        # Parse chapters if it's a string
+        if 'chapters' in data:
+            if isinstance(data['chapters'], str):
+                try:
+                    import json
+                    data['chapters'] = json.loads(data['chapters'])
+                except (json.JSONDecodeError, ValueError):
+                    data['chapters'] = []
+            elif not isinstance(data['chapters'], list):
+                data['chapters'] = []
         
         serializer = VideoLessonSerializer(data=data, context={'request': request})
         if serializer.is_valid():
@@ -8553,11 +8693,92 @@ def admin_video_create(request):
             "errors": serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        logger.error(f"Admin video create error: {str(e)}")
+        error_message = str(e)
+        logger.error(f"Admin video create error: {error_message}")
+        import traceback
+        error_traceback = traceback.format_exc()
+        logger.error(f"Traceback: {error_traceback}")
+        return Response({
+            "message": "An error occurred while creating the video lesson",
+            "error": error_message,
+            "detail": error_traceback if settings.DEBUG else None
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# ============= Public Video Lessons Endpoint =============
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def videos_list(request):
+    """Get all active video lessons for public viewing (adults/videos page)"""
+    try:
+        # Get query parameters
+        difficulty = request.GET.get('difficulty', '').strip()
+        category = request.GET.get('category', '').strip()
+        search = request.GET.get('search', '').strip()
+        
+        # Build queryset - only active videos
+        queryset = VideoLesson.objects.filter(is_active=True)
+        
+        # Apply filters
+        if difficulty and difficulty != 'all':
+            queryset = queryset.filter(difficulty=difficulty)
+        
+        if category and category != 'all':
+            queryset = queryset.filter(category=category)
+        
+        if search:
+            # Search in title, description, and tags (JSONField)
+            queryset = queryset.filter(
+                Q(title__icontains=search) |
+                Q(description__icontains=search) |
+                Q(tags__icontains=search)
+            )
+        
+        # Order by order field, then by creation date
+        videos = queryset.order_by('order', '-created_at')
+        
+        # Serialize
+        serializer = VideoLessonSerializer(videos, many=True, context={'request': request})
+        
+        return Response({
+            'success': True,
+            'videos': serializer.data,
+            'count': len(serializer.data)
+        })
+    except Exception as e:
+        logger.error(f"Videos list error: {str(e)}")
         import traceback
         traceback.print_exc()
         return Response({
-            "message": "An error occurred while creating the video lesson",
+            "success": False,
+            "message": "An error occurred while fetching video lessons",
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def video_detail(request, slug):
+    """Get a specific video lesson by slug for public viewing"""
+    try:
+        video = VideoLesson.objects.get(slug=slug, is_active=True)
+        serializer = VideoLessonSerializer(video, context={'request': request})
+        return Response({
+            'success': True,
+            'video': serializer.data
+        })
+    except VideoLesson.DoesNotExist:
+        return Response({
+            "success": False,
+            "message": "Video lesson not found"
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        logger.error(f"Video detail error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return Response({
+            "success": False,
+            "message": "An error occurred while fetching the video lesson",
             "error": str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

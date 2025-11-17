@@ -306,6 +306,72 @@ export const AuthAPI = {
   }
 };
 
+// ============= Videos API =============
+export const VideosAPI = {
+  /**
+   * Get all active video lessons (public endpoint)
+   */
+  getVideos: async (params?: { difficulty?: string; category?: string; search?: string }) => {
+    try {
+      const usp = new URLSearchParams();
+      if (params?.difficulty && params.difficulty !== 'all') usp.append('difficulty', params.difficulty);
+      if (params?.category && params.category !== 'all') usp.append('category', params.category);
+      if (params?.search) usp.append('search', params.search);
+      const query = usp.toString() ? `?${usp.toString()}` : '';
+      
+      // Public endpoint, no auth required
+      const baseUrl = import.meta.env.VITE_API_BASE || 'http://127.0.0.1:8000';
+      const response = await fetch(`${baseUrl}/api/videos${query}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      return {
+        success: result.success || true,
+        data: result.videos || [],
+        count: result.count || 0
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get a specific video lesson by slug (public endpoint)
+   */
+  getVideoBySlug: async (slug: string) => {
+    try {
+      // Public endpoint, no auth required
+      const baseUrl = import.meta.env.VITE_API_BASE || 'http://127.0.0.1:8000';
+      const response = await fetch(`${baseUrl}/api/videos/${slug}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      return {
+        success: result.success || true,
+        data: result.video || null
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  }
+};
+
 // ============= Admin API =============
 export const AdminAPI = {
   /**

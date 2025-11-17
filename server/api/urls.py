@@ -159,6 +159,10 @@ urlpatterns = [
     path('admin/surveys/<int:user_id>/delete', views.admin_survey_delete, name='admin-survey-delete'),
     path('admin/surveys/<int:user_id>/steps', views.admin_survey_steps, name='admin-survey-steps'),
     
+    # ============= Public Video Lessons =============
+    path('videos', views.videos_list, name='videos-list'),
+    path('videos/<str:slug>', views.video_detail, name='video-detail'),
+    
     # ============= Admin Video Lessons Management =============
     path('admin/videos', views.admin_videos_list, name='admin-videos-list'),
     path('admin/videos/stats', views.admin_videos_stats, name='admin-videos-stats'),

@@ -1466,7 +1466,11 @@ export const AdminAPI = {
       // Add all data fields
       Object.keys(data).forEach(key => {
         if (data[key] !== null && data[key] !== undefined) {
-          if (key === 'tags' && Array.isArray(data[key])) {
+          // JSON fields need to be stringified
+          if ((key === 'tags' || key === 'chapters' || key === 'hashtags') && Array.isArray(data[key])) {
+            formData.append(key, JSON.stringify(data[key]));
+          } else if (typeof data[key] === 'object') {
+            // For other objects, stringify them
             formData.append(key, JSON.stringify(data[key]));
           } else {
             formData.append(key, data[key]);
@@ -1509,7 +1513,11 @@ export const AdminAPI = {
       // Add all data fields
       Object.keys(data).forEach(key => {
         if (data[key] !== null && data[key] !== undefined) {
-          if (key === 'tags' && Array.isArray(data[key])) {
+          // JSON fields need to be stringified
+          if ((key === 'tags' || key === 'chapters' || key === 'hashtags') && Array.isArray(data[key])) {
+            formData.append(key, JSON.stringify(data[key]));
+          } else if (typeof data[key] === 'object') {
+            // For other objects, stringify them
             formData.append(key, JSON.stringify(data[key]));
           } else {
             formData.append(key, data[key]);

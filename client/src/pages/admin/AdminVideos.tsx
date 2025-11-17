@@ -41,11 +41,22 @@ import AdminAPI from '@/services/AdminApiService';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE || 'http://127.0.0.1:8000';
+
+const buildMediaUrl = (url?: string | null) => {
+  if (!url) return undefined;
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  const base = API_BASE_URL.replace(/\/$/, '');
+  const normalized = url.startsWith('/') ? url : `/${url}`;
+  return `${base}${normalized}`;
+};
+
 interface VideoLesson {
   id: number;
   slug: string;
   title: string;
   description?: string;
+  full_description?: string;
   thumbnail?: string;
   thumbnail_url?: string;
   video_file?: string;
@@ -58,6 +69,8 @@ interface VideoLesson {
   views: number;
   speaking_exercises: number;
   tags: string[];
+  chapters?: Array<{ t: string; label: string; seconds: number }>;
+  hashtags?: string[];
   is_active: boolean;
   order: number;
   created_at: string;
@@ -88,6 +101,7 @@ const initialFormState = {
   title: '',
   slug: '',
   description: '',
+  full_description: '',
   video_url: '',
   duration: 300,
   difficulty: 'beginner',
@@ -96,6 +110,8 @@ const initialFormState = {
   views: 0,
   speaking_exercises: 0,
   tags: [] as string[],
+  chapters: [] as Array<{ t: string; label: string; seconds: number }>,
+  hashtags: [] as string[],
   is_active: true,
   order: 0,
 };
@@ -122,6 +138,8 @@ export default function AdminVideos() {
   const [selectedVideo, setSelectedVideo] = useState<VideoLesson | null>(null);
   const [formData, setFormData] = useState(initialFormState);
   const [tagsInput, setTagsInput] = useState('');
+  const [hashtagsInput, setHashtagsInput] = useState('');
+  const [chaptersInput, setChaptersInput] = useState('');
   const [files, setFiles] = useState<{ thumbnail?: File; video_file?: File }>({});
   const [saving, setSaving] = useState(false);
   const [viewingVideo, setViewingVideo] = useState<VideoLesson | null>(null);
@@ -193,6 +211,8 @@ export default function AdminVideos() {
     setSelectedVideo(null);
     setFormData(initialFormState);
     setTagsInput('');
+    setHashtagsInput('');
+    setChaptersInput('');
     setFiles({});
     setIsDialogOpen(true);
   };
@@ -203,6 +223,7 @@ export default function AdminVideos() {
       title: video.title,
       slug: video.slug,
       description: video.description || '',
+      full_description: video.full_description || '',
       video_url: video.video_url || '',
       duration: video.duration,
       difficulty: video.difficulty,
@@ -211,10 +232,14 @@ export default function AdminVideos() {
       views: video.views,
       speaking_exercises: video.speaking_exercises,
       tags: video.tags || [],
+      chapters: video.chapters || [],
+      hashtags: video.hashtags || [],
       is_active: video.is_active,
       order: video.order,
     });
     setTagsInput(video.tags?.join(', ') || '');
+    setHashtagsInput(video.hashtags?.join(', ') || '');
+    setChaptersInput(JSON.stringify(video.chapters || [], null, 2));
     setFiles({});
     setIsDialogOpen(true);
   };
@@ -229,6 +254,8 @@ export default function AdminVideos() {
     setSelectedVideo(null);
     setFormData(initialFormState);
     setTagsInput('');
+    setHashtagsInput('');
+    setChaptersInput('');
     setFiles({});
     setSaving(false);
   };
@@ -265,11 +292,32 @@ export default function AdminVideos() {
     }
 
     setSaving(true);
+    
+    // Parse chapters from JSON string
+    let chapters = [];
+    if (chaptersInput.trim()) {
+      try {
+        chapters = JSON.parse(chaptersInput);
+      } catch (e) {
+        toast({
+          title: 'Invalid Chapters Format',
+          description: 'Chapters must be valid JSON array. Example: [{"t":"00:00","label":"Introduction","seconds":0}]',
+          variant: 'destructive',
+        });
+        setSaving(false);
+        return;
+      }
+    }
+    
     const payload = {
       ...formData,
       tags: tagsInput
         ? tagsInput.split(',').map((tag) => tag.trim()).filter(Boolean)
         : [],
+      hashtags: hashtagsInput
+        ? hashtagsInput.split(',').map((tag) => tag.trim()).filter(Boolean)
+        : [],
+      chapters: chapters,
     };
 
     try {
@@ -559,11 +607,14 @@ export default function AdminVideos() {
                       <tr key={video.id} className="border-b last:border-b-0 hover:bg-muted/30">
                         <td className="px-5 py-3">
                           <div className="relative h-14 w-24 rounded overflow-hidden bg-muted">
-                            {video.thumbnail_url ? (
+                            {buildMediaUrl(video.thumbnail_url) || buildMediaUrl(video.thumbnail) ? (
                               <img
-                                src={video.thumbnail_url}
+                                src={buildMediaUrl(video.thumbnail_url) || buildMediaUrl(video.thumbnail)}
                                 alt={video.title}
                                 className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  (e.currentTarget as HTMLImageElement).style.display = 'none';
+                                }}
                               />
                             ) : (
                               <div className="flex h-full items-center justify-center text-muted-foreground">
@@ -681,14 +732,25 @@ export default function AdminVideos() {
                 <p className="text-xs text-muted-foreground">Leave empty to auto-generate from title.</p>
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">Short Description</Label>
                 <Textarea
                   id="description"
-                  rows={4}
+                  rows={3}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Write a short summary of the lesson content..."
+                  placeholder="Write a short summary of the lesson content (shown in cards)..."
                 />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="full_description">Full Description</Label>
+                <Textarea
+                  id="full_description"
+                  rows={8}
+                  value={formData.full_description}
+                  onChange={(e) => setFormData({ ...formData, full_description: e.target.value })}
+                  placeholder="Write a detailed description for the video detail page (expandable)..."
+                />
+                <p className="text-xs text-muted-foreground">This will be shown on the video detail page with expand/collapse functionality.</p>
               </div>
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="grid gap-2">
@@ -823,6 +885,29 @@ export default function AdminVideos() {
                   <p className="text-xs text-muted-foreground">Comma-separated keywords.</p>
                 </div>
               </div>
+              <div className="grid gap-2">
+                <Label htmlFor="hashtags">Hashtags</Label>
+                <Input
+                  id="hashtags"
+                  value={hashtagsInput}
+                  onChange={(e) => setHashtagsInput(e.target.value)}
+                  placeholder="#EnglishLessons, #Greetings, #LearnEnglish"
+                />
+                <p className="text-xs text-muted-foreground">Comma-separated hashtags (with or without #).</p>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="chapters">Chapters (JSON)</Label>
+                <Textarea
+                  id="chapters"
+                  rows={6}
+                  value={chaptersInput}
+                  onChange={(e) => setChaptersInput(e.target.value)}
+                  placeholder='[{"t":"00:00","label":"Introduction","seconds":0},{"t":"00:15","label":"Lesson overview","seconds":15}]'
+                />
+                <p className="text-xs text-muted-foreground">
+                  JSON array of chapters. Each chapter needs: t (time string), label (text), seconds (number).
+                </p>
+              </div>
               <div className="flex items-center gap-2">
                 <input
                   id="is_active"
@@ -863,9 +948,9 @@ export default function AdminVideos() {
             {viewingVideo && (
               <div className="space-y-4">
                 <div className="rounded-lg overflow-hidden bg-muted">
-                  {viewingVideo.thumbnail_url ? (
+                  {buildMediaUrl(viewingVideo.thumbnail_url) || buildMediaUrl(viewingVideo.thumbnail) ? (
                     <img
-                      src={viewingVideo.thumbnail_url}
+                      src={buildMediaUrl(viewingVideo.thumbnail_url) || buildMediaUrl(viewingVideo.thumbnail)}
                       alt={viewingVideo.title}
                       className="w-full h-48 object-cover"
                     />

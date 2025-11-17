@@ -1212,6 +1212,11 @@ class VideoLesson(models.Model):
     is_active = models.BooleanField(default=True)
     order = models.IntegerField(default=0)
     
+    # Video detail page content
+    full_description = models.TextField(blank=True, help_text="Full expandable description for video detail page")
+    chapters = models.JSONField(default=list, blank=True, help_text="List of chapters with time, label, and seconds")
+    hashtags = models.JSONField(default=list, blank=True, help_text="List of hashtags for the video")
+    
     # Metadata
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -640,12 +640,12 @@ class VideoLessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = VideoLesson
         fields = [
-            'id', 'slug', 'title', 'description', 'thumbnail', 'thumbnail_url',
+            'id', 'slug', 'title', 'description', 'full_description', 'thumbnail', 'thumbnail_url',
             'video_file', 'video_file_url', 'video_url', 'duration', 'difficulty',
-            'category', 'rating', 'views', 'speaking_exercises', 'tags',
+            'category', 'rating', 'views', 'speaking_exercises', 'tags', 'chapters', 'hashtags',
             'is_active', 'order', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at', 'views']
+        read_only_fields = ['id', 'created_at', 'updated_at']
     
     def get_thumbnail_url(self, obj):
         if obj.thumbnail:

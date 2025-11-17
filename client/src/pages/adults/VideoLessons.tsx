@@ -11,13 +11,28 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
+import { VideosAPI } from '@/services/ApiService';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE || 'http://127.0.0.1:8000';
+
+const buildMediaUrl = (url?: string | null) => {
+  if (!url) return undefined;
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  const base = API_BASE_URL.replace(/\/$/, '');
+  const normalized = url.startsWith('/') ? url : `/${url}`;
+  return `${base}${normalized}`;
+};
 
 interface VideoLesson {
-  id: string;
+  id: number;
   slug: string;
   title: string;
-  description: string;
-  thumbnail: string;
+  description?: string;
+  thumbnail?: string;
+  thumbnail_url?: string;
+  video_file?: string;
+  video_file_url?: string;
+  video_url?: string;
   duration: number; // in seconds
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   category: 'pronunciation' | 'conversation' | 'grammar' | 'business' | 'daily';
@@ -33,6 +48,10 @@ interface VideoLesson {
     total_points: number;
   };
   tags: string[];
+  is_active: boolean;
+  order: number;
+  created_at: string;
+  updated_at: string;
 }
 
 const VideoLessons = () => {
@@ -63,151 +82,70 @@ const VideoLessons = () => {
     generateStars();
   }, []);
 
-  // Mock data - replace with API call
+  // Fetch videos from API
   useEffect(() => {
-    const mockLessons: VideoLesson[] = [
-      {
-        id: '1',
-        slug: 'professional-greetings',
-        title: 'Professional Greetings & Introductions',
-        description: 'Master formal greetings for business meetings, job interviews, and professional networking events with native speakers.',
-        thumbnail: '/Lesson01_Thumb.png',
-        duration: 96, // 1:36
-        difficulty: 'beginner',
-        category: 'business',
-        rating: 4.8,
-        views: 1250,
-        speaking_exercises: 8,
-        progress: {
-          watched_seconds: 195,
-          completed: false,
-          completion_percentage: 60,
-          quizzes_answered: 5,
-          quizzes_correct: 4,
-          total_points: 45
-        },
-        tags: ['greetings', 'business', 'formal', 'networking']
-      },
-      {
-        id: '2',
-        slug: 'daily-conversations',
-        title: 'Daily Conversations - Coffee Shop Scenarios',
-        description: 'Practice natural English conversations for ordering coffee, making small talk, and interacting in everyday situations.',
-        thumbnail: '/video-thumbs/daily.jpg',
-        duration: 420, // 7:00
-        difficulty: 'beginner',
-        category: 'daily',
-        rating: 4.9,
-        views: 2100,
-        speaking_exercises: 12,
-        progress: undefined,
-        tags: ['daily', 'conversation', 'casual', 'practice']
-      },
-      {
-        id: '3',
-        slug: 'pronunciation-r-sounds',
-        title: 'Master R and L Sounds',
-        description: 'Perfect your pronunciation of challenging R and L sounds with guided practice and real-time feedback.',
-        thumbnail: '/video-thumbs/pronunciation.jpg',
-        duration: 280, // 4:40
-        difficulty: 'intermediate',
-        category: 'pronunciation',
-        rating: 4.7,
-        views: 890,
-        speaking_exercises: 15,
-        progress: {
-          watched_seconds: 280,
-          completed: true,
-          completion_percentage: 100,
-          quizzes_answered: 15,
-          quizzes_correct: 14,
-          total_points: 150
-        },
-        tags: ['pronunciation', 'sounds', 'practice', 'feedback']
-      },
-      {
-        id: '4',
-        slug: 'business-meetings',
-        title: 'Participating in Business Meetings',
-        description: 'Learn to express opinions, ask questions, and contribute effectively in professional meetings.',
-        thumbnail: '/video-thumbs/meetings.jpg',
-        duration: 540, // 9:00
-        difficulty: 'advanced',
-        category: 'business',
-        rating: 4.8,
-        views: 1560,
-        speaking_exercises: 10,
-        progress: {
-          watched_seconds: 320,
-          completed: false,
-          completion_percentage: 59,
-          quizzes_answered: 6,
-          quizzes_correct: 5,
-          total_points: 55
-        },
-        tags: ['business', 'meetings', 'professional', 'communication']
-      },
-      {
-        id: '5',
-        slug: 'telephone-english',
-        title: 'Telephone English - Making Calls',
-        description: 'Practice making and receiving phone calls in English with professional scenarios and common phrases.',
-        thumbnail: '/video-thumbs/phone.jpg',
-        duration: 360, // 6:00
-        difficulty: 'intermediate',
-        category: 'conversation',
-        rating: 4.6,
-        views: 980,
-        speaking_exercises: 9,
-        progress: undefined,
-        tags: ['phone', 'telephone', 'calls', 'professional']
-      },
-      {
-        id: '6',
-        slug: 'presentation-skills',
-        title: 'Giving Effective Presentations',
-        description: 'Master the art of presenting in English with tips on structure, language, and delivery techniques.',
-        thumbnail: '/video-thumbs/presentation.jpg',
-        duration: 600, // 10:00
-        difficulty: 'advanced',
-        category: 'business',
-        rating: 4.9,
-        views: 2340,
-        speaking_exercises: 12,
-        progress: undefined,
-        tags: ['presentations', 'public-speaking', 'business', 'skills']
+    const fetchVideos = async () => {
+      try {
+        setIsLoading(true);
+        const response = await VideosAPI.getVideos({
+          difficulty: selectedDifficulty !== 'all' ? selectedDifficulty : undefined,
+          category: selectedCategory !== 'all' ? selectedCategory : undefined,
+          search: searchQuery || undefined,
+        });
+        
+        if (response.success && 'data' in response && response.data) {
+          // Map API response to component format
+          const mappedLessons: VideoLesson[] = response.data.map((video: any) => {
+            const thumbnailUrl = buildMediaUrl(video.thumbnail_url) || buildMediaUrl(video.thumbnail);
+            const videoFileUrl = buildMediaUrl(video.video_file_url) || buildMediaUrl(video.video_file);
+            const externalVideoUrl = video.video_url && (video.video_url.startsWith('http://') || video.video_url.startsWith('https://'))
+              ? video.video_url
+              : buildMediaUrl(video.video_url);
+            
+            return {
+              id: video.id,
+              slug: video.slug,
+              title: video.title,
+              description: video.description || '',
+              thumbnail: thumbnailUrl || '/Lesson01_Thumb.png',
+              thumbnail_url: thumbnailUrl,
+              video_file_url: videoFileUrl,
+              video_url: externalVideoUrl,
+              duration: video.duration || 0,
+              difficulty: video.difficulty,
+              category: video.category,
+              rating: video.rating || 0,
+              views: video.views || 0,
+              speaking_exercises: video.speaking_exercises || 0,
+              tags: video.tags || [],
+              is_active: video.is_active,
+              order: video.order || 0,
+              created_at: video.created_at,
+              updated_at: video.updated_at,
+              // Progress will be fetched separately if needed
+              progress: undefined,
+            };
+          });
+          
+          setLessons(mappedLessons);
+        } else {
+          console.error('Failed to fetch videos:', response);
+          setLessons([]);
+        }
+      } catch (error) {
+        console.error('Error fetching videos:', error);
+        setLessons([]);
+      } finally {
+        setIsLoading(false);
       }
-    ];
+    };
 
-    setLessons(mockLessons);
-    setIsLoading(false);
-  }, []);
+    fetchVideos();
+  }, [selectedDifficulty, selectedCategory, searchQuery]);
 
-  // Filter lessons based on search and filters
+  // Update filtered lessons when lessons change (filtering is done by API)
   useEffect(() => {
-    let filtered = [...lessons];
-
-    // Search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(lesson =>
-        lesson.title.toLowerCase().includes(query) ||
-        lesson.description.toLowerCase().includes(query) ||
-        lesson.tags.some(tag => tag.toLowerCase().includes(query))
-      );
-    }
-
-    // Difficulty filter
-    if (selectedDifficulty !== 'all') {
-      filtered = filtered.filter(lesson => lesson.difficulty === selectedDifficulty);
-    }
-
-    // Category filter
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(lesson => lesson.category === selectedCategory);
-    }
-
-    setFilteredLessons(filtered);
+    setFilteredLessons(lessons);
 
     // Update URL params
     const params = new URLSearchParams();
@@ -538,10 +476,7 @@ const VideoLessons = () => {
                       viewMode === 'list' && 'flex flex-col sm:flex-row'
                     )}
                     onClick={() => {
-                      const targetPath = lesson.slug === 'professional-greetings'
-                        ? '/lessons/1'
-                        : `/adults/videos/${lesson.slug}`;
-                      navigate(targetPath);
+                      navigate(`/adults/videos/${lesson.slug}`);
                     }}
                   >
                     {/* Thumbnail */}
@@ -556,17 +491,19 @@ const VideoLessons = () => {
                       )}
                     >
                       {/* Thumbnail */}
-                      <img
-                        src={lesson.thumbnail}
-                        alt={lesson.title}
-                        className={cn(
-                          'absolute inset-0 w-full h-full object-cover',
-                          viewMode === 'list' ? 'object-cover' : 'object-cover'
-                        )}
-                        onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).style.display = 'none';
-                        }}
-                      />
+                      {(lesson.thumbnail_url || lesson.thumbnail) && (
+                        <img
+                          src={lesson.thumbnail_url || lesson.thumbnail}
+                          alt={lesson.title}
+                          className={cn(
+                            'absolute inset-0 w-full h-full object-cover',
+                            viewMode === 'list' ? 'object-cover' : 'object-cover'
+                          )}
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).style.display = 'none';
+                          }}
+                        />
+                      )}
                       {/* Fallback play icon when image fails */}
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                         <div className="p-4 rounded-full bg-black/30 backdrop-blur-sm">
@@ -671,10 +608,7 @@ const VideoLessons = () => {
                         )}
                         onClick={(e) => {
                           e.stopPropagation();
-                          const targetPath = lesson.slug === 'professional-greetings'
-                            ? '/lessons/1'
-                            : `/adults/videos/${lesson.slug}`;
-                          navigate(targetPath);
+                          navigate(`/adults/videos/${lesson.slug}`);
                         }}
                       >
                         {lesson.progress?.completed ? (
