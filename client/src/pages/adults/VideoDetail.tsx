@@ -299,24 +299,43 @@ const VideoDetail: React.FC = () => {
 
   useEffect(() => {
     const fetchRelated = async () => {
-      if (!video?.category) return;
+      if (!video?.category) {
+        setRelatedLoading(false);
+        setRelatedVideos([]);
+        return;
+      }
       setRelatedLoading(true);
       try {
         const response = await VideosAPI.getVideos({ category: video.category });
-        if (response.success && 'data' in response && response.data) {
-          const normalized = response.data
-            .filter((item: any) => item.slug !== video.slug)
-            .slice(0, 8)
-            .map(normalizeVideo);
-          setRelatedVideos(normalized);
+        
+        if (response.success && 'data' in response) {
+          const videosData = response.data;
+          
+          if (Array.isArray(videosData) && videosData.length > 0) {
+            // Filter out current video and limit to 8
+            const normalized = videosData
+              .filter((item: any) => item.slug !== video.slug)
+              .slice(0, 8)
+              .map(normalizeVideo);
+            setRelatedVideos(normalized);
+          } else {
+            setRelatedVideos([]);
+          }
+        } else {
+          setRelatedVideos([]);
         }
       } catch (err) {
         console.error('Failed to load related videos', err);
+        setRelatedVideos([]);
       } finally {
         setRelatedLoading(false);
       }
     };
-    fetchRelated();
+    
+    // Only fetch if we have a video with a category
+    if (video?.category) {
+      fetchRelated();
+    }
   }, [video?.category, video?.slug]);
 
   useEffect(() => {
@@ -513,7 +532,7 @@ const VideoDetail: React.FC = () => {
             <section className="mt-6 flex flex-col sm:flex-row sm:items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4">
               <div className="flex items-center gap-3">
                 <img
-                  src="/logo01.png"
+                  src="/bg_logo.png"
                   alt="Channel"
                   className="w-12 h-12 rounded-full object-cover border border-white/20"
                 />
@@ -641,7 +660,7 @@ const DescriptionStat = ({ label, value }: { label: string; value: string }) => 
 );
 
 const ChapterList = ({ chapters, onJump }: { chapters: Chapter[]; onJump: (seconds: number) => void }) => {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
 
   return (
     <div className="mt-6 rounded-2xl border border-white/10 bg-white/5">

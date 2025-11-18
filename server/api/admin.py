@@ -11,7 +11,7 @@ from .models import (
     TeenGameSession, TeenCertificate,
     EmailVerificationToken, SurveyStepResponse, ParentalControlSettings,
     CookieConsent, PlatformSettings, CategoryProgress, PageEligibility,
-    VideoEngagement, ChannelSubscription, PracticeComment, VideoShareEvent
+    VideoLesson, VideoEngagement, ChannelSubscription, PracticeComment, VideoShareEvent
 )
 
 
@@ -232,6 +232,40 @@ class VideoShareEventAdmin(admin.ModelAdmin):
     search_fields = ['video__title', 'user__username']
     readonly_fields = ['created_at']
     date_hierarchy = 'created_at'
+
+
+# ============= Video Lesson Admin =============
+@admin.register(VideoLesson)
+class VideoLessonAdmin(admin.ModelAdmin):
+    list_display = ['title', 'slug', 'difficulty', 'category', 'duration', 'views', 'is_active', 'order', 'created_at']
+    list_filter = ['difficulty', 'category', 'is_active', 'created_at']
+    search_fields = ['title', 'slug', 'description', 'full_description']
+    prepopulated_fields = {'slug': ('title',)}
+    readonly_fields = ['created_at', 'updated_at']
+    ordering = ['order', '-created_at']
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('title', 'slug', 'description', 'full_description')
+        }),
+        ('Video Content', {
+            'fields': ('thumbnail', 'video_file', 'video_url', 'duration'),
+            'description': 'Upload a video file OR provide an external video URL (YouTube, Vimeo, etc.)'
+        }),
+        ('Classification', {
+            'fields': ('difficulty', 'category', 'order', 'is_active')
+        }),
+        ('Engagement & Metadata', {
+            'fields': ('rating', 'views', 'speaking_exercises', 'tags', 'hashtags')
+        }),
+        ('Chapters', {
+            'fields': ('chapters',),
+            'description': 'JSON array of chapters. Format: [{"t": "00:10", "label": "Chapter Name", "seconds": 10}, ...]'
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
 
 
 # ============= Kids Models Admin =============
