@@ -69,6 +69,7 @@ import AdminSurveys from "@/pages/admin/AdminSurveys";
 import { Analytics } from "@/components/common/Analytics";
 import { AdminRouteGuard } from "@/components/admin/AdminRouteGuard";
 import { PageEligibilityGuard } from "@/components/common/PageEligibilityGuard";
+import { ProtectedRoute } from "@/components/common/ProtectedRoute";
 import type { ReactNode } from 'react';
 
 // ✅ Import AuthModal, UserSurvey, and SurveyManager
@@ -677,9 +678,11 @@ const AppRoutes = () => {
           path="/kids/young" 
           element={
             <PageTransition>
-              <PageEligibilityGuard pagePath="/kids/young">
-                <YoungKidsPage />
-              </PageEligibilityGuard>
+              <ProtectedRoute>
+                <PageEligibilityGuard pagePath="/kids/young">
+                  <YoungKidsPage />
+                </PageEligibilityGuard>
+              </ProtectedRoute>
             </PageTransition>
           } 
         />
@@ -687,9 +690,11 @@ const AppRoutes = () => {
           path="/kids/teen" 
           element={
             <PageTransition>
-              <PageEligibilityGuard pagePath="/kids/teen" fallbackPage="/kids/young">
-                <TeenKidsPage />
-              </PageEligibilityGuard>
+              <ProtectedRoute>
+                <PageEligibilityGuard pagePath="/kids/teen" fallbackPage="/kids/young">
+                  <TeenKidsPage />
+                </PageEligibilityGuard>
+              </ProtectedRoute>
             </PageTransition>
           } 
         />
@@ -707,9 +712,11 @@ const AppRoutes = () => {
           path="/adults/beginners" 
           element={
             <PageTransition>
-              <PageEligibilityGuard pagePath="/adults/beginners">
-                <Beginners />
-              </PageEligibilityGuard>
+              <ProtectedRoute>
+                <PageEligibilityGuard pagePath="/adults/beginners">
+                  <Beginners />
+                </PageEligibilityGuard>
+              </ProtectedRoute>
             </PageTransition>
           } 
         />
@@ -717,9 +724,11 @@ const AppRoutes = () => {
           path="/adults/intermediates" 
           element={
             <PageTransition>
-              <PageEligibilityGuard pagePath="/adults/intermediates" fallbackPage="/adults/beginners">
-                <Intermediates />
-              </PageEligibilityGuard>
+              <ProtectedRoute>
+                <PageEligibilityGuard pagePath="/adults/intermediates" fallbackPage="/adults/beginners">
+                  <Intermediates />
+                </PageEligibilityGuard>
+              </ProtectedRoute>
             </PageTransition>
           } 
         />
@@ -727,15 +736,26 @@ const AppRoutes = () => {
           path="/adults/advanced" 
           element={
             <PageTransition>
-              <PageEligibilityGuard pagePath="/adults/advanced" fallbackPage="/adults/intermediates">
-                <Advanced />
-              </PageEligibilityGuard>
+              <ProtectedRoute>
+                <PageEligibilityGuard pagePath="/adults/advanced" fallbackPage="/adults/intermediates">
+                  <Advanced />
+                </PageEligibilityGuard>
+              </ProtectedRoute>
             </PageTransition>
           } 
         />
         <Route path="/adults/practice" element={<PageTransition><QuickPracticeSession /></PageTransition>} />
         <Route path="/adults/practice/:sessionType" element={<PageTransition><QuickPracticeSession /></PageTransition>} />
-        <Route path="/ielts-pte" element={<PageTransition><IeltsPte /></PageTransition>} />
+        <Route 
+          path="/ielts-pte" 
+          element={
+            <PageTransition>
+              <ProtectedRoute>
+                <IeltsPte />
+              </ProtectedRoute>
+            </PageTransition>
+          } 
+        />
         <Route path="/pricing" element={<PageTransition><PricingPage /></PageTransition>} />
         <Route path="/verify-email/:token" element={<PageTransition><VerifyEmail /></PageTransition>} />
         <Route path="/terms-and-conditions" element={<PageTransition><TermsAndConditionsPage /></PageTransition>} />

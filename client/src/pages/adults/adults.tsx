@@ -19,11 +19,17 @@ const AdultsPage = () => {
   const [fluencyScore, setFluencyScore] = useState(65);
   const [isHovered, setIsHovered] = useState<number | null>(null);
   const [stars, setStars] = useState<Array<{ x: number; y: number; size: number; delay: number; opacity: number }>>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
 
-  // Generate animated stars with varying opacity
+  // Generate animated stars with varying opacity - Performance optimized
   useEffect(() => {
     const generateStars = () => {
-      const newStars = Array.from({ length: 200 }, () => ({
+      // Reduce star count on mobile for better performance
+      const isMobile = window.innerWidth < 768;
+      const starCount = isMobile ? 100 : 200;
+      
+      const newStars = Array.from({ length: starCount }, () => ({
         x: Math.random() * 100,
         y: Math.random() * 100,
         size: Math.random() * 2 + 0.5,
@@ -33,6 +39,30 @@ const AdultsPage = () => {
       setStars(newStars);
     };
     generateStars();
+    
+    // Handle window resize for responsive star count
+    const handleResize = () => {
+      const isMobile = window.innerWidth < 768;
+      if ((isMobile && stars.length > 100) || (!isMobile && stars.length < 150)) {
+        generateStars();
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Page load fade-in and theme transition
+  useEffect(() => {
+    setIsLoaded(true);
+  }, []);
+
+  // Parallax scroll effect for planets
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const levels = [
@@ -270,14 +300,25 @@ const AdultsPage = () => {
     return 'text-rose-400';
   };
 
+  // Parallax transform for planets
+  const parallaxTransform1 = `translateY(${scrollY * 0.1}px)`;
+  const parallaxTransform2 = `translateY(${scrollY * 0.15}px)`;
+  const parallaxTransform3 = `translateY(${scrollY * 0.08}px)`;
+  const parallaxTransform4 = `translateY(${scrollY * 0.12}px)`;
+
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950">
+    <div className={`min-h-screen relative overflow-hidden bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 ${isLoaded ? 'space-fade-in' : 'opacity-0'}`}>
+      {/* Theme Transition Overlay */}
+      {!isLoaded && (
+        <div className="fixed inset-0 bg-gradient-to-b from-green-50 via-green-100 to-slate-950 z-50 transition-opacity duration-500" />
+      )}
+
       {/* Deep Space Background with Stars */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {stars.map((star, index) => (
           <div
             key={index}
-            className="absolute rounded-full bg-white animate-pulse"
+            className="absolute rounded-full bg-white space-star"
             style={{
               left: `${star.x}%`,
               top: `${star.y}%`,
@@ -294,14 +335,17 @@ const AdultsPage = () => {
 
       {/* Nebula and Cosmic Effects */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-[800px] h-[800px] bg-gradient-radial from-purple-500/30 via-indigo-500/20 to-transparent rounded-full blur-3xl animate-pulse" />
-        <div className="absolute top-1/4 right-0 w-[600px] h-[600px] bg-gradient-radial from-cyan-500/25 via-blue-500/15 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute bottom-0 left-1/3 w-[700px] h-[700px] bg-gradient-radial from-pink-500/20 via-rose-500/10 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-0 left-0 w-[800px] h-[800px] bg-gradient-radial from-purple-500/30 via-indigo-500/20 to-transparent rounded-full blur-3xl nebula-effect animate-pulse" />
+        <div className="absolute top-1/4 right-0 w-[600px] h-[600px] bg-gradient-radial from-cyan-500/25 via-blue-500/15 to-transparent rounded-full blur-3xl nebula-effect animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute bottom-0 left-1/3 w-[700px] h-[700px] bg-gradient-radial from-pink-500/20 via-rose-500/10 to-transparent rounded-full blur-3xl nebula-effect animate-pulse" style={{ animationDelay: '2s' }} />
       </div>
 
-      {/* Large Planet/Moon Spheres - Main Visual Elements */}
+      {/* Large Planet/Moon Spheres - Main Visual Elements with Parallax */}
       {/* Main Large Planet - Bottom Left - Reduced Size */}
-      <div className="fixed bottom-0 left-0 w-[100px] h-[100px] sm:w-[140px] sm:h-[140px] md:w-[180px] md:h-[180px] lg:w-[220px] lg:h-[220px] xl:w-[260px] xl:h-[260px] pointer-events-none opacity-60 sm:opacity-65 md:opacity-70 lg:opacity-75 xl:opacity-80">
+      <div 
+        className="fixed bottom-0 left-0 w-[100px] h-[100px] sm:w-[140px] sm:h-[140px] md:w-[180px] md:h-[180px] lg:w-[220px] lg:h-[220px] xl:w-[260px] xl:h-[260px] pointer-events-none opacity-60 sm:opacity-65 md:opacity-70 lg:opacity-75 xl:opacity-80 parallax-slow"
+        style={{ transform: parallaxTransform1 }}
+      >
         <div className="relative w-full h-full">
           <img 
             src="/planets/eReia3yfybtZ8P5576d6kF8NJIM.avif" 
@@ -314,7 +358,10 @@ const AdultsPage = () => {
       </div>
 
       {/* Secondary Planet - Top Right */}
-      <div className="fixed top-20 right-2 sm:right-4 md:right-10 w-[100px] h-[100px] sm:w-[150px] sm:h-[150px] md:w-[200px] md:h-[200px] lg:w-[250px] lg:h-[250px] xl:w-[300px] xl:h-[300px] pointer-events-none opacity-40 sm:opacity-50 md:opacity-60 hidden sm:block">
+      <div 
+        className="fixed top-20 right-2 sm:right-4 md:right-10 w-[100px] h-[100px] sm:w-[150px] sm:h-[150px] md:w-[200px] md:h-[200px] lg:w-[250px] lg:h-[250px] xl:w-[300px] xl:h-[300px] pointer-events-none opacity-40 sm:opacity-50 md:opacity-60 hidden sm:block parallax-slow"
+        style={{ transform: parallaxTransform2 }}
+      >
         <div className="relative w-full h-full">
           <img 
             src="/planets/SEp7QE3Bk6RclE0R7rhBgcGIOI.avif" 
@@ -327,7 +374,10 @@ const AdultsPage = () => {
       </div>
 
       {/* Tertiary Planet - Middle Right */}
-      <div className="fixed top-1/2 right-4 md:right-20 w-[80px] h-[80px] sm:w-[120px] sm:h-[120px] md:w-[180px] md:h-[180px] lg:w-[220px] lg:h-[220px] xl:w-[250px] xl:h-[250px] pointer-events-none opacity-30 sm:opacity-40 md:opacity-50 hidden md:block">
+      <div 
+        className="fixed top-1/2 right-4 md:right-20 w-[80px] h-[80px] sm:w-[120px] sm:h-[120px] md:w-[180px] md:h-[180px] lg:w-[220px] lg:h-[220px] xl:w-[250px] xl:h-[250px] pointer-events-none opacity-30 sm:opacity-40 md:opacity-50 hidden md:block parallax-slow"
+        style={{ transform: parallaxTransform3 }}
+      >
         <div className="relative w-full h-full">
           <img 
             src="/planets/K3uC2Tk4o2zjSbuWGs3t0MMuLVY.avif" 
@@ -340,7 +390,10 @@ const AdultsPage = () => {
       </div>
 
       {/* Small Planet - Top Left */}
-      <div className="fixed top-32 left-2 sm:left-4 md:left-20 w-[80px] h-[80px] sm:w-[120px] sm:h-[120px] md:w-[160px] md:h-[160px] lg:w-[180px] lg:h-[180px] xl:w-[200px] xl:h-[200px] pointer-events-none opacity-25 sm:opacity-30 md:opacity-40 hidden lg:block">
+      <div 
+        className="fixed top-32 left-2 sm:left-4 md:left-20 w-[80px] h-[80px] sm:w-[120px] sm:h-[120px] md:w-[160px] md:h-[160px] lg:w-[180px] lg:h-[180px] xl:w-[200px] xl:h-[200px] pointer-events-none opacity-25 sm:opacity-30 md:opacity-40 hidden lg:block parallax-slow"
+        style={{ transform: parallaxTransform4 }}
+      >
         <div className="relative w-full h-full">
           <img 
             src="/planets/F4RKAKmFyoRYVlTsUWN51wD1dg.avif" 
@@ -392,10 +445,14 @@ const AdultsPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-12 md:mb-16">
             {levels.map((level, index) => {
               const Icon = level.icon;
+              const isActive = isHovered === index;
               return (
                 <Card 
                   key={level.id}
-                  className="group relative bg-slate-900/60 backdrop-blur-xl border-purple-500/30 hover:border-purple-400/50 transition-all duration-500 shadow-2xl overflow-hidden"
+                  className={cn(
+                    "group relative bg-slate-900/60 backdrop-blur-xl border-purple-500/30 hover:border-purple-400/50 transition-all duration-500 shadow-2xl overflow-hidden space-card-enter",
+                    isActive && "space-active-glow"
+                  )}
                   onMouseEnter={() => setIsHovered(index)}
                   onMouseLeave={() => setIsHovered(null)}
                 >
@@ -410,7 +467,7 @@ const AdultsPage = () => {
                     <div className="absolute inset-0 rounded-full bg-gradient-to-br from-slate-700/40 via-slate-600/40 to-slate-800/40" />
                   </div>
 
-                  <CardContent className="p-4 sm:p-6 md:p-8 relative z-10">
+                  <CardContent className="p-4 sm:p-6 md:p-8 relative z-10 space-depth-indicator">
                     <div className={cn("p-3 sm:p-4 rounded-xl text-white bg-gradient-to-r shadow-lg mb-4 sm:mb-6 w-fit", level.color)} style={{ boxShadow: `0 0 20px ${level.glowColor}` }}>
                       <Icon className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" />
                     </div>
@@ -437,7 +494,7 @@ const AdultsPage = () => {
                     </div>
 
                     <Link to={`/adults/${level.id}`}>
-                      <Button className="w-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white font-semibold transition-all duration-300">
+                      <Button className="w-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white font-semibold transition-all duration-300 focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-900">
                         Explore Level
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </Button>
@@ -505,7 +562,7 @@ const AdultsPage = () => {
                             </div>
                           </div>
                           <Link to={`/adults/${level.id}`} className="sm:self-start">
-                            <Button variant="outline" size="sm" className="w-full sm:w-auto border-purple-400/30 text-purple-300 hover:bg-purple-500/20 hover:border-purple-400/50 transition-colors">
+                            <Button variant="outline" size="sm" className="w-full sm:w-auto border-purple-400/30 text-purple-300 hover:bg-purple-500/20 hover:border-purple-400/50 transition-colors focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 focus:ring-offset-slate-900">
                               <ArrowRight className="w-4 h-4" />
                             </Button>
                           </Link>
@@ -594,7 +651,7 @@ const AdultsPage = () => {
                 return (
                   <Card
                     key={index}
-                    className="group cursor-pointer bg-slate-900/60 backdrop-blur-xl border-purple-500/30 hover:border-purple-400/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-purple-500/20"
+                    className="group cursor-pointer bg-slate-900/60 backdrop-blur-xl border-purple-500/30 hover:border-purple-400/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-purple-500/20 space-card-enter focus-within:ring-2 focus-within:ring-purple-400 focus-within:ring-offset-2 focus-within:ring-offset-slate-900"
                     onMouseEnter={() => setIsHovered(index + 100)}
                     onMouseLeave={() => setIsHovered(null)}
                     onClick={() => {
@@ -660,7 +717,7 @@ const AdultsPage = () => {
                 return (
                   <Card
                     key={index}
-                    className="group cursor-pointer bg-slate-900/60 backdrop-blur-xl border-purple-500/30 hover:border-purple-400/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-purple-500/20"
+                    className="group cursor-pointer bg-slate-900/60 backdrop-blur-xl border-purple-500/30 hover:border-purple-400/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-purple-500/20 space-card-enter focus-within:ring-2 focus-within:ring-purple-400 focus-within:ring-offset-2 focus-within:ring-offset-slate-900"
                     onClick={() => navigate(`/adults/practice/${action.sessionType}`)}
                     onMouseEnter={() => setIsHovered(index)}
                     onMouseLeave={() => setIsHovered(null)}
@@ -698,7 +755,7 @@ const AdultsPage = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="w-full border-purple-400/30 text-purple-300 hover:bg-purple-500/20 hover:border-purple-400/50 transition-all duration-300"
+                        className="w-full border-purple-400/30 text-purple-300 hover:bg-purple-500/20 hover:border-purple-400/50 transition-all duration-300 focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 focus:ring-offset-slate-900"
                         onClick={(e) => {
                           e.stopPropagation();
                           navigate(`/adults/practice/${action.sessionType}`);
@@ -721,7 +778,7 @@ const AdultsPage = () => {
                 <h2 className="text-xl sm:text-2xl font-bold text-white">Professional Learning Paths</h2>
                 <p className="text-sm sm:text-base text-cyan-100/70">Structured programs for career advancement and professional development</p>
               </div>
-              <Button variant="outline" size="sm" className="w-full sm:w-auto border-purple-400/30 text-purple-300 hover:bg-purple-500/20 hover:border-purple-400/50 transition-colors">
+              <Button variant="outline" size="sm" className="w-full sm:w-auto border-purple-400/30 text-purple-300 hover:bg-purple-500/20 hover:border-purple-400/50 transition-colors focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 focus:ring-offset-slate-900">
                 <BarChart3 className="w-4 h-4 mr-2" />
                 View All Programs
               </Button>
@@ -788,7 +845,7 @@ const AdultsPage = () => {
                       </div>
 
                       <div className="bg-slate-800/40 backdrop-blur-sm px-8 py-6 border-t border-purple-500/20">
-                        <Button className="w-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white font-semibold transition-all duration-300 group-hover:shadow-lg group-hover:shadow-purple-500/30">
+                        <Button className="w-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white font-semibold transition-all duration-300 group-hover:shadow-lg group-hover:shadow-purple-500/30 focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-900">
                           Continue Program
                           <ArrowRight className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
                         </Button>
@@ -867,7 +924,7 @@ const AdultsPage = () => {
                     </div>
                   </div>
 
-                  <Button className="w-full bg-white text-purple-600 hover:bg-cyan-50 font-semibold py-3 text-base transition-all duration-300 hover:scale-105">
+                  <Button className="w-full bg-white text-purple-600 hover:bg-cyan-50 font-semibold py-3 text-base transition-all duration-300 hover:scale-105 focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-900">
                     <Play className="w-5 h-5 mr-2" />
                     Start Recommended Module
                   </Button>

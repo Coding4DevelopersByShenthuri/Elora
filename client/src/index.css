@@ -448,6 +448,101 @@
     background: hsl(222.2 84% 4.9%);
     background: linear-gradient(135deg, hsl(222.2 84% 4.9%) 0%, hsl(217.2 32.6% 17.5%) 100%);
   }
+
+  /* Reduced Motion Support - Accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+    
+    /* Disable star animations for reduced motion */
+    .space-star {
+      animation: none !important;
+    }
+    
+    /* Disable nebula pulse for reduced motion */
+    .nebula-effect {
+      animation: none !important;
+    }
+  }
+
+  /* Space Theme Utilities */
+  .space-fade-in {
+    animation: spaceFadeIn 0.6s ease-out;
+  }
+
+  .space-card-enter {
+    animation: cardEnter 0.5s ease-out backwards;
+  }
+
+  .space-card-enter:nth-child(1) { animation-delay: 0.1s; }
+  .space-card-enter:nth-child(2) { animation-delay: 0.2s; }
+  .space-card-enter:nth-child(3) { animation-delay: 0.3s; }
+  .space-card-enter:nth-child(4) { animation-delay: 0.4s; }
+
+  .space-active-glow {
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.4), 0 0 40px rgba(168, 85, 247, 0.2);
+    transition: box-shadow 0.3s ease;
+  }
+
+  .space-depth-indicator {
+    position: relative;
+  }
+
+  .space-depth-indicator::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, rgba(34, 211, 238, 0.6), rgba(168, 85, 247, 0.6));
+    border-radius: 2px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .space-depth-indicator.active::before {
+    opacity: 1;
+  }
+
+  /* Parallax container */
+  .parallax-slow {
+    transition: transform 0.1s ease-out;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .parallax-slow {
+      transform: none !important;
+    }
+  }
+}
+
+@keyframes spaceFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .glass-panel {

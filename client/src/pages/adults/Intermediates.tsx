@@ -18,11 +18,17 @@ const IntermediatesPage = () => {
   const [fluencyScore, setFluencyScore] = useState(72);
   const [isHovered, setIsHovered] = useState<number | null>(null);
   const [stars, setStars] = useState<Array<{ x: number; y: number; size: number; delay: number; opacity: number }>>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
 
-  // Generate animated stars with varying opacity
+  // Generate animated stars with varying opacity - Performance optimized
   useEffect(() => {
     const generateStars = () => {
-      const newStars = Array.from({ length: 200 }, () => ({
+      // Reduce star count on mobile for better performance
+      const isMobile = window.innerWidth < 768;
+      const starCount = isMobile ? 100 : 200;
+      
+      const newStars = Array.from({ length: starCount }, () => ({
         x: Math.random() * 100,
         y: Math.random() * 100,
         size: Math.random() * 2 + 0.5,
@@ -32,6 +38,30 @@ const IntermediatesPage = () => {
       setStars(newStars);
     };
     generateStars();
+    
+    // Handle window resize for responsive star count
+    const handleResize = () => {
+      const isMobile = window.innerWidth < 768;
+      if ((isMobile && stars.length > 100) || (!isMobile && stars.length < 150)) {
+        generateStars();
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Page load fade-in and theme transition
+  useEffect(() => {
+    setIsLoaded(true);
+  }, []);
+
+  // Parallax scroll effect for planets
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const modules = [
@@ -232,13 +262,18 @@ const IntermediatesPage = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-b from-slate-950 via-purple-950 to-slate-950">
+    <div className={`min-h-screen relative overflow-hidden bg-gradient-to-b from-slate-950 via-purple-950 to-slate-950 ${isLoaded ? 'space-fade-in' : 'opacity-0'}`}>
+      {/* Theme Transition Overlay */}
+      {!isLoaded && (
+        <div className="fixed inset-0 bg-gradient-to-b from-green-50 via-green-100 to-slate-950 z-50 transition-opacity duration-500" />
+      )}
+
       {/* Deep Space Background with Stars */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {stars.map((star, index) => (
           <div
             key={index}
-            className="absolute rounded-full bg-white animate-pulse"
+            className="absolute rounded-full bg-white space-star"
             style={{
               left: `${star.x}%`,
               top: `${star.y}%`,
@@ -255,9 +290,9 @@ const IntermediatesPage = () => {
 
       {/* Nebula and Cosmic Effects */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-[800px] h-[800px] bg-gradient-radial from-purple-500/30 via-pink-500/20 to-transparent rounded-full blur-3xl animate-pulse" />
-        <div className="absolute top-1/4 right-0 w-[600px] h-[600px] bg-gradient-radial from-pink-500/25 via-rose-500/15 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute bottom-0 left-1/3 w-[700px] h-[700px] bg-gradient-radial from-purple-500/20 via-indigo-500/10 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-0 left-0 w-[800px] h-[800px] bg-gradient-radial from-purple-500/30 via-pink-500/20 to-transparent rounded-full blur-3xl nebula-effect animate-pulse" />
+        <div className="absolute top-1/4 right-0 w-[600px] h-[600px] bg-gradient-radial from-pink-500/25 via-rose-500/15 to-transparent rounded-full blur-3xl nebula-effect animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute bottom-0 left-1/3 w-[700px] h-[700px] bg-gradient-radial from-purple-500/20 via-indigo-500/10 to-transparent rounded-full blur-3xl nebula-effect animate-pulse" style={{ animationDelay: '2s' }} />
       </div>
 
       {/* Large Planet/Moon Spheres - Main Visual Elements */}
