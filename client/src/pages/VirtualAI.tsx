@@ -137,21 +137,16 @@ export default function VirtualAI() {
   return (
     <AnimatedTransition show={true}>
       <div className="min-h-screen flex flex-col relative">
-        {/* Single Navigation Bar - Spans Full Width */}
-        <div className="w-full px-4 py-3 sm:py-4 pt-20 sm:pt-24 lg:pt-28 absolute top-0 left-0 right-0 z-20">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleBack}
-              className="rounded-full hover:bg-primary/10 text-primary h-8 w-8 sm:h-9 sm:w-9 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm"
-            >
-              <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
-            </Button>
-            <div className="flex-1 h-1 sm:h-1.5 bg-white/50 dark:bg-gray-800/50 rounded-full overflow-hidden backdrop-blur-sm">
-              <div className="h-full bg-primary rounded-full transition-all duration-300" style={{ width: '100%' }} />
-            </div>
-          </div>
+        {/* Navigation Button */}
+        <div className="absolute top-0 left-0 px-4 py-3 sm:py-4 pt-20 sm:pt-24 lg:pt-28 z-20">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleBack}
+            className="rounded-full hover:bg-primary/10 text-primary h-8 w-8 sm:h-9 sm:w-9 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm"
+          >
+            <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+          </Button>
         </div>
 
         {/* Split Screen Container - Header and Content */}
@@ -159,7 +154,7 @@ export default function VirtualAI() {
           {/* Left Panel - Light Blue Background */}
           <div className="w-full lg:w-1/2 bg-sky-100 dark:bg-sky-900/30 flex flex-col">
             {/* Name Tag Content */}
-            <div className="flex-1 flex items-start lg:items-start justify-center p-4 sm:p-8 lg:p-12 xl:p-16 lg:pt-16 xl:pt-20 relative overflow-hidden">
+            <div className="flex-1 flex items-start lg:items-start justify-center p-4 sm:p-8 lg:p-12 xl:p-16 lg:pt-24 xl:pt-28 relative overflow-hidden">
             {/* Background floating particles */}
             <div className="absolute inset-0 pointer-events-none">
               {Array.from({ length: 20 }).map((_, i) => (
@@ -176,7 +171,7 @@ export default function VirtualAI() {
               ))}
             </div>
             
-            <div className="max-w-md w-full py-4 sm:py-6 lg:py-8 lg:-mt-12 xl:-mt-16 relative z-10">
+            <div className="max-w-md w-full py-4 sm:py-6 lg:py-8 relative z-10">
               {/* Name Tag Card */}
               <div 
                 className="relative group"
@@ -327,8 +322,8 @@ export default function VirtualAI() {
           {/* Right Panel - White Background */}
           <div className="w-full lg:w-1/2 bg-white dark:bg-gray-900 flex flex-col">
             {/* Form Content */}
-            <div className="flex-1 flex items-start lg:items-start justify-center p-4 sm:p-8 lg:p-12 xl:p-16 lg:pt-16 xl:pt-20">
-              <div className="max-w-md w-full space-y-6 sm:space-y-8 md:space-y-10 py-4 sm:py-6 lg:py-8 lg:-mt-12 xl:-mt-16">
+            <div className="flex-1 flex items-start lg:items-start justify-center p-4 sm:p-8 lg:p-12 xl:p-16 lg:pt-24 xl:pt-28">
+              <div className="max-w-md w-full space-y-6 sm:space-y-8 md:space-y-10 py-4 sm:py-6 lg:py-8">
               {/* Question - Aligned with HELLO section */}
               <div className="text-center">
                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2 sm:mb-3">
