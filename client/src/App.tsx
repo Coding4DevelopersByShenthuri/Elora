@@ -24,9 +24,7 @@ import Index from "@/pages/Index";
 import WhyPage from "@/pages/WhyPage";
 import HowPage from "@/pages/HowPage";
 import AboutPage from "@/pages/AboutPage";
-import ManagePage from "@/pages/ManagePage";
 import Profile from "@/pages/Profile";
-import Import from "@/pages/Import";
 import SearchPage from "@/pages/SearchPage";
 import Settings from "@/pages/Settings";
 import HelpPage from "@/pages/HelpPage";
@@ -667,9 +665,7 @@ const AppRoutes = () => {
         <Route path="/why" element={<PageTransition><WhyPage /></PageTransition>} />
         <Route path="/how" element={<PageTransition><HowPage /></PageTransition>} />
         <Route path="/about" element={<PageTransition><AboutPage /></PageTransition>} />
-        <Route path="/manage" element={<PageTransition><ManagePage /></PageTransition>} />
         <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
-        <Route path="/import" element={<PageTransition><Import /></PageTransition>} />
         <Route path="/search" element={<PageTransition><SearchPage /></PageTransition>} />
         <Route path="/settings" element={<PageTransition><Settings /></PageTransition>} />
         <Route path="/help" element={<PageTransition><HelpPage /></PageTransition>} />

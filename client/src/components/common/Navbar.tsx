@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Brain, Search, Upload, User, Settings, LogOut, Moon, Sun,
-  Table, Info, HelpCircle, Code, Menu, Users, Baby, FolderTree, Lightbulb,
+  Brain, Search, User, Settings, LogOut, Moon, Sun,
+  Info, HelpCircle, Code, Menu, Users, Baby, FolderTree, Lightbulb,
   GraduationCap, Layers, Award, BookOpen, Notebook
 } from 'lucide-react';
 import { useRippleEffect } from '@/lib/animations';
@@ -178,9 +178,7 @@ export const Navbar = () => {
   ];
 
   const authNavItems = [
-    { to: '/manage', icon: <Table size={18} />, label: 'Manage', id: 'manage' },
     { to: '/search', icon: <Search size={18} />, label: 'Search', id: 'search' },
-    { to: '/import', icon: <Upload size={18} />, label: 'Import', id: 'import' },
     { to: '/profile', icon: <User size={18} />, label: 'Profile', id: 'profile' },
     { to: '/settings', icon: <Settings size={18} />, label: 'Settings', id: 'settings' },
   ];
