@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
   Brain, Search, User, Settings, LogOut, Moon, Sun,
   Info, HelpCircle, Code, Menu, Users, Baby, FolderTree, Lightbulb,
-  GraduationCap, Layers, Award, BookOpen, Notebook
+  GraduationCap, Layers, Award, BookOpen, Notebook, Bot
 } from 'lucide-react';
 import { useRippleEffect } from '@/lib/animations';
 import { cn } from '@/lib/utils';
@@ -109,6 +109,7 @@ const SubMenuItem = ({ to, icon, label, active, onClick, children }: NavItemProp
 };
 
 export const Navbar = () => {
+  const location = useLocation();
   const [active, setActive] = useState('what');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const { isAuthenticated, logout } = useAuth();
@@ -116,6 +117,30 @@ export const Navbar = () => {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [, setIsScrolled] = useState(false);
+
+  // Update active state based on current location
+  useEffect(() => {
+    const path = location.pathname;
+    if (path === '/') setActive('what');
+    else if (path === '/why') setActive('why');
+    else if (path === '/how') setActive('how');
+    else if (path === '/about') setActive('about');
+    else if (path === '/virtual-ai') setActive('virtual-ai');
+    else if (path === '/help') setActive('help');
+    else if (path.startsWith('/kids')) {
+      if (path === '/kids/young') setActive('kids-young');
+      else if (path === '/kids/teen') setActive('kids-teen');
+      else setActive('kids');
+    } else if (path.startsWith('/adults')) {
+      if (path === '/adults/beginners') setActive('adults-beginners');
+      else if (path === '/adults/intermediates') setActive('adults-intermediates');
+      else if (path === '/adults/advanced') setActive('adults-advanced');
+      else setActive('adults');
+    } else if (path === '/ielts-pte') setActive('ielts-pte');
+    else if (path === '/search') setActive('search');
+    else if (path === '/profile') setActive('profile');
+    else if (path === '/settings') setActive('settings');
+  }, [location.pathname]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -309,6 +334,15 @@ export const Navbar = () => {
 
                     {/* Right side navigation items */}
                     <div className="flex items-center gap-1">
+                      {/* Virtual AI option */}
+                      <NavItem
+                        to="/virtual-ai"
+                        icon={<Bot size={18} />}
+                        label="Virtual AI"
+                        active={active === 'virtual-ai'}
+                        onClick={() => handleNavItemClick('virtual-ai')}
+                      />
+
                       {/* Help option */}
                       <NavItem
                         to="/help"
@@ -548,8 +582,25 @@ export const Navbar = () => {
                           </div>
                         )}
 
-                        {/* Help option for mobile */}
+                        {/* Virtual AI option for mobile */}
                         <div className="transition-all duration-300 ease-out delay-200">
+                          <Link
+                            to="/virtual-ai"
+                            className={cn(
+                              "flex items-center gap-2 rounded-md px-2 py-2 transition-all duration-300 hover:bg-teal-500/20 hover:text-teal-400 text-sm",
+                              active === 'virtual-ai'
+                                ? "bg-teal-500/20 text-teal-400"
+                                : "text-foreground"
+                            )}
+                            onClick={() => handleNavItemClick('virtual-ai')}
+                          >
+                            <Bot size={16} />
+                            <span className="font-medium">Virtual AI</span>
+                          </Link>
+                        </div>
+
+                        {/* Help option for mobile */}
+                        <div className="transition-all duration-300 ease-out delay-250">
                           <Link
                             to="/help"
                             className={cn(

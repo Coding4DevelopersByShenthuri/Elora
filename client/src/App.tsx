@@ -46,6 +46,7 @@ import VideoLessons from "@/pages/adults/VideoLessons";
 import VideoDetail from "@/pages/adults/VideoDetail";
 import AIPoweredPractice from "@/pages/adults/AIPoweredPractice";
 import Lesson1Video from "@/pages/Lesson1Video";
+import VirtualAI from "@/pages/VirtualAI";
 import IeltsPte from "@/pages/IeltsPte";
 import NotFound from "@/pages/NotFound";
 import PricingPage from "@/pages/PricingPage";
@@ -670,6 +671,7 @@ const AppRoutes = () => {
         <Route path="/settings" element={<PageTransition><Settings /></PageTransition>} />
         <Route path="/help" element={<PageTransition><HelpPage /></PageTransition>} />
         <Route path="/contact" element={<PageTransition><ContactPage /></PageTransition>} />
+        <Route path="/virtual-ai" element={<PageTransition><VirtualAI /></PageTransition>} />
         <Route path="/kids" element={<PageTransition><KidsPage /></PageTransition>} />
         <Route 
           path="/kids/young" 
