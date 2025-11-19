@@ -657,6 +657,8 @@ const AdultsPage = () => {
                     onClick={() => {
                       if (resource.title === "Interactive Video Lessons") {
                         navigate('/adults/videos');
+                      } else if (resource.title === "AI-Powered Practice") {
+                        navigate('/adults/ai-practice');
                       }
                     }}
                   >
@@ -681,14 +683,18 @@ const AdultsPage = () => {
                         <Badge variant="outline" className="text-xs bg-purple-500/20 text-purple-300 border-purple-400/30">
                           {resource.count}
                         </Badge>
-                        {resource.title === "Interactive Video Lessons" && (
+                        {(resource.title === "Interactive Video Lessons" || resource.title === "AI-Powered Practice") && (
                           <Button
                             variant="ghost"
                             size="sm"
                             className="text-cyan-300 hover:text-cyan-300 hover:bg-transparent p-0 h-auto"
                             onClick={(e) => {
                               e.stopPropagation();
-                              navigate('/adults/videos');
+                              if (resource.title === "Interactive Video Lessons") {
+                                navigate('/adults/videos');
+                              } else if (resource.title === "AI-Powered Practice") {
+                                navigate('/adults/ai-practice');
+                              }
                             }}
                           >
                             Explore <ArrowRight className="w-3 h-3 ml-1" />
