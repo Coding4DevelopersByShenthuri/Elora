@@ -609,13 +609,19 @@ export default function AdminVideos() {
                       <tr key={video.id} className="border-b last:border-b-0 hover:bg-muted/30">
                         <td className="px-5 py-3">
                           <div className="relative h-14 w-24 rounded overflow-hidden bg-muted">
-                            {buildMediaUrl(video.thumbnail_url) || buildMediaUrl(video.thumbnail) ? (
+                            {(video.thumbnail_url || video.thumbnail) ? (
                               <img
-                                src={buildMediaUrl(video.thumbnail_url) || buildMediaUrl(video.thumbnail)}
+                                src={video.thumbnail_url || buildMediaUrl(video.thumbnail) || ''}
                                 alt={video.title}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
-                                  (e.currentTarget as HTMLImageElement).style.display = 'none';
+                                  const target = e.currentTarget as HTMLImageElement;
+                                  // Try fallback if thumbnail_url failed
+                                  if (video.thumbnail_url && video.thumbnail) {
+                                    target.src = buildMediaUrl(video.thumbnail) || '';
+                                  } else {
+                                    target.style.display = 'none';
+                                  }
                                 }}
                               />
                             ) : (
@@ -763,6 +769,33 @@ export default function AdminVideos() {
                     onChange={(e) => handleFileChange('thumbnail', e.target.files?.[0])}
                   />
                   <p className="text-xs text-muted-foreground">Recommended 16:9 image.</p>
+                  {/* Thumbnail Preview */}
+                  {(files.thumbnail || (selectedVideo && (selectedVideo.thumbnail_url || selectedVideo.thumbnail))) && (
+                    <div className="mt-2 rounded-lg overflow-hidden bg-muted border border-border">
+                      {files.thumbnail ? (
+                        <img
+                          src={URL.createObjectURL(files.thumbnail)}
+                          alt="Thumbnail preview"
+                          className="w-full h-32 object-cover"
+                        />
+                      ) : selectedVideo && (selectedVideo.thumbnail_url || selectedVideo.thumbnail) ? (
+                        <img
+                          src={selectedVideo.thumbnail_url || buildMediaUrl(selectedVideo.thumbnail) || ''}
+                          alt="Current thumbnail"
+                          className="w-full h-32 object-cover"
+                          onError={(e) => {
+                            const target = e.currentTarget as HTMLImageElement;
+                            // Try fallback if thumbnail_url failed
+                            if (selectedVideo.thumbnail_url && selectedVideo.thumbnail) {
+                              target.src = buildMediaUrl(selectedVideo.thumbnail) || '';
+                            } else {
+                              target.style.display = 'none';
+                            }
+                          }}
+                        />
+                      ) : null}
+                    </div>
+                  )}
                 </div>
                 <div className="grid gap-2">
                   <Label>Video File</Label>
@@ -950,11 +983,20 @@ export default function AdminVideos() {
             {viewingVideo && (
               <div className="space-y-4">
                 <div className="rounded-lg overflow-hidden bg-muted">
-                  {buildMediaUrl(viewingVideo.thumbnail_url) || buildMediaUrl(viewingVideo.thumbnail) ? (
+                  {(viewingVideo.thumbnail_url || viewingVideo.thumbnail) ? (
                     <img
-                      src={buildMediaUrl(viewingVideo.thumbnail_url) || buildMediaUrl(viewingVideo.thumbnail)}
+                      src={viewingVideo.thumbnail_url || buildMediaUrl(viewingVideo.thumbnail) || ''}
                       alt={viewingVideo.title}
                       className="w-full h-48 object-cover"
+                      onError={(e) => {
+                        const target = e.currentTarget as HTMLImageElement;
+                        // Try fallback if thumbnail_url failed
+                        if (viewingVideo.thumbnail_url && viewingVideo.thumbnail) {
+                          target.src = buildMediaUrl(viewingVideo.thumbnail) || '';
+                        } else {
+                          target.style.display = 'none';
+                        }
+                      }}
                     />
                   ) : (
                     <div className="h-48 flex items-center justify-center text-muted-foreground">

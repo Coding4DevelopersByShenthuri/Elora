@@ -652,20 +652,6 @@ class VideoLessonSerializer(serializers.ModelSerializer):
     
     def get_thumbnail_url(self, obj):
         if obj.thumbnail:
-            # Check if the file actually exists on disk before building URL
-            try:
-                if not obj.thumbnail.storage.exists(obj.thumbnail.name):
-                    return None
-            except (AttributeError, Exception):
-                # If storage check fails, try to check the file path
-                try:
-                    file_path = os.path.join(settings.MEDIA_ROOT, obj.thumbnail.name)
-                    if not os.path.exists(file_path):
-                        return None
-                except (AttributeError, Exception):
-                    # If file doesn't exist, return None to avoid 404 errors
-                    return None
-            
             request = self.context.get('request')
             if request:
                 # Use build_absolute_uri to get full URL with correct host/port
@@ -684,20 +670,6 @@ class VideoLessonSerializer(serializers.ModelSerializer):
     
     def get_video_file_url(self, obj):
         if obj.video_file:
-            # Check if the file actually exists on disk before building URL
-            try:
-                if not obj.video_file.storage.exists(obj.video_file.name):
-                    return None
-            except (AttributeError, Exception):
-                # If storage check fails, try to check the file path
-                try:
-                    file_path = os.path.join(settings.MEDIA_ROOT, obj.video_file.name)
-                    if not os.path.exists(file_path):
-                        return None
-                except (AttributeError, Exception):
-                    # If file doesn't exist, return None to avoid 404 errors
-                    return None
-            
             request = self.context.get('request')
             if request:
                 # Use build_absolute_uri to get full URL with correct host/port

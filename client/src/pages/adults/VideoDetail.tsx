@@ -375,7 +375,7 @@ const VideoDetail: React.FC = () => {
 
   // Determine video source - use exact URLs from backend
   const videoSrc = video.video_file_url || video.video_url || '';
-  const posterSrc = buildMediaUrl(video.thumbnail_url) || buildMediaUrl(video.thumbnail) || undefined;
+  const posterSrc = video.thumbnail_url || buildMediaUrl(video.thumbnail) || undefined;
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950">
@@ -755,7 +755,7 @@ const PracticeCorner = ({
 );
 
 const RelatedVideoCard = ({ video, onClick }: { video: VideoLesson; onClick: () => void }) => {
-  const thumbnailUrl = buildMediaUrl(video.thumbnail_url) || buildMediaUrl(video.thumbnail);
+  const thumbnailUrl = video.thumbnail_url || buildMediaUrl(video.thumbnail);
 
   return (
     <button
@@ -769,6 +769,15 @@ const RelatedVideoCard = ({ video, onClick }: { video: VideoLesson; onClick: () 
               src={thumbnailUrl} 
               alt={video.title} 
               className="w-full h-full object-cover"
+              onError={(e) => {
+                const target = e.currentTarget as HTMLImageElement;
+                // Try fallback if thumbnail_url failed
+                if (video.thumbnail_url && video.thumbnail) {
+                  target.src = buildMediaUrl(video.thumbnail) || '';
+                } else {
+                  target.style.display = 'none';
+                }
+              }}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-white text-xs">No thumbnail</div>

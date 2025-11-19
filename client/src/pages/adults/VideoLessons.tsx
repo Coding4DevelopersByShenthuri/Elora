@@ -517,14 +517,20 @@ const VideoLessons = () => {
                       {/* Thumbnail */}
                       {(lesson.thumbnail_url || lesson.thumbnail) && (
                         <img
-                          src={lesson.thumbnail_url || lesson.thumbnail}
+                          src={lesson.thumbnail_url || buildMediaUrl(lesson.thumbnail) || ''}
                           alt={lesson.title}
                           className={cn(
                             'absolute inset-0 w-full h-full object-cover',
                             viewMode === 'list' ? 'object-cover' : 'object-cover'
                           )}
                           onError={(e) => {
-                            (e.currentTarget as HTMLImageElement).style.display = 'none';
+                            const target = e.currentTarget as HTMLImageElement;
+                            // Try fallback if thumbnail_url failed
+                            if (lesson.thumbnail_url && lesson.thumbnail) {
+                              target.src = buildMediaUrl(lesson.thumbnail) || '';
+                            } else {
+                              target.style.display = 'none';
+                            }
                           }}
                         />
                       )}
