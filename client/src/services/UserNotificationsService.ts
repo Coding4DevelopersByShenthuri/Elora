@@ -121,10 +121,11 @@ const fetchServerNotifications = async () => {
     return null;
   }
   const response = await NotificationsAPI.list();
-  if (!response.success || !response.data) {
+  if (!response.success || !('data' in response) || !response.data) {
     return null;
   }
-  const serverItems = Array.isArray(response.data.notifications) ? response.data.notifications : [];
+  const data: any = response.data;
+  const serverItems = Array.isArray(data.notifications) ? data.notifications : [];
   return serverItems.map(mapServerNotification);
 };
 
@@ -190,8 +191,8 @@ export const UserNotificationsService = {
           metadata: notification.metadata,
         });
 
-        if (response.success && response.data) {
-          const serverNotification = mapServerNotification(response.data);
+        if (response.success && 'data' in response && response.data) {
+          const serverNotification = mapServerNotification((response as any).data);
           const merged = mergeNotifications(updatedNotifications, [serverNotification]);
           await persistNotifications(userId, merged);
           return { notifications: merged, notification: serverNotification };

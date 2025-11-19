@@ -223,11 +223,11 @@ class LearningPathRecommendationServiceClass {
   /**
    * Calculate recommendation based on categories
    */
-  private calculateRecommendation(
+  private async calculateRecommendation(
     userId: string,
     categories: CategoryProgress[]
-  ): CategoryRecommendation | null {
-    const nextSteps = this.getNextSteps(userId, categories);
+  ): Promise<CategoryRecommendation | null> {
+    const nextSteps = await this.getNextSteps(userId, categories);
     return nextSteps.length > 0 ? nextSteps[0] : null;
   }
 

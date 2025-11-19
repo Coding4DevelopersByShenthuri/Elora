@@ -60,7 +60,7 @@ export function UserDetailDialog({
     setLoading(true);
     try {
       // Prepare the data to send
-      const updateData = {
+      const updateData: any = {
         email: formData.email,
         first_name: formData.first_name,
         last_name: formData.last_name,

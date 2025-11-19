@@ -12,7 +12,7 @@ export interface LessonProgress {
 
 export interface PracticeSession {
   id: string;
-  type: 'pronunciation' | 'conversation' | 'vocabulary' | 'grammar';
+  type: 'pronunciation' | 'conversation' | 'vocabulary' | 'grammar' | 'listening' | 'reading' | 'exam_practice';
   duration: number;
   score: number;
   date: string;

@@ -5,7 +5,7 @@
  * Handles polling, visibility-based updates, focus-based refresh, and efficient caching.
  */
 
-type DataType = 
+export type DataType = 
   | 'category_progress'
   | 'aggregated_progress'
   | 'notifications'
@@ -38,7 +38,7 @@ interface DataCache {
 
 class RealTimeDataServiceClass {
   private subscribers: Map<string, Subscriber> = new Map();
-  private intervals: Map<string, NodeJS.Timeout> = new Map();
+  private intervals: Map<DataType, number> = new Map();
   private cache: Map<DataType, DataCache> = new Map();
   private isPageVisible: boolean = !document.hidden;
   private isWindowFocused: boolean = document.hasFocus();
@@ -202,7 +202,7 @@ class RealTimeDataServiceClass {
     };
 
     // Start polling
-    const intervalId = setInterval(poll, interval);
+    const intervalId = window.setInterval(poll, interval);
     this.intervals.set(dataType, intervalId);
   }
 
@@ -214,7 +214,7 @@ class RealTimeDataServiceClass {
     if (!cached || cached.subscribers.size === 0) {
       const intervalId = this.intervals.get(dataType);
       if (intervalId) {
-        clearInterval(intervalId);
+        window.clearInterval(intervalId);
         this.intervals.delete(dataType);
       }
     }

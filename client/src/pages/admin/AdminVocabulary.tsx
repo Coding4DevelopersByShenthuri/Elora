@@ -227,7 +227,7 @@ export default function AdminVocabulary() {
           <div className="flex gap-2">
             <Button 
               variant="outline" 
-              onClick={handleRefresh}
+              onClick={() => handleRefresh()}
               disabled={loading || statsLoading}
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${loading || statsLoading ? 'animate-spin' : ''}`} />
@@ -411,7 +411,7 @@ export default function AdminVocabulary() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={loadWords}
+                  onClick={() => loadWords()}
                 >
                   <RefreshCw className="h-4 w-4 mr-2" />
                   Retry

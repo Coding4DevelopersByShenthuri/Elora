@@ -70,18 +70,26 @@ class HybridServiceManagerClass {
     await this.ensureOnline();
     const response = await API.progress.getMyProgress(type);
     if (!response.success || !('data' in response)) {
-      throw new Error(response.message || 'Unable to load progress.');
+      const message =
+        !response.success && 'message' in response
+          ? (response as any).message
+          : 'Unable to load progress.';
+      throw new Error(message);
     }
-    return response.data;
+    return (response as any).data;
   }
 
   async getUserStats(): Promise<any> {
     await this.ensureOnline();
     const response = await API.stats.getUserStats();
     if (!response.success || !('data' in response)) {
-      throw new Error(response.message || 'Unable to load statistics.');
+      const message =
+        !response.success && 'message' in response
+          ? (response as any).message
+          : 'Unable to load statistics.';
+      throw new Error(message);
     }
-    return response.data;
+    return (response as any).data;
   }
 
   async saveVocabularyWord(word: {

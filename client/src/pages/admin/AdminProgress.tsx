@@ -274,10 +274,10 @@ export default function AdminProgress() {
               Monitor and analyze lesson progress across all users
             </p>
           </div>
-          <div className="flex gap-2">
+              <div className="flex gap-2">
             <Button 
               variant="outline" 
-              onClick={handleRefresh}
+              onClick={() => handleRefresh()}
               disabled={loading || statsLoading}
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${loading || statsLoading ? 'animate-spin' : ''}`} />
@@ -550,7 +550,7 @@ export default function AdminProgress() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={loadProgressRecords}
+                  onClick={() => loadProgressRecords()}
                 >
                   <RefreshCw className="h-4 w-4 mr-2" />
                   Retry

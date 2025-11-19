@@ -16,7 +16,7 @@
  */
 
 import OnlineTTS from './OnlineTTS';
-import { ModelManager } from './ModelManager';
+import { ModelManager, type DownloadProgress } from './ModelManager';
 
 export interface VoiceProfile {
   name: string;
@@ -292,18 +292,21 @@ export class HybridVoiceService {
     const availableVoices = OnlineTTS.getAvailableVoices();
     
     // First, try to use the exact voice name from the profile
-    if (voiceProfile.voiceName) {
-      const exactVoice = availableVoices.find(v => v.name === voiceProfile.voiceName);
+    const profileVoiceName = voiceProfile.voiceName;
+    if (profileVoiceName) {
+      const targetName = profileVoiceName.toLowerCase();
+
+      const exactVoice = availableVoices.find(v => v.name === profileVoiceName);
       if (exactVoice) {
         console.log(`✅ Found exact voice for ${voiceProfile.name}: ${exactVoice.name}`);
         return exactVoice.name;
       }
       
       // Try partial match for the exact voice name
-      const partialVoice = availableVoices.find(v => 
-        v.name.toLowerCase().includes(voiceProfile.voiceName.toLowerCase()) ||
-        voiceProfile.voiceName.toLowerCase().includes(v.name.toLowerCase())
-      );
+      const partialVoice = availableVoices.find(v => {
+        const voiceNameLower = v.name.toLowerCase();
+        return voiceNameLower.includes(targetName) || targetName.includes(voiceNameLower);
+      });
       if (partialVoice) {
         console.log(`✅ Found partial match for ${voiceProfile.name}: ${partialVoice.name} (wanted: ${voiceProfile.voiceName})`);
         return partialVoice.name;
@@ -359,7 +362,7 @@ export class HybridVoiceService {
   /**
    * Start downloading Piper TTS models for offline use
    */
-  static async startPiperDownload(onProgress?: (progress: number) => void): Promise<void> {
+  static async startPiperDownload(onProgress?: (progress: DownloadProgress) => void): Promise<void> {
     if (this.downloadInProgress) {
       console.log('Download already in progress');
       return;

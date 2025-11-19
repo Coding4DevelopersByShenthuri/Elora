@@ -172,7 +172,8 @@ class PageEligibilityServiceClass {
       let totalProgress = 0;
       let totalWeight = 0;
 
-      for (const [key, required] of Object.entries(criteria)) {
+      for (const [key, requiredValue] of Object.entries(criteria)) {
+        const required = requiredValue ?? 0;
         const current = progressData[key] || 0;
         const met = current >= required;
         const progressPercent = required > 0 ? Math.min(100, (current / required) * 100) : 100;

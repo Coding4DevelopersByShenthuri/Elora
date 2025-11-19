@@ -78,8 +78,7 @@ export {
 export { 
   HybridServiceManager,
   type HybridConfig,
-  type OperationMode,
-  type SessionData
+  type OperationMode
 } from './HybridServiceManager';
 
 // API Service (Online)

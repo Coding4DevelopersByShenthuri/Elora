@@ -9,13 +9,14 @@ interface LessonsCompletionMiniProps {
 export function LessonsCompletionMini({ completionRate, completedLast7 = 0, completedLast30 = 0 }: LessonsCompletionMiniProps) {
   const safeRate = Math.max(0, Math.min(100, Number(isNaN(completionRate) ? 0 : completionRate)));
   const data = [{ name: 'Completion', value: safeRate, fill: 'hsl(var(--primary))' }];
+  const AnyRadialBar = RadialBar as any;
 
   return (
     <div className="grid gap-3">
       <div className="h-[160px]">
         <ResponsiveContainer width="100%" height="100%">
           <RadialBarChart innerRadius="70%" outerRadius="100%" data={data} startAngle={90} endAngle={-270}>
-            <RadialBar minAngle={15} background clockWise dataKey="value" cornerRadius={8} />
+            <AnyRadialBar minAngle={15} background clockWise dataKey="value" cornerRadius={8} />
             <Legend content={() => (
               <div className="text-center">
                 <div className="text-2xl font-semibold">{safeRate}%</div>

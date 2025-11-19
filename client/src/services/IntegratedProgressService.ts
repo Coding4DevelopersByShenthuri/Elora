@@ -163,7 +163,8 @@ class IntegratedProgressServiceClass {
             if (result.success) {
               console.log('Practice session saved to MySQL successfully');
             } else {
-              console.warn('Practice session save to MySQL failed:', result.message);
+              const message = 'message' in result ? (result as any).message : 'Unknown error';
+              console.warn('Practice session save to MySQL failed:', message);
             }
           } catch (error) {
             console.error('Error saving practice session to MySQL:', error);

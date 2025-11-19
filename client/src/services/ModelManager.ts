@@ -147,6 +147,14 @@ class ModelManagerClass {
   }
 
   /**
+   * Get all downloaded (cached) models
+   */
+  async getDownloadedModels(): Promise<ModelInfo[]> {
+    const models = await this.getAvailableModels();
+    return models.filter(m => m.cached);
+  }
+
+  /**
    * Get model by ID
    */
   async getModelInfo(modelId: string): Promise<ModelInfo | null> {
