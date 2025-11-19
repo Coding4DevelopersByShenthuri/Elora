@@ -11,17 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
-import { VideosAPI } from '@/services/ApiService';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE || 'http://127.0.0.1:8000';
-
-const buildMediaUrl = (url?: string | null) => {
-  if (!url) return undefined;
-  if (url.startsWith('http://') || url.startsWith('https://')) return url;
-  const base = API_BASE_URL.replace(/\/$/, '');
-  const normalized = url.startsWith('/') ? url : `/${url}`;
-  return `${base}${normalized}`;
-};
+import { VideosAPI, buildMediaUrl } from '@/services/ApiService';
 
 interface VideoLesson {
   id: number;

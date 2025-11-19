@@ -17,18 +17,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { VideosAPI, ChannelAPI } from '@/services/ApiService';
+import { VideosAPI, ChannelAPI, buildMediaUrl } from '@/services/ApiService';
 import { cn } from '@/lib/utils';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE || 'http://127.0.0.1:8000';
-
-const buildMediaUrl = (url?: string | null) => {
-  if (!url) return undefined;
-  if (url.startsWith('http://') || url.startsWith('https://')) return url;
-  const base = API_BASE_URL.replace(/\/$/, '');
-  const normalized = url.startsWith('/') ? url : `/${url}`;
-  return `${base}${normalized}`;
-};
 
 interface Chapter {
   t: string;
@@ -383,9 +373,9 @@ const VideoDetail: React.FC = () => {
     );
   }
 
-  // Determine video source
+  // Determine video source - use exact URLs from backend
   const videoSrc = video.video_file_url || video.video_url || '';
-  const posterSrc = buildMediaUrl(video.thumbnail_url) || buildMediaUrl(video.thumbnail) || '/Lesson01_Thumb.png';
+  const posterSrc = buildMediaUrl(video.thumbnail_url) || buildMediaUrl(video.thumbnail) || undefined;
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950">
@@ -461,7 +451,9 @@ const VideoDetail: React.FC = () => {
                     src={videoSrc}
                     onError={handleVideoError}
                     ref={videoRef}
-                  />
+                  >
+                    <source src={videoSrc} type="video/mp4" />
+                  </video>
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-slate-900 text-white">
                     No video source available
@@ -762,29 +754,37 @@ const PracticeCorner = ({
   </div>
 );
 
-const RelatedVideoCard = ({ video, onClick }: { video: VideoLesson; onClick: () => void }) => (
-  <button
-    onClick={onClick}
-    className="w-full text-left flex gap-3 hover:bg-white/5 rounded-xl p-2 transition-colors"
-  >
-    <div className="relative w-32 flex-shrink-0">
-      <div className="aspect-video rounded-lg overflow-hidden bg-slate-800">
-        {video.thumbnail_url ? (
-          <img src={video.thumbnail_url} alt={video.title} className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-white text-xs">No image</div>
-        )}
+const RelatedVideoCard = ({ video, onClick }: { video: VideoLesson; onClick: () => void }) => {
+  const thumbnailUrl = buildMediaUrl(video.thumbnail_url) || buildMediaUrl(video.thumbnail);
+
+  return (
+    <button
+      onClick={onClick}
+      className="w-full text-left flex gap-3 hover:bg-white/5 rounded-xl p-2 transition-colors"
+    >
+      <div className="relative w-32 flex-shrink-0">
+        <div className="aspect-video rounded-lg overflow-hidden bg-slate-800">
+          {thumbnailUrl ? (
+            <img 
+              src={thumbnailUrl} 
+              alt={video.title} 
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-white text-xs">No thumbnail</div>
+          )}
+        </div>
+        <div className="absolute bottom-1 right-1 text-[10px] px-1.5 py-0.5 rounded bg-black/70 text-white">
+          {formatDuration(video.duration)}
+        </div>
       </div>
-      <div className="absolute bottom-1 right-1 text-[10px] px-1.5 py-0.5 rounded bg-black/70 text-white">
-        {formatDuration(video.duration)}
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold text-white line-clamp-2">{video.title}</p>
+        <p className="text-xs text-cyan-100/70 mt-1">{formatViews(video.views)} · {video.category}</p>
       </div>
-    </div>
-    <div className="flex-1 min-w-0">
-      <p className="text-sm font-semibold text-white line-clamp-2">{video.title}</p>
-      <p className="text-xs text-cyan-100/70 mt-1">{formatViews(video.views)} · {video.category}</p>
-    </div>
-  </button>
-);
+    </button>
+  );
+};
 
 const ActionButton = ({
   icon: Icon,
@@ -836,19 +836,25 @@ const formatRelativeTime = (dateString: string) => {
 };
 
 const normalizeVideo = (data: any): VideoLesson => {
-  const thumbnailUrl = buildMediaUrl(data.thumbnail_url) || buildMediaUrl(data.thumbnail);
-  const videoFileUrl = buildMediaUrl(data.video_file_url) || buildMediaUrl(data.video_file);
-  const externalVideoUrl = data.video_url
-    ? data.video_url.startsWith('http')
-      ? data.video_url
-      : buildMediaUrl(data.video_url)
-    : undefined;
+  // Use exact URLs from backend - serializer already provides absolute URLs when possible
+  // Only build URL if it's a relative path (starts with /media/)
+  const getUrl = (url: string | null | undefined, fallback: string | null | undefined = null) => {
+    if (!url && !fallback) return undefined;
+    const urlToUse = url || fallback;
+    if (!urlToUse) return undefined;
+    // If already absolute URL, use as-is
+    if (urlToUse.startsWith('http://') || urlToUse.startsWith('https://')) {
+      return urlToUse;
+    }
+    // If relative path, build full URL
+    return buildMediaUrl(urlToUse);
+  };
 
   return {
     ...data,
-    thumbnail_url: thumbnailUrl,
-    video_file_url: videoFileUrl,
-    video_url: externalVideoUrl,
+    thumbnail_url: getUrl(data.thumbnail_url, data.thumbnail),
+    video_file_url: getUrl(data.video_file_url, data.video_file),
+    video_url: data.video_url ? (data.video_url.startsWith('http') ? data.video_url : buildMediaUrl(data.video_url)) : undefined,
     tags: data.tags || [],
     chapters: data.chapters || [],
     hashtags: data.hashtags || [],

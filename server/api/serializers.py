@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
+import os
+from django.conf import settings
 from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
     VocabularyWord, Achievement, UserAchievement,
@@ -650,18 +652,66 @@ class VideoLessonSerializer(serializers.ModelSerializer):
     
     def get_thumbnail_url(self, obj):
         if obj.thumbnail:
+            # Check if the file actually exists on disk before building URL
+            try:
+                if not obj.thumbnail.storage.exists(obj.thumbnail.name):
+                    return None
+            except (AttributeError, Exception):
+                # If storage check fails, try to check the file path
+                try:
+                    file_path = os.path.join(settings.MEDIA_ROOT, obj.thumbnail.name)
+                    if not os.path.exists(file_path):
+                        return None
+                except (AttributeError, Exception):
+                    # If file doesn't exist, return None to avoid 404 errors
+                    return None
+            
             request = self.context.get('request')
             if request:
-                return request.build_absolute_uri(obj.thumbnail.url)
-            return obj.thumbnail.url
+                # Use build_absolute_uri to get full URL with correct host/port
+                url = obj.thumbnail.url
+                # Ensure we have a proper absolute URL
+                if url.startswith('http://') or url.startswith('https://'):
+                    return url
+                return request.build_absolute_uri(url)
+            # Fallback: construct URL manually if no request context
+            base_url = getattr(settings, 'BASE_URL', 'http://127.0.0.1:8000')
+            url = obj.thumbnail.url
+            if url.startswith('http://') or url.startswith('https://'):
+                return url
+            return f"{base_url}{url}"
         return None
     
     def get_video_file_url(self, obj):
         if obj.video_file:
+            # Check if the file actually exists on disk before building URL
+            try:
+                if not obj.video_file.storage.exists(obj.video_file.name):
+                    return None
+            except (AttributeError, Exception):
+                # If storage check fails, try to check the file path
+                try:
+                    file_path = os.path.join(settings.MEDIA_ROOT, obj.video_file.name)
+                    if not os.path.exists(file_path):
+                        return None
+                except (AttributeError, Exception):
+                    # If file doesn't exist, return None to avoid 404 errors
+                    return None
+            
             request = self.context.get('request')
             if request:
-                return request.build_absolute_uri(obj.video_file.url)
-            return obj.video_file.url
+                # Use build_absolute_uri to get full URL with correct host/port
+                url = obj.video_file.url
+                # Ensure we have a proper absolute URL
+                if url.startswith('http://') or url.startswith('https://'):
+                    return url
+                return request.build_absolute_uri(url)
+            # Fallback: construct URL manually if no request context
+            base_url = getattr(settings, 'BASE_URL', 'http://127.0.0.1:8000')
+            url = obj.video_file.url
+            if url.startswith('http://') or url.startswith('https://'):
+                return url
+            return f"{base_url}{url}"
         return None
 
 

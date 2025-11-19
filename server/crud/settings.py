@@ -14,6 +14,9 @@ logger = logging.getLogger(__name__)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Base URL for constructing absolute URLs when request context is not available
+BASE_URL = config('BASE_URL', default='http://127.0.0.1:8000')
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/

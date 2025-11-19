@@ -5,6 +5,26 @@
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
+// Base origin (no trailing /api) used for media/static URLs and any
+// endpoints that are mounted at the Django root rather than under /api.
+// Keep this consistent with API_BASE_URL by default so we never mix
+// hosts (e.g. localhost vs 127.0.0.1) unless the caller explicitly
+// overrides with VITE_API_BASE.
+const RAW_BASE_ORIGIN =
+  import.meta.env.VITE_API_BASE ||
+  API_BASE_URL.replace(/\/$/, '');
+
+export const API_BASE_ORIGIN = RAW_BASE_ORIGIN.replace(/\/api\/?$/, '');
+
+// Helper to turn relative media paths (e.g. /media/...) into absolute URLs.
+// If the backend already returns an absolute URL, it is passed through.
+export const buildMediaUrl = (url?: string | null) => {
+  if (!url) return undefined;
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  const normalized = url.startsWith('/') ? url : `/${url}`;
+  return `${API_BASE_ORIGIN}${normalized}`;
+};
+
 // Helper function to get auth token
 const getAuthToken = (): string | null => {
   return localStorage.getItem('speakbee_auth_token');
@@ -318,9 +338,9 @@ export const VideosAPI = {
       if (params?.category && params.category !== 'all') usp.append('category', params.category);
       if (params?.search) usp.append('search', params.search);
       const query = usp.toString() ? `?${usp.toString()}` : '';
-      
+
       // Public endpoint, no auth required
-      const baseUrl = import.meta.env.VITE_API_BASE || 'http://127.0.0.1:8000';
+      const baseUrl = API_BASE_ORIGIN;
       const response = await fetch(`${baseUrl}/api/videos${query}`, {
         method: 'GET',
         headers: {
@@ -349,7 +369,7 @@ export const VideosAPI = {
   getVideoBySlug: async (slug: string) => {
     try {
       // Public endpoint, no auth required
-      const baseUrl = import.meta.env.VITE_API_BASE || 'http://127.0.0.1:8000';
+      const baseUrl = API_BASE_ORIGIN;
       const response = await fetch(`${baseUrl}/api/videos/${slug}`, {
         method: 'GET',
         headers: {
