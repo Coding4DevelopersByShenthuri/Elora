@@ -1,80 +1,44 @@
+version: "3.9"
+
 services:
   db:
     image: mysql:8.0
-    container_name: elora_db
-    restart: always
+    restart: unless-stopped
     environment:
-      MYSQL_DATABASE: ${DATABASE_NAME:-elora_db}
-      MYSQL_USER: ${DATABASE_USER:-elora_user}
-      MYSQL_PASSWORD: ${DATABASE_PASSWORD:-elora_password}
-      MYSQL_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD:-root_password}
+      MYSQL_DATABASE: elora
+      MYSQL_USER: elora
+      MYSQL_PASSWORD: elora_password
+      MYSQL_ROOT_PASSWORD: root_password
     volumes:
-      - mysql_data:/var/lib/mysql
-    networks:
-      - elora_network
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - db_data:/var/lib/mysql
 
   backend:
     build:
-      context: .
-      dockerfile: Dockerfile.server
-    container_name: elora_backend
-    restart: always
-    environment:
-      - DATABASE_NAME=${DATABASE_NAME:-elora_db}
-      - DATABASE_USER=${DATABASE_USER:-elora_user}
-      - DATABASE_PASSWORD=${DATABASE_PASSWORD:-elora_password}
-      - DATABASE_HOST=db
-      - DATABASE_PORT=3306
-      - SECRET_KEY=${SECRET_KEY}
-      - DEBUG=${DEBUG:-False}
-      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-54.179.120.126,localhost,127.0.0.1}
-      - FRONTEND_URL=${FRONTEND_URL:-http://54.179.120.126}
-      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-http://54.179.120.126,http://localhost:5173}
-      - EMAIL_BACKEND=${EMAIL_BACKEND:-django.core.mail.backends.console.EmailBackend}
-      - EMAIL_HOST=${EMAIL_HOST:-smtp.gmail.com}
-      - EMAIL_PORT=${EMAIL_PORT:-587}
-      - EMAIL_USE_TLS=${EMAIL_USE_TLS:-True}
-      - EMAIL_HOST_USER=${EMAIL_HOST_USER:-}
-      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD:-}
-      - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL:-}
-      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      context: ./server
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - db
+    env_file:
+      - ./server/.env.docker
     volumes:
       - ./server/media:/app/media
-      - ./server/debug.log:/app/debug.log
-    ports:
-      - "8000:8000"
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - elora_network
-    command: >
-      sh -c "python manage.py migrate &&
-             python manage.py collectstatic --noinput &&
-             gunicorn crud.wsgi:application --bind 0.0.0.0:8000 --workers 3"
+    expose:
+      - "8000"
 
   frontend:
     build:
-      context: .
-      dockerfile: Dockerfile.client
-    container_name: elora_frontend
-    restart: always
-    ports:
-      - "80:80"
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: /api
+    restart: unless-stopped
     depends_on:
       - backend
-    networks:
-      - elora_network
+    ports:
+      - "80:80"
 
 volumes:
-  mysql_data:
+  db_data:
 
-networks:
-  elora_network:
-    driver: bridge
 
