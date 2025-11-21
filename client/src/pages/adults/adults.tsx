@@ -270,13 +270,6 @@ const AdultsPage = () => {
       color: "from-cyan-500 to-blue-600"
     },
     {
-      title: "AI-Powered Practice",
-      description: "Personalized speaking practice with instant feedback",
-      icon: Sparkles,
-      count: "24/7 available",
-      color: "from-purple-500 to-pink-600"
-    },
-    {
       title: "Grammar Mastery Course",
       description: "Comprehensive grammar from basics to advanced",
       icon: BookOpen,
@@ -657,8 +650,6 @@ const AdultsPage = () => {
                     onClick={() => {
                       if (resource.title === "Interactive Video Lessons") {
                         navigate('/adults/videos');
-                      } else if (resource.title === "AI-Powered Practice") {
-                        navigate('/adults/ai-practice');
                       }
                     }}
                   >
@@ -683,7 +674,7 @@ const AdultsPage = () => {
                         <Badge variant="outline" className="text-xs bg-purple-500/20 text-purple-300 border-purple-400/30">
                           {resource.count}
                         </Badge>
-                        {(resource.title === "Interactive Video Lessons" || resource.title === "AI-Powered Practice") && (
+                        {resource.title === "Interactive Video Lessons" && (
                           <Button
                             variant="ghost"
                             size="sm"
@@ -692,8 +683,6 @@ const AdultsPage = () => {
                               e.stopPropagation();
                               if (resource.title === "Interactive Video Lessons") {
                                 navigate('/adults/videos');
-                              } else if (resource.title === "AI-Powered Practice") {
-                                navigate('/adults/ai-practice');
                               }
                             }}
                           >

@@ -192,7 +192,7 @@ const PersonalizationSurvey: React.FC<PersonalizationSurveyProps> = ({
                 <div className="flex items-center gap-4">
                   <img
                     src="/student.jpg"
-                    alt="Learna testimonial"
+                    alt="Elora testimonial"
                     className="h-16 w-16 rounded-full object-cover"
                   />
                   <div>
@@ -201,7 +201,7 @@ const PersonalizationSurvey: React.FC<PersonalizationSurveyProps> = ({
                   </div>
                 </div>
                 <p className="mt-6 text-sm leading-relaxed text-slate-600">
-                  “Learna customized just for me. It feels like a personal tutor in my pocket.”
+                  “Elora customized just for me. It feels like a personal tutor in my pocket.”
                 </p>
               </div>
             </div>
