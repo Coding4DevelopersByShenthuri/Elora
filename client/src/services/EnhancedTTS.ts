@@ -55,18 +55,59 @@ class EnhancedTTSClass {
       // Detect gender from voice name (heuristic)
       const nameLower = voice.name.toLowerCase();
       let gender: 'male' | 'female' | 'neutral' = 'neutral';
-      
-      if (nameLower.includes('female') || nameLower.includes('woman') || 
-          nameLower.includes('samantha') || nameLower.includes('victoria')) {
+
+      // Common female-leaning voice name hints across platforms
+      if (
+        nameLower.includes('female') ||
+        nameLower.includes('woman') ||
+        nameLower.includes('samantha') ||
+        nameLower.includes('victoria') ||
+        nameLower.includes('zira') ||
+        nameLower.includes('aria') ||
+        nameLower.includes('hazel') ||
+        nameLower.includes('linda') ||
+        nameLower.includes('susan') ||
+        nameLower.includes('cortana') ||
+        nameLower.includes('emma') ||
+        nameLower.includes('joanna')
+      ) {
         gender = 'female';
-      } else if (nameLower.includes('male') || nameLower.includes('man') || 
-                 nameLower.includes('daniel') || nameLower.includes('alex')) {
+      } else if (
+        nameLower.includes('male') ||
+        nameLower.includes('man') ||
+        nameLower.includes('daniel') ||
+        nameLower.includes('alex') ||
+        nameLower.includes('david') ||
+        nameLower.includes('mark') ||
+        nameLower.includes('guy') ||
+        nameLower.includes('sam') ||
+        nameLower.includes('george') ||
+        nameLower.includes('fred')
+      ) {
         gender = 'male';
       }
 
       // Detect age (simplified)
-      const age: 'child' | 'adult' | 'senior' = 
-        nameLower.includes('child') || nameLower.includes('kid') ? 'child' : 'adult';
+      let age: 'child' | 'adult' | 'senior' = 'adult';
+      if (
+        nameLower.includes('child') ||
+        nameLower.includes('kid') ||
+        nameLower.includes('boy') ||
+        nameLower.includes('girl') ||
+        nameLower.includes('teen')
+      ) {
+        age = 'child';
+      } else if (
+        nameLower.includes('old') ||
+        nameLower.includes('elder') ||
+        nameLower.includes('senior') ||
+        nameLower.includes('grandma') ||
+        nameLower.includes('grandpa') ||
+        nameLower.includes('santa') ||
+        nameLower.includes('claus')
+      ) {
+        age = 'senior';
+      }
 
       // Detect quality
       const quality: 'standard' | 'premium' = 

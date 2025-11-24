@@ -25,6 +25,7 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { AnimatedTransition } from '@/components/common/AnimatedTransition';
 import { cn } from '@/lib/utils';
+import { speakTutorLine, isVirtualAITtsSupported } from '@/services/VirtualAITutorTTS';
 
 const STORAGE_KEY = 'elora_virtual_ai_user_name';
 
@@ -276,6 +277,8 @@ export default function VirtualAI() {
   const [activeUnitIndex, setActiveUnitIndex] = useState(0);
   const [selectedTutorId, setSelectedTutorId] = useState<TutorId>('elora-x');
   const [isTutorDialogOpen, setIsTutorDialogOpen] = useState(false);
+  const [isTutorSpeaking, setIsTutorSpeaking] = useState(false);
+  const [ttsError, setTtsError] = useState<string | null>(null);
   const nameTagRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
@@ -336,6 +339,31 @@ export default function VirtualAI() {
 
   const handleBack = () => {
     navigate(-1);
+  };
+
+  const handleTutorSpeak = async () => {
+    try {
+      setTtsError(null);
+      if (!isVirtualAITtsSupported()) {
+        setTtsError('Voice is not available on this device.');
+        return;
+      }
+
+      const tutor =
+        TUTORS.find((t) => t.id === selectedTutorId) ?? TUTORS[1] ?? TUTORS[0];
+
+      const introLine = userName
+        ? `Hi ${userName}, I'm ${tutor.name}, your ${tutor.role}. Let's practice speaking together.`
+        : `Hi, I'm ${tutor.name}, your ${tutor.role}. Let's practice speaking together.`;
+
+      setIsTutorSpeaking(true);
+      await speakTutorLine(tutor.id, introLine);
+    } catch (error) {
+      console.error('VirtualAI tutor TTS failed:', error);
+      setTtsError('Sorry, I could not play the tutor voice.');
+    } finally {
+      setIsTutorSpeaking(false);
+    }
   };
 
   // Wait for initialization to prevent flash
@@ -580,7 +608,10 @@ export default function VirtualAI() {
                     <img
                       src={selectedTutor.imageSrc}
                       alt={selectedTutor.name}
-                      className="h-full w-full object-cover opacity-90"
+                      className={cn(
+                        'h-full w-full object-cover opacity-90 transition-transform',
+                        isTutorSpeaking && 'scale-[1.02]',
+                      )}
                     />
                     <div className="absolute left-3 top-3 rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white">
                       00:00
@@ -593,7 +624,13 @@ export default function VirtualAI() {
                       onClick={() => setIsTutorDialogOpen(true)}
                       className="flex w-full items-center gap-3 rounded-2xl bg-muted/60 px-3 py-3 text-left shadow-sm transition-colors hover:bg-muted"
                     >
-                      <Avatar className="h-13 w-14 border border-border/60 shadow-sm">
+                      <Avatar
+                        className={cn(
+                          'h-13 w-14 border border-border/60 shadow-sm transition-transform',
+                          isTutorSpeaking &&
+                            'animate-pulse scale-[1.05] ring-2 ring-primary/60 ring-offset-2 ring-offset-background',
+                        )}
+                      >
                         <AvatarImage src={selectedTutor.imageSrc} alt={selectedTutor.name} />
                         <AvatarFallback>{selectedTutor.name.charAt(0)}</AvatarFallback>
                       </Avatar>
@@ -604,7 +641,10 @@ export default function VirtualAI() {
                         <p className="text-sm font-semibold text-foreground">
                           {selectedTutor.name}
                         </p>
-                        <p className="text-xs text-muted-foreground">{selectedTutor.accent}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {selectedTutor.accent}
+                          {isTutorSpeaking && ' • Speaking'}
+                        </p>
                       </div>
                       <ArrowRight className="h-4 w-4 text-muted-foreground" />
                     </button>
@@ -642,7 +682,12 @@ export default function VirtualAI() {
                         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                         <button
                           type="button"
-                          className="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-sky-700 shadow-lg"
+                          onClick={handleTutorSpeak}
+                          disabled={isTutorSpeaking}
+                          className={cn(
+                            'absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-sky-700 shadow-lg transition-transform',
+                            isTutorSpeaking && 'animate-pulse scale-[1.05]',
+                          )}
                         >
                           <Volume2 className="h-5 w-5" />
                         </button>
@@ -670,6 +715,11 @@ export default function VirtualAI() {
                           Choose the tutor you want to practice with. You can switch at any time.
                         </p>
                       </div>
+                      {ttsError && (
+                        <p className="text-xs text-red-500" role="alert">
+                          {ttsError}
+                        </p>
+                      )}
                       <div className="mx-auto w-full max-w-4xl flex-1">
                         <div className="grid gap-4 pr-2 pb-2 sm:grid-cols-3">
                           {TUTORS.map((tutor) => {
