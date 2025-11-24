@@ -90,13 +90,13 @@ def sync_category_progress(user, category, category_progress):
     try:
         from django.utils import timezone
         
-        logger.info(f"Syncing category progress for user {user.id}, category {category}")
+        logger.debug(f"Syncing category progress for user {user.id}, category {category}")
         
         if category == 'young_kids':
             kids_progress = KidsProgress.objects.filter(user=user).first()
-            logger.info(f"YoungKids: Found KidsProgress: {kids_progress is not None}")
+            logger.debug(f"YoungKids: Found KidsProgress: {kids_progress is not None}")
             if kids_progress:
-                logger.info(f"YoungKids: Points={kids_progress.points}, Streak={kids_progress.streak}")
+                logger.debug(f"YoungKids: Points={kids_progress.points}, Streak={kids_progress.streak}")
                 category_progress.total_points = kids_progress.points or 0
                 category_progress.total_streak = kids_progress.streak or 0
                 details = kids_progress.details or {}
@@ -107,14 +107,14 @@ def sync_category_progress(user, category, category_progress):
                     # Also check StoryEnrollment table
                     story_enrollments_db = StoryEnrollment.objects.filter(user=user, completed=True)
                     stories_count = story_enrollments_db.count()
-                    logger.info(f"YoungKids: Found {stories_count} completed stories from StoryEnrollment table")
+                    logger.debug(f"YoungKids: Found {stories_count} completed stories from StoryEnrollment table")
                     category_progress.stories_completed = stories_count
                 else:
                     stories_completed_count = len([
                         s for s in story_enrollments
                         if s.get('completed', False)
                     ])
-                    logger.info(f"YoungKids: Found {stories_completed_count} completed stories from details")
+                    logger.debug(f"YoungKids: Found {stories_completed_count} completed stories from details")
                     category_progress.stories_completed = stories_completed_count
                 category_progress.lessons_completed = category_progress.stories_completed  # Also set lessons_completed for consistency
                 
@@ -123,11 +123,11 @@ def sync_category_progress(user, category, category_progress):
                 if not vocab_dict:
                     # Also check KidsVocabularyPractice table
                     vocab_count = KidsVocabularyPractice.objects.filter(user=user).count()
-                    logger.info(f"YoungKids: Found {vocab_count} vocabulary words from KidsVocabularyPractice table")
+                    logger.debug(f"YoungKids: Found {vocab_count} vocabulary words from KidsVocabularyPractice table")
                     category_progress.vocabulary_words = vocab_count
                 else:
                     vocab_count = len(vocab_dict)
-                    logger.info(f"YoungKids: Found {vocab_count} vocabulary words from details")
+                    logger.debug(f"YoungKids: Found {vocab_count} vocabulary words from details")
                     category_progress.vocabulary_words = vocab_count
                 
                 # Count pronunciation attempts
@@ -135,18 +135,18 @@ def sync_category_progress(user, category, category_progress):
                 if not pron_dict:
                     # Also check KidsPronunciationPractice table
                     pron_count = KidsPronunciationPractice.objects.filter(user=user).count()
-                    logger.info(f"YoungKids: Found {pron_count} pronunciation attempts from KidsPronunciationPractice table")
+                    logger.debug(f"YoungKids: Found {pron_count} pronunciation attempts from KidsPronunciationPractice table")
                     category_progress.pronunciation_attempts = pron_count
                 else:
                     pron_count = len(pron_dict)
-                    logger.info(f"YoungKids: Found {pron_count} pronunciation attempts from details")
+                    logger.debug(f"YoungKids: Found {pron_count} pronunciation attempts from details")
                     category_progress.pronunciation_attempts = pron_count
                 
                 # Count games
                 games_dict = details.get('games', {})
                 if games_dict:
                     games_count = games_dict.get('attempts', 0)
-                    logger.info(f"YoungKids: Found {games_count} games from details")
+                    logger.debug(f"YoungKids: Found {games_count} games from details")
                     category_progress.games_completed = games_count
                 else:
                     # Also check KidsGameSession table
@@ -8007,13 +8007,13 @@ def get_all_category_progress(request):
     """Get progress for all learning categories - Automatically syncs and creates records from existing data"""
     try:
         user = request.user
-        logger.info(f"Getting category progress for user: {user.id} ({user.username})")
+        logger.debug(f"Getting category progress for user: {user.id} ({user.username})")
         
         # Get all existing CategoryProgress records
         try:
             existing_categories = CategoryProgress.objects.filter(user=user)
             existing_category_names = set(c.category for c in existing_categories)
-            logger.info(f"Found {len(existing_categories)} existing category progress records")
+            logger.debug(f"Found {len(existing_categories)} existing category progress records")
         except Exception as e:
             logger.error(f"Error querying CategoryProgress: {str(e)}")
             # If table doesn't exist, return empty array with error message
@@ -8057,16 +8057,16 @@ def get_all_category_progress(request):
                         }
                     )
                     # Sync with existing data
-                    logger.info(f"Syncing data for category: {category}")
+                    logger.debug(f"Syncing data for category: {category}")
                     sync_category_progress(user, category, category_progress)
-                    logger.info(f"Synced {category}: {category_progress.total_points} points, {category_progress.stories_completed} stories")
+                    logger.debug(f"Synced {category}: {category_progress.total_points} points, {category_progress.stories_completed} stories")
                 else:
                     # Update existing record with latest data from source tables
-                    logger.info(f"Updating existing CategoryProgress for category: {category}")
+                    logger.debug(f"Updating existing CategoryProgress for category: {category}")
                     category_progress = CategoryProgress.objects.get(user=user, category=category)
                     sync_category_progress(user, category, category_progress)
                     category_progress.save()  # Save synced data to MySQL
-                    logger.info(f"Updated {category}: {category_progress.total_points} points, {category_progress.stories_completed} stories")
+                    logger.debug(f"Updated {category}: {category_progress.total_points} points, {category_progress.stories_completed} stories")
             except Exception as e:
                 logger.error(f"Error processing category {category}: {str(e)}")
                 import traceback

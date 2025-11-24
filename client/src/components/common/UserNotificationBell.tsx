@@ -93,13 +93,14 @@ const UserNotificationBell = () => {
     };
 
     initialize();
-    const interval = setInterval(() => {
-      initialize();
-    }, 60_000);
+    // Removed polling interval to reduce server load - rely on initial load and manual refresh
+    // const interval = setInterval(() => {
+    //   initialize();
+    // }, 60_000);
 
     return () => {
       isMounted = false;
-      clearInterval(interval);
+      // clearInterval(interval);
     };
   }, [isAuthenticated, user?.id]);
 

@@ -45,21 +45,21 @@ class RealTimeDataServiceClass {
   
   // Default intervals for different data types (in milliseconds)
   private readonly DEFAULT_INTERVALS: Record<DataType, number> = {
-    category_progress: 15000, // 15 seconds
-    aggregated_progress: 15000, // 15 seconds
-    notifications: 10000, // 10 seconds
-    user_progress: 20000, // 20 seconds
-    achievements: 30000, // 30 seconds
-    kids_progress: 5000, // 5 seconds (more frequent for active learning)
-    teen_progress: 5000, // 5 seconds
-    admin_stats: 30000, // 30 seconds
-    admin_users: 30000, // 30 seconds
-    admin_achievements: 30000, // 30 seconds
-    admin_surveys: 30000, // 30 seconds
-    admin_vocabulary: 30000, // 30 seconds
-    admin_progress: 30000, // 30 seconds
-    admin_practice: 30000, // 30 seconds
-    admin_lessons: 30000, // 30 seconds
+    category_progress: 60000, // 60 seconds
+    aggregated_progress: 60000, // 60 seconds
+    notifications: 60000, // 60 seconds
+    user_progress: 60000, // 60 seconds
+    achievements: 60000, // 60 seconds
+    kids_progress: 15000, // 15 seconds (slower but still responsive)
+    teen_progress: 15000, // 15 seconds
+    admin_stats: 60000, // 60 seconds
+    admin_users: 60000, // 60 seconds
+    admin_achievements: 60000, // 60 seconds
+    admin_surveys: 60000, // 60 seconds
+    admin_vocabulary: 60000, // 60 seconds
+    admin_progress: 60000, // 60 seconds
+    admin_practice: 60000, // 60 seconds
+    admin_lessons: 60000, // 60 seconds
   };
 
   // Cache duration (data is considered fresh for this long)
