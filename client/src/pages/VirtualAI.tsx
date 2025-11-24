@@ -271,6 +271,7 @@ export default function VirtualAI() {
   const [userName, setUserName] = useState('');
   const [inputValue, setInputValue] = useState('');
   const [showNameInput, setShowNameInput] = useState(true); // Default to showing name input
+  const [showIntroChat, setShowIntroChat] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [typingAnimation, setTypingAnimation] = useState('');
@@ -328,6 +329,7 @@ export default function VirtualAI() {
       localStorage.setItem(STORAGE_KEY, name);
       setUserName(name);
       setShowNameInput(false);
+      setShowIntroChat(true);
     }
   };
 
@@ -368,6 +370,82 @@ export default function VirtualAI() {
   // Wait for initialization to prevent flash
   if (!isInitialized) {
     return null; // Return null during initialization to prevent flash
+  }
+
+  // After the name input screen, show a short robot intro chat once
+  if (showIntroChat && userName) {
+    return (
+      <AnimatedTransition show={true}>
+        <div className="min-h-screen pt-20 sm:pt-24 lg:pt-28 pb-6 px-3 sm:px-4 flex justify-center">
+          <div className="w-full max-w-4xl space-y-4">
+            {/* Simple progress indicator */}
+            <div className="h-1 w-full rounded-full bg-muted overflow-hidden">
+              <div className="h-full w-1/2 rounded-full bg-primary transition-all" />
+            </div>
+
+            <div className="bg-card shadow-xl rounded-3xl border border-border/60 overflow-hidden">
+              {/* Robot hero area */}
+              <div className="px-4 pt-5 sm:px-6 sm:pt-6">
+                <div className="mx-auto w-full max-w-2xl rounded-3xl bg-[#0b2c5d] flex items-end justify-center h-48 sm:h-56 overflow-hidden">
+                  <img
+                    src="/Robot.png"
+                    alt="Virtual AI tutor robot"
+                    className="h-40 sm:h-48 w-auto object-contain drop-shadow-xl translate-y-1"
+                  />
+                </div>
+              </div>
+
+              {/* Chat area */}
+              <div className="px-4 py-4 sm:px-6 sm:py-6 space-y-4">
+                <div className="space-y-3 max-w-xl">
+                  <div className="inline-block rounded-2xl bg-muted px-4 py-3 text-sm text-foreground shadow-sm">
+                    Hi, there!
+                  </div>
+                  <div className="inline-block rounded-2xl bg-muted px-4 py-3 text-sm text-foreground shadow-sm">
+                    I&apos;m your virtual AI tutor. I&apos;ll help you learn English and improve your
+                    speaking, listening, and confidence one step at a time.
+                  </div>
+                  <div className="inline-block rounded-2xl bg-muted px-4 py-3 text-sm text-foreground shadow-sm">
+                    Nice to meet you,{' '}
+                    <span className="font-semibold">
+                      {userName}
+                    </span>
+                    . Are you ready to begin?
+                  </div>
+                </div>
+
+                {/* User reply bubble, right aligned */}
+                <div className="flex justify-end">
+                  <div className="inline-block rounded-2xl bg-sky-50 text-sky-900 px-4 py-2 text-sm shadow-sm">
+                    Yes, let&apos;s start!
+                  </div>
+                </div>
+
+                {/* Footer: thinking indicator + continue button */}
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-1">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <div className="inline-flex h-8 min-w-[44px] items-center justify-center rounded-full bg-muted px-3">
+                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/70 animate-pulse" />
+                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/70 mx-0.5 animate-pulse" />
+                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/70 animate-pulse" />
+                    </div>
+                    <span>Thinking…</span>
+                  </div>
+                  <div className="flex justify-end">
+                    <Button
+                      className="rounded-full px-6 w-full sm:w-auto"
+                      onClick={() => setShowIntroChat(false)}
+                    >
+                      Continue to your course
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </AnimatedTransition>
+    );
   }
 
   // If user has provided their name, show the main Virtual AI interface
