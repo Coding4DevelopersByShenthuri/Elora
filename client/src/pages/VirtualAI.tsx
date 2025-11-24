@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -31,9 +31,17 @@ import { speakTutorLine, isVirtualAITtsSupported } from '@/services/VirtualAITut
 const STORAGE_KEY = 'elora_virtual_ai_user_name';
 
 const LANGUAGE_OPTIONS = [
-  { code: 'TA', label: 'தமிழ் (Tamil)' },
-  { code: 'SI', label: 'සිංහල (Sinhala)' },
+  { code: 'IN', label: 'தமிழ் (Tamil)' },
+  { code: 'LK', label: 'සිංහල (Sinhala)' },
 ];
+
+const LEARNING_LANGUAGE_OPTIONS = [
+  { code: 'US', label: 'US English' },
+  { code: 'UK', label: 'UK English' },
+];
+
+const INITIAL_MESSAGE_IDS = ['hi', 'intro', 'ask-name'] as const;
+const INITIAL_MESSAGE_SET = new Set<string>(INITIAL_MESSAGE_IDS);
 
 type UnitStatus = 'current' | 'locked' | 'completed';
 
@@ -45,9 +53,10 @@ type LearningUnit = {
   duration: string;
 };
 
-type BotMessage = {
+type ChatMessage = {
   id: string;
   text: string;
+  type: 'bot' | 'user';
   state: 'enter' | 'stay' | 'exit';
 };
 
@@ -283,11 +292,17 @@ export default function VirtualAI() {
   const [userName, setUserName] = useState('');
   const [showIntroChat, setShowIntroChat] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
-  const [introPhase, setIntroPhase] = useState<'name' | 'language'>('name');
+  const [introPhase, setIntroPhase] = useState<'name' | 'language' | 'target' | 'explanation-language'>('name');
   const [introInput, setIntroInput] = useState('');
   const [nameResponse, setNameResponse] = useState<string | null>(null);
   const [languageResponse, setLanguageResponse] = useState<string | null>(null);
-  const [botMessages, setBotMessages] = useState<BotMessage[]>([]);
+  const [targetLanguageResponse, setTargetLanguageResponse] = useState<string | null>(null);
+  const [explanationLanguageResponse, setExplanationLanguageResponse] = useState<string | null>(null);
+  const [isBotThinking, setIsBotThinking] = useState(false);
+  const thinkingTimeoutRef = useRef<number | null>(null);
+  const initialMessagesShownRef = useRef<boolean>(false);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [hasNameBeenSubmitted, setHasNameBeenSubmitted] = useState(false);
   const [activeUnitIndex, setActiveUnitIndex] = useState(0);
   const [selectedTutorId, setSelectedTutorId] = useState<TutorId>('elora-x');
   const [isTutorDialogOpen, setIsTutorDialogOpen] = useState(false);
@@ -295,19 +310,92 @@ export default function VirtualAI() {
   const [ttsError, setTtsError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const enqueueBotMessage = useCallback((id: string, text: string) => {
-    setBotMessages((prev) => [
-      ...prev.map((message) => ({ ...message, state: 'exit' as const })),
-      { id, text, state: 'enter' as const },
-    ]);
+  const removeInitialMessage = useCallback((id: string) => {
+    setChatMessages((prev) =>
+      prev.map((message) =>
+        message.id === id ? { ...message, state: 'exit' as const } : message,
+      ),
+    );
   }, []);
 
-  const bubbleMotionStyle = useCallback((state: BotMessage['state']): CSSProperties | undefined => {
+  // Helper function to extract language name from label
+  const getLanguageName = useCallback((label: string): string => {
+    // For labels like "தமிழ் (Tamil)" or "සිංහල (Sinhala)", extract the part before the parenthesis
+    if (label.includes('(')) {
+      return label.split('(')[0].trim();
+    }
+    // For labels like "US English" or "UK English", extract "English"
+    if (label.includes('English')) {
+      return 'English';
+    }
+    return label;
+  }, []);
+
+  const enqueueMessage = useCallback(
+    (
+      id: string,
+      text: string,
+      type: 'bot' | 'user',
+      options: { exitBots?: boolean; exitUsers?: boolean } = {},
+    ) => {
+      setChatMessages((prev) => {
+        // Prevent adding messages out of sequence
+        if (id === 'ask-language' && !hasNameBeenSubmitted) {
+          return prev; // Don't add language question before name is submitted
+        }
+        if (id === 'ask-target-language' && introPhase !== 'target') {
+          return prev; // Don't add target language question before language is selected
+        }
+        if (id === 'ask-explanation-language' && introPhase !== 'explanation-language') {
+          return prev; // Don't add explanation language question before target language is selected
+        }
+
+        const withExits = prev.map((message) => {
+          // Protect initial three messages until name is submitted
+          if (!hasNameBeenSubmitted && INITIAL_MESSAGE_SET.has(message.id)) {
+            return message;
+          }
+          if (options.exitBots && message.type === 'bot' && message.state !== 'exit') {
+            return { ...message, state: 'exit' as const };
+          }
+          if (options.exitUsers && message.type === 'user' && message.state !== 'exit') {
+            return { ...message, state: 'exit' as const };
+          }
+          return message;
+        });
+
+        return [...withExits, { id, text, type, state: 'enter' as const }];
+      });
+    },
+    [hasNameBeenSubmitted, introPhase],
+  );
+
+  useEffect(() => {
+    if (!chatMessages.some((message) => message.state === 'enter')) return;
+    const timer = window.setTimeout(() => {
+      setChatMessages((prev) =>
+        prev.map((message) =>
+          message.state === 'enter' ? { ...message, state: 'stay' as const } : message,
+        ),
+      );
+    }, 20);
+    return () => window.clearTimeout(timer);
+  }, [chatMessages]);
+
+  useEffect(() => {
+    if (!chatMessages.some((message) => message.state === 'exit')) return;
+    const timer = window.setTimeout(() => {
+      setChatMessages((prev) => prev.filter((message) => message.state !== 'exit'));
+    }, 320);
+    return () => window.clearTimeout(timer);
+  }, [chatMessages]);
+
+  const bubbleMotionStyle = useCallback((state: ChatMessage['state']): CSSProperties | undefined => {
     if (state === 'enter') {
       return { transform: 'translateY(16px)', opacity: 0 };
     }
     if (state === 'exit') {
-      return { transform: 'translateY(-16px)', opacity: 0 };
+      return { transform: 'translateY(-32px)', opacity: 0 };
     }
     return undefined;
   }, []);
@@ -318,73 +406,91 @@ export default function VirtualAI() {
     if (savedName && savedName.trim()) {
       setUserName(savedName.trim());
       setShowIntroChat(false);
+      initialMessagesShownRef.current = true; // Mark as shown since user already has a name
     } else {
       setShowIntroChat(true);
+      initialMessagesShownRef.current = false; // Reset for new users
     }
     setIsInitialized(true);
+
+    return () => {
+      if (thinkingTimeoutRef.current) {
+        window.clearTimeout(thinkingTimeoutRef.current);
+      }
+    };
   }, []);
 
   // When we enter the intro chat, reset its state
   useEffect(() => {
     if (!showIntroChat) return;
-    setIntroPhase('name');
-    setIntroInput('');
-    setNameResponse(null);
-    setLanguageResponse(null);
-    setBotMessages([]);
+    // Reset all state when entering intro chat (but only if initial messages haven't been shown)
+    if (!initialMessagesShownRef.current) {
+      setIntroPhase('name');
+      setIntroInput('');
+      setNameResponse(null);
+      setLanguageResponse(null);
+      setTargetLanguageResponse(null);
+      setExplanationLanguageResponse(null);
+      setChatMessages([]);
+      setIsBotThinking(false);
+      setHasNameBeenSubmitted(false);
+    }
+    if (thinkingTimeoutRef.current) {
+      window.clearTimeout(thinkingTimeoutRef.current);
+      thinkingTimeoutRef.current = null;
+    }
   }, [showIntroChat]);
 
   useEffect(() => {
     if (!showIntroChat) return;
+    // Only show initial messages once
+    if (initialMessagesShownRef.current) return;
+    
     const timers = [
-      window.setTimeout(() => enqueueBotMessage('hi', 'Hi, there!'), 0),
+      window.setTimeout(() => enqueueMessage('hi', 'Hi, there!', 'bot', {}), 0),
       window.setTimeout(
         () =>
-          enqueueBotMessage(
+          enqueueMessage(
             'intro',
             "I'm Learna, your personalized AI Tutor. I will help you to learn a new language and improve your language skills.",
+            'bot',
+            {},
           ),
         900,
       ),
-      window.setTimeout(() => enqueueBotMessage('ask-name', 'What is your name?'), 1800),
+      window.setTimeout(
+        () => {
+          enqueueMessage('ask-name', 'What is your name?', 'bot', {});
+          initialMessagesShownRef.current = true; // Mark as shown after all messages are queued
+        },
+        1800,
+      ),
     ];
 
     return () => {
       timers.forEach((timer) => window.clearTimeout(timer));
     };
-  }, [enqueueBotMessage, showIntroChat]);
-
-  useEffect(() => {
-    if (!botMessages.some((message) => message.state === 'enter')) return;
-    const timer = window.setTimeout(() => {
-      setBotMessages((prev) =>
-        prev.map((message) =>
-          message.state === 'enter' ? { ...message, state: 'stay' as const } : message,
-        ),
-      );
-    }, 30);
-
-    return () => window.clearTimeout(timer);
-  }, [botMessages]);
-
-  useEffect(() => {
-    if (!botMessages.some((message) => message.state === 'exit')) return;
-    const timer = window.setTimeout(() => {
-      setBotMessages((prev) => prev.filter((message) => message.state !== 'exit'));
-    }, 320);
-
-    return () => window.clearTimeout(timer);
-  }, [botMessages]);
+  }, [enqueueMessage, showIntroChat]);
 
   const isNamePromptVisible =
     introPhase === 'name' &&
-    botMessages.some((message) => message.id === 'ask-name') &&
+    chatMessages.some((message) => message.id === 'ask-name' && message.type === 'bot') &&
     !nameResponse;
 
   const isLanguagePromptVisible =
     introPhase === 'language' &&
-    botMessages.some((message) => message.id === 'ask-language') &&
+    chatMessages.some((message) => message.id === 'ask-language' && message.type === 'bot') &&
     !languageResponse;
+
+  const isTargetPromptVisible =
+    introPhase === 'target' &&
+    chatMessages.some((message) => message.id === 'ask-target-language' && message.type === 'bot') &&
+    !targetLanguageResponse;
+
+  const isExplanationPromptVisible =
+    introPhase === 'explanation-language' &&
+    chatMessages.some((message) => message.id === 'ask-explanation-language' && message.type === 'bot') &&
+    !explanationLanguageResponse;
 
   const handleNameSubmit = (event?: React.FormEvent) => {
     event?.preventDefault();
@@ -394,14 +500,173 @@ export default function VirtualAI() {
     localStorage.setItem(STORAGE_KEY, trimmed);
     setUserName(trimmed);
     setNameResponse(trimmed);
+    setHasNameBeenSubmitted(true);
+    
+    // Add user's name message (don't exit previous user messages - they should stay)
+    enqueueMessage(`user-name-${Date.now()}`, trimmed, 'user', {});
+    
     setIntroInput('');
-    setIntroPhase('language');
-    enqueueBotMessage('ask-language', "What's your native language?");
+    
+    // Remove initial messages one by one with delays
+    removeInitialMessage('hi');
+    setTimeout(() => removeInitialMessage('intro'), 200);
+    
+    // Show thinking indicator before asking next question
+    if (thinkingTimeoutRef.current) {
+      window.clearTimeout(thinkingTimeoutRef.current);
+    }
+    setIsBotThinking(true);
+    
+    // After thinking delay, exit "What is your name?" and ask next question
+    thinkingTimeoutRef.current = window.setTimeout(() => {
+      // Exit the "What is your name?" message
+      setChatMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === 'ask-name' ? { ...msg, state: 'exit' as const } : msg,
+        ),
+      );
+      
+      // Update phase and add message
+      setIntroPhase('language');
+      
+      // Add the language question directly to state to avoid closure issues
+      setTimeout(() => {
+        setChatMessages((prev) => {
+          // Exit previous bot messages
+          const withExits = prev.map((message) => {
+            if (message.type === 'bot' && message.state !== 'exit' && !INITIAL_MESSAGE_SET.has(message.id)) {
+              return { ...message, state: 'exit' as const };
+            }
+            return message;
+          });
+          
+          // Add new language question
+          return [...withExits, { 
+            id: 'ask-language', 
+            text: "What's your native language?", 
+            type: 'bot' as const, 
+            state: 'enter' as const 
+          }];
+        });
+        
+        setIsBotThinking(false);
+        thinkingTimeoutRef.current = null;
+      }, 100);
+    }, 1200); // Thinking time
   };
 
   const handleLanguageSelect = (label: string) => {
     setLanguageResponse(label);
-    setTimeout(() => setShowIntroChat(false), 800);
+    
+    // Add user's language selection (don't exit previous user messages - they should stay)
+    enqueueMessage(`user-language-${Date.now()}`, label, 'user', {});
+    
+    // Show thinking indicator before asking next question
+    if (thinkingTimeoutRef.current) {
+      window.clearTimeout(thinkingTimeoutRef.current);
+    }
+    setIsBotThinking(true);
+    
+    // After thinking delay, exit previous question and ask next question
+    thinkingTimeoutRef.current = window.setTimeout(() => {
+      // Exit the "What's your native language?" message
+      setChatMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === 'ask-language' ? { ...msg, state: 'exit' as const } : msg,
+        ),
+      );
+      
+      // Update phase and add message
+      setIntroPhase('target');
+      
+      // Add the target language question directly to state
+      setTimeout(() => {
+        setChatMessages((prev) => {
+          // Exit previous bot messages
+          const withExits = prev.map((message) => {
+            if (message.type === 'bot' && message.state !== 'exit' && !INITIAL_MESSAGE_SET.has(message.id)) {
+              return { ...message, state: 'exit' as const };
+            }
+            return message;
+          });
+          
+          // Add new target language question
+          return [...withExits, { 
+            id: 'ask-target-language', 
+            text: 'Which language would you like to learn?', 
+            type: 'bot' as const, 
+            state: 'enter' as const 
+          }];
+        });
+        
+        setIsBotThinking(false);
+        thinkingTimeoutRef.current = null;
+      }, 100);
+    }, 1200); // Thinking time
+  };
+
+  const handleTargetLanguageSelect = (label: string) => {
+    setTargetLanguageResponse(label);
+    
+    // Add user's target language selection (don't exit previous user messages - they should stay)
+    enqueueMessage(`user-target-${Date.now()}`, label, 'user', {});
+    
+    // Show thinking indicator before asking next question
+    if (thinkingTimeoutRef.current) {
+      window.clearTimeout(thinkingTimeoutRef.current);
+    }
+    setIsBotThinking(true);
+    
+    // After thinking delay, exit previous question and ask next question
+    thinkingTimeoutRef.current = window.setTimeout(() => {
+      // Exit the "Which language would you like to learn?" message
+      setChatMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === 'ask-target-language' ? { ...msg, state: 'exit' as const } : msg,
+        ),
+      );
+      
+      // Update phase
+      setIntroPhase('explanation-language');
+      
+      // Get language names for the dynamic question
+      const nativeLangName = languageResponse ? getLanguageName(languageResponse) : '';
+      const targetLangName = getLanguageName(label); // Just "English" for the first part
+      const targetLangFull = label; // Full label like "UK English" or "US English" for the second part
+      
+      // Add the explanation language question directly to state
+      setTimeout(() => {
+        setChatMessages((prev) => {
+          // Exit previous bot messages
+          const withExits = prev.map((message) => {
+            if (message.type === 'bot' && message.state !== 'exit' && !INITIAL_MESSAGE_SET.has(message.id)) {
+              return { ...message, state: 'exit' as const };
+            }
+            return message;
+          });
+          
+          // Add new explanation language question with dynamic text
+          // Use full target language label (UK English/US English) in the second part
+          const questionText = `Do you want to learn ${targetLangName} with explanations in ${nativeLangName} or in ${targetLangFull}?`;
+          
+          return [...withExits, { 
+            id: 'ask-explanation-language', 
+            text: questionText, 
+            type: 'bot' as const, 
+            state: 'enter' as const 
+          }];
+        });
+        
+        setIsBotThinking(false);
+        thinkingTimeoutRef.current = null;
+      }, 100);
+    }, 1200); // Thinking time
+  };
+
+  const handleExplanationLanguageSelect = (label: string) => {
+    setExplanationLanguageResponse(label);
+    enqueueMessage(`user-explanation-${Date.now()}`, label, 'user', { exitUsers: true });
+    setTimeout(() => setShowIntroChat(false), 1200);
   };
 
   const handleTutorSpeak = async () => {
@@ -457,52 +722,134 @@ export default function VirtualAI() {
               </div>
 
               {/* Chat area */}
-              <div className="px-4 py-4 sm:px-6 sm:py-6 space-y-4">
-                <div className="max-w-xl min-h-[120px] overflow-hidden">
-                  <div className="space-y-2">
-                    {botMessages.map((message) => (
-                      <div
-                        key={message.id}
-                        className={cn(
-                          'intro-chat-bubble inline-block rounded-2xl bg-muted px-4 py-3 text-sm text-foreground shadow-sm transition-all duration-300 ease-out',
-                          message.state === 'exit' && '-translate-y-4 opacity-0',
-                        )}
-                        style={bubbleMotionStyle(message.state)}
-                      >
-                        {message.text}
+              <div className="px-4 py-4 sm:px-6 sm:py-6">
+                <div className="max-w-xl mx-auto lg:max-w-2xl h-[200px] overflow-hidden relative w-full">
+                  <div className="space-y-2 absolute bottom-0 left-0 right-0 flex flex-col w-full">
+                    {chatMessages
+                      .filter((message) => {
+                        // Don't show exited messages
+                        if (message.state === 'exit') return false;
+                        // Only filter out future messages that shouldn't appear yet
+                        if (introPhase === 'name') {
+                          // In name phase, don't show language, target language, or explanation language messages
+                          if (message.id === 'ask-language' || message.id === 'ask-target-language' || message.id === 'ask-explanation-language') {
+                            return false;
+                          }
+                          if (message.id.startsWith('user-language') || message.id.startsWith('user-target') || message.id.startsWith('user-explanation')) {
+                            return false;
+                          }
+                        }
+                        if (introPhase === 'language') {
+                          // In language phase, don't show target language or explanation language messages
+                          if (message.id === 'ask-target-language' || message.id === 'ask-explanation-language' || message.id.startsWith('user-target') || message.id.startsWith('user-explanation')) {
+                            return false;
+                          }
+                        }
+                        if (introPhase === 'target') {
+                          // In target phase, don't show explanation language messages
+                          if (message.id === 'ask-explanation-language' || message.id.startsWith('user-explanation')) {
+                            return false;
+                          }
+                        }
+                        // Show all other messages
+                        return true;
+                      })
+                      .map((message) => (
+                        <div
+                          key={message.id}
+                          className={cn(
+                            'intro-chat-bubble rounded-2xl px-4 py-3 text-sm shadow-sm transition-all duration-300 ease-out',
+                            message.type === 'bot'
+                              ? 'bg-muted text-foreground self-start max-w-[85%] sm:max-w-[80%]'
+                              : 'bg-sky-50 text-sky-900 self-end max-w-[85%] sm:max-w-[80%] w-fit ml-auto',
+                            message.state === 'exit' && '-translate-y-8 opacity-0',
+                          )}
+                          style={bubbleMotionStyle(message.state)}
+                        >
+                          {message.text}
+                        </div>
+                      ))}
+                    
+                    {/* Language selection options as user-side messages */}
+                    {isLanguagePromptVisible && (
+                      <div className="flex flex-wrap gap-2 self-end w-full justify-end items-end">
+                        {LANGUAGE_OPTIONS.map((option) => (
+                          <button
+                            key={option.code}
+                            type="button"
+                            onClick={() => handleLanguageSelect(option.label)}
+                            className="flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-3 py-1.5 text-sm font-medium text-sky-900 shadow-sm transition hover:bg-sky-100 hover:shadow-md"
+                          >
+                            <span className="text-[11px] font-semibold uppercase text-sky-500">
+                              {option.code}
+                            </span>
+                            <span>{option.label}</span>
+                          </button>
+                        ))}
                       </div>
-                    ))}
+                    )}
+
+                    {/* Target language selection options as user-side messages */}
+                    {isTargetPromptVisible && (
+                      <div className="flex flex-wrap gap-2 self-end w-full justify-end items-end">
+                        {LEARNING_LANGUAGE_OPTIONS.map((option) => (
+                          <button
+                            key={option.code}
+                            type="button"
+                            onClick={() => handleTargetLanguageSelect(option.label)}
+                            className="flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-3 py-1.5 text-sm font-medium text-primary shadow-sm transition hover:bg-primary/10 hover:shadow-md"
+                          >
+                            <span className="text-[11px] font-semibold uppercase text-primary/80">
+                              {option.code}
+                            </span>
+                            <span>{option.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Explanation language selection options as user-side messages */}
+                    {isExplanationPromptVisible && languageResponse && targetLanguageResponse && (
+                      <div className="flex flex-wrap gap-2 self-end w-full justify-end items-end">
+                        {/* Native language option */}
+                        <button
+                          type="button"
+                          onClick={() => handleExplanationLanguageSelect(languageResponse)}
+                          className="flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-3 py-1.5 text-sm font-medium text-sky-900 shadow-sm transition hover:bg-sky-100 hover:shadow-md"
+                        >
+                          <span className="text-[11px] font-semibold uppercase text-sky-500">
+                            {LANGUAGE_OPTIONS.find(opt => opt.label === languageResponse)?.code || 'NATIVE'}
+                          </span>
+                          <span>{getLanguageName(languageResponse)}</span>
+                        </button>
+                        {/* Target language option */}
+                        <button
+                          type="button"
+                          onClick={() => handleExplanationLanguageSelect(targetLanguageResponse)}
+                          className="flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-3 py-1.5 text-sm font-medium text-sky-900 shadow-sm transition hover:bg-sky-100 hover:shadow-md"
+                        >
+                          <span className="text-[11px] font-semibold uppercase text-sky-500">
+                            {LEARNING_LANGUAGE_OPTIONS.find(opt => opt.label === targetLanguageResponse)?.code || 'TARGET'}
+                          </span>
+                          <span>{getLanguageName(targetLanguageResponse)}</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                {/* Name response bubble */}
-                {nameResponse && (
-                  <div className="flex justify-end">
-                    <div className="intro-chat-bubble inline-block rounded-2xl bg-sky-50 text-sky-900 px-4 py-2 text-sm shadow-sm">
-                      {nameResponse}
-                    </div>
-                  </div>
-                )}
-
-                {/* Language response bubble */}
-                {languageResponse && (
-                  <div className="flex justify-end">
-                    <div className="intro-chat-bubble inline-block rounded-2xl bg-sky-50 text-sky-900 px-4 py-2 text-sm shadow-sm">
-                      {languageResponse}
-                    </div>
-                  </div>
-                )}
-
                 {/* Footer: thinking indicator + input/chips */}
                 <div className="flex flex-col gap-3 pt-1">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <div className="inline-flex h-8 min-w-[44px] items-center justify-center rounded-full bg-muted px-3">
-                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/70 animate-pulse" />
-                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/70 mx-0.5 animate-pulse" />
-                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/70 animate-pulse" />
+                  {isBotThinking && (
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <div className="inline-flex h-8 min-w-[44px] items-center justify-center rounded-full bg-muted px-3">
+                        <span className="inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/70 animate-pulse" />
+                        <span className="inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/70 mx-0.5 animate-pulse" />
+                        <span className="inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/70 animate-pulse" />
+                      </div>
+                      <span>Thinking…</span>
                     </div>
-                    <span>Thinking…</span>
-                  </div>
+                  )}
 
                   {isNamePromptVisible && (
                     <form
@@ -526,24 +873,6 @@ export default function VirtualAI() {
                         <ArrowUp className="h-5 w-5" />
                       </button>
                     </form>
-                  )}
-
-                  {isLanguagePromptVisible && (
-                    <div className="flex flex-wrap gap-2">
-                      {LANGUAGE_OPTIONS.map((option) => (
-                        <button
-                          key={option.code}
-                          type="button"
-                          onClick={() => handleLanguageSelect(option.label)}
-                          className="flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-sm font-medium text-sky-900 shadow-sm transition hover:bg-sky-100"
-                        >
-                          <span className="text-[11px] font-semibold uppercase text-sky-500">
-                            {option.code}
-                          </span>
-                          <span>{option.label}</span>
-                        </button>
-                      ))}
-                    </div>
                   )}
                 </div>
               </div>
@@ -653,6 +982,7 @@ export default function VirtualAI() {
                     onClick={() => {
                       localStorage.removeItem(STORAGE_KEY);
                       setUserName('');
+                      initialMessagesShownRef.current = false; // Reset so messages show again
                       // Return to the intro chat so the robot can ask again
                       setShowIntroChat(true);
                     }}
