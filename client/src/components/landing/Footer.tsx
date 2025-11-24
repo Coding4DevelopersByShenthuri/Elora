@@ -123,9 +123,9 @@ const Footer = () => {
           <div className="flex flex-col sm:flex-row items-center gap-2">
             <p>© {new Date().getFullYear()} Elora. All rights reserved.</p>
             <div className="flex items-center gap-3 flex-wrap justify-center">
-              <Link to="/privacy" className="hover:text-primary transition">Privacy Policy</Link>
-              <Link to="/terms" className="hover:text-primary transition">Terms</Link>
-              <Link to="/cookies" className="hover:text-primary transition">Cookies</Link>
+              <Link to="/privacy-policy" className="hover:text-primary transition">Privacy Policy</Link>
+              <Link to="/terms-and-conditions" className="hover:text-primary transition">Terms</Link>
+              <Link to="/cookies-policy" className="hover:text-primary transition">Cookies</Link>
             </div>
           </div>
           <div className="flex items-center gap-1 justify-center">
@@ -139,9 +139,9 @@ const Footer = () => {
         <div className="hidden lg:grid lg:grid-cols-3 items-center gap-4 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Left: Privacy Links */}
           <div className="flex items-center gap-3 justify-start">
-            <Link to="/privacy" className="hover:text-primary transition">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-primary transition">Terms</Link>
-            <Link to="/cookies" className="hover:text-primary transition">Cookies</Link>
+            <Link to="/privacy-policy" className="hover:text-primary transition">Privacy Policy</Link>
+            <Link to="/terms-and-conditions" className="hover:text-primary transition">Terms</Link>
+            <Link to="/cookies-policy" className="hover:text-primary transition">Cookies</Link>
           </div>
           
           {/* Center: Copyright */}

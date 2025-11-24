@@ -51,6 +51,8 @@ import NotFound from "@/pages/NotFound";
 import PricingPage from "@/pages/PricingPage";
 import VerifyEmail from "@/pages/VerifyEmail";
 import TermsAndConditionsPage from "@/pages/TermsAndConditionsPage";
+import PrivacyPolicyPage from "@/pages/PrivacyPolicyPage";
+import CookiesPolicyPage from "@/pages/CookiesPolicyPage";
 import CertificatesPage from "@/pages/Certificates";
 import AllCertificatesPage from "@/pages/AllCertificates";
 import AdminLogin from "@/pages/admin/AdminLogin";
@@ -757,6 +759,8 @@ const AppRoutes = () => {
         <Route path="/pricing" element={<PageTransition><PricingPage /></PageTransition>} />
         <Route path="/verify-email/:token" element={<PageTransition><VerifyEmail /></PageTransition>} />
         <Route path="/terms-and-conditions" element={<PageTransition><TermsAndConditionsPage /></PageTransition>} />
+        <Route path="/privacy-policy" element={<PageTransition><PrivacyPolicyPage /></PageTransition>} />
+        <Route path="/cookies-policy" element={<PageTransition><CookiesPolicyPage /></PageTransition>} />
         <Route path="/certificates" element={<PageTransition><CertificatesPage /></PageTransition>} />
         <Route path="/my-certificates" element={<PageTransition><AllCertificatesPage /></PageTransition>} />
         
