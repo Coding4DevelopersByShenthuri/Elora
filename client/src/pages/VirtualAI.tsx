@@ -644,6 +644,21 @@ export default function VirtualAI() {
                           {selectedTutor.accent}
                           {isTutorSpeaking && ' • Speaking'}
                         </p>
+                        {isTutorSpeaking && (
+                          <div className="mt-1 flex items-center justify-start gap-1">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <div
+                                // eslint-disable-next-line react/no-array-index-key
+                                key={i}
+                                className="w-1.5 rounded-full bg-primary/70 animate-tutor-wave"
+                                style={{
+                                  height: '26px',
+                                  animationDelay: `${i * 0.09}s`,
+                                }}
+                              />
+                            ))}
+                          </div>
+                        )}
                       </div>
                       <ArrowRight className="h-4 w-4 text-muted-foreground" />
                     </button>
@@ -1183,6 +1198,23 @@ export default function VirtualAI() {
         
         .animate-blink {
           animation: blink 1s step-end infinite;
+        }
+
+        /* Tutor speaking waveform for Virtual AI characters */
+        @keyframes tutor-wave {
+          0%, 100% {
+            transform: scaleY(0.4);
+            opacity: 0.6;
+          }
+          50% {
+            transform: scaleY(1.1);
+            opacity: 1;
+          }
+        }
+
+        .animate-tutor-wave {
+          transform-origin: bottom;
+          animation: tutor-wave 0.7s ease-in-out infinite;
         }
       `}</style>
     </AnimatedTransition>
