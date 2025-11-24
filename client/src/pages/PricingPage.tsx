@@ -291,12 +291,7 @@ const PricingPage = () => {
 
   return (
     <div className="min-h-screen pt-24 sm:pt-28 md:pt-36 pb-12 relative overflow-hidden">
-      {/* Decorative SVG elements - Green and Orange */}
-      <div className="absolute top-32 left-16 w-20 h-20 text-orange-500 opacity-30 hidden xl:block animate-pulse">
-        <svg viewBox="0 0 100 100" fill="currentColor" className="w-full h-full">
-          <path d="M50 10L60 40L90 50L60 60L50 90L40 60L10 50L40 40Z"/>
-        </svg>
-      </div>
+      {/* Decorative SVG elements - Green */}
       <div className="absolute top-60 right-24 w-24 h-24 text-green-500 opacity-30 hidden xl:block">
         <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
           <path d="M50 10C30 10 10 30 10 50C10 70 30 90 50 90C70 90 90 70 90 50C90 35 80 25 65 25C55 25 45 35 45 45C45 55 55 60 60 60" stroke="currentColor" strokeWidth="2" fill="none"/>
