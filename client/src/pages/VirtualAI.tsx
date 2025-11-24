@@ -352,9 +352,8 @@ export default function VirtualAI() {
       const tutor =
         TUTORS.find((t) => t.id === selectedTutorId) ?? TUTORS[1] ?? TUTORS[0];
 
-      const introLine = userName
-        ? `Hi ${userName}, I'm ${tutor.name}, your ${tutor.role}. Let's practice speaking together.`
-        : `Hi, I'm ${tutor.name}, your ${tutor.role}. Let's practice speaking together.`;
+      // For voice preview, use a short, consistent line so it’s easy to compare voices
+      const introLine = `Hello there, I'm ${tutor.name}.`;
 
       setIsTutorSpeaking(true);
       await speakTutorLine(tutor.id, introLine);
