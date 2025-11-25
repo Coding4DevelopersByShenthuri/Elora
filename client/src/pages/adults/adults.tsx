@@ -37,6 +37,7 @@ const AdultsPage = () => {
   const [scrollY, setScrollY] = useState(0);
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [dailyConversationProgress, setDailyConversationProgress] = useState<any>(null);
 
   // Generate animated stars with varying opacity - Performance optimized
   useEffect(() => {
@@ -68,7 +69,43 @@ const AdultsPage = () => {
   // Load dashboard data
   useEffect(() => {
     loadDashboardData();
+    loadDailyConversationProgress();
   }, [user]);
+
+  // Load daily conversation progress from localStorage
+  const loadDailyConversationProgress = () => {
+    try {
+      const progress = JSON.parse(
+        localStorage.getItem('dailyConversationProgress') || '{}'
+      );
+      setDailyConversationProgress(progress);
+    } catch (error) {
+      console.error('Error loading daily conversation progress:', error);
+      setDailyConversationProgress({});
+    }
+  };
+
+  // Listen for storage changes to update progress in real-time
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'dailyConversationProgress') {
+        loadDailyConversationProgress();
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also listen for custom events (for same-tab updates)
+    const handleCustomStorage = () => {
+      loadDailyConversationProgress();
+    };
+    window.addEventListener('dailyConversationProgressUpdated', handleCustomStorage);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('dailyConversationProgressUpdated', handleCustomStorage);
+    };
+  }, []);
 
   const loadDashboardData = async () => {
     if (!user?.id) {
@@ -157,6 +194,33 @@ const AdultsPage = () => {
     }
   ];
 
+  // Calculate total points from all daily conversation topics
+  const getDailyConversationPoints = () => {
+    if (!dailyConversationProgress) return 0;
+    let totalPoints = 0;
+    Object.values(dailyConversationProgress).forEach((topic: any) => {
+      if (topic && topic.scenario1 && topic.scenario2) {
+        totalPoints += (topic.scenario1.points || 0) + (topic.scenario2.points || 0);
+      }
+    });
+    return totalPoints;
+  };
+
+  // Check if any topic is enrolled
+  const hasAnyEnrolledTopic = () => {
+    if (!dailyConversationProgress) return false;
+    return Object.values(dailyConversationProgress).some((topic: any) => topic?.enrolled === true);
+  };
+
+  // Get overall progress across all topics
+  const getOverallProgress = () => {
+    if (!dailyConversationProgress) return null;
+    const topics = Object.values(dailyConversationProgress).filter((topic: any) => topic?.average !== undefined);
+    if (topics.length === 0) return null;
+    const totalAverage = topics.reduce((sum: number, topic: any) => sum + (topic.average || 0), 0);
+    return Math.round(totalAverage / topics.length);
+  };
+
   const stats = [
     {
       label: "Fluency Score",
@@ -183,12 +247,12 @@ const AdultsPage = () => {
       description: "Daily practice streak"
     },
     {
-      label: "Modules Completed",
-      value: dashboardData?.common_lessons?.completed || "24",
-      icon: Award,
-      color: "text-purple-400",
-      glowColor: "rgba(168, 85, 247, 0.2)",
-      description: "Total learning modules"
+      label: "Daily Conversation Points",
+      value: getDailyConversationPoints().toString(),
+      icon: Trophy,
+      color: "text-amber-400",
+      glowColor: "rgba(245, 158, 11, 0.2)",
+      description: "Points earned from practice"
     },
   ];
 
@@ -453,36 +517,90 @@ const AdultsPage = () => {
                   <div>
                     <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Quick Practice Sessions</h2>
                     <p className="text-xs sm:text-sm text-cyan-100/70 mb-4 sm:mb-6">Short, focused exercises for busy professionals</p>
-                  </div>
-                  
+                </div>
+
                   {/* Daily Conversation - Prominent */}
-                  <Card className="bg-gradient-to-br from-cyan-500/20 via-purple-500/30 to-pink-500/20 backdrop-blur-xl border-purple-400/50 shadow-2xl">
+                  <Card className="bg-gradient-to-br from-cyan-500/20 via-purple-500/30 to-pink-500/20 backdrop-blur-xl border-purple-400/50 shadow-2xl relative">
+                    {/* Enrolled/Completed Badge - Show if any topic is enrolled */}
+                    {hasAnyEnrolledTopic() && (
+                      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10">
+                        <Badge className="bg-gradient-to-r from-emerald-500 to-green-600 text-white border-0 shadow-lg px-2 sm:px-3 py-1 text-xs sm:text-sm">
+                          <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                          Enrolled
+                        </Badge>
+                      </div>
+                    )}
                     <CardContent className="p-4 sm:p-6 md:p-8">
                       <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
                         <div className={cn("p-4 sm:p-6 rounded-2xl text-white bg-gradient-to-r shadow-lg flex-shrink-0", "from-cyan-500 to-blue-600")}>
                           <MessageCircle className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
                         </div>
                         <div className="flex-1 text-center sm:text-left w-full">
-                          <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">Daily Conversation</h3>
+                          <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
+                            <h3 className="text-xl sm:text-2xl font-bold text-white">Daily Conversation</h3>
+                            {getOverallProgress() !== null && (
+                              <Badge variant="outline" className="bg-emerald-500/20 text-emerald-300 border-emerald-400/50 text-xs">
+                                {getOverallProgress()}% Complete
+                              </Badge>
+                            )}
+                          </div>
                           <p className="text-sm sm:text-base text-cyan-100/80 mb-3 sm:mb-4">
                             Practice professional speaking about everyday topics with AI-powered feedback
                           </p>
+                          {/* Progress Display - Show if any topic has progress */}
+                          {getOverallProgress() !== null && (
+                            <div className="mb-3 sm:mb-4 space-y-2">
+                              <div className="flex items-center justify-between text-xs sm:text-sm text-cyan-200/70 mb-1">
+                                <span>Overall Progress</span>
+                                <span className="font-semibold">{getOverallProgress()}%</span>
+                              </div>
+                              <Progress 
+                                value={getOverallProgress() || 0} 
+                                className="h-2 bg-slate-700/50"
+                              />
+                              {/* Enrolled Topics Summary */}
+                              {dailyConversationProgress && Object.keys(dailyConversationProgress).length > 0 && (
+                                <div className="flex flex-wrap gap-2 text-xs text-cyan-200/60 mb-2">
+                                  {Object.entries(dailyConversationProgress).map(([topicId, topic]: [string, any]) => {
+                                    if (topic?.enrolled) {
+                                      const topicName = topicId === 'greetings' ? 'Greetings' : 
+                                                       topicId === 'work' ? 'Work & Professional' : topicId;
+                                      return (
+                                        <Badge key={topicId} variant="outline" className="bg-emerald-500/20 text-emerald-300 border-emerald-400/30 text-xs">
+                                          {topicName}
+                                        </Badge>
+                                      );
+                                    }
+                                    return null;
+                                  })}
+                                </div>
+                              )}
+                              {/* Points Display */}
+                              {getDailyConversationPoints() > 0 && (
+                                <div className="flex items-center justify-between p-2 sm:p-3 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-400/30 rounded-lg">
+                                  <div className="flex items-center gap-2">
+                                    <Trophy className="w-4 h-4 text-amber-400" />
+                                    <span className="text-xs sm:text-sm text-amber-200 font-medium">Total Points</span>
+                                  </div>
+                                  <span className="text-base sm:text-lg font-bold text-amber-300">
+                                    {getDailyConversationPoints()}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          )}
                           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-4 mb-3 sm:mb-4">
-                            <Badge variant="outline" className="bg-slate-700/50 text-cyan-200 border-cyan-500/30 text-xs">
-                              <Clock className="w-3 h-3 mr-1" />
-                              10-15 min
-                            </Badge>
                             <Badge variant="outline" className="bg-purple-500/20 text-purple-300 border-purple-400/30 text-xs">
                               All Levels
                             </Badge>
-                          </div>
+                      </div>
                           <Button
                             size="default"
                             className="w-full sm:w-auto bg-white text-purple-600 hover:bg-cyan-50 font-semibold text-sm sm:text-base"
                             onClick={() => navigate('/adults/practice/daily-conversation')}
                           >
                             <Play className="w-4 h-4 mr-2" />
-                            Start Daily Conversation
+                            {hasAnyEnrolledTopic() ? 'Continue Practice' : 'Start Daily Conversation'}
                             <ArrowRight className="w-4 h-4 ml-2" />
                           </Button>
                         </div>
@@ -491,11 +609,11 @@ const AdultsPage = () => {
                   </Card>
 
                   {/* Microlearning Modules */}
-                  <div>
-                    <h3 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Quick Learning Modules</h3>
+              <div>
+        
                     <MicrolearningModules />
-                  </div>
-                </div>
+              </div>
+            </div>
               </TabsContent>
 
               <TabsContent value="lessons" className="mt-0">
@@ -523,7 +641,7 @@ const AdultsPage = () => {
           {/* Video Lessons - Separate Prominent Section */}
           <div className="mb-8 sm:mb-10 md:mb-12">
             <Card className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30 shadow-2xl overflow-hidden">
-              <CardContent className="p-0">
+                    <CardContent className="p-0">
                 <div className={cn("h-auto min-h-[200px] sm:min-h-[240px] md:min-h-[280px] py-6 sm:py-8 md:py-10 bg-gradient-to-r flex items-center justify-center relative overflow-hidden", "from-cyan-500 via-purple-500 to-pink-500")}>
                   <div className="absolute inset-0 bg-black/20" />
                   <div className="relative z-10 text-center px-4 sm:px-6 md:px-8 w-full max-w-4xl mx-auto">
