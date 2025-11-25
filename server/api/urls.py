@@ -172,4 +172,46 @@ urlpatterns = [
     path('admin/videos/stats', views.admin_videos_stats, name='admin-videos-stats'),
     path('admin/videos/create', views.admin_video_create, name='admin-video-create'),
     path('admin/videos/<int:video_id>', views.admin_video_detail, name='admin-video-detail'),
+    
+    # ============= Adults Common Features =============
+    # Common Lessons
+    path('adults/common-lessons', views.adults_common_lessons, name='adults-common-lessons'),
+    path('adults/common-lessons/<int:lesson_id>', views.adults_common_lesson_detail, name='adults-common-lesson-detail'),
+    path('adults/common-lessons/<int:lesson_id>/enroll', views.adults_common_lesson_enroll, name='adults-common-lesson-enroll'),
+    path('adults/common-lessons/enrollments', views.adults_common_lesson_enrollments, name='adults-common-lesson-enrollments'),
+    path('adults/common-lessons/<int:lesson_id>/progress', views.adults_common_lesson_progress, name='adults-common-lesson-progress'),
+    
+    # Weekly Challenges
+    path('adults/weekly-challenges', views.adults_weekly_challenges, name='adults-weekly-challenges'),
+    path('adults/weekly-challenges/<int:challenge_id>/enroll', views.adults_weekly_challenge_enroll, name='adults-weekly-challenge-enroll'),
+    path('adults/weekly-challenges/my', views.adults_my_weekly_challenges, name='adults-my-weekly-challenges'),
+    path('adults/weekly-challenges/<int:challenge_id>/update-progress', views.adults_weekly_challenge_update_progress, name='adults-weekly-challenge-update-progress'),
+    
+    # Learning Goals
+    path('adults/learning-goals', views.adults_learning_goals, name='adults-learning-goals'),
+    path('adults/learning-goals/create', views.adults_learning_goal_create, name='adults-learning-goal-create'),
+    path('adults/learning-goals/<int:goal_id>', views.adults_learning_goal_detail, name='adults-learning-goal-detail'),
+    path('adults/learning-goals/<int:goal_id>/update', views.adults_learning_goal_update, name='adults-learning-goal-update'),
+    
+    # Personalized Recommendations
+    path('adults/recommendations', views.adults_recommendations, name='adults-recommendations'),
+    path('adults/recommendations/<int:recommendation_id>/view', views.adults_recommendation_view, name='adults-recommendation-view'),
+    path('adults/recommendations/<int:recommendation_id>/accept', views.adults_recommendation_accept, name='adults-recommendation-accept'),
+    path('adults/recommendations/<int:recommendation_id>/dismiss', views.adults_recommendation_dismiss, name='adults-recommendation-dismiss'),
+    
+    # Spaced Repetition
+    path('adults/spaced-repetition/items', views.adults_spaced_repetition_items, name='adults-spaced-repetition-items'),
+    path('adults/spaced-repetition/items/<int:item_id>/review', views.adults_spaced_repetition_review, name='adults-spaced-repetition-review'),
+    path('adults/spaced-repetition/due', views.adults_spaced_repetition_due, name='adults-spaced-repetition-due'),
+    
+    # Microlearning
+    path('adults/microlearning', views.adults_microlearning_modules, name='adults-microlearning-modules'),
+    path('adults/microlearning/<int:module_id>', views.adults_microlearning_module_detail, name='adults-microlearning-module-detail'),
+    path('adults/microlearning/<int:module_id>/complete', views.adults_microlearning_complete, name='adults-microlearning-complete'),
+    path('adults/microlearning/featured', views.adults_microlearning_featured, name='adults-microlearning-featured'),
+    
+    # Progress Analytics
+    path('adults/analytics', views.adults_progress_analytics, name='adults-progress-analytics'),
+    path('adults/analytics/summary', views.adults_analytics_summary, name='adults-analytics-summary'),
+    path('adults/dashboard', views.adults_dashboard, name='adults-dashboard'),
 ]

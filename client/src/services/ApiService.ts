@@ -1421,6 +1421,376 @@ const PageEligibilityAPI = {
   },
 };
 
+// ============= Adults Common Features API =============
+export const AdultsAPI = {
+  /**
+   * Get all common lessons
+   */
+  getCommonLessons: async (params?: { category?: string; difficulty?: string; search?: string }) => {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.category) queryParams.append('category', params.category);
+      if (params?.difficulty) queryParams.append('difficulty', params.difficulty);
+      if (params?.search) queryParams.append('search', params.search);
+      
+      const url = `adults/common-lessons${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+      const result = await fetchWithAuth(url);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get common lesson detail
+   */
+  getCommonLessonDetail: async (lessonId: number) => {
+    try {
+      const result = await fetchWithAuth(`adults/common-lessons/${lessonId}`);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Enroll in a common lesson
+   */
+  enrollCommonLesson: async (lessonId: number) => {
+    try {
+      const result = await fetchWithAuth(`adults/common-lessons/${lessonId}/enroll`, {
+        method: 'POST',
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get user's common lesson enrollments
+   */
+  getCommonLessonEnrollments: async () => {
+    try {
+      const result = await fetchWithAuth('adults/common-lessons/enrollments');
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Update common lesson progress
+   */
+  updateCommonLessonProgress: async (lessonId: number, data: {
+    progress_percentage?: number;
+    score?: number;
+    time_spent_minutes?: number;
+    completed?: boolean;
+  }) => {
+    try {
+      const result = await fetchWithAuth(`adults/common-lessons/${lessonId}/progress`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get weekly challenges
+   */
+  getWeeklyChallenges: async () => {
+    try {
+      const result = await fetchWithAuth('adults/weekly-challenges');
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Enroll in a weekly challenge
+   */
+  enrollWeeklyChallenge: async (challengeId: number) => {
+    try {
+      const result = await fetchWithAuth(`adults/weekly-challenges/${challengeId}/enroll`, {
+        method: 'POST',
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get user's weekly challenges
+   */
+  getMyWeeklyChallenges: async () => {
+    try {
+      const result = await fetchWithAuth('adults/weekly-challenges/my');
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Update weekly challenge progress
+   */
+  updateWeeklyChallengeProgress: async (challengeId: number, progressIncrement: number) => {
+    try {
+      const result = await fetchWithAuth(`adults/weekly-challenges/${challengeId}/update-progress`, {
+        method: 'POST',
+        body: JSON.stringify({ progress_increment: progressIncrement }),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get learning goals
+   */
+  getLearningGoals: async (isActive?: boolean) => {
+    try {
+      const url = `adults/learning-goals${isActive !== undefined ? `?is_active=${isActive}` : ''}`;
+      const result = await fetchWithAuth(url);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Create a learning goal
+   */
+  createLearningGoal: async (data: {
+    goal_type: string;
+    title: string;
+    description?: string;
+    target_value: number;
+    unit: string;
+    start_date: string;
+    target_date: string;
+  }) => {
+    try {
+      const result = await fetchWithAuth('adults/learning-goals/create', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Update a learning goal
+   */
+  updateLearningGoal: async (goalId: number, data: any) => {
+    try {
+      const result = await fetchWithAuth(`adults/learning-goals/${goalId}/update`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get personalized recommendations
+   */
+  getRecommendations: async () => {
+    try {
+      const result = await fetchWithAuth('adults/recommendations');
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Mark recommendation as viewed
+   */
+  viewRecommendation: async (recommendationId: number) => {
+    try {
+      const result = await fetchWithAuth(`adults/recommendations/${recommendationId}/view`, {
+        method: 'POST',
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Accept a recommendation
+   */
+  acceptRecommendation: async (recommendationId: number) => {
+    try {
+      const result = await fetchWithAuth(`adults/recommendations/${recommendationId}/accept`, {
+        method: 'POST',
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Dismiss a recommendation
+   */
+  dismissRecommendation: async (recommendationId: number) => {
+    try {
+      const result = await fetchWithAuth(`adults/recommendations/${recommendationId}/dismiss`, {
+        method: 'POST',
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get spaced repetition items
+   */
+  getSpacedRepetitionItems: async (itemType?: string) => {
+    try {
+      const url = `adults/spaced-repetition/items${itemType ? `?item_type=${itemType}` : ''}`;
+      const result = await fetchWithAuth(url);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get due spaced repetition items
+   */
+  getSpacedRepetitionDue: async () => {
+    try {
+      const result = await fetchWithAuth('adults/spaced-repetition/due');
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Review a spaced repetition item
+   */
+  reviewSpacedRepetitionItem: async (itemId: number, quality: number) => {
+    try {
+      const result = await fetchWithAuth(`adults/spaced-repetition/items/${itemId}/review`, {
+        method: 'POST',
+        body: JSON.stringify({ quality }),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get microlearning modules
+   */
+  getMicrolearningModules: async (category?: string) => {
+    try {
+      const url = `adults/microlearning${category ? `?category=${category}` : ''}`;
+      const result = await fetchWithAuth(url);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get featured microlearning modules
+   */
+  getFeaturedMicrolearning: async () => {
+    try {
+      const result = await fetchWithAuth('adults/microlearning/featured');
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get microlearning module detail
+   */
+  getMicrolearningModuleDetail: async (moduleId: number) => {
+    try {
+      const result = await fetchWithAuth(`adults/microlearning/${moduleId}`);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Complete a microlearning module
+   */
+  completeMicrolearning: async (moduleId: number, data: { score: number; time_spent_minutes: number }) => {
+    try {
+      const result = await fetchWithAuth(`adults/microlearning/${moduleId}/complete`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get progress analytics
+   */
+  getProgressAnalytics: async (category?: string, periodType?: string) => {
+    try {
+      const queryParams = new URLSearchParams();
+      if (category) queryParams.append('category', category);
+      if (periodType) queryParams.append('period_type', periodType);
+      
+      const url = `adults/analytics${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+      const result = await fetchWithAuth(url);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get analytics summary
+   */
+  getAnalyticsSummary: async () => {
+    try {
+      const result = await fetchWithAuth('adults/analytics/summary');
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get adults dashboard data
+   */
+  getDashboard: async () => {
+    try {
+      const result = await fetchWithAuth('adults/dashboard');
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+};
+
 // ============= Export all APIs =============
 export const API = {
   auth: AuthAPI,
@@ -1434,6 +1804,7 @@ export const API = {
   cookieConsent: CookieConsentAPI,
   waitlist: WaitlistAPI,
   pageEligibility: PageEligibilityAPI,
+  adults: AdultsAPI,
 };
 
 export default API;

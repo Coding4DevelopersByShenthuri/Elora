@@ -27,47 +27,47 @@ const dailyConversationTopics = [
     color: 'from-cyan-500 to-blue-600',
     scenarios: [
       {
-        title: 'Meeting Someone New',
+        title: 'Meeting Someone New at a Professional Event',
         partnerName: 'Alex',
         dialogue: [
           { speaker: 'Partner', text: "Hello! I'm Alex. Nice to meet you!" },
           { speaker: 'You', text: "Hello, I'm [Your Name]. Nice to meet you too." },
-          { speaker: 'Partner', text: "What do you do for a living?" },
-          { speaker: 'You', text: "I work in [Your Field]. How about you?" },
-          { speaker: 'Partner', text: "I work in marketing. It's quite interesting!" }
-        ],
-        keyPhrases: [
-          'Nice to meet you',
-          'What do you do?',
-          'I work in...',
-          'How about you?'
-        ],
-        practicePoints: [
-          'Practice introducing yourself clearly',
-          'Ask follow-up questions',
-          'Use appropriate professional language'
+          { speaker: 'Partner', text: "It's great to be here. Is this your first time at this conference?" },
+          { speaker: 'You', text: "Yes, it's my first time. I'm really excited to learn from the speakers." },
+          { speaker: 'Partner', text: "That's wonderful! What brings you here today?" },
+          { speaker: 'You', text: "I'm interested in learning about digital marketing strategies." },
+          { speaker: 'Partner', text: "Oh, that's my field! I work in marketing. What do you do for a living?" },
+          { speaker: 'You', text: "I work in [Your Field]. How about you? What's your role in marketing?" },
+          { speaker: 'Partner', text: "I'm a marketing manager at a tech company. It's quite interesting!" },
+          { speaker: 'You', text: "That sounds like a challenging but rewarding position." },
+          { speaker: 'Partner', text: "It definitely is! How long have you been in your current role?" },
+          { speaker: 'You', text: "I've been working there for about three years now." },
+          { speaker: 'Partner', text: "That's impressive! You must really enjoy what you do." },
+          { speaker: 'You', text: "Yes, I do. It's been a great learning experience." },
+          { speaker: 'Partner', text: "Well, it was lovely meeting you. I hope we can stay in touch!" },
+          { speaker: 'You', text: "Absolutely! It was great meeting you too. Have a wonderful day!" }
         ]
       },
       {
-        title: 'Casual Greetings',
-        partnerName: 'Alex',
+        title: 'Casual Greetings with a Colleague',
+        partnerName: 'Sarah',
         dialogue: [
-          { speaker: 'Partner', text: "Hey there! I'm Alex. How's it going?" },
-          { speaker: 'You', text: "Hey, how's it going?" },
-          { speaker: 'Partner', text: "Pretty good, thanks! How about you?" },
-          { speaker: 'You', text: "Can't complain! What have you been up to?" },
-          { speaker: 'Partner', text: "Just working on a new project. It's keeping me busy." }
-        ],
-        keyPhrases: [
-          "How's it going?",
-          "What have you been up to?",
-          "Can't complain",
-          "Keeping me busy"
-        ],
-        practicePoints: [
-          'Use casual expressions naturally',
-          'Maintain conversation flow',
-          'Show interest in the other person'
+          { speaker: 'Partner', text: "Hey there! I'm Sarah. How's it going?" },
+          { speaker: 'You', text: "Hey Sarah! I'm doing well, thanks. How about you?" },
+          { speaker: 'Partner', text: "Pretty good, thanks! I'm just getting back from lunch." },
+          { speaker: 'You', text: "Oh nice! Where did you go?" },
+          { speaker: 'Partner', text: "I tried that new Italian restaurant down the street. It was delicious!" },
+          { speaker: 'You', text: "I've been meaning to try that place. Would you recommend it?" },
+          { speaker: 'Partner', text: "Absolutely! The pasta is amazing. You should definitely check it out." },
+          { speaker: 'You', text: "Thanks for the recommendation! I'll probably go there this weekend." },
+          { speaker: 'Partner', text: "Great! Let me know what you think. What have you been up to today?" },
+          { speaker: 'You', text: "Can't complain! Just working on some projects. What about you?" },
+          { speaker: 'Partner', text: "Same here. Just working on a new project. It's keeping me busy." },
+          { speaker: 'You', text: "That sounds interesting. What kind of project is it?" },
+          { speaker: 'Partner', text: "It's a website redesign for one of our clients. Lots of planning involved." },
+          { speaker: 'You', text: "That does sound like a lot of work. I'm sure it will turn out great though." },
+          { speaker: 'Partner', text: "Thanks! I hope so. Well, I should get back to it. See you around!" },
+          { speaker: 'You', text: "See you! Good luck with your project!" }
         ]
       }
     ]
@@ -278,6 +278,10 @@ const QuickPracticeSession = () => {
   const [ttsInitialized, setTtsInitialized] = useState(false);
   const [sttAvailable, setSttAvailable] = useState(false);
   const [overallScore, setOverallScore] = useState(0);
+  const [currentDialogueIndex, setCurrentDialogueIndex] = useState(0);
+  const [completedLines, setCompletedLines] = useState<Set<number>>(new Set());
+  const dialogueEndRef = useRef<HTMLDivElement>(null);
+  const lineRefs = useRef<Record<number, HTMLDivElement>>({});
   const recognitionRef = useRef<any>(null);
 
   // Initialize TTS and STT
@@ -310,6 +314,27 @@ const QuickPracticeSession = () => {
     };
     initServices();
   }, [toast]);
+
+  // Restore session from cache if available
+  useEffect(() => {
+    if (selectedTopic && currentScenarioData) {
+      const cachedSession = localStorage.getItem('dailyConversationSession');
+      if (cachedSession) {
+        try {
+          const session = JSON.parse(cachedSession);
+          if (session.topic === selectedTopic && session.scenario === currentScenario) {
+            setIsSessionActive(true);
+            setSessionStartTime(new Date(session.startTime));
+            if (session.user_responses) setUserResponses(session.user_responses);
+            if (session.practice_scores) setPracticeScores(session.practice_scores);
+            if (session.score) setOverallScore(session.score);
+          }
+        } catch (e) {
+          console.error('Error restoring session from cache:', e);
+        }
+      }
+    }
+  }, [selectedTopic, currentScenario]);
 
   // Cleanup recognition on unmount
   useEffect(() => {
@@ -393,17 +418,30 @@ const QuickPracticeSession = () => {
   const handleStartPractice = (topicId: string) => {
     setSelectedTopic(topicId);
     setCurrentScenario(0);
+    setCurrentDialogueIndex(0);
+    setCompletedLines(new Set());
+    setUserResponses({});
+    setPracticeScores({});
+    setOverallScore(0);
   };
 
   const handleNextScenario = () => {
     if (selectedTopicData && currentScenario < selectedTopicData.scenarios.length - 1) {
       setCurrentScenario(currentScenario + 1);
+      setCurrentDialogueIndex(0);
+      setCompletedLines(new Set());
+      setUserResponses({});
+      setPracticeScores({});
     }
   };
 
   const handlePreviousScenario = () => {
     if (currentScenario > 0) {
       setCurrentScenario(currentScenario - 1);
+      setCurrentDialogueIndex(0);
+      setCompletedLines(new Set());
+      setUserResponses({});
+      setPracticeScores({});
     }
   };
 
@@ -625,8 +663,20 @@ const QuickPracticeSession = () => {
     setInterimTranscript('');
   };
 
+  // Smooth scroll to a specific line
+  const scrollToLine = (index: number) => {
+    const lineElement = lineRefs.current[index];
+    if (lineElement) {
+      lineElement.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center',
+        inline: 'nearest'
+      });
+    }
+  };
+
   // Handle user practice response (from speech or manual)
-  const handlePracticeResponse = (index: number, response: string) => {
+  const handlePracticeResponse = async (index: number, response: string) => {
     setUserResponses(prev => ({ ...prev, [index]: response }));
     
     if (currentScenarioData) {
@@ -634,6 +684,7 @@ const QuickPracticeSession = () => {
       if (expectedLine && expectedLine.speaker === 'You') {
         const score = calculateResponseScore(response, expectedLine.text);
         setPracticeScores(prev => ({ ...prev, [index]: score }));
+        setCompletedLines(prev => new Set([...prev, index]));
         
         // Update overall score
         const allScores = { ...practiceScores, [index]: score };
@@ -646,40 +697,81 @@ const QuickPracticeSession = () => {
           : 0;
         setOverallScore(avgScore);
 
-        // Auto-advance to next line if score is good
+        // Auto-advance to next line if score is good (70% or higher)
         if (score >= 70 && index < currentScenarioData.dialogue.length - 1) {
-          setTimeout(() => {
-            const nextIndex = index + 1;
-            if (nextIndex < currentScenarioData.dialogue.length) {
-              const nextLine = currentScenarioData.dialogue[nextIndex];
-              // If next line is from partner, auto-play it
-              if (nextLine.speaker !== 'You') {
-                speakText(nextLine.text, nextIndex).then(() => {
-                  // After partner speaks, check if next is user line
-                  const userLineIndex = nextIndex + 1;
-                  if (userLineIndex < currentScenarioData.dialogue.length) {
-                    const userLine = currentScenarioData.dialogue[userLineIndex];
-                    if (userLine.speaker === 'You') {
-                      setTimeout(() => {
-                        toast({
-                          title: "Your Turn! 🎤",
-                          description: `Speak: "${userLine.text}"`,
-                        });
-                      }, 1000);
-                    }
+          const nextIndex = index + 1;
+          setCurrentDialogueIndex(nextIndex);
+          
+          // Scroll to next line smoothly
+          setTimeout(() => scrollToLine(nextIndex), 300);
+          
+          if (nextIndex < currentScenarioData.dialogue.length) {
+            const nextLine = currentScenarioData.dialogue[nextIndex];
+            
+            // If next line is from partner, auto-play it
+            if (nextLine.speaker !== 'You') {
+              setTimeout(async () => {
+                await speakText(nextLine.text, nextIndex);
+                
+                // After partner speaks, check if next is user line
+                const userLineIndex = nextIndex + 1;
+                if (userLineIndex < currentScenarioData.dialogue.length) {
+                  const userLine = currentScenarioData.dialogue[userLineIndex];
+                  if (userLine.speaker === 'You') {
+                    setTimeout(() => {
+                      scrollToLine(userLineIndex);
+                      toast({
+                        title: "Your Turn! 🎤",
+                        description: `Speak: "${userLine.text}"`,
+                      });
+                    }, 1000);
                   }
+                }
+              }, 500);
+            } else {
+              // Next line is also "You" - prompt immediately
+              setTimeout(() => {
+                scrollToLine(nextIndex);
+                toast({
+                  title: "Your Turn! 🎤",
+                  description: `Speak: "${nextLine.text}"`,
                 });
-              } else {
-                // Next line is also "You" - prompt immediately
-                setTimeout(() => {
-                  toast({
-                    title: "Your Turn! 🎤",
-                    description: `Speak: "${nextLine.text}"`,
-                  });
-                }, 500);
-              }
+              }, 500);
             }
-          }, 1500);
+          }
+          
+          // Check if we've completed all lines in current scenario
+          const allUserLines = currentScenarioData.dialogue
+            .map((line, idx) => line.speaker === 'You' ? idx : -1)
+            .filter(idx => idx !== -1);
+          const completedUserLines = allUserLines.filter(idx => 
+            completedLines.has(idx) || idx === index
+          );
+          
+          // If all user lines completed, auto-advance to next scenario
+          if (completedUserLines.length === allUserLines.length && 
+              currentScenario < (selectedTopicData?.scenarios.length || 1) - 1) {
+            setTimeout(() => {
+              toast({
+                title: "🎉 Scenario Complete!",
+                description: "Moving to next scenario...",
+              });
+              setTimeout(() => {
+                setCurrentScenario(currentScenario + 1);
+                setCurrentDialogueIndex(0);
+                setCompletedLines(new Set());
+                setUserResponses({});
+                setPracticeScores({});
+              }, 2000);
+            }, 2000);
+          }
+        } else if (score < 70) {
+          // If score is low, encourage retry
+          toast({
+            title: "Keep Practicing! 💪",
+            description: `Your score: ${score}%. Try again to improve!`,
+            variant: "default"
+          });
         }
       }
     }
@@ -687,32 +779,50 @@ const QuickPracticeSession = () => {
 
 
   const handleStartPracticeSession = async () => {
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to start a practice session",
-        variant: "destructive"
-      });
-      return;
-    }
-
     try {
       setIsSessionActive(true);
       setSessionStartTime(new Date());
       setUserResponses({});
       setPracticeScores({});
       setOverallScore(0);
+      setCurrentDialogueIndex(0);
+      setCompletedLines(new Set());
+      
+      // Save to local cache
+      const sessionData = {
+        topic: selectedTopic,
+        scenario: currentScenario,
+        startTime: new Date().toISOString(),
+        userId: user?.id || 'guest'
+      };
+      localStorage.setItem('dailyConversationSession', JSON.stringify(sessionData));
+      
+      // Auto-play first line if it's from partner
+      if (currentScenarioData) {
+        const firstLine = currentScenarioData.dialogue[0];
+        if (firstLine && firstLine.speaker !== 'You') {
+          setTimeout(async () => {
+            await speakText(firstLine.text, 0);
+            // Check if next line is user's turn
+            if (currentScenarioData.dialogue.length > 1) {
+              const nextLine = currentScenarioData.dialogue[1];
+              if (nextLine.speaker === 'You') {
+                setTimeout(() => {
+                  scrollToLine(1);
+                  toast({
+                    title: "Your Turn! 🎤",
+                    description: `Speak: "${nextLine.text}"`,
+                  });
+                }, 1000);
+              }
+            }
+          }, 500);
+        }
+      }
       
       toast({
         title: "Practice Session Started",
         description: "Listen to the dialogue, then practice your responses. You'll get points based on accuracy!",
-      });
-      
-      console.log('Practice session started:', {
-        userId: user.id,
-        topic: selectedTopic,
-        scenario: currentScenario,
-        startTime: new Date()
       });
     } catch (error) {
       console.error('Error starting practice session:', error);
@@ -727,15 +837,6 @@ const QuickPracticeSession = () => {
   };
 
   const handleEndPracticeSession = async () => {
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to save your practice session",
-        variant: "destructive"
-      });
-      return;
-    }
-
     if (!sessionStartTime) {
       toast({
         title: "No Active Session",
@@ -752,60 +853,65 @@ const QuickPracticeSession = () => {
     // Calculate points based on score
     const pointsEarned = Math.round(finalScore / 10) + (sentencesPracticed * 2);
     
+    // Save to local cache instead of MySQL
+    const sessionData = {
+      userId: user?.id || 'guest',
+      type: 'conversation',
+      duration: durationMinutes,
+      score: finalScore,
+      sentences_practiced: sentencesPracticed,
+      points_earned: pointsEarned,
+      topic: selectedTopic,
+      scenario: currentScenario,
+      topic_title: selectedTopicData?.title,
+      scenario_title: currentScenarioData?.title,
+      practice_scores: practiceScores,
+      user_responses: userResponses,
+      completed_at: new Date().toISOString()
+    };
+    
     try {
-      console.log('Saving practice session:', {
-        userId: user.id,
-        type: 'conversation',
-        duration: durationMinutes,
-        score: finalScore,
-        sentences_practiced: sentencesPracticed,
-        points_earned: pointsEarned,
-        topic: selectedTopic,
-        scenario: currentScenario
+      // Get existing sessions from cache
+      const existingSessions = JSON.parse(
+        localStorage.getItem('dailyConversationHistory') || '[]'
+      );
+      
+      // Add new session
+      existingSessions.push(sessionData);
+      
+      // Keep only last 50 sessions
+      const recentSessions = existingSessions.slice(-50);
+      
+      // Save to local cache
+      localStorage.setItem('dailyConversationHistory', JSON.stringify(recentSessions));
+      
+      // Also save current session state
+      localStorage.setItem('dailyConversationSession', JSON.stringify({
+        ...sessionData,
+        startTime: sessionStartTime.toISOString()
+      }));
+      
+      toast({
+        title: "🎉 Session Saved Successfully!",
+        description: `Score: ${finalScore}% | Points: ${pointsEarned} | Duration: ${durationMinutes} min | Sentences: ${sentencesPracticed}`,
       });
-
-      const result = await IntegratedProgressService.recordPracticeSession(user.id, {
-        type: 'conversation',
-        duration: durationMinutes,
-        score: finalScore,
-        sentences_practiced: sentencesPracticed,
-        words_practiced: Object.values(userResponses).join(' ').split(/\s+/).length,
-        mistakes_count: Math.max(0, 100 - finalScore),
-        details: {
-          topic: selectedTopic,
-          scenario: currentScenario,
-          session_type: 'daily-conversation',
-          topic_title: selectedTopicData?.title,
-          scenario_title: currentScenarioData?.title,
-          practice_scores: practiceScores,
-          user_responses: userResponses
-        }
-      });
-
-      if (result.success) {
-        toast({
-          title: "🎉 Session Saved Successfully!",
-          description: `Score: ${finalScore}% | Points: ${pointsEarned} | Duration: ${durationMinutes} min | Sentences: ${sentencesPracticed}`,
-        });
-        
-        // Reset session state
-        setIsSessionActive(false);
-        setSessionStartTime(null);
-        setUserResponses({});
-        setPracticeScores({});
-        setOverallScore(0);
-      } else {
-        toast({
-          title: "Save Failed",
-          description: result.message || "Failed to save your session. Please try again.",
-          variant: "destructive"
-        });
-      }
+      
+      // Reset session state
+      setIsSessionActive(false);
+      setSessionStartTime(null);
+      setUserResponses({});
+      setPracticeScores({});
+      setOverallScore(0);
+      setCurrentDialogueIndex(0);
+      setCompletedLines(new Set());
+      
+      // Clear session cache
+      localStorage.removeItem('dailyConversationSession');
     } catch (error) {
-      console.error('Error saving practice session:', error);
+      console.error('Error saving practice session to cache:', error);
       toast({
         title: "Error",
-        description: "An error occurred while saving your session. Please check your connection and try again.",
+        description: "An error occurred while saving your session.",
         variant: "destructive"
       });
     }
@@ -1042,7 +1148,7 @@ const QuickPracticeSession = () => {
                             </div>
                           )}
 
-                          <div className="space-y-3 bg-slate-800/40 rounded-xl p-4 sm:p-6 border border-purple-500/20">
+                          <div className="space-y-3 bg-slate-800/40 rounded-xl p-4 sm:p-6 border border-purple-500/20 max-h-[600px] overflow-y-auto">
                             {currentScenarioData.dialogue.map((line, index) => {
                               const isUser = line.speaker === 'You';
                               const isPartner = line.speaker === 'Partner' || line.speaker === 'Interviewer' || line.speaker === 'Waiter';
@@ -1057,7 +1163,17 @@ const QuickPracticeSession = () => {
                                 : line.speaker;
                               
                               return (
-                                <div key={index} className="space-y-2">
+                                <div 
+                                  key={index} 
+                                  ref={(el) => {
+                                    if (el) lineRefs.current[index] = el;
+                                  }}
+                                  className={cn(
+                                    "space-y-2 transition-all duration-300",
+                                    index === currentDialogueIndex && "ring-2 ring-cyan-400/50 rounded-lg p-2 -m-2",
+                                    completedLines.has(index) && "opacity-75"
+                                  )}
+                                >
                                   <div
                                     className={cn(
                                       "flex items-start gap-3",
@@ -1232,46 +1348,6 @@ const QuickPracticeSession = () => {
                           </div>
                         </div>
 
-                        {/* Key Phrases */}
-                        <div>
-                          <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                            <Target className="w-5 h-5 text-emerald-400" />
-                            Key Phrases
-                          </h3>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            {currentScenarioData.keyPhrases.map((phrase, index) => (
-                              <div
-                                key={index}
-                                className="p-3 bg-slate-800/40 rounded-lg border border-emerald-500/20"
-                              >
-                                <div className="flex items-center gap-2">
-                                  <CheckCircle className="w-4 h-4 text-emerald-400" />
-                                  <span className="text-cyan-100">{phrase}</span>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Practice Points */}
-                        <div>
-                          <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                            <Lightbulb className="w-5 h-5 text-amber-400" />
-                            Practice Points
-                          </h3>
-                          <div className="space-y-2">
-                            {currentScenarioData.practicePoints.map((point, index) => (
-                              <div
-                                key={index}
-                                className="p-3 bg-slate-800/40 rounded-lg border border-amber-500/20 flex items-start gap-3"
-                              >
-                                <Zap className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
-                                <span className="text-cyan-100">{point}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
                         {/* Practice Button */}
                         <div className="pt-4 sm:pt-6 border-t border-purple-500/20">
                           {!isSessionActive ? (
@@ -1285,16 +1361,15 @@ const QuickPracticeSession = () => {
                               )}
                               <div className="space-y-3">
                                 <Button
-                                  className="w-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white font-semibold py-4 sm:py-6 text-base sm:text-lg disabled:opacity-50"
+                                  className="w-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white font-semibold py-4 sm:py-6 text-base sm:text-lg"
                                   onClick={handleStartPracticeSession}
-                                  disabled={!user}
                                 >
                                   <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                                  {user ? 'Start Voice Practice Session' : 'Login to Start Session'}
+                                  Start Voice Practice Session
                                 </Button>
                                 {sttAvailable && (
                                   <p className="text-xs text-center text-cyan-200/70">
-                                    🎤 Voice recognition ready! You'll speak your responses.
+                                    🎤 Voice recognition ready! You'll speak your responses. The conversation will flow automatically when you speak correctly!
                                   </p>
                                 )}
                               </div>

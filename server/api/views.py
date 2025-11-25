@@ -41,7 +41,11 @@ from .serializers import (
     TeenVocabularyPracticeSerializer, TeenPronunciationPracticeSerializer, TeenFavoriteSerializer,
     TeenAchievementSerializer, TeenGameSessionSerializer, TeenCertificateSerializer,
     PageEligibilitySerializer, CategoryProgressSerializer, AggregatedProgressSerializer,
-    VideoLessonSerializer, PracticeCommentSerializer
+    VideoLessonSerializer, PracticeCommentSerializer,
+    CommonLessonSerializer, CommonLessonEnrollmentSerializer, WeeklyChallengeSerializer,
+    UserWeeklyChallengeSerializer, LearningGoalSerializer, PersonalizedRecommendationSerializer,
+    SpacedRepetitionItemSerializer, MicrolearningModuleSerializer, MicrolearningProgressSerializer,
+    ProgressAnalyticsSerializer
 )
 from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
@@ -55,7 +59,10 @@ from .models import (
     TeenVocabularyPractice, TeenPronunciationPractice, TeenFavorite,
     TeenAchievement, TeenGameSession, TeenCertificate,
     PageEligibility, CategoryProgress, VideoLesson,
-    VideoEngagement, ChannelSubscription, PracticeComment, VideoShareEvent
+    VideoEngagement, ChannelSubscription, PracticeComment, VideoShareEvent,
+    CommonLesson, CommonLessonEnrollment, WeeklyChallenge, UserWeeklyChallenge,
+    LearningGoal, PersonalizedRecommendation, SpacedRepetitionItem,
+    MicrolearningModule, MicrolearningProgress, ProgressAnalytics
 )
 
 logger = logging.getLogger(__name__)
@@ -8973,3 +8980,991 @@ def video_share_event(request, slug):
     user = request.user if request.user.is_authenticated else None
     VideoShareEvent.objects.create(video=video, user=user, method=method)
     return Response({'success': True, 'message': 'Share recorded'})
+
+
+# ============= Adults Common Features API Endpoints =============
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def adults_common_lessons(request):
+    """Get all common lessons available for adults"""
+    try:
+        category = request.GET.get('category', '').strip()
+        difficulty = request.GET.get('difficulty', '').strip()
+        search = request.GET.get('search', '').strip()
+        
+        queryset = CommonLesson.objects.filter(is_active=True)
+        
+        if category:
+            queryset = queryset.filter(category=category)
+        if difficulty:
+            queryset = queryset.filter(difficulty=difficulty)
+        if search:
+            queryset = queryset.filter(
+                Q(title__icontains=search) | Q(description__icontains=search)
+            )
+        
+        lessons = queryset.order_by('order', '-created_at')
+        serializer = CommonLessonSerializer(lessons, many=True, context={'request': request})
+        
+        return Response({
+            'success': True,
+            'lessons': serializer.data,
+            'count': len(serializer.data)
+        })
+    except Exception as e:
+        logger.error(f"Adults common lessons error: {str(e)}")
+        return Response({
+            'success': False,
+            'message': 'An error occurred while fetching common lessons',
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def adults_common_lesson_detail(request, lesson_id):
+    """Get details of a specific common lesson"""
+    try:
+        lesson = CommonLesson.objects.get(id=lesson_id, is_active=True)
+        serializer = CommonLessonSerializer(lesson, context={'request': request})
+        
+        # Get user's enrollment if exists
+        enrollment = CommonLessonEnrollment.objects.filter(
+            user=request.user, lesson=lesson
+        ).first()
+        enrollment_data = CommonLessonEnrollmentSerializer(enrollment).data if enrollment else None
+        
+        return Response({
+            'success': True,
+            'lesson': serializer.data,
+            'enrollment': enrollment_data
+        })
+    except CommonLesson.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Lesson not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        logger.error(f"Adults common lesson detail error: {str(e)}")
+        return Response({
+            'success': False,
+            'message': 'An error occurred',
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def adults_common_lesson_enroll(request, lesson_id):
+    """Enroll in a common lesson"""
+    try:
+        lesson = CommonLesson.objects.get(id=lesson_id, is_active=True)
+        enrollment, created = CommonLessonEnrollment.objects.get_or_create(
+            user=request.user,
+            lesson=lesson,
+            defaults={'enrolled_at': timezone.now()}
+        )
+        
+        if not created:
+            return Response({
+                'success': True,
+                'message': 'Already enrolled',
+                'enrollment': CommonLessonEnrollmentSerializer(enrollment).data
+            })
+        
+        # Update lesson views
+        lesson.views += 1
+        lesson.save(update_fields=['views'])
+        
+        serializer = CommonLessonEnrollmentSerializer(enrollment)
+        return Response({
+            'success': True,
+            'message': 'Successfully enrolled',
+            'enrollment': serializer.data
+        }, status=status.HTTP_201_CREATED)
+    except CommonLesson.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Lesson not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        logger.error(f"Adults common lesson enroll error: {str(e)}")
+        return Response({
+            'success': False,
+            'message': 'An error occurred',
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def adults_common_lesson_enrollments(request):
+    """Get user's common lesson enrollments"""
+    try:
+        enrollments = CommonLessonEnrollment.objects.filter(user=request.user).order_by('-enrolled_at')
+        serializer = CommonLessonEnrollmentSerializer(enrollments, many=True)
+        
+        return Response({
+            'success': True,
+            'enrollments': serializer.data,
+            'count': len(serializer.data)
+        })
+    except Exception as e:
+        logger.error(f"Adults common lesson enrollments error: {str(e)}")
+        return Response({
+            'success': False,
+            'message': 'An error occurred',
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def adults_common_lesson_progress(request, lesson_id):
+    """Update progress for a common lesson"""
+    try:
+        lesson = CommonLesson.objects.get(id=lesson_id, is_active=True)
+        enrollment = CommonLessonEnrollment.objects.get(user=request.user, lesson=lesson)
+        
+        progress = request.data.get('progress_percentage', enrollment.progress_percentage)
+        score = request.data.get('score', enrollment.score)
+        time_spent = request.data.get('time_spent_minutes', 0)
+        completed = request.data.get('completed', False)
+        
+        enrollment.progress_percentage = min(100, max(0, float(progress)))
+        enrollment.score = max(0, min(100, float(score)))
+        enrollment.time_spent_minutes += int(time_spent)
+        enrollment.attempts += 1
+        
+        if completed and not enrollment.completed:
+            enrollment.completed = True
+            enrollment.completed_at = timezone.now()
+            lesson.completion_count += 1
+            
+            # Update average score
+            total_completions = lesson.completion_count
+            current_avg = lesson.average_score
+            lesson.average_score = ((current_avg * (total_completions - 1)) + score) / total_completions
+            lesson.save(update_fields=['completion_count', 'average_score'])
+        
+        if not enrollment.started_at:
+            enrollment.started_at = timezone.now()
+        
+        enrollment.save()
+        
+        serializer = CommonLessonEnrollmentSerializer(enrollment)
+        return Response({
+            'success': True,
+            'enrollment': serializer.data
+        })
+    except (CommonLesson.DoesNotExist, CommonLessonEnrollment.DoesNotExist) as e:
+        return Response({
+            'success': False,
+            'message': 'Lesson or enrollment not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        logger.error(f"Adults common lesson progress error: {str(e)}")
+        return Response({
+            'success': False,
+            'message': 'An error occurred',
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def adults_weekly_challenges(request):
+    """Get active weekly challenges"""
+    try:
+        today = timezone.now().date()
+        challenges = WeeklyChallenge.objects.filter(
+            is_active=True,
+            start_date__lte=today,
+            end_date__gte=today
+        ).order_by('-start_date')
+        
+        serializer = WeeklyChallengeSerializer(challenges, many=True, context={'request': request})
+        
+        return Response({
+            'success': True,
+            'challenges': serializer.data,
+            'count': len(serializer.data)
+        })
+    except Exception as e:
+        logger.error(f"Adults weekly challenges error: {str(e)}")
+        return Response({
+            'success': False,
+            'message': 'An error occurred',
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def adults_weekly_challenge_enroll(request, challenge_id):
+    """Enroll in a weekly challenge"""
+    try:
+        challenge = WeeklyChallenge.objects.get(id=challenge_id, is_active=True)
+        enrollment, created = UserWeeklyChallenge.objects.get_or_create(
+            user=request.user,
+            challenge=challenge,
+            defaults={
+                'enrolled_at': timezone.now(),
+                'started_at': timezone.now()
+            }
+        )
+        
+        if not created:
+            return Response({
+                'success': True,
+                'message': 'Already enrolled',
+                'enrollment': UserWeeklyChallengeSerializer(enrollment).data
+            })
+        
+        serializer = UserWeeklyChallengeSerializer(enrollment)
+        return Response({
+            'success': True,
+            'message': 'Successfully enrolled in challenge',
+            'enrollment': serializer.data
+        }, status=status.HTTP_201_CREATED)
+    except WeeklyChallenge.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Challenge not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        logger.error(f"Adults weekly challenge enroll error: {str(e)}")
+        return Response({
+            'success': False,
+            'message': 'An error occurred',
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def adults_my_weekly_challenges(request):
+    """Get user's weekly challenges"""
+    try:
+        enrollments = UserWeeklyChallenge.objects.filter(user=request.user).order_by('-enrolled_at')
+        serializer = UserWeeklyChallengeSerializer(enrollments, many=True)
+        
+        return Response({
+            'success': True,
+            'challenges': serializer.data,
+            'count': len(serializer.data)
+        })
+    except Exception as e:
+        logger.error(f"Adults my weekly challenges error: {str(e)}")
+        return Response({
+            'success': False,
+            'message': 'An error occurred',
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def adults_weekly_challenge_update_progress(request, challenge_id):
+    """Update progress for a weekly challenge"""
+    try:
+        challenge = WeeklyChallenge.objects.get(id=challenge_id, is_active=True)
+        enrollment = UserWeeklyChallenge.objects.get(user=request.user, challenge=challenge)
+        
+        progress_increment = request.data.get('progress_increment', 0)
+        enrollment.current_progress += int(progress_increment)
+        
+        # Calculate progress percentage
+        if challenge.requirement_value > 0:
+            enrollment.progress_percentage = min(100, (enrollment.current_progress / challenge.requirement_value) * 100)
+        
+        # Check if completed
+        if enrollment.current_progress >= challenge.requirement_value and not enrollment.completed:
+            enrollment.completed = True
+            enrollment.completed_at = timezone.now()
+            enrollment.points_earned = challenge.points_reward
+            
+            # Award points to user profile
+            profile = request.user.profile
+            profile.points += challenge.points_reward
+            profile.save(update_fields=['points'])
+        
+        enrollment.save()
+        
+        serializer = UserWeeklyChallengeSerializer(enrollment)
+        return Response({
+            'success': True,
+            'enrollment': serializer.data
+        })
+    except (WeeklyChallenge.DoesNotExist, UserWeeklyChallenge.DoesNotExist) as e:
+        return Response({
+            'success': False,
+            'message': 'Challenge or enrollment not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        logger.error(f"Adults weekly challenge update progress error: {str(e)}")
+        return Response({
+            'success': False,
+            'message': 'An error occurred',
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def adults_learning_goals(request):
+    """Get or create learning goals"""
+    if request.method == 'GET':
+        try:
+            is_active = request.GET.get('is_active', 'true').lower() == 'true'
+            goals = LearningGoal.objects.filter(user=request.user, is_active=is_active).order_by('-created_at')
+            serializer = LearningGoalSerializer(goals, many=True)
+            
+            return Response({
+                'success': True,
+                'goals': serializer.data,
+                'count': len(serializer.data)
+            })
+        except Exception as e:
+            logger.error(f"Adults learning goals GET error: {str(e)}")
+            return Response({
+                'success': False,
+                'message': 'An error occurred',
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    elif request.method == 'POST':
+        try:
+            data = request.data.copy()
+            data['user'] = request.user.id
+            serializer = LearningGoalSerializer(data=data)
+            
+            if serializer.is_valid():
+                serializer.save()
+                return Response({
+                    'success': True,
+                    'goal': serializer.data
+                }, status=status.HTTP_201_CREATED)
+            return Response({
+                'success': False,
+                'errors': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            logger.error(f"Adults learning goal create error: {str(e)}")
+            return Response({
+                'success': False,
+                'message': 'An error occurred',
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def adults_learning_goal_create(request):
+    """Create a new learning goal"""
+    return adults_learning_goals(request)
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def adults_learning_goal_detail(request, goal_id):
+    """Get, update, or delete a learning goal"""
+    try:
+        goal = LearningGoal.objects.get(id=goal_id, user=request.user)
+    except LearningGoal.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Goal not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'GET':
+        serializer = LearningGoalSerializer(goal)
+        return Response({
+            'success': True,
+            'goal': serializer.data
+        })
+    
+    elif request.method == 'PUT':
+        serializer = LearningGoalSerializer(goal, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                'success': True,
+                'goal': serializer.data
+            })
+        return Response({
+            'success': False,
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    elif request.method == 'DELETE':
+        goal.delete()
+        return Response({
+            'success': True,
+            'message': 'Goal deleted'
+        })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def adults_learning_goal_update(request, goal_id):
+    """Update a learning goal"""
+    return adults_learning_goal_detail(request, goal_id)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def adults_recommendations(request):
+    """Get personalized recommendations for user"""
+    try:
+        # Get active, non-dismissed recommendations
+        recommendations = PersonalizedRecommendation.objects.filter(
+            user=request.user,
+            dismissed=False
+        ).exclude(
+            expires_at__lt=timezone.now()
+        ).order_by('-priority', '-created_at')[:10]
+        
+        serializer = PersonalizedRecommendationSerializer(recommendations, many=True)
+        
+        return Response({
+            'success': True,
+            'recommendations': serializer.data,
+            'count': len(serializer.data)
+        })
+    except Exception as e:
+        logger.error(f"Adults recommendations error: {str(e)}")
+        return Response({
+            'success': False,
+            'message': 'An error occurred',
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def adults_recommendation_view(request, recommendation_id):
+    """Mark a recommendation as viewed"""
+    try:
+        recommendation = PersonalizedRecommendation.objects.get(
+            id=recommendation_id,
+            user=request.user
+        )
+        recommendation.viewed = True
+        recommendation.viewed_at = timezone.now()
+        recommendation.save()
+        
+        return Response({
+            'success': True,
+            'message': 'Recommendation marked as viewed'
+        })
+    except PersonalizedRecommendation.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Recommendation not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def adults_recommendation_accept(request, recommendation_id):
+    """Accept a recommendation"""
+    try:
+        recommendation = PersonalizedRecommendation.objects.get(
+            id=recommendation_id,
+            user=request.user
+        )
+        recommendation.accepted = True
+        recommendation.accepted_at = timezone.now()
+        recommendation.viewed = True
+        recommendation.viewed_at = timezone.now()
+        recommendation.save()
+        
+        return Response({
+            'success': True,
+            'message': 'Recommendation accepted'
+        })
+    except PersonalizedRecommendation.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Recommendation not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def adults_recommendation_dismiss(request, recommendation_id):
+    """Dismiss a recommendation"""
+    try:
+        recommendation = PersonalizedRecommendation.objects.get(
+            id=recommendation_id,
+            user=request.user
+        )
+        recommendation.dismissed = True
+        recommendation.dismissed_at = timezone.now()
+        recommendation.save()
+        
+        return Response({
+            'success': True,
+            'message': 'Recommendation dismissed'
+        })
+    except PersonalizedRecommendation.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Recommendation not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def adults_spaced_repetition_items(request):
+    """Get all spaced repetition items for user"""
+    try:
+        item_type = request.GET.get('item_type', '').strip()
+        queryset = SpacedRepetitionItem.objects.filter(user=request.user)
+        
+        if item_type:
+            queryset = queryset.filter(item_type=item_type)
+        
+        items = queryset.order_by('next_review_date')
+        serializer = SpacedRepetitionItemSerializer(items, many=True)
+        
+        return Response({
+            'success': True,
+            'items': serializer.data,
+            'count': len(serializer.data)
+        })
+    except Exception as e:
+        logger.error(f"Adults spaced repetition items error: {str(e)}")
+        return Response({
+            'success': False,
+            'message': 'An error occurred',
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def adults_spaced_repetition_due(request):
+    """Get items due for review today"""
+    try:
+        today = timezone.now().date()
+        items = SpacedRepetitionItem.objects.filter(
+            user=request.user,
+            next_review_date__lte=today
+        ).order_by('next_review_date')
+        
+        serializer = SpacedRepetitionItemSerializer(items, many=True)
+        
+        return Response({
+            'success': True,
+            'items': serializer.data,
+            'count': len(serializer.data)
+        })
+    except Exception as e:
+        logger.error(f"Adults spaced repetition due error: {str(e)}")
+        return Response({
+            'success': False,
+            'message': 'An error occurred',
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def adults_spaced_repetition_review(request, item_id):
+    """Record a review session for spaced repetition"""
+    try:
+        item = SpacedRepetitionItem.objects.get(id=item_id, user=request.user)
+        quality = request.data.get('quality', 3)  # 0-5 scale
+        
+        # SM-2 Algorithm implementation
+        if quality < 3:
+            # Incorrect answer
+            item.repetitions = 0
+            item.interval_days = 1
+            item.times_incorrect += 1
+        else:
+            # Correct answer
+            item.times_correct += 1
+            if item.repetitions == 0:
+                item.interval_days = 1
+            elif item.repetitions == 1:
+                item.interval_days = 6
+            else:
+                item.interval_days = int(item.interval_days * item.ease_factor)
+            
+            item.repetitions += 1
+            
+            # Update ease factor
+            item.ease_factor = max(1.3, item.ease_factor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)))
+        
+        # Update next review date
+        from datetime import timedelta
+        item.next_review_date = timezone.now().date() + timedelta(days=item.interval_days)
+        item.times_reviewed += 1
+        item.last_reviewed = timezone.now()
+        
+        # Calculate mastery level
+        if item.times_reviewed > 0:
+            item.mastery_level = (item.times_correct / item.times_reviewed) * 100
+        
+        item.save()
+        
+        serializer = SpacedRepetitionItemSerializer(item)
+        return Response({
+            'success': True,
+            'item': serializer.data
+        })
+    except SpacedRepetitionItem.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Item not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        logger.error(f"Adults spaced repetition review error: {str(e)}")
+        return Response({
+            'success': False,
+            'message': 'An error occurred',
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def adults_microlearning_modules(request):
+    """Get microlearning modules"""
+    try:
+        category = request.GET.get('category', '').strip()
+        queryset = MicrolearningModule.objects.filter(is_active=True)
+        
+        if category:
+            queryset = queryset.filter(category=category)
+        
+        modules = queryset.order_by('-is_featured', 'order', '-created_at')
+        serializer = MicrolearningModuleSerializer(modules, many=True, context={'request': request})
+        
+        return Response({
+            'success': True,
+            'modules': serializer.data,
+            'count': len(serializer.data)
+        })
+    except Exception as e:
+        logger.error(f"Adults microlearning modules error: {str(e)}")
+        return Response({
+            'success': False,
+            'message': 'An error occurred',
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def adults_microlearning_featured(request):
+    """Get featured microlearning modules"""
+    try:
+        modules = MicrolearningModule.objects.filter(
+            is_active=True,
+            is_featured=True
+        ).order_by('order', '-created_at')[:5]
+        
+        serializer = MicrolearningModuleSerializer(modules, many=True, context={'request': request})
+        
+        return Response({
+            'success': True,
+            'modules': serializer.data,
+            'count': len(serializer.data)
+        })
+    except Exception as e:
+        logger.error(f"Adults microlearning featured error: {str(e)}")
+        return Response({
+            'success': False,
+            'message': 'An error occurred',
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def adults_microlearning_module_detail(request, module_id):
+    """Get details of a microlearning module"""
+    try:
+        module = MicrolearningModule.objects.get(id=module_id, is_active=True)
+        serializer = MicrolearningModuleSerializer(module, context={'request': request})
+        
+        # Get user progress
+        progress = MicrolearningProgress.objects.filter(
+            user=request.user, module=module
+        ).first()
+        progress_data = MicrolearningProgressSerializer(progress).data if progress else None
+        
+        return Response({
+            'success': True,
+            'module': serializer.data,
+            'progress': progress_data
+        })
+    except MicrolearningModule.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Module not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        logger.error(f"Adults microlearning module detail error: {str(e)}")
+        return Response({
+            'success': False,
+            'message': 'An error occurred',
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def adults_microlearning_complete(request, module_id):
+    """Mark a microlearning module as completed"""
+    try:
+        module = MicrolearningModule.objects.get(id=module_id, is_active=True)
+        progress, created = MicrolearningProgress.objects.get_or_create(
+            user=request.user,
+            module=module
+        )
+        
+        score = request.data.get('score', 0)
+        time_spent = request.data.get('time_spent_minutes', 0)
+        
+        progress.score = max(0, min(100, float(score)))
+        progress.time_spent_minutes += int(time_spent)
+        progress.attempts += 1
+        progress.completed = True
+        progress.completed_at = timezone.now()
+        progress.save()
+        
+        # Update module stats
+        module.completion_count += 1
+        module.views += 1
+        module.save(update_fields=['completion_count', 'views'])
+        
+        # Award points
+        profile = request.user.profile
+        profile.points += module.points_reward
+        profile.save(update_fields=['points'])
+        
+        serializer = MicrolearningProgressSerializer(progress)
+        return Response({
+            'success': True,
+            'progress': serializer.data
+        })
+    except MicrolearningModule.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Module not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        logger.error(f"Adults microlearning complete error: {str(e)}")
+        return Response({
+            'success': False,
+            'message': 'An error occurred',
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def adults_progress_analytics(request):
+    """Get progress analytics for user"""
+    try:
+        category = request.GET.get('category', '').strip()
+        period_type = request.GET.get('period_type', 'weekly').strip()
+        
+        # Calculate period dates
+        today = timezone.now().date()
+        if period_type == 'weekly':
+            period_start = today - timedelta(days=7)
+            period_end = today
+        elif period_type == 'monthly':
+            period_start = today - timedelta(days=30)
+            period_end = today
+        else:
+            period_start = today - timedelta(days=7)
+            period_end = today
+        
+        queryset = ProgressAnalytics.objects.filter(
+            user=request.user,
+            period_start=period_start,
+            period_end=period_end,
+            period_type=period_type
+        )
+        
+        if category:
+            queryset = queryset.filter(category=category)
+        
+        analytics = queryset.first()
+        
+        if not analytics:
+            # Create default analytics if none exists
+            analytics = ProgressAnalytics.objects.create(
+                user=request.user,
+                category=category or 'adults_beginner',
+                period_start=period_start,
+                period_end=period_end,
+                period_type=period_type
+            )
+        
+        serializer = ProgressAnalyticsSerializer(analytics)
+        return Response({
+            'success': True,
+            'analytics': serializer.data
+        })
+    except Exception as e:
+        logger.error(f"Adults progress analytics error: {str(e)}")
+        return Response({
+            'success': False,
+            'message': 'An error occurred',
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def adults_analytics_summary(request):
+    """Get summary analytics across all adult categories"""
+    try:
+        # Get progress for all adult categories
+        categories = ['adults_beginner', 'adults_intermediate', 'adults_advanced']
+        summary = {}
+        
+        for category in categories:
+            progress = CategoryProgress.objects.filter(
+                user=request.user,
+                category=category
+            ).first()
+            
+            if progress:
+                summary[category] = {
+                    'total_points': progress.total_points,
+                    'lessons_completed': progress.lessons_completed,
+                    'practice_time_minutes': progress.practice_time_minutes,
+                    'average_score': progress.average_score,
+                    'progress_percentage': progress.progress_percentage,
+                    'streak': progress.total_streak
+                }
+            else:
+                summary[category] = {
+                    'total_points': 0,
+                    'lessons_completed': 0,
+                    'practice_time_minutes': 0,
+                    'average_score': 0,
+                    'progress_percentage': 0,
+                    'streak': 0
+                }
+        
+        # Calculate totals
+        total_points = sum(s['total_points'] for s in summary.values())
+        total_lessons = sum(s['lessons_completed'] for s in summary.values())
+        total_time = sum(s['practice_time_minutes'] for s in summary.values())
+        avg_score = sum(s['average_score'] for s in summary.values()) / len(categories) if categories else 0
+        
+        return Response({
+            'success': True,
+            'summary': summary,
+            'totals': {
+                'total_points': total_points,
+                'total_lessons': total_lessons,
+                'total_time_minutes': total_time,
+                'average_score': avg_score
+            }
+        })
+    except Exception as e:
+        logger.error(f"Adults analytics summary error: {str(e)}")
+        return Response({
+            'success': False,
+            'message': 'An error occurred',
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def adults_dashboard(request):
+    """Get comprehensive dashboard data for adults page"""
+    try:
+        # Get all relevant data
+        from django.db.models import Sum, Avg, Count
+        
+        # Common lessons enrollments
+        common_enrollments = CommonLessonEnrollment.objects.filter(user=request.user)
+        common_lessons_count = common_enrollments.count()
+        common_lessons_completed = common_enrollments.filter(completed=True).count()
+        
+        # Weekly challenges
+        today = timezone.now().date()
+        active_challenges = WeeklyChallenge.objects.filter(
+            is_active=True,
+            start_date__lte=today,
+            end_date__gte=today
+        ).count()
+        user_challenges = UserWeeklyChallenge.objects.filter(user=request.user)
+        challenges_completed = user_challenges.filter(completed=True).count()
+        
+        # Learning goals
+        active_goals = LearningGoal.objects.filter(user=request.user, is_active=True, completed=False).count()
+        completed_goals = LearningGoal.objects.filter(user=request.user, completed=True).count()
+        
+        # Recommendations
+        recommendations_count = PersonalizedRecommendation.objects.filter(
+            user=request.user,
+            dismissed=False
+        ).exclude(expires_at__lt=timezone.now()).count()
+        
+        # Spaced repetition
+        due_items = SpacedRepetitionItem.objects.filter(
+            user=request.user,
+            next_review_date__lte=today
+        ).count()
+        
+        # Microlearning
+        microlearning_completed = MicrolearningProgress.objects.filter(
+            user=request.user,
+            completed=True
+        ).count()
+        
+        # Progress summary
+        analytics_summary_response = adults_analytics_summary(request)
+        analytics_summary = analytics_summary_response.data.get('summary', {}) if hasattr(analytics_summary_response, 'data') else {}
+        
+        return Response({
+            'success': True,
+            'dashboard': {
+                'common_lessons': {
+                    'total': common_lessons_count,
+                    'completed': common_lessons_completed
+                },
+                'weekly_challenges': {
+                    'active': active_challenges,
+                    'completed': challenges_completed
+                },
+                'learning_goals': {
+                    'active': active_goals,
+                    'completed': completed_goals
+                },
+                'recommendations': {
+                    'pending': recommendations_count
+                },
+                'spaced_repetition': {
+                    'due_items': due_items
+                },
+                'microlearning': {
+                    'completed': microlearning_completed
+                },
+                'progress_summary': analytics_summary
+            }
+        })
+    except Exception as e:
+        logger.error(f"Adults dashboard error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return Response({
+            'success': False,
+            'message': 'An error occurred',
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

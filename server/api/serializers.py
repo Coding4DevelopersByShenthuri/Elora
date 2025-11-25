@@ -14,7 +14,10 @@ from .models import (
     TeenVocabularyPractice, TeenPronunciationPractice, TeenFavorite,
     TeenAchievement, TeenGameSession, TeenCertificate,
     PageEligibility, CategoryProgress, VideoLesson,
-    PracticeComment
+    PracticeComment, CommonLesson, CommonLessonEnrollment, WeeklyChallenge,
+    UserWeeklyChallenge, LearningGoal, PersonalizedRecommendation,
+    SpacedRepetitionItem, MicrolearningModule, MicrolearningProgress,
+    ProgressAnalytics
 )
 from django.contrib.auth.password_validation import validate_password
 
@@ -706,3 +709,203 @@ class PracticeCommentSerializer(serializers.ModelSerializer):
         if request and request.user.is_authenticated:
             return obj.user_id == request.user.id
         return False
+
+
+# ============= Adults Common Features Serializers =============
+class CommonLessonSerializer(serializers.ModelSerializer):
+    """Serializer for common lessons shared across adult levels"""
+    thumbnail_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = CommonLesson
+        fields = [
+            'id', 'slug', 'title', 'description', 'category', 'difficulty',
+            'duration_minutes', 'points_reward', 'content', 'thumbnail_url',
+            'is_active', 'order', 'views', 'completion_count', 'average_score',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'views', 'completion_count', 'average_score', 'created_at', 'updated_at']
+    
+    def get_thumbnail_url(self, obj):
+        if obj.thumbnail:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.thumbnail.url)
+            return obj.thumbnail.url
+        return None
+
+
+class CommonLessonEnrollmentSerializer(serializers.ModelSerializer):
+    """Serializer for common lesson enrollments"""
+    lesson = CommonLessonSerializer(read_only=True)
+    lesson_id = serializers.IntegerField(write_only=True, required=False)
+    
+    class Meta:
+        model = CommonLessonEnrollment
+        fields = [
+            'id', 'lesson', 'lesson_id', 'enrolled_at', 'started_at', 'completed_at',
+            'completed', 'progress_percentage', 'score', 'time_spent_minutes',
+            'attempts', 'details', 'last_accessed'
+        ]
+        read_only_fields = ['id', 'enrolled_at', 'last_accessed']
+
+
+class WeeklyChallengeSerializer(serializers.ModelSerializer):
+    """Serializer for weekly challenges"""
+    user_progress = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = WeeklyChallenge
+        fields = [
+            'id', 'challenge_id', 'title', 'description', 'category',
+            'start_date', 'end_date', 'points_reward', 'badge_icon',
+            'requirement_type', 'requirement_value', 'requirement_description',
+            'is_active', 'user_progress', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']
+    
+    def get_user_progress(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            user_challenge = UserWeeklyChallenge.objects.filter(
+                user=request.user, challenge=obj
+            ).first()
+            if user_challenge:
+                return {
+                    'enrolled': True,
+                    'completed': user_challenge.completed,
+                    'progress': user_challenge.current_progress,
+                    'progress_percentage': user_challenge.progress_percentage,
+                    'points_earned': user_challenge.points_earned
+                }
+        return {'enrolled': False}
+
+
+class UserWeeklyChallengeSerializer(serializers.ModelSerializer):
+    """Serializer for user weekly challenge participation"""
+    challenge = WeeklyChallengeSerializer(read_only=True)
+    challenge_id = serializers.IntegerField(write_only=True, required=False)
+    
+    class Meta:
+        model = UserWeeklyChallenge
+        fields = [
+            'id', 'challenge', 'challenge_id', 'enrolled_at', 'started_at',
+            'completed_at', 'completed', 'current_progress', 'progress_percentage',
+            'points_earned', 'details', 'updated_at'
+        ]
+        read_only_fields = ['id', 'enrolled_at', 'updated_at']
+
+
+class LearningGoalSerializer(serializers.ModelSerializer):
+    """Serializer for learning goals"""
+    progress_percentage = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = LearningGoal
+        fields = [
+            'id', 'goal_type', 'title', 'description', 'target_value', 'current_value',
+            'unit', 'start_date', 'target_date', 'completed_at', 'completed',
+            'is_active', 'progress_percentage', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'completed_at', 'created_at', 'updated_at']
+    
+    def get_progress_percentage(self, obj):
+        if obj.target_value > 0:
+            return min(100, (obj.current_value / obj.target_value) * 100)
+        return 0
+
+
+class PersonalizedRecommendationSerializer(serializers.ModelSerializer):
+    """Serializer for personalized recommendations"""
+    class Meta:
+        model = PersonalizedRecommendation
+        fields = [
+            'id', 'recommendation_type', 'title', 'description', 'priority',
+            'target_id', 'target_type', 'action_url', 'reason', 'confidence_score',
+            'viewed', 'viewed_at', 'accepted', 'accepted_at', 'dismissed',
+            'dismissed_at', 'expires_at', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+
+class SpacedRepetitionItemSerializer(serializers.ModelSerializer):
+    """Serializer for spaced repetition items"""
+    days_until_review = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = SpacedRepetitionItem
+        fields = [
+            'id', 'item_type', 'item_id', 'item_content', 'ease_factor',
+            'interval_days', 'repetitions', 'next_review_date', 'days_until_review',
+            'times_reviewed', 'times_correct', 'times_incorrect', 'last_reviewed',
+            'mastery_level', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']
+    
+    def get_days_until_review(self, obj):
+        from django.utils import timezone
+        today = timezone.now().date()
+        delta = obj.next_review_date - today
+        return max(0, delta.days)
+
+
+class MicrolearningModuleSerializer(serializers.ModelSerializer):
+    """Serializer for microlearning modules"""
+    thumbnail_url = serializers.SerializerMethodField()
+    user_progress = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = MicrolearningModule
+        fields = [
+            'id', 'slug', 'title', 'description', 'category', 'difficulty',
+            'content', 'duration_minutes', 'points_reward', 'thumbnail_url',
+            'is_active', 'is_featured', 'order', 'views', 'completion_count',
+            'user_progress', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'views', 'completion_count', 'created_at', 'updated_at']
+    
+    def get_thumbnail_url(self, obj):
+        # Can be extended if thumbnails are added
+        return None
+    
+    def get_user_progress(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            progress = MicrolearningProgress.objects.filter(
+                user=request.user, module=obj
+            ).first()
+            if progress:
+                return {
+                    'completed': progress.completed,
+                    'score': progress.score,
+                    'attempts': progress.attempts
+                }
+        return None
+
+
+class MicrolearningProgressSerializer(serializers.ModelSerializer):
+    """Serializer for microlearning progress"""
+    module = MicrolearningModuleSerializer(read_only=True)
+    module_id = serializers.IntegerField(write_only=True, required=False)
+    
+    class Meta:
+        model = MicrolearningProgress
+        fields = [
+            'id', 'module', 'module_id', 'completed', 'completed_at',
+            'score', 'time_spent_minutes', 'attempts', 'last_accessed', 'created_at'
+        ]
+        read_only_fields = ['id', 'last_accessed', 'created_at']
+
+
+class ProgressAnalyticsSerializer(serializers.ModelSerializer):
+    """Serializer for progress analytics"""
+    class Meta:
+        model = ProgressAnalytics
+        fields = [
+            'id', 'category', 'period_start', 'period_end', 'period_type',
+            'lessons_completed', 'practice_time_minutes', 'average_score',
+            'vocabulary_learned', 'pronunciation_attempts', 'streak_days',
+            'points_earned', 'improvement_percentage', 'consistency_score',
+            'insights', 'recommendations', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']

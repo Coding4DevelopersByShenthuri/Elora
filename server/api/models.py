@@ -1309,3 +1309,414 @@ class VideoShareEvent(models.Model):
     
     def __str__(self):
         return f"Share event on {self.video.title} via {self.method or 'unknown'}"
+
+
+# ============= Adults Common Features =============
+class CommonLesson(models.Model):
+    """Common lessons shared across all adult levels (Beginner, Intermediate, Advanced)"""
+    CATEGORY_CHOICES = [
+        ('grammar', 'Grammar'),
+        ('vocabulary', 'Vocabulary'),
+        ('pronunciation', 'Pronunciation'),
+        ('conversation', 'Conversation'),
+        ('business', 'Business English'),
+        ('culture', 'Cultural Context'),
+        ('idioms', 'Idioms & Expressions'),
+    ]
+    
+    slug = models.SlugField(unique=True)
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    difficulty = models.CharField(max_length=20, choices=VideoLesson.DIFFICULTY_CHOICES, default='beginner')
+    duration_minutes = models.IntegerField(default=15)
+    points_reward = models.IntegerField(default=50)
+    
+    # Content
+    content = models.JSONField(default=dict)  # Lesson content, exercises, etc.
+    thumbnail = models.ImageField(upload_to='common_lesson_thumbnails/', blank=True, null=True)
+    
+    # Metadata
+    is_active = models.BooleanField(default=True)
+    order = models.IntegerField(default=0)
+    views = models.IntegerField(default=0)
+    completion_count = models.IntegerField(default=0)
+    average_score = models.FloatField(default=0.0)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['order', '-created_at']
+        indexes = [
+            models.Index(fields=['category', 'is_active']),
+            models.Index(fields=['difficulty', 'is_active']),
+        ]
+        verbose_name = "Common Lesson"
+        verbose_name_plural = "Common Lessons"
+    
+    def __str__(self):
+        return f"{self.title} ({self.category})"
+
+
+class CommonLessonEnrollment(models.Model):
+    """Track user enrollments in common lessons"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='common_lesson_enrollments')
+    lesson = models.ForeignKey(CommonLesson, on_delete=models.CASCADE, related_name='enrollments')
+    
+    enrolled_at = models.DateTimeField(auto_now_add=True)
+    started_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    completed = models.BooleanField(default=False)
+    
+    # Progress tracking
+    progress_percentage = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    score = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    time_spent_minutes = models.IntegerField(default=0)
+    attempts = models.IntegerField(default=0)
+    
+    # Additional data
+    details = models.JSONField(default=dict)
+    last_accessed = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['user', 'lesson']
+        indexes = [
+            models.Index(fields=['user', 'completed']),
+            models.Index(fields=['user', 'enrolled_at']),
+            models.Index(fields=['lesson', 'completed']),
+        ]
+        verbose_name = "Common Lesson Enrollment"
+        verbose_name_plural = "Common Lesson Enrollments"
+    
+    def __str__(self):
+        status = "Completed" if self.completed else "In Progress"
+        return f"{self.user.username} - {self.lesson.title} ({status})"
+
+
+class WeeklyChallenge(models.Model):
+    """Weekly challenges for adults to boost engagement"""
+    STATUS_CHOICES = [
+        ('upcoming', 'Upcoming'),
+        ('active', 'Active'),
+        ('completed', 'Completed'),
+    ]
+    
+    challenge_id = models.CharField(max_length=100, unique=True)
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    category = models.CharField(max_length=50)  # e.g., 'speaking', 'vocabulary', 'grammar'
+    
+    # Challenge details
+    start_date = models.DateField()
+    end_date = models.DateField()
+    points_reward = models.IntegerField(default=100)
+    badge_icon = models.CharField(max_length=50, blank=True)
+    
+    # Requirements
+    requirement_type = models.CharField(max_length=50)  # 'lessons_completed', 'practice_time', 'score_threshold'
+    requirement_value = models.IntegerField()
+    requirement_description = models.TextField(blank=True)
+    
+    # Metadata
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-start_date']
+        indexes = [
+            models.Index(fields=['start_date', 'end_date', 'is_active']),
+            models.Index(fields=['challenge_id']),
+        ]
+        verbose_name = "Weekly Challenge"
+        verbose_name_plural = "Weekly Challenges"
+    
+    def __str__(self):
+        return f"{self.title} ({self.start_date} - {self.end_date})"
+
+
+class UserWeeklyChallenge(models.Model):
+    """Track user participation in weekly challenges"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='weekly_challenges')
+    challenge = models.ForeignKey(WeeklyChallenge, on_delete=models.CASCADE, related_name='user_participations')
+    
+    enrolled_at = models.DateTimeField(auto_now_add=True)
+    started_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    completed = models.BooleanField(default=False)
+    
+    # Progress tracking
+    current_progress = models.IntegerField(default=0)
+    progress_percentage = models.FloatField(default=0.0)
+    points_earned = models.IntegerField(default=0)
+    
+    # Additional data
+    details = models.JSONField(default=dict)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['user', 'challenge']
+        indexes = [
+            models.Index(fields=['user', 'completed']),
+            models.Index(fields=['challenge', 'completed']),
+        ]
+        verbose_name = "User Weekly Challenge"
+        verbose_name_plural = "User Weekly Challenges"
+    
+    def __str__(self):
+        status = "Completed" if self.completed else f"{self.progress_percentage}%"
+        return f"{self.user.username} - {self.challenge.title} ({status})"
+
+
+class LearningGoal(models.Model):
+    """User-defined learning goals"""
+    GOAL_TYPE_CHOICES = [
+        ('daily_practice', 'Daily Practice Time'),
+        ('weekly_lessons', 'Weekly Lessons Completed'),
+        ('vocabulary', 'Vocabulary Words Learned'),
+        ('streak', 'Learning Streak'),
+        ('score', 'Average Score Target'),
+        ('custom', 'Custom Goal'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='learning_goals')
+    goal_type = models.CharField(max_length=50, choices=GOAL_TYPE_CHOICES)
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    
+    # Target and current values
+    target_value = models.IntegerField()
+    current_value = models.IntegerField(default=0)
+    unit = models.CharField(max_length=50, default='')  # e.g., 'minutes', 'lessons', 'words'
+    
+    # Timeline
+    start_date = models.DateField()
+    target_date = models.DateField()
+    completed_at = models.DateTimeField(null=True, blank=True)
+    completed = models.BooleanField(default=False)
+    
+    # Metadata
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'is_active', 'completed']),
+            models.Index(fields=['user', 'target_date']),
+        ]
+        verbose_name = "Learning Goal"
+        verbose_name_plural = "Learning Goals"
+    
+    def __str__(self):
+        status = "Completed" if self.completed else "Active"
+        return f"{self.user.username} - {self.title} ({status})"
+
+
+class PersonalizedRecommendation(models.Model):
+    """AI-generated personalized learning recommendations"""
+    RECOMMENDATION_TYPE_CHOICES = [
+        ('lesson', 'Lesson Recommendation'),
+        ('practice', 'Practice Session'),
+        ('video', 'Video Lesson'),
+        ('challenge', 'Challenge'),
+        ('review', 'Review Material'),
+        ('path', 'Learning Path'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='personalized_recommendations')
+    recommendation_type = models.CharField(max_length=50, choices=RECOMMENDATION_TYPE_CHOICES)
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    priority = models.IntegerField(default=5, validators=[MinValueValidator(1), MaxValueValidator(10)])
+    
+    # Recommendation target
+    target_id = models.CharField(max_length=255, blank=True)  # ID of lesson, video, etc.
+    target_type = models.CharField(max_length=50, blank=True)  # 'lesson', 'video', 'challenge'
+    action_url = models.CharField(max_length=500, blank=True)
+    
+    # Reasoning
+    reason = models.TextField(blank=True, help_text="Why this recommendation was made")
+    confidence_score = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(1)])
+    
+    # User interaction
+    viewed = models.BooleanField(default=False)
+    viewed_at = models.DateTimeField(null=True, blank=True)
+    accepted = models.BooleanField(default=False)
+    accepted_at = models.DateTimeField(null=True, blank=True)
+    dismissed = models.BooleanField(default=False)
+    dismissed_at = models.DateTimeField(null=True, blank=True)
+    
+    # Metadata
+    expires_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-priority', '-created_at']
+        indexes = [
+            models.Index(fields=['user', 'viewed', 'dismissed']),
+            models.Index(fields=['user', 'recommendation_type']),
+            models.Index(fields=['expires_at']),
+        ]
+        verbose_name = "Personalized Recommendation"
+        verbose_name_plural = "Personalized Recommendations"
+    
+    def __str__(self):
+        status = "Dismissed" if self.dismissed else ("Accepted" if self.accepted else "Pending")
+        return f"{self.user.username} - {self.title} ({status})"
+
+
+class SpacedRepetitionItem(models.Model):
+    """Spaced repetition system for vocabulary and concepts"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='spaced_repetition_items')
+    item_type = models.CharField(max_length=50)  # 'vocabulary', 'phrase', 'grammar_rule', 'idiom'
+    item_id = models.CharField(max_length=255)  # ID of the vocabulary word, phrase, etc.
+    item_content = models.CharField(max_length=500)  # The actual content to review
+    
+    # Spaced repetition algorithm (SM-2 algorithm parameters)
+    ease_factor = models.FloatField(default=2.5)
+    interval_days = models.IntegerField(default=1)
+    repetitions = models.IntegerField(default=0)
+    next_review_date = models.DateField()
+    
+    # Performance tracking
+    times_reviewed = models.IntegerField(default=0)
+    times_correct = models.IntegerField(default=0)
+    times_incorrect = models.IntegerField(default=0)
+    last_reviewed = models.DateTimeField(null=True, blank=True)
+    mastery_level = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['user', 'item_type', 'item_id']
+        indexes = [
+            models.Index(fields=['user', 'next_review_date']),
+            models.Index(fields=['user', 'item_type']),
+        ]
+        verbose_name = "Spaced Repetition Item"
+        verbose_name_plural = "Spaced Repetition Items"
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.item_content[:50]} (Review: {self.next_review_date})"
+
+
+class MicrolearningModule(models.Model):
+    """Short, focused learning modules (5-10 minutes)"""
+    CATEGORY_CHOICES = [
+        ('quick_tip', 'Quick Tip'),
+        ('vocabulary_boost', 'Vocabulary Boost'),
+        ('grammar_refresher', 'Grammar Refresher'),
+        ('pronunciation_tip', 'Pronunciation Tip'),
+        ('idiom_of_day', 'Idiom of the Day'),
+        ('business_phrase', 'Business Phrase'),
+    ]
+    
+    slug = models.SlugField(unique=True)
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+    difficulty = models.CharField(max_length=20, choices=VideoLesson.DIFFICULTY_CHOICES, default='beginner')
+    
+    # Content
+    content = models.JSONField(default=dict)
+    duration_minutes = models.IntegerField(default=5, validators=[MinValueValidator(1), MaxValueValidator(15)])
+    points_reward = models.IntegerField(default=25)
+    
+    # Metadata
+    is_active = models.BooleanField(default=True)
+    is_featured = models.BooleanField(default=False)
+    order = models.IntegerField(default=0)
+    views = models.IntegerField(default=0)
+    completion_count = models.IntegerField(default=0)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-is_featured', 'order', '-created_at']
+        indexes = [
+            models.Index(fields=['category', 'is_active']),
+            models.Index(fields=['is_featured', 'is_active']),
+        ]
+        verbose_name = "Microlearning Module"
+        verbose_name_plural = "Microlearning Modules"
+    
+    def __str__(self):
+        return f"{self.title} ({self.category})"
+
+
+class MicrolearningProgress(models.Model):
+    """Track user progress in microlearning modules"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='microlearning_progress')
+    module = models.ForeignKey(MicrolearningModule, on_delete=models.CASCADE, related_name='user_progress')
+    
+    completed = models.BooleanField(default=False)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    score = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    time_spent_minutes = models.IntegerField(default=0)
+    attempts = models.IntegerField(default=0)
+    
+    last_accessed = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['user', 'module']
+        indexes = [
+            models.Index(fields=['user', 'completed']),
+            models.Index(fields=['module', 'completed']),
+        ]
+        verbose_name = "Microlearning Progress"
+        verbose_name_plural = "Microlearning Progress"
+    
+    def __str__(self):
+        status = "Completed" if self.completed else "In Progress"
+        return f"{self.user.username} - {self.module.title} ({status})"
+
+
+class ProgressAnalytics(models.Model):
+    """Detailed progress analytics for adults dashboard"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='progress_analytics')
+    category = models.CharField(max_length=50, choices=CategoryProgress.CATEGORY_CHOICES)
+    
+    # Date range
+    period_start = models.DateField()
+    period_end = models.DateField()
+    period_type = models.CharField(max_length=20, default='weekly')  # 'daily', 'weekly', 'monthly'
+    
+    # Metrics
+    lessons_completed = models.IntegerField(default=0)
+    practice_time_minutes = models.IntegerField(default=0)
+    average_score = models.FloatField(default=0.0)
+    vocabulary_learned = models.IntegerField(default=0)
+    pronunciation_attempts = models.IntegerField(default=0)
+    streak_days = models.IntegerField(default=0)
+    points_earned = models.IntegerField(default=0)
+    
+    # Trends
+    improvement_percentage = models.FloatField(default=0.0)
+    consistency_score = models.FloatField(default=0.0)
+    
+    # Additional insights
+    insights = models.JSONField(default=dict)
+    recommendations = models.JSONField(default=list)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['user', 'category', 'period_start', 'period_end', 'period_type']
+        indexes = [
+            models.Index(fields=['user', 'category', 'period_start']),
+            models.Index(fields=['user', 'period_type']),
+        ]
+        verbose_name = "Progress Analytics"
+        verbose_name_plural = "Progress Analytics"
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.category} ({self.period_start} to {self.period_end})"
