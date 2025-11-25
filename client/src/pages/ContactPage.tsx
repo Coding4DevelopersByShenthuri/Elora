@@ -88,11 +88,6 @@ const ContactPage = () => {
           <path d="M20 20C40 10 60 30 80 20C85 18 90 22 90 25C90 30 85 35 80 30C70 25 50 15 30 25C25 27 20 25 20 20Z" stroke="currentColor" strokeWidth="2" fill="currentColor"/>
         </svg>
       </div>
-      <div className="absolute top-40 right-20 w-20 h-20 text-orange-500 opacity-30 hidden lg:block">
-        <svg viewBox="0 0 100 100" fill="currentColor" className="w-full h-full">
-          <path d="M50 10L60 40L90 50L60 60L50 90L40 60L10 50L40 40Z"/>
-        </svg>
-      </div>
       <div className="absolute bottom-20 left-20 w-24 h-24 text-green-500 opacity-30 hidden lg:block">
         <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
           <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="3" strokeDasharray="10,5"/>
