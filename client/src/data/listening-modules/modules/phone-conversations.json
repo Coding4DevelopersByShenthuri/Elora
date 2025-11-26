@@ -1,0 +1,207 @@
+{
+  "module": {
+    "id": "phone-conversations",
+    "title": "Phone Conversations",
+    "description": "Master phone communication skills for professional and personal calls",
+    "difficulty": "beginner",
+    "duration": "12-18 min",
+    "level": "Foundation",
+    "icon": "📞",
+    "color": "from-amber-500 to-orange-600",
+    "category": "Communication"
+  },
+  "exercises": [
+    {
+      "id": "ex1",
+      "type": "comprehension",
+      "question": "Why does Lila call the IT help desk first thing in the morning?",
+      "audioSegment": {
+        "start": 0,
+        "end": 60
+      },
+      "options": [
+        "She forgot her password",
+        "Her VPN token expired overnight",
+        "Her webcam stopped working",
+        "She needs new keyboard shortcuts"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Lila’s VPN token expired and she cannot access payroll systems.",
+      "points": 10
+    },
+    {
+      "id": "ex2",
+      "type": "multiple-choice",
+      "question": "What temporary solution does the IT specialist provide?",
+      "audioSegment": {
+        "start": 60,
+        "end": 110
+      },
+      "options": [
+        "A backup laptop",
+        "A one-time passcode emailed to her manager",
+        "A loaner hotspot",
+        "A mobile app workaround"
+      ],
+      "correctAnswer": 1,
+      "explanation": "He emails a one-time passcode to her manager for security verification.",
+      "points": 9
+    },
+    {
+      "id": "ex3",
+      "type": "fill-blank",
+      "question": "During the client call, Lila promises to send the revised proposal by __________ local time.",
+      "audioSegment": {
+        "start": 110,
+        "end": 170
+      },
+      "correctAnswer": "4:00 PM",
+      "explanation": "She commits to delivering the document by 4:00 PM in the client’s time zone.",
+      "points": 10
+    },
+    {
+      "id": "ex4",
+      "type": "multiple-choice",
+      "question": "Which concern does the Berlin client raise about the rollout?",
+      "audioSegment": {
+        "start": 170,
+        "end": 230
+      },
+      "options": [
+        "Server capacity during peak hours",
+        "Translation quality",
+        "Shipping delays",
+        "Licensing fees"
+      ],
+      "correctAnswer": 0,
+      "explanation": "The client worries about peak-hour server load when training launches.",
+      "points": 11
+    },
+    {
+      "id": "ex5",
+      "type": "true-false",
+      "question": "Lila’s pharmacy call confirms that her inhaler refill is already ready for pickup.",
+      "audioSegment": {
+        "start": 230,
+        "end": 280
+      },
+      "correctAnswer": false,
+      "explanation": "The pharmacist says the refill will be ready after 5 PM and offers delivery.",
+      "points": 8
+    },
+    {
+      "id": "ex6",
+      "type": "multiple-choice",
+      "question": "What does the courier request when delivering the data drives?",
+      "audioSegment": {
+        "start": 280,
+        "end": 330
+      },
+      "options": [
+        "Cash on delivery",
+        "A building access code",
+        "An electronic signature",
+        "Proof of identity"
+      ],
+      "correctAnswer": 2,
+      "explanation": "The courier needs an electronic signature on the phone before release.",
+      "points": 9
+    },
+    {
+      "id": "ex7",
+      "type": "fill-blank",
+      "question": "Lila tells the courier to leave the package with the coworking receptionist named __________.",
+      "audioSegment": {
+        "start": 330,
+        "end": 370
+      },
+      "correctAnswer": "Marisol",
+      "explanation": "She spells out Marisol’s name so the courier logs it correctly.",
+      "points": 8
+    },
+    {
+      "id": "ex8",
+      "type": "comprehension",
+      "question": "Why does Lila call her mentor in the evening?",
+      "audioSegment": {
+        "start": 370,
+        "end": 430
+      },
+      "options": [
+        "To request a reference letter",
+        "To practice salary negotiation language",
+        "To reschedule a dinner",
+        "To share good news"
+      ],
+      "correctAnswer": 1,
+      "explanation": "She role-plays salary negotiation before an upcoming interview.",
+      "points": 10
+    },
+    {
+      "id": "ex9",
+      "type": "multiple-choice",
+      "question": "Which tactic does the mentor recommend for the negotiation call?",
+      "audioSegment": {
+        "start": 430,
+        "end": 490
+      },
+      "options": [
+        "Anchoring low to seem flexible",
+        "Quoting the first number immediately",
+        "Framing the ask around documented impact",
+        "Avoiding a range"
+      ],
+      "correctAnswer": 2,
+      "explanation": "The mentor tells her to reference specific metrics before stating the target salary.",
+      "points": 11
+    },
+    {
+      "id": "ex10",
+      "type": "true-false",
+      "question": "Lila ends the day by ignoring the wellness reminder on her phone.",
+      "audioSegment": {
+        "start": 490,
+        "end": 530
+      },
+      "correctAnswer": false,
+      "explanation": "She actually follows the breathing reminder while placing a final check-in call to her mom.",
+      "points": 7
+    }
+  ],
+  "transcript": "Call 1 – 7:15 AM: “IT Help Desk, this is Marco.” Lila explains that her VPN token expired overnight and payroll locks her out after three failed logins. Marco verifies her ID, emails a one-time passcode to her manager for security, and walks her through reactivating multi-factor authentication before the workday begins. \n\nCall 2 – 9:00 AM: Lila joins a conference call with a Berlin client launching training software. They discuss data residency, and the client worries about server capacity during peak sign-ons. Lila promises to send a revised proposal by 4:00 PM Berlin time with load-testing results and confirms the new milestone dates. \n\nCall 3 – 11:30 AM: She phones a neighborhood pharmacy to refill an inhaler prescription. Supply-chain delays mean it will be ready after 5 PM, so the pharmacist offers same-day courier delivery if Lila confirms the address and pays the co-pay through the automated system. \n\nCall 4 – 1:45 PM: A courier driver rings her cell from the lobby, asking for a building access code while holding encrypted data drives. Because security prohibits sharing codes, Lila directs him to the coworking reception desk, spells the attendant’s name—Marisol—and signs electronically to release the package before her next meeting. \n\nCall 5 – 5:10 PM: Her mentor Ruth calls back during a walk between meetings. Lila practices salary negotiation talking points for an interview the next morning. Ruth reminds her to cite measurable success—“a 27 percent reduction in onboarding time”—before naming her compensation range, and they rehearse responses to counteroffers. \n\nCall 6 – 8:30 PM: As she tidies her desk, the wellness app nudges her to breathe. Lila dials her mother, who just landed after a delayed flight, and uses the guided breathing exercise while catching up. She ends the day by confirming that the pharmacy courier dropped off the inhaler and that the revised proposal uploaded correctly to the client portal.",
+  "vocabulary": [
+    {
+      "word": "multi-factor authentication",
+      "definition": "A security process requiring two or more verification methods",
+      "example": "The help desk reset her multi-factor authentication after the token expired."
+    },
+    {
+      "word": "load testing",
+      "definition": "Simulating high demand to see how a system performs under stress",
+      "example": "They ran load testing before promising the peak-hour rollout."
+    },
+    {
+      "word": "co-pay",
+      "definition": "The portion of a medical cost paid by the patient",
+      "example": "She paid her co-pay through the automated phone system."
+    },
+    {
+      "word": "encrypted drive",
+      "definition": "A storage device protected by data encryption",
+      "example": "The courier delivered encrypted drives for the compliance team."
+    },
+    {
+      "word": "anchor (verb)",
+      "definition": "In negotiation, to establish the initial reference number",
+      "example": "Her mentor warned her not to anchor too low."
+    }
+  ],
+  "tips": [
+    "Phone conversations often unfold in sequences; track who calls whom and why.",
+    "Take note of digits—times, codes, and deadlines are common quiz points.",
+    "Listen for service jargon like “multi-factor authentication” or “co-pay” to infer context quickly.",
+    "Observe tone shifts: urgent customer service calls sound different from mentorship chats.",
+    "Summarize outcomes after each call to reinforce comprehension (problem, action, resolution)."
+  ]
+}
+

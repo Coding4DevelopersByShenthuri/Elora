@@ -11,7 +11,16 @@ from .models import (
     TeenGameSession, TeenCertificate,
     EmailVerificationToken, SurveyStepResponse, ParentalControlSettings,
     CookieConsent, PlatformSettings, CategoryProgress, PageEligibility,
-    VideoLesson, VideoEngagement, ChannelSubscription, PracticeComment, VideoShareEvent
+    VideoLesson, VideoEngagement, ChannelSubscription, PracticeComment, VideoShareEvent,
+    # New models for adults features
+    DictionaryEntry, UserDictionary, FlashcardDeck, Flashcard, FlashcardReview,
+    DailyGoal, UserToolbarPreference, MultiModePracticeSession,
+    EmailTemplate, EmailPracticeSession, PronunciationPractice,
+    CulturalIntelligenceModule, CulturalIntelligenceProgress, SearchHistory,
+    # Existing adults models
+    CommonLesson, CommonLessonEnrollment, WeeklyChallenge, UserWeeklyChallenge,
+    LearningGoal, PersonalizedRecommendation, SpacedRepetitionItem,
+    MicrolearningModule, MicrolearningProgress, ProgressAnalytics
 )
 
 
@@ -610,3 +619,178 @@ class PageEligibilityAdmin(admin.ModelAdmin):
             'fields': ('created_at', 'updated_at')
         }),
     )
+
+
+# ============= Dictionary Admin =============
+@admin.register(DictionaryEntry)
+class DictionaryEntryAdmin(admin.ModelAdmin):
+    list_display = ['word', 'part_of_speech', 'difficulty_level', 'category', 'usage_frequency', 'is_active', 'created_at']
+    list_filter = ['part_of_speech', 'difficulty_level', 'category', 'is_active']
+    search_fields = ['word', 'phonetic', 'definitions', 'synonyms']
+    readonly_fields = ['created_at', 'updated_at']
+    ordering = ['word']
+    list_per_page = 50
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('word', 'phonetic', 'definitions', 'part_of_speech', 'category')
+        }),
+        ('Additional Details', {
+            'fields': ('examples', 'synonyms', 'antonyms', 'image_url', 'audio_url')
+        }),
+        ('Metadata', {
+            'fields': ('difficulty_level', 'usage_frequency', 'is_active')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
+
+
+@admin.register(UserDictionary)
+class UserDictionaryAdmin(admin.ModelAdmin):
+    list_display = ['user', 'dictionary_entry', 'mastery_level', 'times_practiced', 'last_reviewed']
+    list_filter = ['mastery_level', 'last_reviewed']
+    search_fields = ['user__username', 'dictionary_entry__word']
+    readonly_fields = ['added_at', 'last_reviewed']
+
+
+# ============= Flashcards Admin =============
+@admin.register(FlashcardDeck)
+class FlashcardDeckAdmin(admin.ModelAdmin):
+    list_display = ['title', 'user', 'is_default', 'total_cards', 'mastered_cards', 'created_at']
+    list_filter = ['is_default', 'is_active', 'created_at']
+    search_fields = ['title', 'description', 'user__username']
+    readonly_fields = ['created_at', 'updated_at']
+
+
+@admin.register(Flashcard)
+class FlashcardAdmin(admin.ModelAdmin):
+    list_display = ['front', 'deck', 'mastery_level', 'next_review_date', 'times_reviewed']
+    list_filter = ['deck', 'mastery_level', 'next_review_date']
+    search_fields = ['front', 'back', 'deck__title']
+    readonly_fields = ['created_at', 'updated_at', 'last_reviewed']
+
+
+@admin.register(FlashcardReview)
+class FlashcardReviewAdmin(admin.ModelAdmin):
+    list_display = ['user', 'flashcard', 'quality', 'was_correct', 'reviewed_at']
+    list_filter = ['was_correct', 'quality', 'reviewed_at']
+    search_fields = ['user__username', 'flashcard__front']
+    readonly_fields = ['reviewed_at']
+
+
+# ============= Daily Goals Admin =============
+@admin.register(DailyGoal)
+class DailyGoalAdmin(admin.ModelAdmin):
+    list_display = ['user', 'goal_type', 'current_value', 'target_value', 'goal_date', 'completed']
+    list_filter = ['goal_type', 'completed', 'goal_date']
+    search_fields = ['user__username']
+    readonly_fields = ['created_at', 'updated_at', 'completed_at']
+
+
+# ============= Toolbar Preferences Admin =============
+@admin.register(UserToolbarPreference)
+class UserToolbarPreferenceAdmin(admin.ModelAdmin):
+    list_display = ['user', 'is_visible', 'position', 'updated_at']
+    list_filter = ['is_visible', 'position']
+    search_fields = ['user__username']
+    readonly_fields = ['created_at', 'updated_at']
+
+
+# ============= Multi-Mode Practice Admin =============
+@admin.register(MultiModePracticeSession)
+class MultiModePracticeSessionAdmin(admin.ModelAdmin):
+    list_display = ['user', 'mode', 'score', 'duration_minutes', 'items_completed', 'started_at']
+    list_filter = ['mode', 'content_type', 'started_at']
+    search_fields = ['user__username', 'content_id']
+    readonly_fields = ['started_at', 'completed_at']
+
+
+# ============= Business Email Coach Admin =============
+@admin.register(EmailTemplate)
+class EmailTemplateAdmin(admin.ModelAdmin):
+    list_display = ['title', 'template_type', 'difficulty', 'category', 'usage_count', 'is_active', 'order']
+    list_filter = ['template_type', 'difficulty', 'category', 'is_active']
+    search_fields = ['title', 'template_id', 'description']
+    prepopulated_fields = {'template_id': ('title',)}
+    readonly_fields = ['created_at', 'updated_at', 'usage_count']
+    ordering = ['order', 'title']
+    list_per_page = 30
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('title', 'template_id', 'description', 'template_type', 'difficulty', 'category')
+        }),
+        ('Content', {
+            'fields': ('subject_template', 'body_template', 'tips', 'common_phrases', 'example_email')
+        }),
+        ('Settings', {
+            'fields': ('is_active', 'order', 'usage_count')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
+
+
+@admin.register(EmailPracticeSession)
+class EmailPracticeSessionAdmin(admin.ModelAdmin):
+    list_display = ['user', 'template', 'overall_score', 'grammar_score', 'tone_score', 'attempts', 'created_at']
+    list_filter = ['template', 'created_at']
+    search_fields = ['user__username', 'template__title', 'subject']
+    readonly_fields = ['created_at', 'updated_at']
+
+
+# ============= Pronunciation Analyzer Admin =============
+@admin.register(PronunciationPractice)
+class PronunciationPracticeAdmin(admin.ModelAdmin):
+    list_display = ['user', 'target_text', 'accuracy_score', 'pronunciation_score', 'attempts', 'practiced_at']
+    list_filter = ['difficulty_level', 'practiced_at']
+    search_fields = ['user__username', 'target_text']
+    readonly_fields = ['practiced_at', 'updated_at']
+
+
+# ============= Cultural Intelligence Admin =============
+@admin.register(CulturalIntelligenceModule)
+class CulturalIntelligenceModuleAdmin(admin.ModelAdmin):
+    list_display = ['title', 'category', 'region', 'difficulty', 'views', 'completion_count', 'is_active', 'order']
+    list_filter = ['category', 'region', 'difficulty', 'is_active']
+    search_fields = ['title', 'slug', 'description']
+    prepopulated_fields = {'slug': ('title',)}
+    readonly_fields = ['created_at', 'updated_at', 'views', 'completion_count']
+    ordering = ['order', 'category', 'title']
+    list_per_page = 30
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('title', 'slug', 'description', 'category', 'region', 'difficulty')
+        }),
+        ('Content', {
+            'fields': ('content', 'estimated_time_minutes')
+        }),
+        ('Statistics', {
+            'fields': ('views', 'completion_count', 'is_active', 'order')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
+
+
+@admin.register(CulturalIntelligenceProgress)
+class CulturalIntelligenceProgressAdmin(admin.ModelAdmin):
+    list_display = ['user', 'module', 'completed', 'score', 'quiz_score', 'time_spent_minutes', 'last_accessed']
+    list_filter = ['completed', 'module__category']
+    search_fields = ['user__username', 'module__title']
+    readonly_fields = ['created_at', 'last_accessed']
+
+
+# ============= Search History Admin =============
+@admin.register(SearchHistory)
+class SearchHistoryAdmin(admin.ModelAdmin):
+    list_display = ['user', 'query', 'search_type', 'results_count', 'searched_at']
+    list_filter = ['search_type', 'searched_at']
+    search_fields = ['query', 'user__username']
+    readonly_fields = ['searched_at']
+    ordering = ['-searched_at']

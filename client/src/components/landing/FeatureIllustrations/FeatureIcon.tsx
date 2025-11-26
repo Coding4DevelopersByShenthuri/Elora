@@ -1,6 +1,6 @@
 import React from 'react';
 import { 
-  WifiOff, Mic, Sparkles, Layers, BrainCircuit, 
+  Wifi, Mic, Sparkles, Layers, BrainCircuit, 
   MessageSquare, TrendingUp, FileText, Lock, Award, 
   Grid, Search, BookOpen, Users, Zap, Sun 
 } from 'lucide-react';
@@ -18,7 +18,7 @@ export const FeatureIcon: React.FC<FeatureIconProps> = ({
   className 
 }) => {
   const icons = [
-    <WifiOff key="offline" size={size} strokeWidth={1.5} />,         // Offline First
+    <Wifi key="Online" size={size} strokeWidth={1.5} />,         // Online
     <Mic key="mic" size={size} strokeWidth={1.5} />,                 // Voice Recognition
     <Sparkles key="ai" size={size} strokeWidth={1.5} />,             // AI Coaching
     <Layers key="levels" size={size} strokeWidth={1.5} />,           // Learning Levels

@@ -17,7 +17,12 @@ from .models import (
     PracticeComment, CommonLesson, CommonLessonEnrollment, WeeklyChallenge,
     UserWeeklyChallenge, LearningGoal, PersonalizedRecommendation,
     SpacedRepetitionItem, MicrolearningModule, MicrolearningProgress,
-    ProgressAnalytics
+    ProgressAnalytics,
+    # New models for adults features
+    DictionaryEntry, UserDictionary, FlashcardDeck, Flashcard, FlashcardReview,
+    DailyGoal, UserToolbarPreference, MultiModePracticeSession,
+    EmailTemplate, EmailPracticeSession, PronunciationPractice,
+    CulturalIntelligenceModule, CulturalIntelligenceProgress, SearchHistory
 )
 from django.contrib.auth.password_validation import validate_password
 
@@ -909,3 +914,237 @@ class ProgressAnalyticsSerializer(serializers.ModelSerializer):
             'insights', 'recommendations', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
+
+
+# ============= Dictionary Serializers =============
+class DictionaryEntrySerializer(serializers.ModelSerializer):
+    """Serializer for dictionary entries"""
+    class Meta:
+        model = DictionaryEntry
+        fields = [
+            'id', 'word', 'phonetic', 'pronunciation_guide', 'part_of_speech',
+            'definitions', 'examples', 'synonyms', 'antonyms', 'difficulty_level',
+            'category', 'tags', 'audio_url', 'usage_frequency', 'is_active',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+
+class UserDictionarySerializer(serializers.ModelSerializer):
+    """Serializer for user's personal dictionary"""
+    dictionary_entry = DictionaryEntrySerializer(read_only=True)
+    dictionary_entry_id = serializers.IntegerField(write_only=True, required=False)
+    word = serializers.CharField(source='dictionary_entry.word', read_only=True)
+    
+    class Meta:
+        model = UserDictionary
+        fields = [
+            'id', 'dictionary_entry', 'dictionary_entry_id', 'word',
+            'personal_notes', 'personal_example', 'mastery_level',
+            'times_viewed', 'times_practiced', 'added_at', 'last_reviewed'
+        ]
+        read_only_fields = ['id', 'added_at', 'last_reviewed']
+
+
+# ============= Flashcard Serializers =============
+class FlashcardDeckSerializer(serializers.ModelSerializer):
+    """Serializer for flashcard decks"""
+    cards_count = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = FlashcardDeck
+        fields = [
+            'id', 'title', 'description', 'is_default', 'is_active',
+            'total_cards', 'mastered_cards', 'cards_count', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'total_cards', 'mastered_cards', 'created_at', 'updated_at']
+    
+    def get_cards_count(self, obj):
+        return obj.cards.count()
+
+
+class FlashcardSerializer(serializers.ModelSerializer):
+    """Serializer for flashcards"""
+    deck_title = serializers.CharField(source='deck.title', read_only=True)
+    days_until_review = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Flashcard
+        fields = [
+            'id', 'deck', 'deck_title', 'dictionary_entry', 'front', 'back', 'example',
+            'audio_url', 'ease_factor', 'interval_days', 'repetitions', 'next_review_date',
+            'days_until_review', 'times_reviewed', 'times_correct', 'times_incorrect',
+            'mastery_level', 'last_reviewed', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'last_reviewed', 'created_at', 'updated_at']
+    
+    def get_days_until_review(self, obj):
+        from django.utils import timezone
+        today = timezone.now().date()
+        delta = obj.next_review_date - today
+        return max(0, delta.days)
+
+
+class FlashcardReviewSerializer(serializers.ModelSerializer):
+    """Serializer for flashcard review sessions"""
+    flashcard_front = serializers.CharField(source='flashcard.front', read_only=True)
+    
+    class Meta:
+        model = FlashcardReview
+        fields = [
+            'id', 'flashcard', 'flashcard_front', 'quality', 'was_correct',
+            'time_spent_seconds', 'reviewed_at'
+        ]
+        read_only_fields = ['id', 'reviewed_at']
+
+
+# ============= Daily Goals Serializers =============
+class DailyGoalSerializer(serializers.ModelSerializer):
+    """Serializer for daily goals"""
+    progress_percentage = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = DailyGoal
+        fields = [
+            'id', 'goal_type', 'target_value', 'current_value', 'goal_date',
+            'completed', 'completed_at', 'progress_percentage', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'completed_at', 'created_at', 'updated_at']
+    
+    def get_progress_percentage(self, obj):
+        if obj.target_value > 0:
+            return min(100, (obj.current_value / obj.target_value) * 100)
+        return 0
+
+
+# ============= Toolbar Preferences Serializers =============
+class UserToolbarPreferenceSerializer(serializers.ModelSerializer):
+    """Serializer for toolbar preferences"""
+    class Meta:
+        model = UserToolbarPreference
+        fields = [
+            'id', 'toolbar_items', 'is_visible', 'position', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+
+# ============= Multi-Mode Practice Serializers =============
+class MultiModePracticeSessionSerializer(serializers.ModelSerializer):
+    """Serializer for multi-mode practice sessions"""
+    mode_display = serializers.CharField(source='get_mode_display', read_only=True)
+    
+    class Meta:
+        model = MultiModePracticeSession
+        fields = [
+            'id', 'mode', 'mode_display', 'duration_minutes', 'score', 'points_earned',
+            'items_completed', 'items_correct', 'items_incorrect', 'content_type',
+            'content_id', 'details', 'started_at', 'completed_at'
+        ]
+        read_only_fields = ['id', 'started_at', 'completed_at']
+
+
+# ============= Email Coach Serializers =============
+class EmailTemplateSerializer(serializers.ModelSerializer):
+    """Serializer for email templates"""
+    class Meta:
+        model = EmailTemplate
+        fields = [
+            'id', 'template_id', 'title', 'description', 'template_type', 'difficulty',
+            'subject_template', 'body_template', 'tips', 'common_phrases', 'example_email',
+            'category', 'usage_count', 'is_active', 'order', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'usage_count', 'created_at', 'updated_at']
+
+
+class EmailPracticeSessionSerializer(serializers.ModelSerializer):
+    """Serializer for email practice sessions"""
+    template_title = serializers.CharField(source='template.title', read_only=True)
+    
+    class Meta:
+        model = EmailPracticeSession
+        fields = [
+            'id', 'template', 'template_title', 'subject', 'body',
+            'grammar_score', 'tone_score', 'clarity_score', 'overall_score',
+            'feedback', 'suggestions', 'attempts', 'is_saved',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+
+# ============= Pronunciation Analyzer Serializers =============
+class PronunciationPracticeSerializer(serializers.ModelSerializer):
+    """Serializer for pronunciation practice"""
+    class Meta:
+        model = PronunciationPractice
+        fields = [
+            'id', 'target_text', 'target_phonetic', 'target_audio_url',
+            'user_audio_url', 'user_audio_duration', 'accuracy_score',
+            'pronunciation_score', 'fluency_score', 'phonetic_analysis',
+            'mistakes', 'feedback', 'suggestions', 'attempts', 'difficulty_level',
+            'practiced_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'practiced_at', 'updated_at']
+
+
+# ============= Cultural Intelligence Serializers =============
+class CulturalIntelligenceModuleSerializer(serializers.ModelSerializer):
+    """Serializer for cultural intelligence modules"""
+    thumbnail_url = serializers.SerializerMethodField()
+    user_progress = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = CulturalIntelligenceModule
+        fields = [
+            'id', 'slug', 'title', 'description', 'category', 'region', 'difficulty',
+            'content', 'thumbnail_url', 'video_url', 'views', 'completion_count',
+            'is_active', 'order', 'user_progress', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'views', 'completion_count', 'created_at', 'updated_at']
+    
+    def get_thumbnail_url(self, obj):
+        if obj.thumbnail:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.thumbnail.url)
+        return None
+    
+    def get_user_progress(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            progress = CulturalIntelligenceProgress.objects.filter(
+                user=request.user, module=obj
+            ).first()
+            if progress:
+                return {
+                    'completed': progress.completed,
+                    'score': progress.score,
+                    'quiz_score': progress.quiz_score,
+                    'time_spent_minutes': progress.time_spent_minutes
+                }
+        return None
+
+
+class CulturalIntelligenceProgressSerializer(serializers.ModelSerializer):
+    """Serializer for cultural intelligence progress"""
+    module = CulturalIntelligenceModuleSerializer(read_only=True)
+    module_id = serializers.IntegerField(write_only=True, required=False)
+    
+    class Meta:
+        model = CulturalIntelligenceProgress
+        fields = [
+            'id', 'module', 'module_id', 'completed', 'completed_at',
+            'score', 'quiz_score', 'quiz_attempts', 'time_spent_minutes',
+            'last_accessed', 'created_at'
+        ]
+        read_only_fields = ['id', 'last_accessed', 'created_at']
+
+
+# ============= Search History Serializers =============
+class SearchHistorySerializer(serializers.ModelSerializer):
+    """Serializer for search history"""
+    class Meta:
+        model = SearchHistory
+        fields = [
+            'id', 'query', 'search_type', 'results_count', 'clicked_result', 'searched_at'
+        ]
+        read_only_fields = ['id', 'searched_at']

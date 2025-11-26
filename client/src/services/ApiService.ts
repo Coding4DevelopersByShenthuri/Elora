@@ -1789,6 +1789,520 @@ export const AdultsAPI = {
       return handleApiError(error);
     }
   },
+
+  // ============= Dictionary API =============
+  /**
+   * Search dictionary entries
+   */
+  searchDictionary: async (query: string) => {
+    try {
+      const result = await fetchWithAuth(`adults/dictionary/search?q=${encodeURIComponent(query)}`);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Lookup word details
+   */
+  lookupWord: async (word: string) => {
+    try {
+      const result = await fetchWithAuth(`adults/dictionary/lookup/${encodeURIComponent(word)}`);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get user's personal dictionary
+   */
+  getMyDictionary: async () => {
+    try {
+      const result = await fetchWithAuth('adults/dictionary/my');
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Add word to personal dictionary
+   */
+  addToDictionary: async (data: { word?: string; dictionary_entry_id?: number }) => {
+    try {
+      const result = await fetchWithAuth('adults/dictionary/add', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Remove word from personal dictionary
+   */
+  removeFromDictionary: async (entryId: number) => {
+    try {
+      const result = await fetchWithAuth(`adults/dictionary/${entryId}/remove`, {
+        method: 'DELETE',
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // ============= Flashcards API =============
+  /**
+   * Get user's flashcard decks
+   */
+  getFlashcardDecks: async () => {
+    try {
+      const result = await fetchWithAuth('adults/flashcards/decks');
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Create a flashcard deck
+   */
+  createFlashcardDeck: async (data: { title: string; description?: string; is_default?: boolean }) => {
+    try {
+      const result = await fetchWithAuth('adults/flashcards/decks', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get flashcard deck detail with cards
+   */
+  getFlashcardDeckDetail: async (deckId: number) => {
+    try {
+      const result = await fetchWithAuth(`adults/flashcards/decks/${deckId}`);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get flashcards due for review
+   */
+  getFlashcardsDue: async (deckId?: number) => {
+    try {
+      const url = deckId ? `adults/flashcards/review/due?deck_id=${deckId}` : 'adults/flashcards/review/due';
+      const result = await fetchWithAuth(url);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Submit flashcard review result
+   */
+  submitFlashcardReview: async (data: { flashcard_id: number; quality: number; time_spent_seconds?: number }) => {
+    try {
+      const result = await fetchWithAuth('adults/flashcards/review/submit', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // ============= Daily Goals API =============
+  /**
+   * Get or create daily goals
+   */
+  getDailyGoals: async () => {
+    try {
+      const result = await fetchWithAuth('adults/goals/daily');
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Create a daily goal
+   */
+  createDailyGoal: async (data: { goal_type: string; target_value: number }) => {
+    try {
+      const result = await fetchWithAuth('adults/goals/daily', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Update daily goal progress
+   */
+  updateDailyGoal: async (goalId: number, data: { current_value: number }) => {
+    try {
+      const result = await fetchWithAuth(`adults/goals/daily/${goalId}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get daily goals history
+   */
+  getDailyGoalsHistory: async (days: number = 7) => {
+    try {
+      const result = await fetchWithAuth(`adults/goals/history?days=${days}`);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // ============= Toolbar Preferences API =============
+  /**
+   * Get toolbar preferences
+   */
+  getToolbarPreferences: async () => {
+    try {
+      const result = await fetchWithAuth('adults/toolbar/preferences');
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Update toolbar preferences
+   */
+  updateToolbarPreferences: async (data: { enabled_tools?: string[]; tool_order?: string[]; toolbar_position?: string }) => {
+    try {
+      const result = await fetchWithAuth('adults/toolbar/preferences', {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // ============= Multi-Mode Practice API =============
+  /**
+   * Start multi-mode practice session
+   */
+  startMultiModePractice: async (data: { mode: 'listening' | 'speaking' | 'reading' | 'writing'; content_type?: string; content_id?: string; details?: any }) => {
+    try {
+      const result = await fetchWithAuth('adults/practice/multi-mode/start', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Complete multi-mode practice session
+   */
+  completeMultiModePractice: async (sessionId: number, data: {
+    score: number;
+    points_earned?: number;
+    duration_minutes?: number;
+    items_completed?: number;
+    items_correct?: number;
+    items_incorrect?: number;
+    details?: any;
+  }) => {
+    try {
+      const result = await fetchWithAuth(`adults/practice/multi-mode/${sessionId}/complete`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get multi-mode practice history
+   */
+  getMultiModePracticeHistory: async (mode?: string, days: number = 30) => {
+    try {
+      const params = new URLSearchParams();
+      if (mode) params.append('mode', mode);
+      params.append('days', days.toString());
+      const result = await fetchWithAuth(`adults/practice/multi-mode/history?${params.toString()}`);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Delete a specific multi-mode practice session
+   */
+  deleteMultiModePracticeSession: async (sessionId: number) => {
+    try {
+      const result = await fetchWithAuth(`adults/practice/multi-mode/sessions/${sessionId}/delete`, {
+        method: 'DELETE',
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Delete multiple multi-mode practice sessions (bulk delete)
+   */
+  deleteMultiModePracticeSessions: async (sessionIds?: number[], deleteOld?: boolean, daysOld?: number) => {
+    try {
+      const result = await fetchWithAuth(`adults/practice/multi-mode/sessions/delete`, {
+        method: 'POST',
+        body: JSON.stringify({
+          session_ids: sessionIds || [],
+          delete_old: deleteOld || false,
+          days_old: daysOld || 30,
+        }),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // ============= Business Email Coach API =============
+  /**
+   * Get email templates
+   */
+  getEmailTemplates: async (type?: string, difficulty?: string) => {
+    try {
+      const params = new URLSearchParams();
+      if (type) params.append('type', type);
+      if (difficulty) params.append('difficulty', difficulty);
+      const url = `adults/email/templates${params.toString() ? '?' + params.toString() : ''}`;
+      const result = await fetchWithAuth(url);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get email template detail
+   */
+  getEmailTemplateDetail: async (templateId: number) => {
+    try {
+      const result = await fetchWithAuth(`adults/email/templates/${templateId}`);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Submit email for AI feedback
+   */
+  submitEmailPractice: async (data: { template_id: number; subject: string; body: string }) => {
+    try {
+      const result = await fetchWithAuth('adults/email/practice', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get email practice history
+   */
+  getEmailPracticeHistory: async () => {
+    try {
+      const result = await fetchWithAuth('adults/email/practice/history');
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // ============= Pronunciation Analyzer API =============
+  /**
+   * Submit pronunciation recording for analysis
+   */
+  submitPronunciationPractice: async (data: {
+    target_text: string;
+    user_audio_url?: string;
+    target_phonetic?: string;
+    target_audio_url?: string;
+    user_audio_duration?: number;
+  }) => {
+    try {
+      const result = await fetchWithAuth('adults/pronunciation/practice', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get pronunciation practice history
+   */
+  getPronunciationHistory: async () => {
+    try {
+      const result = await fetchWithAuth('adults/pronunciation/history');
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get pronunciation statistics
+   */
+  getPronunciationStatistics: async () => {
+    try {
+      const result = await fetchWithAuth('adults/pronunciation/stats');
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // ============= Cultural Intelligence API =============
+  /**
+   * Get cultural intelligence modules
+   */
+  getCulturalModules: async (category?: string, region?: string) => {
+    try {
+      const params = new URLSearchParams();
+      if (category) params.append('category', category);
+      if (region) params.append('region', region);
+      const url = `adults/cultural/modules${params.toString() ? '?' + params.toString() : ''}`;
+      const result = await fetchWithAuth(url);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get cultural module detail
+   */
+  getCulturalModuleDetail: async (slug: string) => {
+    try {
+      const result = await fetchWithAuth(`adults/cultural/modules/${slug}`);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get or update cultural progress
+   */
+  getCulturalProgress: async (moduleId?: number) => {
+    try {
+      const url = moduleId ? `adults/cultural/progress?module_id=${moduleId}` : 'adults/cultural/progress';
+      const result = await fetchWithAuth(url);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Update cultural progress
+   */
+  updateCulturalProgress: async (data: {
+    module_id: number;
+    score?: number;
+    quiz_score?: number;
+    time_spent_minutes?: number;
+    completed?: boolean;
+  }) => {
+    try {
+      const result = await fetchWithAuth('adults/cultural/progress', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // ============= Search API =============
+  /**
+   * Save search query
+   */
+  saveSearch: async (data: {
+    query: string;
+    search_type?: string;
+    results_count?: number;
+    clicked_result?: string;
+  }) => {
+    try {
+      const result = await fetchWithAuth('adults/search', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get search suggestions
+   */
+  getSearchSuggestions: async (query: string) => {
+    try {
+      const result = await fetchWithAuth(`adults/search/suggestions?q=${encodeURIComponent(query)}`);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Get search history
+   */
+  getSearchHistory: async (days: number = 30) => {
+    try {
+      const result = await fetchWithAuth(`adults/search/history?days=${days}`);
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
 };
 
 // ============= Export all APIs =============

@@ -1720,3 +1720,520 @@ class ProgressAnalytics(models.Model):
     
     def __str__(self):
         return f"{self.user.username} - {self.category} ({self.period_start} to {self.period_end})"
+
+
+# ============= Dictionary System =============
+class DictionaryEntry(models.Model):
+    """Dictionary entries for offline/online dictionary"""
+    word = models.CharField(max_length=255, unique=True, db_index=True)
+    phonetic = models.CharField(max_length=255, blank=True)
+    part_of_speech = models.CharField(max_length=50, blank=True)
+    definitions = models.JSONField(default=list)  # List of definitions
+    examples = models.JSONField(default=list)  # List of example sentences
+    synonyms = models.JSONField(default=list, blank=True)
+    antonyms = models.JSONField(default=list, blank=True)
+    difficulty_level = models.IntegerField(default=1, validators=[MinValueValidator(1), MaxValueValidator(10)])
+    category = models.CharField(max_length=100, blank=True)  # business, academic, casual, etc.
+    tags = models.JSONField(default=list, blank=True)
+    audio_url = models.URLField(blank=True, null=True)
+    pronunciation_guide = models.CharField(max_length=255, blank=True)
+    usage_frequency = models.IntegerField(default=0, help_text="How commonly used this word is")
+    is_active = models.BooleanField(default=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['word']
+        indexes = [
+            models.Index(fields=['word', 'is_active']),
+            models.Index(fields=['category', 'difficulty_level']),
+            models.Index(fields=['usage_frequency']),
+        ]
+        verbose_name = "Dictionary Entry"
+        verbose_name_plural = "Dictionary Entries"
+    
+    def __str__(self):
+        return f"{self.word} ({self.part_of_speech})"
+
+
+class UserDictionary(models.Model):
+    """User's personal dictionary/vocabulary collection"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_dictionary')
+    dictionary_entry = models.ForeignKey(DictionaryEntry, on_delete=models.CASCADE, related_name='user_entries')
+    
+    # Personal notes and customization
+    personal_notes = models.TextField(blank=True)
+    personal_example = models.TextField(blank=True)
+    
+    # Mastery tracking
+    mastery_level = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    times_viewed = models.IntegerField(default=0)
+    times_practiced = models.IntegerField(default=0)
+    
+    # Tracking
+    added_at = models.DateTimeField(auto_now_add=True)
+    last_reviewed = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        unique_together = ['user', 'dictionary_entry']
+        indexes = [
+            models.Index(fields=['user', 'mastery_level']),
+            models.Index(fields=['user', 'last_reviewed']),
+        ]
+        verbose_name = "User Dictionary Entry"
+        verbose_name_plural = "User Dictionary Entries"
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.dictionary_entry.word}"
+
+
+# ============= Flashcards System =============
+class FlashcardDeck(models.Model):
+    """Flashcard decks for vocabulary review"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='flashcard_decks')
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    
+    # Deck settings
+    is_default = models.BooleanField(default=False, help_text="Default deck for auto-generated flashcards")
+    is_active = models.BooleanField(default=True)
+    
+    # Statistics
+    total_cards = models.IntegerField(default=0)
+    mastered_cards = models.IntegerField(default=0)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-is_default', '-created_at']
+        indexes = [
+            models.Index(fields=['user', 'is_active']),
+        ]
+        verbose_name = "Flashcard Deck"
+        verbose_name_plural = "Flashcard Decks"
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.title}"
+
+
+class Flashcard(models.Model):
+    """Individual flashcard"""
+    deck = models.ForeignKey(FlashcardDeck, on_delete=models.CASCADE, related_name='cards')
+    dictionary_entry = models.ForeignKey(DictionaryEntry, on_delete=models.CASCADE, related_name='flashcards', null=True, blank=True)
+    
+    # Card content
+    front = models.TextField(help_text="Word or phrase")
+    back = models.TextField(help_text="Definition, translation, or answer")
+    example = models.TextField(blank=True)
+    audio_url = models.URLField(blank=True, null=True)
+    
+    # Spaced repetition (SM-2 algorithm)
+    ease_factor = models.FloatField(default=2.5)
+    interval_days = models.IntegerField(default=1)
+    repetitions = models.IntegerField(default=0)
+    next_review_date = models.DateField()
+    
+    # Performance tracking
+    times_reviewed = models.IntegerField(default=0)
+    times_correct = models.IntegerField(default=0)
+    times_incorrect = models.IntegerField(default=0)
+    mastery_level = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    last_reviewed = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        ordering = ['next_review_date', 'created_at']
+        indexes = [
+            models.Index(fields=['deck', 'next_review_date']),
+            models.Index(fields=['mastery_level']),
+        ]
+        verbose_name = "Flashcard"
+        verbose_name_plural = "Flashcards"
+    
+    def __str__(self):
+        return f"{self.front[:50]} - {self.deck.title}"
+
+
+class FlashcardReview(models.Model):
+    """Track individual flashcard review sessions"""
+    flashcard = models.ForeignKey(Flashcard, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='flashcard_reviews')
+    
+    quality = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)], help_text="User rating (0-5) of recall quality")
+    was_correct = models.BooleanField()
+    time_spent_seconds = models.IntegerField(default=0)
+    
+    reviewed_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-reviewed_at']
+        indexes = [
+            models.Index(fields=['user', 'reviewed_at']),
+            models.Index(fields=['flashcard']),
+        ]
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.flashcard.front[:30]} - {self.quality}"
+
+
+# ============= Daily Goals =============
+class DailyGoal(models.Model):
+    """User's daily learning goals"""
+    GOAL_TYPE_CHOICES = [
+        ('practice_time', 'Practice Time (minutes)'),
+        ('vocabulary_words', 'Vocabulary Words'),
+        ('lessons_completed', 'Lessons Completed'),
+        ('flashcard_reviews', 'Flashcard Reviews'),
+        ('streak_maintenance', 'Streak Maintenance'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='daily_goals')
+    goal_type = models.CharField(max_length=50, choices=GOAL_TYPE_CHOICES)
+    target_value = models.IntegerField()
+    current_value = models.IntegerField(default=0)
+    
+    # Date tracking
+    goal_date = models.DateField(db_index=True)
+    completed = models.BooleanField(default=False)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['user', 'goal_type', 'goal_date']
+        indexes = [
+            models.Index(fields=['user', 'goal_date', 'completed']),
+            models.Index(fields=['goal_date']),
+        ]
+        verbose_name = "Daily Goal"
+        verbose_name_plural = "Daily Goals"
+    
+    def __str__(self):
+        status = "Completed" if self.completed else "In Progress"
+        return f"{self.user.username} - {self.get_goal_type_display()} ({self.current_value}/{self.target_value}) - {status}"
+
+
+# ============= Quick Access Toolbar =============
+class UserToolbarPreference(models.Model):
+    """User's quick access toolbar preferences"""
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='toolbar_preference')
+    
+    # Toolbar configuration (JSON array of tool IDs and their order)
+    toolbar_items = models.JSONField(default=list, help_text="Array of tool IDs and positions")
+    is_visible = models.BooleanField(default=True)
+    position = models.CharField(max_length=20, default='bottom-right', choices=[
+        ('bottom-right', 'Bottom Right'),
+        ('bottom-left', 'Bottom Left'),
+        ('top-right', 'Top Right'),
+        ('top-left', 'Top Left'),
+    ])
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "User Toolbar Preference"
+        verbose_name_plural = "User Toolbar Preferences"
+    
+    def __str__(self):
+        return f"{self.user.username} - Toolbar Preferences"
+
+
+# ============= Multi-Mode Practice =============
+class MultiModePracticeSession(models.Model):
+    """Track multi-mode practice sessions (Listening, Speaking, Reading, Writing)"""
+    MODE_CHOICES = [
+        ('listening', 'Listening'),
+        ('speaking', 'Speaking'),
+        ('reading', 'Reading'),
+        ('writing', 'Writing'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='multi_mode_sessions')
+    mode = models.CharField(max_length=20, choices=MODE_CHOICES)
+    
+    # Session details
+    duration_minutes = models.IntegerField(default=0)
+    score = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    points_earned = models.IntegerField(default=0)
+    
+    # Mode-specific metrics
+    items_completed = models.IntegerField(default=0)
+    items_correct = models.IntegerField(default=0)
+    items_incorrect = models.IntegerField(default=0)
+    
+    # Additional data
+    content_type = models.CharField(max_length=50, blank=True)  # 'article', 'podcast', 'conversation', etc.
+    content_id = models.CharField(max_length=255, blank=True)
+    details = models.JSONField(default=dict)
+    
+    started_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        ordering = ['-started_at']
+        indexes = [
+            models.Index(fields=['user', 'mode', 'started_at']),
+            models.Index(fields=['user', 'started_at']),
+        ]
+        verbose_name = "Multi-Mode Practice Session"
+        verbose_name_plural = "Multi-Mode Practice Sessions"
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.get_mode_display()} ({self.score}%) - {self.started_at.date()}"
+
+
+# ============= Business Email Coach =============
+class EmailTemplate(models.Model):
+    """Business email templates for practice"""
+    TEMPLATE_TYPE_CHOICES = [
+        ('follow_up', 'Follow-up Email'),
+        ('proposal', 'Proposal Email'),
+        ('meeting_request', 'Meeting Request'),
+        ('thank_you', 'Thank You Email'),
+        ('apology', 'Apology Email'),
+        ('introduction', 'Introduction Email'),
+        ('rejection', 'Rejection Email'),
+        ('inquiry', 'Inquiry Email'),
+        ('report', 'Report Email'),
+        ('custom', 'Custom Template'),
+    ]
+    
+    template_id = models.SlugField(unique=True)
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    template_type = models.CharField(max_length=50, choices=TEMPLATE_TYPE_CHOICES)
+    difficulty = models.CharField(max_length=20, choices=VideoLesson.DIFFICULTY_CHOICES, default='beginner')
+    
+    # Template content
+    subject_template = models.CharField(max_length=255)
+    body_template = models.TextField()
+    tips = models.JSONField(default=list, help_text="List of tips for writing this email type")
+    common_phrases = models.JSONField(default=list, help_text="Common phrases for this email type")
+    example_email = models.TextField(blank=True, help_text="Example of a good email")
+    
+    # Metadata
+    category = models.CharField(max_length=50, blank=True)  # business, academic, professional
+    usage_count = models.IntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    order = models.IntegerField(default=0)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['order', '-created_at']
+        indexes = [
+            models.Index(fields=['template_type', 'is_active']),
+            models.Index(fields=['difficulty']),
+        ]
+        verbose_name = "Email Template"
+        verbose_name_plural = "Email Templates"
+    
+    def __str__(self):
+        return f"{self.title} ({self.get_template_type_display()})"
+
+
+class EmailPracticeSession(models.Model):
+    """Track user's email writing practice sessions"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='email_practice_sessions')
+    template = models.ForeignKey(EmailTemplate, on_delete=models.CASCADE, related_name='practice_sessions')
+    
+    # User's email content
+    subject = models.CharField(max_length=255, blank=True)
+    body = models.TextField()
+    
+    # AI Feedback
+    grammar_score = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    tone_score = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    clarity_score = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    overall_score = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    
+    # Detailed feedback
+    feedback = models.JSONField(default=dict, help_text="Detailed AI feedback on grammar, tone, clarity")
+    suggestions = models.JSONField(default=list, help_text="List of improvement suggestions")
+    
+    # Tracking
+    attempts = models.IntegerField(default=1)
+    is_saved = models.BooleanField(default=False)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'created_at']),
+            models.Index(fields=['template']),
+        ]
+        verbose_name = "Email Practice Session"
+        verbose_name_plural = "Email Practice Sessions"
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.template.title} ({self.overall_score}%)"
+
+
+# ============= Pronunciation Analyzer =============
+class PronunciationPractice(models.Model):
+    """Pronunciation practice sessions"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pronunciation_practices')
+    
+    # Target phrase/word
+    target_text = models.CharField(max_length=500)
+    target_phonetic = models.CharField(max_length=255, blank=True)
+    target_audio_url = models.URLField(blank=True, null=True)
+    
+    # User's recording
+    user_audio_url = models.URLField(blank=True, null=True)
+    user_audio_duration = models.FloatField(default=0.0)
+    
+    # Analysis results
+    accuracy_score = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    pronunciation_score = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    fluency_score = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    
+    # Detailed analysis
+    phonetic_analysis = models.JSONField(default=dict, help_text="Phonetic breakdown and comparison")
+    mistakes = models.JSONField(default=list, help_text="List of pronunciation mistakes")
+    feedback = models.TextField(blank=True)
+    suggestions = models.JSONField(default=list, help_text="Improvement suggestions")
+    
+    # Tracking
+    attempts = models.IntegerField(default=1)
+    difficulty_level = models.IntegerField(default=1, validators=[MinValueValidator(1), MaxValueValidator(10)])
+    
+    practiced_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-practiced_at']
+        indexes = [
+            models.Index(fields=['user', 'practiced_at']),
+            models.Index(fields=['target_text']),
+        ]
+        verbose_name = "Pronunciation Practice"
+        verbose_name_plural = "Pronunciation Practices"
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.target_text[:50]} ({self.accuracy_score}%)"
+
+
+# ============= Cultural Intelligence =============
+class CulturalIntelligenceModule(models.Model):
+    """Cultural intelligence learning modules"""
+    CATEGORY_CHOICES = [
+        ('business_etiquette', 'Business Etiquette'),
+        ('communication_style', 'Communication Style'),
+        ('meeting_protocols', 'Meeting Protocols'),
+        ('email_etiquette', 'Email Etiquette'),
+        ('gift_giving', 'Gift Giving'),
+        ('negotiation_style', 'Negotiation Style'),
+        ('small_talk', 'Small Talk Topics'),
+        ('time_management', 'Time Management'),
+        ('hierarchy', 'Hierarchy & Status'),
+    ]
+    
+    slug = models.SlugField(unique=True)
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+    
+    # Content
+    content = models.JSONField(default=dict, help_text="Module content including dos/don'ts, examples, scenarios")
+    region = models.CharField(max_length=100, blank=True, help_text="Geographic region this applies to")
+    difficulty = models.CharField(max_length=20, choices=VideoLesson.DIFFICULTY_CHOICES, default='beginner')
+    
+    # Media
+    thumbnail = models.ImageField(upload_to='cultural_intelligence/', blank=True, null=True)
+    video_url = models.URLField(blank=True, null=True)
+    
+    # Metadata
+    views = models.IntegerField(default=0)
+    completion_count = models.IntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    order = models.IntegerField(default=0)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['order', '-created_at']
+        indexes = [
+            models.Index(fields=['category', 'is_active']),
+            models.Index(fields=['region']),
+        ]
+        verbose_name = "Cultural Intelligence Module"
+        verbose_name_plural = "Cultural Intelligence Modules"
+    
+    def __str__(self):
+        return f"{self.title} ({self.get_category_display()})"
+
+
+class CulturalIntelligenceProgress(models.Model):
+    """Track user progress in cultural intelligence modules"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cultural_intelligence_progress')
+    module = models.ForeignKey(CulturalIntelligenceModule, on_delete=models.CASCADE, related_name='user_progress')
+    
+    completed = models.BooleanField(default=False)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    score = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    time_spent_minutes = models.IntegerField(default=0)
+    
+    # Quiz results
+    quiz_score = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    quiz_attempts = models.IntegerField(default=0)
+    
+    last_accessed = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['user', 'module']
+        indexes = [
+            models.Index(fields=['user', 'completed']),
+            models.Index(fields=['module']),
+        ]
+        verbose_name = "Cultural Intelligence Progress"
+        verbose_name_plural = "Cultural Intelligence Progress"
+    
+    def __str__(self):
+        status = "Completed" if self.completed else "In Progress"
+        return f"{self.user.username} - {self.module.title} ({status})"
+
+
+# ============= Search History =============
+class SearchHistory(models.Model):
+    """Track user search history for content discovery"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='search_history', null=True, blank=True)
+    
+    query = models.CharField(max_length=255, db_index=True)
+    search_type = models.CharField(max_length=50, default='all', choices=[
+        ('all', 'All'),
+        ('lessons', 'Lessons'),
+        ('videos', 'Videos'),
+        ('vocabulary', 'Vocabulary'),
+        ('dictionary', 'Dictionary'),
+    ])
+    
+    # Results metadata
+    results_count = models.IntegerField(default=0)
+    clicked_result = models.CharField(max_length=255, blank=True)
+    
+    searched_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    
+    class Meta:
+        ordering = ['-searched_at']
+        indexes = [
+            models.Index(fields=['user', 'searched_at']),
+            models.Index(fields=['query']),
+        ]
+        verbose_name = "Search History"
+        verbose_name_plural = "Search History"
+    
+    def __str__(self):
+        user_str = self.user.username if self.user else "Anonymous"
+        return f"{user_str} - {self.query} - {self.searched_at.date()}"

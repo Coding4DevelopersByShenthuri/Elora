@@ -11,7 +11,7 @@ export const ManageSection = ({ show }: ManageSectionProps) => {
   const [activeFeature, setActiveFeature] = useState<number | null>(0);
 
   const features = [
-    { title: "Offline First", description: "Practice anywhere—our AI coach runs fully on your device without internet." },
+    { title: "Online", description: "Practice anywhere—our AI coach runs fully on your device with internet, in Future planning to implement Offline-First." },
     { title: "Voice Recognition", description: "Speak naturally and get instant feedback on pronunciation and fluency." },
     { title: "AI Coaching", description: "Personalized guidance on grammar, vocabulary, and sentence structure." },
     { title: "Learning Levels", description: "Beginner, intermediate, and advanced modes tailored to your journey." },
@@ -39,7 +39,7 @@ export const ManageSection = ({ show }: ManageSectionProps) => {
         <div className="flex flex-col items-center text-center gap-2 mb-8 sm:mb-12">
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold text-[#529641]">Features</h2>
           <p className="text-foreground max-w-3xl text-base sm:text-lg md:text-xl mt-2 px-4">
-            Your first and only personal AI English coach works Offline/Online.
+            Your first and only personal AI English coach works Online.
           </p>
         </div>
 

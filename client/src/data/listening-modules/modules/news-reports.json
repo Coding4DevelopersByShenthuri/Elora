@@ -1,0 +1,237 @@
+{
+  "module": {
+    "id": "news-reports",
+    "title": "News Reports",
+    "description": "Listen to news broadcasts and improve understanding of current events",
+    "difficulty": "intermediate",
+    "duration": "18-22 min",
+    "level": "Intermediate",
+    "icon": "📰",
+    "color": "from-emerald-500 to-teal-600",
+    "category": "Media"
+  },
+  "exercises": [
+    {
+      "id": "ex1",
+      "type": "comprehension",
+      "question": "Which city is hosting the Global Climate Innovation Summit featured in the first segment?",
+      "audioSegment": {
+        "start": 0,
+        "end": 60
+      },
+      "options": [
+        "Singapore",
+        "Reykjavík",
+        "Toronto",
+        "Lisbon"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Anchor Elena Park repeatedly references Toronto as the host city.",
+      "points": 10
+    },
+    {
+      "id": "ex2",
+      "type": "multiple-choice",
+      "question": "What efficiency milestone does the summit’s prototype solar cell reach?",
+      "audioSegment": {
+        "start": 60,
+        "end": 120
+      },
+      "options": [
+        "25%",
+        "32%",
+        "38%",
+        "50%"
+      ],
+      "correctAnswer": 2,
+      "explanation": "The engineer states that the tandem solar cell surpassed the 38% efficiency mark.",
+      "points": 12
+    },
+    {
+      "id": "ex3",
+      "type": "fill-blank",
+      "question": "The Bank of Canada kept its benchmark interest rate unchanged at __________ percent.",
+      "audioSegment": {
+        "start": 120,
+        "end": 180
+      },
+      "correctAnswer": "5.0",
+      "explanation": "The business correspondent emphasizes the 5.0 percent decision.",
+      "points": 10
+    },
+    {
+      "id": "ex4",
+      "type": "multiple-choice",
+      "question": "Which sector showed signs of cooling in the jobs report?",
+      "audioSegment": {
+        "start": 180,
+        "end": 230
+      },
+      "options": [
+        "Hospitality",
+        "Technology",
+        "Construction",
+        "Healthcare"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Temporary layoffs in hospitality were cited as evidence of cooling demand.",
+      "points": 11
+    },
+    {
+      "id": "ex5",
+      "type": "true-false",
+      "question": "The wildfire emergency in Western Australia was downgraded before the afternoon update.",
+      "audioSegment": {
+        "start": 230,
+        "end": 285
+      },
+      "correctAnswer": false,
+      "explanation": "Officials maintained the highest alert status due to shifting winds.",
+      "points": 8
+    },
+    {
+      "id": "ex6",
+      "type": "multiple-choice",
+      "question": "What medical breakthrough is highlighted in the health segment?",
+      "audioSegment": {
+        "start": 285,
+        "end": 345
+      },
+      "options": [
+        "An mRNA-based flu booster",
+        "A portable dialysis machine",
+        "An AI screening tool for lung cancer",
+        "A new COVID-19 antiviral tablet"
+      ],
+      "correctAnswer": 2,
+      "explanation": "The AI lung cancer screening tool is described in detail, including pilot hospital data.",
+      "points": 12
+    },
+    {
+      "id": "ex7",
+      "type": "comprehension",
+      "question": "How much did the screening tool reduce false positives in the clinical trial?",
+      "audioSegment": {
+        "start": 345,
+        "end": 390
+      },
+      "options": [
+        "12%",
+        "21%",
+        "33%",
+        "45%"
+      ],
+      "correctAnswer": 2,
+      "explanation": "The medical correspondent cites a 33% drop in false positives.",
+      "points": 10
+    },
+    {
+      "id": "ex8",
+      "type": "fill-blank",
+      "question": "The arts segment reviews a documentary about the restoration of __________ Cathedral.",
+      "audioSegment": {
+        "start": 390,
+        "end": 440
+      },
+      "correctAnswer": "Notre-Dame",
+      "explanation": "The film explores the post-fire restoration of Notre-Dame in Paris.",
+      "points": 9
+    },
+    {
+      "id": "ex9",
+      "type": "multiple-choice",
+      "question": "Which sports figure announced retirement during the broadcast?",
+      "audioSegment": {
+        "start": 440,
+        "end": 495
+      },
+      "options": [
+        "A World Cup-winning soccer captain",
+        "An Olympic swimmer",
+        "A Formula 1 driver",
+        "A Grand Slam tennis champion"
+      ],
+      "correctAnswer": 0,
+      "explanation": "The sports anchor covers the retirement of a World Cup-winning national team captain.",
+      "points": 10
+    },
+    {
+      "id": "ex10",
+      "type": "true-false",
+      "question": "The final community segment features a youth robotics competition in Nairobi.",
+      "audioSegment": {
+        "start": 495,
+        "end": 540
+      },
+      "correctAnswer": true,
+      "explanation": "The closing story celebrates Kenyan students winning a robotics challenge.",
+      "points": 8
+    },
+    {
+      "id": "ex11",
+      "type": "comprehension",
+      "question": "What challenge did the Kenyan students overcome to participate?",
+      "audioSegment": {
+        "start": 540,
+        "end": 590
+      },
+      "options": [
+        "Visas were delayed",
+        "A crowdfunding shortfall",
+        "Equipment confiscation",
+        "Severe weather"
+      ],
+      "correctAnswer": 1,
+      "explanation": "They mentioned launching a crowdfunding campaign to cover travel costs.",
+      "points": 9
+    },
+    {
+      "id": "ex12",
+      "type": "fill-blank",
+      "question": "The robotics team’s winning design sorts plastic waste by detecting __________ signatures.",
+      "audioSegment": {
+        "start": 590,
+        "end": 630
+      },
+      "correctAnswer": "infrared",
+      "explanation": "Their robot uses infrared signatures to classify recyclables.",
+      "points": 12
+    }
+  ],
+  "transcript": "This is Global Newsline with Elena Park. We begin in Toronto, where delegates from 50 countries have convened for the Global Climate Innovation Summit. Engineers unveiled a tandem solar cell that just cleared the 38 percent efficiency mark, a formidable jump over conventional silicon panels. Energy ministers toured a demonstration micogrid that links rooftop arrays with second-life electric vehicle batteries, signaling how cities may reach net-zero targets without building new fossil plants. \n\nTurning to markets, the Bank of Canada held its benchmark rate at 5.0 percent for a fifth consecutive meeting. The central bank cited easing consumer inflation but warned that rent and groceries are still rising too fast for comfort. A fresh jobs report showed modest gains, though hospitality employers scaled back hours ahead of shoulder season. Analysts say the pause gives indebted households breathing room while investors monitor wage growth. \n\nWe head now to Western Australia, where firefighters are battling a fast-moving blaze sparked by dry lightning. Officials kept the highest alert in place as winds shifted toward coastal towns. Aerial tankers painted orange fire retardant along a 60-kilometer front while volunteer crews escorted residents to evacuation shelters. Authorities urged people to prepare three-day go bags, reminding viewers that late-night evacuations are often chaotic. \n\nIn health news, researchers at St. Martha’s Hospital debuted an artificial intelligence screening tool for early lung cancer detection. The software reviews CT scan patterns and cut false positives by thirty-three percent in a 4,000-patient trial, meaning fewer invasive biopsies. Clinicians say the program doesn’t replace radiologists; instead, it flags anomalies so doctors can focus on complex cases. The hospital plans to license the technology to community clinics next year if regulatory approvals stay on track. \n\nArts correspondent Diego Ramos takes us to Paris, where a new documentary chronicles the painstaking restoration of Notre-Dame Cathedral. The film reveals artisans replicating gargoyles with 3D-printed molds, while historians debate how closely the new spire should match architect Viollet-le-Duc’s 19th-century design. The director weaves in interviews with firefighters who risked their lives the night of the 2019 blaze, offering a moving portrait of cultural resilience. \n\nSports anchor Maya Greene reports that national soccer captain Lila Sørensen is retiring after securing Denmark’s first World Cup medal. Sørensen cited chronic knee injuries but promised to mentor young women entering the academy system. Fans flooded social media with highlight reels, and Copenhagen City Hall plans a farewell ceremony next week. \n\nWe close in Nairobi, where a youth robotics team returned home with top honors from the Pan-African STEM Challenge. The high schoolers designed a robot that uses infrared signatures to sort plastic waste, tackling one of the city’s biggest landfill problems. Their trip almost fell through when airfare doubled, but a last-minute crowdfunding campaign raised twenty thousand dollars in four days. Standing on the airport tarmac, the students encouraged girls to join next year’s competition, reminding us that innovation thrives when communities rally together. That’s the latest from Global Newsline. I’m Elena Park—thanks for watching.",
+  "vocabulary": [
+    {
+      "word": "tandem solar cell",
+      "definition": "A solar panel that layers multiple materials to capture more of the light spectrum",
+      "example": "The tandem solar cell surpassed single-junction efficiency records."
+    },
+    {
+      "word": "benchmark rate",
+      "definition": "A reference interest rate set by a central bank",
+      "example": "Mortgage costs often follow changes in the benchmark rate."
+    },
+    {
+      "word": "false positive",
+      "definition": "A test result that incorrectly indicates the presence of a condition",
+      "example": "Reducing false positives spares patients unnecessary biopsies."
+    },
+    {
+      "word": "fire retardant",
+      "definition": "A substance used to slow or stop the spread of fire",
+      "example": "Helicopters dropped fire retardant ahead of the blaze."
+    },
+    {
+      "word": "crowdfunding",
+      "definition": "Raising money by collecting many small contributions, usually online",
+      "example": "The robotics team launched a crowdfunding campaign for travel costs."
+    }
+  ],
+  "tips": [
+    "Map each segment (politics, business, weather, health, arts, sports) to stay oriented.",
+    "Write down numbers as you hear them; anchors often use statistics to summarize impact.",
+    "Listen for expert quotes—they signal key perspectives that may appear in questions.",
+    "Identify transitions such as \"turning to\" or \"we close in\" to anticipate topic shifts.",
+    "News reports compress information; synthesizing the who/what/why after each story builds comprehension."
+  ]
+}
+

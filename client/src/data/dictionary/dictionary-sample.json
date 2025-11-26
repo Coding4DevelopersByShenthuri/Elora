@@ -1,0 +1,53 @@
+{
+  "entries": [
+    {
+      "word": "acquire",
+      "phonetic": "/əˈkwaɪər/",
+      "definition": "to gain or obtain something, especially knowledge or skills",
+      "partOfSpeech": "verb",
+      "examples": [
+        "She acquired fluency in three languages.",
+        "The company acquired several smaller businesses last year."
+      ],
+      "synonyms": ["obtain", "gain", "attain", "secure"],
+      "antonyms": ["lose", "forfeit", "relinquish"],
+      "difficulty": "intermediate",
+      "frequency": "high",
+      "category": "business",
+      "audioUrl": "/audio/acquire.mp3"
+    },
+    {
+      "word": "implement",
+      "phonetic": "/ˈɪmplɪment/",
+      "definition": "to put a plan or system into effect",
+      "partOfSpeech": "verb",
+      "examples": [
+        "We need to implement the new strategy immediately.",
+        "The software will be implemented next month."
+      ],
+      "synonyms": ["execute", "apply", "enforce", "carry out"],
+      "antonyms": ["abandon", "cancel", "halt"],
+      "difficulty": "intermediate",
+      "frequency": "high",
+      "category": "business",
+      "audioUrl": "/audio/implement.mp3"
+    },
+    {
+      "word": "strategy",
+      "phonetic": "/ˈstrætədʒi/",
+      "definition": "a plan of action designed to achieve a long-term or overall aim",
+      "partOfSpeech": "noun",
+      "examples": [
+        "Our marketing strategy focuses on digital channels.",
+        "What's your strategy for the meeting?"
+      ],
+      "synonyms": ["plan", "approach", "tactic", "method"],
+      "antonyms": ["improvisation", "haphazard"],
+      "difficulty": "intermediate",
+      "frequency": "high",
+      "category": "business",
+      "audioUrl": "/audio/strategy.mp3"
+    }
+  ]
+}
+

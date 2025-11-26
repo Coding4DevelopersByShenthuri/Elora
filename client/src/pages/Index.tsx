@@ -116,7 +116,7 @@ const Index = () => {
               <div className="flex flex-wrap items-center gap-4 md:gap-8 text-xs sm:text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-3 h-3 md:w-4 md:h-4 text-green-500" />
-                  <span>100% Offline/Online</span>
+                  <span>100% Online</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-3 h-3 md:w-4 md:h-4 text-green-500" />

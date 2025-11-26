@@ -1,0 +1,262 @@
+{
+  "module": {
+    "id": "academic-lectures",
+    "title": "Academic Lectures",
+    "description": "Enhance comprehension of academic presentations and educational content",
+    "difficulty": "advanced",
+    "duration": "25-30 min",
+    "level": "Academic",
+    "icon": "🎓",
+    "color": "from-purple-500 to-pink-600",
+    "category": "Education"
+  },
+  "exercises": [
+    {
+      "id": "ex1",
+      "type": "comprehension",
+      "question": "What interdisciplinary perspective does Professor Malik emphasize at the beginning of the lecture?",
+      "audioSegment": {
+        "start": 0,
+        "end": 60
+      },
+      "options": [
+        "The overlap between astrophysics and psychology",
+        "The intersection of climate policy, engineering, and data science",
+        "A comparison of medieval history and modern finance",
+        "The relationship between literature and anthropology"
+      ],
+      "correctAnswer": 1,
+      "explanation": "He frames the talk as a convergence of policy, engineering constraints, and data analytics.",
+      "points": 15
+    },
+    {
+      "id": "ex2",
+      "type": "multiple-choice",
+      "question": "Which global temperature threshold does the professor cite as a critical guardrail?",
+      "audioSegment": {
+        "start": 60,
+        "end": 110
+      },
+      "options": [
+        "0.5°C",
+        "1.5°C",
+        "3.0°C",
+        "4.5°C"
+      ],
+      "correctAnswer": 1,
+      "explanation": "He references the 1.5°C limit tied to the Paris Agreement and IPCC scenarios.",
+      "points": 15
+    },
+    {
+      "id": "ex3",
+      "type": "fill-blank",
+      "question": "According to the International Energy Agency, solar and wind accounted for __________ of new global electricity capacity in 2023.",
+      "audioSegment": {
+        "start": 110,
+        "end": 150
+      },
+      "correctAnswer": "four-fifths",
+      "explanation": "He quotes the IEA report noting that renewables delivered four-fifths of added capacity.",
+      "points": 12
+    },
+    {
+      "id": "ex4",
+      "type": "multiple-choice",
+      "question": "What financial mechanism does Malik describe for de-risking clean energy projects in emerging markets?",
+      "audioSegment": {
+        "start": 150,
+        "end": 205
+      },
+      "options": [
+        "Short-term payday loans",
+        "Blended finance stacks",
+        "Lottery-backed bonds",
+        "High-frequency trading strategies"
+      ],
+      "correctAnswer": 1,
+      "explanation": "He explains how blended finance stacks pair public guarantees with private capital.",
+      "points": 15
+    },
+    {
+      "id": "ex5",
+      "type": "true-false",
+      "question": "The professor states that efficiency gains alone can meet global decarbonization targets.",
+      "audioSegment": {
+        "start": 205,
+        "end": 240
+      },
+      "correctAnswer": false,
+      "explanation": "He stresses that efficiency is vital but insufficient without rapid clean-energy deployment.",
+      "points": 10
+    },
+    {
+      "id": "ex6",
+      "type": "comprehension",
+      "question": "Which storage technology does he highlight for balancing intermittent renewables?",
+      "audioSegment": {
+        "start": 240,
+        "end": 295
+      },
+      "options": [
+        "Diesel generators",
+        "Long-duration iron-air batteries",
+        "Compressed natural gas",
+        "Coal reserves"
+      ],
+      "correctAnswer": 1,
+      "explanation": "He discusses emerging iron-air chemistry that can store energy for multi-day events.",
+      "points": 12
+    },
+    {
+      "id": "ex7",
+      "type": "multiple-choice",
+      "question": "Which dataset does Malik recommend for analyzing household adoption of heat pumps?",
+      "audioSegment": {
+        "start": 295,
+        "end": 345
+      },
+      "options": [
+        "The United Nations Food Index",
+        "Residential Electrification Survey (RES)",
+        "Oceanic Salinity Atlas",
+        "Global Tourism Monitor"
+      ],
+      "correctAnswer": 1,
+      "explanation": "He points students toward the U.S. Residential Electrification Survey for adoption trends.",
+      "points": 12
+    },
+    {
+      "id": "ex8",
+      "type": "fill-blank",
+      "question": "The lecturer notes that grid congestion is often a __________ issue rather than a hardware limitation.",
+      "audioSegment": {
+        "start": 345,
+        "end": 385
+      },
+      "correctAnswer": "permitting",
+      "explanation": "He explains that administrative permitting delays frequently hinder transmission upgrades.",
+      "points": 12
+    },
+    {
+      "id": "ex9",
+      "type": "multiple-choice",
+      "question": "What example does he use to illustrate co-benefits of energy retrofits?",
+      "audioSegment": {
+        "start": 385,
+        "end": 435
+      },
+      "options": [
+        "A university data center",
+        "A public housing complex",
+        "A cryptocurrency mine",
+        "A shopping mall"
+      ],
+      "correctAnswer": 1,
+      "explanation": "He highlights how a public housing complex saw lower bills and improved indoor air quality.",
+      "points": 10
+    },
+    {
+      "id": "ex10",
+      "type": "true-false",
+      "question": "Malik recommends relying solely on proprietary datasets for capstone projects.",
+      "audioSegment": {
+        "start": 435,
+        "end": 470
+      },
+      "correctAnswer": false,
+      "explanation": "He encourages mixing open data portals with proprietary sources for transparency.",
+      "points": 10
+    },
+    {
+      "id": "ex11",
+      "type": "multiple-choice",
+      "question": "Which upcoming assignment requires students to model policy trade-offs?",
+      "audioSegment": {
+        "start": 470,
+        "end": 520
+      },
+      "options": [
+        "The reflective journal",
+        "The midterm exam",
+        "The policy memo due in two weeks",
+        "The lab safety report"
+      ],
+      "correctAnswer": 2,
+      "explanation": "He reminds the class that the policy memo must compare two contrasting policy levers.",
+      "points": 12
+    },
+    {
+      "id": "ex12",
+      "type": "fill-blank",
+      "question": "Students are invited to an optional workshop on __________ data this Friday.",
+      "audioSegment": {
+        "start": 520,
+        "end": 560
+      },
+      "correctAnswer": "grid interconnection",
+      "explanation": "He plugs a workshop on cleaning grid interconnection queue data for projects.",
+      "points": 12
+    }
+  ],
+  "transcript": "Good afternoon, everyone. Today we are zooming out from the component level and looking at the energy transition through an interdisciplinary lens. This course sits at the intersection of climate policy, electrical engineering, and applied data science. That means we care about molecules and markets, transformers and tax credits. Our core question is deceptively simple: how do we electrify everything while keeping the global temperature increase near 1.5 degrees Celsius? \n\nWe will begin with a reality check. According to the International Energy Agency, solar and wind supplied four-fifths of new global electricity capacity in 2023. Yet fossil fuels still provide over 60 percent of total generation. Efficiency is indispensable, but it is not sufficient. To reach net-zero by mid-century we must simultaneously deploy renewables, modernize grids, and rewire incentives. This year the IPCC’s AR6 report reminded us that every tenth of a degree matters, so think of today’s lecture as a toolkit for pragmatic optimism. \n\nLet’s unpack three pillars: finance, hardware, and data. On finance, many of you asked about risk premiums in emerging markets. The most exciting developments are happening inside blended finance stacks which braid concessional capital, philanthropic guarantees, and commercial investors. When the African Development Bank backstops currency risk, private developers can finally build battery storage outside coastal capitals. I want you to read the Convergence report posted on Canvas and identify one blended structure that could work for your capstone city. \n\nOn hardware, let’s talk storage. Lithium-ion remains the workhorse for vehicles, but grid planners are experimenting with long-duration iron-air chemistry and thermal storage reservoirs. These technologies can absorb multi-day wind lulls without resorting to diesel peaker plants. Pay attention to permitting bottlenecks: we often treat grid congestion as an engineering failure, when in fact the holdup lives inside a 600-page environmental review. Bureaucratic drag is measurable. In the assignment you’ll quantify how many clean megawatts are stranded because of interconnection queues. \n\nNow for data. We cannot manage what we do not measure, so I am pointing you toward three open datasets. First, the U.S. Residential Electrification Survey for household adoption patterns of heat pumps and induction stoves. Second, the European Network of Transmission System Operators dataset for congestion pricing signals. Third, the Global Power Plant Database for geospatial cross-checking. Blend these with proprietary sources if you have access, but document every transformation step because reproducibility is part of your grade. \n\nCase study time. Last semester a team partnered with a public housing authority to evaluate deep retrofits. They used smart-meter data, compared pre- and post-intervention bills, and layered in health department records. The outcome was striking: indoor air quality improved, emergency-room asthma visits declined, and residents saved an average of thirty dollars per month. That is the kind of co-benefit analysis that persuades policymakers. \n\nBefore we close, a few housekeeping notes. Your policy memo, due in two weeks, should evaluate at least two contrasting instruments—perhaps a clean energy standard versus performance-based tax credits. Next Friday we are hosting an optional workshop on cleaning grid interconnection data; I strongly recommend attending if your project touches transmission. Office hours are hybrid this week, and I will post the recording of today’s lecture tonight. Remember, the energy transition is not a single technology or headline. It is a choreography of finance, hardware, people, and code. Your job in this class is to keep all of those beats in view. See you Wednesday.",
+  "vocabulary": [
+    {
+      "word": "blended finance",
+      "definition": "Investment structures that mix public, philanthropic, and private capital to reduce project risk",
+      "example": "Blended finance lowered the cost of capital for the rural solar project."
+    },
+    {
+      "word": "concessional capital",
+      "definition": "Funding offered on more generous terms than market rates to catalyze investments",
+      "example": "A concessional loan from a development bank anchored the deal."
+    },
+    {
+      "word": "interconnection queue",
+      "definition": "A waiting list of power projects seeking approval to connect to the grid",
+      "example": "Dozens of wind farms remain stuck in the interconnection queue."
+    },
+    {
+      "word": "long-duration storage",
+      "definition": "Energy storage technologies that can discharge electricity for many hours or days",
+      "example": "Long-duration storage can bridge multiday calm periods."
+    },
+    {
+      "word": "permitting bottleneck",
+      "definition": "Delays caused by lengthy approval processes",
+      "example": "Transmission lines are often slowed by permitting bottlenecks."
+    },
+    {
+      "word": "co-benefit",
+      "definition": "An additional positive outcome beyond the primary goal",
+      "example": "Lower asthma rates were a co-benefit of the retrofit."
+    },
+    {
+      "word": "congestion pricing",
+      "definition": "Market signals that raise prices when grid lines are overloaded",
+      "example": "Congestion pricing encouraged demand response."
+    },
+    {
+      "word": "clean energy standard",
+      "definition": "A policy requiring utilities to source a certain percentage of power from low-carbon resources",
+      "example": "The state’s clean energy standard rises to 80% by 2035."
+    },
+    {
+      "word": "policy lever",
+      "definition": "An instrument that governments can adjust to influence outcomes",
+      "example": "Tax credits are one policy lever for accelerating adoption."
+    },
+    {
+      "word": "reproducibility",
+      "definition": "The ability to replicate results using the same data and methods",
+      "example": "She documented her code to support reproducibility."
+    }
+  ],
+  "tips": [
+    "Note every statistic the lecturer cites—percentages, dates, and agency names often appear in questions.",
+    "Track the lecture structure: finance, hardware, and data are separate pillars with examples.",
+    "Listen for datasets and policy instruments; academic lectures frequently test recall of resources.",
+    "When you hear case studies, capture the problem, method, and outcome—they summarize the professor’s main argument.",
+    "Expect housekeeping announcements (deadlines, workshops) at the end; they are common quiz material in university courses."
+  ]
+}
+

@@ -42,6 +42,7 @@ import Beginners from "@/pages/adults/Beginners";
 import Intermediates from "@/pages/adults/Intermediates";
 import Advanced from "@/pages/adults/Advanced";
 import QuickPracticeSession from "@/pages/adults/QuickPracticeSession";
+import MultiModePracticePage from "@/pages/adults/MultiModePracticePage";
 import VideoLessons from "@/pages/adults/VideoLessons";
 import VideoDetail from "@/pages/adults/VideoDetail";
 import Lesson1Video from "@/pages/Lesson1Video";
@@ -746,6 +747,7 @@ const AppRoutes = () => {
         />
         <Route path="/adults/practice" element={<PageTransition><QuickPracticeSession /></PageTransition>} />
         <Route path="/adults/practice/:sessionType" element={<PageTransition><QuickPracticeSession /></PageTransition>} />
+        <Route path="/adults/practice/multi-mode" element={<PageTransition><MultiModePracticePage /></PageTransition>} />
         <Route 
           path="/ielts-pte" 
           element={

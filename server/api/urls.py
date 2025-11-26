@@ -214,4 +214,54 @@ urlpatterns = [
     path('adults/analytics', views.adults_progress_analytics, name='adults-progress-analytics'),
     path('adults/analytics/summary', views.adults_analytics_summary, name='adults-analytics-summary'),
     path('adults/dashboard', views.adults_dashboard, name='adults-dashboard'),
+    
+    # ============= Dictionary =============
+    path('adults/dictionary/search', views.dictionary_search, name='dictionary-search'),
+    path('adults/dictionary/lookup/<str:word>', views.dictionary_lookup, name='dictionary-lookup'),
+    path('adults/dictionary/my', views.my_dictionary, name='my-dictionary'),
+    path('adults/dictionary/add', views.add_to_dictionary, name='add-to-dictionary'),
+    path('adults/dictionary/<int:entry_id>', views.remove_from_dictionary, name='remove-from-dictionary'),
+    
+    # ============= Flashcards =============
+    path('adults/flashcards/decks', views.flashcard_decks, name='flashcard-decks'),
+    path('adults/flashcards/decks/<int:deck_id>', views.flashcard_deck_detail, name='flashcard-deck-detail'),
+    path('adults/flashcards/review/due', views.flashcards_due_for_review, name='flashcards-due-for-review'),
+    path('adults/flashcards/review/submit', views.submit_flashcard_review, name='submit-flashcard-review'),
+    path('adults/flashcards/generate', views.generate_flashcards_from_vocabulary, name='generate-flashcards'),
+    
+    # ============= Daily Goals =============
+    path('adults/goals/daily', views.daily_goals, name='daily-goals'),
+    path('adults/goals/daily/<int:goal_id>', views.update_daily_goal, name='update-daily-goal'),
+    path('adults/goals/history', views.daily_goals_history, name='daily-goals-history'),
+    
+    # ============= Toolbar Preferences =============
+    path('adults/toolbar/preferences', views.toolbar_preferences, name='toolbar-preferences'),
+    
+    # ============= Multi-Mode Practice =============
+    path('adults/practice/multi-mode/start', views.start_multi_mode_practice, name='start-multi-mode-practice'),
+    path('adults/practice/multi-mode/<int:session_id>/complete', views.complete_multi_mode_practice, name='complete-multi-mode-practice'),
+    path('adults/practice/multi-mode/history', views.multi_mode_practice_history, name='multi-mode-practice-history'),
+    path('adults/practice/multi-mode/sessions/<int:session_id>/delete', views.delete_multi_mode_practice_session, name='delete-multi-mode-session'),
+    path('adults/practice/multi-mode/sessions/delete', views.delete_multi_mode_practice_sessions, name='delete-multi-mode-sessions'),
+    
+    # ============= Business Email Coach =============
+    path('adults/email/templates', views.email_templates, name='email-templates'),
+    path('adults/email/templates/<int:template_id>', views.email_template_detail, name='email-template-detail'),
+    path('adults/email/practice', views.submit_email_practice, name='submit-email-practice'),
+    path('adults/email/practice/history', views.email_practice_history, name='email-practice-history'),
+    
+    # ============= Pronunciation Analyzer =============
+    path('adults/pronunciation/practice', views.submit_pronunciation_practice, name='submit-pronunciation-practice'),
+    path('adults/pronunciation/history', views.pronunciation_practice_history, name='pronunciation-practice-history'),
+    path('adults/pronunciation/stats', views.pronunciation_statistics, name='pronunciation-statistics'),
+    
+    # ============= Cultural Intelligence =============
+    path('adults/cultural/modules', views.cultural_modules, name='cultural-modules'),
+    path('adults/cultural/modules/<str:slug>', views.cultural_module_detail, name='cultural-module-detail'),
+    path('adults/cultural/progress', views.cultural_progress, name='cultural-progress'),
+    
+    # ============= Search =============
+    path('adults/search', views.save_search, name='save-search'),
+    path('adults/search/suggestions', views.search_suggestions, name='search-suggestions'),
+    path('adults/search/history', views.search_history, name='search-history'),
 ]

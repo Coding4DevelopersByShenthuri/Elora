@@ -1,0 +1,316 @@
+{
+  "module": {
+    "id": "business-meetings",
+    "title": "Business Meetings",
+    "description": "Practice understanding professional meeting discussions, presentations, and negotiations",
+    "difficulty": "intermediate",
+    "duration": "20-25 min",
+    "level": "Professional",
+    "icon": "💼",
+    "color": "from-blue-500 to-indigo-600",
+    "category": "Business"
+  },
+  "exercises": [
+    {
+      "id": "ex1",
+      "type": "comprehension",
+      "question": "What is the main topic of this meeting?",
+      "audioSegment": {
+        "start": 0,
+        "end": 30
+      },
+      "options": [
+        "Quarterly sales review",
+        "New product launch",
+        "Budget planning",
+        "Team restructuring"
+      ],
+      "correctAnswer": 0,
+      "explanation": "The meeting begins with a discussion about quarterly sales performance.",
+      "points": 10
+    },
+    {
+      "id": "ex2",
+      "type": "multiple-choice",
+      "question": "What percentage increase in sales did the team achieve?",
+      "audioSegment": {
+        "start": 30,
+        "end": 60
+      },
+      "options": [
+        "15%",
+        "25%",
+        "35%",
+        "45%"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The speaker mentioned a 25% increase in quarterly sales.",
+      "points": 10
+    },
+    {
+      "id": "ex3",
+      "type": "fill-blank",
+      "question": "The next phase will focus on ___________ in the European market.",
+      "audioSegment": {
+        "start": 60,
+        "end": 90
+      },
+      "correctAnswer": "expansion",
+      "explanation": "The meeting discussed plans for expansion into European markets.",
+      "points": 15
+    },
+    {
+      "id": "ex4",
+      "type": "true-false",
+      "question": "The team needs additional budget approval for the new project.",
+      "audioSegment": {
+        "start": 90,
+        "end": 120
+      },
+      "correctAnswer": true,
+      "explanation": "The speaker mentioned that budget approval is required before proceeding.",
+      "points": 10
+    },
+    {
+      "id": "ex5",
+      "type": "multiple-choice",
+      "question": "When does the finance team expect to respond about the budget proposal?",
+      "audioSegment": {
+        "start": 120,
+        "end": 150
+      },
+      "options": [
+        "This week",
+        "Next week",
+        "In two weeks",
+        "Next month"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The speaker mentioned expecting to hear back from the finance team by next week.",
+      "points": 10
+    },
+    {
+      "id": "ex6",
+      "type": "comprehension",
+      "question": "What was the primary driver of the sales growth?",
+      "audioSegment": {
+        "start": 150,
+        "end": 180
+      },
+      "options": [
+        "New marketing initiatives and customer engagement",
+        "Price reductions",
+        "New product launches",
+        "International expansion"
+      ],
+      "correctAnswer": 0,
+      "explanation": "The growth was driven primarily by new marketing initiatives and strong customer engagement.",
+      "points": 12
+    },
+    {
+      "id": "ex7",
+      "type": "fill-blank",
+      "question": "The marketing team has proposed a new ___________ strategy for Q4.",
+      "audioSegment": {
+        "start": 180,
+        "end": 210
+      },
+      "correctAnswer": "digital",
+      "explanation": "The meeting discussed a new digital marketing strategy for the fourth quarter.",
+      "points": 15
+    },
+    {
+      "id": "ex8",
+      "type": "multiple-choice",
+      "question": "What is the target market for the European expansion?",
+      "audioSegment": {
+        "start": 210,
+        "end": 240
+      },
+      "options": [
+        "Germany and France",
+        "UK and Ireland",
+        "Scandinavian countries",
+        "All of Western Europe"
+      ],
+      "correctAnswer": 3,
+      "explanation": "The expansion plan targets all of Western Europe as the initial market.",
+      "points": 12
+    },
+    {
+      "id": "ex9",
+      "type": "true-false",
+      "question": "The team has already secured partnerships in the European market.",
+      "audioSegment": {
+        "start": 240,
+        "end": 270
+      },
+      "correctAnswer": false,
+      "explanation": "The meeting indicated that partnerships are still being negotiated, not yet secured.",
+      "points": 10
+    },
+    {
+      "id": "ex10",
+      "type": "comprehension",
+      "question": "What is the main concern raised about the expansion plan?",
+      "audioSegment": {
+        "start": 270,
+        "end": 300
+      },
+      "options": [
+        "Lack of market research",
+        "Budget constraints",
+        "Language barriers",
+        "Competition in the market"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Budget constraints were the main concern, requiring additional approval.",
+      "points": 12
+    },
+    {
+      "id": "ex11",
+      "type": "fill-blank",
+      "question": "The project timeline suggests a ___________ launch in Q1 of next year.",
+      "audioSegment": {
+        "start": 300,
+        "end": 330
+      },
+      "correctAnswer": "phased",
+      "explanation": "The meeting discussed a phased launch approach for the European market.",
+      "points": 15
+    },
+    {
+      "id": "ex12",
+      "type": "multiple-choice",
+      "question": "How many team members will be assigned to the European project?",
+      "audioSegment": {
+        "start": 330,
+        "end": 360
+      },
+      "options": [
+        "5-7 members",
+        "8-10 members",
+        "12-15 members",
+        "20+ members"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The meeting mentioned assigning 8-10 team members to the European expansion project.",
+      "points": 12
+    },
+    {
+      "id": "ex13",
+      "type": "true-false",
+      "question": "The company has previous experience operating in European markets.",
+      "audioSegment": {
+        "start": 360,
+        "end": 390
+      },
+      "correctAnswer": true,
+      "explanation": "The speaker mentioned previous successful operations in select European countries.",
+      "points": 10
+    },
+    {
+      "id": "ex14",
+      "type": "comprehension",
+      "question": "What is the next step after budget approval?",
+      "audioSegment": {
+        "start": 390,
+        "end": 420
+      },
+      "options": [
+        "Hiring new staff",
+        "Conducting market research",
+        "Finalizing partnerships",
+        "Setting up local offices"
+      ],
+      "correctAnswer": 2,
+      "explanation": "After budget approval, the next step is finalizing partnerships with local companies.",
+      "points": 12
+    },
+    {
+      "id": "ex15",
+      "type": "fill-blank",
+      "question": "The success metrics will include market ___________ and customer acquisition rates.",
+      "audioSegment": {
+        "start": 420,
+        "end": 450
+      },
+      "correctAnswer": "penetration",
+      "explanation": "Market penetration and customer acquisition rates were identified as key success metrics.",
+      "points": 15
+    }
+  ],
+  "transcript": "Good morning everyone. Thank you for joining today's quarterly review meeting. I'd like to start by discussing our sales performance over the past three months. We've seen a significant 25% increase in our quarterly sales, which is excellent news. This growth has been driven primarily by our new marketing initiatives and strong customer engagement. Moving forward, our next phase will focus on expansion in the European market. However, I should mention that we'll need additional budget approval for this new project. The finance team is currently reviewing our proposal, and we expect to hear back by next week. The marketing team has been working diligently on a new digital strategy for Q4, which we believe will further accelerate our growth. Our European expansion plan targets all of Western Europe as the initial market. While we're still in the negotiation phase for key partnerships, we're optimistic about the opportunities ahead. The project timeline suggests a phased launch in Q1 of next year, with 8-10 team members assigned to this initiative. We do have previous experience operating in select European countries, which gives us confidence in this venture. Once we receive budget approval, our immediate next step will be finalizing partnerships with local companies. Our success metrics will include market penetration and customer acquisition rates. We'll be tracking these closely to ensure we meet our strategic objectives. I'd like to open the floor for questions and discussion about any of these points.",
+  "vocabulary": [
+    {
+      "word": "quarterly",
+      "definition": "occurring or done every quarter of a year",
+      "example": "We have quarterly review meetings every three months."
+    },
+    {
+      "word": "initiative",
+      "definition": "a new plan or action to improve something",
+      "example": "The new marketing initiative increased our sales."
+    },
+    {
+      "word": "expansion",
+      "definition": "the action of becoming larger or more extensive",
+      "example": "The company is planning expansion into new markets."
+    },
+    {
+      "word": "budget approval",
+      "definition": "official permission to spend money on a project",
+      "example": "We're waiting for budget approval before starting the project."
+    },
+    {
+      "word": "proposal",
+      "definition": "a plan or suggestion put forward for consideration",
+      "example": "The finance team is reviewing our budget proposal."
+    },
+    {
+      "word": "digital strategy",
+      "definition": "a plan for using digital technologies to achieve business goals",
+      "example": "Our new digital strategy focuses on online marketing."
+    },
+    {
+      "word": "phased launch",
+      "definition": "introducing something in stages rather than all at once",
+      "example": "We'll use a phased launch approach for the new product."
+    },
+    {
+      "word": "partnership",
+      "definition": "a relationship between two or more parties working together",
+      "example": "We're negotiating partnerships with local companies."
+    },
+    {
+      "word": "market penetration",
+      "definition": "the extent to which a product or service is recognized and bought by customers",
+      "example": "Market penetration is one of our key success metrics."
+    },
+    {
+      "word": "customer acquisition",
+      "definition": "the process of gaining new customers",
+      "example": "Customer acquisition rates have improved this quarter."
+    },
+    {
+      "word": "strategic objectives",
+      "definition": "long-term goals that align with the company's overall strategy",
+      "example": "We need to ensure we meet our strategic objectives."
+    },
+    {
+      "word": "negotiation",
+      "definition": "discussion aimed at reaching an agreement",
+      "example": "We're still in the negotiation phase for key partnerships."
+    }
+  ],
+  "tips": [
+    "Focus on key numbers and percentages mentioned in business meetings",
+    "Pay attention to action items and deadlines",
+    "Note down important names, dates, and project names",
+    "Listen for transition phrases like 'moving forward' or 'next phase'",
+    "Identify the main topics and sub-topics being discussed",
+    "Pay attention to concerns or challenges mentioned",
+    "Note the sequence of steps in a plan or process",
+    "Listen for specific metrics and success criteria"
+  ]
+}

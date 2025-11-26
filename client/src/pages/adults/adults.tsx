@@ -5,7 +5,7 @@ import {
   Mic, Volume2, CheckCircle, TrendingUp, Zap, Lightbulb, Crown, BarChart3,
   Clock, ThumbsUp, Shield, Rocket,
   ArrowRight, GraduationCap, Brain, Languages, Star, Sparkles, Globe,
-  Flame, Calendar, Trophy, RefreshCw
+  Flame, Calendar, Trophy, RefreshCw, FileText
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,10 +20,19 @@ import {
   PersonalizedRecommendations,
   SpacedRepetition,
   MicrolearningModules,
-  ProgressAnalytics
+  ProgressAnalytics,
+  QuickAccessToolbar,
+  DictionaryWidget,
+  DailyGoalsWidget,
+  FlashcardsSystem,
+  BusinessEmailCoach,
+  PronunciationAnalyzer,
+  CulturalIntelligence
 } from '@/components/adults';
+import FlashcardsMain from '@/components/adults/FlashcardsMain';
 import { AdultsAPI } from '@/services/ApiService';
 import { useAuth } from '@/contexts/AuthContext';
+import { allMultiModeModules, getTotalModulesByMode, getModuleById } from '@/data/multi-mode-modules-config';
 
 const AdultsPage = () => {
   const navigate = useNavigate();
@@ -38,6 +47,9 @@ const AdultsPage = () => {
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [dailyConversationProgress, setDailyConversationProgress] = useState<any>(null);
+  const [activeWidget, setActiveWidget] = useState<string | null>(null);
+  const [multiModeProgress, setMultiModeProgress] = useState<any>(null);
+  const [enrolledModules, setEnrolledModules] = useState<Set<string>>(new Set());
 
   // Generate animated stars with varying opacity - Performance optimized
   useEffect(() => {
@@ -70,7 +82,58 @@ const AdultsPage = () => {
   useEffect(() => {
     loadDashboardData();
     loadDailyConversationProgress();
+    loadMultiModeProgress();
+    loadEnrolledModules();
   }, [user]);
+
+  // Load Multi-Mode Practice progress
+  const loadMultiModeProgress = async () => {
+    if (!user) return;
+    try {
+      const result = await AdultsAPI.getMultiModePracticeHistory();
+      if (result.success && 'data' in result && result.data?.data) {
+        const sessions = result.data.data || [];
+        const totalPoints = sessions.reduce((sum: number, s: any) => sum + (s.points_earned || 0), 0);
+        const totalSessions = sessions.length;
+        const avgScore = sessions.length > 0 
+          ? sessions.reduce((sum: number, s: any) => sum + (s.score || 0), 0) / sessions.length 
+          : 0;
+        
+        // Track completed modules
+        // A module is considered completed if:
+        // 1. It has a completed session (completed_at is not null)
+        // 2. The session has a score > 0 (user actually completed exercises)
+        // 3. It has content_id (is a module, not just a mode practice)
+        const completedModules = new Set<string>();
+        sessions.forEach((session: any) => {
+          if (session.completed_at && session.score > 0 && session.content_id) {
+            // For listening modules, use content_id
+            // For other modes, this will work when modules are added
+            completedModules.add(session.content_id);
+          }
+        });
+        
+        setMultiModeProgress({
+          totalPoints,
+          totalSessions,
+          avgScore: Math.round(avgScore),
+          sessions,
+          completedModules: Array.from(completedModules)
+        });
+      }
+    } catch (error) {
+      console.error('Failed to load multi-mode progress:', error);
+    }
+  };
+
+  // Load enrolled modules
+  const loadEnrolledModules = () => {
+    if (!user) return;
+    const stored = localStorage.getItem(`enrolled_modules_${user.id}`);
+    if (stored) {
+      setEnrolledModules(new Set(JSON.parse(stored)));
+    }
+  };
 
   // Load daily conversation progress from localStorage
   const loadDailyConversationProgress = () => {
@@ -101,9 +164,17 @@ const AdultsPage = () => {
     };
     window.addEventListener('dailyConversationProgressUpdated', handleCustomStorage);
     
+    // Listen for Multi-Mode Practice updates
+    const handleMultiModeUpdate = () => {
+      loadMultiModeProgress();
+      loadEnrolledModules();
+    };
+    window.addEventListener('multiModeProgressUpdated', handleMultiModeUpdate);
+    
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('dailyConversationProgressUpdated', handleCustomStorage);
+      window.removeEventListener('multiModeProgressUpdated', handleMultiModeUpdate);
     };
   }, []);
 
@@ -126,6 +197,11 @@ const AdultsPage = () => {
             return acc + (cat?.progress_percentage || 0);
           }, 0) / Object.keys(summary).length;
           setProgress(Math.round(totalProgress));
+        }
+        
+        // Update streak from dashboard
+        if (result.data?.dashboard?.current_streak !== undefined) {
+          setStreak(result.data.dashboard.current_streak);
         }
       }
     } catch (error) {
@@ -206,6 +282,120 @@ const AdultsPage = () => {
     return totalPoints;
   };
 
+  // Calculate total points from all enrolled components
+  const getAllOverPoints = () => {
+    let total = 0;
+    
+    // Daily Conversation points
+    total += getDailyConversationPoints();
+    
+    // Multi-Mode Practice points
+    if (multiModeProgress) {
+      total += multiModeProgress.totalPoints || 0;
+    }
+    
+    // Add other component points here as needed
+    
+    return total;
+  };
+
+  // Get Multi-Mode Practice progress percentage
+  const getMultiModeProgress = () => {
+    // Get total modules across all modes
+    const totalModules = getTotalModulesByMode();
+    
+    if (totalModules.total === 0) return null;
+    
+    // Count completed modules (modules with at least one completed session)
+    const completedModulesCount = multiModeProgress?.completedModules?.length || 0;
+    
+    // Calculate progress: (completed modules / total modules) * 100
+    const progress = Math.round((completedModulesCount / totalModules.total) * 100);
+    
+    return Math.min(100, Math.max(0, progress));
+  };
+
+  // Get progress breakdown by mode
+  const getProgressByMode = () => {
+    const totalModules = getTotalModulesByMode();
+    const completedModules = multiModeProgress?.completedModules || [];
+    
+    const breakdown = {
+      listening: {
+        total: totalModules.listening,
+        completed: completedModules.filter((id: string) => {
+          const module = getModuleById(id);
+          return module?.mode === 'listening';
+        }).length,
+        progress: totalModules.listening > 0 
+          ? Math.round((completedModules.filter((id: string) => {
+              const module = getModuleById(id);
+              return module?.mode === 'listening';
+            }).length / totalModules.listening) * 100)
+          : 0
+      },
+      speaking: {
+        total: totalModules.speaking,
+        completed: completedModules.filter((id: string) => {
+          const module = getModuleById(id);
+          return module?.mode === 'speaking';
+        }).length,
+        progress: totalModules.speaking > 0 
+          ? Math.round((completedModules.filter((id: string) => {
+              const module = getModuleById(id);
+              return module?.mode === 'speaking';
+            }).length / totalModules.speaking) * 100)
+          : 0
+      },
+      reading: {
+        total: totalModules.reading,
+        completed: completedModules.filter((id: string) => {
+          const module = getModuleById(id);
+          return module?.mode === 'reading';
+        }).length,
+        progress: totalModules.reading > 0 
+          ? Math.round((completedModules.filter((id: string) => {
+              const module = getModuleById(id);
+              return module?.mode === 'reading';
+            }).length / totalModules.reading) * 100)
+          : 0
+      },
+      writing: {
+        total: totalModules.writing,
+        completed: completedModules.filter((id: string) => {
+          const module = getModuleById(id);
+          return module?.mode === 'writing';
+        }).length,
+        progress: totalModules.writing > 0 
+          ? Math.round((completedModules.filter((id: string) => {
+              const module = getModuleById(id);
+              return module?.mode === 'writing';
+            }).length / totalModules.writing) * 100)
+          : 0
+      }
+    };
+    
+    return breakdown;
+  };
+
+  const getEnrolledSummaryByMode = () => {
+    const summary = {
+      listening: 0,
+      speaking: 0,
+      reading: 0,
+      writing: 0,
+    };
+
+    enrolledModules.forEach((moduleId) => {
+      const module = getModuleById(moduleId);
+      if (module) {
+        summary[module.mode]++;
+      }
+    });
+
+    return summary;
+  };
+
   // Check if any topic is enrolled
   const hasAnyEnrolledTopic = () => {
     if (!dailyConversationProgress) return false;
@@ -247,12 +437,12 @@ const AdultsPage = () => {
       description: "Daily practice streak"
     },
     {
-      label: "Daily Conversation Points",
-      value: getDailyConversationPoints().toString(),
+      label: "All over points",
+      value: getAllOverPoints().toString(),
       icon: Trophy,
       color: "text-amber-400",
       glowColor: "rgba(245, 158, 11, 0.2)",
-      description: "Points earned from practice"
+      description: "Total points from all practice activities"
     },
   ];
 
@@ -268,6 +458,29 @@ const AdultsPage = () => {
   const parallaxTransform2 = `translateY(${scrollY * 0.15}px)`;
   const parallaxTransform3 = `translateY(${scrollY * 0.08}px)`;
   const parallaxTransform4 = `translateY(${scrollY * 0.12}px)`;
+
+  const handleToolbarClick = (tool: string) => {
+    setActiveWidget(tool);
+  };
+
+  const handleCloseWidget = () => {
+    setActiveWidget(null);
+  };
+
+  const renderWidget = () => {
+    switch (activeWidget) {
+      case 'dictionary':
+        return <DictionaryWidget onClose={handleCloseWidget} />;
+      case 'flashcards':
+        return <FlashcardsMain onClose={handleCloseWidget} />;
+      case 'cultural':
+        return <CulturalIntelligence onClose={handleCloseWidget} />;
+      case 'pronunciation':
+        return <PronunciationAnalyzer onClose={handleCloseWidget} />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className={`min-h-screen relative overflow-hidden bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 ${isLoaded ? 'space-fade-in' : 'opacity-0'}`}>
@@ -363,6 +576,24 @@ const AdultsPage = () => {
           <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-500/10 to-blue-500/10 blur-lg" />
         </div>
       </div>
+
+      {/* Quick Access Toolbar */}
+      {user && <QuickAccessToolbar onToolClick={handleToolbarClick} />}
+
+      {/* Widget Modals */}
+      {activeWidget && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          onClick={handleCloseWidget}
+        >
+          <div 
+            className="w-full max-w-6xl max-h-[90vh] flex items-center justify-center animate-in fade-in-0 zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {renderWidget()}
+          </div>
+        </div>
+      )}
 
       <div className="relative z-10 pb-12 sm:pb-16 md:pb-20 pt-20 sm:pt-24 md:pt-32">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -482,7 +713,7 @@ const AdultsPage = () => {
           {/* Main Content Tabs - All Features Organized */}
           <div className="mb-8 sm:mb-10 md:mb-12">
             <Tabs defaultValue="practice" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 bg-slate-900/60 border-purple-500/30 mb-6 h-auto">
+              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-9 bg-slate-900/60 border-purple-500/30 mb-6 h-auto">
                 <TabsTrigger value="practice" className="text-xs sm:text-sm data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300 py-2 sm:py-3">
                   <MessageCircle className="w-4 h-4 mr-2" />
                   <span className="hidden sm:inline">Quick Practice</span>
@@ -505,6 +736,21 @@ const AdultsPage = () => {
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Review
                 </TabsTrigger>
+                <TabsTrigger value="multimode" className="text-xs sm:text-sm data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300 py-2 sm:py-3">
+                  <Play className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Multi-Mode</span>
+                  <span className="sm:hidden">Practice</span>
+                </TabsTrigger>
+                <TabsTrigger value="email" className="text-xs sm:text-sm data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300 py-2 sm:py-3">
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Email Coach</span>
+                  <span className="sm:hidden">Email</span>
+                </TabsTrigger>
+                <TabsTrigger value="cultural" className="text-xs sm:text-sm data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300 py-2 sm:py-3">
+                  <Globe className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Cultural</span>
+                  <span className="sm:hidden">Culture</span>
+                </TabsTrigger>
                 <TabsTrigger value="analytics" className="text-xs sm:text-sm data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300 py-2 sm:py-3">
                   <BarChart3 className="w-4 h-4 mr-2" />
                   Analytics
@@ -518,6 +764,146 @@ const AdultsPage = () => {
                     <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Quick Practice Sessions</h2>
                     <p className="text-xs sm:text-sm text-cyan-100/70 mb-4 sm:mb-6">Short, focused exercises for busy professionals</p>
                 </div>
+
+                  {/* Multi-Mode Practice */}
+                  <Card className="bg-gradient-to-br from-blue-500/20 via-indigo-500/30 to-purple-500/20 backdrop-blur-xl border-blue-400/50 shadow-2xl relative">
+                    <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10">
+                      <Badge className="bg-gradient-to-r from-emerald-500 to-green-600 text-white border-0 shadow-lg px-2 sm:px-3 py-1 text-xs sm:text-sm">
+                        <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                        Enrolled: {enrolledModules.size}
+                      </Badge>
+                    </div>
+                    <CardContent className="p-4 sm:p-6 md:p-8">
+                      <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                        <div className="p-4 sm:p-6 rounded-2xl text-white bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg flex-shrink-0">
+                          <Play className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
+                        </div>
+                        <div className="flex-1 text-center sm:text-left w-full">
+                          <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
+                            <h3 className="text-xl sm:text-2xl font-bold text-white">Multi-Mode Practice</h3>
+                            {getMultiModeProgress() !== null && (
+                              <Badge variant="outline" className="bg-emerald-500/20 text-emerald-300 border-emerald-400/50 text-xs">
+                                {getMultiModeProgress()}% Complete
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-sm sm:text-base text-cyan-100/80 mb-3 sm:mb-4">
+                            Practice listening, speaking, reading, and writing skills with comprehensive exercises
+                          </p>
+                          {/* Mode Eligibility Badges */}
+                          {(() => {
+                            const summary = getEnrolledSummaryByMode();
+                            const badges = [
+                              { id: 'listening', label: 'Listening', count: summary.listening, color: 'bg-blue-500/20 text-blue-200 border-blue-400/30' },
+                              { id: 'speaking', label: 'Speaking', count: summary.speaking, color: 'bg-green-500/20 text-green-200 border-green-400/30' },
+                              { id: 'reading', label: 'Reading', count: summary.reading, color: 'bg-purple-500/20 text-purple-200 border-purple-400/30' },
+                              { id: 'writing', label: 'Writing', count: summary.writing, color: 'bg-amber-500/20 text-amber-200 border-amber-400/30' },
+                            ];
+                            const hasAny = badges.some(badge => badge.count > 0);
+                            if (!hasAny) return null;
+                            return (
+                              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3 mb-3 sm:mb-4">
+                                {badges.map((badge) => (
+                                  badge.count > 0 && (
+                                    <Badge key={badge.id} variant="outline" className={`${badge.color} text-xs sm:text-sm`}>
+                                      {badge.label} • {badge.count}
+                                    </Badge>
+                                  )
+                                ))}
+                              </div>
+                            );
+                          })()}
+                          {/* Progress Display */}
+                          {getMultiModeProgress() !== null && (
+                            <div className="mb-3 sm:mb-4 space-y-2">
+                              <div className="flex items-center justify-between text-xs sm:text-sm text-cyan-200/70 mb-1">
+                                <span>Overall Progress</span>
+                                <span className="font-semibold">{getMultiModeProgress()}%</span>
+                              </div>
+                              <Progress 
+                                value={getMultiModeProgress() || 0} 
+                                className="h-2 bg-slate-700/50"
+                              />
+                              
+                              {/* Enrolled Modules Badges */}
+                              {enrolledModules.size > 0 && (
+                                <div className="flex flex-wrap gap-2 text-xs text-cyan-200/60 mb-2">
+                                  {Array.from(enrolledModules).map((moduleId) => {
+                                    const module = getModuleById(moduleId);
+                                    return (
+                                      <Badge key={moduleId} variant="outline" className="bg-blue-500/20 text-blue-300 border-blue-400/30 text-xs">
+                                        {module?.title || moduleId}
+                                      </Badge>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                              {/* Points Display */}
+                              {multiModeProgress && multiModeProgress.totalPoints > 0 && (
+                                <div className="flex items-center justify-between p-2 sm:p-3 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-400/30 rounded-lg">
+                                  <div className="flex items-center gap-2">
+                                    <Trophy className="w-4 h-4 text-amber-400" />
+                                    <span className="text-xs sm:text-sm text-amber-200 font-medium">Total Points</span>
+                                  </div>
+                                  <span className="text-base sm:text-lg font-bold text-amber-300">
+                                    {multiModeProgress.totalPoints}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-4 mb-3 sm:mb-4">
+                            <Badge variant="outline" className="bg-blue-500/20 text-blue-300 border-blue-400/30 text-xs">
+                              All Modes
+                            </Badge>
+                            <Badge variant="outline" className="bg-indigo-500/20 text-indigo-300 border-indigo-400/30 text-xs">
+                              Interactive
+                            </Badge>
+                          </div>
+                          <Button
+                            size="default"
+                            className="w-full sm:w-auto bg-white text-blue-600 hover:bg-blue-50 font-semibold text-sm sm:text-base"
+                            onClick={() => navigate('/adults/practice/multi-mode')}
+                          >
+                            <Play className="w-4 h-4 mr-2" />
+                            {enrolledModules.size > 0 ? 'Continue Practice' : 'Start Practice'}
+                            <ArrowRight className="w-4 h-4 ml-2" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Pronunciation Analyzer */}
+                  <Card className="bg-gradient-to-br from-amber-500/20 via-orange-500/30 to-red-500/20 backdrop-blur-xl border-amber-400/50 shadow-2xl">
+                    <CardContent className="p-4 sm:p-6 md:p-8">
+                      <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                        <div className="p-4 sm:p-6 rounded-2xl text-white bg-gradient-to-r from-amber-500 to-orange-600 shadow-lg flex-shrink-0">
+                          <Mic className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
+                        </div>
+                        <div className="flex-1 text-center sm:text-left w-full">
+                          <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">Pronunciation Analyzer</h3>
+                          <p className="text-sm sm:text-base text-cyan-100/80 mb-3 sm:mb-4">
+                            Record and analyze your pronunciation with AI-powered feedback
+                          </p>
+                          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-4 mb-3 sm:mb-4">
+                            <Badge variant="outline" className="bg-amber-500/20 text-amber-300 border-amber-400/30 text-xs">
+                              AI Feedback
+                            </Badge>
+                          </div>
+                          <Button
+                            size="default"
+                            className="w-full sm:w-auto bg-white text-amber-600 hover:bg-amber-50 font-semibold text-sm sm:text-base"
+                            onClick={() => setActiveWidget('pronunciation')}
+                          >
+                            <Mic className="w-4 h-4 mr-2" />
+                            Analyze Pronunciation
+                            <ArrowRight className="w-4 h-4 ml-2" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
 
                   {/* Daily Conversation - Prominent */}
                   <Card className="bg-gradient-to-br from-cyan-500/20 via-purple-500/30 to-pink-500/20 backdrop-blur-xl border-purple-400/50 shadow-2xl relative">
@@ -629,7 +1015,49 @@ const AdultsPage = () => {
               </TabsContent>
 
               <TabsContent value="review" className="mt-0">
-                <SpacedRepetition />
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Review & Flashcards</h2>
+                    <p className="text-xs sm:text-sm text-cyan-100/70 mb-4 sm:mb-6">Spaced repetition and flashcard review</p>
+                  </div>
+                  <SpacedRepetition />
+                  <FlashcardsMain />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="multimode" className="mt-0">
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Multi-Mode Practice</h2>
+                    <p className="text-xs sm:text-sm text-cyan-100/70 mb-4 sm:mb-6">Practice all language skills in one place</p>
+                  </div>
+                  <Card className="bg-gradient-to-br from-blue-500/20 via-indigo-500/30 to-purple-500/20 backdrop-blur-xl border-blue-400/50 shadow-2xl">
+                    <CardContent className="p-6">
+                      <div className="text-center">
+                        <p className="text-cyan-100/80 mb-4">
+                          Access comprehensive practice for listening, speaking, reading, and writing skills
+                        </p>
+                        <Button
+                          size="default"
+                          className="bg-white text-blue-600 hover:bg-blue-50 font-semibold"
+                          onClick={() => navigate('/adults/practice/multi-mode')}
+                        >
+                          <Play className="w-4 h-4 mr-2" />
+                          Open Multi-Mode Practice
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="email" className="mt-0">
+                <BusinessEmailCoach onClose={() => {}} />
+              </TabsContent>
+
+              <TabsContent value="cultural" className="mt-0">
+                <CulturalIntelligence onClose={() => {}} />
               </TabsContent>
 
               <TabsContent value="analytics" className="mt-0">

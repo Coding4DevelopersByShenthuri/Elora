@@ -45,7 +45,16 @@ from .serializers import (
     CommonLessonSerializer, CommonLessonEnrollmentSerializer, WeeklyChallengeSerializer,
     UserWeeklyChallengeSerializer, LearningGoalSerializer, PersonalizedRecommendationSerializer,
     SpacedRepetitionItemSerializer, MicrolearningModuleSerializer, MicrolearningProgressSerializer,
-    ProgressAnalyticsSerializer
+    ProgressAnalyticsSerializer,
+    # New serializers for adults features
+    DictionaryEntrySerializer, UserDictionarySerializer,
+    FlashcardDeckSerializer, FlashcardSerializer, FlashcardReviewSerializer,
+    DailyGoalSerializer, UserToolbarPreferenceSerializer,
+    MultiModePracticeSessionSerializer,
+    EmailTemplateSerializer, EmailPracticeSessionSerializer,
+    PronunciationPracticeSerializer,
+    CulturalIntelligenceModuleSerializer, CulturalIntelligenceProgressSerializer,
+    SearchHistorySerializer
 )
 from .models import (
     UserProfile, Lesson, LessonProgress, PracticeSession,
@@ -62,7 +71,12 @@ from .models import (
     VideoEngagement, ChannelSubscription, PracticeComment, VideoShareEvent,
     CommonLesson, CommonLessonEnrollment, WeeklyChallenge, UserWeeklyChallenge,
     LearningGoal, PersonalizedRecommendation, SpacedRepetitionItem,
-    MicrolearningModule, MicrolearningProgress, ProgressAnalytics
+    MicrolearningModule, MicrolearningProgress, ProgressAnalytics,
+    # New models for adults features
+    DictionaryEntry, UserDictionary, FlashcardDeck, Flashcard, FlashcardReview,
+    DailyGoal, UserToolbarPreference, MultiModePracticeSession,
+    EmailTemplate, EmailPracticeSession, PronunciationPractice,
+    CulturalIntelligenceModule, CulturalIntelligenceProgress, SearchHistory
 )
 
 logger = logging.getLogger(__name__)
@@ -9824,10 +9838,8 @@ def adults_progress_analytics(request):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def adults_analytics_summary(request):
-    """Get summary analytics across all adult categories"""
+def _get_adults_analytics_summary(user):
+    """Helper function to get summary analytics across all adult categories"""
     try:
         # Get progress for all adult categories
         categories = ['adults_beginner', 'adults_intermediate', 'adults_advanced']
@@ -9835,7 +9847,7 @@ def adults_analytics_summary(request):
         
         for category in categories:
             progress = CategoryProgress.objects.filter(
-                user=request.user,
+                user=user,
                 category=category
             ).first()
             
@@ -9864,8 +9876,7 @@ def adults_analytics_summary(request):
         total_time = sum(s['practice_time_minutes'] for s in summary.values())
         avg_score = sum(s['average_score'] for s in summary.values()) / len(categories) if categories else 0
         
-        return Response({
-            'success': True,
+        return {
             'summary': summary,
             'totals': {
                 'total_points': total_points,
@@ -9873,6 +9884,29 @@ def adults_analytics_summary(request):
                 'total_time_minutes': total_time,
                 'average_score': avg_score
             }
+        }
+    except Exception as e:
+        logger.error(f"Adults analytics summary error: {str(e)}")
+        return {
+            'summary': {},
+            'totals': {
+                'total_points': 0,
+                'total_lessons': 0,
+                'total_time_minutes': 0,
+                'average_score': 0
+            }
+        }
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def adults_analytics_summary(request):
+    """Get summary analytics across all adult categories"""
+    try:
+        result = _get_adults_analytics_summary(request.user)
+        return Response({
+            'success': True,
+            **result
         })
     except Exception as e:
         logger.error(f"Adults analytics summary error: {str(e)}")
@@ -9929,8 +9963,15 @@ def adults_dashboard(request):
         ).count()
         
         # Progress summary
-        analytics_summary_response = adults_analytics_summary(request)
-        analytics_summary = analytics_summary_response.data.get('summary', {}) if hasattr(analytics_summary_response, 'data') else {}
+        analytics_data = _get_adults_analytics_summary(request.user)
+        analytics_summary = analytics_data.get('summary', {})
+        
+        # Get user's current streak from profile
+        try:
+            profile = UserProfile.objects.get(user=request.user)
+            current_streak = profile.current_streak or 0
+        except UserProfile.DoesNotExist:
+            current_streak = 0
         
         return Response({
             'success': True,
@@ -9956,7 +9997,8 @@ def adults_dashboard(request):
                 'microlearning': {
                     'completed': microlearning_completed
                 },
-                'progress_summary': analytics_summary
+                'progress_summary': analytics_summary,
+                'current_streak': current_streak
             }
         })
     except Exception as e:
@@ -9968,3 +10010,664 @@ def adults_dashboard(request):
             'message': 'An error occurred',
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# ============= Dictionary Endpoints =============
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def dictionary_search(request):
+    """Search dictionary entries"""
+    query = request.GET.get('q', '').strip()
+    if not query:
+        return Response({'success': False, 'error': 'Query required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    entries = DictionaryEntry.objects.filter(
+        word__icontains=query, is_active=True
+    )[:20]
+    
+    serializer = DictionaryEntrySerializer(entries, many=True, context={'request': request})
+    return Response({'success': True, 'data': serializer.data})
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def dictionary_lookup(request, word):
+    """Lookup word details"""
+    try:
+        entry = DictionaryEntry.objects.get(word__iexact=word, is_active=True)
+        serializer = DictionaryEntrySerializer(entry, context={'request': request})
+        return Response({'success': True, 'data': serializer.data})
+    except DictionaryEntry.DoesNotExist:
+        return Response({'success': False, 'error': 'Word not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def my_dictionary(request):
+    """Get user's personal dictionary"""
+    entries = UserDictionary.objects.filter(user=request.user).order_by('-added_at')
+    serializer = UserDictionarySerializer(entries, many=True, context={'request': request})
+    return Response({'success': True, 'data': serializer.data})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_to_dictionary(request):
+    """Add word to personal dictionary"""
+    word = request.data.get('word', '').strip()
+    dictionary_entry_id = request.data.get('dictionary_entry_id')
+    
+    if not word and not dictionary_entry_id:
+        return Response({'success': False, 'error': 'Word or dictionary_entry_id required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        if dictionary_entry_id:
+            entry = DictionaryEntry.objects.get(id=dictionary_entry_id, is_active=True)
+        else:
+            entry = DictionaryEntry.objects.get(word__iexact=word, is_active=True)
+        
+        user_dict, created = UserDictionary.objects.get_or_create(
+            user=request.user,
+            dictionary_entry=entry,
+            defaults={'mastery_level': 0.0}
+        )
+        
+        serializer = UserDictionarySerializer(user_dict, context={'request': request})
+        return Response({
+            'success': True,
+            'data': serializer.data,
+            'created': created
+        }, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+    except DictionaryEntry.DoesNotExist:
+        return Response({'success': False, 'error': 'Word not found in dictionary'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def remove_from_dictionary(request, entry_id):
+    """Remove word from personal dictionary"""
+    try:
+        user_dict = UserDictionary.objects.get(user=request.user, id=entry_id)
+        user_dict.delete()
+        return Response({'success': True, 'message': 'Removed from dictionary'})
+    except UserDictionary.DoesNotExist:
+        return Response({'success': False, 'error': 'Entry not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+# ============= Flashcards Endpoints =============
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def flashcard_decks(request):
+    """Get user's flashcard decks or create new deck"""
+    if request.method == 'GET':
+        decks = FlashcardDeck.objects.filter(user=request.user, is_active=True)
+        serializer = FlashcardDeckSerializer(decks, many=True, context={'request': request})
+        return Response({'success': True, 'data': serializer.data})
+    else:  # POST
+        title = request.data.get('title', '').strip()
+        if not title:
+            return Response({'success': False, 'error': 'Title required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        deck = FlashcardDeck.objects.create(
+            user=request.user,
+            title=title,
+            description=request.data.get('description', ''),
+            is_default=request.data.get('is_default', False)
+        )
+        serializer = FlashcardDeckSerializer(deck, context={'request': request})
+        return Response({'success': True, 'data': serializer.data}, status=status.HTTP_201_CREATED)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def flashcard_deck_detail(request, deck_id):
+    """Get deck details with cards"""
+    try:
+        deck = FlashcardDeck.objects.get(user=request.user, id=deck_id)
+        cards = Flashcard.objects.filter(deck=deck).order_by('next_review_date')
+        deck_serializer = FlashcardDeckSerializer(deck, context={'request': request})
+        cards_serializer = FlashcardSerializer(cards, many=True, context={'request': request})
+        return Response({
+            'success': True,
+            'deck': deck_serializer.data,
+            'cards': cards_serializer.data
+        })
+    except FlashcardDeck.DoesNotExist:
+        return Response({'success': False, 'error': 'Deck not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def flashcards_due_for_review(request):
+    """Get flashcards due for review"""
+    today = timezone.now().date()
+    deck_id = request.GET.get('deck_id')
+    
+    query = Flashcard.objects.filter(deck__user=request.user, next_review_date__lte=today)
+    if deck_id:
+        query = query.filter(deck_id=deck_id)
+    
+    cards = query.order_by('next_review_date')[:20]
+    serializer = FlashcardSerializer(cards, many=True, context={'request': request})
+    return Response({'success': True, 'data': serializer.data})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def submit_flashcard_review(request):
+    """Submit flashcard review result"""
+    flashcard_id = request.data.get('flashcard_id')
+    quality = request.data.get('quality', 3)  # 0-5 scale
+    time_spent = request.data.get('time_spent_seconds', 0)
+    
+    try:
+        flashcard = Flashcard.objects.get(deck__user=request.user, id=flashcard_id)
+        
+        # Create review record
+        was_correct = quality >= 3
+        FlashcardReview.objects.create(
+            flashcard=flashcard,
+            user=request.user,
+            quality=quality,
+            was_correct=was_correct,
+            time_spent_seconds=time_spent
+        )
+        
+        # Update flashcard using SM-2 algorithm (simplified)
+        flashcard.times_reviewed += 1
+        if was_correct:
+            flashcard.times_correct += 1
+            flashcard.repetitions += 1
+            flashcard.interval_days = flashcard.interval_days * 2
+            flashcard.next_review_date = timezone.now().date() + timedelta(days=flashcard.interval_days)
+        else:
+            flashcard.times_incorrect += 1
+            flashcard.repetitions = 0
+            flashcard.interval_days = 1
+            flashcard.next_review_date = timezone.now().date() + timedelta(days=1)
+        
+        flashcard.last_reviewed = timezone.now()
+        flashcard.mastery_level = (flashcard.times_correct / flashcard.times_reviewed * 100) if flashcard.times_reviewed > 0 else 0
+        flashcard.save()
+        
+        serializer = FlashcardSerializer(flashcard, context={'request': request})
+        return Response({'success': True, 'data': serializer.data})
+    except Flashcard.DoesNotExist:
+        return Response({'success': False, 'error': 'Flashcard not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def generate_flashcards_from_vocabulary(request):
+    """Auto-generate flashcards from user's vocabulary"""
+    return Response({'success': False, 'error': 'Not implemented yet'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+
+
+# ============= Daily Goals Endpoints =============
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def daily_goals(request):
+    """Get or create daily goals"""
+    today = timezone.now().date()
+    
+    if request.method == 'GET':
+        goals = DailyGoal.objects.filter(user=request.user, goal_date=today)
+        serializer = DailyGoalSerializer(goals, many=True)
+        return Response({'success': True, 'data': serializer.data})
+    else:  # POST
+        goal_type = request.data.get('goal_type')
+        target_value = request.data.get('target_value')
+        
+        if not goal_type or not target_value:
+            return Response({'success': False, 'error': 'goal_type and target_value required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        goal, created = DailyGoal.objects.get_or_create(
+            user=request.user,
+            goal_type=goal_type,
+            goal_date=today,
+            defaults={'target_value': target_value, 'current_value': 0}
+        )
+        
+        serializer = DailyGoalSerializer(goal)
+        return Response({
+            'success': True,
+            'data': serializer.data,
+            'created': created
+        }, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def update_daily_goal(request, goal_id):
+    """Update daily goal progress"""
+    try:
+        goal = DailyGoal.objects.get(user=request.user, id=goal_id)
+        goal.current_value = request.data.get('current_value', goal.current_value)
+        
+        if goal.current_value >= goal.target_value and not goal.completed:
+            goal.completed = True
+            goal.completed_at = timezone.now()
+        
+        goal.save()
+        serializer = DailyGoalSerializer(goal)
+        return Response({'success': True, 'data': serializer.data})
+    except DailyGoal.DoesNotExist:
+        return Response({'success': False, 'error': 'Goal not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def daily_goals_history(request):
+    """Get daily goals history"""
+    days = int(request.GET.get('days', 7))
+    start_date = timezone.now().date() - timedelta(days=days)
+    
+    goals = DailyGoal.objects.filter(
+        user=request.user,
+        goal_date__gte=start_date
+    ).order_by('-goal_date')
+    
+    serializer = DailyGoalSerializer(goals, many=True)
+    return Response({'success': True, 'data': serializer.data})
+
+
+# ============= Toolbar Preferences =============
+@api_view(['GET', 'PUT'])
+@permission_classes([IsAuthenticated])
+def toolbar_preferences(request):
+    """Get or update toolbar preferences"""
+    preference, created = UserToolbarPreference.objects.get_or_create(user=request.user)
+    
+    if request.method == 'GET':
+        serializer = UserToolbarPreferenceSerializer(preference)
+        return Response({'success': True, 'data': serializer.data})
+    else:  # PUT
+        serializer = UserToolbarPreferenceSerializer(preference, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'success': True, 'data': serializer.data})
+        return Response({'success': False, 'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# ============= Multi-Mode Practice =============
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def start_multi_mode_practice(request):
+    """Start multi-mode practice session"""
+    mode = request.data.get('mode')
+    if not mode or mode not in ['listening', 'speaking', 'reading', 'writing']:
+        return Response({'success': False, 'error': 'Valid mode required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    session = MultiModePracticeSession.objects.create(
+        user=request.user,
+        mode=mode,
+        content_type=request.data.get('content_type', ''),
+        content_id=request.data.get('content_id', ''),
+        details=request.data.get('details', {})
+    )
+    
+    serializer = MultiModePracticeSessionSerializer(session, context={'request': request})
+    return Response({'success': True, 'data': serializer.data}, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def complete_multi_mode_practice(request, session_id):
+    """Complete multi-mode practice session"""
+    try:
+        session = MultiModePracticeSession.objects.get(user=request.user, id=session_id)
+        session.score = request.data.get('score', 0.0)
+        session.points_earned = request.data.get('points_earned', 0)
+        session.duration_minutes = request.data.get('duration_minutes', 0)
+        session.items_completed = request.data.get('items_completed', 0)
+        session.items_correct = request.data.get('items_correct', 0)
+        session.items_incorrect = request.data.get('items_incorrect', 0)
+        session.completed_at = timezone.now()
+        session.details.update(request.data.get('details', {}))
+        session.save()
+        
+        serializer = MultiModePracticeSessionSerializer(session, context={'request': request})
+        return Response({'success': True, 'data': serializer.data})
+    except MultiModePracticeSession.DoesNotExist:
+        return Response({'success': False, 'error': 'Session not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def multi_mode_practice_history(request):
+    """Get multi-mode practice history"""
+    mode = request.GET.get('mode')
+    days = int(request.GET.get('days', 30))
+    start_date = timezone.now() - timedelta(days=days)
+    
+    sessions = MultiModePracticeSession.objects.filter(
+        user=request.user,
+        started_at__gte=start_date
+    )
+    
+    if mode:
+        sessions = sessions.filter(mode=mode)
+    
+    sessions = sessions.order_by('-started_at')[:50]
+    serializer = MultiModePracticeSessionSerializer(sessions, many=True, context={'request': request})
+    return Response({'success': True, 'data': serializer.data})
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_multi_mode_practice_session(request, session_id):
+    """Delete a specific multi-mode practice session"""
+    try:
+        session = MultiModePracticeSession.objects.get(id=session_id, user=request.user)
+        session.delete()
+        return Response({'success': True, 'message': 'Session deleted successfully'})
+    except MultiModePracticeSession.DoesNotExist:
+        return Response({'success': False, 'error': 'Session not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def delete_multi_mode_practice_sessions(request):
+    """Delete multiple multi-mode practice sessions (bulk delete)"""
+    session_ids = request.data.get('session_ids', [])
+    delete_old = request.data.get('delete_old', False)
+    days_old = int(request.data.get('days_old', 30))
+    
+    try:
+        if delete_old:
+            # Delete sessions older than specified days
+            cutoff_date = timezone.now() - timedelta(days=days_old)
+            deleted_count = MultiModePracticeSession.objects.filter(
+                user=request.user,
+                started_at__lt=cutoff_date
+            ).delete()[0]
+            return Response({
+                'success': True,
+                'message': f'Deleted {deleted_count} old session(s)',
+                'deleted_count': deleted_count
+            })
+        elif session_ids:
+            # Delete specific sessions
+            deleted_count = MultiModePracticeSession.objects.filter(
+                id__in=session_ids,
+                user=request.user
+            ).delete()[0]
+            return Response({
+                'success': True,
+                'message': f'Deleted {deleted_count} session(s)',
+                'deleted_count': deleted_count
+            })
+        else:
+            return Response({
+                'success': False,
+                'error': 'No sessions specified for deletion'
+            }, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        logger.error(f"Error deleting sessions: {str(e)}")
+        return Response({
+            'success': False,
+            'error': 'Failed to delete sessions'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# ============= Business Email Coach =============
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def email_templates(request):
+    """Get email templates"""
+    template_type = request.GET.get('type')
+    difficulty = request.GET.get('difficulty')
+    
+    templates = EmailTemplate.objects.filter(is_active=True)
+    if template_type:
+        templates = templates.filter(template_type=template_type)
+    if difficulty:
+        templates = templates.filter(difficulty=difficulty)
+    
+    templates = templates.order_by('order')[:50]
+    serializer = EmailTemplateSerializer(templates, many=True, context={'request': request})
+    return Response({'success': True, 'data': serializer.data})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def email_template_detail(request, template_id):
+    """Get email template details"""
+    try:
+        template = EmailTemplate.objects.get(id=template_id, is_active=True)
+        template.usage_count += 1
+        template.save()
+        serializer = EmailTemplateSerializer(template, context={'request': request})
+        return Response({'success': True, 'data': serializer.data})
+    except EmailTemplate.DoesNotExist:
+        return Response({'success': False, 'error': 'Template not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def submit_email_practice(request):
+    """Submit email for AI feedback"""
+    template_id = request.data.get('template_id')
+    subject = request.data.get('subject', '')
+    body = request.data.get('body', '')
+    
+    try:
+        template = EmailTemplate.objects.get(id=template_id, is_active=True)
+        
+        # TODO: Add AI feedback logic here
+        session = EmailPracticeSession.objects.create(
+            user=request.user,
+            template=template,
+            subject=subject,
+            body=body,
+            grammar_score=75.0,
+            tone_score=80.0,
+            clarity_score=70.0,
+            overall_score=75.0,
+            feedback={'message': 'AI feedback will be implemented'},
+            suggestions=[]
+        )
+        
+        serializer = EmailPracticeSessionSerializer(session, context={'request': request})
+        return Response({'success': True, 'data': serializer.data}, status=status.HTTP_201_CREATED)
+    except EmailTemplate.DoesNotExist:
+        return Response({'success': False, 'error': 'Template not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def email_practice_history(request):
+    """Get email practice history"""
+    sessions = EmailPracticeSession.objects.filter(user=request.user).order_by('-created_at')[:20]
+    serializer = EmailPracticeSessionSerializer(sessions, many=True, context={'request': request})
+    return Response({'success': True, 'data': serializer.data})
+
+
+# ============= Pronunciation Analyzer =============
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def submit_pronunciation_practice(request):
+    """Submit pronunciation recording for analysis"""
+    target_text = request.data.get('target_text', '')
+    user_audio_url = request.data.get('user_audio_url', '')
+    
+    if not target_text:
+        return Response({'success': False, 'error': 'target_text required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    practice = PronunciationPractice.objects.create(
+        user=request.user,
+        target_text=target_text,
+        target_phonetic=request.data.get('target_phonetic', ''),
+        target_audio_url=request.data.get('target_audio_url', ''),
+        user_audio_url=user_audio_url,
+        user_audio_duration=request.data.get('user_audio_duration', 0.0),
+        accuracy_score=75.0,
+        pronunciation_score=80.0,
+        fluency_score=70.0,
+        phonetic_analysis={},
+        mistakes=[],
+        feedback='AI analysis will be implemented',
+        suggestions=[]
+    )
+    
+    serializer = PronunciationPracticeSerializer(practice, context={'request': request})
+    return Response({'success': True, 'data': serializer.data}, status=status.HTTP_201_CREATED)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def pronunciation_practice_history(request):
+    """Get pronunciation practice history"""
+    practices = PronunciationPractice.objects.filter(user=request.user).order_by('-practiced_at')[:20]
+    serializer = PronunciationPracticeSerializer(practices, many=True, context={'request': request})
+    return Response({'success': True, 'data': serializer.data})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def pronunciation_statistics(request):
+    """Get pronunciation statistics"""
+    practices = PronunciationPractice.objects.filter(user=request.user)
+    
+    total_practices = practices.count()
+    avg_accuracy = practices.aggregate(avg=Avg('accuracy_score'))['avg'] or 0
+    avg_pronunciation = practices.aggregate(avg=Avg('pronunciation_score'))['avg'] or 0
+    
+    return Response({
+        'success': True,
+        'data': {
+            'total_practices': total_practices,
+            'average_accuracy': round(avg_accuracy, 2),
+            'average_pronunciation': round(avg_pronunciation, 2)
+        }
+    })
+
+
+# ============= Cultural Intelligence =============
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def cultural_modules(request):
+    """Get cultural intelligence modules"""
+    category = request.GET.get('category')
+    region = request.GET.get('region')
+    
+    modules = CulturalIntelligenceModule.objects.filter(is_active=True)
+    if category:
+        modules = modules.filter(category=category)
+    if region:
+        modules = modules.filter(region=region)
+    
+    modules = modules.order_by('order')[:50]
+    serializer = CulturalIntelligenceModuleSerializer(modules, many=True, context={'request': request})
+    return Response({'success': True, 'data': serializer.data})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def cultural_module_detail(request, slug):
+    """Get cultural module details"""
+    try:
+        module = CulturalIntelligenceModule.objects.get(slug=slug, is_active=True)
+        module.views += 1
+        module.save()
+        serializer = CulturalIntelligenceModuleSerializer(module, context={'request': request})
+        return Response({'success': True, 'data': serializer.data})
+    except CulturalIntelligenceModule.DoesNotExist:
+        return Response({'success': False, 'error': 'Module not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def cultural_progress(request):
+    """Get or update cultural intelligence progress"""
+    module_id = request.data.get('module_id') if request.method == 'POST' else request.GET.get('module_id')
+    
+    if request.method == 'GET':
+        progress_list = CulturalIntelligenceProgress.objects.filter(user=request.user)
+        if module_id:
+            progress_list = progress_list.filter(module_id=module_id)
+        
+        serializer = CulturalIntelligenceProgressSerializer(progress_list, many=True, context={'request': request})
+        return Response({'success': True, 'data': serializer.data})
+    else:  # POST
+        try:
+            module = CulturalIntelligenceModule.objects.get(id=module_id)
+            progress, created = CulturalIntelligenceProgress.objects.get_or_create(
+                user=request.user,
+                module=module,
+                defaults={'score': 0.0}
+            )
+            
+            progress.score = request.data.get('score', progress.score)
+            progress.quiz_score = request.data.get('quiz_score', progress.quiz_score)
+            progress.time_spent_minutes = request.data.get('time_spent_minutes', progress.time_spent_minutes)
+            
+            if request.data.get('completed'):
+                progress.completed = True
+                progress.completed_at = timezone.now()
+                module.completion_count += 1
+                module.save()
+            
+            progress.save()
+            serializer = CulturalIntelligenceProgressSerializer(progress, context={'request': request})
+            return Response({
+                'success': True,
+                'data': serializer.data,
+                'created': created
+            }, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+        except CulturalIntelligenceModule.DoesNotExist:
+            return Response({'success': False, 'error': 'Module not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+# ============= Search =============
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def save_search(request):
+    """Save search query"""
+    query = request.data.get('query', '').strip()
+    search_type = request.data.get('search_type', 'all')
+    results_count = request.data.get('results_count', 0)
+    clicked_result = request.data.get('clicked_result', '')
+    
+    if query:
+        SearchHistory.objects.create(
+            user=request.user if request.user.is_authenticated else None,
+            query=query,
+            search_type=search_type,
+            results_count=results_count,
+            clicked_result=clicked_result
+        )
+    
+    return Response({'success': True})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def search_suggestions(request):
+    """Get search suggestions based on history"""
+    query = request.GET.get('q', '').strip()
+    
+    suggestions = SearchHistory.objects.filter(
+        query__icontains=query
+    ).values('query').distinct()[:10]
+    
+    return Response({
+        'success': True,
+        'data': [s['query'] for s in suggestions]
+    })
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def search_history(request):
+    """Get user search history"""
+    days = int(request.GET.get('days', 30))
+    start_date = timezone.now() - timedelta(days=days)
+    
+    searches = SearchHistory.objects.filter(
+        user=request.user,
+        searched_at__gte=start_date
+    ).order_by('-searched_at')[:50]
+    
+    serializer = SearchHistorySerializer(searches, many=True)
+    return Response({'success': True, 'data': serializer.data})

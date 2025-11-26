@@ -1,0 +1,252 @@
+{
+  "module": {
+    "id": "daily-conversations",
+    "title": "Daily Conversations",
+    "description": "Improve your listening skills with everyday conversations and social interactions",
+    "difficulty": "beginner",
+    "duration": "15-20 min",
+    "level": "Foundation",
+    "icon": "💬",
+    "color": "from-cyan-500 to-blue-600",
+    "category": "Daily Life"
+  },
+  "exercises": [
+    {
+      "id": "ex1",
+      "type": "comprehension",
+      "question": "Where does Maya stop on her way to work every morning?",
+      "audioSegment": {
+        "start": 0,
+        "end": 45
+      },
+      "options": [
+        "At the gym",
+        "At a corner bakery",
+        "At the train station",
+        "At her friend's apartment"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Maya and her barista greet each other at the corner bakery before she catches the train.",
+      "points": 10
+    },
+    {
+      "id": "ex2",
+      "type": "multiple-choice",
+      "question": "Which commute change does Maya notice on Monday?",
+      "audioSegment": {
+        "start": 45,
+        "end": 95
+      },
+      "options": [
+        "Track maintenance delays",
+        "A new express train",
+        "Higher ticket prices",
+        "Closed subway entrance"
+      ],
+      "correctAnswer": 0,
+      "explanation": "She mentions the transit app warning about track maintenance delays.",
+      "points": 10
+    },
+    {
+      "id": "ex3",
+      "type": "fill-blank",
+      "question": "Maya promises to email the updated __________ before lunchtime.",
+      "audioSegment": {
+        "start": 95,
+        "end": 140
+      },
+      "correctAnswer": "care calendar",
+      "explanation": "She will send the updated care calendar after speaking with the nurse.",
+      "points": 12
+    },
+    {
+      "id": "ex4",
+      "type": "multiple-choice",
+      "question": "Why do Maya and her brother call their mother during the lunch break?",
+      "audioSegment": {
+        "start": 140,
+        "end": 190
+      },
+      "options": [
+        "To remind her about groceries",
+        "To check on her medication schedule",
+        "To invite her to dinner",
+        "To plan a vacation"
+      ],
+      "correctAnswer": 1,
+      "explanation": "They review their mother's medication reminders and meal deliveries.",
+      "points": 10
+    },
+    {
+      "id": "ex5",
+      "type": "true-false",
+      "question": "Maya postpones her dentist appointment to attend her nephew's recital.",
+      "audioSegment": {
+        "start": 190,
+        "end": 230
+      },
+      "correctAnswer": true,
+      "explanation": "She calls the dentist to move the cleaning so she can support her nephew.",
+      "points": 8
+    },
+    {
+      "id": "ex6",
+      "type": "comprehension",
+      "question": "What meal do Maya and Lucas decide to cook for dinner?",
+      "audioSegment": {
+        "start": 230,
+        "end": 280
+      },
+      "options": [
+        "Vegetable stir-fry",
+        "Grilled salmon",
+        "Taco bowls",
+        "Pasta primavera"
+      ],
+      "correctAnswer": 2,
+      "explanation": "They choose taco bowls because everyone can build their own plate.",
+      "points": 10
+    },
+    {
+      "id": "ex7",
+      "type": "fill-blank",
+      "question": "Lucas adds cilantro and a bag of __________ to the shared grocery list.",
+      "audioSegment": {
+        "start": 280,
+        "end": 320
+      },
+      "correctAnswer": "limes",
+      "explanation": "He updates the app list with cilantro and limes for the taco bowls.",
+      "points": 12
+    },
+    {
+      "id": "ex8",
+      "type": "multiple-choice",
+      "question": "Which evening plan do Maya and her friends settle on for Thursday?",
+      "audioSegment": {
+        "start": 320,
+        "end": 370
+      },
+      "options": [
+        "Virtual trivia night",
+        "Outdoor movie",
+        "Book-club video call",
+        "Live concert"
+      ],
+      "correctAnswer": 2,
+      "explanation": "They confirm the monthly book-club video call for Thursday night.",
+      "points": 9
+    },
+    {
+      "id": "ex9",
+      "type": "true-false",
+      "question": "Maya decides to finish her online course before watching the travel documentary.",
+      "audioSegment": {
+        "start": 370,
+        "end": 410
+      },
+      "correctAnswer": true,
+      "explanation": "She wants the satisfaction of ticking off her course assignment first.",
+      "points": 7
+    },
+    {
+      "id": "ex10",
+      "type": "multiple-choice",
+      "question": "What mindfulness technique does Maya use during her evening walk?",
+      "audioSegment": {
+        "start": 410,
+        "end": 455
+      },
+      "options": [
+        "Box breathing",
+        "Counting steps",
+        "Body scan",
+        "Gratitude journaling"
+      ],
+      "correctAnswer": 0,
+      "explanation": "She practices box breathing while circling the neighborhood.",
+      "points": 10
+    },
+    {
+      "id": "ex11",
+      "type": "comprehension",
+      "question": "Which friend does Maya text goodnight?",
+      "audioSegment": {
+        "start": 455,
+        "end": 495
+      },
+      "options": [
+        "Nina",
+        "Tori",
+        "Sasha",
+        "Dev"
+      ],
+      "correctAnswer": 3,
+      "explanation": "She sends Dev a quick message to catch up on the weekend.",
+      "points": 8
+    },
+    {
+      "id": "ex12",
+      "type": "fill-blank",
+      "question": "At the end of the day Maya notes three things she felt __________ for.",
+      "audioSegment": {
+        "start": 495,
+        "end": 540
+      },
+      "correctAnswer": "grateful",
+      "explanation": "She closes her planner with a gratitude trio before sleeping.",
+      "points": 12
+    }
+  ],
+  "transcript": "Good morning! It's Maya again, sending a voice memo as soon as I leave the apartment. I waved at my neighbor who was watering her plants and headed toward the corner bakery. Arjun, the barista, already knew to start a cinnamon latte, and we compared notes about the rainy forecast. With my coffee in hand, I hurried to the platform, checked the transit app, and saw a warning about track maintenance. The train crawled along the river, so I pulled up my to‑do list and reshuffled meetings before arriving at the office. \n\nAt 9:15 I called my brother Lucas to review Mom's care calendar. We double-checked nurse visits, medication reminders, and grocery deliveries. I promised to email the updated calendar to the family thread before lunch. While I heated leftovers, Lucas looped Mom into a three-way video call so we could remind her about the new allergy pills. She joked that we were running a command center, and we all laughed. After lunch, I dialed my dentist to push my cleaning to next week because my nephew's recital landed on the same afternoon. \n\nAround 3 PM my watch pinged—a hydration reminder from the wellness app. I refilled my water bottle, stretched, and finished drafting progress notes for my manager. When the office quieted, Lucas texted asking what we should cook for dinner. We settled on taco bowls so everyone could build their own plate. He added cilantro and a bag of limes to our shared grocery list, and I claimed responsibility for the roasted vegetables. \n\nAt 5:45 I stepped into the grocery store and bumped into my neighbor Nina. We compared impulse purchases, laughed about mid-week snacks, and promised to trade leftover recipes. Back home, Lucas chopped produce while I logged into our HOA portal to dispute a parking ticket. After dinner we tidied the kitchen and reviewed the group chat about Thursday night's book-club video call. We confirmed the new novel, decided on a virtual background theme, and set reminders. \n\nBy 8:30 I opened my laptop to finish the last module of an online productivity course. I resisted the temptation to start a travel documentary until I earned the completion badge. Once the course quiz was done, I texted Dev to confirm our Saturday hiking plans. \n\nTo wind down, I slipped on sneakers for a short walk around the block, practicing box breathing: inhale for four counts, hold for four, exhale for four, hold again. Back at home I brewed chamomile tea, dimmed the lights, and scribbled three gratitude notes in my planner—supportive family, flexible coworkers, and a quiet neighborhood. Finally, I set out my clothes for the morning circuit class, silenced my phone, and whispered goodnight to the city. That's a wrap on another everyday adventure.",
+  "vocabulary": [
+    {
+      "word": "reshuffle",
+      "definition": "to rearrange or change the order of tasks or plans",
+      "example": "She reshuffled her morning meetings while waiting on the train."
+    },
+    {
+      "word": "care calendar",
+      "definition": "a shared schedule that tracks appointments and responsibilities for a loved one's care",
+      "example": "The siblings updated their mother's care calendar every Sunday."
+    },
+    {
+      "word": "hydration reminder",
+      "definition": "a notification prompting someone to drink water",
+      "example": "Her smartwatch sends a hydration reminder every two hours."
+    },
+    {
+      "word": "impulse purchase",
+      "definition": "something bought suddenly without planning",
+      "example": "The chocolate croissant was definitely an impulse purchase."
+    },
+    {
+      "word": "virtual background",
+      "definition": "an image that replaces the real background during a video call",
+      "example": "They chose a beach virtual background for the book club call."
+    },
+    {
+      "word": "completion badge",
+      "definition": "a digital symbol showing that a course or challenge is finished",
+      "example": "She collected a completion badge after finishing each module."
+    },
+    {
+      "word": "box breathing",
+      "definition": "a breathing technique with equal counts for inhaling, holding, exhaling, and holding again",
+      "example": "Box breathing helped her relax during evening walks."
+    },
+    {
+      "word": "grateful",
+      "definition": "feeling thankful for something",
+      "example": "Writing three things she was grateful for helped her sleep."
+    }
+  ],
+  "tips": [
+    "Listen for subtle time cues such as morning, lunch break, or evening wind down.",
+    "Track small logistical details—appointments, reminders, and grocery lists often signal comprehension questions.",
+    "Notice how everyday problems are solved; there may be clues about priorities or relationships.",
+    "Pay attention to vocabulary that combines two words, like 'care calendar' or 'impulse purchase'.",
+    "Use the narrator's routine to predict what might happen next and stay engaged for the full 15–20 minutes."
+  ]
+}
+

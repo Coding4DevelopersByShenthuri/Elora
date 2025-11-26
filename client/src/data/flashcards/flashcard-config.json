@@ -1,0 +1,25 @@
+{
+  "decks": [
+    {
+      "id": "default",
+      "title": "Default Deck",
+      "description": "Your personal flashcard collection",
+      "isDefault": true
+    }
+  ],
+  "cardTemplates": {
+    "vocabulary": {
+      "frontField": "word",
+      "backFields": ["definition", "example", "phonetic"]
+    },
+    "phrase": {
+      "frontField": "phrase",
+      "backFields": ["meaning", "context", "example"]
+    },
+    "grammar": {
+      "frontField": "rule",
+      "backFields": ["explanation", "examples"]
+    }
+  }
+}
+

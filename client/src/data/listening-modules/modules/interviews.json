@@ -1,0 +1,207 @@
+{
+  "module": {
+    "id": "interviews",
+    "title": "Job Interviews",
+    "description": "Practice understanding interview questions and professional dialogues",
+    "difficulty": "intermediate",
+    "duration": "20-25 min",
+    "level": "Professional",
+    "icon": "🎤",
+    "color": "from-rose-500 to-red-600",
+    "category": "Career"
+  },
+  "exercises": [
+    {
+      "id": "ex1",
+      "type": "comprehension",
+      "question": "What role is Maya interviewing for?",
+      "audioSegment": {
+        "start": 0,
+        "end": 50
+      },
+      "options": [
+        "Program Director",
+        "Customer Success Lead",
+        "Senior Product Manager",
+        "Scrum Master"
+      ],
+      "correctAnswer": 2,
+      "explanation": "The recruiter states the opening is for a Senior Product Manager.",
+      "points": 10
+    },
+    {
+      "id": "ex2",
+      "type": "multiple-choice",
+      "question": "Which product metric does Maya highlight from her last launch?",
+      "audioSegment": {
+        "start": 50,
+        "end": 120
+      },
+      "options": [
+        "Daily active users doubled",
+        "Churn decreased by 18%",
+        "Average order value increased by 12%",
+        "Onboarding completion jumped to 92%"
+      ],
+      "correctAnswer": 3,
+      "explanation": "She emphasizes taking onboarding completion from 71% to 92% in one quarter.",
+      "points": 12
+    },
+    {
+      "id": "ex3",
+      "type": "fill-blank",
+      "question": "During the behavioral question, Maya describes a conflict between the design lead and __________ lead.",
+      "audioSegment": {
+        "start": 120,
+        "end": 190
+      },
+      "correctAnswer": "analytics",
+      "explanation": "She mediates a disagreement between design and analytics about experiment scope.",
+      "points": 11
+    },
+    {
+      "id": "ex4",
+      "type": "multiple-choice",
+      "question": "What framework does Maya use to align stakeholders?",
+      "audioSegment": {
+        "start": 190,
+        "end": 250
+      },
+      "options": [
+        "RACI chart",
+        "HEART metrics",
+        "MoSCoW prioritization",
+        "North Star narrative"
+      ],
+      "correctAnswer": 0,
+      "explanation": "She references a RACI chart to clarify decision rights.",
+      "points": 10
+    },
+    {
+      "id": "ex5",
+      "type": "true-false",
+      "question": "The panel interview includes a live case study about marketplace cancellations.",
+      "audioSegment": {
+        "start": 250,
+        "end": 310
+      },
+      "correctAnswer": true,
+      "explanation": "The product director presents a case about reducing cancellations on a marketplace.",
+      "points": 9
+    },
+    {
+      "id": "ex6",
+      "type": "multiple-choice",
+      "question": "Which data source does Maya request before solving the case?",
+      "audioSegment": {
+        "start": 310,
+        "end": 380
+      },
+      "options": [
+        "Customer support transcripts",
+        "Competitor pricing",
+        "Heatmap recordings",
+        "Weekly activation cohort data"
+      ],
+      "correctAnswer": 3,
+      "explanation": "She asks for activation cohort data to see where drop-offs occur.",
+      "points": 11
+    },
+    {
+      "id": "ex7",
+      "type": "fill-blank",
+      "question": "Maya proposes launching a two-week __________ test to verify the hypothesis.",
+      "audioSegment": {
+        "start": 380,
+        "end": 430
+      },
+      "correctAnswer": "A/B",
+      "explanation": "She suggests a two-week A/B test focusing on clearer cancellation language.",
+      "points": 9
+    },
+    {
+      "id": "ex8",
+      "type": "multiple-choice",
+      "question": "What compensation factor does the recruiter mention when discussing the offer range?",
+      "audioSegment": {
+        "start": 430,
+        "end": 490
+      },
+      "options": [
+        "Geographic salary bands",
+        "Signing bonus limits",
+        "401(k) matching",
+        "Overtime eligibility"
+      ],
+      "correctAnswer": 0,
+      "explanation": "She explains the company uses geographic salary bands for hybrid roles.",
+      "points": 8
+    },
+    {
+      "id": "ex9",
+      "type": "comprehension",
+      "question": "Which value does the leadership panel emphasize when asking for questions?",
+      "audioSegment": {
+        "start": 490,
+        "end": 560
+      },
+      "options": [
+        "Speed above everything",
+        "Radical transparency",
+        "Steep hierarchy",
+        "Individual awards"
+      ],
+      "correctAnswer": 1,
+      "explanation": "They emphasize radical transparency and share examples.",
+      "points": 10
+    },
+    {
+      "id": "ex10",
+      "type": "true-false",
+      "question": "Maya follows up the same evening with personalized thank-you notes.",
+      "audioSegment": {
+        "start": 560,
+        "end": 610
+      },
+      "correctAnswer": true,
+      "explanation": "The transcript ends with her drafting specific thank-you emails.",
+      "points": 7
+    }
+  ],
+  "transcript": "Recruiter Screen – 15 minutes: “Hi Maya, thanks for joining. I’m Priya, recruiting for the Senior Product Manager opening.” They review her background leading onboarding products. Maya shares that her last launch pushed completion from 71 to 92 percent in one quarter by clarifying copy and trimming steps. Priya probes for salary expectations and explains the company’s geographic salary bands for hybrid employees. Maya signals a range but says she is open to the complete compensation picture. \n\nPanel Interview – 45 minutes: Maya meets Product Director Leo, Engineering Manager Noor, and Design Lead Sloane. Leo asks, “Tell us about a time you handled conflicting feedback.” Maya recalls a disagreement between design and analytics about experiment scope. She hosted a joint session, mapped decisions with a RACI chart, and reframed the debate around success metrics rather than personal preference. Noor asks how Maya ensures technical debt stays visible; she describes a quarterly “maintenance sprint” that she co-created with engineering. The panel leans in when she explains how she reports outcomes, citing a 27% drop in activation time and a 40% reduction in support tickets. \n\nLive Case Study – 30 minutes: The product director presents data on rising same-day cancellations inside the company’s marketplace app. Maya clarifies the hypothesis, requests activation cohort data, customer support tags, and push notification logs. She notices cancellations spike when users see a vague service-fee message. Her solution: test clearer fee explanations plus a countdown timer before cancellation. She outlines a two-week A/B test, defines leading indicators, and flags dependencies with design and legal. The panel appreciates that she asks for guardrails—“What would success look like for you if we only reduce cancellations by five percent?” \n\nLeadership Culture Chat – 20 minutes: Two senior leaders join to discuss values. They emphasize “radical transparency,” explaining that roadmaps, OKRs, and slack channels are public by default. Maya asks how feedback travels upward. Leaders describe monthly listening sessions and anonymous surveys. She shares a time she pushed for accessibility prioritization, aligning with their inclusion goals. \n\nWrap-Up – 10 minutes: Priya returns to answer logistical questions about relocation support, start dates, and the interview timeline. She encourages Maya to email any follow-ups. That evening Maya writes personalized thank-you notes: one to Leo referencing the marketplace case, another to Noor about maintenance sprints, and one to Sloane about inclusive design patterns. She reiterates her excitement and the specific ways she could contribute to onboarding and retention metrics.",
+  "vocabulary": [
+    {
+      "word": "RACI chart",
+      "definition": "A matrix clarifying who is Responsible, Accountable, Consulted, and Informed",
+      "example": "She referenced a RACI chart to resolve ownership confusion."
+    },
+    {
+      "word": "activation cohort",
+      "definition": "A group of users tracked from signup to a key activation milestone",
+      "example": "Analyzing activation cohorts revealed where new users churned."
+    },
+    {
+      "word": "guardrails",
+      "definition": "Constraints or acceptable boundaries for experiments or decisions",
+      "example": "She asked stakeholders to define guardrails before testing."
+    },
+    {
+      "word": "geographic salary band",
+      "definition": "Compensation range adjusted for an employee’s working location",
+      "example": "Hybrid roles follow geographic salary bands to stay equitable."
+    },
+    {
+      "word": "radical transparency",
+      "definition": "An organizational value that promotes sharing information openly",
+      "example": "Radical transparency means product roadmaps are visible to all teams."
+    }
+  ],
+  "tips": [
+    "Interview transcripts include multiple mini-conversations; note who is speaking and why.",
+    "Bullet-point metrics and percentages—they often become comprehension questions.",
+    "Pay attention to frameworks (RACI, A/B testing) and how candidates justify decisions.",
+    "Listen for cultural cues such as values or leadership expectations; interviews test alignment.",
+    "Follow-up actions, like personalized thank-you notes, illustrate professionalism and may be referenced in questions."
+  ]
+}
+
