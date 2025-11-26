@@ -59,18 +59,21 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
   const [searchResults, setSearchResults] = useState<DictionaryEntry[]>([]);
   const [selectedWord, setSelectedWord] = useState<DictionaryEntry | null>(null);
 const [myDictionary, setMyDictionary] = useState<UserDictionaryWord[]>([]);
-  const [localDictionary, setLocalDictionary] = useState<LocalDictionaryWord[]>([]);
+const [localDictionary, setLocalDictionary] = useState<LocalDictionaryWord[]>([]);
+const [currentPage, setCurrentPage] = useState(1);
+const ITEMS_PER_PAGE = 4;
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'search' | 'my-words'>('search');
   const [isSyncingVocab, setIsSyncingVocab] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      loadMyDictionary();
-      loadLocalDictionary();
-      syncListeningVocabulary();
-    }
-  }, [user]);
+useEffect(() => {
+  if (user) {
+    setCurrentPage(1);
+    loadMyDictionary();
+    loadLocalDictionary();
+    syncListeningVocabulary();
+  }
+}, [user]);
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
@@ -85,7 +88,7 @@ const [myDictionary, setMyDictionary] = useState<UserDictionaryWord[]>([]);
     return () => clearTimeout(delayDebounce);
   }, [searchQuery]);
 
-  const displayDictionary: DisplayDictionaryWord[] = useMemo(() => {
+const displayDictionary: DisplayDictionaryWord[] = useMemo(() => {
     const localEntries: DisplayDictionaryWord[] = localDictionary.map((entry) => ({
       id: -1,
       dictionary_entry: {
@@ -111,6 +114,25 @@ const [myDictionary, setMyDictionary] = useState<UserDictionaryWord[]>([]);
 
     return [...localEntries, ...serverEntries];
   }, [localDictionary, myDictionary]);
+
+  useEffect(() => {
+    if (activeTab === 'my-words') {
+      setCurrentPage(1);
+    }
+  }, [activeTab, displayDictionary.length]);
+
+  const totalPages = Math.max(1, Math.ceil(displayDictionary.length / ITEMS_PER_PAGE));
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [totalPages]);
+
+  const paginatedDictionary = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return displayDictionary.slice(start, start + ITEMS_PER_PAGE);
+  }, [displayDictionary, currentPage]);
 
   const performSearch = async () => {
     try {
@@ -387,8 +409,8 @@ const [myDictionary, setMyDictionary] = useState<UserDictionaryWord[]>([]);
   };
 
   return (
-    <Card className="bg-slate-900/95 backdrop-blur-xl border-purple-500/30 shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col mx-auto">
-      <CardHeader className="border-b border-purple-500/30">
+    <Card className="relative z-50 mt-6 sm:mt-10 bg-slate-900/95 backdrop-blur-xl border-purple-500/30 shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col mx-auto">
+      <CardHeader className="border-b border-purple-500/30 sticky top-0 bg-slate-900/95 z-10">
         <div className="flex items-center justify-between">
           <CardTitle className="text-white flex items-center gap-2">
             <BookOpen className="h-5 w-5 text-blue-400" />
@@ -589,62 +611,97 @@ const [myDictionary, setMyDictionary] = useState<UserDictionaryWord[]>([]);
             )}
           </>
         ) : (
-          <ScrollArea className="flex-1">
-            <div className="p-4 space-y-3">
-              {displayDictionary.length === 0 ? (
-                <div className="text-center text-cyan-300/70 py-8">
-                  No words saved yet. Search and add words to your dictionary!
-                </div>
-              ) : (
-                displayDictionary.map((item) => (
-                  <div
-                    key={`${item.isLocal ? 'local' : 'server'}-${item.isLocal ? item.localId : item.id}`}
-                    className="p-4 rounded-lg border bg-slate-800/30 border-purple-500/20 hover:bg-slate-800/50 transition-all"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h4 className="font-semibold text-white">
-                            {item.dictionary_entry.word}
-                          </h4>
-                          {item.isLocal && item.dictionary_entry.category && (
-                            <Badge className="bg-blue-500/20 text-blue-200 border-blue-400/30">
-                              {item.dictionary_entry.category}
-                            </Badge>
-                          )}
-                          {item.mastery_level >= 80 && (
-                            <Badge className="bg-green-500/20 text-green-300 border-green-400/30">
-                              Mastered
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-sm text-cyan-100/80 line-clamp-2">
-                          {item.dictionary_entry.definition}
-                        </p>
-                        <div className="flex items-center gap-4 mt-2 text-xs text-cyan-300/60">
-                          <span>Mastery: {Math.round(item.mastery_level)}%</span>
-                          <span>Practiced: {item.times_practiced} times</span>
-                          {item.last_practiced_at && (
+          <>
+            <ScrollArea className="flex-1">
+              <div className="p-4 space-y-3">
+                {displayDictionary.length === 0 ? (
+                  <div className="text-center text-cyan-300/70 py-8">
+                    No words saved yet. Search and add words to your dictionary!
+                  </div>
+                ) : (
+                  paginatedDictionary.map((item) => (
+                    <div
+                      key={`${item.isLocal ? 'local' : 'server'}-${item.isLocal ? item.localId : item.id}`}
+                      className="p-4 rounded-lg border bg-slate-800/30 border-purple-500/20 hover:bg-slate-800/50 transition-all"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h4 className="font-semibold text-white">
+                              {item.dictionary_entry.word}
+                            </h4>
+                            {item.isLocal && item.dictionary_entry.category && (
+                              <Badge className="bg-blue-500/20 text-blue-200 border-blue-400/30">
+                                {item.dictionary_entry.category}
+                              </Badge>
+                            )}
+                            {!item.isLocal && item.mastery_level >= 80 && (
+                              <Badge className="bg-green-500/20 text-green-300 border-green-400/30">
+                                Mastered
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-cyan-100/80 line-clamp-2">
+                            {item.dictionary_entry.definition}
+                          </p>
+                          <div className="flex items-center gap-4 mt-2 text-xs text-cyan-300/60">
+                            {!item.isLocal ? (
+                              <>
+                                <span>Mastery: {Math.round(item.mastery_level)}%</span>
+                                <span>Practiced: {item.times_practiced} times</span>
+                                {item.last_practiced_at && (
+                                  <span className="flex items-center gap-1">
+                                    <Clock className="h-3 w-3" />
+                                    {new Date(item.last_practiced_at).toLocaleDateString()}
+                                  </span>
+                                )}
+                              </>
+                            ) : (
+                              <span>From: {item.dictionary_entry.category}</span>
+                            )}
                             <span className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
-                              {new Date(item.last_practiced_at).toLocaleDateString()}
+                              {new Date(item.added_at).toLocaleDateString()}
                             </span>
-                          )}
+                          </div>
                         </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleRemoveDictionaryEntry(item)}
+                        >
+                          <X className="h-4 w-4 text-rose-400" />
+                        </Button>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleRemoveDictionaryEntry(item)}
-                      >
-                        <X className="h-4 w-4 text-rose-400" />
-                      </Button>
                     </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </ScrollArea>
+                  ))
+                )}
+              </div>
+            </ScrollArea>
+            {displayDictionary.length > ITEMS_PER_PAGE && (
+              <div className="border-t border-purple-500/20 bg-slate-900/80 p-3 flex items-center justify-between gap-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                >
+                  Prev
+                </Button>
+                <span className="text-xs text-cyan-100/70">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                >
+                  Next
+                </Button>
+              </div>
+            )}
+          </>
         )}
       </CardContent>
     </Card>
