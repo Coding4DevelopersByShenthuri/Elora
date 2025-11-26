@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { BookOpen, Search, Plus, Volume2, X, Star, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,6 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { AdultsAPI } from '@/services/ApiService';
 import { useAuth } from '@/contexts/AuthContext';
+import { getListeningModuleData } from '@/data/listening-modules/listening-modules-config';
 
 interface DictionaryEntry {
   id: number;
@@ -33,6 +34,21 @@ interface UserDictionaryWord {
   times_practiced: number;
 }
 
+interface LocalDictionaryWord {
+  id: string;
+  word: string;
+  definition: string;
+  example?: string;
+  moduleId: string;
+  moduleTitle: string;
+  addedAt: string;
+}
+
+type DisplayDictionaryWord = UserDictionaryWord & {
+  isLocal?: boolean;
+  localId?: string;
+};
+
 interface DictionaryWidgetProps {
   onClose: () => void;
 }
@@ -42,13 +58,17 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<DictionaryEntry[]>([]);
   const [selectedWord, setSelectedWord] = useState<DictionaryEntry | null>(null);
-  const [myDictionary, setMyDictionary] = useState<UserDictionaryWord[]>([]);
+const [myDictionary, setMyDictionary] = useState<UserDictionaryWord[]>([]);
+  const [localDictionary, setLocalDictionary] = useState<LocalDictionaryWord[]>([]);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'search' | 'my-words'>('search');
+  const [isSyncingVocab, setIsSyncingVocab] = useState(false);
 
   useEffect(() => {
     if (user) {
       loadMyDictionary();
+      loadLocalDictionary();
+      syncListeningVocabulary();
     }
   }, [user]);
 
@@ -65,11 +85,38 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
     return () => clearTimeout(delayDebounce);
   }, [searchQuery]);
 
+  const displayDictionary: DisplayDictionaryWord[] = useMemo(() => {
+    const localEntries: DisplayDictionaryWord[] = localDictionary.map((entry) => ({
+      id: -1,
+      dictionary_entry: {
+        id: -1,
+        word: entry.word,
+        definition: entry.definition,
+        example_sentence: entry.example,
+        category: entry.moduleTitle,
+        difficulty_level: 0,
+        usage_frequency: 0,
+      },
+      mastery_level: 0,
+      added_at: entry.addedAt,
+      times_practiced: 0,
+      isLocal: true,
+      localId: entry.id,
+    }));
+
+    const serverEntries: DisplayDictionaryWord[] = myDictionary.map((entry) => ({
+      ...entry,
+      isLocal: false,
+    }));
+
+    return [...localEntries, ...serverEntries];
+  }, [localDictionary, myDictionary]);
+
   const performSearch = async () => {
     try {
       setLoading(true);
       const result = await AdultsAPI.searchDictionary(searchQuery);
-      if (result.success) {
+      if (result.success && 'data' in result) {
         setSearchResults(result.data?.data || []);
         if (result.data?.data?.length === 1) {
           setSelectedWord(result.data.data[0]);
@@ -82,10 +129,165 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
     }
   };
 
+  const syncListeningVocabulary = async () => {
+    if (!user || isSyncingVocab) return;
+
+    const syncedKey = `synced_listening_vocab_${user.id}`;
+    try {
+      setIsSyncingVocab(true);
+      const stored = localStorage.getItem(syncedKey);
+      let syncedModules = new Set<string>(stored ? JSON.parse(stored) : []);
+
+      const dictionaryWords = new Set<string>();
+      try {
+        const dictionaryResult = await AdultsAPI.getMyDictionary();
+        if (dictionaryResult.success && 'data' in dictionaryResult) {
+          const entries = dictionaryResult.data?.data || [];
+          entries.forEach((entry: UserDictionaryWord) => {
+            if (entry.dictionary_entry?.word) {
+              dictionaryWords.add(entry.dictionary_entry.word.toLowerCase());
+            }
+          });
+          setMyDictionary(entries);
+        }
+      } catch (err) {
+        console.error('Failed to fetch dictionary before syncing vocab:', err);
+      }
+
+      let currentLocalEntries: LocalDictionaryWord[] = [];
+      if (localKey) {
+        try {
+          const storedLocal = localStorage.getItem(localKey);
+          currentLocalEntries = storedLocal ? JSON.parse(storedLocal) : [];
+          setLocalDictionary(currentLocalEntries);
+          currentLocalEntries.forEach((entry: LocalDictionaryWord) => {
+            dictionaryWords.add(entry.word.toLowerCase());
+          });
+        } catch (err) {
+          console.error('Failed to parse local dictionary entries', err);
+        }
+      }
+
+      // Re-validate previously synced modules in case words were not added earlier
+      const revalidatedSynced = new Set<string>();
+      for (const moduleId of syncedModules) {
+        try {
+          const moduleData = await getListeningModuleData(moduleId);
+          if (!moduleData?.vocabulary?.length) continue;
+          const hasWord = moduleData.vocabulary.some((vocab) =>
+            dictionaryWords.has(vocab.word.toLowerCase())
+          );
+          if (hasWord) {
+            revalidatedSynced.add(moduleId);
+          }
+        } catch (err) {
+          console.error(`Failed to validate module ${moduleId}:`, err);
+        }
+      }
+      syncedModules = revalidatedSynced;
+
+      const history = await AdultsAPI.getMultiModePracticeHistory('listening', 365);
+      if (!history.success || !('data' in history) || !history.data?.data) return;
+
+      const sessions = history.data.data as Array<any>;
+      const eligibleModules = new Set<string>();
+
+      sessions.forEach((session) => {
+        const moduleId = session?.details?.module_id || session?.content_id;
+        if (
+          session?.mode === 'listening' &&
+          typeof session?.score === 'number' &&
+          session.score >= 75 &&
+          typeof moduleId === 'string' &&
+          !syncedModules.has(moduleId)
+        ) {
+          eligibleModules.add(moduleId);
+        }
+      });
+
+      if (!eligibleModules.size) return;
+
+      let didAddAnyWord = false;
+
+      for (const moduleId of Array.from(eligibleModules)) {
+        try {
+          const moduleData = await getListeningModuleData(moduleId);
+          if (!moduleData?.vocabulary?.length) continue;
+
+          let moduleSynced = false;
+
+          for (const vocab of moduleData.vocabulary) {
+            try {
+              const addResult = await AdultsAPI.addToDictionary({ word: vocab.word });
+              if (addResult.success) {
+                moduleSynced = true;
+                didAddAnyWord = true;
+                dictionaryWords.add(vocab.word.toLowerCase());
+              } else {
+                addLocalDictionaryWord(moduleId, moduleData.module.title, vocab);
+                dictionaryWords.add(vocab.word.toLowerCase());
+                moduleSynced = true;
+              }
+            } catch (err) {
+              console.error(`Failed to add vocab "${vocab.word}" to dictionary:`, err);
+              addLocalDictionaryWord(moduleId, moduleData.module.title, vocab);
+              dictionaryWords.add(vocab.word.toLowerCase());
+              moduleSynced = true;
+            }
+          }
+
+          if (moduleSynced) {
+            syncedModules.add(moduleId);
+          }
+        } catch (err) {
+          console.error(`Failed to sync vocabulary for module ${moduleId}:`, err);
+        }
+      }
+
+      if (syncedModules.size > 0) {
+        localStorage.setItem(syncedKey, JSON.stringify(Array.from(syncedModules)));
+      }
+
+      if (didAddAnyWord) {
+        await loadMyDictionary();
+      }
+    } catch (error) {
+      console.error('Error syncing listening vocabulary:', error);
+    } finally {
+      setIsSyncingVocab(false);
+    }
+  };
+
+  const localKey = user ? `local_dictionary_entries_${user.id}` : null;
+
+  const loadLocalDictionary = () => {
+    if (!localKey) return;
+    try {
+      const stored = localStorage.getItem(localKey);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        setLocalDictionary(parsed);
+      } else {
+        setLocalDictionary([]);
+      }
+    } catch (error) {
+      console.error('Failed to load local dictionary', error);
+    }
+  };
+
+  const persistLocalDictionary = (entries: LocalDictionaryWord[]) => {
+    if (!localKey) return;
+    try {
+      localStorage.setItem(localKey, JSON.stringify(entries));
+    } catch (error) {
+      console.error('Failed to persist local dictionary', error);
+    }
+  };
+
   const loadMyDictionary = async () => {
     try {
       const result = await AdultsAPI.getMyDictionary();
-      if (result.success) {
+      if (result.success && 'data' in result) {
         setMyDictionary(result.data?.data || []);
       }
     } catch (error) {
@@ -93,10 +295,43 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
     }
   };
 
+  const addLocalDictionaryWord = (moduleId: string, moduleTitle: string, vocab: { word: string; definition: string; example?: string }) => {
+    if (!localKey) return;
+    setLocalDictionary((prev) => {
+      const exists = prev.some(
+        (entry) =>
+          entry.word.toLowerCase() === vocab.word.toLowerCase() && entry.moduleId === moduleId
+      );
+      if (exists) {
+        return prev;
+      }
+      const newEntry: LocalDictionaryWord = {
+        id: `${moduleId}:${vocab.word.toLowerCase()}`,
+        word: vocab.word,
+        definition: vocab.definition,
+        example: vocab.example,
+        moduleId,
+        moduleTitle,
+        addedAt: new Date().toISOString(),
+      };
+      const updated = [...prev, newEntry];
+      persistLocalDictionary(updated);
+      return updated;
+    });
+  };
+
+  const removeLocalDictionaryWord = (localId: string) => {
+    setLocalDictionary((prev) => {
+      const updated = prev.filter((entry) => entry.id !== localId);
+      persistLocalDictionary(updated);
+      return updated;
+    });
+  };
+
   const handleWordClick = async (word: string) => {
     try {
       const result = await AdultsAPI.lookupWord(word);
-      if (result.success) {
+      if (result.success && 'data' in result) {
         setSelectedWord(result.data?.data);
       }
     } catch (error) {
@@ -124,9 +359,14 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
     }
   };
 
-  const handleRemoveFromDictionary = async (entryId: number) => {
+  const handleRemoveDictionaryEntry = async (entry: DisplayDictionaryWord) => {
+    if (entry.isLocal && entry.localId) {
+      removeLocalDictionaryWord(entry.localId);
+      return;
+    }
+
     try {
-      const result = await AdultsAPI.removeFromDictionary(entryId);
+      const result = await AdultsAPI.removeFromDictionary(entry.id);
       if (result.success) {
         loadMyDictionary();
       }
@@ -351,14 +591,14 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
         ) : (
           <ScrollArea className="flex-1">
             <div className="p-4 space-y-3">
-              {myDictionary.length === 0 ? (
+              {displayDictionary.length === 0 ? (
                 <div className="text-center text-cyan-300/70 py-8">
                   No words saved yet. Search and add words to your dictionary!
                 </div>
               ) : (
-                myDictionary.map((item) => (
+                displayDictionary.map((item) => (
                   <div
-                    key={item.id}
+                    key={`${item.isLocal ? 'local' : 'server'}-${item.isLocal ? item.localId : item.id}`}
                     className="p-4 rounded-lg border bg-slate-800/30 border-purple-500/20 hover:bg-slate-800/50 transition-all"
                   >
                     <div className="flex items-start justify-between">
@@ -367,6 +607,11 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
                           <h4 className="font-semibold text-white">
                             {item.dictionary_entry.word}
                           </h4>
+                          {item.isLocal && item.dictionary_entry.category && (
+                            <Badge className="bg-blue-500/20 text-blue-200 border-blue-400/30">
+                              {item.dictionary_entry.category}
+                            </Badge>
+                          )}
                           {item.mastery_level >= 80 && (
                             <Badge className="bg-green-500/20 text-green-300 border-green-400/30">
                               Mastered
@@ -390,7 +635,7 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => handleRemoveFromDictionary(item.id)}
+                        onClick={() => handleRemoveDictionaryEntry(item)}
                       >
                         <X className="h-4 w-4 text-rose-400" />
                       </Button>
