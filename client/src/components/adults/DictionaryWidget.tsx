@@ -443,7 +443,7 @@ const displayDictionary: DisplayDictionaryWord[] = useMemo(() => {
             )}
           >
             <Star className="h-4 w-4 mr-2" />
-            My Words ({myDictionary.length})
+            My Words ({displayDictionary.length})
           </Button>
         </div>
       </CardHeader>
