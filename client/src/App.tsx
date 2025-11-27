@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import { useVocabularySync } from "@/hooks/useVocabularySync";
 
 // ✅ Global Components
 import Navbar from "@/components/common/Navbar";
@@ -366,6 +367,9 @@ const AppRoutes = () => {
   const { updateUserSurveyData, syncWithServer, user, isOnline } = useAuth();
   const navigate = useNavigate();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  
+  // Global vocabulary sync - runs on all pages
+  useVocabularySync();
   
   // Helper function to save survey step to MySQL database
   const saveSurveyStepToBackend = async (stepName: string, stepNumber: number, responseData: any) => {

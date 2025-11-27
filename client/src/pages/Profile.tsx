@@ -6,6 +6,8 @@ import {
   Bell,
   BookOpen,
   CheckCheck,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   ExternalLink,
   Flame,
@@ -58,6 +60,14 @@ import UserNotificationBell from '@/components/common/UserNotificationBell';
 import { AnimatedTransition } from '@/components/common/AnimatedTransition';
 import { useAnimateIn } from '@/lib/animations';
 import KidsProgressService from '@/services/KidsProgressService';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 import KidsApi from '@/services/KidsApi';
 import TeenApi from '@/services/TeenApi';
 import StoryWordsService from '@/services/StoryWordsService';
@@ -103,6 +113,8 @@ const Profile = () => {
   const [notifications, setNotifications] = useState<UserNotification[]>([]);
   const [loadingNotifications, setLoadingNotifications] = useState(false);
   const [notificationsSyncing, setNotificationsSyncing] = useState(false);
+  const [notificationsPage, setNotificationsPage] = useState(1);
+  const notificationsPerPage = 10;
   const [kidsStats, setKidsStats] = useState({
     points: 0,
     streak: 0,
@@ -240,6 +252,8 @@ const Profile = () => {
     if (realTimeNotifications) {
       setNotifications(realTimeNotifications);
       setLoadingNotifications(false);
+      // Reset to first page when notifications change
+      setNotificationsPage(1);
     }
   }, [realTimeNotifications]);
 
@@ -435,6 +449,21 @@ const Profile = () => {
     () => notifications.filter((notification) => !notification.isRead),
     [notifications]
   );
+
+  // Pagination for notifications
+  const paginatedNotifications = useMemo(() => {
+    const startIndex = (notificationsPage - 1) * notificationsPerPage;
+    const endIndex = startIndex + notificationsPerPage;
+    return notifications.slice(startIndex, endIndex);
+  }, [notifications, notificationsPage, notificationsPerPage]);
+
+  const totalPages = Math.ceil(notifications.length / notificationsPerPage);
+
+  const handleNotificationsPageChange = (page: number) => {
+    setNotificationsPage(page);
+    // Scroll to top of notifications section
+    document.getElementById('profile-notifications')?.scrollIntoView({ behavior: 'smooth' });
+  };
   
   const handleEditProfile = () => {
     setTempProfile({ ...profile });
@@ -1492,8 +1521,9 @@ const Profile = () => {
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    {notifications.map((notification) => (
+                  <>
+                    <div className="space-y-3">
+                      {paginatedNotifications.map((notification) => (
                       <div
                         key={notification.id}
                         className={cn(
@@ -1566,8 +1596,76 @@ const Profile = () => {
                           </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                    
+                    {/* Pagination Controls */}
+                    {totalPages > 1 && (
+                      <div className="mt-6 flex items-center justify-between">
+                        <div className="text-sm text-muted-foreground">
+                          Showing {(notificationsPage - 1) * notificationsPerPage + 1} to{' '}
+                          {Math.min(notificationsPage * notificationsPerPage, notifications.length)} of{' '}
+                          {notifications.length} notifications
+                        </div>
+                        <Pagination>
+                          <PaginationContent>
+                            <PaginationItem>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleNotificationsPageChange(notificationsPage - 1)}
+                                disabled={notificationsPage === 1}
+                                className="gap-1"
+                              >
+                                <ChevronLeft className="h-4 w-4" />
+                                <span>Previous</span>
+                              </Button>
+                            </PaginationItem>
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                              // Show first page, last page, current page, and pages around current
+                              if (
+                                page === 1 ||
+                                page === totalPages ||
+                                (page >= notificationsPage - 1 && page <= notificationsPage + 1)
+                              ) {
+                                return (
+                                  <PaginationItem key={page}>
+                                    <Button
+                                      variant={page === notificationsPage ? "outline" : "ghost"}
+                                      size="sm"
+                                      onClick={() => handleNotificationsPageChange(page)}
+                                      className="min-w-[2.5rem]"
+                                    >
+                                      {page}
+                                    </Button>
+                                  </PaginationItem>
+                                );
+                              } else if (page === notificationsPage - 2 || page === notificationsPage + 2) {
+                                return (
+                                  <PaginationItem key={page}>
+                                    <span className="px-2 text-muted-foreground">...</span>
+                                  </PaginationItem>
+                                );
+                              }
+                              return null;
+                            })}
+                            <PaginationItem>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleNotificationsPageChange(notificationsPage + 1)}
+                                disabled={notificationsPage === totalPages}
+                                className="gap-1"
+                              >
+                                <span>Next</span>
+                                <ChevronRight className="h-4 w-4" />
+                              </Button>
+                            </PaginationItem>
+                          </PaginationContent>
+                        </Pagination>
+                      </div>
+                    )}
+                  </>
                 )}
               </CardContent>
               <CardFooter className="flex items-center justify-between text-xs text-muted-foreground">

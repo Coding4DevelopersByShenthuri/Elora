@@ -38,16 +38,86 @@ export function DictionaryBook({ entries, onClose, searchQuery = '', onSearchCha
     }
   };
 
-  // Filter entries based on search query
+  // Filter entries based on search query with improved accuracy
   const filteredEntries = useMemo(() => {
     if (!localSearchQuery.trim()) return entries;
-    const query = localSearchQuery.toLowerCase();
-    return entries.filter(entry => 
-      entry.word.toLowerCase().includes(query) ||
-      entry.definition.toLowerCase().includes(query) ||
-      entry.example_sentence?.toLowerCase().includes(query) ||
-      entry.category?.toLowerCase().includes(query)
-    );
+    const query = localSearchQuery.toLowerCase().trim();
+    const queryWords = query.split(/\s+/).filter(w => w.length > 0);
+    
+    return entries.filter(entry => {
+      const wordLower = entry.word.toLowerCase();
+      const definitionLower = entry.definition.toLowerCase();
+      const exampleLower = entry.example_sentence?.toLowerCase() || '';
+      const categoryLower = entry.category?.toLowerCase() || '';
+      const phoneticLower = entry.phonetic?.toLowerCase() || '';
+      
+      // Exact word match (highest priority)
+      if (wordLower === query) return true;
+      
+      // Word starts with query (high priority)
+      if (wordLower.startsWith(query)) return true;
+      
+      // Word contains query as whole word (medium-high priority)
+      const wordBoundaryRegex = new RegExp(`\\b${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+      if (wordBoundaryRegex.test(entry.word)) return true;
+      
+      // Word contains query (medium priority)
+      if (wordLower.includes(query)) return true;
+      
+      // All query words present in definition (medium priority)
+      if (queryWords.length > 1 && queryWords.every(qw => definitionLower.includes(qw))) {
+        return true;
+      }
+      
+      // Definition contains query as phrase (medium priority)
+      if (definitionLower.includes(query)) return true;
+      
+      // Example sentence contains query (low-medium priority)
+      if (exampleLower.includes(query)) return true;
+      
+      // Category matches (low-medium priority)
+      if (categoryLower.includes(query)) return true;
+      
+      // Phonetic matches (low priority)
+      if (phoneticLower.includes(query)) return true;
+      
+      // Search in synonyms
+      if (entry.synonyms?.some(syn => syn.toLowerCase().includes(query))) return true;
+      
+      // Search in antonyms
+      if (entry.antonyms?.some(ant => ant.toLowerCase().includes(query))) return true;
+      
+      return false;
+    }).sort((a, b) => {
+      // Sort by relevance: exact matches first, then starts with, then contains
+      const aWord = a.word.toLowerCase();
+      const bWord = b.word.toLowerCase();
+      
+      // Exact match gets highest priority
+      if (aWord === query && bWord !== query) return -1;
+      if (bWord === query && aWord !== query) return 1;
+      
+      // Starts with gets second priority
+      const aStarts = aWord.startsWith(query);
+      const bStarts = bWord.startsWith(query);
+      if (aStarts && !bStarts) return -1;
+      if (bStarts && !aStarts) return 1;
+      
+      // Word boundary match gets third priority
+      const aWordBoundary = new RegExp(`\\b${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(a.word);
+      const bWordBoundary = new RegExp(`\\b${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(b.word);
+      if (aWordBoundary && !bWordBoundary) return -1;
+      if (bWordBoundary && !aWordBoundary) return 1;
+      
+      // Word contains gets fourth priority
+      const aContains = aWord.includes(query);
+      const bContains = bWord.includes(query);
+      if (aContains && !bContains) return -1;
+      if (bContains && !aContains) return 1;
+      
+      // Alphabetical order for same priority
+      return aWord.localeCompare(bWord);
+    });
   }, [entries, localSearchQuery]);
 
   const pages = useMemo(() => {
@@ -88,15 +158,31 @@ export function DictionaryBook({ entries, onClose, searchQuery = '', onSearchCha
       }
     }
 
-    return entriesToShow.map((entry, index) => ({
-      id: entry.id || index,
-      content: (
-        <div className="h-full flex flex-col p-3 sm:p-4 md:p-6 overflow-y-auto bg-white dark:bg-slate-900 hide-scrollbar">
-          {/* Header */}
-          <div className="mb-3 sm:mb-4 pb-3 sm:pb-4 border-b border-teal-200 dark:border-teal-700">
-            <div className="flex items-start justify-between gap-2 sm:gap-4">
-              <div className="flex-1 min-w-0">
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-1 sm:mb-2 break-words">{entry.word}</h1>
+    return entriesToShow.map((entry, index) => {
+      // Determine if this is a right-side page (even index in spread)
+      const isRightPage = index % 2 === 1;
+      
+      return {
+        id: entry.id || index,
+        content: (
+          <div className="h-full flex flex-col p-3 sm:p-4 md:p-6 overflow-y-auto bg-white dark:bg-slate-900 hide-scrollbar relative overflow-x-visible">
+            {/* Logo on right-side pages - top right corner */}
+            {isRightPage && (
+              <div className="absolute top-0 right-0 sm:top-0 sm:right-0 md:top-0 md:right-0 z-10" style={{ transform: 'translate(0, 0)' }}>
+                <img 
+                  src="/logo01.png" 
+                  alt="Elora Logo" 
+                  className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 object-contain"
+                  style={{ maxWidth: 'none' }}
+                />
+              </div>
+            )}
+            
+            {/* Header */}
+            <div className="mb-3 sm:mb-4 pb-3 sm:pb-4 border-b border-teal-200 dark:border-teal-700">
+              <div className="flex items-start justify-between gap-2 sm:gap-4">
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-1 sm:mb-2 break-words">{entry.word}</h1>
                 {entry.phonetic && (
                   <p className="text-sm sm:text-base md:text-lg text-teal-600 dark:text-teal-400 font-medium mb-1 sm:mb-2">{entry.phonetic}</p>
                 )}
@@ -197,8 +283,9 @@ export function DictionaryBook({ entries, onClose, searchQuery = '', onSearchCha
             Word {index + 1} of {entriesToShow.length}
           </div>
         </div>
-      )
-    }));
+        )
+      };
+    });
   }, [filteredEntries, entries, localSearchQuery]);
 
   const handleSearchChange = (value: string) => {
@@ -211,28 +298,39 @@ export function DictionaryBook({ entries, onClose, searchQuery = '', onSearchCha
   return (
     <div className="relative w-full max-w-[900px] mx-auto flex flex-col gap-6 sm:gap-7 md:gap-8 h-full justify-center">
       {/* Search Bar - Above Book - Always visible with proper spacing and high z-index */}
-      <div className="flex-shrink-0 w-full bg-transparent relative z-[110]">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-teal-600 dark:text-teal-400 z-10" />
+      <div className="flex-shrink-0 w-full bg-transparent relative z-[110] pointer-events-auto">
+        <div className="relative pointer-events-auto">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-teal-600 dark:text-teal-400 z-10 pointer-events-none" />
           <Input
             placeholder="Search in dictionary..."
             value={localSearchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
-            className="pl-10 pr-10 border-teal-200 dark:border-teal-800 focus:border-teal-400 dark:focus:border-teal-600 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm"
+            onFocus={(e) => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+            className="pl-10 pr-10 border-teal-200 dark:border-teal-800 focus:border-teal-400 dark:focus:border-teal-600 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm pointer-events-auto touch-manipulation text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400"
+            style={{ WebkitAppearance: 'none' }}
           />
           {localSearchQuery && (
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleSearchChange('')}
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 hover:bg-teal-50 dark:hover:bg-teal-900/30 z-10"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleSearchChange('');
+              }}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleSearchChange('');
+              }}
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 hover:bg-teal-50 dark:hover:bg-teal-900/30 z-10 pointer-events-auto touch-manipulation"
             >
               <X className="h-3 w-3 text-teal-600 dark:text-teal-400" />
             </Button>
           )}
         </div>
         {localSearchQuery && (
-          <p className="text-xs sm:text-sm text-teal-600 dark:text-teal-400 mt-1 sm:mt-2 ml-1">
+          <p className="text-xs sm:text-sm text-teal-600 dark:text-teal-400 mt-1 sm:mt-2 ml-1 pointer-events-none">
             Found {filteredEntries.length} {filteredEntries.length === 1 ? 'word' : 'words'}
           </p>
         )}

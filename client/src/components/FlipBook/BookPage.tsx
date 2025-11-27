@@ -15,10 +15,11 @@ export function BookPage({ content, isFlipping, isLeft = false, zIndex = 0, styl
       style={{
         zIndex,
         transformStyle: 'preserve-3d',
+        overflow: 'visible',
         ...style
       }}
     >
-      <div className="h-full overflow-hidden overflow-y-auto hide-scrollbar">
+      <div className="h-full overflow-y-auto hide-scrollbar" style={{ overflowX: 'visible' }}>
         {content}
       </div>
     </div>

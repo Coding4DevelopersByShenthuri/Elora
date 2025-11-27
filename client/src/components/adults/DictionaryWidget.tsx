@@ -10,6 +10,8 @@ import { AdultsAPI } from '@/services/ApiService';
 import { useAuth } from '@/contexts/AuthContext';
 import { getListeningModuleData } from '@/data/listening-modules/listening-modules-config';
 import { DictionaryBook } from '@/components/FlipBook/DictionaryBook';
+import { useToast } from '@/hooks/use-toast';
+import UserNotificationsService from '@/services/UserNotificationsService';
 
 interface DictionaryEntry {
   id: number;
@@ -56,6 +58,7 @@ interface DictionaryWidgetProps {
 
 export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<DictionaryEntry[]>([]);
   const [selectedWord, setSelectedWord] = useState<DictionaryEntry | null>(null);
@@ -71,6 +74,17 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
       loadLocalDictionary();
       syncListeningVocabulary();
     }
+  }, [user]);
+
+  // Periodic sync check when widget is open (every 30 seconds)
+  useEffect(() => {
+    if (!user) return;
+
+    const syncInterval = setInterval(() => {
+      syncListeningVocabulary();
+    }, 30000); // Check every 30 seconds for new enrolled modules
+
+    return () => clearInterval(syncInterval);
   }, [user]);
 
   useEffect(() => {
@@ -226,6 +240,7 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
       if (!eligibleModules.size) return;
 
       let didAddAnyWord = false;
+      const addedModules: Array<{ title: string; wordCount: number }> = [];
 
       for (const moduleId of Array.from(eligibleModules)) {
         try {
@@ -233,6 +248,7 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
           if (!moduleData?.vocabulary?.length) continue;
 
           let moduleSynced = false;
+          let wordsAdded = 0;
 
           for (const vocab of moduleData.vocabulary) {
             try {
@@ -240,22 +256,29 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
               if (addResult.success) {
                 moduleSynced = true;
                 didAddAnyWord = true;
+                wordsAdded++;
                 dictionaryWords.add(vocab.word.toLowerCase());
               } else {
                 addLocalDictionaryWord(moduleId, moduleData.module.title, vocab);
                 dictionaryWords.add(vocab.word.toLowerCase());
                 moduleSynced = true;
+                wordsAdded++;
               }
             } catch (err) {
               console.error(`Failed to add vocab "${vocab.word}" to dictionary:`, err);
               addLocalDictionaryWord(moduleId, moduleData.module.title, vocab);
               dictionaryWords.add(vocab.word.toLowerCase());
               moduleSynced = true;
+              wordsAdded++;
             }
           }
 
-          if (moduleSynced) {
+          if (moduleSynced && wordsAdded > 0) {
             syncedModules.add(moduleId);
+            addedModules.push({
+              title: moduleData.module.title,
+              wordCount: wordsAdded
+            });
           }
         } catch (err) {
           console.error(`Failed to sync vocabulary for module ${moduleId}:`, err);
@@ -268,6 +291,47 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
 
       if (didAddAnyWord) {
         await loadMyDictionary();
+        
+        // Create notification message
+        const totalWords = addedModules.reduce((sum, mod) => sum + mod.wordCount, 0);
+        let notificationTitle = "New Vocabulary Added! 📚";
+        let notificationMessage = '';
+        
+        if (addedModules.length === 1) {
+          notificationMessage = `${addedModules[0].wordCount} word${addedModules[0].wordCount > 1 ? 's' : ''} from "${addedModules[0].title}" added to your dictionary. Score 75% or higher to unlock vocabulary!`;
+        } else {
+          notificationMessage = `${totalWords} words from ${addedModules.length} module${addedModules.length > 1 ? 's' : ''} added to your dictionary. Check your dictionary to see them! Score 75% or higher to unlock vocabulary.`;
+        }
+        
+        // Show toast notification (immediate feedback)
+        toast({
+          title: notificationTitle,
+          description: notificationMessage,
+          duration: 5000,
+        });
+        
+        // Save notification to profile notifications (persistent)
+        if (user) {
+          try {
+            await UserNotificationsService.create(user.id, {
+              type: 'achievement',
+              title: notificationTitle,
+              message: notificationMessage,
+              icon: '📚',
+              actionUrl: '/profile#notifications',
+              eventKey: `vocab-added-${Date.now()}-${addedModules.map(m => m.title).join('-')}`,
+              metadata: {
+                wordCount: totalWords,
+                moduleCount: addedModules.length,
+                modules: addedModules.map(m => ({ title: m.title, wordCount: m.wordCount })),
+                timestamp: Date.now(),
+              },
+            });
+          } catch (err) {
+            console.error('Failed to create notification:', err);
+            // Don't fail the whole sync if notification creation fails
+          }
+        }
       }
     } catch (error) {
       console.error('Error syncing listening vocabulary:', error);
@@ -402,8 +466,8 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
           </div>
 
           {/* Dictionary Book - with proper top spacing to avoid navbar (navbar is ~64-80px) */}
-          <div className="flex-1 flex flex-col items-center justify-center pt-16 sm:pt-20 md:pt-24 pb-12 sm:pb-16 md:pb-20 px-2 sm:px-4 md:px-6 lg:px-8 overflow-hidden min-h-0">
-            <div className="w-full max-w-[900px] flex flex-col items-center justify-center relative z-[105] h-full">
+          <div className="flex-1 flex flex-col items-center justify-center pt-16 sm:pt-20 md:pt-24 pb-12 sm:pb-16 md:pb-20 px-2 sm:px-4 md:px-6 lg:px-8 overflow-hidden min-h-0 pointer-events-auto">
+            <div className="w-full max-w-[900px] flex flex-col items-center justify-center relative z-[105] h-full pointer-events-auto">
               <DictionaryBook 
                 entries={bookEntries} 
               />
