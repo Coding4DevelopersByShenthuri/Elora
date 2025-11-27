@@ -5,6 +5,7 @@ import { getListeningModuleData } from '@/data/listening-modules/listening-modul
 import { useToast } from '@/hooks/use-toast';
 import UserNotificationsService from '@/services/UserNotificationsService';
 import { playNotificationSound } from '@/utils/playNotificationSound';
+import { runWithVocabularySyncLock } from '@/utils/vocabularySyncLock';
 
 export function useVocabularySync() {
   const { user } = useAuth();
@@ -13,7 +14,7 @@ export function useVocabularySync() {
   useEffect(() => {
     if (!user) return;
 
-    const syncListeningVocabulary = async () => {
+    const syncListeningVocabulary = () => runWithVocabularySyncLock(async () => {
       const syncedKey = `synced_listening_vocab_${user.id}`;
       try {
         const stored = localStorage.getItem(syncedKey);
@@ -85,7 +86,7 @@ export function useVocabularySync() {
 
         if (!eligibleModules.size) return;
 
-        const addedModules: Array<{ title: string; wordCount: number }> = [];
+        const addedModules: Array<{ moduleId: string; title: string; wordCount: number }> = [];
 
         for (const moduleId of Array.from(eligibleModules)) {
           try {
@@ -131,9 +132,10 @@ export function useVocabularySync() {
               }
             }
 
-            if (wordsAdded > 0) {
+            if (wordsAdded > 0 && moduleData?.module) {
               syncedModules.add(moduleId);
               addedModules.push({
+                moduleId,
                 title: moduleData.module.title,
                 wordCount: wordsAdded
               });
@@ -151,16 +153,13 @@ export function useVocabularySync() {
           const totalWords = addedModules.reduce((sum, mod) => sum + mod.wordCount, 0);
           
           // Create notification message
-          let notificationTitle = "New Vocabulary Added! 📚";
-          let notificationMessage = '';
+          const notificationTitle = "New Vocabulary Added! 📚";
+          const notificationMessage =
+            addedModules.length === 1
+              ? `${addedModules[0].wordCount} word${addedModules[0].wordCount > 1 ? 's' : ''} from "${addedModules[0].title}" added to your dictionary. Score 75% or higher to unlock vocabulary!`
+              : `${totalWords} words from ${addedModules.length} module${addedModules.length > 1 ? 's' : ''} added to your dictionary. Check your dictionary to see them! Score 75% or higher to unlock vocabulary.`;
+          const moduleIdsSignature = addedModules.map((m) => m.moduleId).sort().join('-') || `batch-${Date.now()}`;
           
-          if (addedModules.length === 1) {
-            notificationMessage = `${addedModules[0].wordCount} word${addedModules[0].wordCount > 1 ? 's' : ''} from "${addedModules[0].title}" added to your dictionary. Score 75% or higher to unlock vocabulary!`;
-          } else {
-            notificationMessage = `${totalWords} words from ${addedModules.length} module${addedModules.length > 1 ? 's' : ''} added to your dictionary. Check your dictionary to see them! Score 75% or higher to unlock vocabulary.`;
-          }
-          
-          // Show toast notification (immediate feedback)
           toast({
             title: notificationTitle,
             description: notificationMessage,
@@ -168,7 +167,6 @@ export function useVocabularySync() {
           });
           playNotificationSound();
           
-          // Save notification to profile notifications (persistent)
           try {
             await UserNotificationsService.create(user.id, {
               type: 'achievement',
@@ -176,23 +174,26 @@ export function useVocabularySync() {
               message: notificationMessage,
               icon: '📚',
               actionUrl: '/profile#notifications',
-              eventKey: `vocab-added-${Date.now()}-${addedModules.map(m => m.title).join('-')}`,
+              eventKey: `vocab-sync-${moduleIdsSignature}`,
               metadata: {
                 wordCount: totalWords,
                 moduleCount: addedModules.length,
-                modules: addedModules.map(m => ({ title: m.title, wordCount: m.wordCount })),
+                modules: addedModules.map(m => ({
+                  moduleId: m.moduleId,
+                  title: m.title,
+                  wordCount: m.wordCount
+                })),
                 timestamp: Date.now(),
               },
             });
           } catch (err) {
             console.error('Failed to create notification:', err);
-            // Don't fail the whole sync if notification creation fails
           }
         }
       } catch (error) {
         console.error('Error syncing listening vocabulary:', error);
       }
-    };
+    });
 
     // Run sync on mount
     syncListeningVocabulary();

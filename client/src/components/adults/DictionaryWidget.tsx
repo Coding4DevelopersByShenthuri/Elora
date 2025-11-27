@@ -13,6 +13,7 @@ import { DictionaryBook } from '@/components/FlipBook/DictionaryBook';
 import { useToast } from '@/hooks/use-toast';
 import UserNotificationsService from '@/services/UserNotificationsService';
 import { playNotificationSound } from '@/utils/playNotificationSound';
+import { runWithVocabularySyncLock } from '@/utils/vocabularySyncLock';
 
 interface DictionaryEntry {
   id: number;
@@ -164,177 +165,179 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
   };
 
   const syncListeningVocabulary = async () => {
-    if (!user || isSyncingVocab) return;
+    if (!user) return;
 
+    setIsSyncingVocab(true);
     const syncedKey = `synced_listening_vocab_${user.id}`;
+
     try {
-      setIsSyncingVocab(true);
-      const stored = localStorage.getItem(syncedKey);
-      let syncedModules = new Set<string>(stored ? JSON.parse(stored) : []);
+      await runWithVocabularySyncLock(async () => {
+        const stored = localStorage.getItem(syncedKey);
+        let syncedModules = new Set<string>(stored ? JSON.parse(stored) : []);
 
-      const dictionaryWords = new Set<string>();
-      try {
-        const dictionaryResult = await AdultsAPI.getMyDictionary();
-        if (dictionaryResult.success && 'data' in dictionaryResult) {
-          const entries = dictionaryResult.data?.data || [];
-          entries.forEach((entry: UserDictionaryWord) => {
-            if (entry.dictionary_entry?.word) {
-              dictionaryWords.add(entry.dictionary_entry.word.toLowerCase());
-            }
-          });
-          setMyDictionary(entries);
-        }
-      } catch (err) {
-        console.error('Failed to fetch dictionary before syncing vocab:', err);
-      }
-
-      let currentLocalEntries: LocalDictionaryWord[] = [];
-      if (localKey) {
+        const dictionaryWords = new Set<string>();
         try {
-          const storedLocal = localStorage.getItem(localKey);
-          currentLocalEntries = storedLocal ? JSON.parse(storedLocal) : [];
-          setLocalDictionary(currentLocalEntries);
-          currentLocalEntries.forEach((entry: LocalDictionaryWord) => {
-            dictionaryWords.add(entry.word.toLowerCase());
-          });
-        } catch (err) {
-          console.error('Failed to parse local dictionary entries', err);
-        }
-      }
-
-      const revalidatedSynced = new Set<string>();
-      for (const moduleId of syncedModules) {
-        try {
-          const moduleData = await getListeningModuleData(moduleId);
-          if (!moduleData?.vocabulary?.length) continue;
-          const hasWord = moduleData.vocabulary.some((vocab) =>
-            dictionaryWords.has(vocab.word.toLowerCase())
-          );
-          if (hasWord) {
-            revalidatedSynced.add(moduleId);
+          const dictionaryResult = await AdultsAPI.getMyDictionary();
+          if (dictionaryResult.success && 'data' in dictionaryResult) {
+            const entries = dictionaryResult.data?.data || [];
+            entries.forEach((entry: UserDictionaryWord) => {
+              if (entry.dictionary_entry?.word) {
+                dictionaryWords.add(entry.dictionary_entry.word.toLowerCase());
+              }
+            });
+            setMyDictionary(entries);
           }
         } catch (err) {
-          console.error(`Failed to validate module ${moduleId}:`, err);
+          console.error('Failed to fetch dictionary before syncing vocab:', err);
         }
-      }
-      syncedModules = revalidatedSynced;
 
-      const history = await AdultsAPI.getMultiModePracticeHistory('listening', 365);
-      if (!history.success || !('data' in history) || !history.data?.data) return;
-
-      const sessions = history.data.data as Array<any>;
-      const eligibleModules = new Set<string>();
-
-      sessions.forEach((session) => {
-        const moduleId = session?.details?.module_id || session?.content_id;
-        if (
-          session?.mode === 'listening' &&
-          typeof session?.score === 'number' &&
-          session.score >= 75 &&
-          typeof moduleId === 'string' &&
-          !syncedModules.has(moduleId)
-        ) {
-          eligibleModules.add(moduleId);
+        let currentLocalEntries: LocalDictionaryWord[] = [];
+        if (localKey) {
+          try {
+            const storedLocal = localStorage.getItem(localKey);
+            currentLocalEntries = storedLocal ? JSON.parse(storedLocal) : [];
+            setLocalDictionary(currentLocalEntries);
+            currentLocalEntries.forEach((entry: LocalDictionaryWord) => {
+              dictionaryWords.add(entry.word.toLowerCase());
+            });
+          } catch (err) {
+            console.error('Failed to parse local dictionary entries', err);
+          }
         }
-      });
 
-      if (!eligibleModules.size) return;
+        const revalidatedSynced = new Set<string>();
+        for (const moduleId of syncedModules) {
+          try {
+            const moduleData = await getListeningModuleData(moduleId);
+            if (!moduleData?.vocabulary?.length) continue;
+            const hasWord = moduleData.vocabulary.some((vocab) =>
+              dictionaryWords.has(vocab.word.toLowerCase())
+            );
+            if (hasWord) {
+              revalidatedSynced.add(moduleId);
+            }
+          } catch (err) {
+            console.error(`Failed to validate module ${moduleId}:`, err);
+          }
+        }
+        syncedModules = revalidatedSynced;
 
-      let didAddAnyWord = false;
-      const addedModules: Array<{ title: string; wordCount: number }> = [];
+        const history = await AdultsAPI.getMultiModePracticeHistory('listening', 365);
+        if (!history.success || !('data' in history) || !history.data?.data) return;
 
-      for (const moduleId of Array.from(eligibleModules)) {
-        try {
-          const moduleData = await getListeningModuleData(moduleId);
-          if (!moduleData?.vocabulary?.length) continue;
+        const sessions = history.data.data as Array<any>;
+        const eligibleModules = new Set<string>();
 
-          let moduleSynced = false;
-          let wordsAdded = 0;
+        sessions.forEach((session) => {
+          const moduleId = session?.details?.module_id || session?.content_id;
+          if (
+            session?.mode === 'listening' &&
+            typeof session?.score === 'number' &&
+            session.score >= 75 &&
+            typeof moduleId === 'string' &&
+            !syncedModules.has(moduleId)
+          ) {
+            eligibleModules.add(moduleId);
+          }
+        });
 
-          for (const vocab of moduleData.vocabulary) {
-            try {
-              const addResult = await AdultsAPI.addToDictionary({ word: vocab.word });
-              if (addResult.success) {
-                moduleSynced = true;
-                didAddAnyWord = true;
-                wordsAdded++;
-                dictionaryWords.add(vocab.word.toLowerCase());
-              } else {
+        if (!eligibleModules.size) return;
+
+        let didAddAnyWord = false;
+        const addedModules: Array<{ moduleId: string; title: string; wordCount: number }> = [];
+
+        for (const moduleId of Array.from(eligibleModules)) {
+          try {
+            const moduleData = await getListeningModuleData(moduleId);
+            if (!moduleData?.vocabulary?.length) continue;
+
+            let moduleSynced = false;
+            let wordsAdded = 0;
+
+            for (const vocab of moduleData.vocabulary) {
+              try {
+                const addResult = await AdultsAPI.addToDictionary({ word: vocab.word });
+                if (addResult.success) {
+                  moduleSynced = true;
+                  didAddAnyWord = true;
+                  wordsAdded++;
+                  dictionaryWords.add(vocab.word.toLowerCase());
+                } else {
+                  addLocalDictionaryWord(moduleId, moduleData.module.title, vocab);
+                  dictionaryWords.add(vocab.word.toLowerCase());
+                  moduleSynced = true;
+                  wordsAdded++;
+                }
+              } catch (err) {
+                console.error(`Failed to add vocab "${vocab.word}" to dictionary:`, err);
                 addLocalDictionaryWord(moduleId, moduleData.module.title, vocab);
                 dictionaryWords.add(vocab.word.toLowerCase());
                 moduleSynced = true;
                 wordsAdded++;
               }
+            }
+
+            if (moduleSynced && wordsAdded > 0 && moduleData?.module) {
+              syncedModules.add(moduleId);
+              addedModules.push({
+                moduleId,
+                title: moduleData.module.title,
+                wordCount: wordsAdded
+              });
+            }
+          } catch (err) {
+            console.error(`Failed to sync vocabulary for module ${moduleId}:`, err);
+          }
+        }
+
+        if (syncedModules.size > 0) {
+          localStorage.setItem(syncedKey, JSON.stringify(Array.from(syncedModules)));
+        }
+
+        if (didAddAnyWord) {
+          await loadMyDictionary();
+          
+          const totalWords = addedModules.reduce((sum, mod) => sum + mod.wordCount, 0);
+          const notificationTitle = "New Vocabulary Added! 📚";
+          const notificationMessage =
+            addedModules.length === 1
+              ? `${addedModules[0].wordCount} word${addedModules[0].wordCount > 1 ? 's' : ''} from "${addedModules[0].title}" added to your dictionary. Score 75% or higher to unlock vocabulary!`
+              : `${totalWords} words from ${addedModules.length} module${addedModules.length > 1 ? 's' : ''} added to your dictionary. Check your dictionary to see them! Score 75% or higher to unlock vocabulary.`;
+          const moduleIdsSignature = addedModules.map((m) => m.moduleId).sort().join('-') || `batch-${Date.now()}`;
+          
+          toast({
+            title: notificationTitle,
+            description: notificationMessage,
+            duration: 5000,
+          });
+          playNotificationSound();
+          
+          if (user) {
+            try {
+              await UserNotificationsService.create(user.id, {
+                type: 'achievement',
+                title: notificationTitle,
+                message: notificationMessage,
+                icon: '📚',
+                actionUrl: '/profile#notifications',
+                eventKey: `vocab-sync-${moduleIdsSignature}`,
+                metadata: {
+                  wordCount: totalWords,
+                  moduleCount: addedModules.length,
+                  modules: addedModules.map(m => ({
+                    moduleId: m.moduleId,
+                    title: m.title,
+                    wordCount: m.wordCount
+                  })),
+                  timestamp: Date.now(),
+                },
+              });
             } catch (err) {
-              console.error(`Failed to add vocab "${vocab.word}" to dictionary:`, err);
-              addLocalDictionaryWord(moduleId, moduleData.module.title, vocab);
-              dictionaryWords.add(vocab.word.toLowerCase());
-              moduleSynced = true;
-              wordsAdded++;
+              console.error('Failed to create notification:', err);
             }
           }
-
-          if (moduleSynced && wordsAdded > 0) {
-            syncedModules.add(moduleId);
-            addedModules.push({
-              title: moduleData.module.title,
-              wordCount: wordsAdded
-            });
-          }
-        } catch (err) {
-          console.error(`Failed to sync vocabulary for module ${moduleId}:`, err);
         }
-      }
-
-      if (syncedModules.size > 0) {
-        localStorage.setItem(syncedKey, JSON.stringify(Array.from(syncedModules)));
-      }
-
-      if (didAddAnyWord) {
-        await loadMyDictionary();
-        
-        // Create notification message
-        const totalWords = addedModules.reduce((sum, mod) => sum + mod.wordCount, 0);
-        let notificationTitle = "New Vocabulary Added! 📚";
-        let notificationMessage = '';
-        
-        if (addedModules.length === 1) {
-          notificationMessage = `${addedModules[0].wordCount} word${addedModules[0].wordCount > 1 ? 's' : ''} from "${addedModules[0].title}" added to your dictionary. Score 75% or higher to unlock vocabulary!`;
-        } else {
-          notificationMessage = `${totalWords} words from ${addedModules.length} module${addedModules.length > 1 ? 's' : ''} added to your dictionary. Check your dictionary to see them! Score 75% or higher to unlock vocabulary.`;
-        }
-        
-        // Show toast notification (immediate feedback)
-        toast({
-          title: notificationTitle,
-          description: notificationMessage,
-          duration: 5000,
-        });
-        playNotificationSound();
-        
-        // Save notification to profile notifications (persistent)
-        if (user) {
-          try {
-            await UserNotificationsService.create(user.id, {
-              type: 'achievement',
-              title: notificationTitle,
-              message: notificationMessage,
-              icon: '📚',
-              actionUrl: '/profile#notifications',
-              eventKey: `vocab-added-${Date.now()}-${addedModules.map(m => m.title).join('-')}`,
-              metadata: {
-                wordCount: totalWords,
-                moduleCount: addedModules.length,
-                modules: addedModules.map(m => ({ title: m.title, wordCount: m.wordCount })),
-                timestamp: Date.now(),
-              },
-            });
-          } catch (err) {
-            console.error('Failed to create notification:', err);
-            // Don't fail the whole sync if notification creation fails
-          }
-        }
-      }
+      });
     } catch (error) {
       console.error('Error syncing listening vocabulary:', error);
     } finally {
