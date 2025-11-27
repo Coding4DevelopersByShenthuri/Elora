@@ -97,8 +97,19 @@ const formatAIResponse = (content: string): string => {
   return formatted.trim();
 };
 
-type GameType = 'tongue-twister' | 'word-chain' | 'story-telling' | 'pronunciation-challenge' | 'conversation-practice' |
-                'debate-club' | 'critical-thinking' | 'research-challenge' | 'presentation-master' | 'ethics-discussion';
+type GameType =
+  | 'tongue-twister'
+  | 'word-chain'
+  | 'story-telling'
+  | 'pronunciation-challenge'
+  | 'conversation-practice'
+  | 'debate-club'
+  | 'critical-thinking'
+  | 'research-challenge'
+  | 'presentation-master'
+  | 'ethics-discussion'
+  | 'innovation-lab'
+  | 'leadership-challenge';
 
 interface ConversationMessage {
   role: 'user' | 'assistant';
@@ -117,15 +128,20 @@ const youngGameTitles: Record<string, { title: string; emoji: string; descriptio
   'conversation-practice': { title: 'Chat Practice', emoji: '💬', description: 'Practice real conversations with AI!' }
 };
 
-// Teen games (ages 11-17)
+// Teen games reuse the same Gemini-supported IDs with advanced descriptions
 const teenGameTitles: Record<string, { title: string; emoji: string; description: string }> = {
-  'debate-club': { title: 'Debate Club', emoji: '⚖️', description: 'Engage in structured debates on real-world topics! Develop critical arguments and persuasive speaking skills.' },
-  'critical-thinking': { title: 'Critical Thinking Challenge', emoji: '🧠', description: 'Solve complex problems and analyze arguments! Strengthen your logical reasoning abilities.' },
-  'research-challenge': { title: 'Research Challenge', emoji: '🔬', description: 'Present findings on advanced topics with AI feedback! Practice academic research skills.' },
-  'presentation-master': { title: 'Presentation Master', emoji: '📊', description: 'Practice professional presentations and public speaking! Build confidence for real-world scenarios.' },
-  'ethics-discussion': { title: 'Ethics Discussion', emoji: '🤔', description: 'Explore ethical dilemmas and moral reasoning! Develop thoughtful perspectives on complex issues.' },
-  'pronunciation-challenge': { title: 'Advanced Pronunciation', emoji: '🎯', description: 'Master complex phrases and professional speech! Perfect your pronunciation for academic and professional contexts.' },
-  'conversation-practice': { title: 'Professional Conversation', emoji: '💼', description: 'Practice business and academic conversations! Build confidence in professional settings.' }
+  'tongue-twister': { title: 'Pro Tongue Twisters', emoji: '⚡', description: 'High-speed pronunciation drills that sharpen clarity for speeches and presentations.' },
+  'word-chain': { title: 'Advanced Word Chain', emoji: '🧠', description: 'Think fast and connect academic vocabulary to boost fluency.' },
+  'story-telling': { title: 'Creative Story Lab', emoji: '📝', description: 'Co-write imaginative stories while practicing narrative skills.' },
+  'pronunciation-challenge': { title: 'Precision Pronunciation', emoji: '🎯', description: 'Perfect complex phrases for interviews, debates, and leadership moments.' },
+  'conversation-practice': { title: 'Pro Conversation', emoji: '💬', description: 'Hold confident conversations on real-world topics with AI coaching.' },
+  'debate-club': { title: 'Debate Club', emoji: '⚖️', description: 'Form arguments, deliver rebuttals, and persuade your audience on trending topics.' },
+  'critical-thinking': { title: 'Critical Thinking Challenge', emoji: '🧩', description: 'Tackle logic puzzles and scenario-based questions that stretch your reasoning.' },
+  'research-challenge': { title: 'Research Challenge', emoji: '🔬', description: 'Investigate complex ideas, summarize findings, and cite evidence like a scholar.' },
+  'presentation-master': { title: 'Presentation Master', emoji: '📊', description: 'Practice structured speeches with AI feedback on tone, clarity, and impact.' },
+  'ethics-discussion': { title: 'Ethics Discussion', emoji: '🤔', description: 'Explore thoughtful perspectives on moral dilemmas and global decisions.' },
+  'innovation-lab': { title: 'Innovation Lab', emoji: '🚀', description: 'Design futuristic solutions and pitch them like a startup founder.' },
+  'leadership-challenge': { title: 'Leadership Challenge', emoji: '👑', description: 'Navigate team scenarios, make decisions, and reflect on leadership styles.' }
 };
 
 const KidsGamePage = () => {
@@ -163,7 +179,20 @@ const KidsGamePage = () => {
   // Validate game ID based on context
   useEffect(() => {
     const youngGames: GameType[] = ['tongue-twister', 'word-chain', 'story-telling', 'pronunciation-challenge', 'conversation-practice'];
-    const teenGames: GameType[] = ['debate-club', 'critical-thinking', 'research-challenge', 'presentation-master', 'ethics-discussion', 'pronunciation-challenge', 'conversation-practice'];
+    const teenGames: GameType[] = [
+      'tongue-twister',
+      'word-chain',
+      'story-telling',
+      'pronunciation-challenge',
+      'conversation-practice',
+      'debate-club',
+      'critical-thinking',
+      'research-challenge',
+      'presentation-master',
+      'ethics-discussion',
+      'innovation-lab',
+      'leadership-challenge'
+    ];
     
     if (!gameId) {
       navigate(isTeenContext ? '/kids/teen?section=games' : '/kids/young?section=games');
@@ -498,20 +527,7 @@ const KidsGamePage = () => {
 
       const formattedContent = formatAIResponse(response.content);
       
-      // For all teen games, skip showing the initial AI greeting response
-      const teenGames: GameType[] = ['debate-club', 'critical-thinking', 'research-challenge', 'presentation-master', 'ethics-discussion'];
-      // Also skip for shared games when in teen context
-      const shouldSkipInitialResponse = isTeenContext && (
-        teenGames.includes(currentGame) || 
-        (currentGame === 'pronunciation-challenge' || currentGame === 'conversation-practice')
-      );
-      
-      if (!shouldSkipInitialResponse) {
-        setGameContent(formattedContent);
-      } else {
-        // For teen games, don't set gameContent so it won't be displayed
-        setGameContent('');
-      }
+      setGameContent(formattedContent);
       
       if (response.gameInstruction) {
         setGameInstruction(response.gameInstruction);
@@ -521,7 +537,7 @@ const KidsGamePage = () => {
       }
 
       // For all teen games, don't add initial AI response to conversation history
-      const initialHistory: ConversationMessage[] = shouldSkipInitialResponse ? [] : [{
+      const initialHistory: ConversationMessage[] = [{
         role: 'assistant' as const,
         content: formattedContent,
         timestamp: Date.now()
@@ -553,7 +569,7 @@ const KidsGamePage = () => {
       }
 
       // For all teen games, don't speak the initial greeting message
-      if (isSoundEnabled && formattedContent && !shouldSkipInitialResponse) {
+      if (isSoundEnabled && formattedContent) {
         const femaleVoiceId = findFemaleVoiceId();
         await EnhancedTTS.speak(formattedContent, { 
           voice: femaleVoiceId,

@@ -11,8 +11,19 @@ import TeenApi from '@/services/TeenApi';
 import { GeminiService } from '@/services/GeminiService';
 import StoryWordsService from '@/services/StoryWordsService';
 
-type GameType = 'tongue-twister' | 'word-chain' | 'story-telling' | 'pronunciation-challenge' | 'conversation-practice' | 
-  'debate-club' | 'critical-thinking' | 'research-challenge' | 'presentation-master' | 'ethics-discussion';
+type GameType =
+  | 'tongue-twister'
+  | 'word-chain'
+  | 'story-telling'
+  | 'pronunciation-challenge'
+  | 'conversation-practice'
+  | 'debate-club'
+  | 'critical-thinking'
+  | 'research-challenge'
+  | 'presentation-master'
+  | 'ethics-discussion'
+  | 'innovation-lab'
+  | 'leadership-challenge';
 
 interface InteractiveGamesProps {
   isTeenKids?: boolean;
@@ -71,17 +82,36 @@ const InteractiveGames = ({ isTeenKids }: InteractiveGamesProps = {}) => {
   const [sessionBaseline, setSessionBaseline] = useState(0); // Baseline points at session start
   const { user, isAuthenticated } = useAuth();
   const userId = user?.id ? String(user.id) : 'local-user';
+  const [isGeminiReady, setIsGeminiReady] = useState(() => GeminiService.isReady());
 
   // Initialize Gemini Service
   useEffect(() => {
+    let isMounted = true;
+
+    const updateGeminiReadyState = () => {
+      if (!isMounted) return;
+      setIsGeminiReady(GeminiService.isReady());
+    };
+
     const initGemini = async () => {
       try {
         await GeminiService.initialize();
       } catch (error) {
         console.error('Failed to initialize Gemini:', error);
+      } finally {
+        updateGeminiReadyState();
       }
     };
+
     initGemini();
+    window.addEventListener('online', updateGeminiReadyState);
+    window.addEventListener('offline', updateGeminiReadyState);
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener('online', updateGeminiReadyState);
+      window.removeEventListener('offline', updateGeminiReadyState);
+    };
   }, []);
 
   // Initialize session points - reset on mount and track baseline
@@ -284,7 +314,7 @@ const InteractiveGames = ({ isTeenKids }: InteractiveGamesProps = {}) => {
       <GameMenu 
         onSelectGame={startGame}
         totalScore={isTeenContext ? gameScore : sessionPoints} 
-        isGeminiReady={GeminiService.isReady()}
+        isGeminiReady={isGeminiReady}
         isTeenKids={isTeenContext}
       />
     </div>
@@ -344,60 +374,97 @@ const GameMenu = ({
     }
   ];
 
-  // Advanced games for teen kids with enhanced prompts
-  const teenGames = [
+  const teenCoreGames = [
     {
-      id: 'debate-club' as GameType,
-      title: 'Debate Club',
-      description: 'Master persuasive arguments on current events, social issues, and global topics. Build confidence in structured debates with AI-powered feedback on your reasoning and delivery!',
-      emoji: '⚖️',
+      id: 'tongue-twister' as GameType,
+      title: 'Pro Tongue Twisters',
+      description: 'High-speed pronunciation drills that sharpen clarity for debates and talks.',
+      emoji: '⚡',
       color: 'from-indigo-400 to-purple-400'
     },
     {
-      id: 'critical-thinking' as GameType,
-      title: 'Critical Thinking',
-      description: 'Analyze complex scenarios, evaluate evidence, and solve real-world problems. Strengthen your logical reasoning and decision-making skills through challenging thought experiments!',
+      id: 'word-chain' as GameType,
+      title: 'Advanced Word Chain',
+      description: 'Connect academic vocabulary fast to boost fluency and critical thinking.',
       emoji: '🧠',
       color: 'from-violet-400 to-fuchsia-400'
     },
     {
+      id: 'story-telling' as GameType,
+      title: 'Creative Story Lab',
+      description: 'Co-create narratives that test imagination, structure, and persuasion.',
+      emoji: '📝',
+      color: 'from-cyan-400 to-blue-400'
+    },
+    {
+      id: 'pronunciation-challenge' as GameType,
+      title: 'Precision Pronunciation',
+      description: 'Perfect complex phrases for interviews, speeches, and leadership moments.',
+      emoji: '🎯',
+      color: 'from-emerald-400 to-teal-400'
+    },
+    {
+      id: 'conversation-practice' as GameType,
+      title: 'Pro Conversation',
+      description: 'Hold confident conversations on real-world topics with AI coaching.',
+      emoji: '💬',
+      color: 'from-rose-400 to-pink-400'
+    }
+  ];
+
+  const teenAdvancedGames = [
+    {
+      id: 'debate-club' as GameType,
+      title: 'Debate Club',
+      description: 'Build persuasive arguments and rebuttals on trending global issues.',
+      emoji: '⚖️',
+      color: 'from-indigo-500 to-purple-500'
+    },
+    {
+      id: 'critical-thinking' as GameType,
+      title: 'Critical Thinking',
+      description: 'Solve logic puzzles and scenario-based challenges that stretch your reasoning.',
+      emoji: '🧩',
+      color: 'from-blue-500 to-cyan-500'
+    },
+    {
       id: 'research-challenge' as GameType,
       title: 'Research Challenge',
-      description: 'Investigate advanced topics, synthesize information, and present your findings like a scholar. Practice academic research skills with AI guidance on structure and clarity!',
+      description: 'Investigate advanced topics, summarize findings, and cite evidence like a scholar.',
       emoji: '🔬',
-      color: 'from-cyan-400 to-blue-400'
+      color: 'from-emerald-500 to-teal-500'
     },
     {
       id: 'presentation-master' as GameType,
       title: 'Presentation Master',
-      description: 'Perfect your public speaking with professional presentation practice. Get real-time feedback on pacing, clarity, and engagement for school projects and future career success!',
+      description: 'Practice structured speeches with AI feedback on tone, clarity, and impact.',
       emoji: '📊',
-      color: 'from-emerald-400 to-teal-400'
+      color: 'from-orange-500 to-amber-500'
     },
     {
       id: 'ethics-discussion' as GameType,
       title: 'Ethics Discussion',
-      description: 'Explore moral dilemmas, ethical frameworks, and complex decision-making. Develop thoughtful perspectives on real-world issues that matter to your generation!',
+      description: 'Explore nuanced dilemmas and build thoughtful perspectives with Socratic questioning.',
       emoji: '🤔',
-      color: 'from-rose-400 to-pink-400'
+      color: 'from-rose-500 to-pink-500'
     },
     {
-      id: 'pronunciation-challenge' as GameType,
-      title: 'Advanced Pronunciation',
-      description: 'Master complex academic and professional phrases with precision. Perfect your articulation for presentations, interviews, and confident communication in any setting!',
-      emoji: '🎯',
-      color: 'from-purple-400 to-indigo-400'
+      id: 'innovation-lab' as GameType,
+      title: 'Innovation Lab',
+      description: 'Design solutions for futuristic challenges and pitch them like a startup founder.',
+      emoji: '🚀',
+      color: 'from-purple-500 to-fuchsia-500'
     },
     {
-      id: 'conversation-practice' as GameType,
-      title: 'Professional Conversation',
-      description: 'Practice business networking, academic discussions, and professional interactions. Build confidence for job interviews, college admissions, and real-world communication!',
-      emoji: '💼',
-      color: 'from-orange-400 to-yellow-400'
+      id: 'leadership-challenge' as GameType,
+      title: 'Leadership Challenge',
+      description: 'Navigate team scenarios, make decisions, and reflect on leadership styles.',
+      emoji: '👑',
+      color: 'from-yellow-500 to-lime-500'
     }
   ];
 
-  const games = isTeenKids ? teenGames : youngGames;
+  const games = isTeenKids ? [...teenCoreGames, ...teenAdvancedGames] : youngGames;
   const cardsPerPage = 6;
   const totalPages = Math.ceil(games.length / cardsPerPage);
   const startIndex = (currentPage - 1) * cardsPerPage;

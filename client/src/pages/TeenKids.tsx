@@ -1658,7 +1658,7 @@ const TeenKidsPage = () => {
           </div>
             <div className="space-y-2">
               <h1 className="text-3xl font-semibold text-foreground">
-                Little Learners
+                Teen Learners
               </h1>
               <p className="text-base text-muted-foreground">
                 Magical stories, fun games, and exciting adventures for young minds. Sign in to keep learning where you left off.
@@ -1692,7 +1692,7 @@ const TeenKidsPage = () => {
                 <div className="space-y-4 lg:max-w-2xl">
                   <div className="flex flex-wrap items-center gap-3">
                     <Badge className="bg-white/25 text-white uppercase tracking-wide">
-                      Little Learners
+                      Teen Learners
                     </Badge>
                     <SyncStatusIndicator showDetails={false} className="bg-white/20 text-white backdrop-blur-sm" />
                     <Badge className="rounded-full bg-white/20 text-white">

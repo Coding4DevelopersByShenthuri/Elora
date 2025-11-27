@@ -1,6 +1,17 @@
 interface GeminiGameRequest {
-  gameType: 'tongue-twister' | 'word-chain' | 'story-telling' | 'pronunciation-challenge' | 'conversation-practice' |
-            'debate-club' | 'critical-thinking' | 'research-challenge' | 'presentation-master' | 'ethics-discussion';
+  gameType:
+    | 'tongue-twister'
+    | 'word-chain'
+    | 'story-telling'
+    | 'pronunciation-challenge'
+    | 'conversation-practice'
+    | 'debate-club'
+    | 'critical-thinking'
+    | 'research-challenge'
+    | 'presentation-master'
+    | 'ethics-discussion'
+    | 'innovation-lab'
+    | 'leadership-challenge';
   conversationHistory?: Array<{ role: 'user' | 'assistant'; content: string }>;
   userInput?: string;
   context?: {

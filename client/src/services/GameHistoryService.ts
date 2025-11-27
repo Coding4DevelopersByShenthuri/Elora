@@ -20,7 +20,14 @@ export interface GameSession {
   completed: boolean;
 }
 
+const HISTORY_RETENTION_DAYS = 30;
+const HISTORY_RETENTION_MS = HISTORY_RETENTION_DAYS * 24 * 60 * 60 * 1000;
+
 export class GameHistoryService {
+  private static filterExpiredSessions(sessions: GameSession[]): GameSession[] {
+    const cutoff = Date.now() - HISTORY_RETENTION_MS;
+    return sessions.filter((session) => session.startTime >= cutoff);
+  }
 
   /**
    * Save a game session (to both local storage and MySQL)
@@ -54,8 +61,9 @@ export class GameHistoryService {
       localHistory.push(session);
     }
     
-    // Keep only last 100 sessions locally
-    const sorted = localHistory.sort((a, b) => b.startTime - a.startTime);
+    // Remove expired sessions and keep only last 100
+    const cleaned = this.filterExpiredSessions(localHistory);
+    const sorted = cleaned.sort((a, b) => b.startTime - a.startTime);
     const limited = sorted.slice(0, 100);
     
     await userDataService.saveUserLearningData(userId, { 
@@ -116,6 +124,14 @@ export class GameHistoryService {
       localHistory = [];
     }
 
+    // Clean up expired sessions from local cache
+    const cleanedLocal = this.filterExpiredSessions(localHistory);
+    if (cleanedLocal.length !== localHistory.length) {
+      await userDataService.saveUserLearningData(userId, {
+        gameHistory: cleanedLocal
+      } as any);
+    }
+
     // Try to sync from server if authenticated
     if (syncFromServer) {
       try {
@@ -152,7 +168,8 @@ export class GameHistoryService {
               )
             );
 
-            return uniqueSessions.sort((a, b) => b.startTime - a.startTime);
+            const cleaned = this.filterExpiredSessions(uniqueSessions);
+            return cleaned.sort((a, b) => b.startTime - a.startTime);
           }
         }
       } catch (error) {
@@ -160,7 +177,7 @@ export class GameHistoryService {
       }
     }
 
-    return localHistory.sort((a, b) => b.startTime - a.startTime);
+    return cleanedLocal.sort((a, b) => b.startTime - a.startTime);
   }
 
   /**
@@ -187,8 +204,9 @@ export class GameHistoryService {
     await userDataService.initDB();
     const history = await this.getGameHistory(userId);
     const filtered = history.filter(s => s.id !== sessionId);
+    const cleaned = this.filterExpiredSessions(filtered);
     await userDataService.saveUserLearningData(userId, { 
-      gameHistory: filtered 
+      gameHistory: cleaned 
     } as any);
   }
 

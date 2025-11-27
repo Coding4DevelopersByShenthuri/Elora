@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { History, Clock, Award, Eye, Trophy, ArrowLeft, Filter } from 'lucide-react';
+import { History, Clock, Award, Eye, Trophy, ArrowLeft, Filter, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import GameHistoryService, { type GameSession } from '@/services/GameHistoryService';
@@ -16,6 +16,7 @@ const GameHistoryPage = () => {
   const [allSessions, setAllSessions] = useState<GameSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSession, setSelectedSession] = useState<GameSession | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>(searchParams.get('game') || 'all');
 
   // Game titles mapping
@@ -26,10 +27,12 @@ const GameHistoryPage = () => {
     'pronunciation-challenge': { title: 'Pronunciation Master', emoji: '🎯' },
     'conversation-practice': { title: 'Chat Practice', emoji: '💬' },
     'debate-club': { title: 'Debate Club', emoji: '⚖️' },
-    'critical-thinking': { title: 'Critical Thinking', emoji: '🧠' },
+    'critical-thinking': { title: 'Critical Thinking', emoji: '🧩' },
     'research-challenge': { title: 'Research Challenge', emoji: '🔬' },
     'presentation-master': { title: 'Presentation Master', emoji: '📊' },
     'ethics-discussion': { title: 'Ethics Discussion', emoji: '🤔' },
+    'innovation-lab': { title: 'Innovation Lab', emoji: '🚀' },
+    'leadership-challenge': { title: 'Leadership Challenge', emoji: '👑' }
   };
 
   // Add styles for select options in dark mode
@@ -123,6 +126,23 @@ const GameHistoryPage = () => {
   const topGameType = Object.entries(favoriteGameType).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
   const topGameInfo = topGameType ? (gameTitles[topGameType] || { title: topGameType, emoji: '🎮' }) : null;
 
+  const handleDeleteSession = async (sessionId: string, event?: React.MouseEvent) => {
+    event?.stopPropagation();
+    if (deletingId) return;
+    setDeletingId(sessionId);
+    try {
+      await GameHistoryService.deleteGameSession(userId, sessionId);
+      setAllSessions((prev) => prev.filter((s) => s.id !== sessionId));
+      if (selectedSession?.id === sessionId) {
+        setSelectedSession(null);
+      }
+    } catch (error) {
+      console.error('Failed to delete game session:', error);
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -134,13 +154,13 @@ const GameHistoryPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-muted/20 pb-20 pt-24">
-      <main className="container mx-auto max-w-6xl space-y-8 px-4">
-        <section>
+    <div className="min-h-screen bg-muted/20 pb-16 pt-20">
+      <main className="mx-auto w-full max-w-5xl space-y-8 px-4 sm:px-6">
+        <section className="mx-auto w-full">
           <Card className="relative overflow-hidden border-none bg-gradient-to-br from-[#1B4332] via-[#2D6A4F] to-[#74C69D] text-white shadow-xl">
             <span className="absolute -right-28 -top-24 h-56 w-56 rounded-full bg-white/10 blur-3xl" aria-hidden />
             <span className="absolute -left-24 bottom-0 h-48 w-48 rounded-full bg-white/10 blur-3xl" aria-hidden />
-            <CardContent className="relative z-10 space-y-6 p-6 md:p-10">
+            <CardContent className="relative z-10 space-y-5 p-5 md:p-7">
               <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                 <div className="space-y-4 lg:max-w-3xl">
                   <div className="flex flex-wrap items-center gap-3">
@@ -185,7 +205,7 @@ const GameHistoryPage = () => {
                   <Filter className="h-4 w-4" />
                   Filter by game
                 </div>
-                <div className="flex flex-1 flex-wrap gap-2">
+                <div className="flex flex-1 flex-wrap gap-2 overflow-x-auto pb-1">
                   <Button
                     variant={filter === 'all' ? 'default' : 'ghost'}
                     onClick={() => setFilter('all')}
@@ -299,18 +319,30 @@ const GameHistoryPage = () => {
                           )}
                         </div>
                       </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedSession(session);
-                        }}
-                        className="w-full rounded-full sm:w-auto"
-                      >
-                        <Eye className="mr-2 h-4 w-4" />
-                        View details
-                      </Button>
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedSession(session);
+                          }}
+                          className="w-full rounded-full sm:w-auto"
+                        >
+                          <Eye className="mr-2 h-4 w-4" />
+                          View details
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => handleDeleteSession(session.id, e)}
+                          className="w-full rounded-full text-red-600 hover:text-red-700 sm:w-auto"
+                          disabled={deletingId === session.id}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          {deletingId === session.id ? 'Deleting...' : 'Delete'}
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -330,9 +362,26 @@ const GameHistoryPage = () => {
                   <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
                     Game session details
                   </h2>
-                  <Button variant="outline" size="sm" onClick={() => setSelectedSession(null)} className="w-full sm:w-auto">
-                    Close
-                  </Button>
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSelectedSession(null)}
+                      className="w-full sm:w-auto"
+                    >
+                      Close
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-red-600 hover:text-red-700"
+                      onClick={() => selectedSession && handleDeleteSession(selectedSession.id)}
+                      disabled={!selectedSession || deletingId === selectedSession.id}
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      {deletingId === selectedSession?.id ? 'Deleting...' : 'Delete session'}
+                    </Button>
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
