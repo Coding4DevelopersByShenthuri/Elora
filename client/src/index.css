@@ -386,7 +386,17 @@
     overflow-x: hidden;
     min-height: 100vh;
   }
+
+  /* Hide scrollbars but keep functionality */
+  .hide-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
   
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari and Opera */
+  }
+
   /* Consistent Green Background for ALL Light Mode Pages */
   .light body {
     background: #d8f3dcff; /* --nyanza exact color */
