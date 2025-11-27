@@ -1,0 +1,60 @@
+{
+  "business-meetings": {
+    "quarterly": "காலாண்டு",
+    "initiative": "முனைவு",
+    "expansion": "விரிவு",
+    "budget approval": "பட்ஜெட் அனுமதி",
+    "proposal": "வழங்கல் திட்டம்",
+    "digital strategy": "டிஜிட்டல் திட்டமிடல்",
+    "phased launch": "அடுக்கு அறிமுகம்",
+    "partnership": "கூட்டு ஒப்பந்தம்",
+    "market penetration": "சந்தை ஊடுருவல்",
+    "customer acquisition": "வாடிக்கையாளர் சேர்த்தல்",
+    "strategic objectives": "மூலோபாய குறிக்கோள்கள்",
+    "negotiation": "பேச்சுவார்த்தை"
+  },
+  "daily-conversations": {
+    "reshuffle": "மறுசீரமைத்தல்",
+    "care calendar": "பாதுகாப்பு அட்டவணை",
+    "hydration reminder": "தண்ணீர் நினைவூட்டல்",
+    "impulse purchase": "திடீர் கொள்முதல்",
+    "virtual background": "மெய்நிகர் பின்னணி",
+    "completion badge": "முடித்தல் பதக்கம்",
+    "box breathing": "பெட்டி சுவாசம்",
+    "grateful": "நன்றியுள்ள"
+  },
+  "academic-lectures": {
+    "blended finance": "கலப்பு நிதி",
+    "concessional capital": "சலுகை மூலதனம்",
+    "interconnection queue": "இணைப்பு வரிசை",
+    "long-duration storage": "நீண்டகால சேமிப்பு",
+    "permitting bottleneck": "அனுமதி நெரிசல்",
+    "co-benefit": "இணை நன்மை",
+    "congestion pricing": "நெரிசல் கட்டண நிர்ணயம்",
+    "clean energy standard": "தூய்மையான ஆற்றல் தரநிலை",
+    "policy lever": "கொள்கை கட்டுப்பாடு",
+    "reproducibility": "மீளுருவாக்கத்தன்மை"
+  },
+  "news-reports": {
+    "tandem solar cell": "இணை சூரியசெல்",
+    "benchmark rate": "அளவுகோல் வட்டி",
+    "false positive": "பிழையான நேர்மையான முடிவு",
+    "fire retardant": "தீ தாமதப்படுத்தி",
+    "crowdfunding": "கூட்டு நிதிபெறல்"
+  },
+  "phone-conversations": {
+    "multi-factor authentication": "பலக்கூறு அங்கீகாரம்",
+    "load testing": "சுமை சோதனை",
+    "co-pay": "கூட்டு கட்டணம்",
+    "encrypted drive": "குறியாக்கப்பட்ட இயக்கி",
+    "anchor (verb)": "ஆரம்ப அளவை நிர்ணயித்தல்"
+  },
+  "interviews": {
+    "raci chart": "RACI விளக்கப்படம்",
+    "activation cohort": "செயல்பாட்டு குழு",
+    "guardrails": "பாதுகாப்பு வரம்புகள்",
+    "geographic salary band": "புவியியல் சம்பள பகுதி",
+    "radical transparency": "முழு வெளிப்படைத் தன்மை"
+  }
+}
+

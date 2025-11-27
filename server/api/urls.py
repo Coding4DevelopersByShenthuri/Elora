@@ -90,6 +90,7 @@ urlpatterns = [
     path('kids/vocabulary/practice', views.kids_vocabulary_practice, name='kids-vocabulary-practice'),
     path('kids/pronunciation/practice', views.kids_pronunciation_practice, name='kids-pronunciation-practice'),
     path('kids/games/session', views.kids_game_session, name='kids-game-session'),
+    path('kids/games/session/<int:session_id>', views.kids_game_session_delete, name='kids-game-session-delete'),
     
     # ============= Waitlist =============
     path('waitlist/signup', views.waitlist_signup, name='waitlist-signup'),

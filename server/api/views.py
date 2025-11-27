@@ -2943,12 +2943,45 @@ def kids_pronunciation_practice(request):
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def kids_game_session(request):
-    """Get or record a game session"""
+    """Get, record, or delete a game session"""
     if request.method == 'GET':
         # Get all game sessions for the user
         sessions = KidsGameSession.objects.filter(user=request.user).order_by('-created_at')
         serializer = KidsGameSessionSerializer(sessions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    if request.method == 'DELETE':
+        # Delete a game session (history only, points are preserved)
+        session_id = request.data.get('session_id') or request.query_params.get('session_id')
+        if not session_id:
+            return Response(
+                {"message": "session_id is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            # Extract numeric ID if it's in format "server-123"
+            numeric_id = int(session_id.replace('server-', '')) if isinstance(session_id, str) and session_id.startswith('server-') else int(session_id)
+            session = KidsGameSession.objects.get(id=numeric_id, user=request.user)
+            
+            # Delete the session (history only - points are stored separately in CategoryProgress)
+            session.delete()
+            
+            logger.info(f"Game session {numeric_id} deleted for user {request.user.id} (points preserved)")
+            return Response(
+                {"message": "Game session deleted successfully (points preserved)"},
+                status=status.HTTP_200_OK
+            )
+        except KidsGameSession.DoesNotExist:
+            return Response(
+                {"message": "Game session not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except ValueError:
+            return Response(
+                {"message": "Invalid session_id format"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
     
     # POST - Record a game session
     game_type = request.data.get('game_type')
@@ -3033,6 +3066,28 @@ def kids_game_session(request):
     
     serializer = KidsGameSessionSerializer(session)
     return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def kids_game_session_delete(request, session_id):
+    """Delete a game session (history only, points are preserved)"""
+    try:
+        session = KidsGameSession.objects.get(id=session_id, user=request.user)
+        
+        # Delete the session (history only - points are stored separately in CategoryProgress)
+        session.delete()
+        
+        logger.info(f"Game session {session_id} deleted for user {request.user.id} (points preserved)")
+        return Response(
+            {"message": "Game session deleted successfully (points preserved)"},
+            status=status.HTTP_200_OK
+        )
+    except KidsGameSession.DoesNotExist:
+        return Response(
+            {"message": "Game session not found"},
+            status=status.HTTP_404_NOT_FOUND
+        )
 
 
 # ============= Gemini AI Games =============
@@ -10211,10 +10266,10 @@ def dictionary_search(request):
     if not query:
         return Response({'success': False, 'error': 'Query required'}, status=status.HTTP_400_BAD_REQUEST)
     
-    entries = DictionaryEntry.objects.filter(
+    entries = list(DictionaryEntry.objects.filter(
         word__icontains=query, is_active=True
-    )[:20]
-    
+    )[:20])
+
     serializer = DictionaryEntrySerializer(entries, many=True, context={'request': request})
     return Response({'success': True, 'data': serializer.data})
 
@@ -10235,7 +10290,7 @@ def dictionary_lookup(request, word):
 @permission_classes([IsAuthenticated])
 def my_dictionary(request):
     """Get user's personal dictionary"""
-    entries = UserDictionary.objects.filter(user=request.user).order_by('-added_at')
+    entries = list(UserDictionary.objects.filter(user=request.user).order_by('-added_at'))
     serializer = UserDictionarySerializer(entries, many=True, context={'request': request})
     return Response({'success': True, 'data': serializer.data})
 

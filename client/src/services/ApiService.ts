@@ -1215,6 +1215,34 @@ export const KidsAPI = {
     } catch (error) {
       return handleApiError(error);
     }
+  },
+
+  /**
+   * Delete a game session (history only, points are preserved)
+   */
+  deleteGameSession: async (sessionId: string) => {
+    try {
+      // Extract numeric ID if it's a server session (format: "server-123")
+      const id = sessionId.startsWith('server-') ? sessionId.replace('server-', '') : sessionId;
+      const result = await fetchWithAuth(`kids/games/session/${id}`, {
+        method: 'DELETE',
+      });
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error) {
+      // If 404, session might not exist on server (local-only session)
+      // This is okay - we've already deleted it locally and tracked it
+      if ((error as any)?.status === 404) {
+        console.log(`Session ${sessionId} not found on server (local-only), deletion successful`);
+        return {
+          success: true,
+          data: { message: 'Session deleted (local-only)' }
+        };
+      }
+      return handleApiError(error);
+    }
   }
 };
 

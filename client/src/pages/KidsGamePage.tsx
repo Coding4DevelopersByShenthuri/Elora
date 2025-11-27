@@ -11,6 +11,7 @@ import KidsVoiceRecorder from '@/components/kids/KidsVoiceRecorder';
 import { useAuth } from '@/contexts/AuthContext';
 import KidsApi from '@/services/KidsApi';
 import KidsProgressService from '@/services/KidsProgressService';
+import TeenApi from '@/services/TeenApi';
 import { GeminiService } from '@/services/GeminiService';
 import GameHistoryService, { type GameSession } from '@/services/GameHistoryService';
 
@@ -245,9 +246,17 @@ const KidsGamePage = () => {
       window.dispatchEvent(event);
       
       // Also update localStorage to trigger storage events (works across tabs)
-      const gamePointsKey = `speakbee_game_points_${userId}`;
-      const currentGamePoints = Number(localStorage.getItem(gamePointsKey) || '0');
-      localStorage.setItem(gamePointsKey, String(currentGamePoints + points));
+      if (isTeenContext) {
+        // For teen context, track game points separately
+        const teenGamePointsKey = `teen_game_points_total_${userId}`;
+        const currentGamePoints = Number(localStorage.getItem(teenGamePointsKey) || '0');
+        localStorage.setItem(teenGamePointsKey, String(currentGamePoints + points));
+        console.log(`🎮 TeenKids: Saved ${points} game points to localStorage. Total: ${currentGamePoints + points}`);
+      } else {
+        const gamePointsKey = `speakbee_game_points_${userId}`;
+        const currentGamePoints = Number(localStorage.getItem(gamePointsKey) || '0');
+        localStorage.setItem(gamePointsKey, String(currentGamePoints + points));
+      }
     } catch (error) {
       console.warn('Error dispatching game points event:', error);
     }
@@ -257,35 +266,57 @@ const KidsGamePage = () => {
     try {
       const token = localStorage.getItem('speakbee_auth_token');
       if (token && token !== 'local-token') {
-        const current = await KidsApi.getProgress(token);
-        const currentPoints = (current as any)?.points || 0;
-        const details = { ...((current as any).details || {}) };
-        details.games = details.games || {};
-        details.games.points = Number(details.games.points || 0) + points;
-        const arr = Array.isArray(details.games.types) ? details.games.types : [];
-        if (gameType && !arr.includes(gameType)) arr.push(gameType);
-        details.games.types = arr;
-        details.games.attempts = Number(details.games.attempts || 0) + 1;
-        await KidsApi.updateProgress(token, {
-          points: currentPoints + points,
-          details
-        });
-      } else {
-        await KidsProgressService.update(userId, (progress) => {
-          const anyP: any = progress as any;
-          const details = { ...(anyP.details || {}) };
+        if (isTeenContext) {
+          // For teen context, use TeenApi.recordQuickAction to save points and increment games
+          try {
+            await TeenApi.recordQuickAction(token, {
+              deltaPoints: points,
+              incrementGames: true
+            });
+            console.log(`✅ TeenKids: Saved ${points} points and incremented games_completed`);
+          } catch (error) {
+            console.error('Error saving teen game points:', error);
+          }
+        } else {
+          // For young kids context, use KidsApi
+          const current = await KidsApi.getProgress(token);
+          const currentPoints = (current as any)?.points || 0;
+          const details = { ...((current as any).details || {}) };
           details.games = details.games || {};
           details.games.points = Number(details.games.points || 0) + points;
           const arr = Array.isArray(details.games.types) ? details.games.types : [];
           if (gameType && !arr.includes(gameType)) arr.push(gameType);
           details.games.types = arr;
           details.games.attempts = Number(details.games.attempts || 0) + 1;
-          return {
-            ...progress,
-            points: progress.points + points,
+          await KidsApi.updateProgress(token, {
+            points: currentPoints + points,
             details
-          } as any;
-        });
+          });
+        }
+      } else {
+        // Offline mode - save locally
+        if (isTeenContext) {
+          // For teen context, save to local storage (will sync when online)
+          const teenGamePointsKey = `teen_game_points_${userId}`;
+          const currentTeenPoints = Number(localStorage.getItem(teenGamePointsKey) || '0');
+          localStorage.setItem(teenGamePointsKey, String(currentTeenPoints + points));
+        } else {
+          await KidsProgressService.update(userId, (progress) => {
+            const anyP: any = progress as any;
+            const details = { ...(anyP.details || {}) };
+            details.games = details.games || {};
+            details.games.points = Number(details.games.points || 0) + points;
+            const arr = Array.isArray(details.games.types) ? details.games.types : [];
+            if (gameType && !arr.includes(gameType)) arr.push(gameType);
+            details.games.types = arr;
+            details.games.attempts = Number(details.games.attempts || 0) + 1;
+            return {
+              ...progress,
+              points: progress.points + points,
+              details
+            } as any;
+          });
+        }
       }
     } catch (error) {
       console.error('Error updating game score:', error);
@@ -326,8 +357,12 @@ const KidsGamePage = () => {
       await handleScoreUpdate(completionBonus, currentGame);
     }
     
-    // Save game history
-    if (isAuthenticated && currentSessionId) {
+    // Save game history when game ends
+    // Only save if game was actually played (has user interactions or meaningful progress)
+    const hasUserInteraction = conversationHistory.some(msg => msg.role === 'user');
+    const hasProgress = currentRound > 0 || finalScore > 0;
+    
+    if (isAuthenticated && currentSessionId && (hasUserInteraction || hasProgress || isFullCompletion)) {
       const gameTitles = isTeenContext ? teenGameTitles : youngGameTitles;
       const gameInfo = gameTitles[currentGame];
       
@@ -350,6 +385,8 @@ const KidsGamePage = () => {
       } catch (error) {
         console.error('Error saving game end:', error);
       }
+    } else if (isAuthenticated && currentSessionId && !hasUserInteraction && !hasProgress) {
+      console.log('⏭️ Skipping save - game was not actually played (no user interaction or progress)');
     }
     
     // Generate appropriate ending message
@@ -431,10 +468,19 @@ const KidsGamePage = () => {
   }, [sessionStartTime, gameCompleted, gameTimeLimit]);
 
   // Save game session periodically and on unmount
+  // Only save games that were actually played (have user interactions or meaningful progress)
   useEffect(() => {
     // Function to save current game session
     const saveCurrentSession = async () => {
-      if (isAuthenticated && currentSessionId && conversationHistory.length > 0) {
+      // Only save if:
+      // 1. User has interacted (has user messages in conversation history)
+      // 2. OR game was completed
+      // 3. OR game has meaningful progress (rounds > 0 or score > 0)
+      const hasUserInteraction = conversationHistory.some(msg => msg.role === 'user');
+      const hasProgress = currentRound > 0 || gameScore > 0;
+      const shouldSave = hasUserInteraction || gameCompleted || hasProgress;
+      
+      if (isAuthenticated && currentSessionId && shouldSave && conversationHistory.length > 0) {
         const gameTitles = isTeenContext ? teenGameTitles : youngGameTitles;
         const gameInfo = gameTitles[currentGame];
         
@@ -460,18 +506,22 @@ const KidsGamePage = () => {
       }
     };
 
-    // Save session every 30 seconds during active play
+    // Save session every 30 seconds during active play (only if game was actually played)
     const saveInterval = setInterval(() => {
-      if (!gameCompleted && conversationHistory.length > 0) {
+      const hasUserInteraction = conversationHistory.some(msg => msg.role === 'user');
+      const hasProgress = currentRound > 0 || gameScore > 0;
+      if (!gameCompleted && (hasUserInteraction || hasProgress)) {
         saveCurrentSession();
       }
     }, 30000); // Save every 30 seconds
 
-    // Cleanup: save on unmount
+    // Cleanup: save on unmount (only if game was actually played)
     return () => {
       clearInterval(saveInterval);
-      // Save final state on unmount
-      if (isAuthenticated && currentSessionId && conversationHistory.length > 0) {
+      // Save final state on unmount only if game was actually played
+      const hasUserInteraction = conversationHistory.some(msg => msg.role === 'user');
+      const hasProgress = currentRound > 0 || gameScore > 0;
+      if (isAuthenticated && currentSessionId && (hasUserInteraction || hasProgress || gameCompleted) && conversationHistory.length > 0) {
         saveCurrentSession();
       }
     };
@@ -544,29 +594,8 @@ const KidsGamePage = () => {
       }];
       setConversationHistory(initialHistory);
       
-      // Save initial game session when game starts
-      if (isAuthenticated && currentSessionId) {
-        const gameTitles = isTeenContext ? teenGameTitles : youngGameTitles;
-        const gameInfo = gameTitles[currentGame];
-        
-        const session: GameSession = {
-          id: currentSessionId,
-          gameType: currentGame,
-          gameTitle: gameInfo?.title || currentGame,
-          startTime: sessionStartTime,
-          endTime: undefined,
-          score: 0,
-          rounds: 0,
-          difficulty: currentDifficulty,
-          conversationHistory: initialHistory,
-          completed: false
-        };
-        
-        // Save initial session
-        GameHistoryService.saveGameSession(userId, session).catch(error => {
-          console.warn('Error saving initial game session:', error);
-        });
-      }
+      // Don't save initial session - only save when user actually interacts
+      // This prevents empty sessions from appearing in history
 
       // For all teen games, don't speak the initial greeting message
       if (isSoundEnabled && formattedContent) {
@@ -607,6 +636,15 @@ const KidsGamePage = () => {
       };
       updatedHistory = [...conversationHistory, userMessage];
       setConversationHistory(updatedHistory);
+    } else {
+      // If existingMessage is provided, ensure it's in the history
+      // This handles the case where handleVoiceInput already added the message
+      const messageExists = updatedHistory.some(
+        msg => msg.role === 'user' && msg.content === input && msg.timestamp === existingMessage.timestamp
+      );
+      if (!messageExists) {
+        updatedHistory = [...updatedHistory, existingMessage];
+      }
     }
 
     try {
@@ -643,11 +681,14 @@ const KidsGamePage = () => {
         content: formattedContent,
         timestamp: Date.now()
       };
-      const newHistory: ConversationMessage[] = [...conversationHistory, assistantMessage];
+      // Use updatedHistory (which includes the user message) instead of conversationHistory
+      const newHistory: ConversationMessage[] = [...updatedHistory, assistantMessage];
       setConversationHistory(newHistory);
       
       // Auto-save game session after each AI response (to ensure progress is saved)
-      if (isAuthenticated && currentSessionId && newHistory.length > 0) {
+      // Only save if user has actually interacted (has user messages)
+      const hasUserInteraction = newHistory.some(msg => msg.role === 'user');
+      if (isAuthenticated && currentSessionId && hasUserInteraction && newHistory.length > 0) {
         const gameTitles = isTeenContext ? teenGameTitles : youngGameTitles;
         const gameInfo = gameTitles[currentGame];
         

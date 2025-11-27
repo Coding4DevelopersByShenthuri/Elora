@@ -15,6 +15,7 @@ interface DictionaryEntry {
   image_url?: string;
   synonyms?: string[];
   antonyms?: string[];
+  tamil_translations?: string[];
   category?: string;
   difficulty_level?: number;
   usage_frequency?: number;
@@ -214,6 +215,22 @@ export function DictionaryBook({ entries, onClose, searchQuery = '', onSearchCha
             </h3>
             <p className="text-sm sm:text-base md:text-lg text-gray-800 dark:text-gray-200 leading-relaxed">{entry.definition}</p>
           </div>
+
+          {/* Tamil Translation */}
+          {entry.tamil_translations?.length ? (
+            <div className="mb-3 sm:mb-4 rounded-lg border border-teal-200 bg-teal-50/80 p-3 dark:border-teal-900 dark:bg-teal-900/30">
+              <h3 className="text-xs sm:text-sm font-semibold text-teal-700 dark:text-teal-200 uppercase tracking-wide mb-1 sm:mb-2">
+                Tamil Meaning
+              </h3>
+              <ul className="space-y-1">
+                {entry.tamil_translations.map((translation, idx) => (
+                  <li key={`${entry.id}-tamil-${idx}`} className="text-sm sm:text-base text-gray-900 dark:text-gray-100 leading-relaxed">
+                    {translation}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
 
           {/* Example Sentence */}
           {entry.example_sentence && (

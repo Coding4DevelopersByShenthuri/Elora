@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import UserNotificationsService from '@/services/UserNotificationsService';
 import { playNotificationSound } from '@/utils/playNotificationSound';
 import { runWithVocabularySyncLock } from '@/utils/vocabularySyncLock';
+import { getTamilTranslationForWord } from '@/data/listening-modules/tamilTranslations';
 
 export function useVocabularySync() {
   const { user } = useAuth();
@@ -108,6 +109,7 @@ export function useVocabularySync() {
                     try {
                       const storedLocal = localStorage.getItem(localKey);
                       const currentLocalEntries = storedLocal ? JSON.parse(storedLocal) : [];
+                      const tamilTranslation = getTamilTranslationForWord(vocab.word, moduleId);
                       const newEntry = {
                         id: `local_${Date.now()}_${Math.random()}`,
                         word: vocab.word,
@@ -116,6 +118,7 @@ export function useVocabularySync() {
                         moduleId,
                         moduleTitle: moduleData.module.title,
                         addedAt: new Date().toISOString(),
+                        tamilTranslation,
                       };
                       const updated = [...currentLocalEntries, newEntry];
                       localStorage.setItem(localKey, JSON.stringify(updated));

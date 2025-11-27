@@ -5,7 +5,7 @@ import {
   Mic, Volume2, CheckCircle, TrendingUp, Zap, Lightbulb, Crown, BarChart3,
   Clock, ThumbsUp, Shield, Rocket,
   ArrowRight, GraduationCap, Brain, Languages, Star, Sparkles, Globe,
-  Flame, Calendar, Trophy, RefreshCw, FileText
+  Flame, Calendar, Trophy, RefreshCw, FileText, Layers
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -402,6 +402,11 @@ const AdultsPage = () => {
     return Object.values(dailyConversationProgress).some((topic: any) => topic?.enrolled === true);
   };
 
+const getDailyConversationEnrollmentCount = () => {
+  if (!dailyConversationProgress) return 0;
+  return Object.values(dailyConversationProgress).filter((topic: any) => topic?.enrolled).length;
+};
+
   // Get overall progress across all topics
   const getOverallProgress = () => {
     if (!dailyConversationProgress) return null;
@@ -445,6 +450,8 @@ const AdultsPage = () => {
       description: "Total points from all practice activities"
     },
   ];
+
+const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
 
   const getScoreColor = (score: number) => {
     if (score >= 90) return 'text-emerald-400';
@@ -776,7 +783,7 @@ const AdultsPage = () => {
                     <CardContent className="p-4 sm:p-6 md:p-8">
                       <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
                         <div className="p-4 sm:p-6 rounded-2xl text-white bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg flex-shrink-0">
-                          <Play className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
+                          <Layers className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
                         </div>
                         <div className="flex-1 text-center sm:text-left w-full">
                           <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
@@ -907,15 +914,14 @@ const AdultsPage = () => {
 
                   {/* Daily Conversation - Prominent */}
                   <Card className="bg-gradient-to-br from-cyan-500/20 via-purple-500/30 to-pink-500/20 backdrop-blur-xl border-purple-400/50 shadow-2xl relative">
-                    {/* Enrolled/Completed Badge - Show if any topic is enrolled */}
-                    {hasAnyEnrolledTopic() && (
-                      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10">
-                        <Badge className="bg-gradient-to-r from-emerald-500 to-green-600 text-white border-0 shadow-lg px-2 sm:px-3 py-1 text-xs sm:text-sm">
+                    <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10">
+                      <Badge className="bg-gradient-to-r from-emerald-500 to-green-600 text-white border-0 shadow-lg px-2 sm:px-3 py-1 text-xs sm:text-sm">
+                        {dailyConversationEnrolledCount > 0 && (
                           <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                          Enrolled
-                        </Badge>
-                      </div>
-                    )}
+                        )}
+                        Enrolled: {dailyConversationEnrolledCount}
+                      </Badge>
+                    </div>
                     <CardContent className="p-4 sm:p-6 md:p-8">
                       <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
                         <div className={cn("p-4 sm:p-6 rounded-2xl text-white bg-gradient-to-r shadow-lg flex-shrink-0", "from-cyan-500 to-blue-600")}>

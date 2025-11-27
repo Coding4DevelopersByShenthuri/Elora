@@ -128,13 +128,25 @@ const InteractiveGames = ({ isTeenKids }: InteractiveGamesProps = {}) => {
         let baseline = 0;
 
         if (token && token !== 'local-token') {
-          if (!isTeenContext) {
+          if (isTeenContext) {
+            // For teen context, we track game points separately in localStorage
+            // because total points includes all activities (stories, vocabulary, etc.)
+            const teenGamePointsKey = `teen_game_points_total_${userId}`;
+            baseline = Number(localStorage.getItem(teenGamePointsKey) || '0');
+            console.log(`🎮 TeenKids: Initialized game points baseline: ${baseline}`);
+          } else {
             const progress = await KidsApi.getProgress(token);
             baseline = (progress as any)?.details?.games?.points || 0;
           }
-        } else if (!isTeenContext) {
-          const progress = await KidsProgressService.get(userId);
-          baseline = (progress as any)?.details?.games?.points || 0;
+        } else {
+          if (isTeenContext) {
+            // For teen context offline, check localStorage
+            const teenGamePointsKey = `teen_game_points_total_${userId}`;
+            baseline = Number(localStorage.getItem(teenGamePointsKey) || '0');
+          } else {
+            const progress = await KidsProgressService.get(userId);
+            baseline = (progress as any)?.details?.games?.points || 0;
+          }
         }
 
         setSessionBaseline(Number(baseline));
@@ -151,7 +163,7 @@ const InteractiveGames = ({ isTeenKids }: InteractiveGamesProps = {}) => {
 
   // Listen for game point updates from KidsGamePage
   useEffect(() => {
-    if (!isAuthenticated || isTeenContext) return;
+    if (!isAuthenticated) return;
 
     // Listen for custom events from KidsGamePage (works in same window/tab)
     const handleGamePointsUpdate = ((e: CustomEvent) => {
@@ -159,7 +171,20 @@ const InteractiveGames = ({ isTeenKids }: InteractiveGamesProps = {}) => {
       const eventUserId = e.detail?.userId;
       // Only update if the event is for the current user
       if (pointsAdded > 0 && (!eventUserId || eventUserId === userId)) {
-        setSessionPoints(prev => prev + pointsAdded);
+        console.log(`🎮 Game points event received: ${pointsAdded} points (TeenKids: ${isTeenContext})`);
+        setSessionPoints(prev => {
+          const newTotal = prev + pointsAdded;
+          console.log(`🎮 Session points updated: ${prev} + ${pointsAdded} = ${newTotal}`);
+          
+          // For teen context, also update localStorage to track total game points
+          if (isTeenContext) {
+            const teenGamePointsKey = `teen_game_points_total_${userId}`;
+            const currentTotal = Number(localStorage.getItem(teenGamePointsKey) || '0');
+            localStorage.setItem(teenGamePointsKey, String(currentTotal + pointsAdded));
+          }
+          
+          return newTotal;
+        });
       }
     }) as EventListener;
 
@@ -174,11 +199,24 @@ const InteractiveGames = ({ isTeenKids }: InteractiveGamesProps = {}) => {
         let currentTotal = 0;
 
         if (token && token !== 'local-token') {
-          const progress = await KidsApi.getProgress(token);
-          currentTotal = (progress as any)?.details?.games?.points || 0;
+          if (isTeenContext) {
+            // For teen context, get game points from localStorage (tracked separately)
+            // We can't use total points because it includes all activities
+            const teenGamePointsKey = `teen_game_points_total_${userId}`;
+            currentTotal = Number(localStorage.getItem(teenGamePointsKey) || '0');
+          } else {
+            const progress = await KidsApi.getProgress(token);
+            currentTotal = (progress as any)?.details?.games?.points || 0;
+          }
         } else {
-          const progress = await KidsProgressService.get(userId);
-          currentTotal = (progress as any)?.details?.games?.points || 0;
+          if (isTeenContext) {
+            // For teen context offline, check localStorage
+            const teenGamePointsKey = `teen_game_points_total_${userId}`;
+            currentTotal = Number(localStorage.getItem(teenGamePointsKey) || '0');
+          } else {
+            const progress = await KidsProgressService.get(userId);
+            currentTotal = (progress as any)?.details?.games?.points || 0;
+          }
         }
 
         setSessionPoints(prev => {
@@ -209,7 +247,7 @@ const InteractiveGames = ({ isTeenKids }: InteractiveGamesProps = {}) => {
 
   // Poll for game score changes when component becomes visible (as fallback if events don't work)
   useEffect(() => {
-    if (!isAuthenticated || isTeenContext) return;
+    if (!isAuthenticated) return;
 
     let lastCheck = Date.now();
     let currentBaseline = sessionBaseline;
@@ -224,11 +262,23 @@ const InteractiveGames = ({ isTeenKids }: InteractiveGamesProps = {}) => {
         let currentTotal = 0;
 
         if (token && token !== 'local-token') {
-          const progress = await KidsApi.getProgress(token);
-          currentTotal = (progress as any)?.details?.games?.points || 0;
+          if (isTeenContext) {
+            // For teen context, get game points from localStorage (tracked separately)
+            const teenGamePointsKey = `teen_game_points_total_${userId}`;
+            currentTotal = Number(localStorage.getItem(teenGamePointsKey) || '0');
+          } else {
+            const progress = await KidsApi.getProgress(token);
+            currentTotal = (progress as any)?.details?.games?.points || 0;
+          }
         } else {
-          const progress = await KidsProgressService.get(userId);
-          currentTotal = (progress as any)?.details?.games?.points || 0;
+          if (isTeenContext) {
+            // For teen context offline, check localStorage
+            const teenGamePointsKey = `teen_game_points_total_${userId}`;
+            currentTotal = Number(localStorage.getItem(teenGamePointsKey) || '0');
+          } else {
+            const progress = await KidsProgressService.get(userId);
+            currentTotal = (progress as any)?.details?.games?.points || 0;
+          }
         }
 
         // Get current session points state
@@ -313,7 +363,7 @@ const InteractiveGames = ({ isTeenKids }: InteractiveGamesProps = {}) => {
     <div className="space-y-6">
       <GameMenu 
         onSelectGame={startGame}
-        totalScore={isTeenContext ? gameScore : sessionPoints} 
+        totalScore={sessionPoints} 
         isGeminiReady={isGeminiReady}
         isTeenKids={isTeenContext}
       />

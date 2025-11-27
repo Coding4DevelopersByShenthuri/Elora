@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import UserNotificationsService from '@/services/UserNotificationsService';
 import { playNotificationSound } from '@/utils/playNotificationSound';
 import { runWithVocabularySyncLock } from '@/utils/vocabularySyncLock';
+import { getTamilTranslationForWord } from '@/data/listening-modules/tamilTranslations';
 
 interface DictionaryEntry {
   id: number;
@@ -25,6 +26,7 @@ interface DictionaryEntry {
   image_url?: string;
   synonyms?: string[];
   antonyms?: string[];
+  tamil_translations?: string[];
   category?: string;
   difficulty_level: number;
   usage_frequency: number;
@@ -47,6 +49,7 @@ interface LocalDictionaryWord {
   moduleId: string;
   moduleTitle: string;
   addedAt: string;
+  tamilTranslation?: string;
 }
 
 type DisplayDictionaryWord = UserDictionaryWord & {
@@ -102,32 +105,90 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
     return () => clearTimeout(delayDebounce);
   }, [searchQuery]);
 
+  const normalizeDictionaryEntry = (entry: any, fallback?: LocalDictionaryWord): DictionaryEntry => {
+    const word = entry?.word || fallback?.word || '';
+    const inferredTranslation =
+      entry?.tamil_translations && entry.tamil_translations.length > 0
+        ? entry.tamil_translations
+        : fallback?.tamilTranslation
+        ? [fallback.tamilTranslation]
+        : word
+        ? (() => {
+            const translation = getTamilTranslationForWord(word, fallback?.moduleId);
+            return translation ? [translation] : undefined;
+          })()
+        : undefined;
+
+    return {
+      id: entry?.id ?? -1,
+      word,
+      phonetic: entry?.phonetic,
+      definition:
+        entry?.definition ||
+        (Array.isArray(entry?.definitions) ? entry.definitions[0] : undefined) ||
+        fallback?.definition ||
+        '',
+      example_sentence:
+        entry?.example_sentence ||
+        (Array.isArray(entry?.examples) ? entry.examples[0] : undefined) ||
+        fallback?.example,
+      audio_url: entry?.audio_url,
+      image_url: entry?.image_url,
+      synonyms: entry?.synonyms,
+      antonyms: entry?.antonyms,
+      tamil_translations: inferredTranslation,
+      category: entry?.category || fallback?.moduleTitle,
+      difficulty_level: entry?.difficulty_level ?? 0,
+      usage_frequency: entry?.usage_frequency ?? 0,
+    };
+  };
+
+  const serverDictionaryByWord = useMemo(() => {
+    const map = new Map<string, DictionaryEntry>();
+    myDictionary.forEach((entry) => {
+      const word = entry.dictionary_entry?.word?.toLowerCase();
+      if (word) {
+        map.set(word, entry.dictionary_entry);
+      }
+    });
+    return map;
+  }, [myDictionary]);
+
   const displayDictionary: DisplayDictionaryWord[] = useMemo(() => {
-    const localEntries: DisplayDictionaryWord[] = localDictionary.map((entry) => ({
-      id: -1,
-      dictionary_entry: {
-        id: -1,
-        word: entry.word,
-        definition: entry.definition,
-        example_sentence: entry.example,
-        category: entry.moduleTitle,
-        difficulty_level: 0,
-        usage_frequency: 0,
-      },
-      mastery_level: 0,
-      added_at: entry.addedAt,
-      times_practiced: 0,
-      isLocal: true,
-      localId: entry.id,
-    }));
+    const localEntries: DisplayDictionaryWord[] = localDictionary.map((entry) => {
+      const wordLower = entry.word.toLowerCase();
+      const serverEntry = serverDictionaryByWord.get(wordLower);
+      const dictionaryEntry = normalizeDictionaryEntry(serverEntry, entry);
+
+      return {
+        id: dictionaryEntry.id ?? -1,
+        dictionary_entry: dictionaryEntry,
+        mastery_level: 0,
+        added_at: entry.addedAt,
+        times_practiced: 0,
+        isLocal: true,
+        localId: entry.id,
+      };
+    });
 
     const serverEntries: DisplayDictionaryWord[] = myDictionary.map((entry) => ({
       ...entry,
+      dictionary_entry: normalizeDictionaryEntry(entry.dictionary_entry),
       isLocal: false,
     }));
 
-    return [...localEntries, ...serverEntries];
-  }, [localDictionary, myDictionary]);
+    const merged = new Map<string, DisplayDictionaryWord>();
+    localEntries.forEach((entry) => {
+      const key = entry.dictionary_entry.word.toLowerCase();
+      merged.set(key, entry);
+    });
+    serverEntries.forEach((entry) => {
+      const key = entry.dictionary_entry?.word?.toLowerCase();
+      if (key) merged.set(key, entry);
+    });
+
+    return Array.from(merged.values());
+  }, [localDictionary, serverDictionaryByWord, myDictionary]);
 
   // Convert displayDictionary to DictionaryEntry format for DictionaryBook
   const bookEntries: DictionaryEntry[] = useMemo(() => {
@@ -141,6 +202,7 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
       image_url: item.dictionary_entry.image_url,
       synonyms: item.dictionary_entry.synonyms,
       antonyms: item.dictionary_entry.antonyms,
+      tamil_translations: item.dictionary_entry.tamil_translations,
       category: item.dictionary_entry.category,
       difficulty_level: item.dictionary_entry.difficulty_level || 0,
       usage_frequency: item.dictionary_entry.usage_frequency || 0,
@@ -255,26 +317,15 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
             let wordsAdded = 0;
 
             for (const vocab of moduleData.vocabulary) {
-              try {
-                const addResult = await AdultsAPI.addToDictionary({ word: vocab.word });
-                if (addResult.success) {
-                  moduleSynced = true;
-                  didAddAnyWord = true;
-                  wordsAdded++;
-                  dictionaryWords.add(vocab.word.toLowerCase());
-                } else {
-                  addLocalDictionaryWord(moduleId, moduleData.module.title, vocab);
-                  dictionaryWords.add(vocab.word.toLowerCase());
-                  moduleSynced = true;
-                  wordsAdded++;
-                }
-              } catch (err) {
-                console.error(`Failed to add vocab "${vocab.word}" to dictionary:`, err);
-                addLocalDictionaryWord(moduleId, moduleData.module.title, vocab);
-                dictionaryWords.add(vocab.word.toLowerCase());
-                moduleSynced = true;
-                wordsAdded++;
+              const wordLower = vocab.word.toLowerCase();
+              if (dictionaryWords.has(wordLower)) {
+                continue;
               }
+              addLocalDictionaryWord(moduleId, moduleData.module.title, vocab);
+              dictionaryWords.add(wordLower);
+              moduleSynced = true;
+              didAddAnyWord = true;
+              wordsAdded++;
             }
 
             if (moduleSynced && wordsAdded > 0 && moduleData?.module) {
@@ -282,7 +333,7 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
               addedModules.push({
                 moduleId,
                 title: moduleData.module.title,
-                wordCount: wordsAdded
+                wordCount: wordsAdded,
               });
             }
           } catch (err) {
@@ -295,23 +346,22 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
         }
 
         if (didAddAnyWord) {
-          await loadMyDictionary();
-          
           const totalWords = addedModules.reduce((sum, mod) => sum + mod.wordCount, 0);
           const notificationTitle = "New Vocabulary Added! 📚";
           const notificationMessage =
             addedModules.length === 1
               ? `${addedModules[0].wordCount} word${addedModules[0].wordCount > 1 ? 's' : ''} from "${addedModules[0].title}" added to your dictionary. Score 75% or higher to unlock vocabulary!`
               : `${totalWords} words from ${addedModules.length} module${addedModules.length > 1 ? 's' : ''} added to your dictionary. Check your dictionary to see them! Score 75% or higher to unlock vocabulary.`;
-          const moduleIdsSignature = addedModules.map((m) => m.moduleId).sort().join('-') || `batch-${Date.now()}`;
-          
+          const moduleIdsSignature =
+            addedModules.map((m) => m.moduleId).sort().join('-') || `batch-${Date.now()}`;
+
           toast({
             title: notificationTitle,
             description: notificationMessage,
             duration: 5000,
           });
           playNotificationSound();
-          
+
           if (user) {
             try {
               await UserNotificationsService.create(user.id, {
@@ -324,10 +374,10 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
                 metadata: {
                   wordCount: totalWords,
                   moduleCount: addedModules.length,
-                  modules: addedModules.map(m => ({
+                  modules: addedModules.map((m) => ({
                     moduleId: m.moduleId,
                     title: m.title,
-                    wordCount: m.wordCount
+                    wordCount: m.wordCount,
                   })),
                   timestamp: Date.now(),
                 },
@@ -392,6 +442,7 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
       if (exists) {
         return prev;
       }
+      const tamilTranslation = getTamilTranslationForWord(vocab.word, moduleId);
       const newEntry: LocalDictionaryWord = {
         id: `${moduleId}:${vocab.word.toLowerCase()}`,
         word: vocab.word,
@@ -400,6 +451,7 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
         moduleId,
         moduleTitle,
         addedAt: new Date().toISOString(),
+        tamilTranslation,
       };
       const updated = [...prev, newEntry];
       persistLocalDictionary(updated);
