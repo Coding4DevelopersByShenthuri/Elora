@@ -12,6 +12,7 @@ import { getListeningModuleData } from '@/data/listening-modules/listening-modul
 import { DictionaryBook } from '@/components/FlipBook/DictionaryBook';
 import { useToast } from '@/hooks/use-toast';
 import UserNotificationsService from '@/services/UserNotificationsService';
+import { playNotificationSound } from '@/utils/playNotificationSound';
 
 interface DictionaryEntry {
   id: number;
@@ -309,6 +310,7 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
           description: notificationMessage,
           duration: 5000,
         });
+        playNotificationSound();
         
         // Save notification to profile notifications (persistent)
         if (user) {

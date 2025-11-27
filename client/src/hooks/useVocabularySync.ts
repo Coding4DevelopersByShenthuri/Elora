@@ -4,6 +4,7 @@ import { AdultsAPI } from '@/services/ApiService';
 import { getListeningModuleData } from '@/data/listening-modules/listening-modules-config';
 import { useToast } from '@/hooks/use-toast';
 import UserNotificationsService from '@/services/UserNotificationsService';
+import { playNotificationSound } from '@/utils/playNotificationSound';
 
 export function useVocabularySync() {
   const { user } = useAuth();
@@ -165,6 +166,7 @@ export function useVocabularySync() {
             description: notificationMessage,
             duration: 5000,
           });
+          playNotificationSound();
           
           // Save notification to profile notifications (persistent)
           try {
