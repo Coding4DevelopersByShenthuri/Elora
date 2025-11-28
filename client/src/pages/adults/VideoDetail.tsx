@@ -84,7 +84,6 @@ const VideoDetail: React.FC = () => {
   const [video, setVideo] = useState<VideoLesson | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [stars, setStars] = useState<Array<{ x: number; y: number; size: number; delay: number; opacity: number }>>([]);
   const [relatedVideos, setRelatedVideos] = useState<VideoLesson[]>([]);
   const [relatedLoading, setRelatedLoading] = useState(false);
   const [engagementState, setEngagementState] = useState<EngagementState>({
@@ -242,20 +241,6 @@ const VideoDetail: React.FC = () => {
     }
   };
 
-  // Generate animated stars
-  useEffect(() => {
-    const generateStars = () => {
-      const newStars = Array.from({ length: 180 }, () => ({
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        size: Math.random() * 2 + 0.5,
-        delay: Math.random() * 3,
-        opacity: Math.random() * 0.8 + 0.2
-      }));
-      setStars(newStars);
-    };
-    generateStars();
-  }, []);
 
   // Fetch video data
   useEffect(() => {
@@ -353,18 +338,18 @@ const VideoDetail: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 flex items-center justify-center">
-        <div className="text-white text-xl">Loading video...</div>
+      <div className="relative overflow-hidden min-h-screen flex items-center justify-center">
+        <div className="text-foreground dark:text-white text-xl">Loading video...</div>
       </div>
     );
   }
 
   if (error || !video) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 flex items-center justify-center">
+      <div className="relative overflow-hidden min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="text-white text-xl mb-4">{error || 'Video not found'}</div>
-          <Button onClick={() => navigate('/adults/videos')}>
+          <div className="text-foreground dark:text-white text-xl mb-4">{error || 'Video not found'}</div>
+          <Button onClick={() => navigate('/adults/videos')} className="bg-primary dark:bg-emerald-500">
             <ChevronLeft className="w-4 h-4 mr-2" />
             Back to Videos
           </Button>
@@ -378,69 +363,32 @@ const VideoDetail: React.FC = () => {
   const posterSrc = video.thumbnail_url || buildMediaUrl(video.thumbnail) || undefined;
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950">
-      {/* Deep Space Background with Stars */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {stars.map((star, index) => (
-          <div
-            key={index}
-            className="absolute rounded-full bg-white animate-pulse"
-            style={{
-              left: `${star.x}%`,
-              top: `${star.y}%`,
-              width: `${star.size}px`,
-              height: `${star.size}px`,
-              animationDelay: `${star.delay}s`,
-              animationDuration: `${2 + Math.random() * 2}s`,
-              opacity: star.opacity,
-              boxShadow: `0 0 ${star.size * 2}px rgba(255, 255, 255, ${star.opacity})`
-            }}
-          />
-        ))}
-      </div>
+    <div className="relative overflow-hidden min-h-screen">
+      {/* Background Elements - Matching Adults Page */}
+      <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-primary/5 to-transparent -z-10"></div>
+      <div className="absolute top-1/4 right-0 w-[400px] h-[400px] rounded-full bg-secondary/10 blur-3xl -z-10"></div>
+      <div className="absolute bottom-1/4 left-0 w-[300px] h-[300px] rounded-full bg-accent/10 blur-3xl -z-10"></div>
 
-      {/* Space background accents & planets */}
-      <div className="fixed inset-0 pointer-events-none opacity-60">
-        <div className="absolute top-0 left-0 w-[800px] h-[800px] bg-gradient-radial from-purple-500/30 via-indigo-500/15 to-transparent rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-[700px] h-[700px] bg-gradient-radial from-cyan-500/25 via-blue-500/12 to-transparent rounded-full blur-3xl" />
-        <div className="absolute -bottom-10 left-0 w-[120px] h-[120px] sm:w-[160px] sm:h-[160px] md:w-[200px] md:h-[200px] lg:w-[240px] lg:h-[240px] opacity-70">
-          <div className="relative w-full h-full">
-            <img
-              src="/planets/eReia3yfybtZ8P5576d6kF8NJIM.avif"
-              alt="Planet"
-              className="absolute inset-0 rounded-full object-cover shadow-2xl"
-              style={{ filter: 'grayscale(0.2) brightness(0.85)' }}
-            />
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-500/20 to-purple-500/20 blur-2xl" />
-          </div>
-        </div>
-        <div className="absolute top-24 right-2 sm:right-6 w-[120px] h-[120px] sm:w-[170px] sm:h-[170px] md:w-[220px] md:h-[220px] lg:w-[260px] lg:h-[260px] opacity-50 hidden sm:block">
-          <div className="relative w-full h-full">
-            <img
-              src="/planets/SEp7QE3Bk6RclE0R7rhBgcGIOI.avif"
-              alt="Planet"
-              className="absolute inset-0 rounded-full object-cover shadow-xl"
-              style={{ filter: 'grayscale(0.3) brightness(0.75)' }}
-            />
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500/15 to-pink-500/15 blur-xl" />
-          </div>
-        </div>
-      </div>
-
-      <div className="relative z-10 max-w-6xl mx-auto px-4 pt-28 lg:pt-32 pb-16">
+      <main className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 xl:px-10 pt-24 pb-16">
         <div className="flex flex-col lg:flex-row gap-8">
-          <main className="flex-1 min-w-0">
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/adults/videos')}
-              className="mb-4 text-cyan-300 hover:text-cyan-200 hover:bg-cyan-500/10 w-fit"
-            >
-              <ChevronLeft className="w-4 h-4 mr-2" />
-              Back to Videos
-            </Button>
+          <div className="flex-1 min-w-0">
+            {/* Back Button */}
+            <div className="mb-4 sm:mb-6">
+              <Button
+                variant="ghost"
+                onClick={() => navigate('/adults/videos')}
+                className="text-primary hover:text-primary/80 hover:bg-primary/10 text-xs sm:text-sm dark:text-emerald-300 dark:hover:text-emerald-200 dark:hover:bg-emerald-500/20"
+                size="sm"
+              >
+                <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Back to Videos</span>
+                <span className="sm:hidden">Back</span>
+              </Button>
+            </div>
 
-            <section className="mt-4 rounded-[28px] border border-white/10 bg-gradient-to-br from-white/10 via-slate-900/70 to-slate-900/20 p-1 shadow-[0_20px_80px_rgba(0,0,0,0.45)]">
-              <div className="relative rounded-[24px] bg-black/70 overflow-hidden aspect-video">
+            {/* Video Player */}
+            <section className="mt-4 rounded-xl border border-primary/30 bg-card/80 backdrop-blur-xl shadow-xl dark:border-emerald-500/30 dark:bg-slate-900/60 overflow-hidden">
+              <div className="relative rounded-lg bg-black overflow-hidden aspect-video">
                 {videoSrc ? (
                   <video
                     className="w-full h-full object-contain bg-black"
@@ -455,38 +403,39 @@ const VideoDetail: React.FC = () => {
                     <source src={videoSrc} type="video/mp4" />
                   </video>
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-slate-900 text-white">
+                  <div className="w-full h-full flex items-center justify-center bg-muted text-foreground dark:bg-slate-900 dark:text-white">
                     No video source available
                   </div>
                 )}
               </div>
             </section>
 
+            {/* Video Info */}
             <section className="mt-6">
-              <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-wide text-cyan-200/80">
-                <Badge variant="secondary" className="bg-white/15 text-white px-3 py-1 rounded-full">
+              <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-wide">
+                <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30 px-3 py-1 rounded-full dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-400/30">
                   {video.difficulty}
                 </Badge>
-                <div className="flex items-center gap-1 text-cyan-100/70 text-sm">
+                <div className="flex items-center gap-1 text-muted-foreground dark:text-cyan-100/70 text-sm">
                   <Clock3 className="h-4 w-4" />
                   {formatDuration(video.duration)}
                 </div>
-                <div className="flex items-center gap-1 text-cyan-100/70 text-sm">
+                <div className="flex items-center gap-1 text-muted-foreground dark:text-cyan-100/70 text-sm">
                   <Sparkles className="h-4 w-4" />
                   {video.category}
                 </div>
               </div>
 
-              <h1 className="mt-3 text-3xl md:text-[2.5rem] font-semibold text-white leading-tight">
+              <h1 className="mt-3 text-2xl sm:text-3xl md:text-4xl font-semibold text-foreground dark:text-white leading-tight">
                 {video.title}
               </h1>
 
-              <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between text-sm text-cyan-100/80">
+              <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between text-sm text-muted-foreground dark:text-cyan-100/80">
                 <div className="flex flex-wrap items-center gap-2">
                   <span>{formatViews(video.views)} views</span>
-                  <Dot className="h-4 w-4 text-cyan-200" />
+                  <Dot className="h-4 w-4 text-muted-foreground dark:text-cyan-200" />
                   <span>Published {formatPublishedDate(video.created_at)}</span>
-                  <Dot className="h-4 w-4 text-cyan-200" />
+                  <Dot className="h-4 w-4 text-muted-foreground dark:text-cyan-200" />
                   <span>{video.speaking_exercises} speaking exercises</span>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -521,16 +470,17 @@ const VideoDetail: React.FC = () => {
               </div>
             </section>
 
-            <section className="mt-6 flex flex-col sm:flex-row sm:items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4">
+            {/* Channel Info */}
+            <section className="mt-6 flex flex-col sm:flex-row sm:items-center gap-4 rounded-xl border border-primary/30 bg-card/80 backdrop-blur-xl p-4 dark:border-emerald-500/30 dark:bg-slate-900/60">
               <div className="flex items-center gap-3">
                 <img
                   src="/bg_logo.png"
                   alt="Channel"
-                  className="w-12 h-12 rounded-full object-cover border border-white/20"
+                  className="w-12 h-12 rounded-full object-cover border border-primary/30 dark:border-emerald-500/30"
                 />
                 <div>
-                  <div className="font-semibold text-white leading-tight">Elora English</div>
-                  <div className="text-xs text-cyan-100/80">42.1K subscribers</div>
+                  <div className="font-semibold text-foreground dark:text-white leading-tight">Elora English</div>
+                  <div className="text-xs text-muted-foreground dark:text-cyan-100/80">42.1K subscribers</div>
                 </div>
               </div>
               <div className="flex-1 sm:text-right">
@@ -538,8 +488,8 @@ const VideoDetail: React.FC = () => {
                   className={cn(
                     'rounded-full px-6 font-semibold',
                     engagementState.subscribed
-                      ? 'bg-emerald-500 text-white hover:bg-emerald-600'
-                      : 'bg-primary text-primary-foreground hover:bg-primary/90'
+                      ? 'bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600'
+                      : 'bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600'
                   )}
                   onClick={handleSubscribe}
                 >
@@ -559,7 +509,7 @@ const VideoDetail: React.FC = () => {
                 {formattedHashtags.map((tag) => (
                   <span
                     key={tag}
-                    className="px-3 py-1 rounded-full bg-white/10 text-cyan-200 border border-white/10 text-xs tracking-wide"
+                    className="px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs tracking-wide dark:bg-emerald-500/10 dark:text-emerald-300 dark:border-emerald-500/20"
                   >
                     {tag}
                   </span>
@@ -575,21 +525,21 @@ const VideoDetail: React.FC = () => {
               isSubmitting={commentLoading}
               isAuthenticated={isAuthenticated}
             />
-          </main>
+          </div>
 
-          <aside className="w-full lg:w-80 flex-shrink-0">
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+          <aside className="w-full lg:w-80 flex-shrink-0 lg:pt-15">
+            <div className="rounded-xl border border-primary/30 bg-card/80 backdrop-blur-xl p-4 dark:border-emerald-500/30 dark:bg-slate-900/60">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <p className="text-sm text-cyan-100/70">Up next</p>
-                  <h3 className="text-white font-semibold text-lg">Continue the journey</h3>
+                  <p className="text-sm text-muted-foreground dark:text-cyan-100/70">Up next</p>
+                  <h3 className="text-foreground dark:text-white font-semibold text-lg">Continue the journey</h3>
                 </div>
-                <PlayCircle className="h-5 w-5 text-cyan-200" />
+                <PlayCircle className="h-5 w-5 text-primary dark:text-emerald-300" />
               </div>
               <div className="space-y-4">
-                {relatedLoading && <p className="text-sm text-cyan-100/70">Loading recommendations…</p>}
+                {relatedLoading && <p className="text-sm text-muted-foreground dark:text-cyan-100/70">Loading recommendations…</p>}
                 {!relatedLoading && relatedVideos.length === 0 && (
-                  <p className="text-sm text-cyan-100/70">More lessons coming soon.</p>
+                  <p className="text-sm text-muted-foreground dark:text-cyan-100/70">More lessons coming soon.</p>
                 )}
                 {relatedVideos.map((item) => (
                   <RelatedVideoCard
@@ -602,7 +552,7 @@ const VideoDetail: React.FC = () => {
             </div>
           </aside>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
@@ -615,27 +565,27 @@ function DescriptionBox({ video }: { video: VideoLesson }) {
   const hasMore = lines.length > 3;
 
   return (
-    <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-5 space-y-4">
-      <div className="flex flex-wrap items-center gap-3 text-sm text-cyan-100/80">
-        <span className="font-semibold text-white">{formatViews(video.views)} views</span>
-        <Dot className="h-4 w-4 text-cyan-200" />
+    <div className="mt-6 rounded-xl border border-primary/30 bg-card/80 backdrop-blur-xl p-5 space-y-4 dark:border-emerald-500/30 dark:bg-slate-900/60">
+      <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground dark:text-cyan-100/80">
+        <span className="font-semibold text-foreground dark:text-white">{formatViews(video.views)} views</span>
+        <Dot className="h-4 w-4 text-muted-foreground dark:text-cyan-200" />
         <span>{formatPublishedDate(video.created_at)}</span>
       </div>
 
-      <pre className="whitespace-pre-wrap text-sm text-cyan-50/90">
+      <pre className="whitespace-pre-wrap text-sm text-foreground dark:text-cyan-50/90">
         {expanded || !hasMore ? description : short}
       </pre>
 
       {hasMore && (
         <button
-          className="text-sm text-cyan-300 font-medium"
+          className="text-sm text-primary dark:text-emerald-300 font-medium hover:text-primary/80 dark:hover:text-emerald-200"
           onClick={() => setExpanded((v) => !v)}
         >
           {expanded ? 'Show less' : 'Show more'}
         </button>
       )}
 
-      <div className="grid sm:grid-cols-3 gap-4 text-sm text-cyan-100/80">
+      <div className="grid sm:grid-cols-3 gap-4 text-sm text-muted-foreground dark:text-cyan-100/80">
         <DescriptionStat label="Difficulty" value={video.difficulty} />
         <DescriptionStat label="Category" value={video.category} />
         <DescriptionStat label="Speaking exercises" value={`${video.speaking_exercises}+ prompts`} />
@@ -645,9 +595,9 @@ function DescriptionBox({ video }: { video: VideoLesson }) {
 }
 
 const DescriptionStat = ({ label, value }: { label: string; value: string }) => (
-  <div className="rounded-xl bg-white/5 border border-white/10 p-3">
-    <p className="text-xs uppercase tracking-wide text-cyan-100/60">{label}</p>
-    <p className="text-white font-semibold mt-1">{value}</p>
+  <div className="rounded-xl bg-primary/10 border border-primary/20 p-3 dark:bg-emerald-500/10 dark:border-emerald-500/20">
+    <p className="text-xs uppercase tracking-wide text-muted-foreground dark:text-cyan-100/60">{label}</p>
+    <p className="text-foreground dark:text-white font-semibold mt-1">{value}</p>
   </div>
 );
 
@@ -655,9 +605,9 @@ const ChapterList = ({ chapters, onJump }: { chapters: Chapter[]; onJump: (secon
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="mt-6 rounded-2xl border border-white/10 bg-white/5">
+    <div className="mt-6 rounded-xl border border-primary/30 bg-card/80 backdrop-blur-xl dark:border-emerald-500/30 dark:bg-slate-900/60">
       <button
-        className="w-full px-5 py-4 border-b border-white/10 flex items-center justify-between text-white font-semibold hover:bg-white/5 transition-colors"
+        className="w-full px-5 py-4 border-b border-primary/20 dark:border-emerald-500/20 flex items-center justify-between text-foreground dark:text-white font-semibold hover:bg-primary/10 dark:hover:bg-emerald-500/10 transition-colors"
         onClick={() => setExpanded((prev) => !prev)}
       >
         <span className="flex items-center gap-2">
@@ -666,25 +616,25 @@ const ChapterList = ({ chapters, onJump }: { chapters: Chapter[]; onJump: (secon
         </span>
         <ChevronDown
           className={cn(
-            'h-4 w-4 text-cyan-200 transition-transform duration-200',
+            'h-4 w-4 text-primary dark:text-emerald-300 transition-transform duration-200',
             expanded ? 'rotate-180' : 'rotate-0'
           )}
         />
       </button>
       {expanded && (
-        <div className="divide-y divide-white/10">
+        <div className="divide-y divide-primary/20 dark:divide-emerald-500/20">
           {chapters.map((chapter, index) => (
             <button
               key={`${chapter.label}-${chapter.seconds}`}
-              className="w-full text-left px-5 py-3 flex items-center gap-4 hover:bg-white/5 transition-colors"
+              className="w-full text-left px-5 py-3 flex items-center gap-4 hover:bg-primary/10 dark:hover:bg-emerald-500/10 transition-colors"
               onClick={() => onJump(chapter.seconds)}
             >
-              <div className="w-20 text-xs font-semibold text-cyan-200">{chapter.t}</div>
+              <div className="w-20 text-xs font-semibold text-primary dark:text-emerald-300">{chapter.t}</div>
               <div className="flex-1">
-                <p className="text-white font-medium">{chapter.label}</p>
-                <p className="text-xs text-cyan-100/60">Milestone #{index + 1}</p>
+                <p className="text-foreground dark:text-white font-medium">{chapter.label}</p>
+                <p className="text-xs text-muted-foreground dark:text-cyan-100/60">Milestone #{index + 1}</p>
               </div>
-              <PlayCircle className="h-4 w-4 text-white/70" />
+              <PlayCircle className="h-4 w-4 text-primary/70 dark:text-white/70" />
             </button>
           ))}
         </div>
@@ -708,25 +658,25 @@ const PracticeCorner = ({
   isSubmitting: boolean;
   isAuthenticated: boolean;
 }) => (
-  <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-5 space-y-4">
-    <div className="flex items-center gap-2 text-white font-semibold">
+  <div className="mt-6 rounded-xl border border-primary/30 bg-card/80 backdrop-blur-xl p-5 space-y-4 dark:border-emerald-500/30 dark:bg-slate-900/60">
+    <div className="flex items-center gap-2 text-foreground dark:text-white font-semibold">
       <MessageSquare className="h-5 w-5" />
       Practice Corner
     </div>
-    <p className="text-sm text-cyan-100/80">
+    <p className="text-sm text-muted-foreground dark:text-cyan-100/80">
       Share your best self-introduction below and get feedback from the community.
     </p>
     <textarea
-      className="w-full rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3 text-sm text-white placeholder:text-cyan-100/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/60 disabled:opacity-60"
+      className="w-full rounded-xl border border-primary/30 bg-card/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-60 dark:border-emerald-500/30 dark:bg-slate-800/50 dark:text-white dark:placeholder:text-cyan-100/60 dark:focus:ring-emerald-400/50"
       rows={3}
-      placeholder={isAuthenticated ? '“Hi, my name is … I work as …”' : 'Sign in to share your introduction'}
+      placeholder={isAuthenticated ? '"Hi, my name is … I work as …"' : 'Sign in to share your introduction'}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       disabled={!isAuthenticated || isSubmitting}
     />
     <div className="flex justify-end">
       <Button
-        className="rounded-full px-6"
+        className="rounded-full px-6 bg-primary hover:bg-primary/90 dark:bg-emerald-500 dark:hover:bg-emerald-600"
         onClick={onSubmit}
         disabled={!isAuthenticated || !value.trim() || isSubmitting}
       >
@@ -735,19 +685,19 @@ const PracticeCorner = ({
     </div>
     <div className="space-y-3">
       {comments.length === 0 && (
-        <p className="text-sm text-cyan-100/70">Be the first to introduce yourself.</p>
+        <p className="text-sm text-muted-foreground dark:text-cyan-100/70">Be the first to introduce yourself.</p>
       )}
       {comments.map((comment) => (
-        <div key={comment.id} className="rounded-xl border border-white/10 bg-white/5 p-3">
-          <div className="flex items-center gap-2 text-sm text-cyan-100/80">
-            <span className="text-white font-semibold">
+        <div key={comment.id} className="rounded-xl border border-primary/20 bg-primary/5 p-3 dark:border-emerald-500/20 dark:bg-emerald-500/10">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-cyan-100/80">
+            <span className="text-foreground dark:text-white font-semibold">
               {comment.author_name}
               {comment.is_own && ' • you'}
             </span>
-            <Dot className="h-4 w-4 text-cyan-200" />
+            <Dot className="h-4 w-4 text-muted-foreground dark:text-cyan-200" />
             <span>{formatRelativeTime(comment.created_at)}</span>
           </div>
-          <p className="text-sm text-cyan-50/90 mt-1 whitespace-pre-wrap">{comment.content}</p>
+          <p className="text-sm text-foreground dark:text-cyan-50/90 mt-1 whitespace-pre-wrap">{comment.content}</p>
         </div>
       ))}
     </div>
@@ -760,10 +710,10 @@ const RelatedVideoCard = ({ video, onClick }: { video: VideoLesson; onClick: () 
   return (
     <button
       onClick={onClick}
-      className="w-full text-left flex gap-3 hover:bg-white/5 rounded-xl p-2 transition-colors"
+      className="w-full text-left flex gap-3 hover:bg-primary/10 dark:hover:bg-emerald-500/10 rounded-xl p-2 transition-colors"
     >
       <div className="relative w-32 flex-shrink-0">
-        <div className="aspect-video rounded-lg overflow-hidden bg-slate-800">
+        <div className="aspect-video rounded-lg overflow-hidden bg-muted dark:bg-slate-800">
           {thumbnailUrl ? (
             <img 
               src={thumbnailUrl} 
@@ -780,7 +730,7 @@ const RelatedVideoCard = ({ video, onClick }: { video: VideoLesson; onClick: () 
               }}
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-white text-xs">No thumbnail</div>
+            <div className="w-full h-full flex items-center justify-center text-foreground dark:text-white text-xs">No thumbnail</div>
           )}
         </div>
         <div className="absolute bottom-1 right-1 text-[10px] px-1.5 py-0.5 rounded bg-black/70 text-white">
@@ -788,8 +738,8 @@ const RelatedVideoCard = ({ video, onClick }: { video: VideoLesson; onClick: () 
         </div>
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-white line-clamp-2">{video.title}</p>
-        <p className="text-xs text-cyan-100/70 mt-1">{formatViews(video.views)} · {video.category}</p>
+        <p className="text-sm font-semibold text-foreground dark:text-white line-clamp-2">{video.title}</p>
+        <p className="text-xs text-muted-foreground dark:text-cyan-100/70 mt-1">{formatViews(video.views)} · {video.category}</p>
       </div>
     </button>
   );
@@ -814,13 +764,13 @@ const ActionButton = ({
     className={cn(
       'flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-colors',
       active
-        ? 'border-cyan-400 bg-cyan-500/20 text-cyan-50'
-        : 'border-white/15 bg-white/5 text-white hover:bg-white/10'
+        ? 'border-primary bg-primary/20 text-primary dark:border-emerald-400 dark:bg-emerald-500/20 dark:text-emerald-50'
+        : 'border-primary/30 bg-card/50 text-foreground hover:bg-primary/10 dark:border-emerald-500/30 dark:bg-slate-800/50 dark:text-white dark:hover:bg-emerald-500/20'
     )}
   >
     <Icon className="h-4 w-4" />
     <span>{label}</span>
-    {value && <span className="text-xs text-cyan-200/90">{value}</span>}
+    {value && <span className="text-xs text-muted-foreground dark:text-emerald-200/90">{value}</span>}
   </button>
 );
 
