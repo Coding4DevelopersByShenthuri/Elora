@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Headphones, Mic, BookOpen, PenTool, Play, Pause, CheckCircle, Clock, TrendingUp, Volume2, Eye, EyeOff, Trash2, AlertCircle, Gauge } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
@@ -15,10 +15,46 @@ import { useToast } from '@/hooks/use-toast';
 import { IntegratedProgressService } from '@/services/IntegratedProgressService';
 
 const MODES = [
-  { id: 'listening', label: 'Listening', icon: Headphones, color: 'text-blue-400', bgColor: 'from-blue-500/20 to-cyan-500/20' },
-  { id: 'speaking', label: 'Speaking', icon: Mic, color: 'text-green-400', bgColor: 'from-green-500/20 to-emerald-500/20' },
-  { id: 'reading', label: 'Reading', icon: BookOpen, color: 'text-purple-400', bgColor: 'from-purple-500/20 to-pink-500/20' },
-  { id: 'writing', label: 'Writing', icon: PenTool, color: 'text-amber-400', bgColor: 'from-amber-500/20 to-orange-500/20' },
+  { 
+    id: 'listening', 
+    label: 'Listening', 
+    icon: Headphones, 
+    iconColor: 'text-teal-600 dark:text-teal-300',
+    iconBg: 'bg-teal-500/20 dark:bg-teal-500/30',
+    containerColor: 'from-teal-500/20 via-teal-500/25 to-teal-600/20',
+    borderColor: 'border-teal-400/50 dark:border-teal-400/50',
+    buttonColor: 'bg-teal-600 hover:bg-teal-700 dark:bg-teal-500 dark:hover:bg-teal-600'
+  },
+  { 
+    id: 'speaking', 
+    label: 'Speaking', 
+    icon: Mic, 
+    iconColor: 'text-green-600 dark:text-green-300',
+    iconBg: 'bg-green-500/20 dark:bg-green-500/30',
+    containerColor: 'from-green-500/20 via-green-500/25 to-green-600/20',
+    borderColor: 'border-green-400/50 dark:border-green-400/50',
+    buttonColor: 'bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600'
+  },
+  { 
+    id: 'reading', 
+    label: 'Reading', 
+    icon: BookOpen, 
+    iconColor: 'text-emerald-600 dark:text-emerald-300',
+    iconBg: 'bg-emerald-500/20 dark:bg-emerald-500/30',
+    containerColor: 'from-emerald-500/20 via-emerald-500/25 to-emerald-600/20',
+    borderColor: 'border-emerald-400/50 dark:border-emerald-400/50',
+    buttonColor: 'bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600'
+  },
+  { 
+    id: 'writing', 
+    label: 'Writing', 
+    icon: PenTool, 
+    iconColor: 'text-cyan-600 dark:text-cyan-300',
+    iconBg: 'bg-cyan-500/20 dark:bg-cyan-500/30',
+    containerColor: 'from-cyan-500/20 via-cyan-500/25 to-cyan-600/20',
+    borderColor: 'border-cyan-400/50 dark:border-cyan-400/50',
+    buttonColor: 'bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-500 dark:hover:bg-cyan-600'
+  },
 ];
 
 interface PracticeSession {
@@ -52,8 +88,6 @@ const MultiModePracticePage = () => {
   const [loading, setLoading] = useState(false);
   const [isPracticeActive, setIsPracticeActive] = useState(false);
   const [deletingSessionId, setDeletingSessionId] = useState<number | null>(null);
-  const [stars, setStars] = useState<Array<{ x: number; y: number; size: number; delay: number; opacity: number }>>([]);
-  const [scrollY, setScrollY] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
   const [showTranscript, setShowTranscript] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -71,45 +105,9 @@ const MultiModePracticePage = () => {
     time_spent: 0,
   });
 
-  // Generate animated stars - same as adults page
-  useEffect(() => {
-    const generateStars = () => {
-      const isMobile = window.innerWidth < 768;
-      const starCount = isMobile ? 100 : 200;
-      
-      const newStars = Array.from({ length: starCount }, () => ({
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        size: Math.random() * 2 + 0.5,
-        delay: Math.random() * 3,
-        opacity: Math.random() * 0.8 + 0.2
-      }));
-      setStars(newStars);
-    };
-    generateStars();
-    
-    const handleResize = () => {
-      const isMobile = window.innerWidth < 768;
-      if ((isMobile && stars.length > 100) || (!isMobile && stars.length < 150)) {
-        generateStars();
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   // Page load fade-in
   useEffect(() => {
     setIsLoaded(true);
-  }, []);
-
-  // Parallax scroll effect for planets
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
@@ -529,164 +527,106 @@ const MultiModePracticePage = () => {
     }
   };
 
-  // Parallax transforms for planets
-  const parallaxTransform1 = `translateY(${scrollY * 0.1}px)`;
-  const parallaxTransform2 = `translateY(${scrollY * 0.15}px)`;
-  const parallaxTransform3 = `translateY(${scrollY * 0.08}px)`;
-  const parallaxTransform4 = `translateY(${scrollY * 0.12}px)`;
 
   return (
-    <div className={`min-h-screen relative overflow-hidden bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 ${isLoaded ? 'space-fade-in' : 'opacity-0'}`}>
-      {/* Deep Space Background with Stars */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {stars.map((star, index) => (
-          <div
-            key={index}
-            className="absolute rounded-full bg-white space-star"
-            style={{
-              left: `${star.x}%`,
-              top: `${star.y}%`,
-              width: `${star.size}px`,
-              height: `${star.size}px`,
-              animationDelay: `${star.delay}s`,
-              animationDuration: `${2 + Math.random() * 2}s`,
-              opacity: star.opacity,
-              boxShadow: `0 0 ${star.size * 2}px rgba(255, 255, 255, ${star.opacity})`
-            }}
-          />
-        ))}
-      </div>
+    <div className={`relative overflow-hidden min-h-screen ${isLoaded ? 'animate-fade-in' : 'opacity-0'}`}>
+      {/* Background Elements - Matching Adults Page */}
+      <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-primary/5 to-transparent -z-10"></div>
+      <div className="absolute top-1/4 right-0 w-[400px] h-[400px] rounded-full bg-secondary/10 blur-3xl -z-10"></div>
+      <div className="absolute bottom-1/4 left-0 w-[300px] h-[300px] rounded-full bg-accent/10 blur-3xl -z-10"></div>
 
-      {/* Nebula and Cosmic Effects */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-[800px] h-[800px] bg-gradient-radial from-purple-500/30 via-indigo-500/20 to-transparent rounded-full blur-3xl nebula-effect animate-pulse" />
-        <div className="absolute top-1/4 right-0 w-[600px] h-[600px] bg-gradient-radial from-cyan-500/25 via-blue-500/15 to-transparent rounded-full blur-3xl nebula-effect animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute bottom-0 left-1/3 w-[700px] h-[700px] bg-gradient-radial from-pink-500/20 via-rose-500/10 to-transparent rounded-full blur-3xl nebula-effect animate-pulse" style={{ animationDelay: '2s' }} />
-      </div>
-
-      {/* Large Planet/Moon Spheres - Main Visual Elements with Parallax */}
-      <div 
-        className="fixed bottom-0 left-0 w-[100px] h-[100px] sm:w-[140px] sm:h-[140px] md:w-[180px] md:h-[180px] lg:w-[220px] lg:h-[220px] xl:w-[260px] xl:h-[260px] pointer-events-none opacity-60 sm:opacity-65 md:opacity-70 lg:opacity-75 xl:opacity-80 parallax-slow"
-        style={{ transform: parallaxTransform1 }}
-      >
-        <div className="relative w-full h-full">
-          <img 
-            src="/planets/eReia3yfybtZ8P5576d6kF8NJIM.avif" 
-            alt="Planet" 
-            className="absolute inset-0 rounded-full object-cover shadow-2xl"
-            style={{ filter: 'grayscale(0.2) brightness(0.85)' }}
-          />
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-500/20 to-purple-500/20 blur-2xl" />
+      <main className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 xl:px-10 pt-24 pb-16 space-y-10">
+        {/* Header with Back Button */}
+        <div className="mb-4 sm:mb-6">
+          <Button
+            variant="ghost"
+            onClick={
+              isPracticeActive && activeMode === 'listening' && moduleData
+                ? () => {
+                    setIsPracticeActive(false);
+                    setSelectedModule(null);
+                    setModuleData(null);
+                    setActiveMode('listening');
+                  }
+                : activeMode === 'listening' && !selectedModule
+                ? () => setActiveMode(null)
+                : handleBack
+            }
+            className="text-primary hover:text-primary/80 hover:bg-primary/10 mb-3 sm:mb-4 text-xs sm:text-sm dark:text-emerald-300 dark:hover:text-emerald-200 dark:hover:bg-emerald-500/20"
+            size="sm"
+          >
+            <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">
+              {isPracticeActive && activeMode === 'listening' && moduleData
+                ? 'Back to Modules'
+                : activeMode === 'listening' && !selectedModule
+                ? 'Back to Modes'
+                : 'Back to Adults Dashboard'}
+            </span>
+            <span className="sm:hidden">Back</span>
+          </Button>
         </div>
-      </div>
 
-      <div 
-        className="fixed top-20 right-2 sm:right-4 md:right-10 w-[100px] h-[100px] sm:w-[150px] sm:h-[150px] md:w-[200px] md:h-[200px] lg:w-[250px] lg:h-[250px] xl:w-[300px] xl:h-[300px] pointer-events-none opacity-40 sm:opacity-50 md:opacity-60 hidden sm:block parallax-slow"
-        style={{ transform: parallaxTransform2 }}
-      >
-        <div className="relative w-full h-full">
-          <img 
-            src="/planets/SEp7QE3Bk6RclE0R7rhBgcGIOI.avif" 
-            alt="Planet" 
-            className="absolute inset-0 rounded-full object-cover shadow-xl"
-            style={{ filter: 'grayscale(0.3) brightness(0.75)' }}
-          />
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500/15 to-pink-500/15 blur-xl" />
-        </div>
-      </div>
+        {/* Top Container - Only show when not in practice mode */}
+        {!isPracticeActive && !activeMode && (
+          <section>
+            <Card className="relative overflow-hidden border-none bg-gradient-to-br from-[#065f46] via-[#047857] to-[#10b981] text-white shadow-xl dark:from-[#064e3b] dark:via-[#047857] dark:to-[#059669]">
+              <span className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-white/10 blur-3xl" aria-hidden />
+              <span className="absolute -left-20 bottom-0 h-32 w-32 rounded-full bg-white/10 blur-3xl" aria-hidden />
+              <CardHeader className="space-y-2 py-3 sm:py-4 md:py-5 relative z-10">
+                <div className="flex flex-col gap-2 sm:gap-3">
+                  <div className="space-y-1 sm:space-y-2">
+                    <Badge className="bg-white/25 text-white uppercase tracking-wide text-xs sm:text-sm px-2 py-0.5 sm:px-3 sm:py-1">
+                      Multi-Mode Practice
+                    </Badge>
+                    <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold text-white leading-tight">
+                      Practice listening, speaking, reading, and writing skills with comprehensive exercises
+                    </CardTitle>
+                  </div>
+                </div>
+              </CardHeader>
+            </Card>
+          </section>
+        )}
 
-      <div 
-        className="fixed top-1/2 right-4 md:right-20 w-[80px] h-[80px] sm:w-[120px] sm:h-[120px] md:w-[180px] md:h-[180px] lg:w-[220px] lg:h-[220px] xl:w-[250px] xl:h-[250px] pointer-events-none opacity-30 sm:opacity-40 md:opacity-50 hidden md:block parallax-slow"
-        style={{ transform: parallaxTransform3 }}
-      >
-        <div className="relative w-full h-full">
-          <img 
-            src="/planets/K3uC2Tk4o2zjSbuWGs3t0MMuLVY.avif" 
-            alt="Planet" 
-            className="absolute inset-0 rounded-full object-cover shadow-xl"
-            style={{ filter: 'grayscale(0.3) brightness(0.7)' }}
-          />
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-indigo-500/15 to-blue-500/15 blur-xl" />
-        </div>
-      </div>
+        {/* Top Container for Listening Module Selection */}
+        {activeMode === 'listening' && !selectedModule && !isPracticeActive && (
+          <section>
+            <Card className="relative overflow-hidden border-none bg-gradient-to-br from-[#064e3b] via-[#047857] to-[#10b981] text-white shadow-xl dark:from-[#022c22] dark:via-[#065f46] dark:to-[#059669]">
+              <span className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-white/10 blur-3xl" aria-hidden />
+              <span className="absolute -left-20 bottom-0 h-32 w-32 rounded-full bg-white/10 blur-3xl" aria-hidden />
+              <CardHeader className="space-y-2 py-3 sm:py-4 md:py-5 relative z-10">
+                <div className="flex flex-col gap-2 sm:gap-3">
+                  <div className="space-y-1 sm:space-y-2">
+                    <Badge className="bg-white/25 text-white uppercase tracking-wide text-xs sm:text-sm px-2 py-0.5 sm:px-3 sm:py-1">
+                      Listening Practice
+                    </Badge>
+                    <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold text-white leading-tight">
+                      Choose a Listening Module
+                    </CardTitle>
+                    <CardDescription className="text-white/85 text-sm sm:text-base leading-relaxed">
+                      Select a module to practice your listening skills
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+            </Card>
+          </section>
+        )}
 
-      <div 
-        className="fixed top-32 left-2 sm:left-4 md:left-20 w-[80px] h-[80px] sm:w-[120px] sm:h-[120px] md:w-[160px] md:h-[160px] lg:w-[180px] lg:h-[180px] xl:w-[200px] xl:h-[200px] pointer-events-none opacity-25 sm:opacity-30 md:opacity-40 hidden lg:block parallax-slow"
-        style={{ transform: parallaxTransform4 }}
-      >
-        <div className="relative w-full h-full">
-          <img 
-            src="/planets/F4RKAKmFyoRYVlTsUWN51wD1dg.avif" 
-            alt="Planet" 
-            className="absolute inset-0 rounded-full object-cover shadow-lg"
-            style={{ filter: 'grayscale(0.4) brightness(0.65)' }}
-          />
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-500/10 to-blue-500/10 blur-lg" />
-        </div>
-      </div>
-
-      <div className="relative z-10 pb-12 pt-20 sm:pt-24 md:pt-28 lg:pt-32">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header with Back Button */}
+        {/* Conditional Header for active practice */}
+        {isPracticeActive && activeMode === 'listening' && moduleData && (
           <div className="mb-4 sm:mb-6 md:mb-8">
-            <Button
-              variant="ghost"
-              onClick={
-                isPracticeActive && activeMode === 'listening' && moduleData
-                  ? () => {
-                      setIsPracticeActive(false);
-                      setSelectedModule(null);
-                      setModuleData(null);
-                      setActiveMode('listening');
-                    }
-                  : activeMode === 'listening' && !selectedModule
-                  ? () => setActiveMode(null)
-                  : handleBack
-              }
-              className="text-cyan-300 hover:text-cyan-200 hover:bg-purple-500/20 mb-3 sm:mb-4 text-xs sm:text-sm"
-              size="sm"
-            >
-              <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-              <span className="hidden sm:inline">
-                {isPracticeActive && activeMode === 'listening' && moduleData
-                  ? 'Back to Modules'
-                  : activeMode === 'listening' && !selectedModule
-                  ? 'Back to Modes'
-                  : 'Back to Adults Dashboard'}
-              </span>
-              <span className="sm:hidden">Back</span>
-            </Button>
             <div className="text-center mb-4 sm:mb-6 md:mb-8 px-2">
-              {isPracticeActive && activeMode === 'listening' && moduleData ? (
-                <>
-                  <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2 sm:mb-3 md:mb-4">
-                    {moduleData.module.title}
-                  </h1>
-                  <p className="text-xs sm:text-sm md:text-base lg:text-lg text-cyan-100/80 max-w-2xl mx-auto leading-relaxed">
-                    {moduleData.module.description}
-                  </p>
-                </>
-              ) : activeMode === 'listening' && !selectedModule ? (
-                <>
-                  <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2 sm:mb-3 md:mb-4">
-                    Choose a Listening Module
-                  </h1>
-                  <p className="text-xs sm:text-sm md:text-base lg:text-lg text-cyan-100/80 max-w-2xl mx-auto leading-relaxed">
-                    Select a module to practice your listening skills
-                  </p>
-                </>
-              ) : (
-                <>
-                  <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2 sm:mb-3 md:mb-4">
-                    Multi-Mode Practice
-                  </h1>
-                  <p className="text-xs sm:text-sm md:text-base lg:text-lg text-cyan-100/80 max-w-2xl mx-auto leading-relaxed px-2">
-                    Practice listening, speaking, reading, and writing skills with comprehensive exercises
-                  </p>
-                </>
-              )}
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground dark:text-white mb-2 sm:mb-3 md:mb-4">
+                {moduleData.module.title}
+              </h1>
+              <p className="text-xs sm:text-sm md:text-base lg:text-lg text-muted-foreground dark:text-cyan-100/80 max-w-2xl mx-auto leading-relaxed">
+                {moduleData.module.description}
+              </p>
             </div>
           </div>
+        )}
 
           {/* Listening Module Selection */}
           {activeMode === 'listening' && !selectedModule && (
@@ -696,7 +636,7 @@ const MultiModePracticePage = () => {
                   <Card
                     key={module.id}
                     className={cn(
-                      'relative overflow-hidden group cursor-pointer rounded-2xl bg-slate-900/80 border border-slate-800/70 hover:border-cyan-400/40 transition-all duration-300 hover:shadow-2xl hover:shadow-cyan-500/20'
+                      'relative overflow-hidden group cursor-pointer rounded-2xl bg-card/80 backdrop-blur-xl border-primary/30 hover:border-primary/50 transition-all duration-300 hover:shadow-2xl dark:bg-slate-900/60 dark:border-emerald-500/30 dark:hover:border-emerald-400/50'
                     )}
                     onClick={() => handleSelectListeningModule(module.id)}
                   >
@@ -704,21 +644,21 @@ const MultiModePracticePage = () => {
                     <CardContent className="p-4 sm:p-5 md:p-6 space-y-4">
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="p-2.5 rounded-full bg-slate-800/80 border border-slate-700/70 text-2xl">
+                          <div className="p-2.5 rounded-full bg-primary/20 border border-primary/30 text-2xl dark:bg-emerald-500/20 dark:border-emerald-400/30">
                             {module.icon}
                           </div>
                           <div>
-                            <h3 className="text-lg sm:text-xl font-semibold text-white">{module.title}</h3>
-                            <p className="text-xs text-cyan-100/60">{module.duration} • {module.category}</p>
+                            <h3 className="text-lg sm:text-xl font-semibold text-foreground dark:text-white">{module.title}</h3>
+                            <p className="text-xs text-muted-foreground dark:text-cyan-100/60">{module.duration} • {module.category}</p>
                           </div>
                         </div>
-                        <Badge variant="outline" className="bg-slate-800/70 text-cyan-200 border-cyan-400/30 capitalize text-xs">
+                        <Badge variant="outline" className="bg-primary/20 text-primary border-primary/30 capitalize text-xs dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-400/30">
                           {module.difficulty}
                         </Badge>
                       </div>
-                      <p className="text-cyan-100/75 text-xs sm:text-sm line-clamp-3 min-h-[48px]">{module.description}</p>
+                      <p className="text-muted-foreground dark:text-cyan-100/75 text-xs sm:text-sm line-clamp-3 min-h-[48px]">{module.description}</p>
                       <Button
-                        className="w-full bg-cyan-500/90 hover:bg-cyan-400 text-slate-900 font-semibold text-xs sm:text-sm py-2 sm:py-2.5 border border-cyan-300/40"
+                        className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-xs sm:text-sm py-2 sm:py-2.5 dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleSelectListeningModule(module.id);
@@ -739,12 +679,12 @@ const MultiModePracticePage = () => {
           {/* Practice Modes - Displayed like Daily Conversation topics */}
           {!isPracticeActive && !activeMode && (
             <Tabs defaultValue="modes" className="w-full">
-              <TabsList className="w-full bg-slate-800/50 border-b border-purple-500/30 rounded-none mb-4 sm:mb-6 h-auto">
-                <TabsTrigger value="modes" className="flex-1 text-xs sm:text-sm py-2 sm:py-3 px-2 sm:px-4">
+              <TabsList className="w-full bg-card/80 border-primary/30 rounded-lg mb-4 sm:mb-6 h-auto dark:bg-slate-900/60 dark:border-emerald-500/30">
+                <TabsTrigger value="modes" className="flex-1 text-xs sm:text-sm py-2 sm:py-3 px-2 sm:px-4 data-[state=active]:bg-primary/20 data-[state=active]:text-primary dark:data-[state=active]:bg-emerald-500/20 dark:data-[state=active]:text-emerald-300">
                   <span className="hidden sm:inline">Practice Modes</span>
                   <span className="sm:hidden">Modes</span>
                 </TabsTrigger>
-                <TabsTrigger value="history" className="flex-1 text-xs sm:text-sm py-2 sm:py-3 px-2 sm:px-4">
+                <TabsTrigger value="history" className="flex-1 text-xs sm:text-sm py-2 sm:py-3 px-2 sm:px-4 data-[state=active]:bg-primary/20 data-[state=active]:text-primary dark:data-[state=active]:bg-emerald-500/20 dark:data-[state=active]:text-emerald-300">
                   History
                 </TabsTrigger>
               </TabsList>
@@ -762,40 +702,42 @@ const MultiModePracticePage = () => {
                       <Card
                         key={mode.id}
                         className={cn(
-                          'group cursor-pointer bg-slate-900/60 backdrop-blur-xl border-purple-500/30 hover:border-purple-400/50 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/20 relative',
+                          'group cursor-pointer backdrop-blur-xl transition-all duration-300 hover:shadow-2xl relative border',
                           'bg-gradient-to-br',
-                          mode.bgColor
+                          mode.containerColor,
+                          mode.borderColor,
+                          'hover:border-opacity-70'
                         )}
                         onClick={() => handleStartPractice(mode.id as 'listening' | 'speaking' | 'reading' | 'writing')}
                       >
                         <CardContent className="p-4 sm:p-5 md:p-6">
                           <div className="flex items-start justify-between mb-3 sm:mb-4">
-                            <div className={cn('p-2 sm:p-3 rounded-lg bg-slate-900/50', mode.color)}>
+                            <div className={cn('p-2 sm:p-3 rounded-lg', mode.iconBg, mode.iconColor)}>
                               <Icon className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8" />
                             </div>
                             {modeHistory.length > 0 && (
-                              <Badge variant="outline" className="bg-purple-500/20 text-purple-300 border-purple-400/30 text-xs">
+                              <Badge variant="outline" className={cn('text-xs', mode.iconBg, mode.iconColor, 'border-current/30')}>
                                 {modeHistory.length} {modeHistory.length === 1 ? 'session' : 'sessions'}
                               </Badge>
                             )}
                           </div>
 
-                          <h3 className="text-lg sm:text-xl font-bold text-white mb-2">{mode.label}</h3>
-                          <p className="text-cyan-100/70 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">
+                          <h3 className="text-lg sm:text-xl font-bold text-foreground dark:text-white mb-2">{mode.label}</h3>
+                          <p className="text-muted-foreground dark:text-cyan-100/70 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">
                             Practice your {mode.label.toLowerCase()} skills with interactive exercises
                           </p>
 
                           {modeHistory.length > 0 && (
                             <div className="flex items-center gap-2 text-xs sm:text-sm mb-3 sm:mb-4">
-                              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-green-400 flex-shrink-0" />
-                              <span className="text-cyan-100/70">
-                                Avg: <span className="text-white font-semibold">{Math.round(avgScore)}%</span>
+                              <TrendingUp className={cn('h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0', mode.iconColor)} />
+                              <span className="text-muted-foreground dark:text-cyan-100/70">
+                                Avg: <span className="text-foreground dark:text-white font-semibold">{Math.round(avgScore)}%</span>
                               </span>
                             </div>
                           )}
 
                           <Button
-                            className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-xs sm:text-sm py-2 sm:py-2.5"
+                            className={cn('w-full text-white text-xs sm:text-sm py-2 sm:py-2.5', mode.buttonColor)}
                             onClick={(e) => {
                               e.stopPropagation();
                               handleStartPractice(mode.id as 'listening' | 'speaking' | 'reading' | 'writing');
@@ -822,25 +764,25 @@ const MultiModePracticePage = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="border-red-500/30 text-red-300 hover:bg-red-500/20 hover:text-red-200 text-xs sm:text-sm"
+                          className="border-red-500/30 text-red-600 hover:bg-red-500/20 hover:text-red-700 text-xs sm:text-sm dark:border-red-500/30 dark:text-red-300 dark:hover:bg-red-500/20 dark:hover:text-red-200"
                         >
                           <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                           <span className="hidden sm:inline">Delete Old (30+ days)</span>
                           <span className="sm:hidden">Delete Old</span>
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent className="bg-slate-900 border-purple-500/30">
+                      <AlertDialogContent className="bg-card border-primary/30 dark:bg-slate-900 dark:border-emerald-500/30">
                         <AlertDialogHeader>
-                          <AlertDialogTitle className="text-white flex items-center gap-2">
-                            <AlertCircle className="h-5 w-5 text-amber-400" />
+                          <AlertDialogTitle className="text-foreground dark:text-white flex items-center gap-2">
+                            <AlertCircle className="h-5 w-5 text-amber-500 dark:text-amber-400" />
                             Delete Old Sessions?
                           </AlertDialogTitle>
-                          <AlertDialogDescription className="text-cyan-100/80">
+                          <AlertDialogDescription className="text-muted-foreground dark:text-cyan-100/80">
                             This will permanently delete all practice sessions older than 30 days. This action cannot be undone.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <AlertDialogCancel className="bg-slate-800 text-cyan-100 border-slate-700 hover:bg-slate-700">
+                          <AlertDialogCancel className="bg-muted text-muted-foreground border-border hover:bg-muted/80 dark:bg-slate-800 dark:text-cyan-100 dark:border-slate-700 dark:hover:bg-slate-700">
                             Cancel
                           </AlertDialogCancel>
                           <AlertDialogAction
@@ -858,25 +800,25 @@ const MultiModePracticePage = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="border-red-500/30 text-red-300 hover:bg-red-500/20 hover:text-red-200 text-xs sm:text-sm"
+                          className="border-red-500/30 text-red-600 hover:bg-red-500/20 hover:text-red-700 text-xs sm:text-sm dark:border-red-500/30 dark:text-red-300 dark:hover:bg-red-500/20 dark:hover:text-red-200"
                         >
                           <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                           <span className="hidden sm:inline">Delete All</span>
                           <span className="sm:hidden">Delete All</span>
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent className="bg-slate-900 border-purple-500/30">
+                      <AlertDialogContent className="bg-card border-primary/30 dark:bg-slate-900 dark:border-emerald-500/30">
                         <AlertDialogHeader>
-                          <AlertDialogTitle className="text-white flex items-center gap-2">
-                            <AlertCircle className="h-5 w-5 text-red-400" />
+                          <AlertDialogTitle className="text-foreground dark:text-white flex items-center gap-2">
+                            <AlertCircle className="h-5 w-5 text-red-500 dark:text-red-400" />
                             Delete All Sessions?
                           </AlertDialogTitle>
-                          <AlertDialogDescription className="text-cyan-100/80">
+                          <AlertDialogDescription className="text-muted-foreground dark:text-cyan-100/80">
                             This will permanently delete all {sessionHistory.length} practice session(s). This action cannot be undone.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <AlertDialogCancel className="bg-slate-800 text-cyan-100 border-slate-700 hover:bg-slate-700">
+                          <AlertDialogCancel className="bg-muted text-muted-foreground border-border hover:bg-muted/80 dark:bg-slate-800 dark:text-cyan-100 dark:border-slate-700 dark:hover:bg-slate-700">
                             Cancel
                           </AlertDialogCancel>
                           <AlertDialogAction
@@ -893,7 +835,7 @@ const MultiModePracticePage = () => {
 
                 <div className="space-y-2 sm:space-y-3">
                   {sessionHistory.length === 0 ? (
-                    <div className="text-center py-8 sm:py-12 text-cyan-100/70 text-sm sm:text-base px-4">
+                    <div className="text-center py-8 sm:py-12 text-muted-foreground dark:text-cyan-100/70 text-sm sm:text-base px-4">
                       No practice sessions yet. Start practicing to see your history!
                     </div>
                   ) : (
@@ -926,35 +868,35 @@ const MultiModePracticePage = () => {
                       const moduleName = getModuleName();
                       
                       return (
-                        <Card key={session.id} className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30 hover:border-purple-400/50 transition-all">
+                        <Card key={session.id} className="bg-card/80 backdrop-blur-xl border-primary/30 hover:border-primary/50 transition-all dark:bg-slate-900/60 dark:border-emerald-500/30 dark:hover:border-emerald-400/50">
                           <CardContent className="p-3 sm:p-4">
                             <div className="flex items-center justify-between gap-2 sm:gap-4">
                               <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                                <div className={cn('p-1.5 sm:p-2 rounded-lg flex-shrink-0', modeConfig?.bgColor || 'from-blue-500/20 to-cyan-500/20')}>
-                                  <Icon className={cn('h-4 w-4 sm:h-5 sm:w-5', modeConfig?.color || 'text-blue-400')} />
+                                <div className={cn('p-1.5 sm:p-2 rounded-lg flex-shrink-0', modeConfig?.iconBg || 'bg-primary/20 dark:bg-emerald-500/20', modeConfig?.iconColor || 'text-primary dark:text-emerald-400')}>
+                                  <Icon className={cn('h-4 w-4 sm:h-5 sm:w-5')} />
                                 </div>
                                 <div className="min-w-0 flex-1">
                                   <div className="flex items-center gap-2 flex-wrap">
-                                    <span className="font-semibold text-white capitalize text-sm sm:text-base">
+                                    <span className="font-semibold text-foreground dark:text-white capitalize text-sm sm:text-base">
                                       {session.mode}
                                     </span>
                                     {moduleName && (
-                                      <Badge variant="outline" className="bg-indigo-500/20 text-indigo-300 border-indigo-400/30 text-xs">
+                                      <Badge variant="outline" className="bg-primary/20 text-primary border-primary/30 text-xs dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-400/30">
                                         {moduleName}
                                       </Badge>
                                     )}
                                   </div>
-                                  <div className="text-xs sm:text-sm text-cyan-100/70 mt-1">
+                                  <div className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70 mt-1">
                                     {sessionDate.toLocaleDateString()} {daysAgo > 0 && `(${daysAgo} day${daysAgo !== 1 ? 's' : ''} ago)`}
                                   </div>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2 sm:gap-3">
                                 <div className="text-right flex-shrink-0">
-                                  <div className="text-base sm:text-lg font-bold text-white">{session.score}%</div>
-                                  <div className="text-xs text-cyan-100/70">{session.items_completed} items</div>
+                                  <div className="text-base sm:text-lg font-bold text-foreground dark:text-white">{session.score}%</div>
+                                  <div className="text-xs text-muted-foreground dark:text-cyan-100/70">{session.items_completed} items</div>
                                   {session.points_earned > 0 && (
-                                    <div className="text-xs text-amber-300 font-semibold mt-1">
+                                    <div className="text-xs text-amber-600 dark:text-amber-300 font-semibold mt-1">
                                       {session.points_earned} pts
                                     </div>
                                   )}
@@ -964,24 +906,24 @@ const MultiModePracticePage = () => {
                                     <Button
                                       variant="ghost"
                                       size="icon"
-                                      className="h-8 w-8 text-red-300 hover:text-red-400 hover:bg-red-500/20 flex-shrink-0"
+                                      className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-500/20 flex-shrink-0 dark:text-red-300 dark:hover:text-red-400 dark:hover:bg-red-500/20"
                                       disabled={isDeleting}
                                     >
                                       <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                                     </Button>
                                   </AlertDialogTrigger>
-                                  <AlertDialogContent className="bg-slate-900 border-purple-500/30">
+                                  <AlertDialogContent className="bg-card border-primary/30 dark:bg-slate-900 dark:border-emerald-500/30">
                                     <AlertDialogHeader>
-                                      <AlertDialogTitle className="text-white flex items-center gap-2">
-                                        <AlertCircle className="h-5 w-5 text-red-400" />
+                                      <AlertDialogTitle className="text-foreground dark:text-white flex items-center gap-2">
+                                        <AlertCircle className="h-5 w-5 text-red-500 dark:text-red-400" />
                                         Delete Session?
                                       </AlertDialogTitle>
-                                      <AlertDialogDescription className="text-cyan-100/80">
+                                      <AlertDialogDescription className="text-muted-foreground dark:text-cyan-100/80">
                                         Are you sure you want to delete this {session.mode}{moduleName ? ` - ${moduleName}` : ''} practice session from {sessionDate.toLocaleDateString()}? This action cannot be undone.
                                       </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
-                                      <AlertDialogCancel className="bg-slate-800 text-cyan-100 border-slate-700 hover:bg-slate-700">
+                                      <AlertDialogCancel className="bg-muted text-muted-foreground border-border hover:bg-muted/80 dark:bg-slate-800 dark:text-cyan-100 dark:border-slate-700 dark:hover:bg-slate-700">
                                         Cancel
                                       </AlertDialogCancel>
                                       <AlertDialogAction
@@ -1010,12 +952,12 @@ const MultiModePracticePage = () => {
           {isPracticeActive && activeMode === 'listening' && moduleData && (
             <div className="space-y-4 sm:space-y-6">
               {/* Audio Player Section */}
-              <Card className="bg-gradient-to-br from-blue-500/20 via-indigo-500/30 to-purple-500/20 backdrop-blur-xl border-blue-400/50">
+              <Card className="bg-gradient-to-br from-teal-500/20 via-emerald-500/25 to-teal-600/20 backdrop-blur-xl border-teal-400/50 dark:from-teal-500/20 dark:via-emerald-500/25 dark:to-teal-600/20 dark:border-teal-400/50">
                 <CardContent className="p-4 sm:p-5 md:p-6">
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div className="flex-1 text-center sm:text-left">
-                      <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Listen to the Audio</h3>
-                      <p className="text-xs sm:text-sm text-cyan-100/80">
+                      <h3 className="text-base sm:text-lg font-semibold text-foreground dark:text-white mb-2">Listen to the Audio</h3>
+                      <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/80">
                         Click play to listen to the {moduleData.module.title.toLowerCase()} audio. Listen carefully before answering the questions.
                       </p>
                     </div>
@@ -1033,7 +975,7 @@ const MultiModePracticePage = () => {
                         <Button
                           onClick={handlePlayAudio}
                           disabled={!ttsAvailable}
-                          className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+                          className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white"
                           size="lg"
                         >
                           <Volume2 className="h-5 w-5 mr-2" />
@@ -1044,7 +986,7 @@ const MultiModePracticePage = () => {
                       <Button
                         variant="outline"
                         onClick={() => setShowTranscript(!showTranscript)}
-                        className="border-purple-500/30 text-cyan-300 hover:bg-purple-500/20"
+                        className="border-primary/30 text-primary hover:bg-primary/20 dark:border-emerald-500/30 dark:text-emerald-300 dark:hover:bg-emerald-500/20"
                         size="lg"
                       >
                         {showTranscript ? (
@@ -1063,23 +1005,23 @@ const MultiModePracticePage = () => {
                       </Button>
                       
                       {/* Speed Controller */}
-                      <div className="flex items-center gap-2 border border-purple-500/30 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 bg-slate-800/50">
-                        <Gauge className="h-4 w-4 text-cyan-300" />
+                      <div className="flex items-center gap-2 border border-primary/30 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 bg-card/50 dark:border-emerald-500/30 dark:bg-slate-800/50">
+                        <Gauge className="h-4 w-4 text-primary dark:text-emerald-300" />
                         <select
                           value={playbackSpeed}
                           onChange={(e) => setPlaybackSpeed(e.target.value as 'normal' | 'slow' | 'slower')}
-                          className="bg-transparent text-cyan-300 text-xs sm:text-sm border-none outline-none cursor-pointer"
+                          className="bg-transparent text-foreground dark:text-cyan-300 text-xs sm:text-sm border-none outline-none cursor-pointer"
                           disabled={isPlaying}
                         >
-                          <option value="slower" className="bg-slate-800">0.5x (Slower)</option>
-                          <option value="slow" className="bg-slate-800">0.7x (Slow)</option>
-                          <option value="normal" className="bg-slate-800">1.0x (Normal)</option>
+                          <option value="slower" className="bg-card dark:bg-slate-800">0.5x (Slower)</option>
+                          <option value="slow" className="bg-card dark:bg-slate-800">0.7x (Slow)</option>
+                          <option value="normal" className="bg-card dark:bg-slate-800">1.0x (Normal)</option>
                         </select>
                       </div>
                     </div>
                   </div>
                   {!ttsAvailable && (
-                    <div className="mt-3 p-2 bg-amber-500/20 border border-amber-500/30 rounded text-xs text-amber-200 text-center">
+                    <div className="mt-3 p-2 bg-amber-500/20 border border-amber-500/30 rounded text-xs text-amber-700 dark:text-amber-200 text-center">
                       Audio playback not available. Please enable browser audio permissions or use the transcript.
                     </div>
                   )}
@@ -1088,26 +1030,26 @@ const MultiModePracticePage = () => {
 
               {/* Transcript Section - Toggleable */}
               {showTranscript && (
-                <Card className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30">
+                <Card className="bg-card/80 backdrop-blur-xl border-primary/30 dark:bg-slate-900/60 dark:border-emerald-500/30">
                   <CardContent className="p-4 sm:p-5 md:p-6">
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-base sm:text-lg font-semibold text-white">Transcript</h3>
-                      <Badge variant="outline" className="bg-purple-500/20 text-purple-300 border-purple-400/30 text-xs">
+                      <h3 className="text-base sm:text-lg font-semibold text-foreground dark:text-white">Transcript</h3>
+                      <Badge variant="outline" className="bg-primary/20 text-primary border-primary/30 text-xs dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-400/30">
                         Reference Only
                       </Badge>
                     </div>
-                    <p className="text-xs sm:text-sm md:text-base text-cyan-100/80 leading-relaxed">{moduleData.transcript}</p>
+                    <p className="text-xs sm:text-sm md:text-base text-muted-foreground dark:text-cyan-100/80 leading-relaxed">{moduleData.transcript}</p>
                   </CardContent>
                 </Card>
               )}
               
               {/* Exercises Section */}
-              <Card className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30">
+              <Card className="bg-card/80 backdrop-blur-xl border-primary/30 dark:bg-slate-900/60 dark:border-emerald-500/30">
                 <CardContent className="p-4 sm:p-5 md:p-6">
                   <div className="space-y-4 sm:space-y-6">
                     <div>
-                      <h3 className="text-base sm:text-lg font-semibold text-white mb-2 sm:mb-3">Listening Comprehension Exercises</h3>
-                      <p className="text-xs sm:text-sm text-cyan-100/70 mb-4">
+                      <h3 className="text-base sm:text-lg font-semibold text-foreground dark:text-white mb-2 sm:mb-3">Listening Comprehension Exercises</h3>
+                      <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70 mb-4">
                         Answer the questions based on what you heard. Listen to the audio first before answering.
                       </p>
                       <div className="space-y-2 sm:space-y-3">
@@ -1123,34 +1065,34 @@ const MultiModePracticePage = () => {
                               id={`exercise-${exercise.id}`}
                               key={exercise.id} 
                               className={cn(
-                                "bg-slate-800/50 border-purple-500/20 transition-all",
-                                isCurrentExercise && !showResults && "ring-2 ring-blue-400/50 border-blue-400/50",
-                                isCorrect && "border-green-500/50 bg-green-500/10",
-                                isIncorrect && "border-red-500/50 bg-red-500/10",
+                                "bg-card/60 backdrop-blur-sm border-primary/20 transition-all dark:bg-slate-800/50 dark:border-emerald-500/20",
+                                isCurrentExercise && !showResults && "ring-2 ring-primary/50 border-primary/50 dark:ring-emerald-400/50 dark:border-emerald-400/50",
+                                isCorrect && "border-green-500/50 bg-green-500/10 dark:border-green-500/50 dark:bg-green-500/10",
+                                isIncorrect && "border-red-500/50 bg-red-500/10 dark:border-red-500/50 dark:bg-red-500/10",
                                 isAnswered && !isCurrentExercise && !showResults && "opacity-60"
                               )}
                             >
                               <CardContent className="p-3 sm:p-4">
                                 <div className="flex items-start justify-between mb-2 flex-wrap gap-2">
                                   <div className="flex items-center gap-2">
-                                    <span className="text-xs sm:text-sm font-semibold text-purple-300">Exercise {index + 1}</span>
+                                    <span className="text-xs sm:text-sm font-semibold text-primary dark:text-emerald-300">Exercise {index + 1}</span>
                                     {showResults && isCorrect && (
-                                      <Badge className="bg-green-500/20 text-green-300 border-green-400/30 text-xs">
+                                      <Badge className="bg-green-500/20 text-green-700 border-green-400/30 text-xs dark:bg-green-500/20 dark:text-green-300 dark:border-green-400/30">
                                         <CheckCircle className="h-3 w-3 mr-1" />
                                         Correct
                                       </Badge>
                                     )}
                                     {showResults && isIncorrect && (
-                                      <Badge className="bg-red-500/20 text-red-300 border-red-400/30 text-xs">
+                                      <Badge className="bg-red-500/20 text-red-700 border-red-400/30 text-xs dark:bg-red-500/20 dark:text-red-300 dark:border-red-400/30">
                                         Incorrect
                                       </Badge>
                                     )}
                                   </div>
-                                  <Badge variant="outline" className="bg-blue-500/20 text-blue-300 text-xs">
+                                  <Badge variant="outline" className="bg-primary/20 text-primary text-xs dark:bg-emerald-500/20 dark:text-emerald-300">
                                     {exercise.points} pts
                                   </Badge>
                                 </div>
-                                <p className="text-sm sm:text-base text-white mb-3">{exercise.question}</p>
+                                <p className="text-sm sm:text-base text-foreground dark:text-white mb-3">{exercise.question}</p>
                                 
                                 {(exercise.type === 'multiple-choice' || exercise.type === 'comprehension') && exercise.options && (
                                   <div className="space-y-1.5 sm:space-y-2">
@@ -1165,18 +1107,19 @@ const MultiModePracticePage = () => {
                                           disabled={showResults}
                                           className={cn(
                                             "w-full text-left p-2 sm:p-2.5 rounded text-xs sm:text-sm transition-all",
-                                            "bg-slate-700/30 hover:bg-slate-700/50 border-2",
-                                            isSelected && !showResults && "border-blue-400 bg-blue-500/20",
-                                            isCorrectOption && showResults && "border-green-400 bg-green-500/20",
-                                            isSelected && isIncorrect && showResults && "border-red-400 bg-red-500/20",
+                                            "bg-muted/50 hover:bg-muted border-2 dark:bg-slate-700/30 dark:hover:bg-slate-700/50",
+                                            isSelected && !showResults && "border-primary bg-primary/20 dark:border-emerald-400 dark:bg-emerald-500/20",
+                                            isCorrectOption && showResults && "border-green-500 bg-green-500/20 dark:border-green-400 dark:bg-green-500/20",
+                                            isSelected && isIncorrect && showResults && "border-red-500 bg-red-500/20 dark:border-red-400 dark:bg-red-500/20",
                                             !isSelected && showResults && "border-transparent",
-                                            showResults && "cursor-default"
+                                            showResults && "cursor-default",
+                                            "text-foreground dark:text-white"
                                           )}
                                         >
                                           <span className="font-semibold mr-2">{String.fromCharCode(65 + optIndex)}.</span>
                                           {option}
                                           {isCorrectOption && showResults && (
-                                            <CheckCircle className="h-4 w-4 text-green-400 inline-block ml-2" />
+                                            <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400 inline-block ml-2" />
                                           )}
                                         </button>
                                       );
@@ -1190,11 +1133,11 @@ const MultiModePracticePage = () => {
                                       onClick={() => !showResults && handleAnswerChange(exercise.id, true)}
                                       disabled={showResults}
                                       className={cn(
-                                        "flex-1 p-2 sm:p-3 rounded text-xs sm:text-sm font-semibold transition-all border-2",
-                                        userAnswer === true && !showResults && "bg-blue-500/20 border-blue-400",
-                                        userAnswer === true && showResults && exercise.correctAnswer === true && "bg-green-500/20 border-green-400",
-                                        userAnswer === true && showResults && exercise.correctAnswer !== true && "bg-red-500/20 border-red-400",
-                                        userAnswer !== true && "bg-slate-700/30 border-transparent hover:bg-slate-700/50",
+                                        "flex-1 p-2 sm:p-3 rounded text-xs sm:text-sm font-semibold transition-all border-2 text-foreground dark:text-white",
+                                        userAnswer === true && !showResults && "bg-primary/20 border-primary dark:bg-emerald-500/20 dark:border-emerald-400",
+                                        userAnswer === true && showResults && exercise.correctAnswer === true && "bg-green-500/20 border-green-500 dark:bg-green-500/20 dark:border-green-400",
+                                        userAnswer === true && showResults && exercise.correctAnswer !== true && "bg-red-500/20 border-red-500 dark:bg-red-500/20 dark:border-red-400",
+                                        userAnswer !== true && "bg-muted/50 border-transparent hover:bg-muted dark:bg-slate-700/30 dark:hover:bg-slate-700/50",
                                         showResults && "cursor-default"
                                       )}
                                     >
@@ -1204,11 +1147,11 @@ const MultiModePracticePage = () => {
                                       onClick={() => !showResults && handleAnswerChange(exercise.id, false)}
                                       disabled={showResults}
                                       className={cn(
-                                        "flex-1 p-2 sm:p-3 rounded text-xs sm:text-sm font-semibold transition-all border-2",
-                                        userAnswer === false && !showResults && "bg-blue-500/20 border-blue-400",
-                                        userAnswer === false && showResults && exercise.correctAnswer === false && "bg-green-500/20 border-green-400",
-                                        userAnswer === false && showResults && exercise.correctAnswer !== false && "bg-red-500/20 border-red-400",
-                                        userAnswer !== false && "bg-slate-700/30 border-transparent hover:bg-slate-700/50",
+                                        "flex-1 p-2 sm:p-3 rounded text-xs sm:text-sm font-semibold transition-all border-2 text-foreground dark:text-white",
+                                        userAnswer === false && !showResults && "bg-primary/20 border-primary dark:bg-emerald-500/20 dark:border-emerald-400",
+                                        userAnswer === false && showResults && exercise.correctAnswer === false && "bg-green-500/20 border-green-500 dark:bg-green-500/20 dark:border-green-400",
+                                        userAnswer === false && showResults && exercise.correctAnswer !== false && "bg-red-500/20 border-red-500 dark:bg-red-500/20 dark:border-red-400",
+                                        userAnswer !== false && "bg-muted/50 border-transparent hover:bg-muted dark:bg-slate-700/30 dark:hover:bg-slate-700/50",
                                         showResults && "cursor-default"
                                       )}
                                     >
@@ -1226,25 +1169,25 @@ const MultiModePracticePage = () => {
                                       disabled={showResults}
                                       placeholder="Type your answer here..."
                                       className={cn(
-                                        "w-full p-2 sm:p-3 rounded bg-slate-700/30 border-2 text-white text-xs sm:text-sm",
-                                        "focus:outline-none focus:border-blue-400",
-                                        showResults && isCorrect && "border-green-400 bg-green-500/20",
-                                        showResults && isIncorrect && "border-red-400 bg-red-500/20"
+                                        "w-full p-2 sm:p-3 rounded bg-muted/50 border-2 text-foreground text-xs sm:text-sm dark:bg-slate-700/30 dark:text-white",
+                                        "focus:outline-none focus:border-primary dark:focus:border-emerald-400",
+                                        showResults && isCorrect && "border-green-500 bg-green-500/20 dark:border-green-400 dark:bg-green-500/20",
+                                        showResults && isIncorrect && "border-red-500 bg-red-500/20 dark:border-red-400 dark:bg-red-500/20"
                                       )}
                                     />
                                     {showResults && (
                                       <div className="text-xs sm:text-sm">
-                                        <span className="text-cyan-100/70">Correct answer: </span>
-                                        <span className="text-green-400 font-semibold">{exercise.correctAnswer}</span>
+                                        <span className="text-muted-foreground dark:text-cyan-100/70">Correct answer: </span>
+                                        <span className="text-green-600 dark:text-green-400 font-semibold">{exercise.correctAnswer}</span>
                                       </div>
                                     )}
                                   </div>
                                 )}
                                 
                                 {showResults && exercise.explanation && (
-                                  <div className="mt-3 p-2 sm:p-3 bg-blue-500/10 border border-blue-500/30 rounded">
-                                    <p className="text-xs sm:text-sm text-cyan-100/80">
-                                      <span className="font-semibold text-blue-300">Explanation: </span>
+                                  <div className="mt-3 p-2 sm:p-3 bg-primary/10 border border-primary/30 rounded dark:bg-emerald-500/10 dark:border-emerald-500/30">
+                                    <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/80">
+                                      <span className="font-semibold text-primary dark:text-emerald-300">Explanation: </span>
                                       {exercise.explanation}
                                     </p>
                                   </div>
@@ -1260,7 +1203,7 @@ const MultiModePracticePage = () => {
                           <Button
                             onClick={handleSubmitAnswers}
                             disabled={Object.keys(userAnswers).length !== moduleData.exercises.length}
-                            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
+                            className="bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600"
                             size="lg"
                           >
                             <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
@@ -1270,13 +1213,13 @@ const MultiModePracticePage = () => {
                       )}
                       
                       {showResults && (
-                        <div className="mt-4 sm:mt-6 p-4 sm:p-5 bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-400/30 rounded-lg">
+                        <div className="mt-4 sm:mt-6 p-4 sm:p-5 bg-gradient-to-r from-primary/20 to-secondary/20 border border-primary/30 rounded-lg dark:from-emerald-500/20 dark:to-green-500/20 dark:border-emerald-400/30">
                           <div className="text-center">
-                            <h4 className="text-lg sm:text-xl font-bold text-white mb-2">Your Score</h4>
-                            <div className="text-3xl sm:text-4xl font-bold text-cyan-400 mb-2">
+                            <h4 className="text-lg sm:text-xl font-bold text-foreground dark:text-white mb-2">Your Score</h4>
+                            <div className="text-3xl sm:text-4xl font-bold text-primary dark:text-emerald-400 mb-2">
                               {Math.round((practiceProgress.items_correct / practiceProgress.items_completed) * 100)}%
                             </div>
-                            <p className="text-xs sm:text-sm text-cyan-100/80">
+                            <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/80">
                               {practiceProgress.items_correct} out of {practiceProgress.items_completed} correct
                             </p>
                           </div>
@@ -1285,15 +1228,15 @@ const MultiModePracticePage = () => {
                     </div>
 
                     <div>
-                      <h3 className="text-base sm:text-lg font-semibold text-white mb-2 sm:mb-3">Vocabulary</h3>
+                      <h3 className="text-base sm:text-lg font-semibold text-foreground dark:text-white mb-2 sm:mb-3">Vocabulary</h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                         {moduleData.vocabulary.map((vocab, index) => (
-                          <Card key={index} className="bg-slate-800/50 border-purple-500/20">
+                          <Card key={index} className="bg-card/60 backdrop-blur-sm border-primary/20 dark:bg-slate-800/50 dark:border-emerald-500/20">
                             <CardContent className="p-2.5 sm:p-3">
-                              <div className="font-semibold text-white mb-1 text-sm sm:text-base">{vocab.word}</div>
-                              <div className="text-xs sm:text-sm text-cyan-100/70">{vocab.definition}</div>
+                              <div className="font-semibold text-foreground dark:text-white mb-1 text-sm sm:text-base">{vocab.word}</div>
+                              <div className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70">{vocab.definition}</div>
                               {vocab.example && (
-                                <div className="text-xs text-cyan-100/60 mt-1 italic">"{vocab.example}"</div>
+                                <div className="text-xs text-muted-foreground dark:text-cyan-100/60 mt-1 italic">"{vocab.example}"</div>
                               )}
                             </CardContent>
                           </Card>
@@ -1302,8 +1245,8 @@ const MultiModePracticePage = () => {
                     </div>
 
                     <div>
-                      <h3 className="text-base sm:text-lg font-semibold text-white mb-2 sm:mb-3">Tips</h3>
-                      <ul className="list-disc list-inside space-y-1 text-xs sm:text-sm text-cyan-100/80 pl-2">
+                      <h3 className="text-base sm:text-lg font-semibold text-foreground dark:text-white mb-2 sm:mb-3">Tips</h3>
+                      <ul className="list-disc list-inside space-y-1 text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/80 pl-2">
                         {moduleData.tips.map((tip, index) => (
                           <li key={index} className="leading-relaxed">{tip}</li>
                         ))}
@@ -1319,7 +1262,7 @@ const MultiModePracticePage = () => {
                   setSelectedModule(null);
                   setModuleData(null);
                   setActiveMode(null);
-                }} variant="outline" className="text-cyan-300 text-xs sm:text-sm" size="sm">
+                }} variant="outline" className="text-primary hover:text-primary/80 hover:bg-primary/10 text-xs sm:text-sm dark:text-emerald-300 dark:hover:text-emerald-200 dark:hover:bg-emerald-500/20" size="sm">
                   <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                   <span className="hidden sm:inline">Back to Modules</span>
                   <span className="sm:hidden">Back</span>
@@ -1331,20 +1274,19 @@ const MultiModePracticePage = () => {
           {/* Other Practice Modes Active View */}
           {isPracticeActive && activeMode !== 'listening' && (
             <div className="text-center py-8 sm:py-12 px-4">
-              <p className="text-sm sm:text-base text-cyan-100/80 mb-4">Practice session is active. Implementation coming soon...</p>
+              <p className="text-sm sm:text-base text-muted-foreground dark:text-cyan-100/80 mb-4">Practice session is active. Implementation coming soon...</p>
               <Button onClick={() => {
                 setIsPracticeActive(false);
                 setActiveMode(null);
                 setSelectedModule(null);
                 setModuleData(null);
-              }} variant="outline" className="text-xs sm:text-sm" size="sm">
+              }} variant="outline" className="text-primary hover:text-primary/80 hover:bg-primary/10 text-xs sm:text-sm dark:text-emerald-300 dark:hover:text-emerald-200 dark:hover:bg-emerald-500/20" size="sm">
                 <span className="hidden sm:inline">Back to Modes</span>
                 <span className="sm:hidden">Back</span>
               </Button>
             </div>
           )}
-        </div>
-      </div>
+      </main>
     </div>
   );
 };

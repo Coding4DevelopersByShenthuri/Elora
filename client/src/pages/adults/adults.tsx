@@ -660,23 +660,23 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                 </div>
 
                   {/* Multi-Mode Practice */}
-                  <Card className="bg-gradient-to-br from-primary/20 via-secondary/30 to-accent/20 backdrop-blur-xl border-primary/50 shadow-2xl relative dark:from-emerald-500/20 dark:via-green-500/30 dark:to-teal-500/20 dark:border-emerald-400/50">
+                  <Card className="bg-gradient-to-br from-teal-500/20 via-emerald-500/25 to-teal-600/20 backdrop-blur-xl border-teal-400/50 shadow-2xl relative dark:from-teal-500/20 dark:via-emerald-500/25 dark:to-teal-600/20 dark:border-teal-400/50">
                     <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10">
-                      <Badge className="bg-gradient-to-r from-emerald-500 to-green-600 text-white border-0 shadow-lg px-2 sm:px-3 py-1 text-xs sm:text-sm">
+                      <Badge className="bg-gradient-to-r from-teal-600 to-emerald-600 text-white border-0 shadow-lg px-2 sm:px-3 py-1 text-xs sm:text-sm dark:from-teal-500 dark:to-emerald-600">
                         <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                         Enrolled: {enrolledModules.size}
                       </Badge>
                     </div>
                     <CardContent className="p-4 sm:p-6 md:p-8">
                       <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-                        <div className="p-4 sm:p-6 rounded-2xl text-white bg-gradient-to-r from-primary to-secondary shadow-lg flex-shrink-0 dark:from-emerald-500 dark:to-green-600">
+                        <div className="p-4 sm:p-6 rounded-2xl text-white bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-700 shadow-lg flex-shrink-0">
                           <Layers className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
                         </div>
                         <div className="flex-1 text-center sm:text-left w-full">
                           <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
                             <h3 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white">Multi-Mode Practice</h3>
                             {getMultiModeProgress() !== null && (
-                              <Badge variant="outline" className="bg-emerald-500/20 text-emerald-300 border-emerald-400/50 text-xs">
+                              <Badge variant="outline" className="bg-teal-700/95 text-white font-semibold border-teal-600/90 text-xs dark:bg-teal-600/40 dark:text-white dark:border-teal-500/70">
                                 {getMultiModeProgress()}% Complete
                               </Badge>
                             )}
@@ -688,10 +688,10 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                           {(() => {
                             const summary = getEnrolledSummaryByMode();
                             const badges = [
-                              { id: 'listening', label: 'Listening', count: summary.listening, color: 'bg-primary/20 text-primary border-primary/30 dark:bg-emerald-500/20 dark:text-emerald-200 dark:border-emerald-400/30' },
-                              { id: 'speaking', label: 'Speaking', count: summary.speaking, color: 'bg-secondary/20 text-secondary border-secondary/30 dark:bg-green-500/20 dark:text-green-200 dark:border-green-400/30' },
-                              { id: 'reading', label: 'Reading', count: summary.reading, color: 'bg-accent/20 text-accent border-accent/30 dark:bg-teal-500/20 dark:text-teal-200 dark:border-teal-400/30' },
-                              { id: 'writing', label: 'Writing', count: summary.writing, color: 'bg-primary/20 text-primary border-primary/30 dark:bg-emerald-600/20 dark:text-emerald-200 dark:border-emerald-500/30' },
+                              { id: 'listening', label: 'Listening', count: summary.listening, color: 'bg-teal-600/30 text-gray-800 font-semibold border-teal-500/60 dark:bg-teal-500/30 dark:text-white dark:border-teal-400/50' },
+                              { id: 'speaking', label: 'Speaking', count: summary.speaking, color: 'bg-emerald-600/30 text-gray-800 font-semibold border-emerald-500/60 dark:bg-emerald-500/30 dark:text-white dark:border-emerald-400/50' },
+                              { id: 'reading', label: 'Reading', count: summary.reading, color: 'bg-teal-500/30 text-gray-800 font-semibold border-teal-400/60 dark:bg-teal-400/30 dark:text-white dark:border-teal-300/50' },
+                              { id: 'writing', label: 'Writing', count: summary.writing, color: 'bg-teal-700/30 text-gray-900 font-semibold border-teal-600/60 dark:bg-teal-600/30 dark:text-white dark:border-teal-500/50' },
                             ];
                             const hasAny = badges.some(badge => badge.count > 0);
                             if (!hasAny) return null;
@@ -725,7 +725,7 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                                   {Array.from(enrolledModules).map((moduleId) => {
                                     const module = getModuleById(moduleId);
                                     return (
-                                      <Badge key={moduleId} variant="outline" className="bg-primary/20 text-primary border-primary/30 text-xs dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-400/30">
+                                      <Badge key={moduleId} variant="outline" className="bg-teal-600/30 text-gray-800 font-semibold border-teal-500/60 text-xs dark:bg-teal-500/30 dark:text-white dark:border-teal-400/50">
                                         {module?.title || moduleId}
                                       </Badge>
                                     );
@@ -734,12 +734,12 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                               )}
                               {/* Points Display */}
                               {multiModeProgress && multiModeProgress.totalPoints > 0 && (
-                                <div className="flex items-center justify-between p-2 sm:p-3 bg-gradient-to-r from-primary/20 to-secondary/20 border border-primary/30 rounded-lg dark:from-emerald-500/20 dark:to-green-500/20 dark:border-emerald-400/30">
+                                <div className="flex items-center justify-between p-2 sm:p-3 bg-gradient-to-r from-teal-500/30 to-emerald-500/30 border border-teal-500/60 rounded-lg dark:from-teal-500/30 dark:to-emerald-500/30 dark:border-teal-400/50">
                                   <div className="flex items-center gap-2">
-                                    <Trophy className="w-4 h-4 text-primary dark:text-emerald-400" />
-                                    <span className="text-xs sm:text-sm text-primary font-medium dark:text-emerald-200">Total Points</span>
+                                    <Trophy className="w-4 h-4 text-gray-800 dark:text-white" />
+                                    <span className="text-xs sm:text-sm text-gray-800 font-semibold dark:text-white">Total Points</span>
                                   </div>
-                                  <span className="text-base sm:text-lg font-bold text-primary dark:text-emerald-300">
+                                  <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
                                     {multiModeProgress.totalPoints}
                                   </span>
                                 </div>
@@ -747,16 +747,16 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                             </div>
                           )}
                           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-4 mb-3 sm:mb-4">
-                            <Badge variant="outline" className="bg-primary/20 text-primary border-primary/30 text-xs dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-400/30">
+                            <Badge variant="outline" className="bg-teal-600/30 text-gray-800 font-semibold border-teal-500/60 text-xs dark:bg-teal-500/30 dark:text-white dark:border-teal-400/50">
                               All Modes
                             </Badge>
-                            <Badge variant="outline" className="bg-secondary/20 text-secondary border-secondary/30 text-xs dark:bg-green-500/20 dark:text-green-300 dark:border-green-400/30">
+                            <Badge variant="outline" className="bg-emerald-600/30 text-gray-800 font-semibold border-emerald-500/60 text-xs dark:bg-emerald-500/30 dark:text-white dark:border-emerald-400/50">
                               Interactive
                             </Badge>
                           </div>
                           <Button
                             size="default"
-                            className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm sm:text-base dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600"
+                            className="w-full sm:w-auto bg-gradient-to-r from-teal-600 to-emerald-600 text-white hover:from-teal-700 hover:to-emerald-700 font-semibold text-sm sm:text-base shadow-lg"
                             onClick={() => navigate('/adults/practice/multi-mode')}
                           >
                             <Play className="w-4 h-4 mr-2" />
@@ -769,10 +769,10 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                   </Card>
 
                   {/* Pronunciation Analyzer */}
-                  <Card className="bg-gradient-to-br from-accent/20 via-secondary/30 to-primary/20 backdrop-blur-xl border-accent/50 shadow-2xl dark:from-teal-500/20 dark:via-green-500/30 dark:to-emerald-500/20 dark:border-teal-400/50">
+                  <Card className="bg-gradient-to-br from-green-600/20 to-green-600/20 backdrop-blur-xl border-green-500/50 shadow-2xl dark:from-green-600/20 dark:to-green-600/20 dark:border-green-500/50">
                     <CardContent className="p-4 sm:p-6 md:p-8">
                       <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-                        <div className="p-4 sm:p-6 rounded-2xl text-white bg-gradient-to-r from-accent to-secondary shadow-lg flex-shrink-0 dark:from-teal-500 dark:to-green-600">
+                        <div className="p-4 sm:p-6 rounded-2xl text-white bg-green-600 shadow-lg flex-shrink-0">
                           <Mic className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
                         </div>
                         <div className="flex-1 text-center sm:text-left w-full">
@@ -781,13 +781,13 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                             Record and analyze your pronunciation with AI-powered feedback
                           </p>
                           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-4 mb-3 sm:mb-4">
-                            <Badge variant="outline" className="bg-accent/20 text-accent border-accent/30 text-xs dark:bg-teal-500/20 dark:text-teal-300 dark:border-teal-400/30">
+                            <Badge variant="outline" className="bg-green-600/30 text-gray-800 font-semibold border-green-500/60 text-xs dark:bg-green-600/30 dark:text-white dark:border-green-500/50">
                               AI Feedback
                             </Badge>
                           </div>
                           <Button
                             size="default"
-                            className="w-full sm:w-auto bg-accent text-accent-foreground hover:bg-accent/90 font-semibold text-sm sm:text-base dark:bg-teal-500 dark:text-white dark:hover:bg-teal-600"
+                            className="w-full sm:w-auto bg-green-600 text-white hover:bg-green-700 font-semibold text-sm sm:text-base shadow-lg"
                             onClick={() => setActiveWidget('pronunciation')}
                           >
                             <Mic className="w-4 h-4 mr-2" />
@@ -800,9 +800,9 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                   </Card>
 
                   {/* Daily Conversation - Prominent */}
-                  <Card className="bg-gradient-to-br from-secondary/20 via-primary/30 to-accent/20 backdrop-blur-xl border-primary/50 shadow-2xl relative dark:from-green-500/20 dark:via-emerald-500/30 dark:to-teal-500/20 dark:border-emerald-400/50">
+                  <Card className="bg-gradient-to-br from-emerald-600/20 to-emerald-600/20 backdrop-blur-xl border-emerald-500/50 shadow-2xl relative dark:from-emerald-600/20 dark:to-emerald-600/20 dark:border-emerald-500/50">
                     <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10">
-                      <Badge className="bg-gradient-to-r from-emerald-500 to-green-600 text-white border-0 shadow-lg px-2 sm:px-3 py-1 text-xs sm:text-sm">
+                      <Badge className="bg-emerald-600 text-white border-0 shadow-lg px-2 sm:px-3 py-1 text-xs sm:text-sm">
                         {dailyConversationEnrolledCount > 0 && (
                           <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                         )}
@@ -811,14 +811,14 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                     </div>
                     <CardContent className="p-4 sm:p-6 md:p-8">
                       <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-                        <div className={cn("p-4 sm:p-6 rounded-2xl text-white bg-gradient-to-r shadow-lg flex-shrink-0", "from-secondary to-primary dark:from-green-500 dark:to-emerald-600")}>
+                        <div className="p-4 sm:p-6 rounded-2xl text-white bg-emerald-600 shadow-lg flex-shrink-0">
                           <MessageCircle className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
                         </div>
                         <div className="flex-1 text-center sm:text-left w-full">
                           <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
                             <h3 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white">Daily Conversation</h3>
                             {getOverallProgress() !== null && (
-                              <Badge variant="outline" className="bg-emerald-500/20 text-emerald-300 border-emerald-400/50 text-xs">
+                              <Badge variant="outline" className="bg-emerald-700/95 text-white font-semibold border-emerald-600/90 text-xs dark:bg-emerald-600/40 dark:text-white dark:border-emerald-500/70">
                                 {getOverallProgress()}% Complete
                               </Badge>
                             )}
@@ -845,7 +845,7 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                                       const topicName = topicId === 'greetings' ? 'Greetings' : 
                                                        topicId === 'work' ? 'Work & Professional' : topicId;
                                       return (
-                                        <Badge key={topicId} variant="outline" className="bg-emerald-500/20 text-emerald-300 border-emerald-400/30 text-xs">
+                                        <Badge key={topicId} variant="outline" className="bg-emerald-600/30 text-gray-800 font-semibold border-emerald-500/60 text-xs dark:bg-emerald-600/30 dark:text-white dark:border-emerald-500/50">
                                           {topicName}
                                         </Badge>
                                       );
@@ -856,12 +856,12 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                               )}
                               {/* Points Display */}
                               {getDailyConversationPoints() > 0 && (
-                                <div className="flex items-center justify-between p-2 sm:p-3 bg-gradient-to-r from-primary/20 to-secondary/20 border border-primary/30 rounded-lg dark:from-emerald-500/20 dark:to-green-500/20 dark:border-emerald-400/30">
+                                <div className="flex items-center justify-between p-2 sm:p-3 bg-emerald-600/30 border border-emerald-500/60 rounded-lg dark:bg-emerald-600/30 dark:border-emerald-500/50">
                                   <div className="flex items-center gap-2">
-                                    <Trophy className="w-4 h-4 text-primary dark:text-emerald-400" />
-                                    <span className="text-xs sm:text-sm text-primary font-medium dark:text-emerald-200">Total Points</span>
+                                    <Trophy className="w-4 h-4 text-gray-800 dark:text-white" />
+                                    <span className="text-xs sm:text-sm text-gray-800 font-semibold dark:text-white">Total Points</span>
                                   </div>
-                                  <span className="text-base sm:text-lg font-bold text-primary dark:text-emerald-300">
+                                  <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
                                     {getDailyConversationPoints()}
                                   </span>
                                 </div>
@@ -869,13 +869,13 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                             </div>
                           )}
                           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-4 mb-3 sm:mb-4">
-                            <Badge variant="outline" className="bg-primary/20 text-primary border-primary/30 text-xs dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-400/30">
+                            <Badge variant="outline" className="bg-emerald-600/30 text-gray-800 font-semibold border-emerald-500/60 text-xs dark:bg-emerald-600/30 dark:text-white dark:border-emerald-500/50">
                               All Levels
                             </Badge>
                       </div>
                           <Button
                             size="default"
-                            className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm sm:text-base dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600"
+                            className="w-full sm:w-auto bg-emerald-600 text-white hover:bg-emerald-700 font-semibold text-sm sm:text-base shadow-lg"
                             onClick={() => navigate('/adults/practice/daily-conversation')}
                           >
                             <Play className="w-4 h-4 mr-2" />
@@ -924,7 +924,7 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                     <h2 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2">Multi-Mode Practice</h2>
                     <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70 mb-4 sm:mb-6">Practice all language skills in one place</p>
                   </div>
-                  <Card className="bg-gradient-to-br from-primary/20 via-secondary/30 to-accent/20 backdrop-blur-xl border-primary/50 shadow-2xl dark:from-emerald-500/20 dark:via-green-500/30 dark:to-teal-500/20 dark:border-emerald-400/50">
+                  <Card className="bg-gradient-to-br from-teal-500/20 via-emerald-500/25 to-teal-600/20 backdrop-blur-xl border-teal-400/50 shadow-2xl dark:from-teal-500/20 dark:via-emerald-500/25 dark:to-teal-600/20 dark:border-teal-400/50">
                     <CardContent className="p-6">
                       <div className="text-center">
                         <p className="text-muted-foreground dark:text-cyan-100/80 mb-4">
@@ -932,7 +932,7 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                         </p>
                         <Button
                           size="default"
-                          className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600"
+                          className="bg-gradient-to-r from-teal-600 to-emerald-600 text-white hover:from-teal-700 hover:to-emerald-700 font-semibold shadow-lg"
                           onClick={() => navigate('/adults/practice/multi-mode')}
                         >
                           <Play className="w-4 h-4 mr-2" />
