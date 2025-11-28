@@ -49,10 +49,10 @@ export default function SpacedRepetition() {
         AdultsAPI.getSpacedRepetitionDue(),
       ]);
 
-      if (allItemsRes.success) {
+      if (allItemsRes.success && 'data' in allItemsRes) {
         setItems(allItemsRes.data?.items || []);
       }
-      if (dueItemsRes.success) {
+      if (dueItemsRes.success && 'data' in dueItemsRes) {
         const due = dueItemsRes.data?.items || [];
         setDueItems(due);
         if (due.length > 0 && !currentItem) {

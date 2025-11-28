@@ -46,7 +46,7 @@ export default function ProgressAnalytics() {
     try {
       setLoading(true);
       const result = await AdultsAPI.getAnalyticsSummary();
-      if (result.success) {
+      if (result.success && 'data' in result) {
         setSummary(result.data);
       }
     } catch (error) {

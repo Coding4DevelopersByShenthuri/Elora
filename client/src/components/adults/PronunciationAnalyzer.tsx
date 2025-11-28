@@ -51,7 +51,7 @@ export default function PronunciationAnalyzer({ onClose }: PronunciationAnalyzer
   const loadHistory = async () => {
     try {
       const result = await AdultsAPI.getPronunciationHistory();
-      if (result.success) {
+      if (result.success && 'data' in result) {
         setPracticeHistory(result.data?.data || []);
       }
     } catch (error) {
@@ -62,7 +62,7 @@ export default function PronunciationAnalyzer({ onClose }: PronunciationAnalyzer
   const loadStatistics = async () => {
     try {
       const result = await AdultsAPI.getPronunciationStatistics();
-      if (result.success) {
+      if (result.success && 'data' in result) {
         setStatistics(result.data?.data);
       }
     } catch (error) {
@@ -91,7 +91,7 @@ export default function PronunciationAnalyzer({ onClose }: PronunciationAnalyzer
         user_audio_url: '', // Will be filled with actual recording
       });
 
-      if (result.success) {
+      if (result.success && 'data' in result) {
         setCurrentFeedback(result.data?.data);
         loadHistory();
         loadStatistics();

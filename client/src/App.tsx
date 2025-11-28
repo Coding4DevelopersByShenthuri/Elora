@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GoogleOAuthProvider } from "@react-oauth/google";
@@ -20,59 +20,64 @@ import OfflineIndicator from "@/components/common/OfflineIndicator";
 import CookieConsent from "@/components/common/CookieConsent";
 import PageLoadingOverlay from "@/components/common/PageLoadingOverlay";
 
-// ✅ Pages
+// ✅ Pages - Lightweight pages (keep static for faster initial load)
 import Index from "@/pages/Index";
 import WhyPage from "@/pages/WhyPage";
 import HowPage from "@/pages/HowPage";
 import AboutPage from "@/pages/AboutPage";
-import Profile from "@/pages/Profile";
 import SearchPage from "@/pages/SearchPage";
 import Settings from "@/pages/Settings";
 import HelpPage from "@/pages/HelpPage";
 import ContactPage from "@/pages/ContactPage";
 import KidsPage from "@/pages/Kids";
-import YoungKidsPage from "@/pages/YoungKids";
-import TeenKidsPage from "@/pages/TeenKids";
 import YoungKidsFavoritesPage from "@/pages/YoungKidsFavorites";
 import TeenKidsFavoritesPage from "@/pages/TeenKidsFavorites";
 import ParentalControlsPage from "@/pages/ParentalControlsPage";
 import KidsGamePage from "@/pages/KidsGamePage";
 import GameHistoryPage from "@/pages/GameHistoryPage";
-import Adults from "@/pages/adults/adults";
-import Beginners from "@/pages/adults/Beginners";
-import Intermediates from "@/pages/adults/Intermediates";
-import Advanced from "@/pages/adults/Advanced";
-import QuickPracticeSession from "@/pages/adults/QuickPracticeSession";
-import MultiModePracticePage from "@/pages/adults/MultiModePracticePage";
-import VideoLessons from "@/pages/adults/VideoLessons";
-import VideoDetail from "@/pages/adults/VideoDetail";
 import Lesson1Video from "@/pages/Lesson1Video";
-import VirtualAI from "@/pages/VirtualAI";
-import IeltsPte from "@/pages/IeltsPte";
 import NotFound from "@/pages/NotFound";
 import PricingPage from "@/pages/PricingPage";
 import VerifyEmail from "@/pages/VerifyEmail";
 import TermsAndConditionsPage from "@/pages/TermsAndConditionsPage";
 import PrivacyPolicyPage from "@/pages/PrivacyPolicyPage";
 import CookiesPolicyPage from "@/pages/CookiesPolicyPage";
-import CertificatesPage from "@/pages/Certificates";
-import AllCertificatesPage from "@/pages/AllCertificates";
 import AdminLogin from "@/pages/admin/AdminLogin";
-import AdminDashboard from "@/pages/admin/AdminDashboard";
-import AdminUsers from "@/pages/admin/AdminUsers";
-import AdminAnalytics from "@/pages/admin/AdminAnalytics";
-import AdminSettings from "@/pages/admin/AdminSettings";
-import AdminVideos from "@/pages/admin/AdminVideos";
-import AdminLessons from "@/pages/admin/AdminLessons";
-import AdminPractice from "@/pages/admin/AdminPractice";
-import AdminProgress from "@/pages/admin/AdminProgress";
-import AdminVocabulary from "@/pages/admin/AdminVocabulary";
-import AdminAchievements from "@/pages/admin/AdminAchievements";
-import AdminSurveys from "@/pages/admin/AdminSurveys";
+
+// ✅ Heavy pages - Lazy loaded to reduce initial bundle size
+import {
+  Adults,
+  MultiModePracticePage,
+  VideoLessons,
+  VideoDetail,
+  Beginners,
+  Intermediates,
+  Advanced,
+  QuickPracticeSession,
+  TeenKidsPage,
+  YoungKidsPage,
+  VirtualAI,
+  IeltsPte,
+  Profile,
+  CertificatesPage,
+  AllCertificatesPage,
+  AdminDashboard,
+  AdminUsers,
+  AdminAnalytics,
+  AdminSettings,
+  AdminVideos,
+  AdminLessons,
+  AdminPractice,
+  AdminProgress,
+  AdminVocabulary,
+  AdminAchievements,
+  AdminSurveys,
+} from "@/pages/lazy";
 import { Analytics } from "@/components/common/Analytics";
 import { AdminRouteGuard } from "@/components/admin/AdminRouteGuard";
 import { PageEligibilityGuard } from "@/components/common/PageEligibilityGuard";
 import { ProtectedRoute } from "@/components/common/ProtectedRoute";
+import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import type { ReactNode } from 'react';
 
 // ✅ Import AuthModal, UserSurvey, and SurveyManager
@@ -672,12 +677,12 @@ const AppRoutes = () => {
         <Route path="/why" element={<PageTransition><WhyPage /></PageTransition>} />
         <Route path="/how" element={<PageTransition><HowPage /></PageTransition>} />
         <Route path="/about" element={<PageTransition><AboutPage /></PageTransition>} />
-        <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
+        <Route path="/profile" element={<PageTransition><ErrorBoundary><Suspense fallback={<LoadingScreen />}><Profile /></Suspense></ErrorBoundary></PageTransition>} />
         <Route path="/search" element={<PageTransition><SearchPage /></PageTransition>} />
         <Route path="/settings" element={<PageTransition><Settings /></PageTransition>} />
         <Route path="/help" element={<PageTransition><HelpPage /></PageTransition>} />
         <Route path="/contact" element={<PageTransition><ContactPage /></PageTransition>} />
-        <Route path="/virtual-ai" element={<PageTransition><VirtualAI /></PageTransition>} />
+        <Route path="/virtual-ai" element={<PageTransition><ErrorBoundary><Suspense fallback={<LoadingScreen />}><VirtualAI /></Suspense></ErrorBoundary></PageTransition>} />
         <Route path="/kids" element={<PageTransition><KidsPage /></PageTransition>} />
         <Route 
           path="/kids/young" 
@@ -685,7 +690,7 @@ const AppRoutes = () => {
             <PageTransition>
               <ProtectedRoute>
                 <PageEligibilityGuard pagePath="/kids/young">
-                  <YoungKidsPage />
+                  <ErrorBoundary><Suspense fallback={<LoadingScreen />}><YoungKidsPage /></Suspense></ErrorBoundary>
                 </PageEligibilityGuard>
               </ProtectedRoute>
             </PageTransition>
@@ -697,7 +702,7 @@ const AppRoutes = () => {
             <PageTransition>
               <ProtectedRoute>
                 <PageEligibilityGuard pagePath="/kids/teen" fallbackPage="/kids/young">
-                  <TeenKidsPage />
+                  <ErrorBoundary><Suspense fallback={<LoadingScreen />}><TeenKidsPage /></Suspense></ErrorBoundary>
                 </PageEligibilityGuard>
               </ProtectedRoute>
             </PageTransition>
@@ -709,9 +714,9 @@ const AppRoutes = () => {
         <Route path="/favorites/young" element={<PageTransition><YoungKidsFavoritesPage /></PageTransition>} />
         <Route path="/favorites/teen" element={<PageTransition><TeenKidsFavoritesPage /></PageTransition>} />
         <Route path="/parental-controls" element={<PageTransition><ParentalControlsPage /></PageTransition>} />
-        <Route path="/adults" element={<PageTransition><Adults /></PageTransition>} />
-        <Route path="/adults/videos" element={<PageTransition><VideoLessons /></PageTransition>} />
-        <Route path="/adults/videos/:slug" element={<PageTransition><VideoDetail /></PageTransition>} />
+        <Route path="/adults" element={<PageTransition><ErrorBoundary><Suspense fallback={<LoadingScreen />}><Adults /></Suspense></ErrorBoundary></PageTransition>} />
+        <Route path="/adults/videos" element={<PageTransition><ErrorBoundary><Suspense fallback={<LoadingScreen />}><VideoLessons /></Suspense></ErrorBoundary></PageTransition>} />
+        <Route path="/adults/videos/:slug" element={<PageTransition><ErrorBoundary><Suspense fallback={<LoadingScreen />}><VideoDetail /></Suspense></ErrorBoundary></PageTransition>} />
         <Route path="/lessons/1" element={<PageTransition><Lesson1Video /></PageTransition>} />
         <Route 
           path="/adults/beginners" 
@@ -719,7 +724,7 @@ const AppRoutes = () => {
             <PageTransition>
               <ProtectedRoute>
                 <PageEligibilityGuard pagePath="/adults/beginners">
-                  <Beginners />
+                  <ErrorBoundary><Suspense fallback={<LoadingScreen />}><Beginners /></Suspense></ErrorBoundary>
                 </PageEligibilityGuard>
               </ProtectedRoute>
             </PageTransition>
@@ -731,7 +736,7 @@ const AppRoutes = () => {
             <PageTransition>
               <ProtectedRoute>
                 <PageEligibilityGuard pagePath="/adults/intermediates" fallbackPage="/adults/beginners">
-                  <Intermediates />
+                  <ErrorBoundary><Suspense fallback={<LoadingScreen />}><Intermediates /></Suspense></ErrorBoundary>
                 </PageEligibilityGuard>
               </ProtectedRoute>
             </PageTransition>
@@ -743,21 +748,21 @@ const AppRoutes = () => {
             <PageTransition>
               <ProtectedRoute>
                 <PageEligibilityGuard pagePath="/adults/advanced" fallbackPage="/adults/intermediates">
-                  <Advanced />
+                  <ErrorBoundary><Suspense fallback={<LoadingScreen />}><Advanced /></Suspense></ErrorBoundary>
                 </PageEligibilityGuard>
               </ProtectedRoute>
             </PageTransition>
           } 
         />
-        <Route path="/adults/practice" element={<PageTransition><QuickPracticeSession /></PageTransition>} />
-        <Route path="/adults/practice/:sessionType" element={<PageTransition><QuickPracticeSession /></PageTransition>} />
-        <Route path="/adults/practice/multi-mode" element={<PageTransition><MultiModePracticePage /></PageTransition>} />
+        <Route path="/adults/practice" element={<PageTransition><ErrorBoundary><Suspense fallback={<LoadingScreen />}><QuickPracticeSession /></Suspense></ErrorBoundary></PageTransition>} />
+        <Route path="/adults/practice/:sessionType" element={<PageTransition><ErrorBoundary><Suspense fallback={<LoadingScreen />}><QuickPracticeSession /></Suspense></ErrorBoundary></PageTransition>} />
+        <Route path="/adults/practice/multi-mode" element={<PageTransition><ErrorBoundary><Suspense fallback={<LoadingScreen />}><MultiModePracticePage /></Suspense></ErrorBoundary></PageTransition>} />
         <Route 
           path="/ielts-pte" 
           element={
             <PageTransition>
               <ProtectedRoute>
-                <IeltsPte />
+                <ErrorBoundary><Suspense fallback={<LoadingScreen />}><IeltsPte /></Suspense></ErrorBoundary>
               </ProtectedRoute>
             </PageTransition>
           } 
@@ -767,22 +772,22 @@ const AppRoutes = () => {
         <Route path="/terms-and-conditions" element={<PageTransition><TermsAndConditionsPage /></PageTransition>} />
         <Route path="/privacy-policy" element={<PageTransition><PrivacyPolicyPage /></PageTransition>} />
         <Route path="/cookies-policy" element={<PageTransition><CookiesPolicyPage /></PageTransition>} />
-        <Route path="/certificates" element={<PageTransition><CertificatesPage /></PageTransition>} />
-        <Route path="/my-certificates" element={<PageTransition><AllCertificatesPage /></PageTransition>} />
+        <Route path="/certificates" element={<PageTransition><ErrorBoundary><Suspense fallback={<LoadingScreen />}><CertificatesPage /></Suspense></ErrorBoundary></PageTransition>} />
+        <Route path="/my-certificates" element={<PageTransition><ErrorBoundary><Suspense fallback={<LoadingScreen />}><AllCertificatesPage /></Suspense></ErrorBoundary></PageTransition>} />
         
         {/* Admin Routes - Must come before catch-all route */}
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<PageTransition><AdminRouteGuard><AdminDashboard /></AdminRouteGuard></PageTransition>} />
-        <Route path="/admin/users" element={<PageTransition><AdminRouteGuard><AdminUsers /></AdminRouteGuard></PageTransition>} />
-        <Route path="/admin/lessons" element={<PageTransition><AdminRouteGuard><AdminLessons /></AdminRouteGuard></PageTransition>} />
-        <Route path="/admin/practice" element={<PageTransition><AdminRouteGuard><AdminPractice /></AdminRouteGuard></PageTransition>} />
-        <Route path="/admin/progress" element={<PageTransition><AdminRouteGuard><AdminProgress /></AdminRouteGuard></PageTransition>} />
-        <Route path="/admin/vocabulary" element={<PageTransition><AdminRouteGuard><AdminVocabulary /></AdminRouteGuard></PageTransition>} />
-        <Route path="/admin/achievements" element={<PageTransition><AdminRouteGuard><AdminAchievements /></AdminRouteGuard></PageTransition>} />
-        <Route path="/admin/surveys" element={<PageTransition><AdminRouteGuard><AdminSurveys /></AdminRouteGuard></PageTransition>} />
-        <Route path="/admin/videos" element={<PageTransition><AdminRouteGuard><AdminVideos /></AdminRouteGuard></PageTransition>} />
-        <Route path="/admin/analytics" element={<PageTransition><AdminRouteGuard><AdminAnalytics /></AdminRouteGuard></PageTransition>} />
-        <Route path="/admin/settings" element={<PageTransition><AdminRouteGuard><AdminSettings /></AdminRouteGuard></PageTransition>} />
+        <Route path="/admin/dashboard" element={<PageTransition><AdminRouteGuard><ErrorBoundary><Suspense fallback={<LoadingScreen />}><AdminDashboard /></Suspense></ErrorBoundary></AdminRouteGuard></PageTransition>} />
+        <Route path="/admin/users" element={<PageTransition><AdminRouteGuard><ErrorBoundary><Suspense fallback={<LoadingScreen />}><AdminUsers /></Suspense></ErrorBoundary></AdminRouteGuard></PageTransition>} />
+        <Route path="/admin/lessons" element={<PageTransition><AdminRouteGuard><ErrorBoundary><Suspense fallback={<LoadingScreen />}><AdminLessons /></Suspense></ErrorBoundary></AdminRouteGuard></PageTransition>} />
+        <Route path="/admin/practice" element={<PageTransition><AdminRouteGuard><ErrorBoundary><Suspense fallback={<LoadingScreen />}><AdminPractice /></Suspense></ErrorBoundary></AdminRouteGuard></PageTransition>} />
+        <Route path="/admin/progress" element={<PageTransition><AdminRouteGuard><ErrorBoundary><Suspense fallback={<LoadingScreen />}><AdminProgress /></Suspense></ErrorBoundary></AdminRouteGuard></PageTransition>} />
+        <Route path="/admin/vocabulary" element={<PageTransition><AdminRouteGuard><ErrorBoundary><Suspense fallback={<LoadingScreen />}><AdminVocabulary /></Suspense></ErrorBoundary></AdminRouteGuard></PageTransition>} />
+        <Route path="/admin/achievements" element={<PageTransition><AdminRouteGuard><ErrorBoundary><Suspense fallback={<LoadingScreen />}><AdminAchievements /></Suspense></ErrorBoundary></AdminRouteGuard></PageTransition>} />
+        <Route path="/admin/surveys" element={<PageTransition><AdminRouteGuard><ErrorBoundary><Suspense fallback={<LoadingScreen />}><AdminSurveys /></Suspense></ErrorBoundary></AdminRouteGuard></PageTransition>} />
+        <Route path="/admin/videos" element={<PageTransition><AdminRouteGuard><ErrorBoundary><Suspense fallback={<LoadingScreen />}><AdminVideos /></Suspense></ErrorBoundary></AdminRouteGuard></PageTransition>} />
+        <Route path="/admin/analytics" element={<PageTransition><AdminRouteGuard><ErrorBoundary><Suspense fallback={<LoadingScreen />}><AdminAnalytics /></Suspense></ErrorBoundary></AdminRouteGuard></PageTransition>} />
+        <Route path="/admin/settings" element={<PageTransition><AdminRouteGuard><ErrorBoundary><Suspense fallback={<LoadingScreen />}><AdminSettings /></Suspense></ErrorBoundary></AdminRouteGuard></PageTransition>} />
         
         {/* Catch-all route must be last */}
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />

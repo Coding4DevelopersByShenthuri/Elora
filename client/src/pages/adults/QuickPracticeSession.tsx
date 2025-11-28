@@ -7,7 +7,7 @@ import {
   ChevronDown, ChevronUp
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
@@ -1409,76 +1409,55 @@ const QuickPracticeSession = () => {
   // Show Daily Conversation content
   if (sessionType === 'daily-conversation') {
     return (
-      <div className="min-h-screen relative overflow-hidden bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950">
-        {/* Background Stars */}
-        <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          {stars.map((star, index) => (
-            <div
-              key={index}
-              className="absolute rounded-full bg-white animate-pulse"
-              style={{
-                left: `${star.x}%`,
-                top: `${star.y}%`,
-                width: `${star.size}px`,
-                height: `${star.size}px`,
-                animationDelay: `${star.delay}s`,
-                animationDuration: `${2 + Math.random() * 2}s`,
-                opacity: star.opacity,
-                boxShadow: `0 0 ${star.size * 2}px rgba(255, 255, 255, ${star.opacity})`
-              }}
-            />
-          ))}
-        </div>
+      <div className="relative overflow-hidden min-h-screen">
+        {/* Background Elements - Matching Adults Page */}
+        <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-primary/5 to-transparent -z-10"></div>
+        <div className="absolute top-1/4 right-0 w-[400px] h-[400px] rounded-full bg-secondary/10 blur-3xl -z-10"></div>
+        <div className="absolute bottom-1/4 left-0 w-[300px] h-[300px] rounded-full bg-accent/10 blur-3xl -z-10"></div>
 
-        {/* Planet Images - Responsive */}
-        <div className="fixed inset-0 pointer-events-none overflow-hidden">
-          {/* Planet 1 - Top Right */}
-          <div className="absolute top-10 right-4 sm:right-8 md:right-16 lg:right-24 w-[60px] h-[60px] sm:w-[80px] sm:h-[80px] md:w-[120px] md:h-[120px] lg:w-[150px] lg:h-[150px] opacity-40 sm:opacity-50 md:opacity-60">
-            <img 
-              src="/planets/SEp7QE3Bk6RclE0R7rhBgcGIOI.avif" 
-              alt="Planet" 
-              className="w-full h-full rounded-full object-cover shadow-xl"
-              style={{ filter: 'grayscale(0.3) brightness(0.75)' }}
-            />
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500/15 to-pink-500/15 blur-xl" />
+        <main className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 xl:px-10 pt-24 pb-16 space-y-10">
+          {/* Back Button */}
+          <div className="mb-4 sm:mb-6">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/adults')}
+              className="text-primary hover:text-primary/80 hover:bg-primary/10 text-xs sm:text-sm dark:text-emerald-300 dark:hover:text-emerald-200 dark:hover:bg-emerald-500/20"
+              size="sm"
+            >
+              <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Back to Adults Dashboard</span>
+              <span className="sm:hidden">Back</span>
+            </Button>
           </div>
 
-          {/* Planet 2 - Bottom Left */}
-          <div className="absolute bottom-10 left-4 sm:left-8 md:left-16 lg:left-24 w-[50px] h-[50px] sm:w-[70px] sm:h-[70px] md:w-[100px] md:h-[100px] lg:w-[130px] lg:h-[130px] opacity-30 sm:opacity-40 md:opacity-50">
-            <img 
-              src="/planets/K3uC2Tk4o2zjSbuWGs3t0MMuLVY.avif" 
-              alt="Planet" 
-              className="w-full h-full rounded-full object-cover shadow-xl"
-              style={{ filter: 'grayscale(0.3) brightness(0.7)' }}
-            />
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-indigo-500/15 to-blue-500/15 blur-xl" />
-          </div>
-        </div>
-
-        {/* Nebula Effects */}
-        <div className="fixed inset-0 pointer-events-none">
-          <div className="absolute top-0 left-0 w-[800px] h-[800px] bg-gradient-radial from-cyan-500/20 via-blue-500/10 to-transparent rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-gradient-radial from-purple-500/20 via-pink-500/10 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        </div>
-
-        <div className="relative z-10 pb-12 pt-20 sm:pt-24 md:pt-28 lg:pt-32">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Header - Only show when no topic is selected */}
+          {/* Top Container - Only show when no topic is selected */}
             {!selectedTopic && (
-              <div className="mb-6 sm:mb-8">
-                <div className="text-center mb-6 sm:mb-8">
-                  {/* Removed icon from title */}
-                  <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-3 sm:mb-4">
+            <section>
+              <Card className="relative overflow-hidden border-none bg-gradient-to-br from-[#064e3b] via-[#047857] to-[#10b981] text-white shadow-xl dark:from-[#022c22] dark:via-[#065f46] dark:to-[#059669]">
+                <span className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-white/10 blur-3xl" aria-hidden />
+                <span className="absolute -left-20 bottom-0 h-32 w-32 rounded-full bg-white/10 blur-3xl" aria-hidden />
+                <CardHeader className="space-y-2 py-3 sm:py-4 md:py-5 relative z-10">
+                  <div className="flex flex-col gap-2 sm:gap-3">
+                    <div className="space-y-1 sm:space-y-2">
+                      <Badge className="bg-white/25 text-white uppercase tracking-wide text-xs sm:text-sm px-2 py-0.5 sm:px-3 sm:py-1">
+                        Daily Conversation Practice
+                      </Badge>
+                      <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold text-white leading-tight">
                     {config.title}
-                  </h1>
-                  <p className="text-sm sm:text-base md:text-lg text-cyan-100/80 max-w-2xl mx-auto">{config.description}</p>
+                      </CardTitle>
+                      <CardDescription className="text-white/85 text-sm sm:text-base leading-relaxed">
+                        {config.description}
+                      </CardDescription>
                 </div>
               </div>
+                </CardHeader>
+              </Card>
+            </section>
             )}
 
             {!selectedTopic ? (
               /* Topic Selection */
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
                 {dailyConversationTopics.map((topic) => {
                   const TopicIcon = topic.icon;
                   // Check if topic is enrolled from state
@@ -1496,29 +1475,29 @@ const QuickPracticeSession = () => {
                   return (
                     <Card
                       key={topic.id}
-                      className="group cursor-pointer bg-slate-900/60 backdrop-blur-xl border-purple-500/30 hover:border-purple-400/50 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/20 relative"
+                    className="group cursor-pointer bg-card/80 backdrop-blur-xl border-primary/30 hover:border-primary/50 transition-all duration-300 hover:shadow-2xl relative dark:bg-slate-900/60 dark:border-emerald-500/30 dark:hover:border-emerald-400/50"
                       onClick={() => handleStartPractice(topic.id)}
                     >
                       {/* Enrolled Badge - Top Right */}
                       {isEnrolled && (
                         <div className="absolute top-3 right-3 z-10">
-                          <Badge className="bg-gradient-to-r from-emerald-500 to-green-600 text-white border-0 shadow-lg px-2 py-1 text-xs">
+                        <Badge className="bg-gradient-to-r from-emerald-600 to-green-600 text-white border-0 shadow-lg px-2 py-1 text-xs dark:from-emerald-500 dark:to-green-600">
                             <CheckCircle className="w-3 h-3 mr-1" />
                             Enrolled
                           </Badge>
                         </div>
                       )}
-                      <CardContent className="p-6">
-                        <div className={cn("w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-white bg-gradient-to-r", topic.color)}>
-                          <TopicIcon className="w-7 h-7" />
+                    <CardContent className="p-4 sm:p-5 md:p-6">
+                      <div className={cn("w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center mb-4 text-white bg-gradient-to-r", topic.color)}>
+                        <TopicIcon className="w-6 h-6 sm:w-7 sm:h-7" />
                         </div>
-                        <h3 className="text-xl font-bold text-white mb-2">{topic.title}</h3>
-                        <p className="text-sm text-cyan-100/70 mb-4">{topic.description}</p>
-                        <div className="flex items-center justify-between text-sm text-cyan-100/60">
-                          <Badge variant="outline" className="bg-slate-700/50 text-cyan-200 border-cyan-500/30">
+                      <h3 className="text-lg sm:text-xl font-bold text-foreground dark:text-white mb-2">{topic.title}</h3>
+                      <p className="text-sm text-muted-foreground dark:text-cyan-100/70 mb-4">{topic.description}</p>
+                      <div className="flex items-center justify-between text-sm">
+                        <Badge variant="outline" className="bg-primary/20 text-primary border-primary/30 text-xs dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-400/30">
                             {topic.duration}
                           </Badge>
-                          <Badge variant="outline" className="bg-purple-500/20 text-purple-300 border-purple-400/30">
+                        <Badge variant="outline" className="bg-secondary/20 text-secondary border-secondary/30 text-xs dark:bg-green-500/20 dark:text-green-300 dark:border-green-400/30">
                             {topic.level}
                           </Badge>
                         </div>
@@ -1530,12 +1509,12 @@ const QuickPracticeSession = () => {
             ) : (
               /* Practice Interface - Wider Container */
               <div className="max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto">
-                <Card className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30 shadow-2xl">
+              <Card className="bg-card/80 backdrop-blur-xl border-primary/30 shadow-2xl dark:bg-slate-900/60 dark:border-emerald-500/30">
                   <CardContent className="p-4 sm:p-6 md:p-8">
                     {/* Topic Header - Scenario title on left, Change Topic button on right */}
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4 sm:mb-5">
                       {currentScenarioData && (
-                        <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white leading-tight">
+                        <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground dark:text-white leading-tight">
                           {currentScenarioData.title}
                         </h2>
                       )}
@@ -1552,7 +1531,7 @@ const QuickPracticeSession = () => {
                           setIsSessionActive(false);
                           setSessionStartTime(null);
                         }}
-                        className="border-purple-400/30 text-purple-500 hover:bg-purple-500/20 w-full sm:w-auto shrink-0"
+                        className="border-primary/30 text-primary hover:bg-primary/20 w-full sm:w-auto shrink-0 dark:border-emerald-500/30 dark:text-emerald-300 dark:hover:bg-emerald-500/20"
                       >
                         Change Topic
                       </Button>
@@ -1565,18 +1544,18 @@ const QuickPracticeSession = () => {
                           variant="outline"
                           onClick={handlePreviousScenario}
                           disabled={currentScenario === 0}
-                          className="border-purple-400/30 text-purple-400 w-full sm:w-auto text-sm sm:text-base"
+                          className="border-primary/30 text-primary hover:bg-primary/20 w-full sm:w-auto text-sm sm:text-base dark:border-emerald-500/30 dark:text-emerald-300 dark:hover:bg-emerald-500/20"
                         >
                           Previous
                         </Button>
-                        <span className="text-xs sm:text-sm text-cyan-100/70 text-center">
+                        <span className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70 text-center">
                           Scenario {currentScenario + 1} of {selectedTopicData.scenarios.length}
                         </span>
                         <Button
                           variant="outline"
                           onClick={handleNextScenario}
                           disabled={currentScenario === selectedTopicData.scenarios.length - 1}
-                          className="border-purple-400/30 text-purple-400 w-full sm:w-auto text-sm sm:text-base"
+                          className="border-primary/30 text-primary hover:bg-primary/20 w-full sm:w-auto text-sm sm:text-base dark:border-emerald-500/30 dark:text-emerald-300 dark:hover:bg-emerald-500/20"
                         >
                           Next
                         </Button>
@@ -1600,7 +1579,7 @@ const QuickPracticeSession = () => {
                                     await new Promise(resolve => setTimeout(resolve, 500));
                                   }
                                 }}
-                                className="border-cyan-400/30 text-cyan-600 hover:bg-cyan-500/20"
+                                className="border-primary/30 text-primary hover:bg-primary/20 dark:border-emerald-500/30 dark:text-emerald-300 dark:hover:bg-emerald-500/20"
                               >
                                 <PlayCircle className="w-4 h-4 mr-2" />
                                 Play All Dialogue
@@ -1610,12 +1589,12 @@ const QuickPracticeSession = () => {
                           
                           {/* Instructions */}
                           {!isSessionActive && (
-                            <div className="mb-3 sm:mb-4 p-3 sm:p-4 bg-blue-500/20 border border-blue-400/30 rounded-lg">
+                            <div className="mb-3 sm:mb-4 p-3 sm:p-4 bg-primary/20 border border-primary/30 rounded-lg dark:bg-emerald-500/20 dark:border-emerald-400/30">
                               <div className="flex items-start gap-2 sm:gap-3">
-                                <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                                <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5 text-primary dark:text-emerald-300 flex-shrink-0 mt-0.5" />
                                 <div className="flex-1">
-                                  <h4 className="font-semibold text-white mb-1 text-xs sm:text-sm">Ready to Practice?</h4>
-                                  <p className="text-xs sm:text-sm text-cyan-100/80">
+                                  <h4 className="font-semibold text-foreground dark:text-white mb-1 text-xs sm:text-sm">Ready to Practice?</h4>
+                                  <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/80">
                                     Click "Start Practice Session" to begin. You'll be able to listen to each line and practice your responses!
                                   </p>
                                 </div>
@@ -1629,7 +1608,7 @@ const QuickPracticeSession = () => {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setShowInstructions(!showInstructions)}
-                                className="w-full sm:w-auto text-cyan-300 hover:text-cyan-100 hover:bg-cyan-500/10 mb-2 text-xs sm:text-sm"
+                                className="w-full sm:w-auto text-primary hover:text-primary/80 hover:bg-primary/10 mb-2 text-xs sm:text-sm dark:text-emerald-300 dark:hover:text-emerald-200 dark:hover:bg-emerald-500/20"
                               >
                                 <Lightbulb className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
                                 {showInstructions ? 'Hide Instructions' : 'Show Instructions'}
@@ -1640,12 +1619,12 @@ const QuickPracticeSession = () => {
                                 )}
                               </Button>
                               {showInstructions && (
-                                <div className="p-4 bg-cyan-500/20 border border-cyan-400/30 rounded-lg">
+                                <div className="p-4 bg-primary/20 border border-primary/30 rounded-lg dark:bg-emerald-500/20 dark:border-emerald-400/30">
                                   <div className="flex items-start gap-3">
-                                    <Lightbulb className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
+                                    <Lightbulb className="w-5 h-5 text-primary dark:text-emerald-300 flex-shrink-0 mt-0.5" />
                                     <div className="flex-1">
-                                      <h4 className="font-semibold text-white mb-2 text-sm">How to Practice (Voice Mode):</h4>
-                                      <ul className="text-xs sm:text-sm text-cyan-100/80 space-y-2 list-disc list-inside mb-3">
+                                      <h4 className="font-semibold text-foreground dark:text-white mb-2 text-sm">How to Practice (Voice Mode):</h4>
+                                      <ul className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/80 space-y-2 list-disc list-inside mb-3">
                                         <li>Click the speaker icon 🔊 to hear each line read aloud</li>
                                         <li>For "You" lines, click the microphone 🎤 button and <strong>speak</strong> your response</li>
                                         <li>The system will listen and transcribe what you say</li>
@@ -1656,7 +1635,7 @@ const QuickPracticeSession = () => {
                                         <li>Example: 85% score + 3 sentences = 8 + 6 = <strong>14 points</strong></li>
                                       </ul>
                                       {!sttAvailable && (
-                                        <div className="mt-2 p-2 bg-amber-500/20 border border-amber-400/30 rounded text-xs text-amber-200">
+                                        <div className="mt-2 p-2 bg-amber-500/20 border border-amber-400/30 rounded text-xs text-amber-800 dark:text-amber-200">
                                           ⚠️ Speech recognition requires Chrome or Edge browser
                                         </div>
                                       )}
@@ -1669,15 +1648,15 @@ const QuickPracticeSession = () => {
 
                           {/* Score Display */}
                           {isSessionActive && overallScore > 0 && (
-                            <div className="mb-4 p-3 sm:p-4 bg-emerald-500/20 border border-emerald-400/30 rounded-lg">
+                            <div className="mb-4 p-3 sm:p-4 bg-gradient-to-r from-emerald-600/20 to-green-600/20 border border-emerald-500/30 rounded-lg dark:from-emerald-500/20 dark:to-green-500/20 dark:border-emerald-400/30">
                               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
                                 <div className="flex-1">
-                                  <div className="text-xs sm:text-sm text-emerald-300 font-medium">Current Score</div>
-                                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-white">{overallScore}%</div>
+                                  <div className="text-xs sm:text-sm text-emerald-700 dark:text-emerald-300 font-medium">Current Score</div>
+                                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">{overallScore}%</div>
                                 </div>
                                 <div className="text-left sm:text-right">
-                                  <div className="text-xs sm:text-sm text-emerald-300 font-medium">Points Earned</div>
-                                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-white">
+                                  <div className="text-xs sm:text-sm text-emerald-700 dark:text-emerald-300 font-medium">Points Earned</div>
+                                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
                                     {Math.round(overallScore / 10) + (Object.keys(userResponses).length * 2)}
                                   </div>
                                 </div>
@@ -1697,17 +1676,17 @@ const QuickPracticeSession = () => {
                                 return (
                                   <div className="mt-3 pt-3 border-t border-emerald-400/20">
                                     <div className="flex items-center justify-between text-xs sm:text-sm mb-2">
-                                      <span className="text-emerald-200/80">Scenario Progress</span>
-                                      <span className="text-emerald-300 font-semibold">
+                                      <span className="text-emerald-700 dark:text-emerald-200/80">Scenario Progress</span>
+                                      <span className="text-emerald-800 dark:text-emerald-300 font-semibold">
                                         {completedLines.length} / {allUserLines.length} lines completed (≥50%)
                                       </span>
                                     </div>
                                     <Progress 
                                       value={progress} 
-                                      className="h-2 bg-slate-700/50"
+                                      className="h-2 bg-muted dark:bg-slate-700/50"
                                     />
                                     {completedLines.length === allUserLines.length && allUserLines.length > 0 && (
-                                      <p className="text-xs text-emerald-300 mt-2 text-center animate-pulse">
+                                      <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-2 text-center animate-pulse">
                                         ✨ All lines completed! Moving to Scenario 2...
                                       </p>
                                     )}
@@ -1717,7 +1696,8 @@ const QuickPracticeSession = () => {
                             </div>
                           )}
 
-                          <div className="space-y-2 sm:space-y-3 bg-slate-800/40 rounded-xl p-3 sm:p-4 md:p-6 border border-purple-500/20 max-h-[400px] sm:max-h-[500px] md:max-h-[600px] overflow-y-auto">
+                          {/* Interactive Conversation Interface */}
+                          <div className="space-y-4 sm:space-y-5 bg-gradient-to-b from-card/30 via-card/50 to-card/30 rounded-2xl p-4 sm:p-5 md:p-6 border border-primary/20 shadow-lg max-h-[500px] sm:max-h-[600px] md:max-h-[700px] overflow-y-auto dark:from-slate-800/30 dark:via-slate-800/50 dark:to-slate-800/30 dark:border-emerald-500/20">
                             {currentScenarioData.dialogue.map((line, index) => {
                               const isUser = line.speaker === 'You';
                               const isPartner = line.speaker === 'Partner' || line.speaker === 'Interviewer' || line.speaker === 'Waiter';
@@ -1725,6 +1705,8 @@ const QuickPracticeSession = () => {
                               const userResponse = userResponses[index] || '';
                               const lineScore = practiceScores[index];
                               const isCurrentlySpeaking = isSpeaking[index];
+                              const isCompleted = completedLines.has(index);
+                              const isActive = index === currentDialogueIndex;
                               
                               // Get display name: use partner name if it's a partner/ai speaker and partnerName exists
                               const displayName = isPartner && currentScenarioData.partnerName 
@@ -1738,82 +1720,137 @@ const QuickPracticeSession = () => {
                                     if (el) lineRefs.current[index] = el;
                                   }}
                                   className={cn(
-                                    "space-y-2 transition-all duration-300",
-                                    index === currentDialogueIndex && "ring-2 ring-cyan-400/50 rounded-lg p-2 -m-2",
-                                    completedLines.has(index) && "opacity-75"
+                                    "space-y-3 transition-all duration-500 ease-in-out",
+                                    isActive && "scale-[1.01]",
+                                    isCompleted && "opacity-60"
                                   )}
                                 >
-                                  <div
-                                    className={cn(
-                                      "flex items-start gap-3",
-                                      isPartner && "flex-row-reverse"
-                                    )}
-                                  >
-                                    {/* Message Bubble with Icon Inside */}
+                                  {/* Message Row */}
                                     <div className={cn(
-                                      "flex-1 max-w-[90%] sm:max-w-[85%] md:max-w-[75%]",
-                                      isPartner && "flex flex-col items-end"
+                                    "flex items-start gap-3 sm:gap-4",
+                                    isUser && "flex-row-reverse"
                                     )}>
+                                    {/* Avatar - Outside Message Bubble (Modern Chat Style) */}
                                       <div className={cn(
-                                        "p-2 sm:p-3 md:p-4 rounded-lg flex items-start gap-2 sm:gap-3",
+                                      "flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center shadow-md transition-transform duration-300",
                                         isUser
-                                          ? "bg-cyan-500/20 border border-cyan-400/30"
-                                          : "bg-purple-500/20 border border-purple-400/30"
-                                      )}>
-                                        {/* Avatar Inside Message */}
-                                        <div className={cn(
-                                          "w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center flex-shrink-0",
-                                          isUser
-                                            ? "bg-cyan-500/30"
-                                            : "bg-purple-500/30"
+                                        ? "bg-gradient-to-br from-primary to-primary/80 ring-2 ring-primary/30 dark:from-emerald-500 dark:to-emerald-600 dark:ring-emerald-400/30"
+                                        : "bg-gradient-to-br from-secondary to-secondary/80 ring-2 ring-secondary/30 dark:from-green-500 dark:to-green-600 dark:ring-green-400/30",
+                                      isActive && "ring-4 scale-110",
+                                      isCompleted && "opacity-70"
                                         )}>
                                           {isUser ? (
-                                            <Users className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 text-cyan-300" />
+                                        <Users className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
                                           ) : (
-                                            <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 text-purple-300" />
+                                        <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
                                           )}
                                         </div>
                                         
-                                        {/* Message Content */}
-                                        <div className="flex-1 min-w-0">
-                                          <div className="font-semibold text-white mb-1 text-xs sm:text-sm">{displayName}</div>
-                                          <div className="text-cyan-100/90 text-xs sm:text-sm md:text-base leading-relaxed break-words">{line.text}</div>
+                                    {/* Message Bubble Container */}
+                                    <div className={cn(
+                                      "flex-1 max-w-[85%] sm:max-w-[80%] md:max-w-[75%] transition-all duration-300",
+                                      isUser && "flex justify-end"
+                                    )}>
+                                      <div className={cn(
+                                        "group relative rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl w-full",
+                                        // User messages: Right-aligned, blue/primary theme
+                                        isUser && cn(
+                                          "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground",
+                                          "dark:from-emerald-500 dark:to-emerald-600 dark:text-white",
+                                          "rounded-br-sm", // Chat bubble tail effect
+                                          isActive && "ring-4 ring-primary/30 dark:ring-emerald-400/30 scale-105"
+                                        ),
+                                        // AI messages: Left-aligned, gray/secondary theme
+                                        !isUser && cn(
+                                          "bg-gradient-to-br from-muted to-muted/80 text-foreground",
+                                          "dark:from-slate-700 dark:to-slate-800 dark:text-white",
+                                          "rounded-bl-sm", // Chat bubble tail effect
+                                          isActive && "ring-4 ring-secondary/30 dark:ring-green-400/30 scale-105"
+                                        ),
+                                        isCompleted && "opacity-75"
+                                      )}>
+                                        {/* Message Header */}
+                                        <div className={cn(
+                                          "flex items-center justify-between gap-2 px-3 sm:px-4 pt-3 sm:pt-4 pb-1",
+                                          isUser && "flex-row-reverse"
+                                        )}>
+                                          <div className={cn(
+                                            "font-semibold text-xs sm:text-sm",
+                                            isUser 
+                                              ? "text-primary-foreground dark:text-white"
+                                              : "text-foreground dark:text-white"
+                                          )}>
+                                            {displayName}
                                         </div>
-                                        
-                                        {/* Audio Button Inside Message - Now Functional */}
+                                          {/* Audio Button - Compact */}
                                         <Button
                                           variant="ghost"
                                           size="sm"
                                           onClick={() => speakText(line.text, index)}
                                           disabled={isCurrentlySpeaking || !ttsInitialized}
                                           className={cn(
-                                            "flex-shrink-0 p-1 sm:p-2",
-                                            isCurrentlySpeaking 
-                                              ? "text-cyan-400 animate-pulse" 
-                                              : "text-cyan-300 hover:text-cyan-100"
+                                              "h-6 w-6 sm:h-7 sm:w-7 p-0 flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity",
+                                              isCurrentlySpeaking && "opacity-100 animate-pulse"
                                           )}
                                         >
                                           {isCurrentlySpeaking ? (
-                                            <PlayCircle className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                                              <Volume2 className="w-3 h-3 sm:w-4 sm:h-4 animate-pulse" />
                                           ) : (
                                             <Volume2 className="w-3 h-3 sm:w-4 sm:h-4" />
                                           )}
                                         </Button>
                                       </div>
+                                        
+                                        {/* Message Text */}
+                                        <div className={cn(
+                                          "px-3 sm:px-4 pb-3 sm:pb-4 text-sm sm:text-base leading-relaxed break-words",
+                                          isUser 
+                                            ? "text-primary-foreground dark:text-white"
+                                            : "text-foreground dark:text-white"
+                                        )}>
+                                          {line.text}
+                                        </div>
+
+                                        {/* Timestamp/Status Indicator */}
+                                        <div className={cn(
+                                          "px-3 sm:px-4 pb-2 flex items-center gap-2 text-[10px] sm:text-xs opacity-60",
+                                          isUser && "justify-end"
+                                        )}>
+                                          {isCompleted && (
+                                            <CheckCircle className="w-3 h-3 text-emerald-500 dark:text-emerald-400" />
+                                          )}
+                                          {isActive && !isUser && (
+                                            <div className="flex gap-1">
+                                              <div className="w-1 h-1 rounded-full bg-current animate-pulse" style={{ animationDelay: '0ms' }} />
+                                              <div className="w-1 h-1 rounded-full bg-current animate-pulse" style={{ animationDelay: '150ms' }} />
+                                              <div className="w-1 h-1 rounded-full bg-current animate-pulse" style={{ animationDelay: '300ms' }} />
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
 
-                                  {/* Voice Practice for "You" lines */}
+                                  {/* Voice Practice for "You" lines - Aligned with User Message */}
                                   {isSessionActive && isUserLine && (
-                                    <div className="ml-0 sm:ml-8 md:ml-12 space-y-2 sm:space-y-3">
-                                      <div className="p-3 sm:p-4 bg-cyan-500/10 border border-cyan-400/30 rounded-lg">
+                                    <div className={cn(
+                                      "flex justify-end ml-11 sm:ml-14 md:ml-16",
+                                      "transition-all duration-300"
+                                    )}>
+                                      <div className={cn(
+                                        "p-3 sm:p-4 rounded-xl shadow-md border transition-all duration-300 space-y-2 sm:space-y-3",
+                                        "bg-gradient-to-br from-primary/10 via-primary/5 to-transparent",
+                                        "border-primary/30 dark:from-emerald-500/10 dark:via-emerald-500/5 dark:border-emerald-400/30",
+                                        "max-w-[85%] sm:max-w-[80%] md:max-w-[75%]",
+                                        isActive && "ring-2 ring-primary/30 dark:ring-emerald-400/30 scale-[1.02]"
+                                      )}>
                                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 mb-2 sm:mb-3">
                                           <div className="flex-1">
-                                            <div className="text-xs sm:text-sm font-semibold text-white mb-1">Your Response:</div>
-                                            <div className="text-xs text-cyan-200/70 mb-2 break-words">Try to say: "{line.text}"</div>
+                                            <div className="text-xs sm:text-sm font-semibold text-foreground dark:text-white mb-1">Your Response:</div>
+                                            <div className="text-xs text-muted-foreground dark:text-cyan-200/70 mb-2 break-words">Try to say: "{line.text}"</div>
                                           </div>
                                           {!sttAvailable && (
-                                            <Badge variant="outline" className="bg-amber-500/20 text-amber-300 border-amber-400/30 text-xs w-fit">
+                                            <Badge variant="outline" className="bg-amber-500/20 text-amber-800 dark:text-amber-300 border-amber-400/30 text-xs w-fit">
                                               Use Chrome/Edge
                                             </Badge>
                                           )}
@@ -1821,9 +1858,9 @@ const QuickPracticeSession = () => {
                                         
                                         {/* Show what user said */}
                                         {(userResponse || interimTranscript) && (
-                                          <div className="mb-2 sm:mb-3 p-2 sm:p-3 bg-slate-700/50 rounded-lg border border-cyan-500/20">
-                                            <div className="text-xs text-cyan-200/60 mb-1">You said:</div>
-                                            <div className="text-xs sm:text-sm text-white font-medium break-words">
+                                          <div className="mb-2 sm:mb-3 p-2 sm:p-3 bg-card/50 rounded-lg border border-primary/20 dark:bg-slate-700/50 dark:border-emerald-500/20">
+                                            <div className="text-xs text-muted-foreground dark:text-cyan-200/60 mb-1">You said:</div>
+                                            <div className="text-xs sm:text-sm text-foreground dark:text-white font-medium break-words">
                                               {interimTranscript || userResponse}
                                               {interimTranscript && <span className="animate-pulse">|</span>}
                                             </div>
@@ -1845,7 +1882,7 @@ const QuickPracticeSession = () => {
                                               "flex-1 py-4 sm:py-5 md:py-6 text-sm sm:text-base font-semibold transition-all duration-300",
                                               isListening[index]
                                                 ? "bg-red-500 hover:bg-red-600 text-white animate-pulse"
-                                                : "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white"
+                                                : "bg-primary hover:bg-primary/90 text-primary-foreground dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600"
                                             )}
                                           >
                                             {isListening[index] ? (
@@ -1867,9 +1904,9 @@ const QuickPracticeSession = () => {
                                           {lineScore !== undefined && (
                                             <div className={cn(
                                               "px-3 sm:px-4 py-4 sm:py-5 md:py-6 rounded-lg text-base sm:text-lg md:text-xl font-bold min-w-[60px] sm:min-w-[80px] text-center border-2 flex items-center justify-center",
-                                              lineScore >= 80 ? "bg-emerald-500/30 text-emerald-300 border-emerald-400/50" :
-                                              lineScore >= 60 ? "bg-amber-500/30 text-amber-300 border-amber-400/50" :
-                                              "bg-rose-500/30 text-rose-300 border-rose-400/50"
+                                              lineScore >= 80 ? "bg-emerald-500/30 text-emerald-700 dark:text-emerald-300 border-emerald-400/50" :
+                                              lineScore >= 60 ? "bg-amber-500/30 text-amber-700 dark:text-amber-300 border-amber-400/50" :
+                                              "bg-rose-500/30 text-rose-700 dark:text-rose-300 border-rose-400/50"
                                             )}>
                                               {lineScore}%
                                             </div>
@@ -1881,23 +1918,23 @@ const QuickPracticeSession = () => {
                                           <div className="mt-3">
                                             {lineScore === 100 ? (
                                               <div className="p-3 bg-emerald-500/20 border border-emerald-400/30 rounded-lg flex items-center gap-2">
-                                                <CheckCircle className="w-5 h-5 text-emerald-300" />
-                                                <span className="text-sm text-emerald-200 font-medium">Perfect! Excellent pronunciation! 🎉</span>
+                                                <CheckCircle className="w-5 h-5 text-emerald-700 dark:text-emerald-300" />
+                                                <span className="text-sm text-emerald-800 dark:text-emerald-200 font-medium">Perfect! Excellent pronunciation! 🎉</span>
                                               </div>
                                             ) : lineScore >= 80 ? (
                                               <div className="p-3 bg-emerald-500/20 border border-emerald-400/30 rounded-lg">
-                                                <div className="text-sm text-emerald-200 font-medium mb-1">Great job! Very close!</div>
-                                                <div className="text-xs text-emerald-200/70">Try to match: "{line.text}"</div>
+                                                <div className="text-sm text-emerald-800 dark:text-emerald-200 font-medium mb-1">Great job! Very close!</div>
+                                                <div className="text-xs text-emerald-700 dark:text-emerald-200/70">Try to match: "{line.text}"</div>
                                               </div>
                                             ) : lineScore >= 60 ? (
                                               <div className="p-3 bg-amber-500/20 border border-amber-400/30 rounded-lg">
-                                                <div className="text-sm text-amber-200 font-medium mb-1">Good effort! Keep practicing!</div>
-                                                <div className="text-xs text-amber-200/70">Expected: "{line.text}"</div>
+                                                <div className="text-sm text-amber-800 dark:text-amber-200 font-medium mb-1">Good effort! Keep practicing!</div>
+                                                <div className="text-xs text-amber-700 dark:text-amber-200/70">Expected: "{line.text}"</div>
                                               </div>
                                             ) : (
                                               <div className="p-3 bg-rose-500/20 border border-rose-400/30 rounded-lg">
-                                                <div className="text-sm text-rose-200 font-medium mb-1">Keep trying! Listen to the example again.</div>
-                                                <div className="text-xs text-rose-200/70">Click the speaker icon above to hear: "{line.text}"</div>
+                                                <div className="text-sm text-rose-800 dark:text-rose-200 font-medium mb-1">Keep trying! Listen to the example again.</div>
+                                                <div className="text-xs text-rose-700 dark:text-rose-200/70">Click the speaker icon above to hear: "{line.text}"</div>
                                               </div>
                                             )}
                                           </div>
@@ -1905,7 +1942,7 @@ const QuickPracticeSession = () => {
 
                                         {/* Instructions */}
                                         {!userResponse && !isListening[index] && (
-                                          <div className="mt-3 text-xs text-cyan-200/60 flex items-center gap-2">
+                                          <div className="mt-3 text-xs text-muted-foreground dark:text-cyan-200/60 flex items-center gap-2">
                                             <Lightbulb className="w-3 h-3" />
                                             <span>Click the microphone button and speak your response clearly</span>
                                           </div>
@@ -1920,12 +1957,12 @@ const QuickPracticeSession = () => {
                         </div>
 
                         {/* Practice Button */}
-                        <div className="pt-4 sm:pt-6 border-t border-purple-500/20">
+                        <div className="pt-4 sm:pt-6 border-t border-primary/20 dark:border-emerald-500/20">
                           {!isSessionActive ? (
                             <div className="space-y-3">
                               <div className="space-y-3">
                                 <Button
-                                  className="w-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white font-semibold py-3 sm:py-4 md:py-6 text-sm sm:text-base md:text-lg"
+                                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 sm:py-4 md:py-6 text-sm sm:text-base md:text-lg dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600"
                                   onClick={handleStartPracticeSession}
                                 >
                                   <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
@@ -1933,7 +1970,7 @@ const QuickPracticeSession = () => {
                                   <span className="sm:hidden">Start Practice</span>
                                 </Button>
                                 {sttAvailable && (
-                                  <p className="text-xs sm:text-sm text-center text-cyan-200/70 px-2">
+                                  <p className="text-xs sm:text-sm text-center text-muted-foreground dark:text-cyan-200/70 px-2">
                                     🎤 Voice recognition ready! Speak correctly (≥50% score) to auto-advance. Complete all lines to move to Scenario 2!
                                   </p>
                                 )}
@@ -1941,8 +1978,8 @@ const QuickPracticeSession = () => {
                             </div>
                           ) : (
                             <div className="space-y-3">
-                              <div className="flex items-center justify-center gap-2 text-cyan-300">
-                                <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+                              <div className="flex items-center justify-center gap-2 text-primary dark:text-emerald-300">
+                                <div className="w-2 h-2 bg-primary rounded-full animate-pulse dark:bg-emerald-400" />
                                 <span className="text-xs sm:text-sm md:text-base">
                                   Session in progress... ({sessionStartTime ? Math.max(1, Math.round((new Date().getTime() - sessionStartTime.getTime()) / 60000)) : 0} min)
                                 </span>
@@ -1950,7 +1987,7 @@ const QuickPracticeSession = () => {
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                                 <Button
                                   variant="outline"
-                                  className="w-full border-purple-400/30 text-purple-300 hover:bg-purple-500/20 py-3 sm:py-4 md:py-6 text-sm sm:text-base md:text-lg"
+                                  className="w-full border-primary/30 text-primary hover:bg-primary/20 py-3 sm:py-4 md:py-6 text-sm sm:text-base md:text-lg dark:border-emerald-500/30 dark:text-emerald-300 dark:hover:bg-emerald-500/20"
                                   onClick={() => {
                                     setIsSessionActive(false);
                                     setSessionStartTime(null);
@@ -1963,7 +2000,7 @@ const QuickPracticeSession = () => {
                                   Cancel Session
                                 </Button>
                                 <Button
-                                  className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold py-3 sm:py-4 md:py-6 text-sm sm:text-base md:text-lg"
+                                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 sm:py-4 md:py-6 text-sm sm:text-base md:text-lg dark:bg-emerald-500 dark:hover:bg-emerald-600"
                                   onClick={handleEndPracticeSession}
                                 >
                                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
@@ -1980,8 +2017,7 @@ const QuickPracticeSession = () => {
                 </Card>
               </div>
             )}
-          </div>
-        </div>
+          </main>
       </div>
     );
   }

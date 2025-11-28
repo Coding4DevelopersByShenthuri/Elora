@@ -56,7 +56,7 @@ export default function DailyGoalsWidget({ onClose }: DailyGoalsWidgetProps) {
     try {
       setLoading(true);
       const result = await AdultsAPI.getDailyGoals();
-      if (result.success) {
+      if (result.success && 'data' in result) {
         setGoals(result.data?.data || []);
       }
     } catch (error) {

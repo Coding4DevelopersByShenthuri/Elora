@@ -963,7 +963,7 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
           <div>
             <Card className="bg-card/80 backdrop-blur-xl border-primary/30 shadow-2xl overflow-hidden dark:bg-slate-900/60 dark:border-emerald-500/30">
                     <CardContent className="p-0">
-                <div className={cn("h-auto min-h-[200px] sm:min-h-[240px] md:min-h-[280px] py-6 sm:py-8 md:py-10 bg-gradient-to-r flex items-center justify-center relative overflow-hidden", "from-primary via-secondary to-accent dark:from-emerald-500 dark:via-green-500 dark:to-teal-500")}>
+                <div className="h-auto min-h-[200px] sm:min-h-[240px] md:min-h-[280px] py-6 sm:py-8 md:py-10 bg-emerald-600 flex items-center justify-center relative overflow-hidden dark:bg-emerald-600">
                   <div className="absolute inset-0 bg-black/20" />
                   <div className="relative z-10 text-center px-4 sm:px-6 md:px-8 w-full max-w-4xl mx-auto">
                     <Play className="h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 mx-auto mb-3 sm:mb-4 text-white" />

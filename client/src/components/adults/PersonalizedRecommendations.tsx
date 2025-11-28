@@ -41,7 +41,7 @@ export default function PersonalizedRecommendations() {
     try {
       setLoading(true);
       const result = await AdultsAPI.getRecommendations();
-      if (result.success) {
+      if (result.success && 'data' in result) {
         setRecommendations(result.data?.recommendations || []);
       }
     } catch (error) {

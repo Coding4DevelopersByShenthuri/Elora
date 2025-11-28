@@ -68,10 +68,10 @@ export default function CommonLessonsLibrary() {
         AdultsAPI.getCommonLessonEnrollments(),
       ]);
 
-      if (lessonsRes.success) {
+      if (lessonsRes.success && 'data' in lessonsRes) {
         setLessons(lessonsRes.data?.lessons || []);
       }
-      if (enrollmentsRes.success) {
+      if (enrollmentsRes.success && 'data' in enrollmentsRes) {
         setEnrollments(enrollmentsRes.data?.enrollments || []);
       }
     } catch (error) {

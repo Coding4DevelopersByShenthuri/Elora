@@ -92,7 +92,7 @@ export default function LearningGoals() {
     try {
       setLoading(true);
       const result = await AdultsAPI.getLearningGoals(true);
-      if (result.success) {
+      if (result.success && 'data' in result) {
         setGoals(result.data?.goals || []);
       }
     } catch (error) {
@@ -107,7 +107,7 @@ export default function LearningGoals() {
     try {
       setDailyGoalsLoading(true);
       const result = await AdultsAPI.getDailyGoals();
-      if (result.success) {
+      if (result.success && 'data' in result) {
         setDailyGoals(result.data?.data || []);
       }
     } catch (error) {

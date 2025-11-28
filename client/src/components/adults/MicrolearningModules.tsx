@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Zap, Play, CheckCircle, Clock, Star, ArrowRight,
-  Filter, Sparkles, TrendingUp
+  Filter, Sparkles, TrendingUp, SearchX
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -55,10 +55,10 @@ export default function MicrolearningModules() {
         AdultsAPI.getFeaturedMicrolearning(),
       ]);
 
-      if (allModulesRes.success) {
+      if (allModulesRes.success && 'data' in allModulesRes) {
         setModules(allModulesRes.data?.modules || []);
       }
-      if (featuredRes.success) {
+      if (featuredRes.success && 'data' in featuredRes) {
         setFeaturedModules(featuredRes.data?.modules || []);
       }
     } catch (error) {
@@ -125,8 +125,8 @@ export default function MicrolearningModules() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-white mb-2">Microlearning Modules</h2>
-          <p className="text-sm text-cyan-100/70">
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2">Microlearning Modules</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70">
             Quick 5-10 minute lessons for busy professionals
           </p>
         </div>
@@ -152,8 +152,8 @@ export default function MicrolearningModules() {
       {showFeatured && featuredModules.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-amber-400" />
-            <h3 className="text-lg font-semibold text-white">Featured This Week</h3>
+            <Sparkles className="h-5 w-5 text-amber-400 dark:text-amber-400" />
+            <h3 className="text-lg font-semibold text-foreground dark:text-white">Featured This Week</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {featuredModules.map((module) => {
@@ -232,11 +232,11 @@ export default function MicrolearningModules() {
 
       {/* All Modules */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-white">All Modules</h3>
+        <h3 className="text-lg font-semibold text-foreground dark:text-white">All Modules</h3>
         {modules.length === 0 ? (
           <Card className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30">
             <CardContent className="p-12 text-center">
-              <Zap className="h-12 w-12 mx-auto mb-4 text-cyan-300/50" />
+              <SearchX className="h-12 w-12 mx-auto mb-4 text-cyan-300/50" />
               <p className="text-cyan-100/70">No modules found. Try adjusting your filters.</p>
             </CardContent>
           </Card>

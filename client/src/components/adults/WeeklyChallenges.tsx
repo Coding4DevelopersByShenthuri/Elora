@@ -46,7 +46,7 @@ export default function WeeklyChallenges() {
     try {
       setLoading(true);
       const result = await AdultsAPI.getWeeklyChallenges();
-      if (result.success) {
+      if (result.success && 'data' in result) {
         setChallenges(result.data?.challenges || []);
       }
     } catch (error) {
@@ -200,7 +200,7 @@ export default function WeeklyChallenges() {
                       <Award className="h-3 w-3" />
                       {challenge.points_reward} points
                     </span>
-                    {isEnrolled && challenge.user_progress?.points_earned > 0 && (
+                    {isEnrolled && challenge.user_progress?.points_earned && challenge.user_progress.points_earned > 0 && (
                       <span className="flex items-center gap-1 text-emerald-400">
                         <Zap className="h-3 w-3" />
                         {challenge.user_progress.points_earned} earned
