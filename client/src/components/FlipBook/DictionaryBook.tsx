@@ -135,8 +135,8 @@ export function DictionaryBook({ entries, onClose, searchQuery = '', onSearchCha
             content: (
               <div className="h-full flex flex-col justify-center items-center text-center p-8 bg-white dark:bg-slate-900">
                 <BookOpen className="w-16 h-16 text-teal-600 dark:text-teal-400 mb-4" />
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Your Dictionary</h2>
-                <p className="text-gray-600 dark:text-gray-400 text-lg">No words yet. Start adding words to your dictionary!</p>
+                <h2 className="text-2xl md:text-2xl lg:text-2xl font-bold text-gray-900 dark:text-white mb-4">Your Dictionary</h2>
+                <p className="text-gray-600 dark:text-gray-400 text-base md:text-sm lg:text-sm">No words yet. Start adding words to your dictionary!</p>
               </div>
             )
           }
@@ -149,9 +149,9 @@ export function DictionaryBook({ entries, onClose, searchQuery = '', onSearchCha
             content: (
               <div className="h-full flex flex-col justify-center items-center text-center p-8 bg-white dark:bg-slate-900">
                 <Search className="w-16 h-16 text-teal-600 dark:text-teal-400 mb-4" />
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">No Results Found</h2>
-                <p className="text-gray-600 dark:text-gray-400 text-lg">Try a different search term</p>
-                <p className="text-sm text-teal-600 dark:text-teal-400 mt-2">Searching for: "{localSearchQuery}"</p>
+                <h2 className="text-2xl md:text-2xl lg:text-2xl font-bold text-gray-900 dark:text-white mb-4">No Results Found</h2>
+                <p className="text-gray-600 dark:text-gray-400 text-base md:text-sm lg:text-sm">Try a different search term</p>
+                <p className="text-xs md:text-xs lg:text-xs text-teal-600 dark:text-teal-400 mt-2">Searching for: "{localSearchQuery}"</p>
               </div>
             )
           }
@@ -180,16 +180,16 @@ export function DictionaryBook({ entries, onClose, searchQuery = '', onSearchCha
             )}
             
             {/* Header */}
-            <div className="mb-3 sm:mb-4 pb-3 sm:pb-4 border-b border-teal-200 dark:border-teal-700">
+            <div className="mb-2 sm:mb-3 pb-2 sm:pb-3 border-b border-teal-200 dark:border-teal-700">
               <div className="flex items-start justify-between gap-2 sm:gap-4">
                 <div className="flex-1 min-w-0">
-                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-1 sm:mb-2 break-words">{entry.word}</h1>
+                  <h1 className="text-xl sm:text-2xl md:text-xl lg:text-xl font-bold text-gray-900 dark:text-white mb-1 sm:mb-2 break-words">{entry.word}</h1>
                 {entry.phonetic && (
-                  <p className="text-sm sm:text-base md:text-lg text-teal-600 dark:text-teal-400 font-medium mb-1 sm:mb-2">{entry.phonetic}</p>
+                  <p className="text-xs sm:text-sm md:text-xs lg:text-xs text-teal-600 dark:text-teal-400 font-medium mb-1 sm:mb-2">{entry.phonetic}</p>
                 )}
-                <div className="flex flex-wrap gap-1 sm:gap-2 mt-1 sm:mt-2">
+                <div className="flex flex-wrap gap-1 sm:gap-1.5 mt-1 sm:mt-2">
                   {entry.category && (
-                    <Badge variant="outline" className="bg-teal-100 text-teal-800 border-teal-300 dark:bg-teal-900/30 dark:text-teal-300 dark:border-teal-700 text-xs sm:text-sm">
+                    <Badge variant="outline" className="bg-teal-100 text-teal-800 border-teal-300 dark:bg-teal-900/30 dark:text-teal-300 dark:border-teal-700 text-[10px] sm:text-xs px-1.5 py-0.5">
                       {entry.category}
                     </Badge>
                   )}
@@ -209,22 +209,22 @@ export function DictionaryBook({ entries, onClose, searchQuery = '', onSearchCha
           </div>
 
           {/* Definition */}
-          <div className="mb-3 sm:mb-4">
-            <h3 className="text-xs sm:text-sm font-semibold text-teal-600 dark:text-teal-400 uppercase tracking-wide mb-1 sm:mb-2">
+          <div className="mb-2 sm:mb-3">
+            <h3 className="text-[10px] sm:text-xs font-semibold text-teal-600 dark:text-teal-400 uppercase tracking-wide mb-1 sm:mb-1.5">
               Definition
             </h3>
-            <p className="text-sm sm:text-base md:text-lg text-gray-800 dark:text-gray-200 leading-relaxed">{entry.definition}</p>
+            <p className="text-xs sm:text-sm md:text-xs lg:text-xs text-gray-800 dark:text-gray-200 leading-relaxed">{entry.definition}</p>
           </div>
 
           {/* Tamil Translation */}
           {entry.tamil_translations?.length ? (
-            <div className="mb-3 sm:mb-4 rounded-lg border border-teal-200 bg-teal-50/80 p-3 dark:border-teal-900 dark:bg-teal-900/30">
-              <h3 className="text-xs sm:text-sm font-semibold text-teal-700 dark:text-teal-200 uppercase tracking-wide mb-1 sm:mb-2">
+            <div className="mb-2 sm:mb-3 rounded-lg border border-teal-200 bg-teal-50/80 p-2 sm:p-2.5 dark:border-teal-900 dark:bg-teal-900/30">
+              <h3 className="text-[10px] sm:text-xs font-semibold text-teal-700 dark:text-teal-200 uppercase tracking-wide mb-1 sm:mb-1.5">
                 Tamil Meaning
               </h3>
-              <ul className="space-y-1">
+              <ul className="space-y-0.5 sm:space-y-1">
                 {entry.tamil_translations.map((translation, idx) => (
-                  <li key={`${entry.id}-tamil-${idx}`} className="text-sm sm:text-base text-gray-900 dark:text-gray-100 leading-relaxed">
+                  <li key={`${entry.id}-tamil-${idx}`} className="text-xs sm:text-sm md:text-xs lg:text-xs text-gray-900 dark:text-gray-100 leading-relaxed">
                     {translation}
                   </li>
                 ))}
@@ -234,11 +234,11 @@ export function DictionaryBook({ entries, onClose, searchQuery = '', onSearchCha
 
           {/* Example Sentence */}
           {entry.example_sentence && (
-            <div className="mb-3 sm:mb-4">
-              <h3 className="text-xs sm:text-sm font-semibold text-teal-600 dark:text-teal-400 uppercase tracking-wide mb-1 sm:mb-2">
+            <div className="mb-2 sm:mb-3">
+              <h3 className="text-[10px] sm:text-xs font-semibold text-teal-600 dark:text-teal-400 uppercase tracking-wide mb-1 sm:mb-1.5">
                 Example
               </h3>
-              <p className="text-sm sm:text-base md:text-lg text-gray-700 dark:text-gray-300 italic leading-relaxed">
+              <p className="text-xs sm:text-sm md:text-xs lg:text-xs text-gray-700 dark:text-gray-300 italic leading-relaxed">
                 "{entry.example_sentence}"
               </p>
             </div>
@@ -246,16 +246,16 @@ export function DictionaryBook({ entries, onClose, searchQuery = '', onSearchCha
 
           {/* Synonyms */}
           {entry.synonyms && entry.synonyms.length > 0 && (
-            <div className="mb-3 sm:mb-4">
-              <h3 className="text-xs sm:text-sm font-semibold text-teal-600 dark:text-teal-400 uppercase tracking-wide mb-1 sm:mb-2">
+            <div className="mb-2 sm:mb-3">
+              <h3 className="text-[10px] sm:text-xs font-semibold text-teal-600 dark:text-teal-400 uppercase tracking-wide mb-1 sm:mb-1.5">
                 Synonyms
               </h3>
-              <div className="flex flex-wrap gap-1 sm:gap-2">
+              <div className="flex flex-wrap gap-1 sm:gap-1.5">
                 {entry.synonyms.map((synonym, idx) => (
                   <Badge
                     key={idx}
                     variant="outline"
-                    className="bg-teal-50 text-teal-700 border-teal-300 dark:bg-teal-900/30 dark:text-teal-300 dark:border-teal-700 text-xs sm:text-sm"
+                    className="bg-teal-50 text-teal-700 border-teal-300 dark:bg-teal-900/30 dark:text-teal-300 dark:border-teal-700 text-[10px] sm:text-xs px-1.5 py-0.5"
                   >
                     {synonym}
                   </Badge>
@@ -266,16 +266,16 @@ export function DictionaryBook({ entries, onClose, searchQuery = '', onSearchCha
 
           {/* Antonyms */}
           {entry.antonyms && entry.antonyms.length > 0 && (
-            <div className="mb-3 sm:mb-4">
-              <h3 className="text-xs sm:text-sm font-semibold text-teal-600 dark:text-teal-400 uppercase tracking-wide mb-1 sm:mb-2">
+            <div className="mb-2 sm:mb-3">
+              <h3 className="text-[10px] sm:text-xs font-semibold text-teal-600 dark:text-teal-400 uppercase tracking-wide mb-1 sm:mb-1.5">
                 Antonyms
               </h3>
-              <div className="flex flex-wrap gap-1 sm:gap-2">
+              <div className="flex flex-wrap gap-1 sm:gap-1.5">
                 {entry.antonyms.map((antonym, idx) => (
                   <Badge
                     key={idx}
                     variant="outline"
-                    className="bg-red-50 text-red-700 border-red-300 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700 text-xs sm:text-sm"
+                    className="bg-red-50 text-red-700 border-red-300 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700 text-[10px] sm:text-xs px-1.5 py-0.5"
                   >
                     {antonym}
                   </Badge>

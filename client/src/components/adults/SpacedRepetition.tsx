@@ -120,7 +120,7 @@ export default function SpacedRepetition() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary dark:border-emerald-400"></div>
       </div>
     );
   }
@@ -128,36 +128,34 @@ export default function SpacedRepetition() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-white mb-2">Spaced Repetition</h2>
-          <p className="text-sm text-cyan-100/70">
-            Review vocabulary and concepts at optimal intervals for better retention
-          </p>
-        </div>
+      <div>
+        <h2 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2">Spaced Repetition</h2>
+        <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70 mb-4 sm:mb-6">Review vocabulary and concepts at optimal intervals for better retention</p>
         {dueItems.length > 0 && !reviewMode && (
-          <Button
-            className="bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white"
-            onClick={startReview}
-          >
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Start Review ({dueItems.length} due)
-          </Button>
+          <div className="flex justify-end">
+            <Button
+              className="bg-primary hover:bg-primary/90 text-primary-foreground dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600"
+              onClick={startReview}
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Start Review ({dueItems.length} due)
+            </Button>
+          </div>
         )}
       </div>
 
       {/* Review Mode */}
       {reviewMode && currentItem ? (
-        <Card className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30">
+        <Card className="bg-card/80 backdrop-blur-xl border-primary/30 dark:bg-slate-900/60 dark:border-emerald-500/30">
           <CardContent className="p-6 sm:p-8">
             <div className="text-center space-y-6">
               {/* Item Content */}
               <div className="space-y-4">
-                <Badge variant="outline" className="bg-purple-500/20 text-purple-300 border-purple-400/30">
+                <Badge variant="outline" className="bg-primary/20 text-primary border-primary/30 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-400/30">
                   {getItemTypeLabel(currentItem.item_type)}
                 </Badge>
-                <div className="bg-slate-800/40 rounded-xl p-8 min-h-[200px] flex items-center justify-center">
-                  <p className="text-2xl sm:text-3xl font-semibold text-white">
+                <div className="bg-primary/10 border border-primary/20 rounded-xl p-8 min-h-[200px] flex items-center justify-center dark:bg-emerald-500/10 dark:border-emerald-500/20">
+                  <p className="text-2xl sm:text-3xl font-semibold text-foreground dark:text-white">
                     {currentItem.item_content}
                   </p>
                 </div>
@@ -166,7 +164,7 @@ export default function SpacedRepetition() {
               {/* Show Answer Button */}
               {!showAnswer && (
                 <Button
-                  className="bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600"
                   onClick={() => setShowAnswer(true)}
                 >
                   Show Answer
@@ -176,7 +174,7 @@ export default function SpacedRepetition() {
               {/* Quality Buttons */}
               {showAnswer && (
                 <div className="space-y-4">
-                  <p className="text-cyan-100/70 text-sm">
+                  <p className="text-muted-foreground dark:text-cyan-100/70 text-sm">
                     How well did you remember this?
                   </p>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -203,18 +201,18 @@ export default function SpacedRepetition() {
               )}
 
               {/* Progress */}
-              <div className="pt-4 border-t border-purple-500/20">
-                <div className="flex items-center justify-between text-xs text-cyan-100/70 mb-2">
+              <div className="pt-4 border-t border-primary/20 dark:border-emerald-500/20">
+                <div className="flex items-center justify-between text-xs text-muted-foreground dark:text-cyan-100/70 mb-2">
                   <span>
                     {dueItems.findIndex(item => item.id === currentItem.id) + 1} of {dueItems.length}
                   </span>
-                  <span className={getMasteryColor(currentItem.mastery_level)}>
+                  <span className={cn("text-foreground dark:text-white", getMasteryColor(currentItem.mastery_level))}>
                     {currentItem.mastery_level.toFixed(0)}% mastery
                   </span>
                 </div>
                 <Progress
                   value={(dueItems.findIndex(item => item.id === currentItem.id) + 1) / dueItems.length * 100}
-                  className="h-2 bg-slate-700/50"
+                  className="h-2 bg-muted dark:bg-slate-700/50"
                 />
               </div>
             </div>
@@ -224,45 +222,45 @@ export default function SpacedRepetition() {
         <>
           {/* Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Card className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30">
+            <Card className="bg-card/80 backdrop-blur-xl border-primary/30 dark:bg-slate-900/60 dark:border-emerald-500/30">
               <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600">
+                  <div className="p-3 rounded-xl bg-primary dark:bg-emerald-500">
                     <Clock className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-white">{dueItems.length}</p>
-                    <p className="text-xs text-cyan-100/70">Items Due</p>
+                    <p className="text-2xl font-bold text-foreground dark:text-white">{dueItems.length}</p>
+                    <p className="text-xs text-muted-foreground dark:text-cyan-100/70">Items Due</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30">
+            <Card className="bg-card/80 backdrop-blur-xl border-primary/30 dark:bg-slate-900/60 dark:border-emerald-500/30">
               <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-600">
+                  <div className="p-3 rounded-xl bg-primary dark:bg-emerald-500">
                     <BookOpen className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-white">{items.length}</p>
-                    <p className="text-xs text-cyan-100/70">Total Items</p>
+                    <p className="text-2xl font-bold text-foreground dark:text-white">{items.length}</p>
+                    <p className="text-xs text-muted-foreground dark:text-cyan-100/70">Total Items</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30">
+            <Card className="bg-card/80 backdrop-blur-xl border-primary/30 dark:bg-slate-900/60 dark:border-emerald-500/30">
               <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600">
+                  <div className="p-3 rounded-xl bg-primary dark:bg-emerald-500">
                     <TrendingUp className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-white">
+                    <p className="text-2xl font-bold text-foreground dark:text-white">
                       {items.length > 0
                         ? Math.round(items.reduce((sum, item) => sum + item.mastery_level, 0) / items.length)
                         : 0}%
                     </p>
-                    <p className="text-xs text-cyan-100/70">Avg Mastery</p>
+                    <p className="text-xs text-muted-foreground dark:text-cyan-100/70">Avg Mastery</p>
                   </div>
                 </div>
               </CardContent>
@@ -271,40 +269,40 @@ export default function SpacedRepetition() {
 
           {/* Items List */}
           {items.length === 0 ? (
-            <Card className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30">
+            <Card className="bg-card/60 backdrop-blur-xl border-primary/30 dark:bg-slate-900/60 dark:border-emerald-500/30">
               <CardContent className="p-12 text-center">
-                <RefreshCw className="h-12 w-12 mx-auto mb-4 text-cyan-300/50" />
-                <p className="text-cyan-100/70">No items in your spaced repetition system yet.</p>
+                <RefreshCw className="h-12 w-12 mx-auto mb-4 text-primary dark:text-emerald-300" />
+                <p className="text-muted-foreground dark:text-cyan-100/70">No items in your spaced repetition system yet.</p>
               </CardContent>
             </Card>
           ) : (
             <div className="space-y-3">
-              <h3 className="text-lg font-semibold text-white">Your Items</h3>
+              <h3 className="text-lg font-semibold text-foreground dark:text-white">Your Items</h3>
               <div className="space-y-2 max-h-96 overflow-y-auto">
                 {items.slice(0, 10).map((item) => (
                   <Card
                     key={item.id}
                     className={cn(
-                      "bg-slate-800/40 backdrop-blur-sm border-purple-500/20 hover:border-purple-400/50 transition-all",
-                      item.days_until_review === 0 && "ring-2 ring-cyan-500/50"
+                      "bg-card/60 backdrop-blur-sm border-primary/20 hover:border-primary/50 transition-all dark:bg-slate-800/40 dark:border-emerald-500/20 dark:hover:border-emerald-400/50",
+                      item.days_until_review === 0 && "ring-2 ring-primary/50 dark:ring-emerald-500/50"
                     )}
                   >
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <Badge variant="outline" className="text-xs bg-slate-700/50 text-cyan-200 border-cyan-500/30">
+                            <Badge variant="outline" className="text-xs bg-primary/20 text-primary border-primary/30 dark:bg-slate-700/50 dark:text-cyan-200 dark:border-cyan-500/30">
                               {getItemTypeLabel(item.item_type)}
                             </Badge>
                             {item.days_until_review === 0 && (
-                              <Badge variant="outline" className="text-xs bg-cyan-500/20 text-cyan-300 border-cyan-400/30">
+                              <Badge variant="outline" className="text-xs bg-primary/20 text-primary border-primary/30 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-400/30">
                                 Due Now
                               </Badge>
                             )}
                           </div>
-                          <p className="text-sm font-medium text-white truncate">{item.item_content}</p>
-                          <div className="flex items-center gap-4 mt-2 text-xs text-cyan-100/60">
-                            <span className={getMasteryColor(item.mastery_level)}>
+                          <p className="text-sm font-medium text-foreground dark:text-white truncate">{item.item_content}</p>
+                          <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground dark:text-cyan-100/60">
+                            <span className={cn("text-foreground dark:text-white", getMasteryColor(item.mastery_level))}>
                               {item.mastery_level.toFixed(0)}% mastery
                             </span>
                             <span className="flex items-center gap-1">
@@ -317,7 +315,7 @@ export default function SpacedRepetition() {
                         </div>
                         <Progress
                           value={item.mastery_level}
-                          className="w-16 h-2 bg-slate-700/50 ml-4"
+                          className="w-16 h-2 bg-muted dark:bg-slate-700/50 ml-4"
                         />
                       </div>
                     </CardContent>

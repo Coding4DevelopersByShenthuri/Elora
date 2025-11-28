@@ -231,36 +231,36 @@ export default function LearningGoals() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary dark:border-emerald-400"></div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h2 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2">Learning Goals</h2>
+        <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70 mb-4 sm:mb-6">Set and track your learning objectives</p>
+      </div>
+
       <Tabs defaultValue="long-term" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-slate-900/60 border-purple-500/30 mb-6">
-          <TabsTrigger value="long-term" className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300">
+        <TabsList className="grid w-full grid-cols-2 bg-card/80 border-primary/30 mb-6 h-auto dark:bg-slate-900/60 dark:border-emerald-500/30">
+          <TabsTrigger value="long-term" className="text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary py-2 sm:py-3 dark:data-[state=active]:bg-emerald-500/20 dark:data-[state=active]:text-emerald-300">
             Long-Term Goals
           </TabsTrigger>
-          <TabsTrigger value="daily" className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300">
+          <TabsTrigger value="daily" className="text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary py-2 sm:py-3 dark:data-[state=active]:bg-emerald-500/20 dark:data-[state=active]:text-emerald-300">
             Daily Goals
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="long-term" className="space-y-6">
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-bold text-white mb-2">Learning Goals</h2>
-              <p className="text-sm text-cyan-100/70">
-                Set and track your learning objectives
-              </p>
-            </div>
+          {/* Create Goal Button */}
+          <div className="flex justify-end">
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button
-              className="bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600"
               onClick={() => {
                 setEditingGoal(null);
                 resetForm();
@@ -270,20 +270,20 @@ export default function LearningGoals() {
               New Goal
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-slate-900 border-purple-500/30 text-white max-w-md">
+          <DialogContent className="bg-card border-primary/30 dark:bg-slate-900 dark:border-emerald-500/30 max-w-md">
             <DialogHeader>
-              <DialogTitle className="text-white">
+              <DialogTitle className="text-foreground dark:text-white">
                 {editingGoal ? 'Edit Goal' : 'Create New Goal'}
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4 mt-4">
               <div>
-                <Label className="text-cyan-200">Goal Type</Label>
+                <Label className="text-foreground dark:text-cyan-200">Goal Type</Label>
                 <Select
                   value={formData.goal_type}
                   onValueChange={(value) => setFormData({ ...formData, goal_type: value })}
                 >
-                  <SelectTrigger className="bg-slate-800 border-purple-500/30 text-white">
+                  <SelectTrigger className="bg-card/60 backdrop-blur-xl border-primary/30 text-foreground dark:bg-slate-800 dark:border-emerald-500/30 dark:text-white">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -297,65 +297,65 @@ export default function LearningGoals() {
                 </Select>
               </div>
               <div>
-                <Label className="text-cyan-200">Title</Label>
+                <Label className="text-foreground dark:text-cyan-200">Title</Label>
                 <Input
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="bg-slate-800 border-purple-500/30 text-white"
+                  className="bg-card/60 backdrop-blur-xl border-primary/30 text-foreground dark:bg-slate-800 dark:border-emerald-500/30 dark:text-white"
                   placeholder="e.g., Practice 30 minutes daily"
                 />
               </div>
               <div>
-                <Label className="text-cyan-200">Description (Optional)</Label>
+                <Label className="text-foreground dark:text-cyan-200">Description (Optional)</Label>
                 <Textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="bg-slate-800 border-purple-500/30 text-white"
+                  className="bg-card/60 backdrop-blur-xl border-primary/30 text-foreground dark:bg-slate-800 dark:border-emerald-500/30 dark:text-white"
                   placeholder="Add more details about your goal..."
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-cyan-200">Target Value</Label>
+                  <Label className="text-foreground dark:text-cyan-200">Target Value</Label>
                   <Input
                     type="number"
                     value={formData.target_value}
                     onChange={(e) => setFormData({ ...formData, target_value: parseInt(e.target.value) || 0 })}
-                    className="bg-slate-800 border-purple-500/30 text-white"
+                    className="bg-card/60 backdrop-blur-xl border-primary/30 text-foreground dark:bg-slate-800 dark:border-emerald-500/30 dark:text-white"
                   />
                 </div>
                 <div>
-                  <Label className="text-cyan-200">Unit</Label>
+                  <Label className="text-foreground dark:text-cyan-200">Unit</Label>
                   <Input
                     value={formData.unit}
                     onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
-                    className="bg-slate-800 border-purple-500/30 text-white"
+                    className="bg-card/60 backdrop-blur-xl border-primary/30 text-foreground dark:bg-slate-800 dark:border-emerald-500/30 dark:text-white"
                     placeholder="minutes, lessons, words..."
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-cyan-200">Start Date</Label>
+                  <Label className="text-foreground dark:text-cyan-200">Start Date</Label>
                   <Input
                     type="date"
                     value={formData.start_date}
                     onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                    className="bg-slate-800 border-purple-500/30 text-white"
+                    className="bg-card/60 backdrop-blur-xl border-primary/30 text-foreground dark:bg-slate-800 dark:border-emerald-500/30 dark:text-white"
                   />
                 </div>
                 <div>
-                  <Label className="text-cyan-200">Target Date</Label>
+                  <Label className="text-foreground dark:text-cyan-200">Target Date</Label>
                   <Input
                     type="date"
                     value={formData.target_date}
                     onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
-                    className="bg-slate-800 border-purple-500/30 text-white"
+                    className="bg-card/60 backdrop-blur-xl border-primary/30 text-foreground dark:bg-slate-800 dark:border-emerald-500/30 dark:text-white"
                   />
                 </div>
               </div>
               <Button
-                className="w-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600"
                 onClick={editingGoal ? () => handleUpdateGoal(editingGoal.id) : handleCreateGoal}
               >
                 {editingGoal ? 'Update Goal' : 'Create Goal'}
@@ -367,12 +367,12 @@ export default function LearningGoals() {
 
       {/* Goals Grid */}
       {goals.length === 0 ? (
-        <Card className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30">
+        <Card className="bg-card/60 backdrop-blur-xl border-primary/30 dark:bg-slate-900/60 dark:border-emerald-500/30">
           <CardContent className="p-12 text-center">
-            <Target className="h-12 w-12 mx-auto mb-4 text-cyan-300/50" />
-            <p className="text-cyan-100/70 mb-4">No active goals yet. Create your first goal to get started!</p>
+            <Target className="h-12 w-12 mx-auto mb-4 text-primary dark:text-emerald-300" />
+            <p className="text-muted-foreground dark:text-cyan-100/70 mb-4">No active goals yet. Create your first goal to get started!</p>
             <Button
-              className="bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600"
               onClick={() => setIsDialogOpen(true)}
             >
               <Plus className="h-4 w-4 mr-2" />
@@ -390,7 +390,7 @@ export default function LearningGoals() {
               <Card
                 key={goal.id}
                 className={cn(
-                  "group bg-slate-900/60 backdrop-blur-xl border-purple-500/30 hover:border-purple-400/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-purple-500/20 overflow-hidden",
+                  "group bg-card/80 backdrop-blur-xl border-primary/30 hover:border-primary/50 transition-all duration-300 shadow-xl hover:shadow-2xl overflow-hidden dark:bg-slate-900/60 dark:border-emerald-500/30 dark:hover:border-emerald-400/50",
                   goal.completed && "ring-2 ring-emerald-500/50"
                 )}
               >
@@ -399,40 +399,40 @@ export default function LearningGoals() {
                     <div className="flex items-center gap-3">
                       <div className="text-3xl">{getGoalTypeIcon(goal.goal_type)}</div>
                       <div className="flex-1">
-                        <CardTitle className="text-lg font-bold text-white mb-1">
+                        <CardTitle className="text-lg font-bold text-foreground dark:text-white mb-1">
                           {goal.title}
                         </CardTitle>
-                        <Badge variant="outline" className="text-xs bg-purple-500/20 text-purple-300 border-purple-400/30">
+                        <Badge variant="outline" className="text-xs bg-primary/20 text-primary border-primary/30 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-400/30">
                           {getGoalTypeLabel(goal.goal_type)}
                         </Badge>
                       </div>
                     </div>
                     {goal.completed && (
-                      <CheckCircle className="h-5 w-5 text-emerald-400 flex-shrink-0" />
+                      <CheckCircle className="h-5 w-5 text-emerald-500 dark:text-emerald-400 flex-shrink-0" />
                     )}
                   </div>
                 </CardHeader>
                 <CardContent>
                   {goal.description && (
-                    <p className="text-sm text-cyan-100/70 mb-4">{goal.description}</p>
+                    <p className="text-sm text-muted-foreground dark:text-cyan-100/70 mb-4">{goal.description}</p>
                   )}
 
                   {/* Progress */}
                   <div className="mb-4">
                     <div className="flex items-center justify-between text-sm mb-2">
-                      <span className="text-cyan-100/80">
+                      <span className="text-muted-foreground dark:text-cyan-100/80">
                         {goal.current_value} / {goal.target_value} {goal.unit}
                       </span>
-                      <span className="text-white font-semibold">{progress.toFixed(0)}%</span>
+                      <span className="text-foreground dark:text-white font-semibold">{progress.toFixed(0)}%</span>
                     </div>
                     <Progress
                       value={progress}
-                      className="h-3 bg-slate-700/50"
+                      className="h-3 bg-muted dark:bg-slate-700/50"
                     />
                   </div>
 
                   {/* Info */}
-                  <div className="flex items-center justify-between text-xs text-cyan-100/60 mb-4">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground dark:text-cyan-100/60 mb-4">
                     <span className="flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
                       {daysRemaining} days left
@@ -449,7 +449,7 @@ export default function LearningGoals() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="flex-1 border-purple-400/30 text-purple-300 hover:bg-purple-500/20"
+                        className="flex-1 border-primary/30 text-primary hover:bg-primary/20 dark:border-emerald-500/30 dark:text-emerald-300 dark:hover:bg-emerald-500/20"
                         onClick={() => {
                           setEditingGoal(goal);
                           setFormData({
@@ -481,33 +481,33 @@ export default function LearningGoals() {
           {/* Daily Goals Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-bold text-white mb-2">Daily Goals</h2>
-              <p className="text-sm text-cyan-100/70">
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2">Daily Goals</h2>
+              <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70">
                 Set daily targets to maintain consistent progress
               </p>
             </div>
             <Dialog open={isDailyGoalDialogOpen} onOpenChange={setIsDailyGoalDialogOpen}>
               <DialogTrigger asChild>
                 <Button
-                  className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600"
                   onClick={() => setDailyGoalForm({ goal_type: 'vocabulary', target_value: 10 })}
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Create Daily Goal
                 </Button>
               </DialogTrigger>
-              <DialogContent className="bg-slate-900 border-purple-500/30 text-white max-w-md">
+              <DialogContent className="bg-card border-primary/30 dark:bg-slate-900 dark:border-emerald-500/30 max-w-md">
                 <DialogHeader>
-                  <DialogTitle className="text-white">Create Daily Goal</DialogTitle>
+                  <DialogTitle className="text-foreground dark:text-white">Create Daily Goal</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 mt-4">
                   <div>
-                    <Label className="text-cyan-200">Goal Type</Label>
+                    <Label className="text-foreground dark:text-cyan-200">Goal Type</Label>
                     <Select
                       value={dailyGoalForm.goal_type}
                       onValueChange={(value) => setDailyGoalForm({ ...dailyGoalForm, goal_type: value })}
                     >
-                      <SelectTrigger className="bg-slate-800 border-purple-500/30 text-white">
+                      <SelectTrigger className="bg-card/60 backdrop-blur-xl border-primary/30 text-foreground dark:bg-slate-800 dark:border-emerald-500/30 dark:text-white">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -526,7 +526,7 @@ export default function LearningGoals() {
                     </Select>
                   </div>
                   <div>
-                    <Label className="text-cyan-200">
+                    <Label className="text-foreground dark:text-cyan-200">
                       Target ({getDailyGoalTypeInfo(dailyGoalForm.goal_type).unit})
                     </Label>
                     <Input
@@ -539,12 +539,12 @@ export default function LearningGoals() {
                           target_value: parseInt(e.target.value) || 1,
                         })
                       }
-                      className="bg-slate-800 border-purple-500/30 text-white"
+                      className="bg-card/60 backdrop-blur-xl border-primary/30 text-foreground dark:bg-slate-800 dark:border-emerald-500/30 dark:text-white"
                     />
                   </div>
                   <Button
                     onClick={handleCreateDailyGoal}
-                    className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Create Goal
@@ -556,25 +556,25 @@ export default function LearningGoals() {
 
           {/* Daily Goals Summary */}
           {dailyGoals.length > 0 && (
-            <Card className="bg-slate-900/60 backdrop-blur-xl border-green-500/30">
+            <Card className="bg-card/80 backdrop-blur-xl border-primary/30 dark:bg-slate-900/60 dark:border-emerald-500/30">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <div className="flex items-center justify-between text-sm mb-2">
-                      <span className="text-cyan-100/70">Overall Progress</span>
-                      <span className="text-white font-semibold">{Math.round(totalDailyProgress)}%</span>
+                      <span className="text-muted-foreground dark:text-cyan-100/70">Overall Progress</span>
+                      <span className="text-foreground dark:text-white font-semibold">{Math.round(totalDailyProgress)}%</span>
                     </div>
-                    <Progress value={totalDailyProgress} className="h-2 bg-slate-700/50">
-                      <div className="h-full rounded-full bg-gradient-to-r from-green-500 to-emerald-500" />
+                    <Progress value={totalDailyProgress} className="h-2 bg-muted dark:bg-slate-700/50">
+                      <div className="h-full rounded-full bg-primary dark:bg-emerald-500" />
                     </Progress>
                   </div>
                   <div className="text-center ml-6">
-                    <div className="text-2xl font-bold text-green-400">{completedDailyCount}</div>
-                    <div className="text-xs text-cyan-100/70">Completed</div>
+                    <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{completedDailyCount}</div>
+                    <div className="text-xs text-muted-foreground dark:text-cyan-100/70">Completed</div>
                   </div>
                   <div className="text-center ml-4">
-                    <div className="text-2xl font-bold text-white">{dailyGoals.length}</div>
-                    <div className="text-xs text-cyan-100/70">Total</div>
+                    <div className="text-2xl font-bold text-foreground dark:text-white">{dailyGoals.length}</div>
+                    <div className="text-xs text-muted-foreground dark:text-cyan-100/70">Total</div>
                   </div>
                 </div>
               </CardContent>
@@ -584,15 +584,15 @@ export default function LearningGoals() {
           {/* Daily Goals List */}
           {dailyGoalsLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary dark:border-emerald-400"></div>
             </div>
           ) : dailyGoals.length === 0 ? (
-            <Card className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30">
+            <Card className="bg-card/60 backdrop-blur-xl border-primary/30 dark:bg-slate-900/60 dark:border-emerald-500/30">
               <CardContent className="p-12 text-center">
-                <Target className="h-12 w-12 mx-auto mb-4 text-cyan-300/50" />
-                <p className="text-cyan-100/70 mb-4">No daily goals set for today</p>
+                <Target className="h-12 w-12 mx-auto mb-4 text-primary dark:text-emerald-300" />
+                <p className="text-muted-foreground dark:text-cyan-100/70 mb-4">No daily goals set for today</p>
                 <Button
-                  className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600"
                   onClick={() => setIsDailyGoalDialogOpen(true)}
                 >
                   <Plus className="h-4 w-4 mr-2" />
@@ -611,26 +611,26 @@ export default function LearningGoals() {
                   <Card
                     key={goal.id}
                     className={cn(
-                      'border transition-all',
+                      'border transition-all bg-card/80 backdrop-blur-xl dark:bg-slate-900/60',
                       isCompleted
-                        ? 'bg-green-500/10 border-green-400/30'
-                        : 'bg-slate-800/30 border-purple-500/20'
+                        ? 'bg-emerald-500/10 border-emerald-400/30 dark:bg-emerald-500/10 dark:border-emerald-400/30'
+                        : 'border-primary/30 dark:border-emerald-500/20'
                     )}
                   >
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <Icon className="h-5 w-5 text-green-400" />
-                            <h4 className="font-semibold text-white">{typeInfo.label}</h4>
+                            <Icon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                            <h4 className="font-semibold text-foreground dark:text-white">{typeInfo.label}</h4>
                             {isCompleted && (
-                              <Badge className="bg-green-500/20 text-green-300 border-green-400/30">
+                              <Badge className="bg-emerald-500/20 text-emerald-700 border-emerald-400/30 dark:text-emerald-300 dark:border-emerald-400/30">
                                 <CheckCircle className="h-3 w-3 mr-1" />
                                 Completed
                               </Badge>
                             )}
                           </div>
-                          <div className="flex items-center gap-4 text-sm text-cyan-100/70 mt-2">
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground dark:text-cyan-100/70 mt-2">
                             <span>
                               {goal.current_value} / {goal.target_value} {typeInfo.unit}
                             </span>
@@ -646,15 +646,15 @@ export default function LearningGoals() {
                         value={goal.progress_percentage}
                         className={cn(
                           'h-2 mb-3',
-                          isCompleted ? 'bg-green-500/20' : 'bg-slate-700/50'
+                          isCompleted ? 'bg-emerald-500/20 dark:bg-emerald-500/20' : 'bg-muted dark:bg-slate-700/50'
                         )}
                       >
                         <div
                           className={cn(
                             'h-full rounded-full',
                             isCompleted
-                              ? 'bg-gradient-to-r from-green-500 to-emerald-500'
-                              : 'bg-gradient-to-r from-blue-500 to-purple-500'
+                              ? 'bg-emerald-600 dark:bg-emerald-500'
+                              : 'bg-primary dark:bg-emerald-500'
                           )}
                         />
                       </Progress>
@@ -673,13 +673,13 @@ export default function LearningGoals() {
                               );
                               handleUpdateDailyGoal(goal.id, newValue);
                             }}
-                            className="flex-1 bg-slate-700/50 border-purple-500/30 text-white text-sm"
+                            className="flex-1 bg-card/60 backdrop-blur-xl border-primary/30 text-foreground text-sm dark:bg-slate-700/50 dark:border-emerald-500/30 dark:text-white"
                             placeholder="Update progress"
                           />
                           <Button
                             size="sm"
                             onClick={() => handleUpdateDailyGoal(goal.id, goal.target_value)}
-                            className="bg-green-500 hover:bg-green-600"
+                            className="bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600"
                           >
                             Complete
                           </Button>

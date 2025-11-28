@@ -908,14 +908,7 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
               </TabsContent>
 
               <TabsContent value="review" className="mt-0">
-                <div className="space-y-6">
-                  <div>
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2">Review & Flashcards</h2>
-                    <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70 mb-4 sm:mb-6">Spaced repetition and flashcard review</p>
-                  </div>
-                  <SpacedRepetition />
-                  <FlashcardsMain />
-                </div>
+                <SpacedRepetition />
               </TabsContent>
 
               <TabsContent value="multimode" className="mt-0">

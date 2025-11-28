@@ -133,7 +133,7 @@ export default function CommonLessonsLibrary() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary dark:border-emerald-400"></div>
       </div>
     );
   }
@@ -141,28 +141,24 @@ export default function CommonLessonsLibrary() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-white mb-2">Common Lessons Library</h2>
-          <p className="text-sm text-cyan-100/70">
-            Shared lessons across all adult levels - Build foundational skills
-          </p>
-        </div>
+      <div>
+        <h2 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2">Common Lessons Library</h2>
+        <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70 mb-4 sm:mb-6">Shared lessons across all adult levels - Build foundational skills</p>
       </div>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-cyan-300/50" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-primary dark:text-emerald-300" />
           <Input
             placeholder="Search lessons..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-slate-800/60 border-purple-500/30 text-white placeholder:text-cyan-100/50"
+            className="pl-10 bg-card/60 backdrop-blur-xl border-primary/30 text-foreground placeholder:text-muted-foreground dark:bg-slate-900/60 dark:border-emerald-500/30 dark:text-white dark:placeholder:text-cyan-100/50"
           />
         </div>
         <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-full sm:w-[180px] bg-slate-800/60 border-purple-500/30 text-white">
+          <SelectTrigger className="w-full sm:w-[180px] bg-card/60 backdrop-blur-xl border-primary/30 text-foreground dark:bg-slate-900/60 dark:border-emerald-500/30 dark:text-white">
             <SelectValue placeholder="Category" />
           </SelectTrigger>
           <SelectContent>
@@ -177,7 +173,7 @@ export default function CommonLessonsLibrary() {
           </SelectContent>
         </Select>
         <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
-          <SelectTrigger className="w-full sm:w-[180px] bg-slate-800/60 border-purple-500/30 text-white">
+          <SelectTrigger className="w-full sm:w-[180px] bg-card/60 backdrop-blur-xl border-primary/30 text-foreground dark:bg-slate-900/60 dark:border-emerald-500/30 dark:text-white">
             <SelectValue placeholder="Difficulty" />
           </SelectTrigger>
           <SelectContent>
@@ -191,10 +187,10 @@ export default function CommonLessonsLibrary() {
 
       {/* Lessons Grid */}
       {lessons.length === 0 ? (
-        <Card className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30">
+        <Card className="bg-card/60 backdrop-blur-xl border-primary/30 dark:bg-slate-900/60 dark:border-emerald-500/30">
           <CardContent className="p-12 text-center">
-            <BookOpen className="h-12 w-12 mx-auto mb-4 text-cyan-300/50" />
-            <p className="text-cyan-100/70">No lessons found. Try adjusting your filters.</p>
+            <BookOpen className="h-12 w-12 mx-auto mb-4 text-primary dark:text-emerald-300" />
+            <p className="text-muted-foreground dark:text-cyan-100/70">No lessons found. Try adjusting your filters.</p>
           </CardContent>
         </Card>
       ) : (
@@ -208,7 +204,7 @@ export default function CommonLessonsLibrary() {
               <Card
                 key={lesson.id}
                 className={cn(
-                  "group bg-slate-900/60 backdrop-blur-xl border-purple-500/30 hover:border-purple-400/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-purple-500/20 overflow-hidden",
+                  "group bg-card/80 backdrop-blur-xl border-primary/30 hover:border-primary/50 transition-all duration-300 shadow-xl hover:shadow-2xl overflow-hidden dark:bg-slate-900/60 dark:border-emerald-500/30 dark:hover:border-emerald-400/50",
                   isCompleted && "ring-2 ring-emerald-500/50"
                 )}
               >
@@ -223,26 +219,26 @@ export default function CommonLessonsLibrary() {
                 <CardContent className="p-4 sm:p-6">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
-                      <CardTitle className="text-lg font-bold text-white mb-2 line-clamp-2">
+                      <CardTitle className="text-lg font-bold text-foreground dark:text-white mb-2 line-clamp-2">
                         {lesson.title}
                       </CardTitle>
-                      <p className="text-sm text-cyan-100/70 line-clamp-2 mb-3">
+                      <p className="text-sm text-muted-foreground dark:text-cyan-100/70 line-clamp-2 mb-3">
                         {lesson.description}
                       </p>
                     </div>
                     {isCompleted && (
-                      <CheckCircle className="h-5 w-5 text-emerald-400 flex-shrink-0 ml-2" />
+                      <CheckCircle className="h-5 w-5 text-emerald-500 dark:text-emerald-400 flex-shrink-0 ml-2" />
                     )}
                   </div>
 
                   <div className="flex flex-wrap gap-2 mb-4">
-                    <Badge variant="outline" className="text-xs bg-purple-500/20 text-purple-300 border-purple-400/30">
+                    <Badge variant="outline" className="text-xs bg-primary/20 text-primary border-primary/30 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-400/30">
                       {lesson.category}
                     </Badge>
-                    <Badge variant="outline" className="text-xs bg-slate-700/50 text-cyan-200 border-cyan-500/30">
+                    <Badge variant="outline" className="text-xs bg-primary/20 text-primary border-primary/30 dark:bg-slate-700/50 dark:text-cyan-200 dark:border-cyan-500/30">
                       {lesson.difficulty}
                     </Badge>
-                    <Badge variant="outline" className="text-xs bg-amber-500/20 text-amber-300 border-amber-400/30">
+                    <Badge variant="outline" className="text-xs bg-amber-500/20 text-amber-700 border-amber-400/30 dark:text-amber-300 dark:border-amber-400/30">
                       <Star className="h-3 w-3 mr-1" />
                       {lesson.average_score.toFixed(1)}
                     </Badge>
@@ -250,18 +246,18 @@ export default function CommonLessonsLibrary() {
 
                   {isEnrolled && (
                     <div className="mb-4">
-                      <div className="flex items-center justify-between text-xs text-cyan-100/70 mb-2">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground dark:text-cyan-100/70 mb-2">
                         <span>Progress</span>
-                        <span>{enrollment.progress_percentage.toFixed(0)}%</span>
+                        <span className="text-foreground dark:text-white">{enrollment.progress_percentage.toFixed(0)}%</span>
                       </div>
                       <Progress
                         value={enrollment.progress_percentage}
-                        className="h-2 bg-slate-700/50"
+                        className="h-2 bg-muted dark:bg-slate-700/50"
                       />
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between text-xs text-cyan-100/60 mb-4">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground dark:text-cyan-100/60 mb-4">
                     <span className="flex items-center gap-1">
                       <Clock className="h-3 w-3" />
                       {lesson.duration_minutes} min
@@ -278,12 +274,8 @@ export default function CommonLessonsLibrary() {
 
                   <Button
                     className={cn(
-                      "w-full bg-gradient-to-r text-white font-semibold transition-all duration-300",
-                      isEnrolled
-                        ? isCompleted
-                          ? "from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700"
-                          : "from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600"
-                        : "from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600"
+                      "w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold transition-all duration-300 dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600",
+                      isEnrolled && isCompleted && "bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-700"
                     )}
                     onClick={() => {
                       if (!isEnrolled) {

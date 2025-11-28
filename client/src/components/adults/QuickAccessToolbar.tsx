@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
-  BookOpen, Target, FileText, Mic, Globe,
+  BookOpen, Target, FileText, Mic,
   ChevronUp, ChevronDown, Settings, X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -20,7 +20,6 @@ interface ToolbarPreferences {
 const TOOLS = {
   dictionary: { icon: BookOpen, label: 'Dictionary', color: 'text-emerald-400' },
   flashcards: { icon: FileText, label: 'Flashcards', color: 'text-green-400' },
-  cultural: { icon: Globe, label: 'Cultural', color: 'text-teal-400' },
 };
 
 interface QuickAccessToolbarProps {
@@ -30,8 +29,8 @@ interface QuickAccessToolbarProps {
 export default function QuickAccessToolbar({ onToolClick }: QuickAccessToolbarProps) {
   const { user } = useAuth();
   const [preferences, setPreferences] = useState<ToolbarPreferences>({
-    enabled_tools: ['dictionary', 'flashcards', 'cultural'],
-    tool_order: ['dictionary', 'flashcards', 'cultural'],
+    enabled_tools: ['dictionary', 'flashcards'],
+    tool_order: ['dictionary', 'flashcards'],
     toolbar_position: 'bottom',
     is_collapsed: false,
   });
@@ -49,7 +48,7 @@ export default function QuickAccessToolbar({ onToolClick }: QuickAccessToolbarPr
       const result = await AdultsAPI.getToolbarPreferences();
       if (result.success && 'data' in result && result.data) {
         setPreferences({
-          enabled_tools: result.data.enabled_tools || ['dictionary', 'flashcards', 'cultural'],
+          enabled_tools: result.data.enabled_tools || ['dictionary', 'flashcards'],
           tool_order: result.data.tool_order || Object.keys(TOOLS),
           toolbar_position: (result.data.toolbar_position as 'left' | 'right' | 'bottom') || 'bottom',
           is_collapsed: result.data.is_collapsed || false,

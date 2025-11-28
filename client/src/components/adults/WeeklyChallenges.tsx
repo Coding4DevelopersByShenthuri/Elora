@@ -92,7 +92,7 @@ export default function WeeklyChallenges() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary dark:border-emerald-400"></div>
       </div>
     );
   }
@@ -100,25 +100,25 @@ export default function WeeklyChallenges() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-white mb-2">Weekly Challenges</h2>
-          <p className="text-sm text-cyan-100/70">
-            Complete challenges to earn points and boost your learning
-          </p>
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white">Weekly Challenges</h2>
+          {challenges.length > 0 && (
+            <Badge variant="outline" className="bg-primary/20 text-primary border-primary/30 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-400/30">
+              <Flame className="h-3 w-3 mr-1" />
+              {challenges.length} Active
+            </Badge>
+          )}
         </div>
-        <Badge variant="outline" className="bg-purple-500/20 text-purple-300 border-purple-400/30">
-          <Flame className="h-3 w-3 mr-1" />
-          {challenges.length} Active
-        </Badge>
+        <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70 mb-4 sm:mb-6">Complete challenges to earn points and boost your learning</p>
       </div>
 
       {/* Challenges Grid */}
       {challenges.length === 0 ? (
-        <Card className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30">
+        <Card className="bg-card/60 backdrop-blur-xl border-primary/30 dark:bg-slate-900/60 dark:border-emerald-500/30">
           <CardContent className="p-12 text-center">
-            <Trophy className="h-12 w-12 mx-auto mb-4 text-cyan-300/50" />
-            <p className="text-cyan-100/70">No active challenges at the moment. Check back soon!</p>
+            <Trophy className="h-12 w-12 mx-auto mb-4 text-primary dark:text-emerald-300" />
+            <p className="text-muted-foreground dark:text-cyan-100/70">No active challenges at the moment. Check back soon!</p>
           </CardContent>
         </Card>
       ) : (
@@ -133,7 +133,7 @@ export default function WeeklyChallenges() {
               <Card
                 key={challenge.id}
                 className={cn(
-                  "group bg-slate-900/60 backdrop-blur-xl border-purple-500/30 hover:border-purple-400/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-purple-500/20 overflow-hidden relative",
+                  "group bg-card/80 backdrop-blur-xl border-primary/30 hover:border-primary/50 transition-all duration-300 shadow-xl hover:shadow-2xl overflow-hidden relative dark:bg-slate-900/60 dark:border-emerald-500/30 dark:hover:border-emerald-400/50",
                   isCompleted && "ring-2 ring-emerald-500/50"
                 )}
               >
@@ -161,17 +161,17 @@ export default function WeeklyChallenges() {
                 </div>
 
                 <CardContent className="p-6">
-                  <p className="text-sm text-cyan-100/70 mb-4 line-clamp-2">
+                  <p className="text-sm text-muted-foreground dark:text-cyan-100/70 mb-4 line-clamp-2">
                     {challenge.description}
                   </p>
 
                   {/* Requirement */}
-                  <div className="bg-slate-800/40 rounded-lg p-3 mb-4">
+                  <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 mb-4 dark:bg-emerald-500/10 dark:border-emerald-500/20">
                     <div className="flex items-center gap-2 mb-2">
-                      <Target className="h-4 w-4 text-cyan-400" />
-                      <span className="text-xs font-medium text-cyan-200">Challenge Goal</span>
+                      <Target className="h-4 w-4 text-primary dark:text-emerald-300" />
+                      <span className="text-xs font-medium text-foreground dark:text-emerald-200">Challenge Goal</span>
                     </div>
-                    <p className="text-sm text-white">
+                    <p className="text-sm text-foreground dark:text-white">
                       {challenge.requirement_description || `Complete ${challenge.requirement_value} ${challenge.requirement_type.replace('_', ' ')}`}
                     </p>
                   </div>
@@ -179,19 +179,19 @@ export default function WeeklyChallenges() {
                   {/* Progress */}
                   {isEnrolled && (
                     <div className="mb-4">
-                      <div className="flex items-center justify-between text-xs text-cyan-100/70 mb-2">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground dark:text-cyan-100/70 mb-2">
                         <span>Your Progress</span>
-                        <span>{progress.toFixed(0)}%</span>
+                        <span className="text-foreground dark:text-white">{progress.toFixed(0)}%</span>
                       </div>
                       <Progress
                         value={progress}
-                        className="h-2 bg-slate-700/50"
+                        className="h-2 bg-muted dark:bg-slate-700/50"
                       />
                     </div>
                   )}
 
                   {/* Info */}
-                  <div className="flex items-center justify-between text-xs text-cyan-100/60 mb-4">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground dark:text-cyan-100/60 mb-4">
                     <span className="flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
                       {daysRemaining} days left
@@ -201,7 +201,7 @@ export default function WeeklyChallenges() {
                       {challenge.points_reward} points
                     </span>
                     {isEnrolled && challenge.user_progress?.points_earned && challenge.user_progress.points_earned > 0 && (
-                      <span className="flex items-center gap-1 text-emerald-400">
+                      <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
                         <Zap className="h-3 w-3" />
                         {challenge.user_progress.points_earned} earned
                       </span>
@@ -213,10 +213,8 @@ export default function WeeklyChallenges() {
                     className={cn(
                       "w-full font-semibold transition-all duration-300",
                       isCompleted
-                        ? "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white"
-                        : isEnrolled
-                        ? "bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white"
-                        : "bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white"
+                        ? "bg-emerald-600 hover:bg-emerald-700 text-white dark:bg-emerald-600 dark:hover:bg-emerald-700"
+                        : "bg-primary hover:bg-primary/90 text-primary-foreground dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600"
                     )}
                     onClick={() => {
                       if (!isEnrolled && !isCompleted) {

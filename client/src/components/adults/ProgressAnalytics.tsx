@@ -88,17 +88,17 @@ export default function ProgressAnalytics() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary dark:border-emerald-400"></div>
       </div>
     );
   }
 
   if (!summary) {
     return (
-      <Card className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30">
+      <Card className="bg-card/80 backdrop-blur-xl border-primary/30 dark:bg-slate-900/60 dark:border-emerald-500/30">
         <CardContent className="p-12 text-center">
-          <BarChart3 className="h-12 w-12 mx-auto mb-4 text-cyan-300/50" />
-          <p className="text-cyan-100/70">No analytics data available yet.</p>
+          <BarChart3 className="h-12 w-12 mx-auto mb-4 text-primary dark:text-emerald-300" />
+          <p className="text-muted-foreground dark:text-cyan-100/70">No analytics data available yet.</p>
         </CardContent>
       </Card>
     );
@@ -112,15 +112,15 @@ export default function ProgressAnalytics() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-white mb-2">Progress Analytics</h2>
-          <p className="text-sm text-cyan-100/70">
-            Detailed insights into your learning journey
-          </p>
-        </div>
+      <div>
+        <h2 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2">Progress Analytics</h2>
+        <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70 mb-4 sm:mb-6">Detailed insights into your learning journey</p>
+      </div>
+
+      {/* Period Selector */}
+      <div className="flex justify-end">
         <Select value={periodType} onValueChange={setPeriodType}>
-          <SelectTrigger className="w-full sm:w-[180px] bg-slate-800/60 border-purple-500/30 text-white">
+          <SelectTrigger className="w-full sm:w-[180px] bg-card/60 backdrop-blur-xl border-primary/30 text-foreground dark:bg-slate-900/60 dark:border-emerald-500/30 dark:text-white">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -133,54 +133,54 @@ export default function ProgressAnalytics() {
 
       {/* Overall Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30">
+        <Card className="bg-card/80 backdrop-blur-xl border-primary/30 dark:bg-slate-900/60 dark:border-emerald-500/30">
           <CardContent className="p-4 sm:p-6">
             <div className="flex items-center gap-3">
-              <div className="p-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600">
+              <div className="p-3 rounded-xl bg-gradient-to-r from-primary to-secondary">
                 <Award className="h-5 w-5 text-white" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-white">{summary.totals.total_points}</p>
-                <p className="text-xs text-cyan-100/70">Total Points</p>
+                <p className="text-2xl font-bold text-foreground dark:text-white">{summary.totals.total_points}</p>
+                <p className="text-xs text-muted-foreground dark:text-cyan-100/70">Total Points</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex items-center gap-3">
-              <div className="p-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-600">
-                <BookOpen className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-white">{summary.totals.total_lessons}</p>
-                <p className="text-xs text-cyan-100/70">Lessons Completed</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30">
+        <Card className="bg-card/80 backdrop-blur-xl border-primary/30 dark:bg-slate-900/60 dark:border-emerald-500/30">
           <CardContent className="p-4 sm:p-6">
             <div className="flex items-center gap-3">
               <div className="p-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600">
-                <Clock className="h-5 w-5 text-white" />
+                <BookOpen className="h-5 w-5 text-white" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-white">{formatTime(summary.totals.total_time_minutes)}</p>
-                <p className="text-xs text-cyan-100/70">Practice Time</p>
+                <p className="text-2xl font-bold text-foreground dark:text-white">{summary.totals.total_lessons}</p>
+                <p className="text-xs text-muted-foreground dark:text-cyan-100/70">Lessons Completed</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30">
+        <Card className="bg-card/80 backdrop-blur-xl border-primary/30 dark:bg-slate-900/60 dark:border-emerald-500/30">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600">
+                <Clock className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground dark:text-white">{formatTime(summary.totals.total_time_minutes)}</p>
+                <p className="text-xs text-muted-foreground dark:text-cyan-100/70">Practice Time</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-card/80 backdrop-blur-xl border-primary/30 dark:bg-slate-900/60 dark:border-emerald-500/30">
           <CardContent className="p-4 sm:p-6">
             <div className="flex items-center gap-3">
               <div className="p-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600">
                 <Target className="h-5 w-5 text-white" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-white">{summary.totals.average_score.toFixed(1)}%</p>
-                <p className="text-xs text-cyan-100/70">Average Score</p>
+                <p className="text-2xl font-bold text-foreground dark:text-white">{summary.totals.average_score.toFixed(1)}%</p>
+                <p className="text-xs text-muted-foreground dark:text-cyan-100/70">Average Score</p>
               </div>
             </div>
           </CardContent>
@@ -190,7 +190,7 @@ export default function ProgressAnalytics() {
       {/* Category Filter */}
       <div>
         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-          <SelectTrigger className="w-full sm:w-[200px] bg-slate-800/60 border-purple-500/30 text-white">
+          <SelectTrigger className="w-full sm:w-[200px] bg-card/60 backdrop-blur-xl border-primary/30 text-foreground dark:bg-slate-900/60 dark:border-emerald-500/30 dark:text-white">
             <SelectValue placeholder="Filter by category" />
           </SelectTrigger>
           <SelectContent>
@@ -213,7 +213,7 @@ export default function ProgressAnalytics() {
           return (
             <Card
               key={category}
-              className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30"
+              className="bg-card/80 backdrop-blur-xl border-primary/30 dark:bg-slate-900/60 dark:border-emerald-500/30"
             >
               <CardHeader className="pb-3">
                 <div className={cn(
@@ -222,7 +222,7 @@ export default function ProgressAnalytics() {
                 )}>
                   {category === 'adults_beginner' ? '🌱' : category === 'adults_intermediate' ? '📈' : '👑'}
                 </div>
-                <CardTitle className="text-xl font-bold text-white">
+                <CardTitle className="text-xl font-bold text-foreground dark:text-white">
                   {getCategoryLabel(category)}
                 </CardTitle>
               </CardHeader>
@@ -230,51 +230,51 @@ export default function ProgressAnalytics() {
                 {/* Progress */}
                 <div>
                   <div className="flex items-center justify-between text-sm mb-2">
-                    <span className="text-cyan-100/80">Overall Progress</span>
-                    <span className="text-white font-semibold">{data.progress_percentage.toFixed(0)}%</span>
+                    <span className="text-muted-foreground dark:text-cyan-100/80">Overall Progress</span>
+                    <span className="text-foreground dark:text-white font-semibold">{data.progress_percentage.toFixed(0)}%</span>
                   </div>
                   <Progress
                     value={data.progress_percentage}
-                    className="h-3 bg-slate-700/50"
+                    className="h-3 bg-muted dark:bg-slate-700/50"
                   />
                 </div>
 
                 {/* Stats */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-cyan-100/70 flex items-center gap-1">
+                    <span className="text-muted-foreground dark:text-cyan-100/70 flex items-center gap-1">
                       <Award className="h-3 w-3" />
                       Points
                     </span>
-                    <span className="text-white font-semibold">{data.total_points}</span>
+                    <span className="text-foreground dark:text-white font-semibold">{data.total_points}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-cyan-100/70 flex items-center gap-1">
+                    <span className="text-muted-foreground dark:text-cyan-100/70 flex items-center gap-1">
                       <BookOpen className="h-3 w-3" />
                       Lessons
                     </span>
-                    <span className="text-white font-semibold">{data.lessons_completed}</span>
+                    <span className="text-foreground dark:text-white font-semibold">{data.lessons_completed}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-cyan-100/70 flex items-center gap-1">
+                    <span className="text-muted-foreground dark:text-cyan-100/70 flex items-center gap-1">
                       <Clock className="h-3 w-3" />
                       Time
                     </span>
-                    <span className="text-white font-semibold">{formatTime(data.practice_time_minutes)}</span>
+                    <span className="text-foreground dark:text-white font-semibold">{formatTime(data.practice_time_minutes)}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-cyan-100/70 flex items-center gap-1">
+                    <span className="text-muted-foreground dark:text-cyan-100/70 flex items-center gap-1">
                       <Target className="h-3 w-3" />
                       Score
                     </span>
-                    <span className="text-white font-semibold">{data.average_score.toFixed(1)}%</span>
+                    <span className="text-foreground dark:text-white font-semibold">{data.average_score.toFixed(1)}%</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-cyan-100/70 flex items-center gap-1">
+                    <span className="text-muted-foreground dark:text-cyan-100/70 flex items-center gap-1">
                       <Zap className="h-3 w-3" />
                       Streak
                     </span>
-                    <span className="text-white font-semibold">{data.streak} days</span>
+                    <span className="text-foreground dark:text-white font-semibold">{data.streak} days</span>
                   </div>
                 </div>
               </CardContent>

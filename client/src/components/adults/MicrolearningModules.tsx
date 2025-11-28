@@ -115,7 +115,7 @@ export default function MicrolearningModules() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary dark:border-emerald-400"></div>
       </div>
     );
   }
@@ -123,16 +123,12 @@ export default function MicrolearningModules() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2">Microlearning Modules</h2>
-          <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70">
-            Quick 5-10 minute lessons for busy professionals
-          </p>
-        </div>
-        <div className="flex gap-2">
+      <div>
+        <h2 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2">Microlearning Modules</h2>
+        <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70 mb-4 sm:mb-6">Quick 5-10 minute lessons for busy professionals</p>
+        <div className="flex gap-2 mb-4">
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-full sm:w-[180px] bg-slate-800/60 border-purple-500/30 text-white">
+            <SelectTrigger className="w-full sm:w-[180px] bg-card/60 backdrop-blur-xl border-primary/30 text-foreground dark:bg-slate-900/60 dark:border-emerald-500/30 dark:text-white">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
@@ -152,7 +148,7 @@ export default function MicrolearningModules() {
       {showFeatured && featuredModules.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-amber-400 dark:text-amber-400" />
+            <Sparkles className="h-5 w-5 text-amber-600 dark:text-amber-400" />
             <h3 className="text-lg font-semibold text-foreground dark:text-white">Featured This Week</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -163,7 +159,7 @@ export default function MicrolearningModules() {
                 <Card
                   key={module.id}
                   className={cn(
-                    "group bg-gradient-to-br from-amber-500/20 via-purple-500/20 to-pink-500/20 backdrop-blur-xl border-amber-400/50 hover:border-amber-300/70 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-amber-500/20 overflow-hidden",
+                    "group bg-card/80 backdrop-blur-xl border-primary/30 hover:border-primary/50 transition-all duration-300 shadow-xl hover:shadow-2xl overflow-hidden dark:bg-slate-900/60 dark:border-emerald-500/30 dark:hover:border-emerald-400/50",
                     isCompleted && "ring-2 ring-emerald-500/50"
                   )}
                 >
@@ -177,17 +173,17 @@ export default function MicrolearningModules() {
                   </CardHeader>
                   <CardContent className="p-4 sm:p-6">
                     <div className="flex items-start justify-between mb-3">
-                      <CardTitle className="text-lg font-bold text-white line-clamp-2 flex-1">
+                      <CardTitle className="text-lg font-bold text-foreground dark:text-white line-clamp-2 flex-1">
                         {module.title}
                       </CardTitle>
                       {isCompleted && (
-                        <CheckCircle className="h-5 w-5 text-emerald-400 flex-shrink-0 ml-2" />
+                        <CheckCircle className="h-5 w-5 text-emerald-500 dark:text-emerald-400 flex-shrink-0 ml-2" />
                       )}
                     </div>
-                    <p className="text-sm text-cyan-100/70 line-clamp-2 mb-4">
+                    <p className="text-sm text-muted-foreground dark:text-cyan-100/70 line-clamp-2 mb-4">
                       {module.description}
                     </p>
-                    <div className="flex items-center justify-between text-xs text-cyan-100/60 mb-4">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground dark:text-cyan-100/60 mb-4">
                       <span className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />
                         {module.duration_minutes} min
@@ -196,7 +192,7 @@ export default function MicrolearningModules() {
                         <Zap className="h-3 w-3" />
                         {module.points_reward} pts
                       </span>
-                      <Badge variant="outline" className="text-xs bg-amber-500/20 text-amber-300 border-amber-400/30">
+                      <Badge variant="outline" className="text-xs bg-amber-500/20 text-amber-700 border-amber-400/30 dark:text-amber-300 dark:border-amber-400/30">
                         Featured
                       </Badge>
                     </div>
@@ -204,8 +200,8 @@ export default function MicrolearningModules() {
                       className={cn(
                         "w-full font-semibold transition-all duration-300",
                         isCompleted
-                          ? "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white"
-                          : "bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
+                          ? "bg-emerald-600 hover:bg-emerald-700 text-white dark:bg-emerald-600 dark:hover:bg-emerald-700"
+                          : "bg-primary hover:bg-primary/90 text-primary-foreground dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600"
                       )}
                       onClick={() => navigate(`/adults/microlearning/${module.id}`)}
                     >
@@ -234,10 +230,10 @@ export default function MicrolearningModules() {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-foreground dark:text-white">All Modules</h3>
         {modules.length === 0 ? (
-          <Card className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30">
+          <Card className="bg-card/60 backdrop-blur-xl border-primary/30 dark:bg-slate-900/60 dark:border-emerald-500/30">
             <CardContent className="p-12 text-center">
-              <SearchX className="h-12 w-12 mx-auto mb-4 text-cyan-300/50" />
-              <p className="text-cyan-100/70">No modules found. Try adjusting your filters.</p>
+              <SearchX className="h-12 w-12 mx-auto mb-4 text-primary dark:text-emerald-300" />
+              <p className="text-muted-foreground dark:text-cyan-100/70">No modules found. Try adjusting your filters.</p>
             </CardContent>
           </Card>
         ) : (
@@ -249,7 +245,7 @@ export default function MicrolearningModules() {
                 <Card
                   key={module.id}
                   className={cn(
-                    "group bg-slate-900/60 backdrop-blur-xl border-purple-500/30 hover:border-purple-400/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-purple-500/20 overflow-hidden",
+                    "group bg-card/80 backdrop-blur-xl border-primary/30 hover:border-primary/50 transition-all duration-300 shadow-xl hover:shadow-2xl overflow-hidden dark:bg-slate-900/60 dark:border-emerald-500/30 dark:hover:border-emerald-400/50",
                     isCompleted && "ring-2 ring-emerald-500/50"
                   )}
                 >
@@ -264,26 +260,26 @@ export default function MicrolearningModules() {
                   <CardContent className="p-4 sm:p-6">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
-                        <CardTitle className="text-lg font-bold text-white mb-2 line-clamp-2">
+                        <CardTitle className="text-lg font-bold text-foreground dark:text-white mb-2 line-clamp-2">
                           {module.title}
                         </CardTitle>
-                        <p className="text-sm text-cyan-100/70 line-clamp-2 mb-3">
+                        <p className="text-sm text-muted-foreground dark:text-cyan-100/70 line-clamp-2 mb-3">
                           {module.description}
                         </p>
                       </div>
                       {isCompleted && (
-                        <CheckCircle className="h-5 w-5 text-emerald-400 flex-shrink-0 ml-2" />
+                        <CheckCircle className="h-5 w-5 text-emerald-500 dark:text-emerald-400 flex-shrink-0 ml-2" />
                       )}
                     </div>
                     <div className="flex flex-wrap gap-2 mb-4">
-                      <Badge variant="outline" className="text-xs bg-purple-500/20 text-purple-300 border-purple-400/30">
+                      <Badge variant="outline" className="text-xs bg-primary/20 text-primary border-primary/30 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-400/30">
                         {getCategoryLabel(module.category)}
                       </Badge>
-                      <Badge variant="outline" className="text-xs bg-slate-700/50 text-cyan-200 border-cyan-500/30">
+                      <Badge variant="outline" className="text-xs bg-primary/20 text-primary border-primary/30 dark:bg-slate-700/50 dark:text-cyan-200 dark:border-cyan-500/30">
                         {module.difficulty}
                       </Badge>
                     </div>
-                    <div className="flex items-center justify-between text-xs text-cyan-100/60 mb-4">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground dark:text-cyan-100/60 mb-4">
                       <span className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />
                         {module.duration_minutes} min
@@ -301,8 +297,8 @@ export default function MicrolearningModules() {
                       className={cn(
                         "w-full font-semibold transition-all duration-300",
                         isCompleted
-                          ? "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white"
-                          : "bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white"
+                          ? "bg-emerald-600 hover:bg-emerald-700 text-white dark:bg-emerald-600 dark:hover:bg-emerald-700"
+                          : "bg-primary hover:bg-primary/90 text-primary-foreground dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600"
                       )}
                       onClick={() => navigate(`/adults/microlearning/${module.id}`)}
                     >
