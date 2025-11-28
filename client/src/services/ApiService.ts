@@ -110,9 +110,23 @@ const fetchWithAuth = async (
       if (response.status === 401) {
         // Only clear token if explicitly requested (for login/auth operations)
         // Don't clear token during sync operations to prevent unwanted logouts
-        if (clearTokenOn401 && token && token !== 'local-token') {
+        if (clearTokenOn401) {
+          const hadStoredToken = !!(token && token !== 'local-token');
           localStorage.removeItem('speakbee_auth_token');
-          console.warn('Authentication token expired or invalid. Please sign in again.');
+          localStorage.removeItem('speakbee_current_user');
+
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(
+              new CustomEvent('speakbee-auth-invalidated', {
+                detail: { endpoint },
+              }),
+            );
+          }
+
+          if (hadStoredToken) {
+            // Token expired - user will be logged out via event handler
+            // No need to log this as it's expected behavior
+          }
         }
         const error = await response.json().catch(() => ({ message: 'Authentication required. Please sign in again.' }));
         throw { response: { data: error, status: response.status } };
@@ -178,7 +192,7 @@ export const AuthAPI = {
         localStorage.setItem('speakbee_auth_token', result.token);
       } else if (result.token) {
         // If token exists but user is not verified, DO NOT store it
-        console.log('Registration successful but account not verified - not storing token');
+        // Account needs email verification before login
       }
       
       return {
@@ -1235,7 +1249,7 @@ export const KidsAPI = {
       // If 404, session might not exist on server (local-only session)
       // This is okay - we've already deleted it locally and tracked it
       if ((error as any)?.status === 404) {
-        console.log(`Session ${sessionId} not found on server (local-only), deletion successful`);
+        // Session not found on server (local-only), deletion successful
         return {
           success: true,
           data: { message: 'Session deleted (local-only)' }

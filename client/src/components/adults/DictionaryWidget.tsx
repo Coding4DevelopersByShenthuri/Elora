@@ -15,6 +15,7 @@ import UserNotificationsService from '@/services/UserNotificationsService';
 import { playNotificationSound } from '@/utils/playNotificationSound';
 import { runWithVocabularySyncLock } from '@/utils/vocabularySyncLock';
 import { getTamilTranslationForWord } from '@/data/listening-modules/tamilTranslations';
+import { logger } from '@/utils/logger';
 
 interface DictionaryEntry {
   id: number;
@@ -74,18 +75,35 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
   const [viewMode, setViewMode] = useState<'book' | 'search'>('book'); // Default to book view
 
   useEffect(() => {
-    if (user) {
-      loadMyDictionary();
-      loadLocalDictionary();
-      syncListeningVocabulary();
+    if (!user) return;
+    
+    // Check for valid token before making API calls
+    const token = localStorage.getItem('speakbee_auth_token');
+    if (!token || token === 'local-token') {
+      return;
     }
+    
+    loadMyDictionary();
+    loadLocalDictionary();
+    syncListeningVocabulary();
   }, [user]);
 
   // Periodic sync check when widget is open (every 30 seconds)
   useEffect(() => {
     if (!user) return;
+    
+    // Check for valid token before setting up interval
+    const token = localStorage.getItem('speakbee_auth_token');
+    if (!token || token === 'local-token') {
+      return;
+    }
 
     const syncInterval = setInterval(() => {
+      // Check token is still valid before each sync
+      const currentToken = localStorage.getItem('speakbee_auth_token');
+      if (!currentToken || currentToken === 'local-token') {
+        return; // Token was removed, stop syncing
+      }
       syncListeningVocabulary();
     }, 30000); // Check every 30 seconds for new enrolled modules
 
@@ -220,7 +238,7 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
         }
       }
     } catch (error) {
-      console.error('Dictionary search failed:', error);
+      logger.error('Dictionary search failed:', error);
     } finally {
       setLoading(false);
     }
@@ -228,6 +246,12 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
 
   const syncListeningVocabulary = async () => {
     if (!user) return;
+    
+    // Check for valid token before making API calls
+    const token = localStorage.getItem('speakbee_auth_token');
+    if (!token || token === 'local-token') {
+      return;
+    }
 
     setIsSyncingVocab(true);
     const syncedKey = `synced_listening_vocab_${user.id}`;
@@ -250,7 +274,7 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
             setMyDictionary(entries);
           }
         } catch (err) {
-          console.error('Failed to fetch dictionary before syncing vocab:', err);
+          logger.error('Failed to fetch dictionary before syncing vocab:', err);
         }
 
         let currentLocalEntries: LocalDictionaryWord[] = [];
@@ -263,7 +287,7 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
               dictionaryWords.add(entry.word.toLowerCase());
             });
           } catch (err) {
-            console.error('Failed to parse local dictionary entries', err);
+            logger.error('Failed to parse local dictionary entries', err);
           }
         }
 
@@ -279,7 +303,7 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
               revalidatedSynced.add(moduleId);
             }
           } catch (err) {
-            console.error(`Failed to validate module ${moduleId}:`, err);
+            logger.error(`Failed to validate module ${moduleId}:`, err);
           }
         }
         syncedModules = revalidatedSynced;
@@ -337,7 +361,7 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
               });
             }
           } catch (err) {
-            console.error(`Failed to sync vocabulary for module ${moduleId}:`, err);
+            logger.error(`Failed to sync vocabulary for module ${moduleId}:`, err);
           }
         }
 
@@ -383,13 +407,13 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
                 },
               });
             } catch (err) {
-              console.error('Failed to create notification:', err);
+              logger.error('Failed to create notification:', err);
             }
           }
         }
       });
     } catch (error) {
-      console.error('Error syncing listening vocabulary:', error);
+      logger.error('Error syncing listening vocabulary:', error);
     } finally {
       setIsSyncingVocab(false);
     }
@@ -408,7 +432,7 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
         setLocalDictionary([]);
       }
     } catch (error) {
-      console.error('Failed to load local dictionary', error);
+      logger.error('Failed to load local dictionary', error);
     }
   };
 
@@ -417,7 +441,7 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
     try {
       localStorage.setItem(localKey, JSON.stringify(entries));
     } catch (error) {
-      console.error('Failed to persist local dictionary', error);
+      logger.error('Failed to persist local dictionary', error);
     }
   };
 
@@ -428,7 +452,7 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
         setMyDictionary(result.data?.data || []);
       }
     } catch (error) {
-      console.error('Failed to load my dictionary:', error);
+      logger.error('Failed to load my dictionary:', error);
     }
   };
 
@@ -466,7 +490,7 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
         setSelectedWord(result.data?.data);
       }
     } catch (error) {
-      console.error('Word lookup failed:', error);
+      logger.error('Word lookup failed:', error);
     }
   };
 
@@ -483,14 +507,14 @@ export default function DictionaryWidget({ onClose }: DictionaryWidgetProps) {
         loadMyDictionary();
       }
     } catch (error) {
-      console.error('Failed to add to dictionary:', error);
+      logger.error('Failed to add to dictionary:', error);
     }
   };
 
   const playAudio = (url?: string) => {
     if (url) {
       const audio = new Audio(url);
-      audio.play().catch(err => console.error('Audio play failed:', err));
+      audio.play().catch(err => logger.error('Audio play failed:', err));
     }
   };
 

@@ -18,9 +18,9 @@ interface ToolbarPreferences {
 }
 
 const TOOLS = {
-  dictionary: { icon: BookOpen, label: 'Dictionary', color: 'text-blue-400' },
-  flashcards: { icon: FileText, label: 'Flashcards', color: 'text-purple-400' },
-  cultural: { icon: Globe, label: 'Cultural', color: 'text-pink-400' },
+  dictionary: { icon: BookOpen, label: 'Dictionary', color: 'text-emerald-400' },
+  flashcards: { icon: FileText, label: 'Flashcards', color: 'text-green-400' },
+  cultural: { icon: Globe, label: 'Cultural', color: 'text-teal-400' },
 };
 
 interface QuickAccessToolbarProps {
@@ -93,7 +93,8 @@ export default function QuickAccessToolbar({ onToolClick }: QuickAccessToolbarPr
       {/* Desktop View - Right Side Vertical */}
       <div className="hidden md:flex fixed right-4 top-1/2 -translate-y-1/2 z-40 transition-all duration-300">
         <Card className={cn(
-          'bg-slate-900/95 backdrop-blur-xl border-purple-500/30 shadow-2xl',
+          'bg-card/95 backdrop-blur-xl border-primary/30 shadow-2xl',
+          'dark:bg-slate-900/95 dark:border-emerald-500/30',
           'transition-all duration-300'
         )}>
           <CardContent className="p-2">
@@ -110,7 +111,8 @@ export default function QuickAccessToolbar({ onToolClick }: QuickAccessToolbarPr
                     size="icon"
                     className={cn(
                       'h-11 w-11 rounded-lg transition-all duration-200',
-                      'hover:bg-purple-500/20 hover:border-purple-400/50',
+                      'hover:bg-primary/20 hover:border-primary/50',
+                      'dark:hover:bg-emerald-500/20 dark:hover:border-emerald-400/50',
                       toolConfig.color
                     )}
                     onClick={() => onToolClick(tool)}
@@ -121,19 +123,19 @@ export default function QuickAccessToolbar({ onToolClick }: QuickAccessToolbarPr
                 );
               })}
 
-              <div className="border-t border-purple-500/30 my-1 w-8" />
+              <div className="border-t border-primary/30 dark:border-emerald-500/30 my-1 w-8" />
 
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 rounded-lg hover:bg-purple-500/20"
+                className="h-9 w-9 rounded-lg hover:bg-primary/20 dark:hover:bg-emerald-500/20"
                 onClick={toggleExpand}
                 title={isExpanded ? 'Collapse' : 'Expand'}
               >
                 {isExpanded ? (
-                  <ChevronUp className="h-4 w-4 text-purple-300" />
+                  <ChevronUp className="h-4 w-4 text-primary dark:text-emerald-300" />
                 ) : (
-                  <ChevronDown className="h-4 w-4 text-purple-300" />
+                  <ChevronDown className="h-4 w-4 text-primary dark:text-emerald-300" />
                 )}
               </Button>
             </div>
@@ -144,7 +146,8 @@ export default function QuickAccessToolbar({ onToolClick }: QuickAccessToolbarPr
       {/* Mobile View - Bottom Right Corner Compact */}
       <div className="md:hidden fixed bottom-4 right-4 z-40 transition-all duration-300">
         <Card className={cn(
-          'bg-slate-900/95 backdrop-blur-xl border-purple-500/30 shadow-2xl',
+          'bg-card/95 backdrop-blur-xl border-primary/30 shadow-2xl',
+          'dark:bg-slate-900/95 dark:border-emerald-500/30',
           'transition-all duration-300'
         )}>
           <CardContent className="p-2">
@@ -161,7 +164,8 @@ export default function QuickAccessToolbar({ onToolClick }: QuickAccessToolbarPr
                     size="icon"
                     className={cn(
                       'h-10 w-10 rounded-lg transition-all duration-200',
-                      'hover:bg-purple-500/20 hover:border-purple-400/50',
+                      'hover:bg-primary/20 hover:border-primary/50',
+                      'dark:hover:bg-emerald-500/20 dark:hover:border-emerald-400/50',
                       toolConfig.color
                     )}
                     onClick={() => onToolClick(tool)}
@@ -173,20 +177,20 @@ export default function QuickAccessToolbar({ onToolClick }: QuickAccessToolbarPr
               })}
 
               {isExpanded && (
-                <div className="border-l border-purple-500/30 mx-1 h-6" />
+                <div className="border-l border-primary/30 dark:border-emerald-500/30 mx-1 h-6" />
               )}
 
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-10 w-10 rounded-lg hover:bg-purple-500/20 bg-purple-500/10"
+                className="h-10 w-10 rounded-lg hover:bg-primary/20 bg-primary/10 dark:hover:bg-emerald-500/20 dark:bg-emerald-500/10"
                 onClick={toggleExpand}
                 title={isExpanded ? 'Collapse' : 'Expand Tools'}
               >
                 {isExpanded ? (
-                  <X className="h-4 w-4 text-purple-300" />
+                  <X className="h-4 w-4 text-primary dark:text-emerald-300" />
                 ) : (
-                  <FileText className="h-4 w-4 text-purple-300" />
+                  <FileText className="h-4 w-4 text-primary dark:text-emerald-300" />
                 )}
               </Button>
             </div>
@@ -197,7 +201,7 @@ export default function QuickAccessToolbar({ onToolClick }: QuickAccessToolbarPr
       {/* Settings Modal - Can be implemented later */}
       {showSettings && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <Card className="bg-slate-900 border-purple-500/30 w-full max-w-md">
+          <Card className="bg-card border-primary/30 dark:bg-slate-900 dark:border-emerald-500/30 w-full max-w-md">
             <CardContent className="p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-bold text-white">Toolbar Settings</h3>

@@ -5,10 +5,11 @@ import {
   Mic, Volume2, CheckCircle, TrendingUp, Zap, Lightbulb, Crown, BarChart3,
   Clock, ThumbsUp, Shield, Rocket,
   ArrowRight, GraduationCap, Brain, Languages, Star, Sparkles, Globe,
-  Flame, Calendar, Trophy, RefreshCw, FileText, Layers
+  Flame, Calendar, Trophy, RefreshCw, FileText, Layers,
+  Speech, BookMarked, Flame as FireIcon, Gem, Headphones, PenTool, MessageSquare
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -33,6 +34,7 @@ import FlashcardsMain from '@/components/adults/FlashcardsMain';
 import { AdultsAPI } from '@/services/ApiService';
 import { useAuth } from '@/contexts/AuthContext';
 import { allMultiModeModules, getTotalModulesByMode, getModuleById } from '@/data/multi-mode-modules-config';
+import { logger } from '@/utils/logger';
 
 const AdultsPage = () => {
   const navigate = useNavigate();
@@ -41,9 +43,7 @@ const AdultsPage = () => {
   const [streak, setStreak] = useState(7);
   const [fluencyScore, setFluencyScore] = useState(65);
   const [isHovered, setIsHovered] = useState<number | null>(null);
-  const [stars, setStars] = useState<Array<{ x: number; y: number; size: number; delay: number; opacity: number }>>([]);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [scrollY, setScrollY] = useState(0);
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [dailyConversationProgress, setDailyConversationProgress] = useState<any>(null);
@@ -51,35 +51,16 @@ const AdultsPage = () => {
   const [multiModeProgress, setMultiModeProgress] = useState<any>(null);
   const [enrolledModules, setEnrolledModules] = useState<Set<string>>(new Set());
 
-  // Generate animated stars with varying opacity - Performance optimized
-  useEffect(() => {
-    const generateStars = () => {
-      const isMobile = window.innerWidth < 768;
-      const starCount = isMobile ? 100 : 200;
-      
-      const newStars = Array.from({ length: starCount }, () => ({
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        size: Math.random() * 2 + 0.5,
-        delay: Math.random() * 3,
-        opacity: Math.random() * 0.8 + 0.2
-      }));
-      setStars(newStars);
-    };
-    generateStars();
-    
-    const handleResize = () => {
-      const isMobile = window.innerWidth < 768;
-      if ((isMobile && stars.length > 100) || (!isMobile && stars.length < 150)) {
-        generateStars();
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   // Load dashboard data
   useEffect(() => {
+    // Only load data if user is authenticated and has a valid token
+    const token = localStorage.getItem('speakbee_auth_token');
+    if (!user || !token || token === 'local-token') {
+      setLoading(false);
+      return;
+    }
+    
     loadDashboardData();
     loadDailyConversationProgress();
     loadMultiModeProgress();
@@ -89,6 +70,13 @@ const AdultsPage = () => {
   // Load Multi-Mode Practice progress
   const loadMultiModeProgress = async () => {
     if (!user) return;
+    
+    // Check for valid token before making API call
+    const token = localStorage.getItem('speakbee_auth_token');
+    if (!token || token === 'local-token') {
+      return;
+    }
+    
     try {
       const result = await AdultsAPI.getMultiModePracticeHistory();
       if (result.success && 'data' in result && result.data?.data) {
@@ -122,7 +110,7 @@ const AdultsPage = () => {
         });
       }
     } catch (error) {
-      console.error('Failed to load multi-mode progress:', error);
+      logger.error('Failed to load multi-mode progress:', error);
     }
   };
 
@@ -143,7 +131,7 @@ const AdultsPage = () => {
       );
       setDailyConversationProgress(progress);
     } catch (error) {
-      console.error('Error loading daily conversation progress:', error);
+      logger.error('Error loading daily conversation progress:', error);
       setDailyConversationProgress({});
     }
   };
@@ -183,6 +171,13 @@ const AdultsPage = () => {
       setLoading(false);
       return;
     }
+    
+    // Check for valid token before making API call
+    const token = localStorage.getItem('speakbee_auth_token');
+    if (!token || token === 'local-token') {
+      setLoading(false);
+      return;
+    }
 
     try {
       setLoading(true);
@@ -205,7 +200,7 @@ const AdultsPage = () => {
         }
       }
     } catch (error) {
-      console.error('Failed to load dashboard data:', error);
+      logger.error('Failed to load dashboard data:', error);
     } finally {
       setLoading(false);
     }
@@ -216,57 +211,42 @@ const AdultsPage = () => {
     setIsLoaded(true);
   }, []);
 
-  // Parallax scroll effect for planets
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   const levels = [
     {
       id: 'beginners',
       label: 'Foundation Level',
-      icon: Lightbulb,
-      color: 'from-cyan-400 via-blue-500 to-indigo-600',
-      glowColor: 'rgba(34, 211, 238, 0.3)',
+      icon: GraduationCap,
+      color: 'from-blue-500 via-cyan-500 to-teal-500',
+      glowColor: 'rgba(59, 130, 246, 0.3)',
       description: 'Build essential communication skills for everyday situations',
       progress: dashboardData?.progress_summary?.adults_beginner?.progress_percentage || 65,
       lessons: 12,
       skills: ['Core Grammar', 'Essential Vocabulary', 'Daily Conversations'],
-      duration: '4-6 weeks',
-      constellation: 'Orion',
-      planetImage: '/planets/zu7XaNtVpYwIGWuPT910tDPzo.avif'
+      duration: '4-6 weeks'
     },
     {
       id: 'intermediates',
       label: 'Intermediate Level',
-      icon: Brain,
-      color: 'from-purple-400 via-pink-500 to-rose-600',
-      glowColor: 'rgba(168, 85, 247, 0.3)',
+      icon: Target,
+      color: 'from-emerald-500 via-green-500 to-teal-500',
+      glowColor: 'rgba(16, 185, 129, 0.3)',
       description: 'Develop professional communication and complex discussions',
       progress: dashboardData?.progress_summary?.adults_intermediate?.progress_percentage || 30,
       lessons: 18,
       skills: ['Advanced Grammar', 'Professional Communication', 'Cultural Context'],
-      duration: '6-8 weeks',
-      constellation: 'Cassiopeia',
-      planetImage: '/planets/YZWPZTXZtvH1iH4rCX0Uh48wmtQ.avif'
+      duration: '6-8 weeks'
     },
     {
       id: 'advanced',
       label: 'Advanced Level',
-      icon: Crown,
-      color: 'from-amber-400 via-orange-500 to-red-600',
-      glowColor: 'rgba(251, 191, 36, 0.3)',
+      icon: Award,
+      color: 'from-purple-500 via-indigo-500 to-blue-500',
+      glowColor: 'rgba(168, 85, 247, 0.3)',
       description: 'Master English for professional excellence and leadership',
       progress: dashboardData?.progress_summary?.adults_advanced?.progress_percentage || 15,
       lessons: 24,
       skills: ['Executive Communication', 'Native Expressions', 'Strategic Dialogue'],
-      duration: '8-12 weeks',
-      constellation: 'Pegasus',
-      planetImage: '/planets/Yo4hcrPNqAQh1DJiOgz3TH1rI.avif'
+      duration: '8-12 weeks'
     }
   ];
 
@@ -420,33 +400,37 @@ const getDailyConversationEnrollmentCount = () => {
     {
       label: "Fluency Score",
       value: `${fluencyScore}%`,
-      icon: TrendingUp,
-      color: "text-cyan-400",
-      glowColor: "rgba(34, 211, 238, 0.2)",
+      icon: Speech,
+      color: "text-blue-500",
+      bgColor: "bg-blue-500/20",
+      glowColor: "rgba(59, 130, 246, 0.2)",
       description: "Professional speaking fluency"
     },
     {
       label: "Vocabulary Mastered",
       value: dashboardData?.progress_summary?.adults_beginner?.vocabulary_words || "428",
-      icon: BookOpen,
-      color: "text-emerald-400",
-      glowColor: "rgba(52, 211, 153, 0.2)",
+      icon: BookMarked,
+      color: "text-emerald-500",
+      bgColor: "bg-emerald-500/20",
+      glowColor: "rgba(16, 185, 129, 0.2)",
       description: "Active professional vocabulary"
     },
     {
       label: "Learning Consistency",
       value: `${streak} days`,
-      icon: Zap,
-      color: "text-amber-400",
-      glowColor: "rgba(251, 191, 36, 0.2)",
+      icon: FireIcon,
+      color: "text-orange-500",
+      bgColor: "bg-orange-500/20",
+      glowColor: "rgba(249, 115, 22, 0.2)",
       description: "Daily practice streak"
     },
     {
       label: "All over points",
       value: getAllOverPoints().toString(),
-      icon: Trophy,
-      color: "text-amber-400",
-      glowColor: "rgba(245, 158, 11, 0.2)",
+      icon: Gem,
+      color: "text-purple-500",
+      bgColor: "bg-purple-500/20",
+      glowColor: "rgba(168, 85, 247, 0.2)",
       description: "Total points from all practice activities"
     },
   ];
@@ -454,17 +438,11 @@ const getDailyConversationEnrollmentCount = () => {
 const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
 
   const getScoreColor = (score: number) => {
-    if (score >= 90) return 'text-emerald-400';
-    if (score >= 80) return 'text-cyan-400';
-    if (score >= 70) return 'text-amber-400';
-    return 'text-rose-400';
+    if (score >= 90) return 'text-emerald-500';
+    if (score >= 80) return 'text-green-500';
+    if (score >= 70) return 'text-teal-500';
+    return 'text-emerald-600';
   };
-
-  // Parallax transform for planets
-  const parallaxTransform1 = `translateY(${scrollY * 0.1}px)`;
-  const parallaxTransform2 = `translateY(${scrollY * 0.15}px)`;
-  const parallaxTransform3 = `translateY(${scrollY * 0.08}px)`;
-  const parallaxTransform4 = `translateY(${scrollY * 0.12}px)`;
 
   const handleToolbarClick = (tool: string) => {
     setActiveWidget(tool);
@@ -490,99 +468,11 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
   };
 
   return (
-    <div className={`min-h-screen relative overflow-hidden bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 ${isLoaded ? 'space-fade-in' : 'opacity-0'}`}>
-      {/* Theme Transition Overlay */}
-      {!isLoaded && (
-        <div className="fixed inset-0 bg-gradient-to-b from-green-50 via-green-100 to-slate-950 z-50 transition-opacity duration-500" />
-      )}
-
-      {/* Deep Space Background with Stars */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {stars.map((star, index) => (
-          <div
-            key={index}
-            className="absolute rounded-full bg-white space-star"
-            style={{
-              left: `${star.x}%`,
-              top: `${star.y}%`,
-              width: `${star.size}px`,
-              height: `${star.size}px`,
-              animationDelay: `${star.delay}s`,
-              animationDuration: `${2 + Math.random() * 2}s`,
-              opacity: star.opacity,
-              boxShadow: `0 0 ${star.size * 2}px rgba(255, 255, 255, ${star.opacity})`
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Nebula and Cosmic Effects */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-[800px] h-[800px] bg-gradient-radial from-purple-500/30 via-indigo-500/20 to-transparent rounded-full blur-3xl nebula-effect animate-pulse" />
-        <div className="absolute top-1/4 right-0 w-[600px] h-[600px] bg-gradient-radial from-cyan-500/25 via-blue-500/15 to-transparent rounded-full blur-3xl nebula-effect animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute bottom-0 left-1/3 w-[700px] h-[700px] bg-gradient-radial from-pink-500/20 via-rose-500/10 to-transparent rounded-full blur-3xl nebula-effect animate-pulse" style={{ animationDelay: '2s' }} />
-      </div>
-
-      {/* Large Planet/Moon Spheres - Main Visual Elements with Parallax */}
-      <div 
-        className="fixed bottom-0 left-0 w-[100px] h-[100px] sm:w-[140px] sm:h-[140px] md:w-[180px] md:h-[180px] lg:w-[220px] lg:h-[220px] xl:w-[260px] xl:h-[260px] pointer-events-none opacity-60 sm:opacity-65 md:opacity-70 lg:opacity-75 xl:opacity-80 parallax-slow"
-        style={{ transform: parallaxTransform1 }}
-      >
-        <div className="relative w-full h-full">
-          <img 
-            src="/planets/eReia3yfybtZ8P5576d6kF8NJIM.avif" 
-            alt="Planet" 
-            className="absolute inset-0 rounded-full object-cover shadow-2xl"
-            style={{ filter: 'grayscale(0.2) brightness(0.85)' }}
-          />
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-500/20 to-purple-500/20 blur-2xl" />
-        </div>
-      </div>
-
-      <div 
-        className="fixed top-20 right-2 sm:right-4 md:right-10 w-[100px] h-[100px] sm:w-[150px] sm:h-[150px] md:w-[200px] md:h-[200px] lg:w-[250px] lg:h-[250px] xl:w-[300px] xl:h-[300px] pointer-events-none opacity-40 sm:opacity-50 md:opacity-60 hidden sm:block parallax-slow"
-        style={{ transform: parallaxTransform2 }}
-      >
-        <div className="relative w-full h-full">
-          <img 
-            src="/planets/SEp7QE3Bk6RclE0R7rhBgcGIOI.avif" 
-            alt="Planet" 
-            className="absolute inset-0 rounded-full object-cover shadow-xl"
-            style={{ filter: 'grayscale(0.3) brightness(0.75)' }}
-          />
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500/15 to-pink-500/15 blur-xl" />
-        </div>
-      </div>
-
-      <div 
-        className="fixed top-1/2 right-4 md:right-20 w-[80px] h-[80px] sm:w-[120px] sm:h-[120px] md:w-[180px] md:h-[180px] lg:w-[220px] lg:h-[220px] xl:w-[250px] xl:h-[250px] pointer-events-none opacity-30 sm:opacity-40 md:opacity-50 hidden md:block parallax-slow"
-        style={{ transform: parallaxTransform3 }}
-      >
-        <div className="relative w-full h-full">
-          <img 
-            src="/planets/K3uC2Tk4o2zjSbuWGs3t0MMuLVY.avif" 
-            alt="Planet" 
-            className="absolute inset-0 rounded-full object-cover shadow-xl"
-            style={{ filter: 'grayscale(0.3) brightness(0.7)' }}
-          />
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-indigo-500/15 to-blue-500/15 blur-xl" />
-        </div>
-      </div>
-
-      <div 
-        className="fixed top-32 left-2 sm:left-4 md:left-20 w-[80px] h-[80px] sm:w-[120px] sm:h-[120px] md:w-[160px] md:h-[160px] lg:w-[180px] lg:h-[180px] xl:w-[200px] xl:h-[200px] pointer-events-none opacity-25 sm:opacity-30 md:opacity-40 hidden lg:block parallax-slow"
-        style={{ transform: parallaxTransform4 }}
-      >
-        <div className="relative w-full h-full">
-          <img 
-            src="/planets/F4RKAKmFyoRYVlTsUWN51wD1dg.avif" 
-            alt="Planet" 
-            className="absolute inset-0 rounded-full object-cover shadow-lg"
-            style={{ filter: 'grayscale(0.4) brightness(0.65)' }}
-          />
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-500/10 to-blue-500/10 blur-lg" />
-        </div>
-      </div>
+    <div className={`relative overflow-hidden min-h-screen ${isLoaded ? 'animate-fade-in' : 'opacity-0'}`}>
+      {/* Background Elements - Same as Home Page */}
+      <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-primary/5 to-transparent -z-10"></div>
+      <div className="absolute top-1/4 right-0 w-[400px] h-[400px] rounded-full bg-secondary/10 blur-3xl -z-10"></div>
+      <div className="absolute bottom-1/4 left-0 w-[300px] h-[300px] rounded-full bg-accent/10 blur-3xl -z-10"></div>
 
       {/* Quick Access Toolbar */}
       {user && <QuickAccessToolbar onToolClick={handleToolbarClick} />}
@@ -602,53 +492,62 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
         </div>
       )}
 
-      <div className="relative z-10 pb-12 sm:pb-16 md:pb-20 pt-20 sm:pt-24 md:pt-32">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header Section */}
-          <div className="text-center mb-8 sm:mb-12 md:mb-16">
-            <div className="flex items-center justify-center gap-2 sm:gap-4 mb-4 sm:mb-6 md:mb-8">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Professional English Mastery
-              </h1>
-            </div>
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-cyan-100/80 max-w-3xl mx-auto mb-4 sm:mb-6 md:mb-8 leading-relaxed px-2">
-              Advanced English learning designed for professionals seeking career advancement and executive communication excellence
-            </p>
-            <div className="flex flex-wrap justify-center gap-2 sm:gap-3 px-2">
-              <Badge variant="secondary" className="bg-cyan-500/20 backdrop-blur-sm text-cyan-300 border-cyan-400/30 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 text-xs sm:text-sm">
-                <Target className="w-3 h-3 mr-1 sm:mr-2" />
-                Career-Focused
-              </Badge>
-              <Badge variant="secondary" className="bg-emerald-500/20 backdrop-blur-sm text-emerald-300 border-emerald-400/30 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 text-xs sm:text-sm">
-                <Clock className="w-3 h-3 mr-1 sm:mr-2" />
-                Flexible Learning
-              </Badge>
-              <Badge variant="secondary" className="bg-purple-500/20 backdrop-blur-sm text-purple-300 border-purple-400/30 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 text-xs sm:text-sm">
-                <Shield className="w-3 h-3 mr-1 sm:mr-2" />
-                Professional Curriculum
-              </Badge>
-              <Badge variant="secondary" className="bg-amber-500/20 backdrop-blur-sm text-amber-300 border-amber-400/30 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 text-xs sm:text-sm">
-                <Rocket className="w-3 h-3 mr-1 sm:mr-2" />
-                Accelerated Progress
-              </Badge>
-            </div>
-          </div>
+      <main className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 xl:px-10 pt-24 pb-16 space-y-10">
+        <section>
+          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-[#064e3b] via-[#047857] to-[#10b981] text-white shadow-xl dark:from-[#022c22] dark:via-[#065f46] dark:to-[#059669]">
+            <span className="absolute -right-24 -top-24 h-56 w-56 rounded-full bg-white/10 blur-3xl" aria-hidden />
+            <span className="absolute -left-28 bottom-0 h-48 w-48 rounded-full bg-white/10 blur-3xl" aria-hidden />
+            <CardHeader className="space-y-3 py-4 sm:py-5 md:py-6 relative z-10">
+              <div className="flex flex-col gap-3 sm:gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <div className="space-y-2 sm:space-y-3 lg:max-w-2xl">
+                  <Badge className="bg-white/25 text-white uppercase tracking-wide text-xs sm:text-sm px-2 py-0.5 sm:px-3 sm:py-1">
+                    Professional Learners (Adults)
+                  </Badge>
+                  <CardTitle className="text-xl sm:text-2xl md:text-3xl font-semibold text-white leading-tight">
+                    Comprehensive lessons, interactive practice, and professional development for career advancement
+                  </CardTitle>
+                  <CardDescription className="text-white/85 text-sm sm:text-base leading-relaxed">
+                    Master English communication skills with personalized learning paths, AI-powered feedback, and real-world business scenarios designed for professionals and executives.
+                  </CardDescription>
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2 pt-1">
+                    <Badge variant="secondary" className="bg-white/20 backdrop-blur-sm text-white border-white/30 px-2 py-0.5 sm:px-2.5 sm:py-1 text-xs hover:bg-white/25">
+                      <Target className="w-3 h-3 mr-1" />
+                      Career-Focused
+                    </Badge>
+                    <Badge variant="secondary" className="bg-white/20 backdrop-blur-sm text-white border-white/30 px-2 py-0.5 sm:px-2.5 sm:py-1 text-xs hover:bg-white/25">
+                      <Clock className="w-3 h-3 mr-1" />
+                      Flexible Learning
+                    </Badge>
+                    <Badge variant="secondary" className="bg-white/20 backdrop-blur-sm text-white border-white/30 px-2 py-0.5 sm:px-2.5 sm:py-1 text-xs hover:bg-white/25">
+                      <Shield className="w-3 h-3 mr-1" />
+                      Professional Curriculum
+                    </Badge>
+                    <Badge variant="secondary" className="bg-white/20 backdrop-blur-sm text-white border-white/30 px-2 py-0.5 sm:px-2.5 sm:py-1 text-xs hover:bg-white/25">
+                      <Rocket className="w-3 h-3 mr-1" />
+                      Accelerated Progress
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            </CardHeader>
+          </Card>
+        </section>
 
           {/* Quick Stats Dashboard */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             {stats.map((stat, index) => {
               const Icon = stat.icon;
               return (
                 <Card
                   key={index}
-                  className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30 hover:border-purple-400/50 transition-all duration-300"
+                  className="bg-card/80 backdrop-blur-xl border-primary/30 hover:border-primary/50 transition-all duration-300 dark:bg-slate-900/60 dark:border-emerald-500/30 dark:hover:border-emerald-400/50"
                 >
                   <CardContent className="p-4 sm:p-5">
-                    <div className={cn("p-2 sm:p-3 rounded-lg mb-2 sm:mb-3 w-fit", stat.color)} style={{ backgroundColor: stat.glowColor }}>
+                    <div className={cn("p-2 sm:p-3 rounded-lg mb-2 sm:mb-3 w-fit", stat.bgColor, stat.color)}>
                       <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
-                    <div className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-1">{stat.value}</div>
-                    <div className="text-xs sm:text-sm text-cyan-100/70">{stat.label}</div>
+                    <div className="text-lg sm:text-xl md:text-2xl font-bold text-foreground mb-1 dark:text-white">{stat.value}</div>
+                    <div className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70">{stat.label}</div>
                   </CardContent>
                 </Card>
               );
@@ -656,52 +555,40 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
           </div>
 
           {/* Level Cards - Simplified */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
             {levels.map((level, index) => {
               const Icon = level.icon;
               return (
                 <Card 
                   key={level.id}
                   className={cn(
-                    "group relative bg-slate-900/60 backdrop-blur-xl border-purple-500/30 hover:border-purple-400/50 transition-all duration-500 shadow-2xl overflow-hidden space-card-enter"
+                    "group relative bg-card/80 backdrop-blur-xl border-primary/30 hover:border-primary/50 transition-all duration-500 shadow-2xl overflow-hidden dark:bg-slate-900/60 dark:border-emerald-500/30 dark:hover:border-emerald-400/50"
                   )}
                   onMouseEnter={() => setIsHovered(index)}
                   onMouseLeave={() => setIsHovered(null)}
                 >
-                  <div className="absolute -bottom-10 -right-10 sm:-bottom-16 sm:-right-16 w-32 h-32 sm:w-48 sm:h-48 opacity-20 sm:opacity-25 group-hover:opacity-40 transition-opacity duration-500">
-                    <img 
-                      src={level.planetImage}
-                      alt={`${level.label} planet`}
-                      className="w-full h-full rounded-full object-cover"
-                      style={{ filter: 'grayscale(0.4) brightness(0.7)' }}
-                    />
-                  </div>
-
                   <CardContent className="p-4 sm:p-6 relative z-10">
                     <div className={cn("p-3 rounded-xl text-white bg-gradient-to-r shadow-lg mb-4 w-fit", level.color)}>
                       <Icon className="w-6 h-6 sm:w-7 sm:h-7" />
                     </div>
                     
                     <div className="flex items-center gap-2 mb-2">
-                      <h3 className="text-xl sm:text-2xl font-bold text-white">{level.label}</h3>
-                      <Badge variant="outline" className="bg-purple-500/20 text-purple-300 border-purple-400/30 text-xs">
-                        {level.constellation}
-                      </Badge>
+                      <h3 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white">{level.label}</h3>
                     </div>
-                    <p className="text-sm text-cyan-100/70 mb-4">{level.description}</p>
+                    <p className="text-sm text-muted-foreground mb-4 dark:text-cyan-100/70">{level.description}</p>
                     
                     <div className="space-y-2 mb-4">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-cyan-100/70">Progress</span>
-                        <span className="font-semibold text-white">{level.progress}%</span>
+                        <span className="text-muted-foreground dark:text-cyan-100/70">Progress</span>
+                        <span className="font-semibold text-foreground dark:text-white">{level.progress}%</span>
                       </div>
-                      <Progress value={level.progress} className="h-2 bg-slate-700/50">
+                      <Progress value={level.progress} className="h-2 bg-muted dark:bg-slate-700/50">
                         <div className={cn("h-full rounded-full bg-gradient-to-r", level.color)} />
                       </Progress>
                     </div>
 
                     <Link to={`/adults/${level.id}`}>
-                      <Button className="w-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white font-semibold transition-all duration-300">
+                      <Button className="w-full bg-gradient-to-r from-primary via-secondary to-accent hover:from-primary/90 hover:via-secondary/90 hover:to-accent/90 text-white font-semibold transition-all duration-300 dark:from-emerald-500 dark:via-green-500 dark:to-teal-500 dark:hover:from-emerald-600 dark:hover:via-green-600 dark:hover:to-teal-600">
                         Explore Level
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </Button>
@@ -713,52 +600,52 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
           </div>
 
           {/* Personalized Recommendations - Prominent */}
-          <div className="mb-8 sm:mb-10 md:mb-12">
+          <div>
             <PersonalizedRecommendations />
           </div>
 
           {/* Main Content Tabs - All Features Organized */}
-          <div className="mb-8 sm:mb-10 md:mb-12">
+          <div>
             <Tabs defaultValue="practice" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-9 bg-slate-900/60 border-purple-500/30 mb-6 h-auto">
-                <TabsTrigger value="practice" className="text-xs sm:text-sm data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300 py-2 sm:py-3">
+              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-9 bg-card/80 border-primary/30 mb-6 h-auto dark:bg-slate-900/60 dark:border-emerald-500/30">
+                <TabsTrigger value="practice" className="text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary py-2 sm:py-3 dark:data-[state=active]:bg-emerald-500/20 dark:data-[state=active]:text-emerald-300">
                   <MessageCircle className="w-4 h-4 mr-2" />
                   <span className="hidden sm:inline">Quick Practice</span>
                   <span className="sm:hidden">Practice</span>
                 </TabsTrigger>
-                <TabsTrigger value="lessons" className="text-xs sm:text-sm data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300 py-2 sm:py-3">
+                <TabsTrigger value="lessons" className="text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary py-2 sm:py-3 dark:data-[state=active]:bg-emerald-500/20 dark:data-[state=active]:text-emerald-300">
                   <BookOpen className="w-4 h-4 mr-2" />
                   <span className="hidden sm:inline">Common Lessons</span>
                   <span className="sm:hidden">Lessons</span>
                 </TabsTrigger>
-                <TabsTrigger value="challenges" className="text-xs sm:text-sm data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300 py-2 sm:py-3">
+                <TabsTrigger value="challenges" className="text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary py-2 sm:py-3 dark:data-[state=active]:bg-emerald-500/20 dark:data-[state=active]:text-emerald-300">
                   <Trophy className="w-4 h-4 mr-2" />
                   Challenges
                 </TabsTrigger>
-                <TabsTrigger value="goals" className="text-xs sm:text-sm data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300 py-2 sm:py-3">
+                <TabsTrigger value="goals" className="text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary py-2 sm:py-3 dark:data-[state=active]:bg-emerald-500/20 dark:data-[state=active]:text-emerald-300">
                   <Target className="w-4 h-4 mr-2" />
                   Goals
                 </TabsTrigger>
-                <TabsTrigger value="review" className="text-xs sm:text-sm data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300 py-2 sm:py-3">
+                <TabsTrigger value="review" className="text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary py-2 sm:py-3 dark:data-[state=active]:bg-emerald-500/20 dark:data-[state=active]:text-emerald-300">
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Review
                 </TabsTrigger>
-                <TabsTrigger value="multimode" className="text-xs sm:text-sm data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300 py-2 sm:py-3">
+                <TabsTrigger value="multimode" className="text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary py-2 sm:py-3 dark:data-[state=active]:bg-emerald-500/20 dark:data-[state=active]:text-emerald-300">
                   <Play className="w-4 h-4 mr-2" />
                   <span className="hidden sm:inline">Multi-Mode</span>
                   <span className="sm:hidden">Practice</span>
                 </TabsTrigger>
-                <TabsTrigger value="email" className="text-xs sm:text-sm data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300 py-2 sm:py-3">
+                <TabsTrigger value="email" className="text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary py-2 sm:py-3 dark:data-[state=active]:bg-emerald-500/20 dark:data-[state=active]:text-emerald-300">
                   <MessageCircle className="w-4 h-4 mr-2" />
                   <span className="hidden sm:inline">Email Coach</span>
                   <span className="sm:hidden">Email</span>
                 </TabsTrigger>
-                <TabsTrigger value="cultural" className="text-xs sm:text-sm data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300 py-2 sm:py-3">
+                <TabsTrigger value="cultural" className="text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary py-2 sm:py-3 dark:data-[state=active]:bg-emerald-500/20 dark:data-[state=active]:text-emerald-300">
                   <Globe className="w-4 h-4 mr-2" />
                   <span className="hidden sm:inline">Cultural</span>
                   <span className="sm:hidden">Culture</span>
                 </TabsTrigger>
-                <TabsTrigger value="analytics" className="text-xs sm:text-sm data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300 py-2 sm:py-3">
+                <TabsTrigger value="analytics" className="text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary py-2 sm:py-3 dark:data-[state=active]:bg-emerald-500/20 dark:data-[state=active]:text-emerald-300">
                   <BarChart3 className="w-4 h-4 mr-2" />
                   Analytics
                 </TabsTrigger>
@@ -768,12 +655,12 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
               <TabsContent value="practice" className="mt-0">
                 <div className="space-y-6">
                   <div>
-                    <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Quick Practice Sessions</h2>
-                    <p className="text-xs sm:text-sm text-cyan-100/70 mb-4 sm:mb-6">Short, focused exercises for busy professionals</p>
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2">Quick Practice Sessions</h2>
+                    <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70 mb-4 sm:mb-6">Short, focused exercises for busy professionals</p>
                 </div>
 
                   {/* Multi-Mode Practice */}
-                  <Card className="bg-gradient-to-br from-blue-500/20 via-indigo-500/30 to-purple-500/20 backdrop-blur-xl border-blue-400/50 shadow-2xl relative">
+                  <Card className="bg-gradient-to-br from-primary/20 via-secondary/30 to-accent/20 backdrop-blur-xl border-primary/50 shadow-2xl relative dark:from-emerald-500/20 dark:via-green-500/30 dark:to-teal-500/20 dark:border-emerald-400/50">
                     <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10">
                       <Badge className="bg-gradient-to-r from-emerald-500 to-green-600 text-white border-0 shadow-lg px-2 sm:px-3 py-1 text-xs sm:text-sm">
                         <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
@@ -782,29 +669,29 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                     </div>
                     <CardContent className="p-4 sm:p-6 md:p-8">
                       <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-                        <div className="p-4 sm:p-6 rounded-2xl text-white bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg flex-shrink-0">
+                        <div className="p-4 sm:p-6 rounded-2xl text-white bg-gradient-to-r from-primary to-secondary shadow-lg flex-shrink-0 dark:from-emerald-500 dark:to-green-600">
                           <Layers className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
                         </div>
                         <div className="flex-1 text-center sm:text-left w-full">
                           <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
-                            <h3 className="text-xl sm:text-2xl font-bold text-white">Multi-Mode Practice</h3>
+                            <h3 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white">Multi-Mode Practice</h3>
                             {getMultiModeProgress() !== null && (
                               <Badge variant="outline" className="bg-emerald-500/20 text-emerald-300 border-emerald-400/50 text-xs">
                                 {getMultiModeProgress()}% Complete
                               </Badge>
                             )}
                           </div>
-                          <p className="text-sm sm:text-base text-cyan-100/80 mb-3 sm:mb-4">
+                          <p className="text-sm sm:text-base text-muted-foreground dark:text-cyan-100/80 mb-3 sm:mb-4">
                             Practice listening, speaking, reading, and writing skills with comprehensive exercises
                           </p>
                           {/* Mode Eligibility Badges */}
                           {(() => {
                             const summary = getEnrolledSummaryByMode();
                             const badges = [
-                              { id: 'listening', label: 'Listening', count: summary.listening, color: 'bg-blue-500/20 text-blue-200 border-blue-400/30' },
-                              { id: 'speaking', label: 'Speaking', count: summary.speaking, color: 'bg-green-500/20 text-green-200 border-green-400/30' },
-                              { id: 'reading', label: 'Reading', count: summary.reading, color: 'bg-purple-500/20 text-purple-200 border-purple-400/30' },
-                              { id: 'writing', label: 'Writing', count: summary.writing, color: 'bg-amber-500/20 text-amber-200 border-amber-400/30' },
+                              { id: 'listening', label: 'Listening', count: summary.listening, color: 'bg-primary/20 text-primary border-primary/30 dark:bg-emerald-500/20 dark:text-emerald-200 dark:border-emerald-400/30' },
+                              { id: 'speaking', label: 'Speaking', count: summary.speaking, color: 'bg-secondary/20 text-secondary border-secondary/30 dark:bg-green-500/20 dark:text-green-200 dark:border-green-400/30' },
+                              { id: 'reading', label: 'Reading', count: summary.reading, color: 'bg-accent/20 text-accent border-accent/30 dark:bg-teal-500/20 dark:text-teal-200 dark:border-teal-400/30' },
+                              { id: 'writing', label: 'Writing', count: summary.writing, color: 'bg-primary/20 text-primary border-primary/30 dark:bg-emerald-600/20 dark:text-emerald-200 dark:border-emerald-500/30' },
                             ];
                             const hasAny = badges.some(badge => badge.count > 0);
                             if (!hasAny) return null;
@@ -823,22 +710,22 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                           {/* Progress Display */}
                           {getMultiModeProgress() !== null && (
                             <div className="mb-3 sm:mb-4 space-y-2">
-                              <div className="flex items-center justify-between text-xs sm:text-sm text-cyan-200/70 mb-1">
+                              <div className="flex items-center justify-between text-xs sm:text-sm text-muted-foreground dark:text-cyan-200/70 mb-1">
                                 <span>Overall Progress</span>
-                                <span className="font-semibold">{getMultiModeProgress()}%</span>
+                                <span className="font-semibold text-foreground dark:text-white">{getMultiModeProgress()}%</span>
                               </div>
                               <Progress 
                                 value={getMultiModeProgress() || 0} 
-                                className="h-2 bg-slate-700/50"
+                                className="h-2 bg-muted dark:bg-slate-700/50"
                               />
                               
                               {/* Enrolled Modules Badges */}
                               {enrolledModules.size > 0 && (
-                                <div className="flex flex-wrap gap-2 text-xs text-cyan-200/60 mb-2">
+                                <div className="flex flex-wrap gap-2 text-xs text-muted-foreground dark:text-cyan-200/60 mb-2">
                                   {Array.from(enrolledModules).map((moduleId) => {
                                     const module = getModuleById(moduleId);
                                     return (
-                                      <Badge key={moduleId} variant="outline" className="bg-blue-500/20 text-blue-300 border-blue-400/30 text-xs">
+                                      <Badge key={moduleId} variant="outline" className="bg-primary/20 text-primary border-primary/30 text-xs dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-400/30">
                                         {module?.title || moduleId}
                                       </Badge>
                                     );
@@ -847,12 +734,12 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                               )}
                               {/* Points Display */}
                               {multiModeProgress && multiModeProgress.totalPoints > 0 && (
-                                <div className="flex items-center justify-between p-2 sm:p-3 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-400/30 rounded-lg">
+                                <div className="flex items-center justify-between p-2 sm:p-3 bg-gradient-to-r from-primary/20 to-secondary/20 border border-primary/30 rounded-lg dark:from-emerald-500/20 dark:to-green-500/20 dark:border-emerald-400/30">
                                   <div className="flex items-center gap-2">
-                                    <Trophy className="w-4 h-4 text-amber-400" />
-                                    <span className="text-xs sm:text-sm text-amber-200 font-medium">Total Points</span>
+                                    <Trophy className="w-4 h-4 text-primary dark:text-emerald-400" />
+                                    <span className="text-xs sm:text-sm text-primary font-medium dark:text-emerald-200">Total Points</span>
                                   </div>
-                                  <span className="text-base sm:text-lg font-bold text-amber-300">
+                                  <span className="text-base sm:text-lg font-bold text-primary dark:text-emerald-300">
                                     {multiModeProgress.totalPoints}
                                   </span>
                                 </div>
@@ -860,16 +747,16 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                             </div>
                           )}
                           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-4 mb-3 sm:mb-4">
-                            <Badge variant="outline" className="bg-blue-500/20 text-blue-300 border-blue-400/30 text-xs">
+                            <Badge variant="outline" className="bg-primary/20 text-primary border-primary/30 text-xs dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-400/30">
                               All Modes
                             </Badge>
-                            <Badge variant="outline" className="bg-indigo-500/20 text-indigo-300 border-indigo-400/30 text-xs">
+                            <Badge variant="outline" className="bg-secondary/20 text-secondary border-secondary/30 text-xs dark:bg-green-500/20 dark:text-green-300 dark:border-green-400/30">
                               Interactive
                             </Badge>
                           </div>
                           <Button
                             size="default"
-                            className="w-full sm:w-auto bg-white text-blue-600 hover:bg-blue-50 font-semibold text-sm sm:text-base"
+                            className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm sm:text-base dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600"
                             onClick={() => navigate('/adults/practice/multi-mode')}
                           >
                             <Play className="w-4 h-4 mr-2" />
@@ -882,25 +769,25 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                   </Card>
 
                   {/* Pronunciation Analyzer */}
-                  <Card className="bg-gradient-to-br from-amber-500/20 via-orange-500/30 to-red-500/20 backdrop-blur-xl border-amber-400/50 shadow-2xl">
+                  <Card className="bg-gradient-to-br from-accent/20 via-secondary/30 to-primary/20 backdrop-blur-xl border-accent/50 shadow-2xl dark:from-teal-500/20 dark:via-green-500/30 dark:to-emerald-500/20 dark:border-teal-400/50">
                     <CardContent className="p-4 sm:p-6 md:p-8">
                       <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-                        <div className="p-4 sm:p-6 rounded-2xl text-white bg-gradient-to-r from-amber-500 to-orange-600 shadow-lg flex-shrink-0">
+                        <div className="p-4 sm:p-6 rounded-2xl text-white bg-gradient-to-r from-accent to-secondary shadow-lg flex-shrink-0 dark:from-teal-500 dark:to-green-600">
                           <Mic className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
                         </div>
                         <div className="flex-1 text-center sm:text-left w-full">
-                          <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">Pronunciation Analyzer</h3>
-                          <p className="text-sm sm:text-base text-cyan-100/80 mb-3 sm:mb-4">
+                          <h3 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2">Pronunciation Analyzer</h3>
+                          <p className="text-sm sm:text-base text-muted-foreground dark:text-cyan-100/80 mb-3 sm:mb-4">
                             Record and analyze your pronunciation with AI-powered feedback
                           </p>
                           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-4 mb-3 sm:mb-4">
-                            <Badge variant="outline" className="bg-amber-500/20 text-amber-300 border-amber-400/30 text-xs">
+                            <Badge variant="outline" className="bg-accent/20 text-accent border-accent/30 text-xs dark:bg-teal-500/20 dark:text-teal-300 dark:border-teal-400/30">
                               AI Feedback
                             </Badge>
                           </div>
                           <Button
                             size="default"
-                            className="w-full sm:w-auto bg-white text-amber-600 hover:bg-amber-50 font-semibold text-sm sm:text-base"
+                            className="w-full sm:w-auto bg-accent text-accent-foreground hover:bg-accent/90 font-semibold text-sm sm:text-base dark:bg-teal-500 dark:text-white dark:hover:bg-teal-600"
                             onClick={() => setActiveWidget('pronunciation')}
                           >
                             <Mic className="w-4 h-4 mr-2" />
@@ -913,7 +800,7 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                   </Card>
 
                   {/* Daily Conversation - Prominent */}
-                  <Card className="bg-gradient-to-br from-cyan-500/20 via-purple-500/30 to-pink-500/20 backdrop-blur-xl border-purple-400/50 shadow-2xl relative">
+                  <Card className="bg-gradient-to-br from-secondary/20 via-primary/30 to-accent/20 backdrop-blur-xl border-primary/50 shadow-2xl relative dark:from-green-500/20 dark:via-emerald-500/30 dark:to-teal-500/20 dark:border-emerald-400/50">
                     <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10">
                       <Badge className="bg-gradient-to-r from-emerald-500 to-green-600 text-white border-0 shadow-lg px-2 sm:px-3 py-1 text-xs sm:text-sm">
                         {dailyConversationEnrolledCount > 0 && (
@@ -924,35 +811,35 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                     </div>
                     <CardContent className="p-4 sm:p-6 md:p-8">
                       <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-                        <div className={cn("p-4 sm:p-6 rounded-2xl text-white bg-gradient-to-r shadow-lg flex-shrink-0", "from-cyan-500 to-blue-600")}>
+                        <div className={cn("p-4 sm:p-6 rounded-2xl text-white bg-gradient-to-r shadow-lg flex-shrink-0", "from-secondary to-primary dark:from-green-500 dark:to-emerald-600")}>
                           <MessageCircle className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
                         </div>
                         <div className="flex-1 text-center sm:text-left w-full">
                           <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
-                            <h3 className="text-xl sm:text-2xl font-bold text-white">Daily Conversation</h3>
+                            <h3 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white">Daily Conversation</h3>
                             {getOverallProgress() !== null && (
                               <Badge variant="outline" className="bg-emerald-500/20 text-emerald-300 border-emerald-400/50 text-xs">
                                 {getOverallProgress()}% Complete
                               </Badge>
                             )}
                           </div>
-                          <p className="text-sm sm:text-base text-cyan-100/80 mb-3 sm:mb-4">
+                          <p className="text-sm sm:text-base text-muted-foreground dark:text-cyan-100/80 mb-3 sm:mb-4">
                             Practice professional speaking about everyday topics with AI-powered feedback
                           </p>
                           {/* Progress Display - Show if any topic has progress */}
                           {getOverallProgress() !== null && (
                             <div className="mb-3 sm:mb-4 space-y-2">
-                              <div className="flex items-center justify-between text-xs sm:text-sm text-cyan-200/70 mb-1">
+                              <div className="flex items-center justify-between text-xs sm:text-sm text-muted-foreground dark:text-cyan-200/70 mb-1">
                                 <span>Overall Progress</span>
-                                <span className="font-semibold">{getOverallProgress()}%</span>
+                                <span className="font-semibold text-foreground dark:text-white">{getOverallProgress()}%</span>
                               </div>
                               <Progress 
                                 value={getOverallProgress() || 0} 
-                                className="h-2 bg-slate-700/50"
+                                className="h-2 bg-muted dark:bg-slate-700/50"
                               />
                               {/* Enrolled Topics Summary */}
                               {dailyConversationProgress && Object.keys(dailyConversationProgress).length > 0 && (
-                                <div className="flex flex-wrap gap-2 text-xs text-cyan-200/60 mb-2">
+                                <div className="flex flex-wrap gap-2 text-xs text-muted-foreground dark:text-cyan-200/60 mb-2">
                                   {Object.entries(dailyConversationProgress).map(([topicId, topic]: [string, any]) => {
                                     if (topic?.enrolled) {
                                       const topicName = topicId === 'greetings' ? 'Greetings' : 
@@ -969,12 +856,12 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                               )}
                               {/* Points Display */}
                               {getDailyConversationPoints() > 0 && (
-                                <div className="flex items-center justify-between p-2 sm:p-3 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-400/30 rounded-lg">
+                                <div className="flex items-center justify-between p-2 sm:p-3 bg-gradient-to-r from-primary/20 to-secondary/20 border border-primary/30 rounded-lg dark:from-emerald-500/20 dark:to-green-500/20 dark:border-emerald-400/30">
                                   <div className="flex items-center gap-2">
-                                    <Trophy className="w-4 h-4 text-amber-400" />
-                                    <span className="text-xs sm:text-sm text-amber-200 font-medium">Total Points</span>
+                                    <Trophy className="w-4 h-4 text-primary dark:text-emerald-400" />
+                                    <span className="text-xs sm:text-sm text-primary font-medium dark:text-emerald-200">Total Points</span>
                                   </div>
-                                  <span className="text-base sm:text-lg font-bold text-amber-300">
+                                  <span className="text-base sm:text-lg font-bold text-primary dark:text-emerald-300">
                                     {getDailyConversationPoints()}
                                   </span>
                                 </div>
@@ -982,13 +869,13 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                             </div>
                           )}
                           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-4 mb-3 sm:mb-4">
-                            <Badge variant="outline" className="bg-purple-500/20 text-purple-300 border-purple-400/30 text-xs">
+                            <Badge variant="outline" className="bg-primary/20 text-primary border-primary/30 text-xs dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-400/30">
                               All Levels
                             </Badge>
                       </div>
                           <Button
                             size="default"
-                            className="w-full sm:w-auto bg-white text-purple-600 hover:bg-cyan-50 font-semibold text-sm sm:text-base"
+                            className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm sm:text-base dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600"
                             onClick={() => navigate('/adults/practice/daily-conversation')}
                           >
                             <Play className="w-4 h-4 mr-2" />
@@ -1023,8 +910,8 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
               <TabsContent value="review" className="mt-0">
                 <div className="space-y-6">
                   <div>
-                    <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Review & Flashcards</h2>
-                    <p className="text-xs sm:text-sm text-cyan-100/70 mb-4 sm:mb-6">Spaced repetition and flashcard review</p>
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2">Review & Flashcards</h2>
+                    <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70 mb-4 sm:mb-6">Spaced repetition and flashcard review</p>
                   </div>
                   <SpacedRepetition />
                   <FlashcardsMain />
@@ -1034,18 +921,18 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
               <TabsContent value="multimode" className="mt-0">
                 <div className="space-y-6">
                   <div>
-                    <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Multi-Mode Practice</h2>
-                    <p className="text-xs sm:text-sm text-cyan-100/70 mb-4 sm:mb-6">Practice all language skills in one place</p>
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2">Multi-Mode Practice</h2>
+                    <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70 mb-4 sm:mb-6">Practice all language skills in one place</p>
                   </div>
-                  <Card className="bg-gradient-to-br from-blue-500/20 via-indigo-500/30 to-purple-500/20 backdrop-blur-xl border-blue-400/50 shadow-2xl">
+                  <Card className="bg-gradient-to-br from-primary/20 via-secondary/30 to-accent/20 backdrop-blur-xl border-primary/50 shadow-2xl dark:from-emerald-500/20 dark:via-green-500/30 dark:to-teal-500/20 dark:border-emerald-400/50">
                     <CardContent className="p-6">
                       <div className="text-center">
-                        <p className="text-cyan-100/80 mb-4">
+                        <p className="text-muted-foreground dark:text-cyan-100/80 mb-4">
                           Access comprehensive practice for listening, speaking, reading, and writing skills
                         </p>
                         <Button
                           size="default"
-                          className="bg-white text-blue-600 hover:bg-blue-50 font-semibold"
+                          className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600"
                           onClick={() => navigate('/adults/practice/multi-mode')}
                         >
                           <Play className="w-4 h-4 mr-2" />
@@ -1073,22 +960,22 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
           </div>
 
           {/* Video Lessons - Separate Prominent Section */}
-          <div className="mb-8 sm:mb-10 md:mb-12">
-            <Card className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30 shadow-2xl overflow-hidden">
+          <div>
+            <Card className="bg-card/80 backdrop-blur-xl border-primary/30 shadow-2xl overflow-hidden dark:bg-slate-900/60 dark:border-emerald-500/30">
                     <CardContent className="p-0">
-                <div className={cn("h-auto min-h-[200px] sm:min-h-[240px] md:min-h-[280px] py-6 sm:py-8 md:py-10 bg-gradient-to-r flex items-center justify-center relative overflow-hidden", "from-cyan-500 via-purple-500 to-pink-500")}>
+                <div className={cn("h-auto min-h-[200px] sm:min-h-[240px] md:min-h-[280px] py-6 sm:py-8 md:py-10 bg-gradient-to-r flex items-center justify-center relative overflow-hidden", "from-primary via-secondary to-accent dark:from-emerald-500 dark:via-green-500 dark:to-teal-500")}>
                   <div className="absolute inset-0 bg-black/20" />
                   <div className="relative z-10 text-center px-4 sm:px-6 md:px-8 w-full max-w-4xl mx-auto">
                     <Play className="h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 mx-auto mb-3 sm:mb-4 text-white" />
                     <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2 sm:mb-3 px-2">
                       Interactive Video Lessons
                     </h2>
-                    <p className="text-cyan-100/90 text-xs sm:text-sm md:text-base max-w-2xl mx-auto mb-4 sm:mb-5 md:mb-6 px-2 leading-relaxed">
+                    <p className="text-white/90 text-xs sm:text-sm md:text-base max-w-2xl mx-auto mb-4 sm:mb-5 md:mb-6 px-2 leading-relaxed">
                       Engage with native speakers in real-world scenarios. Practice pronunciation, learn idioms, and master professional communication.
                     </p>
                     <Button
                       size="default"
-                      className="bg-white text-purple-600 hover:bg-cyan-50 font-semibold text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-2.5"
+                      className="bg-white text-primary hover:bg-primary/10 font-semibold text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-2.5 dark:bg-white dark:text-emerald-600 dark:hover:bg-emerald-50"
                       onClick={() => navigate('/adults/videos')}
                     >
                       Explore 150+ Video Lessons
@@ -1099,8 +986,7 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
               </CardContent>
             </Card>
           </div>
-        </div>
-      </div>
+      </main>
     </div>
   );
 };

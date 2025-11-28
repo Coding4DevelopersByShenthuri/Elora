@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import { API } from '@/services/ApiService';
+import { logger } from '@/utils/logger';
 
 // Make sure this interface matches exactly with AuthModal's User interface
 interface User {
@@ -79,7 +80,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           const parsedUser = JSON.parse(userData);
           setUser(parsedUser);
         } catch (error) {
-          console.error('Error parsing user data:', error);
+          logger.error('Error parsing user data:', error);
           // If parsing fails, try to fetch from server instead
           // Don't clear token - might be valid
         }
@@ -90,7 +91,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // Only sync once on mount, not on every online status change
       if (navigator.onLine && token !== 'local-token') {
         syncWithServerInternal().catch(err => {
-          console.log('Server sync failed - continuing with local data:', err);
+          logger.debug('Server sync failed - continuing with local data:', err);
           // Don't logout on sync failure - preserve user session
           // If userData was missing and sync failed, user will remain logged out
           // but token is preserved for next successful sync
@@ -172,7 +173,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       
       return { success: false, message: response.message || 'Login failed' };
     } catch (error) {
-      console.error('Login error:', error);
+      logger.error('Login error:', error);
       return { success: false, message: 'Login failed. Please try again.' };
     }
   };
@@ -219,7 +220,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       
       return { success: false, message: response.message || 'Google authentication failed' };
     } catch (error) {
-      console.error('Google login error:', error);
+      logger.error('Google login error:', error);
       return { success: false, message: 'Google authentication failed. Please try again.' };
     }
   };
@@ -263,7 +264,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         errors: errors
       };
     } catch (error: any) {
-      console.error('Registration error:', error);
+      logger.error('Registration error:', error);
       // If error has response data, extract the message
       const errorMessage = error?.response?.data?.message || 
                           error?.message || 
@@ -289,7 +290,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       
       // Handle 401 errors gracefully - don't logout user
       if (!response.success && 'status' in response && response.status === 401) {
-        console.warn('Token validation failed during sync - keeping local session active');
+        logger.debug('Token validation failed during sync - keeping local session active');
         // Don't clear token or logout - user might have valid local session
         // Token might be expired but user data is still valid locally
         return;
@@ -363,13 +364,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // Only log network/connection errors, not auth errors
       // Auth errors are handled above
       if (error?.response?.status !== 401) {
-        console.error('Sync error (non-auth):', error);
+        logger.error('Sync error (non-auth):', error);
       }
       // Don't logout on sync failure - preserve user session
     }
   };
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setUser(null);
     API.auth.logout();
     // Clear all session storage flags on logout
@@ -377,7 +378,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     sessionStorage.removeItem('speakbee_survey_in_progress');
     sessionStorage.removeItem('speakbee_survey_step');
     sessionStorage.removeItem('speakbee_survey_data');
-  };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleAuthInvalidated = () => {
+      logout();
+    };
+
+    window.addEventListener('speakbee-auth-invalidated', handleAuthInvalidated);
+    return () => {
+      window.removeEventListener('speakbee-auth-invalidated', handleAuthInvalidated);
+    };
+  }, [logout]);
 
   const updateUserProfile = (updates: Partial<User['profile']>) => {
     if (user) {
@@ -416,7 +430,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         );
         localStorage.setItem("speakbee_users", JSON.stringify(updatedUsers));
       } catch (error) {
-        console.error('Error updating user survey data in storage:', error);
+        logger.error('Error updating user survey data in storage:', error);
       }
 
       // Sync survey data to backend server (if online and not admin user)
@@ -430,9 +444,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             if (stepName && stepNumber !== undefined) {
               try {
                 await API.auth.saveSurveyStep(stepName, stepNumber, surveyData);
-                console.log(`✅ Survey step ${stepNumber} (${stepName}) saved to MySQL`);
+                logger.debug(`Survey step ${stepNumber} (${stepName}) saved to MySQL`);
               } catch (error) {
-                console.warn(`⚠️ Failed to save survey step ${stepNumber} to MySQL:`, error);
+                logger.warn(`Failed to save survey step ${stepNumber} to MySQL:`, error);
               }
             }
             
@@ -471,14 +485,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             // Update profile via API
             const response = await API.auth.updateProfile(profileUpdateData);
             if (response.success) {
-              console.log('✅ Survey data saved to backend');
+              logger.debug('Survey data saved to backend');
             } else {
               const errorMessage = (response as any).message || 'Unknown error';
-              console.warn('⚠️ Failed to save survey data to backend:', errorMessage);
+              logger.warn('Failed to save survey data to backend:', errorMessage);
             }
           }
         } catch (error) {
-          console.error('Error syncing survey data to backend:', error);
+          logger.error('Error syncing survey data to backend:', error);
           // Don't throw - survey completion should still work offline
         }
       }

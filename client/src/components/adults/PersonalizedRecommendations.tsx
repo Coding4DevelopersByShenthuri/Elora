@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   Sparkles, X, Check, ArrowRight, Lightbulb, BookOpen,
-  Play, Target, TrendingUp, Star
+  Play, Target, TrendingUp, Star, Compass, Rocket
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -116,10 +116,12 @@ export default function PersonalizedRecommendations() {
 
   if (recommendations.length === 0) {
     return (
-      <Card className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30">
+      <Card className="bg-card/80 backdrop-blur-xl border-primary/30 dark:bg-slate-900/60 dark:border-purple-500/30">
         <CardContent className="p-12 text-center">
-          <Sparkles className="h-12 w-12 mx-auto mb-4 text-cyan-300/50" />
-          <p className="text-cyan-100/70">No recommendations at the moment. Keep learning!</p>
+          <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 via-secondary/20 to-accent/20 dark:from-emerald-500/20 dark:via-green-500/20 dark:to-teal-500/20 flex items-center justify-center">
+            <Compass className="h-8 w-8 text-primary dark:text-emerald-400" />
+          </div>
+          <p className="text-muted-foreground dark:text-cyan-100/70 text-base">No recommendations at the moment. Keep learning!</p>
         </CardContent>
       </Card>
     );

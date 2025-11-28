@@ -21,12 +21,22 @@ BASE_URL = config('BASE_URL', default='http://127.0.0.1:8000')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-# Load from environment variable or use default for development
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-wo(!w-s!_(hlg6grj0d04ey^ef*h*_v*&a33kn4v@d01')
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
+# Default to False for security - explicitly set DEBUG=True in development
+DEBUG = config('DEBUG', default=False, cast=bool)
+if DEBUG:
+    logger.warning('DEBUG mode is enabled - this should only be used in development!')
+
+# SECURITY WARNING: keep the secret key used in production secret!
+# Load from environment variable - REQUIRED in production
+SECRET_KEY = config('SECRET_KEY', default=None)
+if not SECRET_KEY:
+    if DEBUG:
+        # Only allow default in development
+        SECRET_KEY = 'django-insecure-wo(!w-s!_(hlg6grj0d04ey^ef*h*_v*&a33kn4v@d01'
+        logger.warning('Using default SECRET_KEY - this should only be used in development!')
+    else:
+        raise ImproperlyConfigured('SECRET_KEY must be set in production environment!')
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0').split(',')
 
@@ -173,6 +183,7 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.MultiPartParser',
         'rest_framework.parsers.FormParser',
     ),
+    'EXCEPTION_HANDLER': 'api.exceptions.custom_exception_handler',
 }
 
 # JWT Settings
@@ -272,12 +283,19 @@ LOGGING = {
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-            'formatter': 'simple'
+            'formatter': 'simple',
+            'filters': ['suppress_401'],
         },
         'file': {
             'class': 'logging.FileHandler',
             'filename': BASE_DIR / 'debug.log',
             'formatter': 'verbose',
+            'filters': ['suppress_401'],
+        },
+    },
+    'filters': {
+        'suppress_401': {
+            '()': 'api.logging_filters.Suppress401WarningsFilter',
         },
     },
     'root': {
@@ -288,6 +306,16 @@ LOGGING = {
         'django': {
             'handlers': ['console', 'file'],
             'level': 'INFO',
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['console', 'file'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'rest_framework.authentication': {
+            'handlers': ['console', 'file'],
+            'level': 'ERROR',  # Only log errors, suppress 401 warnings
             'propagate': False,
         },
         'api': {

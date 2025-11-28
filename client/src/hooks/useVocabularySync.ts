@@ -7,6 +7,7 @@ import UserNotificationsService from '@/services/UserNotificationsService';
 import { playNotificationSound } from '@/utils/playNotificationSound';
 import { runWithVocabularySyncLock } from '@/utils/vocabularySyncLock';
 import { getTamilTranslationForWord } from '@/data/listening-modules/tamilTranslations';
+import { logger } from '@/utils/logger';
 
 export function useVocabularySync() {
   const { user } = useAuth();
@@ -14,8 +15,19 @@ export function useVocabularySync() {
 
   useEffect(() => {
     if (!user) return;
+    
+    // Check for valid token before making any API calls
+    const token = localStorage.getItem('speakbee_auth_token');
+    if (!token || token === 'local-token') {
+      return; // Don't make API calls without a valid token
+    }
 
     const syncListeningVocabulary = () => runWithVocabularySyncLock(async () => {
+      // Double-check token is still valid before each sync
+      const currentToken = localStorage.getItem('speakbee_auth_token');
+      if (!currentToken || currentToken === 'local-token') {
+        return; // Token was removed, stop syncing
+      }
       const syncedKey = `synced_listening_vocab_${user.id}`;
       try {
         const stored = localStorage.getItem(syncedKey);
@@ -33,7 +45,7 @@ export function useVocabularySync() {
             });
           }
         } catch (err) {
-          console.error('Failed to fetch dictionary before syncing vocab:', err);
+          logger.error('Failed to fetch dictionary before syncing vocab:', err);
         }
 
         const localKey = `local_dictionary_entries_${user.id}`;
@@ -45,7 +57,7 @@ export function useVocabularySync() {
               dictionaryWords.add(entry.word.toLowerCase());
             });
           } catch (err) {
-            console.error('Failed to parse local dictionary entries', err);
+            logger.error('Failed to parse local dictionary entries', err);
           }
         }
 
@@ -61,7 +73,7 @@ export function useVocabularySync() {
               revalidatedSynced.add(moduleId);
             }
           } catch (err) {
-            console.error(`Failed to validate module ${moduleId}:`, err);
+            logger.error(`Failed to validate module ${moduleId}:`, err);
           }
         }
         syncedModules = revalidatedSynced;
@@ -123,14 +135,14 @@ export function useVocabularySync() {
                       const updated = [...currentLocalEntries, newEntry];
                       localStorage.setItem(localKey, JSON.stringify(updated));
                     } catch (err) {
-                      console.error('Failed to add local dictionary word', err);
+                      logger.error('Failed to add local dictionary word', err);
                     }
                   }
                   dictionaryWords.add(vocab.word.toLowerCase());
                   wordsAdded++;
                 }
               } catch (err) {
-                console.error(`Failed to add vocab "${vocab.word}" to dictionary:`, err);
+                logger.error(`Failed to add vocab "${vocab.word}" to dictionary:`, err);
                 wordsAdded++;
               }
             }
@@ -144,7 +156,7 @@ export function useVocabularySync() {
               });
             }
           } catch (err) {
-            console.error(`Failed to sync vocabulary for module ${moduleId}:`, err);
+            logger.error(`Failed to sync vocabulary for module ${moduleId}:`, err);
           }
         }
 
@@ -190,11 +202,11 @@ export function useVocabularySync() {
               },
             });
           } catch (err) {
-            console.error('Failed to create notification:', err);
+            logger.error('Failed to create notification:', err);
           }
         }
       } catch (error) {
-        console.error('Error syncing listening vocabulary:', error);
+        logger.error('Error syncing listening vocabulary:', error);
       }
     });
 
