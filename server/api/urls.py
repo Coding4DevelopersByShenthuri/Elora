@@ -255,6 +255,8 @@ urlpatterns = [
     path('adults/pronunciation/practice', views.submit_pronunciation_practice, name='submit-pronunciation-practice'),
     path('adults/pronunciation/history', views.pronunciation_practice_history, name='pronunciation-practice-history'),
     path('adults/pronunciation/stats', views.pronunciation_statistics, name='pronunciation-statistics'),
+    path('adults/pronunciation/practices/<int:practice_id>/delete', views.delete_pronunciation_practice, name='delete-pronunciation-practice'),
+    path('adults/pronunciation/practices/delete', views.delete_pronunciation_practices, name='delete-pronunciation-practices'),
     
     # ============= Cultural Intelligence =============
     path('adults/cultural/modules', views.cultural_modules, name='cultural-modules'),

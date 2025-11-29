@@ -8,6 +8,7 @@ import { lazy } from 'react';
 // Heavy pages - lazy load to reduce initial bundle
 export const Adults = lazy(() => import('@/pages/adults/adults'));
 export const MultiModePracticePage = lazy(() => import('@/pages/adults/MultiModePracticePage'));
+export const PronunciationAnalyzerPage = lazy(() => import('@/pages/adults/PronunciationAnalyzerPage'));
 export const VideoLessons = lazy(() => import('@/pages/adults/VideoLessons'));
 export const VideoDetail = lazy(() => import('@/pages/adults/VideoDetail'));
 export const Beginners = lazy(() => import('@/pages/adults/Beginners'));

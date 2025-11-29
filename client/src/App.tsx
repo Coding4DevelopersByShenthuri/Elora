@@ -48,6 +48,7 @@ import AdminLogin from "@/pages/admin/AdminLogin";
 import {
   Adults,
   MultiModePracticePage,
+  PronunciationAnalyzerPage,
   VideoLessons,
   VideoDetail,
   Beginners,
@@ -757,6 +758,7 @@ const AppRoutes = () => {
         <Route path="/adults/practice" element={<PageTransition><ErrorBoundary><Suspense fallback={<LoadingScreen />}><QuickPracticeSession /></Suspense></ErrorBoundary></PageTransition>} />
         <Route path="/adults/practice/:sessionType" element={<PageTransition><ErrorBoundary><Suspense fallback={<LoadingScreen />}><QuickPracticeSession /></Suspense></ErrorBoundary></PageTransition>} />
         <Route path="/adults/practice/multi-mode" element={<PageTransition><ErrorBoundary><Suspense fallback={<LoadingScreen />}><MultiModePracticePage /></Suspense></ErrorBoundary></PageTransition>} />
+        <Route path="/adults/practice/pronunciation" element={<PageTransition><ErrorBoundary><Suspense fallback={<LoadingScreen />}><PronunciationAnalyzerPage /></Suspense></ErrorBoundary></PageTransition>} />
         <Route 
           path="/ielts-pte" 
           element={

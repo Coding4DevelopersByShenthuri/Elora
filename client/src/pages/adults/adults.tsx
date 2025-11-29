@@ -26,7 +26,6 @@ import {
   DictionaryWidget,
   DailyGoalsWidget,
   BusinessEmailCoach,
-  PronunciationAnalyzer,
   CulturalIntelligence
 } from '@/components/adults';
 import { AdultsAPI } from '@/services/ApiService';
@@ -456,8 +455,6 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
         return <DictionaryWidget onClose={handleCloseWidget} />;
       case 'cultural':
         return <CulturalIntelligence onClose={handleCloseWidget} />;
-      case 'pronunciation':
-        return <PronunciationAnalyzer onClose={handleCloseWidget} />;
       default:
         return null;
     }
@@ -784,7 +781,7 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                           <Button
                             size="default"
                             className="w-full sm:w-auto bg-green-600 text-white hover:bg-green-700 font-semibold text-sm sm:text-base shadow-lg"
-                            onClick={() => setActiveWidget('pronunciation')}
+                            onClick={() => navigate('/adults/practice/pronunciation')}
                           >
                             <Mic className="w-4 h-4 mr-2" />
                             Analyze Pronunciation
@@ -976,6 +973,7 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
             </Card>
           </div>
       </main>
+
     </div>
   );
 };

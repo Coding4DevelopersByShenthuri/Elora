@@ -2238,6 +2238,39 @@ export const AdultsAPI = {
     }
   },
 
+  /**
+   * Delete a specific pronunciation practice session
+   */
+  deletePronunciationPractice: async (practiceId: number) => {
+    try {
+      const result = await fetchWithAuth(`adults/pronunciation/practices/${practiceId}/delete`, {
+        method: 'DELETE',
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  /**
+   * Delete multiple pronunciation practice sessions (bulk delete or old sessions)
+   */
+  deletePronunciationPractices: async (practiceIds?: number[], deleteOld?: boolean, daysOld?: number) => {
+    try {
+      const result = await fetchWithAuth('adults/pronunciation/practices/delete', {
+        method: 'POST',
+        body: JSON.stringify({
+          practice_ids: practiceIds || [],
+          delete_old: deleteOld || false,
+          days_old: daysOld || 30,
+        }),
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
   // ============= Cultural Intelligence API =============
   /**
    * Get cultural intelligence modules

@@ -1074,16 +1074,27 @@ class EmailPracticeSessionSerializer(serializers.ModelSerializer):
 # ============= Pronunciation Analyzer Serializers =============
 class PronunciationPracticeSerializer(serializers.ModelSerializer):
     """Serializer for pronunciation practice"""
+    user_audio_url_full = serializers.SerializerMethodField()
+    
     class Meta:
         model = PronunciationPractice
         fields = [
             'id', 'target_text', 'target_phonetic', 'target_audio_url',
-            'user_audio_url', 'user_audio_duration', 'accuracy_score',
+            'user_audio_url', 'user_audio_url_full', 'user_audio_duration', 'accuracy_score',
             'pronunciation_score', 'fluency_score', 'phonetic_analysis',
             'mistakes', 'feedback', 'suggestions', 'attempts', 'difficulty_level',
             'practiced_at', 'updated_at'
         ]
         read_only_fields = ['id', 'practiced_at', 'updated_at']
+    
+    def get_user_audio_url_full(self, obj):
+        """Return full URL for user audio file"""
+        if obj.user_audio_url:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.user_audio_url)
+            return obj.user_audio_url
+        return None
 
 
 # ============= Cultural Intelligence Serializers =============

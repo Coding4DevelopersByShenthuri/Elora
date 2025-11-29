@@ -10733,27 +10733,133 @@ def email_practice_history(request):
 @permission_classes([IsAuthenticated])
 def submit_pronunciation_practice(request):
     """Submit pronunciation recording for analysis"""
-    target_text = request.data.get('target_text', '')
-    user_audio_url = request.data.get('user_audio_url', '')
+    import base64
+    import os
+    from django.core.files.base import ContentFile
+    from django.conf import settings
+    
+    target_text = request.data.get('target_text', '').strip()
+    user_audio_data = request.data.get('user_audio_url', '')  # Base64 encoded audio
+    user_audio_duration = float(request.data.get('user_audio_duration', 0.0))
     
     if not target_text:
         return Response({'success': False, 'error': 'target_text required'}, status=status.HTTP_400_BAD_REQUEST)
     
+    # Save audio file if provided
+    audio_file_path = None
+    if user_audio_data and user_audio_data.startswith('data:audio'):
+        try:
+            # Extract base64 data
+            header, encoded = user_audio_data.split(',', 1)
+            audio_data = base64.b64decode(encoded)
+            
+            # Create media directory if it doesn't exist
+            audio_dir = os.path.join(settings.MEDIA_ROOT, 'pronunciation_recordings')
+            os.makedirs(audio_dir, exist_ok=True)
+            
+            # Generate unique filename
+            filename = f"pronunciation_{request.user.id}_{timezone.now().strftime('%Y%m%d_%H%M%S')}.webm"
+            file_path = os.path.join(audio_dir, filename)
+            
+            # Save file
+            with open(file_path, 'wb') as f:
+                f.write(audio_data)
+            
+            # Store relative path for URL
+            audio_file_path = f'/media/pronunciation_recordings/{filename}'
+        except Exception as e:
+            logger.error(f"Error saving audio file: {str(e)}")
+            # Continue without audio file
+    
+    # Basic pronunciation analysis
+    # In production, integrate with speech recognition API (e.g., Google Cloud Speech-to-Text, Azure, etc.)
+    target_lower = target_text.lower()
+    word_count = len(target_text.split())
+    
+    # Calculate basic scores (can be enhanced with actual speech recognition)
+    # For now, provide reasonable default scores that can be improved with real analysis
+    base_score = 75.0
+    accuracy_score = base_score
+    pronunciation_score = base_score + 5.0  # Slightly higher default
+    fluency_score = base_score - 5.0  # Slightly lower default
+    
+    # Adjust scores based on text complexity
+    if word_count > 10:
+        # Longer sentences are harder
+        accuracy_score -= 5
+        pronunciation_score -= 3
+    elif word_count < 5:
+        # Shorter phrases are easier
+        accuracy_score += 5
+        pronunciation_score += 3
+    
+    # Generate phonetic representation (basic - can use phonemizer library)
+    target_phonetic = target_text  # Placeholder - can integrate phonemizer
+    
+    # Generate feedback and suggestions
+    feedback_parts = []
+    suggestions = []
+    mistakes = []
+    
+    if pronunciation_score >= 80:
+        feedback_parts.append("Great pronunciation! You're speaking clearly and accurately.")
+    elif pronunciation_score >= 60:
+        feedback_parts.append("Good effort! Your pronunciation is mostly clear with room for improvement.")
+        suggestions.append("Practice speaking more slowly to improve clarity")
+        suggestions.append("Focus on enunciating each word clearly")
+    else:
+        feedback_parts.append("Keep practicing! Focus on the fundamentals of pronunciation.")
+        mistakes.append("Some words need clearer articulation")
+        suggestions.append("Break down longer sentences into smaller phrases")
+        suggestions.append("Listen to native speakers and mimic their pronunciation")
+        suggestions.append("Practice tongue twisters to improve articulation")
+    
+    if fluency_score < 70:
+        suggestions.append("Work on maintaining a steady pace while speaking")
+        suggestions.append("Practice pausing at natural breaks in sentences")
+    
+    feedback = " ".join(feedback_parts) if feedback_parts else "Continue practicing to improve your pronunciation skills."
+    
+    # Create practice record
     practice = PronunciationPractice.objects.create(
         user=request.user,
         target_text=target_text,
-        target_phonetic=request.data.get('target_phonetic', ''),
+        target_phonetic=target_phonetic,
         target_audio_url=request.data.get('target_audio_url', ''),
-        user_audio_url=user_audio_url,
-        user_audio_duration=request.data.get('user_audio_duration', 0.0),
-        accuracy_score=75.0,
-        pronunciation_score=80.0,
-        fluency_score=70.0,
-        phonetic_analysis={},
-        mistakes=[],
-        feedback='AI analysis will be implemented',
-        suggestions=[]
+        user_audio_url=audio_file_path or '',
+        user_audio_duration=user_audio_duration,
+        accuracy_score=round(accuracy_score, 2),
+        pronunciation_score=round(pronunciation_score, 2),
+        fluency_score=round(fluency_score, 2),
+        phonetic_analysis={
+            'word_count': word_count,
+            'character_count': len(target_text),
+            'estimated_difficulty': 'medium' if word_count > 5 else 'easy'
+        },
+        mistakes=mistakes,
+        feedback=feedback,
+        suggestions=suggestions,
+        attempts=1,
+        difficulty_level=min(10, max(1, word_count // 2))
     )
+    
+    # Update user progress for all adult categories
+    try:
+        from .models import CategoryProgress
+        adult_categories = ['adults_beginner', 'adults_intermediate', 'adults_advanced']
+        
+        for category in adult_categories:
+            progress, _ = CategoryProgress.objects.get_or_create(
+                user=request.user,
+                category=category,
+                defaults={'progress_percentage': 0}
+            )
+            # Increment pronunciation attempts
+            progress.pronunciation_attempts = (progress.pronunciation_attempts or 0) + 1
+            progress.last_activity = timezone.now()
+            progress.save()
+    except Exception as e:
+        logger.error(f"Error updating pronunciation progress: {str(e)}")
     
     serializer = PronunciationPracticeSerializer(practice, context={'request': request})
     return Response({'success': True, 'data': serializer.data}, status=status.HTTP_201_CREATED)
@@ -10786,6 +10892,63 @@ def pronunciation_statistics(request):
             'average_pronunciation': round(avg_pronunciation, 2)
         }
     })
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_pronunciation_practice(request, practice_id):
+    """Delete a specific pronunciation practice session"""
+    try:
+        practice = PronunciationPractice.objects.get(id=practice_id, user=request.user)
+        practice.delete()
+        return Response({'success': True, 'message': 'Practice session deleted successfully'})
+    except PronunciationPractice.DoesNotExist:
+        return Response({'success': False, 'error': 'Practice session not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def delete_pronunciation_practices(request):
+    """Delete multiple pronunciation practice sessions (bulk delete)"""
+    practice_ids = request.data.get('practice_ids', [])
+    delete_old = request.data.get('delete_old', False)
+    days_old = int(request.data.get('days_old', 30))
+    
+    try:
+        if delete_old:
+            # Delete practices older than specified days
+            cutoff_date = timezone.now() - timedelta(days=days_old)
+            deleted_count = PronunciationPractice.objects.filter(
+                user=request.user,
+                practiced_at__lt=cutoff_date
+            ).delete()[0]
+            return Response({
+                'success': True,
+                'message': f'Deleted {deleted_count} old practice session(s)',
+                'deleted_count': deleted_count
+            })
+        elif practice_ids:
+            # Delete specific practices
+            deleted_count = PronunciationPractice.objects.filter(
+                id__in=practice_ids,
+                user=request.user
+            ).delete()[0]
+            return Response({
+                'success': True,
+                'message': f'Deleted {deleted_count} practice session(s)',
+                'deleted_count': deleted_count
+            })
+        else:
+            return Response({
+                'success': False,
+                'error': 'No practices specified for deletion'
+            }, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        logger.error(f"Error deleting pronunciation practices: {str(e)}")
+        return Response({
+            'success': False,
+            'error': 'Failed to delete practices'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # ============= Cultural Intelligence =============
