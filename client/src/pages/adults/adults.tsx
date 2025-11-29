@@ -25,12 +25,10 @@ import {
   QuickAccessToolbar,
   DictionaryWidget,
   DailyGoalsWidget,
-  FlashcardsSystem,
   BusinessEmailCoach,
   PronunciationAnalyzer,
   CulturalIntelligence
 } from '@/components/adults';
-import FlashcardsMain from '@/components/adults/FlashcardsMain';
 import { AdultsAPI } from '@/services/ApiService';
 import { useAuth } from '@/contexts/AuthContext';
 import { allMultiModeModules, getTotalModulesByMode, getModuleById } from '@/data/multi-mode-modules-config';
@@ -456,8 +454,6 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
     switch (activeWidget) {
       case 'dictionary':
         return <DictionaryWidget onClose={handleCloseWidget} />;
-      case 'flashcards':
-        return <FlashcardsMain onClose={handleCloseWidget} />;
       case 'cultural':
         return <CulturalIntelligence onClose={handleCloseWidget} />;
       case 'pronunciation':

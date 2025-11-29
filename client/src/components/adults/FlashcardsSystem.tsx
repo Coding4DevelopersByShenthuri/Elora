@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
-import { FileText, RotateCw, CheckCircle, X, Plus, BookOpen, TrendingUp } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { FileText, RotateCw, CheckCircle, X, BookOpen, TrendingUp, Clock, Target, Award, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { AdultsAPI } from '@/services/ApiService';
 import { useAuth } from '@/contexts/AuthContext';
@@ -30,6 +31,7 @@ interface FlashcardDeck {
   title: string;
   description?: string;
   card_count: number;
+  is_default?: boolean;
 }
 
 interface FlashcardsSystemProps {
@@ -40,18 +42,19 @@ interface FlashcardsSystemProps {
 export default function FlashcardsSystem({ onClose, defaultDeckId = null }: FlashcardsSystemProps) {
   const { user } = useAuth();
   const [decks, setDecks] = useState<FlashcardDeck[]>([]);
-  const [selectedDeck, setSelectedDeck] = useState<number | null>(null);
+  const [selectedDeck, setSelectedDeck] = useState<number | null>(defaultDeckId);
   const [cardsDue, setCardsDue] = useState<Flashcard[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [mode, setMode] = useState<'review' | 'browse'>('review');
+  const [reviewStartTime, setReviewStartTime] = useState<number | null>(null);
+  const [showDeckSelector, setShowDeckSelector] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (user) {
       loadDecks();
       if (defaultDeckId) {
-        setSelectedDeck(defaultDeckId);
         loadCardsDue(defaultDeckId);
       } else {
         loadCardsDue();
@@ -60,16 +63,29 @@ export default function FlashcardsSystem({ onClose, defaultDeckId = null }: Flas
   }, [user, defaultDeckId]);
 
   useEffect(() => {
-    if (selectedDeck) {
+    if (selectedDeck !== null) {
       loadCardsDue(selectedDeck);
     }
   }, [selectedDeck]);
+
+  useEffect(() => {
+    if (cardsDue.length > 0 && currentCardIndex < cardsDue.length) {
+      setReviewStartTime(Date.now());
+      setIsFlipped(false);
+    }
+  }, [currentCardIndex, cardsDue.length]);
 
   const loadDecks = async () => {
     try {
       const result = await AdultsAPI.getFlashcardDecks();
       if (result.success && 'data' in result) {
-        setDecks(result.data?.data || []);
+        const decksData = result.data?.data || [];
+        setDecks(decksData);
+        // Auto-select default deck if available
+        if (!selectedDeck && decksData.length > 0) {
+          const defaultDeck = decksData.find((d: FlashcardDeck) => d.is_default) || decksData[0];
+          setSelectedDeck(defaultDeck.id);
+        }
       }
     } catch (error) {
       console.error('Failed to load decks:', error);
@@ -94,14 +110,16 @@ export default function FlashcardsSystem({ onClose, defaultDeckId = null }: Flas
   };
 
   const handleReview = async (quality: number) => {
-    if (cardsDue.length === 0) return;
+    if (cardsDue.length === 0 || !cardsDue[currentCardIndex]) return;
 
     const currentCard = cardsDue[currentCardIndex];
+    const timeSpent = reviewStartTime ? Math.round((Date.now() - reviewStartTime) / 1000) : 5;
+
     try {
       const result = await AdultsAPI.submitFlashcardReview({
         flashcard_id: currentCard.id,
         quality,
-        time_spent_seconds: 5, // TODO: Track actual time
+        time_spent_seconds: timeSpent,
       });
 
       if (result.success) {
@@ -119,237 +137,311 @@ export default function FlashcardsSystem({ onClose, defaultDeckId = null }: Flas
     }
   };
 
+  const handleDeckChange = (deckId: string) => {
+    const id = deckId === 'all' ? null : parseInt(deckId);
+    setSelectedDeck(id);
+    setCurrentCardIndex(0);
+    setIsFlipped(false);
+  };
+
   const currentCard = cardsDue[currentCardIndex];
   const progress = cardsDue.length > 0
     ? ((currentCardIndex + 1) / cardsDue.length) * 100
     : 0;
 
+  const selectedDeckName = selectedDeck 
+    ? decks.find(d => d.id === selectedDeck)?.title || 'Selected Deck'
+    : 'All Decks';
+
+  const totalStats = cardsDue.reduce((acc, card) => {
+    acc.totalReviewed += card.times_reviewed;
+    acc.totalCorrect += card.times_correct;
+    acc.totalIncorrect += card.times_incorrect;
+    acc.totalMastery += card.mastery_level;
+    return acc;
+  }, { totalReviewed: 0, totalCorrect: 0, totalIncorrect: 0, totalMastery: 0 });
+
+  const averageMastery = cardsDue.length > 0 ? totalStats.totalMastery / cardsDue.length : 0;
+
   return (
-    <Card className="bg-slate-900/95 backdrop-blur-xl border-purple-500/30 shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col mx-auto">
-      <CardHeader className="border-b border-purple-500/30">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-white flex items-center gap-2">
-            <FileText className="h-5 w-5 text-purple-400" />
-            Flashcards
-          </CardTitle>
-          <div className="flex items-center gap-2">
-            <Button
-              variant={mode === 'review' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => {
-                setMode('review');
-                loadCardsDue(selectedDeck || undefined);
-              }}
-              className={mode === 'review' ? 'bg-purple-500/20' : ''}
-            >
-              <RotateCw className="h-4 w-4 mr-2" />
-              Review
-            </Button>
-            <Button
-              variant={mode === 'browse' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setMode('browse')}
-              className={mode === 'browse' ? 'bg-purple-500/20' : ''}
-            >
-              <BookOpen className="h-4 w-4 mr-2" />
-              Browse
-            </Button>
-            <Button variant="ghost" size="icon" onClick={onClose}>
-              <X className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h2 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2">Flashcard Review</h2>
+        <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70 mb-4 sm:mb-6">Practice vocabulary with spaced repetition for better retention</p>
+      </div>
 
-        {mode === 'review' && (
-          <div className="mt-4">
-            <div className="flex items-center justify-between text-sm mb-2">
-              <span className="text-cyan-100/70">
-                Card {currentCardIndex + 1} of {cardsDue.length}
-              </span>
-              <span className="text-cyan-100/70">
-                {cardsDue.length - currentCardIndex - 1} remaining
-              </span>
+      <Card className="bg-card/80 backdrop-blur-xl border-primary/30 shadow-2xl w-full max-w-7xl mx-auto flex flex-col dark:bg-slate-900/60 dark:border-emerald-500/30">
+        {onClose && (
+          <CardHeader className="border-b border-primary/30 dark:border-emerald-500/30">
+            <div className="flex items-center justify-end">
+              <Button variant="ghost" size="icon" onClick={onClose} className="text-foreground dark:text-white">
+                <X className="h-5 w-5" />
+              </Button>
             </div>
-            <Progress value={progress} className="h-2 bg-slate-700/50">
-              <div className="h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500" />
-            </Progress>
-          </div>
+          </CardHeader>
         )}
-      </CardHeader>
 
-      <CardContent className="flex-1 overflow-hidden flex flex-col p-0">
-        {loading ? (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-cyan-300/70">Loading flashcards...</div>
+        <CardContent className="flex-1 overflow-hidden flex flex-col p-0">
+          {/* Deck Selector and Stats */}
+          <div className="p-4 sm:p-6 border-b border-primary/20 dark:border-emerald-500/20">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex-1 w-full sm:w-auto">
+                <Select value={selectedDeck?.toString() || 'all'} onValueChange={handleDeckChange}>
+                  <SelectTrigger className="w-full sm:w-[250px] bg-card/60 backdrop-blur-xl border-primary/30 text-foreground dark:bg-slate-800/50 dark:border-emerald-500/30 dark:text-white">
+                    <SelectValue placeholder="Select a deck" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Decks</SelectItem>
+                    {decks.map((deck) => (
+                      <SelectItem key={deck.id} value={deck.id.toString()}>
+                        {deck.title} ({deck.card_count} cards)
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {cardsDue.length > 0 && (
+                <div className="flex flex-wrap items-center gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Target className="h-4 w-4 text-primary dark:text-emerald-300" />
+                    <span className="text-muted-foreground dark:text-cyan-100/70">
+                      {cardsDue.length} due
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 text-primary dark:text-emerald-300" />
+                    <span className="text-muted-foreground dark:text-cyan-100/70">
+                      {Math.round(averageMastery)}% mastery
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Progress Bar */}
+            {cardsDue.length > 0 && (
+              <div className="mt-4">
+                <div className="flex items-center justify-between text-sm mb-2">
+                  <span className="text-muted-foreground dark:text-cyan-100/70">
+                    Card {currentCardIndex + 1} of {cardsDue.length}
+                  </span>
+                  <span className="text-muted-foreground dark:text-cyan-100/70">
+                    {cardsDue.length - currentCardIndex - 1} remaining
+                  </span>
+                </div>
+                <Progress value={progress} className="h-2 bg-muted dark:bg-slate-700/50">
+                  <div className="h-full rounded-full bg-gradient-to-r from-primary via-secondary to-accent dark:from-emerald-500 dark:via-green-500 dark:to-teal-500" />
+                </Progress>
+              </div>
+            )}
           </div>
-        ) : mode === 'review' ? (
-          <>
-            {cardsDue.length === 0 ? (
-              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-                <CheckCircle className="h-16 w-16 text-green-400 mb-4" />
-                <h3 className="text-xl font-semibold text-white mb-2">
-                  All Caught Up!
-                </h3>
-                <p className="text-cyan-100/70 mb-4">
-                  You've reviewed all your flashcards for today. Come back tomorrow for more reviews.
-                </p>
-                <Button onClick={() => loadCardsDue(selectedDeck || undefined)}>
+
+          {/* Main Content */}
+          {loading ? (
+            <div className="flex-1 flex items-center justify-center py-12">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary dark:border-emerald-400 mx-auto mb-4"></div>
+                <p className="text-muted-foreground dark:text-cyan-100/70">Loading flashcards...</p>
+              </div>
+            </div>
+          ) : cardsDue.length === 0 ? (
+            <div className="flex-1 flex flex-col items-center justify-center p-8 sm:p-12 text-center">
+              <CheckCircle className="h-16 w-16 text-emerald-500 dark:text-emerald-400 mb-4" />
+              <h3 className="text-xl font-semibold text-foreground dark:text-white mb-2">
+                All Caught Up!
+              </h3>
+              <p className="text-muted-foreground dark:text-cyan-100/70 mb-6 max-w-md">
+                You've reviewed all your flashcards for today. Come back tomorrow for more reviews, or create new flashcards to continue learning.
+              </p>
+              <div className="flex gap-3">
+                <Button 
+                  onClick={() => loadCardsDue(selectedDeck || undefined)}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600"
+                >
                   <RotateCw className="h-4 w-4 mr-2" />
                   Check Again
                 </Button>
+                {onClose && (
+                  <Button 
+                    variant="outline"
+                    onClick={onClose}
+                    className="border-primary/30 text-primary hover:bg-primary/20 dark:border-emerald-500/30 dark:text-emerald-300 dark:hover:bg-emerald-500/20"
+                  >
+                    Close
+                  </Button>
+                )}
               </div>
-            ) : currentCard ? (
-              <div className="flex-1 flex flex-col p-6">
-                {/* Flashcard */}
+            </div>
+          ) : currentCard ? (
+            <div className="flex-1 flex flex-col p-4 sm:p-6">
+              {/* Flashcard */}
+              <div
+                ref={cardRef}
+                className={cn(
+                  'flex-1 flex items-center justify-center min-h-[300px] sm:min-h-[400px] cursor-pointer',
+                  'perspective-1000'
+                )}
+                onClick={() => setIsFlipped(!isFlipped)}
+              >
                 <div
                   className={cn(
-                    'flex-1 flex items-center justify-center perspective-1000',
-                    'min-h-[300px]'
+                    'relative w-full max-w-lg h-full transition-transform duration-500',
+                    'transform-style-preserve-3d',
+                    isFlipped && '[transform:rotateY(180deg)]'
                   )}
-                  onClick={() => setIsFlipped(!isFlipped)}
+                  style={{ transformStyle: 'preserve-3d' }}
                 >
+                  {/* Front */}
                   <div
                     className={cn(
-                      'relative w-full max-w-lg h-full transform-style-preserve-3d transition-transform duration-500',
-                      isFlipped && 'rotate-y-180'
+                      'absolute inset-0 rounded-xl border-2 p-6 sm:p-8',
+                      'bg-gradient-to-br from-primary via-secondary to-accent',
+                      'border-primary/50 dark:border-emerald-400/50',
+                      'flex flex-col items-center justify-center text-center',
+                      'backface-hidden',
+                      isFlipped && '[transform:rotateY(180deg)]'
                     )}
-                    style={{ transformStyle: 'preserve-3d' }}
+                    style={{ backfaceVisibility: 'hidden' }}
                   >
-                    {/* Front */}
-                    <div
-                      className={cn(
-                        'absolute inset-0 backface-hidden rounded-xl border-2 p-8',
-                        'bg-gradient-to-br from-blue-600 to-purple-600 border-blue-400/50',
-                        'flex flex-col items-center justify-center text-center',
-                        isFlipped && 'rotate-y-180'
-                      )}
-                      style={{ backfaceVisibility: 'hidden' }}
-                    >
-                      <div className="text-white">
-                        <p className="text-sm text-blue-200/70 mb-4">Front</p>
-                        {currentCard.dictionary_entry ? (
-                          <>
-                            <h3 className="text-3xl font-bold mb-2">
-                              {currentCard.dictionary_entry.word}
-                            </h3>
-                            <p className="text-lg text-blue-100/90">
+                    <div className="text-white w-full">
+                      <Badge className="mb-4 bg-white/20 text-white border-white/30">
+                        Front
+                      </Badge>
+                      {currentCard.dictionary_entry ? (
+                        <>
+                          <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3">
+                            {currentCard.dictionary_entry.word}
+                          </h3>
+                          {currentCard.front && (
+                            <p className="text-base sm:text-lg text-white/90">
                               {currentCard.front}
                             </p>
-                          </>
-                        ) : (
-                          <h3 className="text-3xl font-bold">
-                            {currentCard.front}
-                          </h3>
-                        )}
-                      </div>
-                      <p className="text-blue-200/70 text-sm mt-4">
-                        Click to flip
-                      </p>
-                    </div>
-
-                    {/* Back */}
-                    <div
-                      className={cn(
-                        'absolute inset-0 backface-hidden rounded-xl border-2 p-8 rotate-y-180',
-                        'bg-gradient-to-br from-purple-600 to-pink-600 border-purple-400/50',
-                        'flex flex-col items-center justify-center text-center',
-                        isFlipped && 'rotate-y-0'
+                          )}
+                        </>
+                      ) : (
+                        <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold">
+                          {currentCard.front}
+                        </h3>
                       )}
-                      style={{ backfaceVisibility: 'hidden' }}
-                    >
-                      <div className="text-white">
-                        <p className="text-sm text-purple-200/70 mb-4">Back</p>
-                        {currentCard.dictionary_entry ? (
-                          <>
-                            <h3 className="text-2xl font-bold mb-2">
-                              {currentCard.dictionary_entry.word}
-                            </h3>
-                            <p className="text-lg text-purple-100/90 mb-4">
-                              {currentCard.dictionary_entry.definition}
-                            </p>
-                          </>
-                        ) : (
-                          <h3 className="text-3xl font-bold">
-                            {currentCard.back}
+                    </div>
+                    <p className="text-white/70 text-xs sm:text-sm mt-6">
+                      Click to reveal answer
+                    </p>
+                  </div>
+
+                  {/* Back */}
+                  <div
+                    className={cn(
+                      'absolute inset-0 rounded-xl border-2 p-6 sm:p-8',
+                      'bg-gradient-to-br from-emerald-600 via-green-600 to-teal-600',
+                      'border-emerald-400/50 dark:border-emerald-400/50',
+                      'flex flex-col items-center justify-center text-center',
+                      'backface-hidden [transform:rotateY(180deg)]',
+                      isFlipped && '[transform:rotateY(0deg)]'
+                    )}
+                    style={{ backfaceVisibility: 'hidden' }}
+                  >
+                    <div className="text-white w-full">
+                      <Badge className="mb-4 bg-white/20 text-white border-white/30">
+                        Back
+                      </Badge>
+                      {currentCard.dictionary_entry ? (
+                        <>
+                          <h3 className="text-xl sm:text-2xl font-bold mb-3">
+                            {currentCard.dictionary_entry.word}
                           </h3>
-                        )}
-                        {currentCard.back && !currentCard.dictionary_entry && (
-                          <p className="text-lg text-purple-100/90 mt-4">
-                            {currentCard.back}
+                          <p className="text-base sm:text-lg text-white/90 mb-4">
+                            {currentCard.dictionary_entry.definition}
                           </p>
-                        )}
-                      </div>
-                      <p className="text-purple-200/70 text-sm mt-4">
-                        Click to flip
-                      </p>
+                          {currentCard.back && (
+                            <p className="text-sm text-white/80">
+                              {currentCard.back}
+                            </p>
+                          )}
+                        </>
+                      ) : (
+                        <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold">
+                          {currentCard.back}
+                        </h3>
+                      )}
                     </div>
+                    <p className="text-white/70 text-xs sm:text-sm mt-6">
+                      Click to see question
+                    </p>
                   </div>
-                </div>
-
-                {/* Review Controls */}
-                <div className="border-t border-purple-500/30 pt-6 mt-6">
-                  <div className="flex items-center justify-center gap-4">
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      onClick={() => handleReview(0)}
-                      className="border-red-500/30 text-red-400 hover:bg-red-500/20"
-                    >
-                      <X className="h-5 w-5 mr-2" />
-                      Again (0)
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      onClick={() => handleReview(1)}
-                      className="border-orange-500/30 text-orange-400 hover:bg-orange-500/20"
-                    >
-                      Hard (1)
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      onClick={() => handleReview(3)}
-                      className="border-blue-500/30 text-blue-400 hover:bg-blue-500/20"
-                    >
-                      Good (3)
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      onClick={() => handleReview(5)}
-                      className="border-green-500/30 text-green-400 hover:bg-green-500/20"
-                    >
-                      <CheckCircle className="h-5 w-5 mr-2" />
-                      Easy (5)
-                    </Button>
-                  </div>
-
-                  {/* Stats */}
-                  {currentCard.times_reviewed > 0 && (
-                    <div className="flex items-center justify-center gap-6 mt-4 text-sm">
-                      <div className="flex items-center gap-2 text-cyan-300/70">
-                        <TrendingUp className="h-4 w-4" />
-                        <span>Mastery: {Math.round(currentCard.mastery_level)}%</span>
-                      </div>
-                      <div className="text-cyan-300/70">
-                        Reviewed: {currentCard.times_reviewed} times
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
-            ) : null}
-          </>
-        ) : (
-          <div className="flex-1 p-6">
-            <p className="text-cyan-100/70 text-center py-8">
-              Browse mode - coming soon! Create decks and manage your flashcards.
-            </p>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+
+              {/* Review Controls */}
+              <div className="border-t border-primary/20 dark:border-emerald-500/20 pt-6 mt-6">
+                <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mb-4">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => handleReview(0)}
+                    className="border-red-500/30 text-red-600 hover:bg-red-500/20 dark:border-red-500/30 dark:text-red-400 dark:hover:bg-red-500/20"
+                  >
+                    <X className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                    <span className="hidden sm:inline">Again</span>
+                    <span className="sm:hidden">0</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => handleReview(1)}
+                    className="border-orange-500/30 text-orange-600 hover:bg-orange-500/20 dark:border-orange-500/30 dark:text-orange-400 dark:hover:bg-orange-500/20"
+                  >
+                    Hard
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => handleReview(3)}
+                    className="border-blue-500/30 text-blue-600 hover:bg-blue-500/20 dark:border-blue-500/30 dark:text-blue-400 dark:hover:bg-blue-500/20"
+                  >
+                    Good
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => handleReview(5)}
+                    className="border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/20 dark:border-emerald-500/30 dark:text-emerald-400 dark:hover:bg-emerald-500/20"
+                  >
+                    <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                    Easy
+                  </Button>
+                </div>
+
+                {/* Card Stats */}
+                {currentCard.times_reviewed > 0 && (
+                  <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-4 text-sm">
+                    <div className="flex items-center gap-2 text-muted-foreground dark:text-cyan-100/70">
+                      <TrendingUp className="h-4 w-4 text-primary dark:text-emerald-300" />
+                      <span>Mastery: {Math.round(currentCard.mastery_level)}%</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-muted-foreground dark:text-cyan-100/70">
+                      <RotateCw className="h-4 w-4 text-primary dark:text-emerald-300" />
+                      <span>Reviewed: {currentCard.times_reviewed}x</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-muted-foreground dark:text-cyan-100/70">
+                      <CheckCircle className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
+                      <span>Correct: {currentCard.times_correct}</span>
+                    </div>
+                    {currentCard.days_until_review > 0 && (
+                      <div className="flex items-center gap-2 text-muted-foreground dark:text-cyan-100/70">
+                        <Clock className="h-4 w-4 text-primary dark:text-emerald-300" />
+                        <span>Next: {currentCard.days_until_review}d</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : null}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
-

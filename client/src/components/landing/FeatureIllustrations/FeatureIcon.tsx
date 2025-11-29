@@ -2,7 +2,7 @@ import React from 'react';
 import { 
   Wifi, Mic, Sparkles, Layers, BrainCircuit, 
   MessageSquare, TrendingUp, FileText, Lock, Award, 
-  Grid, Search, BookOpen, Users, Zap, Sun 
+  Grid, Search, BookOpen, Users, Sun 
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -32,8 +32,7 @@ export const FeatureIcon: React.FC<FeatureIconProps> = ({
     <Sun key="dlmode" size={size} strokeWidth={1.5} />,              // D/L mode
     <Grid key="multi-mode" size={size} strokeWidth={1.5} />,         // Multi-Mode Practice
     <BookOpen key="dictionary" size={size} strokeWidth={1.5} />,     // Offline Dictionary
-    <Users key="roleplay" size={size} strokeWidth={1.5} />,          // Roleplay Modes
-    <Zap key="flashcards" size={size} strokeWidth={1.5} />           // Flashcards
+    <Users key="roleplay" size={size} strokeWidth={1.5} />           // Roleplay Modes
   ];
 
   return <div className={cn("text-primary", className)}>{icons[index % icons.length]}</div>;

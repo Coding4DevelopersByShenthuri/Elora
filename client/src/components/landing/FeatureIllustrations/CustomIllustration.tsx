@@ -39,7 +39,7 @@ export const CustomIllustration: React.FC<CustomIllustrationProps> = ({
     "Online First", "Voice Recognition", "AI Coaching", "Learning Levels", "Intelligence",
     "Interactive Dialogues", "Progress Tracking", "Search", "Contextual Learning",
     "Private & Secure", "Gamified Practice", "D/L mode", "Multi-Mode Practice",
-    "Online Dictionary", "Roleplay Modes", "Flashcards"
+    "Online Dictionary", "Roleplay Modes"
   ];
 
   const descriptions = [
@@ -57,8 +57,7 @@ export const CustomIllustration: React.FC<CustomIllustrationProps> = ({
     "Toggle between dark and simplified interface with custom color modes for focus.",
     "Switch between multiple learning modes for better practice.",
     "Access a live dictionary anytime for quick reference.",
-    "Engage in roleplay scenarios to boost conversational skills.",
-    "Use flashcards to memorize and revise vocabulary effectively."
+    "Engage in roleplay scenarios to boost conversational skills."
   ];
 
   const bgColor = bgColors[featureIndex % bgColors.length];
@@ -816,61 +815,6 @@ export const CustomIllustration: React.FC<CustomIllustrationProps> = ({
       {/* Footer Note */}
       <div className="absolute bottom-10 right-10 text-xs bg-primary/10 p-2 rounded animate-pulse">
         Engage in interactive roleplay modes
-      </div>
-
-      {/* Shimmer CSS */}
-      <style>{`
-        .shimmer {
-          position: relative;
-          overflow: hidden;
-        }
-        .shimmer::after {
-          content: "";
-          position: absolute;
-          top: 0;
-          left: -150%;
-          width: 150%;
-          height: 100%;
-          background: linear-gradient(
-            120deg,
-            transparent 0%,
-            rgba(255, 255, 255, 0.2) 50%,
-            transparent 100%
-          );
-          animation: shimmer 2.5s infinite;
-        }
-        @keyframes shimmer {
-          100% {
-            left: 150%;
-          }
-        }
-      `}</style>
-    </div>
-  );
-
-
-      case 15: // Flashcards
-  return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center">
-
-      {/* Header */}
-      <div className="glass-panel shimmer rounded-full px-4 py-2 w-3/4 flex items-center mb-6">
-        <Zap className="text-primary w-5 h-5 mr-2 animate-bounce" />
-        <div className="h-5 w-full bg-primary/10 rounded"></div>
-      </div>
-
-      {/* Flashcard Grid */}
-      <div className="grid grid-cols-3 gap-4 w-3/4">
-        {Array(6).fill(0).map((_, idx) => (
-          <div key={idx} className="glass-panel shimmer p-2 rounded-md h-12 w-full flex items-center justify-center">
-            <div className="h-4 w-2/3 bg-primary/10 rounded animate-pulse"></div>
-          </div>
-        ))}
-      </div>
-
-      {/* Footer Note */}
-      <div className="absolute bottom-10 right-10 text-xs bg-primary/10 p-2 rounded animate-pulse">
-        Practice efficiently with flashcards
       </div>
 
       {/* Shimmer CSS */}

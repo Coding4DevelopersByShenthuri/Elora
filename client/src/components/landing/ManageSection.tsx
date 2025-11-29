@@ -26,7 +26,6 @@ export const ManageSection = ({ show }: ManageSectionProps) => {
     { title: "Multi-Mode Practice", description: "Switch between listening, speaking, reading, and writing exercises." },
     { title: "Offline Dictionary", description: "Look up meanings, synonyms, and usage examples instantly without internet access." },
     { title: "Roleplay Modes", description: "Practice interviews, travel talks, and casual chats." },
-    { title: "Flashcards", description: "Review words quickly with smart AI flashcards." },
   ];
 
   const handleFeatureClick = (index: number) => {

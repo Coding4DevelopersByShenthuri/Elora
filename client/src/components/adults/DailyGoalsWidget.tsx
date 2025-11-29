@@ -32,7 +32,6 @@ const GOAL_TYPES = [
   { value: 'vocabulary', label: 'Learn Vocabulary', unit: 'words', icon: '📚' },
   { value: 'practice', label: 'Practice Time', unit: 'minutes', icon: '⏱️' },
   { value: 'lessons', label: 'Complete Lessons', unit: 'lessons', icon: '📖' },
-  { value: 'flashcards', label: 'Review Flashcards', unit: 'cards', icon: '🗂️' },
   { value: 'pronunciation', label: 'Pronunciation Practice', unit: 'words', icon: '🎤' },
 ];
 

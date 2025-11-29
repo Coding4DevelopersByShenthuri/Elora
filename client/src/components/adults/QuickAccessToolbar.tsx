@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
-  BookOpen, Target, FileText, Mic,
+  BookOpen, Target, Mic,
   ChevronUp, ChevronDown, Settings, X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,6 @@ interface ToolbarPreferences {
 
 const TOOLS = {
   dictionary: { icon: BookOpen, label: 'Dictionary', color: 'text-emerald-400' },
-  flashcards: { icon: FileText, label: 'Flashcards', color: 'text-green-400' },
 };
 
 interface QuickAccessToolbarProps {
@@ -29,8 +28,8 @@ interface QuickAccessToolbarProps {
 export default function QuickAccessToolbar({ onToolClick }: QuickAccessToolbarProps) {
   const { user } = useAuth();
   const [preferences, setPreferences] = useState<ToolbarPreferences>({
-    enabled_tools: ['dictionary', 'flashcards'],
-    tool_order: ['dictionary', 'flashcards'],
+    enabled_tools: ['dictionary'],
+    tool_order: ['dictionary'],
     toolbar_position: 'bottom',
     is_collapsed: false,
   });
@@ -48,7 +47,7 @@ export default function QuickAccessToolbar({ onToolClick }: QuickAccessToolbarPr
       const result = await AdultsAPI.getToolbarPreferences();
       if (result.success && 'data' in result && result.data) {
         setPreferences({
-          enabled_tools: result.data.enabled_tools || ['dictionary', 'flashcards'],
+          enabled_tools: result.data.enabled_tools || ['dictionary'],
           tool_order: result.data.tool_order || Object.keys(TOOLS),
           toolbar_position: (result.data.toolbar_position as 'left' | 'right' | 'bottom') || 'bottom',
           is_collapsed: result.data.is_collapsed || false,
@@ -189,7 +188,7 @@ export default function QuickAccessToolbar({ onToolClick }: QuickAccessToolbarPr
                 {isExpanded ? (
                   <X className="h-4 w-4 text-primary dark:text-emerald-300" />
                 ) : (
-                  <FileText className="h-4 w-4 text-primary dark:text-emerald-300" />
+                  <BookOpen className="h-4 w-4 text-primary dark:text-emerald-300" />
                 )}
               </Button>
             </div>
