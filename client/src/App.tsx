@@ -53,6 +53,7 @@ import {
   Beginners,
   Intermediates,
   Advanced,
+  QuickPracticeSession,
   TeenKidsPage,
   YoungKidsPage,
   VirtualAI,
@@ -753,6 +754,7 @@ const AppRoutes = () => {
             </PageTransition>
           } 
         />
+        <Route path="/adults/practice/daily-conversation" element={<PageTransition><ErrorBoundary><Suspense fallback={<LoadingScreen />}><QuickPracticeSession /></Suspense></ErrorBoundary></PageTransition>} />
         <Route path="/adults/practice/multi-mode" element={<PageTransition><ErrorBoundary><Suspense fallback={<LoadingScreen />}><MultiModePracticePage /></Suspense></ErrorBoundary></PageTransition>} />
         <Route 
           path="/ielts-pte" 

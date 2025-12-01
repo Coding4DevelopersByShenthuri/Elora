@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import {
   Volume2, Mic, CheckCircle, Clock, ArrowLeft, ArrowRight, MessageCircle,
   BookOpen, Languages, Zap, Star, Target,
@@ -358,8 +358,12 @@ const dailyConversationTopics = [
 
 
 const QuickPracticeSession = () => {
-  const { sessionType } = useParams<{ sessionType: string }>();
+  const { sessionType: paramSessionType } = useParams<{ sessionType: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
+  
+  // Extract sessionType from URL pathname if not in params
+  const sessionType = paramSessionType || (location.pathname.includes('daily-conversation') ? 'daily-conversation' : undefined);
   const { user } = useAuth();
   const { toast } = useToast();
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
@@ -384,8 +388,11 @@ const QuickPracticeSession = () => {
   const recognitionRef = useRef<any>(null);
 
   // Redirect invalid or deprecated routes back to adults page
+  // Only allow daily-conversation session type
   useEffect(() => {
-    if (!sessionType || sessionType === 'pronunciation') {
+    // Only redirect if we have a sessionType that's not daily-conversation
+    // Don't redirect if sessionType is undefined (might be loading)
+    if (sessionType && sessionType !== 'daily-conversation') {
       navigate('/adults', { replace: true });
     }
   }, [sessionType, navigate]);
@@ -723,8 +730,8 @@ const QuickPracticeSession = () => {
     }
   };
 
-  // If no session type, show selection
-  if (!sessionType) {
+  // If no session type, show selection (but not if we're on daily-conversation route)
+  if (!sessionType && !location.pathname.includes('daily-conversation')) {
     return (
       <div className="min-h-screen relative overflow-hidden bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950">
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
