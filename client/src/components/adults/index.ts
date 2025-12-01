@@ -10,6 +10,5 @@ export { default as DictionaryWidget } from './DictionaryWidget';
 export { default as DailyGoalsWidget } from './DailyGoalsWidget';
 export { default as MultiModePracticeHub } from './MultiModePracticeHub';
 export { default as BusinessEmailCoach } from './BusinessEmailCoach';
-export { default as PronunciationAnalyzer } from './PronunciationAnalyzer';
 export { default as CulturalIntelligence } from './CulturalIntelligence';
 
