@@ -838,7 +838,8 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                           <Button
                             size="default"
                             className="w-full sm:w-auto bg-emerald-600 text-white hover:bg-emerald-700 font-semibold text-sm sm:text-base shadow-lg"
-                            onClick={() => navigate('/adults/practice/daily-conversation')}
+                            disabled
+                            title="Daily Conversation practice is currently unavailable"
                           >
                             <Play className="w-4 h-4 mr-2" />
                             {hasAnyEnrolledTopic() ? 'Continue Practice' : 'Start Daily Conversation'}

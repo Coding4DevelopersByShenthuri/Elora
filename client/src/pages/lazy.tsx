@@ -13,7 +13,6 @@ export const VideoDetail = lazy(() => import('@/pages/adults/VideoDetail'));
 export const Beginners = lazy(() => import('@/pages/adults/Beginners'));
 export const Intermediates = lazy(() => import('@/pages/adults/Intermediates'));
 export const Advanced = lazy(() => import('@/pages/adults/Advanced'));
-export const QuickPracticeSession = lazy(() => import('@/pages/adults/QuickPracticeSession'));
 export const TeenKidsPage = lazy(() => import('@/pages/TeenKids'));
 export const YoungKidsPage = lazy(() => import('@/pages/YoungKids'));
 export const VirtualAI = lazy(() => import('@/pages/VirtualAI'));
