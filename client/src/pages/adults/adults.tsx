@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Play, Target, Award, BookOpen, MessageCircle,
-  Mic, Volume2, CheckCircle, TrendingUp, Zap, Lightbulb, Crown, BarChart3,
+  Volume2, CheckCircle, TrendingUp, Zap, Lightbulb, Crown, BarChart3,
   Clock, ThumbsUp, Shield, Rocket,
   ArrowRight, GraduationCap, Brain, Languages, Star, Sparkles, Globe,
   Flame, Calendar, Trophy, RefreshCw, FileText, Layers,
@@ -754,37 +754,6 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                           >
                             <Play className="w-4 h-4 mr-2" />
                             {enrolledModules.size > 0 ? 'Continue Practice' : 'Start Practice'}
-                            <ArrowRight className="w-4 h-4 ml-2" />
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Pronunciation Analyzer */}
-                  <Card className="bg-gradient-to-br from-green-600/20 to-green-600/20 backdrop-blur-xl border-green-500/50 shadow-2xl dark:from-green-600/20 dark:to-green-600/20 dark:border-green-500/50">
-                    <CardContent className="p-4 sm:p-6 md:p-8">
-                      <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-                        <div className="p-4 sm:p-6 rounded-2xl text-white bg-green-600 shadow-lg flex-shrink-0">
-                          <Mic className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
-                        </div>
-                        <div className="flex-1 text-center sm:text-left w-full">
-                          <h3 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2">Pronunciation Analyzer</h3>
-                          <p className="text-sm sm:text-base text-muted-foreground dark:text-cyan-100/80 mb-3 sm:mb-4">
-                            Record and analyze your pronunciation with AI-powered feedback
-                          </p>
-                          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-4 mb-3 sm:mb-4">
-                            <Badge variant="outline" className="bg-green-600/30 text-gray-800 font-semibold border-green-500/60 text-xs dark:bg-green-600/30 dark:text-white dark:border-green-500/50">
-                              AI Feedback
-                            </Badge>
-                          </div>
-                          <Button
-                            size="default"
-                            className="w-full sm:w-auto bg-green-600 text-white hover:bg-green-700 font-semibold text-sm sm:text-base shadow-lg"
-                            onClick={() => navigate('/adults/practice/pronunciation')}
-                          >
-                            <Mic className="w-4 h-4 mr-2" />
-                            Analyze Pronunciation
                             <ArrowRight className="w-4 h-4 ml-2" />
                           </Button>
                         </div>
