@@ -383,10 +383,10 @@ const QuickPracticeSession = () => {
   const lineRefs = useRef<Record<number, HTMLDivElement>>({});
   const recognitionRef = useRef<any>(null);
 
-  // Redirect deprecated pronunciation route back to main practice page
+  // Redirect invalid or deprecated routes back to adults page
   useEffect(() => {
-    if (sessionType === 'pronunciation') {
-      navigate('/adults/practice', { replace: true });
+    if (!sessionType || sessionType === 'pronunciation') {
+      navigate('/adults', { replace: true });
     }
   }, [sessionType, navigate]);
 
@@ -2027,11 +2027,11 @@ const QuickPracticeSession = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <Button
             variant="ghost"
-            onClick={() => navigate('/adults/practice')}
+            onClick={() => navigate('/adults')}
             className="mb-8 text-cyan-300 hover:text-cyan-100"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Practice Sessions
+            Back to Adults Dashboard
           </Button>
 
           <Card className="bg-slate-900/60 backdrop-blur-xl border-purple-500/30 max-w-2xl mx-auto">

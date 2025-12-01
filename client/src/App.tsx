@@ -754,7 +754,6 @@ const AppRoutes = () => {
             </PageTransition>
           } 
         />
-        <Route path="/adults/practice" element={<PageTransition><ErrorBoundary><Suspense fallback={<LoadingScreen />}><QuickPracticeSession /></Suspense></ErrorBoundary></PageTransition>} />
         <Route path="/adults/practice/:sessionType" element={<PageTransition><ErrorBoundary><Suspense fallback={<LoadingScreen />}><QuickPracticeSession /></Suspense></ErrorBoundary></PageTransition>} />
         <Route path="/adults/practice/multi-mode" element={<PageTransition><ErrorBoundary><Suspense fallback={<LoadingScreen />}><MultiModePracticePage /></Suspense></ErrorBoundary></PageTransition>} />
         <Route 
