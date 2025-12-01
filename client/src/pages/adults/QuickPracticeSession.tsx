@@ -383,6 +383,13 @@ const QuickPracticeSession = () => {
   const lineRefs = useRef<Record<number, HTMLDivElement>>({});
   const recognitionRef = useRef<any>(null);
 
+  // Redirect deprecated pronunciation route back to main practice page
+  useEffect(() => {
+    if (sessionType === 'pronunciation') {
+      navigate('/adults/practice', { replace: true });
+    }
+  }, [sessionType, navigate]);
+
   // Initialize TTS and STT
   useEffect(() => {
     const initServices = async () => {
@@ -511,14 +518,6 @@ const QuickPracticeSession = () => {
           icon: MessageCircle,
           color: 'from-cyan-500 to-blue-600',
           topics: dailyConversationTopics
-        };
-      case 'pronunciation':
-        return {
-          title: 'Pronunciation Drill',
-          description: 'Improve your accent and speaking clarity',
-          icon: Volume2,
-          color: 'from-emerald-500 to-teal-600',
-          topics: []
         };
       case 'grammar':
         return {
@@ -768,7 +767,6 @@ const QuickPracticeSession = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
               {[
                 { type: 'daily-conversation', title: 'Daily Conversation', icon: MessageCircle, color: 'from-cyan-500 to-blue-600' },
-                { type: 'pronunciation', title: 'Pronunciation Drill', icon: Volume2, color: 'from-emerald-500 to-teal-600' },
                 { type: 'grammar', title: 'Grammar Challenge', icon: BookOpen, color: 'from-purple-500 to-pink-600' },
                 { type: 'vocabulary', title: 'Vocabulary Builder', icon: Languages, color: 'from-amber-500 to-orange-600' }
               ].map((session) => {
