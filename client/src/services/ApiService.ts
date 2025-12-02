@@ -2333,51 +2333,6 @@ export const AdultsAPI = {
       return handleApiError(error);
     }
   },
-
-  // ============= Search API =============
-  /**
-   * Save search query
-   */
-  saveSearch: async (data: {
-    query: string;
-    search_type?: string;
-    results_count?: number;
-    clicked_result?: string;
-  }) => {
-    try {
-      const result = await fetchWithAuth('adults/search', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
-      return { success: true, data: result };
-    } catch (error) {
-      return handleApiError(error);
-    }
-  },
-
-  /**
-   * Get search suggestions
-   */
-  getSearchSuggestions: async (query: string) => {
-    try {
-      const result = await fetchWithAuth(`adults/search/suggestions?q=${encodeURIComponent(query)}`);
-      return { success: true, data: result };
-    } catch (error) {
-      return handleApiError(error);
-    }
-  },
-
-  /**
-   * Get search history
-   */
-  getSearchHistory: async (days: number = 30) => {
-    try {
-      const result = await fetchWithAuth(`adults/search/history?days=${days}`);
-      return { success: true, data: result };
-    } catch (error) {
-      return handleApiError(error);
-    }
-  },
 };
 
 // ============= Export all APIs =============

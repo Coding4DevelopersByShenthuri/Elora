@@ -25,7 +25,6 @@ import Index from "@/pages/Index";
 import WhyPage from "@/pages/WhyPage";
 import HowPage from "@/pages/HowPage";
 import AboutPage from "@/pages/AboutPage";
-import SearchPage from "@/pages/SearchPage";
 import Settings from "@/pages/Settings";
 import HelpPage from "@/pages/HelpPage";
 import ContactPage from "@/pages/ContactPage";
@@ -678,7 +677,6 @@ const AppRoutes = () => {
         <Route path="/how" element={<PageTransition><HowPage /></PageTransition>} />
         <Route path="/about" element={<PageTransition><AboutPage /></PageTransition>} />
         <Route path="/profile" element={<PageTransition><ErrorBoundary><Suspense fallback={<LoadingScreen />}><Profile /></Suspense></ErrorBoundary></PageTransition>} />
-        <Route path="/search" element={<PageTransition><SearchPage /></PageTransition>} />
         <Route path="/settings" element={<PageTransition><Settings /></PageTransition>} />
         <Route path="/help" element={<PageTransition><HelpPage /></PageTransition>} />
         <Route path="/contact" element={<PageTransition><ContactPage /></PageTransition>} />

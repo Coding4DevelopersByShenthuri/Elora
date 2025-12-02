@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  Brain, Search, User, Settings, LogOut, Moon, Sun,
+  Brain, User, Settings, LogOut, Moon, Sun,
   Info, HelpCircle, Code, Menu, Users, Baby, FolderTree, Lightbulb,
   GraduationCap, Layers, Award, BookOpen, Notebook, Bot
 } from 'lucide-react';
@@ -136,8 +136,7 @@ export const Navbar = () => {
       else if (path === '/adults/intermediates') setActive('adults-intermediates');
       else if (path === '/adults/advanced') setActive('adults-advanced');
       else setActive('adults');
-    } else if (path === '/ielts-pte') setActive('ielts-pte');
-    else if (path === '/search') setActive('search');
+    }     else if (path === '/ielts-pte') setActive('ielts-pte');
     else if (path === '/profile') setActive('profile');
     else if (path === '/settings') setActive('settings');
   }, [location.pathname]);
@@ -203,7 +202,6 @@ export const Navbar = () => {
   ];
 
   const authNavItems = [
-    { to: '/search', icon: <Search size={18} />, label: 'Search', id: 'search' },
     { to: '/profile', icon: <User size={18} />, label: 'Profile', id: 'profile' },
     { to: '/settings', icon: <Settings size={18} />, label: 'Settings', id: 'settings' },
   ];
