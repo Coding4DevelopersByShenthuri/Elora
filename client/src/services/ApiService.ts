@@ -1402,37 +1402,6 @@ export const CookieConsentAPI = {
   }
 };
 
-
-// ============= Waitlist API =============
-export const WaitlistAPI = {
-  /**
-   * Sign up for waitlist
-   */
-  signup: async (data: {
-    email: string;
-    name?: string;
-    interest?: string;
-    source?: string;
-    notes?: string;
-  }) => {
-    try {
-      const result = await fetchWithAuth('waitlist/signup', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
-      
-      return {
-        success: true,
-        data: result.data,
-        message: result.message
-      };
-    } catch (error) {
-      return handleApiError(error);
-    }
-  }
-};
-
-
 // ============= Page Eligibility API =============
 const PageEligibilityAPI = {
   /**
@@ -2346,7 +2315,6 @@ export const API = {
   kids: KidsAPI,
   parentalControls: ParentalControlsAPI,
   cookieConsent: CookieConsentAPI,
-  waitlist: WaitlistAPI,
   pageEligibility: PageEligibilityAPI,
   adults: AdultsAPI,
 };

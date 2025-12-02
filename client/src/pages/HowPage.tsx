@@ -11,7 +11,6 @@ import {
   Award
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { WaitlistModal } from '@/components/waitlist/WaitlistModal';
 
 // Kept for potential future use
 /*
@@ -101,7 +100,6 @@ const ValueProp = ({
 
 const HowPage = () => {
   const [, setLoading] = useState(true);
-  const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -462,8 +460,6 @@ const HowPage = () => {
           </div>
         </div>
       </div>
-
-      <WaitlistModal isOpen={isWaitlistOpen} onClose={() => setIsWaitlistOpen(false)} />
     </div>
   );
 };

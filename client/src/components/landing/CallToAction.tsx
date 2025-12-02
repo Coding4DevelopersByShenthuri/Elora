@@ -1,7 +1,5 @@
 import { Button } from '@/components/ui/button';
 import { AnimatedTransition } from '@/components/common/AnimatedTransition';
-import { useState } from 'react';
-import { WaitlistModal } from '../../components/waitlist/WaitlistModal';
 import { Link } from 'react-router-dom';
 
 interface CallToActionProps {
@@ -9,11 +7,6 @@ interface CallToActionProps {
 }
 
 export const CallToAction = ({ show }: CallToActionProps) => {
-  const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
-
-  const openWaitlist = () => setIsWaitlistOpen(true);
-  const closeWaitlist = () => setIsWaitlistOpen(false);
-
   return (
     <>
       <AnimatedTransition show={show} animation="slide-up" duration={600}>
@@ -30,9 +23,11 @@ export const CallToAction = ({ show }: CallToActionProps) => {
               size="lg"
               variant="outline"
               className="rounded-full px-8 py-6 text-base font-medium bg-transparent text-primary-foreground border-primary-foreground hover:bg-primary-foreground/10 transition-all duration-300"
-              onClick={openWaitlist}
+              asChild
             >
-              Join Early Access
+              <Link to="/pricing">
+                Start Now
+              </Link>
             </Button>
 
             <Button
@@ -48,9 +43,6 @@ export const CallToAction = ({ show }: CallToActionProps) => {
           </div>
         </div>
       </AnimatedTransition>
-
-      {/* Waitlist modal */}
-      <WaitlistModal isOpen={isWaitlistOpen} onClose={closeWaitlist} />
     </>
   );
 };
