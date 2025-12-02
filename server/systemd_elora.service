@@ -1,0 +1,25 @@
+[Unit]
+Description=Elora Gunicorn daemon
+After=network.target mysql.service
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/Elora/server
+Environment="PATH=/home/ubuntu/Elora/server/venv/bin"
+Environment="DJANGO_SETTINGS_MODULE=crud.settings"
+ExecStart=/home/ubuntu/Elora/server/venv/bin/gunicorn \
+    --workers 3 \
+    --bind 127.0.0.1:8000 \
+    --timeout 120 \
+    --access-logfile /home/ubuntu/Elora/server/logs/access.log \
+    --error-logfile /home/ubuntu/Elora/server/logs/error.log \
+    --log-level info \
+    crud.wsgi:application
+
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+

@@ -12,7 +12,7 @@ urlpatterns = [
 
 # Serve static and media files through Django so they are available
 # both in local development (DEBUG=True) and when running under
-# gunicorn in Docker behind nginx (DEBUG=False).
+# gunicorn behind nginx in production (DEBUG=False).
 #
 # Note: For high-traffic production this is usually offloaded to
 # nginx directly, but for this project it's acceptable and ensures
