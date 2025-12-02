@@ -96,17 +96,19 @@ const CookieConsent = () => {
     }
 
     const consentStatus = getStoredValue(COOKIE_CONSENT_KEY);
+    
+    // Show banner immediately if no consent has been given (first visit)
+    // Standard behavior: show banner on first visit, hide if already accepted
     if (consentStatus === 'accepted') {
       setIsVisible(false);
-    } else if (consentStatus) {
+      setIsLoading(false);
+    } else {
+      // Show banner immediately for first-time visitors or pending consent
       setIsVisible(true);
+      setIsLoading(false); // Don't wait for server - show immediately
     }
 
     setConsentId(storedConsentId);
-
-    if (!storedConsentId) {
-      setIsLoading(false);
-    }
   }, []);
 
   useEffect(() => {
@@ -115,7 +117,7 @@ const CookieConsent = () => {
     let isCancelled = false;
 
     const fetchConsent = async () => {
-      setIsLoading(true);
+      // Don't block UI - fetch in background
       try {
         const response = await CookieConsentAPI.get(consentId);
         if (isCancelled) {
@@ -137,40 +139,38 @@ const CookieConsent = () => {
           }
 
           setPreferences(remotePreferences);
-          setIsVisible(!acceptedFlag);
+          
+          // Only hide if consent was accepted, otherwise keep visible
+          if (acceptedFlag) {
+            setIsVisible(false);
+          }
+          
           setErrorMessage(null);
           updateLocalState(acceptedFlag, remotePreferences);
         } else {
-          if ('message' in response && response.message) {
-            setErrorMessage(response.message);
-          }
-          const fallbackPrefs = readLocalPreferences();
-          if (fallbackPrefs) {
-            setPreferences(fallbackPrefs);
-          }
+          // Server doesn't have consent - check local storage
           const consentStatus = getStoredValue(COOKIE_CONSENT_KEY);
-          setIsVisible(consentStatus === 'accepted' ? false : true);
+          if (consentStatus === 'accepted') {
+            setIsVisible(false);
+          }
+          // If no local consent, banner should already be visible from initial useEffect
         }
       } catch (error) {
         if (isCancelled) {
           return;
         }
         console.error('Failed to load cookie consent:', error);
-        setErrorMessage('We could not load your cookie preferences. Please review them below.');
-
-        const fallbackPrefs = readLocalPreferences();
-        if (fallbackPrefs) {
-          setPreferences(fallbackPrefs);
-        }
+        // Don't show error on initial load - just use local storage
+        // Error will only show if user tries to save preferences
+        
         const consentStatus = getStoredValue(COOKIE_CONSENT_KEY);
-        setIsVisible(consentStatus === 'accepted' ? false : true);
-      } finally {
-        if (!isCancelled) {
-          setIsLoading(false);
+        if (consentStatus === 'accepted') {
+          setIsVisible(false);
         }
       }
     };
 
+    // Fetch consent in background (non-blocking)
     fetchConsent();
 
     return () => {
@@ -235,6 +235,16 @@ const CookieConsent = () => {
     await persistConsent(updatedPreferences, true);
   };
 
+  const handleReject = async () => {
+    // Reject all non-essential cookies (only keep functional)
+    const updatedPreferences: CookiePreferences = {
+      functional: true,
+      statistics: false,
+      marketing: false,
+    };
+    await persistConsent(updatedPreferences, true);
+  };
+
   const handleSavePreferences = async () => {
     await persistConsent(preferences, true);
   };
@@ -251,12 +261,13 @@ const CookieConsent = () => {
     setExpandedCategory(expandedCategory === category ? null : category);
   };
 
-  if (!isVisible || isLoading) return null;
+  // Don't show loading state - show banner immediately
+  if (!isVisible) return null;
 
   return (
     <>
-      {/* Black backdrop overlay - matches Dialog component pattern */}
-      <div className="fixed inset-0 z-50 bg-black/80 animate-fade-in" />
+      {/* Backdrop overlay - standard cookie consent pattern */}
+      <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm animate-fade-in" />
       
       {/* Cookie consent popup */}
       <div className="fixed bottom-0 left-0 right-0 z-[51] animate-slide-up p-2 sm:p-3 md:p-4">
@@ -494,15 +505,27 @@ const CookieConsent = () => {
 
               {/* Right: Action Buttons */}
               <div className="flex flex-col items-start sm:items-center justify-start gap-2 lg:col-span-1">
-                <Button
-                  onClick={handleAccept}
-                  size="default"
-                  className="w-full sm:w-auto min-w-[140px]"
-                  disabled={isSaving || isLoading}
-                  aria-busy={isSaving}
-                >
-                  Accept all
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                  <Button
+                    onClick={handleAccept}
+                    size="default"
+                    className="w-full sm:w-auto min-w-[140px]"
+                    disabled={isSaving || isLoading}
+                    aria-busy={isSaving}
+                  >
+                    Accept all
+                  </Button>
+                  <Button
+                    onClick={handleReject}
+                    variant="outline"
+                    size="default"
+                    className="w-full sm:w-auto min-w-[140px]"
+                    disabled={isSaving || isLoading}
+                    aria-busy={isSaving}
+                  >
+                    Reject all
+                  </Button>
+                </div>
                 <Button
                   onClick={handleSavePreferences}
                   variant="outline"
