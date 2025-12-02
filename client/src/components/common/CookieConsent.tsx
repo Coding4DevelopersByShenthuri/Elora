@@ -187,6 +187,11 @@ const CookieConsent = () => {
     setIsSaving(true);
     setErrorMessage(null);
 
+    // Always save to localStorage first (immediate feedback)
+    updateLocalState(accepted, updatedPreferences);
+    setPreferences(updatedPreferences);
+    
+    // Try to sync with server, but don't fail if server is unavailable
     try {
       const response = await CookieConsentAPI.save({
         consentId,
@@ -195,32 +200,43 @@ const CookieConsent = () => {
       });
 
       if (!response.success) {
+        // Server failed, but localStorage is already saved
         const message =
           'message' in response && response.message
             ? response.message
-            : 'Unable to save your preferences. Please try again.';
-        setErrorMessage(message);
-        return false;
+            : 'Preferences saved locally. Server sync failed.';
+        console.warn('Cookie consent server sync failed:', message);
+        // Don't show error to user - localStorage save succeeded
+        // Just hide the banner since consent was given
+        setIsVisible(false);
+        return true;
       }
 
+      // Server save succeeded - update with server response
       const payload = 'data' in response ? response.data : null;
-      const savedPreferences: CookiePreferences = payload?.preferences
-        ? {
-            functional: true,
-            statistics: Boolean(payload.preferences.statistics),
-            marketing: Boolean(payload.preferences.marketing),
-          }
-        : updatedPreferences;
-      const savedAccepted = payload?.accepted ?? accepted;
-
-      updateLocalState(savedAccepted, savedPreferences);
-      setPreferences(savedPreferences);
-      setIsVisible(!savedAccepted);
+      if (payload) {
+        const savedPreferences: CookiePreferences = payload.preferences
+          ? {
+              functional: true,
+              statistics: Boolean(payload.preferences.statistics),
+              marketing: Boolean(payload.preferences.marketing),
+            }
+          : updatedPreferences;
+        const savedAccepted = payload.accepted ?? accepted;
+        
+        // Update localStorage with server response
+        updateLocalState(savedAccepted, savedPreferences);
+        setPreferences(savedPreferences);
+      }
+      
+      setIsVisible(false);
       return true;
-    } catch (error) {
-      console.error('Failed to save cookie preferences:', error);
-      setErrorMessage('Unable to save your preferences. Please try again.');
-      return false;
+    } catch (error: any) {
+      // Network error or server unavailable - localStorage save already succeeded
+      console.warn('Cookie consent server sync failed (using localStorage):', error);
+      // Don't show error - localStorage save succeeded, banner should close
+      setIsVisible(false);
+      return true;
     } finally {
       setIsSaving(false);
     }

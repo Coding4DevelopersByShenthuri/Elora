@@ -1355,12 +1355,15 @@ export const CookieConsentAPI = {
         };
       }
 
-      const result = await fetchWithAuth(`privacy/cookie-consent?consent_id=${encodeURIComponent(consentId)}`);
+      // Cookie consent endpoint doesn't require auth, but fetchWithAuth handles it gracefully
+      // Use clearTokenOn401=false to prevent clearing token on 401 (if user is logged in)
+      const result = await fetchWithAuth(`privacy/cookie-consent?consent_id=${encodeURIComponent(consentId)}`, {}, 15000, false);
       return {
         success: true,
         data: result
       };
     } catch (error) {
+      console.error('CookieConsentAPI.get error:', error);
       return handleApiError(error);
     }
   },
@@ -1388,15 +1391,19 @@ export const CookieConsentAPI = {
         accepted: data.accepted ?? true
       };
 
+      // Cookie consent endpoint doesn't require auth, but fetchWithAuth handles it gracefully
+      // Use clearTokenOn401=false to prevent clearing token on 401 (if user is logged in)
       const result = await fetchWithAuth('privacy/cookie-consent', {
         method: 'POST',
         body: JSON.stringify(payload)
-      });
+      }, 15000, false); // Don't clear token on 401 for cookie consent
+      
       return {
         success: true,
         data: result
       };
     } catch (error) {
+      console.error('CookieConsentAPI.save error:', error);
       return handleApiError(error);
     }
   }
