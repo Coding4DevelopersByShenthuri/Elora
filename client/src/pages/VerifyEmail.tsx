@@ -19,28 +19,41 @@ const VerifyEmail: React.FC = () => {
 
       try {
         // Call the backend API to verify the email
-        // VITE_API_URL already includes /api, so we don't add it again
+        // VITE_API_URL should include /api (e.g., http://54.179.120.126/api)
         let apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
         
-        // Clean up the URL: remove trailing slashes and fix double /api
-        apiBaseUrl = apiBaseUrl.replace(/\/+$/, ''); // Remove trailing slashes
-        // apiBaseUrl = apiBaseUrl.replace(/\/api\/api\/?$/, '/api'); // Fix double /api
+        // Clean up the URL: remove trailing slashes
+        apiBaseUrl = apiBaseUrl.replace(/\/+$/, '');
+        
+        // Fix double /api/api pattern - this handles cases where VITE_API_URL might be incorrectly set
+        // Replace /api/api/ or /api/api at the end with just /api
+        apiBaseUrl = apiBaseUrl.replace(/\/api\/api(\/|$)/g, '/api$1');
+        // Also handle /api/api/ in the middle of the URL
+        apiBaseUrl = apiBaseUrl.replace(/\/api\/api\//g, '/api/');
+        
+        // Ensure URL ends with /api if it contains /api but doesn't end with it
+        // This handles cases like http://54.179.120.126/api/something -> http://54.179.120.126/api
+        if (apiBaseUrl.includes('/api') && !apiBaseUrl.endsWith('/api')) {
+          const apiIndex = apiBaseUrl.lastIndexOf('/api');
+          if (apiIndex !== -1) {
+            apiBaseUrl = apiBaseUrl.substring(0, apiIndex + 4); // +4 for '/api'
+          }
+        }
         
         // Token from React Router is already decoded, and secrets.token_urlsafe() generates URL-safe tokens
         // But we'll encode it to be safe for any edge cases
         const encodedToken = encodeURIComponent(token);
         
-        // Construct the full URL
+        // Construct the full URL - apiBaseUrl should now be clean (e.g., http://54.179.120.126/api)
         const verifyUrl = `${apiBaseUrl}/verify-email/${encodedToken}/`;
         
-        // Debug logging (remove in production if needed)
-        if (import.meta.env.DEV) {
-          console.log('Verifying email:');
-          console.log('  API Base URL:', apiBaseUrl);
-          console.log('  Token (first 20 chars):', token.substring(0, 20));
-          console.log('  Token length:', token.length);
-          console.log('  Full URL:', verifyUrl);
-        }
+        // Debug logging - always log in production to help diagnose issues
+        console.log('🔍 Email Verification Debug:');
+        console.log('  VITE_API_URL (raw):', import.meta.env.VITE_API_URL);
+        console.log('  API Base URL (cleaned):', apiBaseUrl);
+        console.log('  Token (first 20 chars):', token.substring(0, 20));
+        console.log('  Token length:', token.length);
+        console.log('  Full Verification URL:', verifyUrl);
         
         const response = await fetch(verifyUrl, {
           method: 'GET',
