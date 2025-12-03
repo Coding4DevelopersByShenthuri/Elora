@@ -288,11 +288,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const response = await API.auth.getUserInfo();
       
-      // Handle 401 errors gracefully - don't logout user
+      // Handle 401 errors - token expired, need to logout
       if (!response.success && 'status' in response && response.status === 401) {
-        logger.debug('Token validation failed during sync - keeping local session active');
-        // Don't clear token or logout - user might have valid local session
-        // Token might be expired but user data is still valid locally
+        logger.warn('Token expired during sync - logging out user');
+        // Token is expired, clear everything and logout
+        setUser(null);
+        localStorage.removeItem('speakbee_auth_token');
+        localStorage.removeItem('speakbee_current_user');
+        sessionStorage.removeItem('speakbee_just_authenticated');
+        sessionStorage.removeItem('speakbee_survey_in_progress');
+        sessionStorage.removeItem('speakbee_survey_step');
+        sessionStorage.removeItem('speakbee_survey_data');
+        // Redirect to home page
+        if (typeof window !== 'undefined') {
+          window.location.href = '/';
+        }
         return;
       }
       
@@ -384,14 +394,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (typeof window === 'undefined') return;
 
     const handleAuthInvalidated = () => {
-      logout();
+      // Immediately clear user state and logout
+      setUser(null);
+      localStorage.removeItem('speakbee_auth_token');
+      localStorage.removeItem('speakbee_current_user');
+      // Clear session storage as well
+      sessionStorage.removeItem('speakbee_just_authenticated');
+      sessionStorage.removeItem('speakbee_survey_in_progress');
+      sessionStorage.removeItem('speakbee_survey_step');
+      sessionStorage.removeItem('speakbee_survey_data');
+      // Force page reload to clear any stale state
+      window.location.href = '/';
     };
 
     window.addEventListener('speakbee-auth-invalidated', handleAuthInvalidated);
     return () => {
       window.removeEventListener('speakbee-auth-invalidated', handleAuthInvalidated);
     };
-  }, [logout]);
+  }, []);
 
   const updateUserProfile = (updates: Partial<User['profile']>) => {
     if (user) {

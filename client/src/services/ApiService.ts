@@ -112,20 +112,29 @@ const fetchWithAuth = async (
         // Don't clear token during sync operations to prevent unwanted logouts
         if (clearTokenOn401) {
           const hadStoredToken = !!(token && token !== 'local-token');
+          
+          // Clear tokens immediately
           localStorage.removeItem('speakbee_auth_token');
           localStorage.removeItem('speakbee_current_user');
-
+          
+          // Clear session storage as well
           if (typeof window !== 'undefined') {
+            sessionStorage.removeItem('speakbee_just_authenticated');
+            sessionStorage.removeItem('speakbee_survey_in_progress');
+            sessionStorage.removeItem('speakbee_survey_step');
+            sessionStorage.removeItem('speakbee_survey_data');
+            
+            // Dispatch event to notify AuthContext
             window.dispatchEvent(
               new CustomEvent('speakbee-auth-invalidated', {
-                detail: { endpoint },
+                detail: { endpoint, reason: 'token_expired' },
               }),
             );
           }
 
           if (hadStoredToken) {
             // Token expired - user will be logged out via event handler
-            // No need to log this as it's expected behavior
+            console.warn('Authentication token expired. Please sign in again.');
           }
         }
         const error = await response.json().catch(() => ({ message: 'Authentication required. Please sign in again.' }));
