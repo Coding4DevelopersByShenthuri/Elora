@@ -81,8 +81,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setUser(parsedUser);
         } catch (error) {
           logger.error('Error parsing user data:', error);
-          // If parsing fails, try to fetch from server instead
-          // Don't clear token - might be valid
+          // If parsing fails, clear corrupted data
+          localStorage.removeItem('speakbee_current_user');
+          // Don't clear token - might be valid, will verify with server
         }
       }
       
@@ -90,12 +91,38 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // This will restore user data if userData was missing or invalid
       // Only sync once on mount, not on every online status change
       if (navigator.onLine && token !== 'local-token') {
-        syncWithServerInternal().catch(err => {
-          logger.debug('Server sync failed - continuing with local data:', err);
-          // Don't logout on sync failure - preserve user session
-          // If userData was missing and sync failed, user will remain logged out
-          // but token is preserved for next successful sync
-        });
+        // Add timeout to prevent hanging
+        const syncTimeout = setTimeout(() => {
+          logger.warn('Server sync timed out - clearing potentially expired session');
+          // If sync takes too long, token might be expired
+          // Clear everything to prevent blank pages
+          setUser(null);
+          localStorage.removeItem('speakbee_auth_token');
+          localStorage.removeItem('speakbee_current_user');
+          sessionStorage.clear();
+          // Reload page to ensure clean state
+          window.location.href = '/';
+        }, 10000); // 10 second timeout
+        
+        syncWithServerInternal()
+          .then(() => {
+            clearTimeout(syncTimeout);
+          })
+          .catch(err => {
+            clearTimeout(syncTimeout);
+            // Check if it's a 401 (token expired)
+            if (err?.response?.status === 401 || err?.status === 401) {
+              logger.warn('Token expired on sync - logging out');
+              setUser(null);
+              localStorage.removeItem('speakbee_auth_token');
+              localStorage.removeItem('speakbee_current_user');
+              sessionStorage.clear();
+              window.location.href = '/';
+            } else {
+              logger.debug('Server sync failed - continuing with local data:', err);
+              // Don't logout on network errors - preserve user session
+            }
+          });
       }
     } else if (token === 'local-token') {
       // Clean up local-token (offline-only token)
