@@ -972,24 +972,57 @@ def login(request):
 def verify_email(request, token):
     """Verify user email with token"""
     try:
-        logger.info(f"Email verification attempt with token: {token[:10]}...")
+        # Log full token for debugging (in production, only log first/last few chars)
+        token_preview = f"{token[:10]}...{token[-10:]}" if len(token) > 20 else token
+        logger.info(f"Email verification attempt - Token length: {len(token)}, Preview: {token_preview}")
+        logger.info(f"Request path: {request.path}")
+        logger.info(f"Request method: {request.method}")
+        
+        # URL decode the token in case it was encoded
+        from urllib.parse import unquote
+        token = unquote(token)
+        logger.debug(f"Decoded token: {token[:20]}...")
+        
+        # Validate token format (should be URL-safe base64)
+        if not token or len(token) < 10:
+            logger.warning(f"Invalid token format: token too short")
+            return Response({
+                "message": "Invalid verification token format.",
+                "success": False
+            }, status=status.HTTP_400_BAD_REQUEST)
         
         # Find the token
         try:
             verification_token = EmailVerificationToken.objects.get(token=token, is_used=False)
+            logger.info(f"Found verification token for user: {verification_token.user.email}")
         except EmailVerificationToken.DoesNotExist:
-            logger.warning(f"Verification token not found or already used: {token[:10]}...")
-            return Response({
-                "message": "Invalid or expired verification token. The link may have already been used or expired.",
-                "success": False
-            }, status=status.HTTP_400_BAD_REQUEST)
+            # Check if token exists but is already used
+            used_token = EmailVerificationToken.objects.filter(token=token).first()
+            if used_token:
+                logger.warning(f"Token already used for user: {used_token.user.email}")
+                return Response({
+                    "message": "This verification link has already been used. Your account should already be activated. Please try logging in.",
+                    "success": False,
+                    "already_used": True
+                }, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                logger.warning(f"Verification token not found in database")
+                # Try to find similar tokens (for debugging)
+                similar_tokens = EmailVerificationToken.objects.filter(token__startswith=token[:10])[:5]
+                logger.debug(f"Found {similar_tokens.count()} tokens starting with same prefix")
+                return Response({
+                    "message": "Invalid verification token. The link may be incorrect or expired.",
+                    "success": False
+                }, status=status.HTTP_400_BAD_REQUEST)
         
         # Check if token is still valid
         if not verification_token.is_valid():
             logger.warning(f"Verification token expired for user {verification_token.user.email}")
+            logger.warning(f"Token created at: {verification_token.created_at}, Now: {timezone.now()}")
             return Response({
                 "message": "Verification token has expired. Please request a new verification email.",
-                "success": False
+                "success": False,
+                "expired": True
             }, status=status.HTTP_400_BAD_REQUEST)
         
         # Activate user account
@@ -1019,7 +1052,8 @@ def verify_email(request, token):
     except Exception as e:
         logger.error(f"Email verification error: {str(e)}")
         import traceback
-        logger.error(traceback.format_exc())
+        error_traceback = traceback.format_exc()
+        logger.error(error_traceback)
         return Response({
             "message": "An error occurred during verification. Please try again or contact support.",
             "success": False,

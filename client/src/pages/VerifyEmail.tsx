@@ -26,8 +26,21 @@ const VerifyEmail: React.FC = () => {
         apiBaseUrl = apiBaseUrl.replace(/\/+$/, ''); // Remove trailing slashes
         apiBaseUrl = apiBaseUrl.replace(/\/api\/api\/?$/, '/api'); // Fix double /api
         
+        // Token from React Router is already decoded, and secrets.token_urlsafe() generates URL-safe tokens
+        // But we'll encode it to be safe for any edge cases
+        const encodedToken = encodeURIComponent(token);
+        
         // Construct the full URL
-        const verifyUrl = `${apiBaseUrl}/verify-email/${token}/`;
+        const verifyUrl = `${apiBaseUrl}/verify-email/${encodedToken}/`;
+        
+        // Debug logging (remove in production if needed)
+        if (import.meta.env.DEV) {
+          console.log('Verifying email:');
+          console.log('  API Base URL:', apiBaseUrl);
+          console.log('  Token (first 20 chars):', token.substring(0, 20));
+          console.log('  Token length:', token.length);
+          console.log('  Full URL:', verifyUrl);
+        }
         
         const response = await fetch(verifyUrl, {
           method: 'GET',
@@ -35,6 +48,22 @@ const VerifyEmail: React.FC = () => {
             'Content-Type': 'application/json',
           },
         });
+
+        // Check if response is OK before parsing JSON
+        if (!response.ok) {
+          // Try to get error message from response
+          let errorMessage = 'Verification failed';
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorData.error || `Server error: ${response.status}`;
+          } catch {
+            errorMessage = `Server error: ${response.status} ${response.statusText}`;
+          }
+          setVerificationStatus('error');
+          setMessage(errorMessage);
+          console.error('Verification failed:', response.status, errorMessage);
+          return;
+        }
 
         const data = await response.json();
 
@@ -45,9 +74,11 @@ const VerifyEmail: React.FC = () => {
           setVerificationStatus('error');
           setMessage(data.message || 'Verification failed');
         }
-      } catch (error) {
+      } catch (error: any) {
         setVerificationStatus('error');
-        setMessage('An error occurred during verification');
+        const errorMessage = error?.message || 'An error occurred during verification. Please check your connection and try again.';
+        setMessage(errorMessage);
+        console.error('Verification error:', error);
       }
     };
 
