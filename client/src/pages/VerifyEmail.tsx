@@ -19,38 +19,36 @@ const VerifyEmail: React.FC = () => {
 
       try {
         // Call the backend API to verify the email
-        // VITE_API_URL should include /api (e.g., http://54.179.120.126/api)
+        // Target URL: http://54.179.120.126/api/verify-email/<token>/
         let apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
         
-        // Clean up the URL: remove trailing slashes
-        apiBaseUrl = apiBaseUrl.replace(/\/+$/, '');
+        // Clean up the URL
+        apiBaseUrl = apiBaseUrl.trim().replace(/\/+$/, ''); // Remove trailing slashes
         
-        // Fix double /api/api pattern - this handles cases where VITE_API_URL might be incorrectly set
-        // Replace /api/api/ or /api/api at the end with just /api
+        // Fix any double /api/api patterns first
         apiBaseUrl = apiBaseUrl.replace(/\/api\/api(\/|$)/g, '/api$1');
-        // Also handle /api/api/ in the middle of the URL
         apiBaseUrl = apiBaseUrl.replace(/\/api\/api\//g, '/api/');
         
-        // Ensure URL ends with /api if it contains /api but doesn't end with it
-        // This handles cases like http://54.179.120.126/api/something -> http://54.179.120.126/api
-        if (apiBaseUrl.includes('/api') && !apiBaseUrl.endsWith('/api')) {
-          const apiIndex = apiBaseUrl.lastIndexOf('/api');
-          if (apiIndex !== -1) {
-            apiBaseUrl = apiBaseUrl.substring(0, apiIndex + 4); // +4 for '/api'
-          }
-        }
+        // Extract base origin (protocol + host, e.g., http://54.179.120.126)
+        const originMatch = apiBaseUrl.match(/^(https?:\/\/[^\/]+)/);
+        const baseOrigin = originMatch ? originMatch[1] : apiBaseUrl.split('/api')[0] || apiBaseUrl;
         
-        // Token from React Router is already decoded, and secrets.token_urlsafe() generates URL-safe tokens
-        // But we'll encode it to be safe for any edge cases
+        // Ensure the URL ends with exactly one /api
+        // Strategy: Always rebuild from base origin + /api
+        const finalApiBaseUrl = `${baseOrigin}/api`;
+        
+        // Token from React Router - encode it to be safe for URL
         const encodedToken = encodeURIComponent(token);
         
-        // Construct the full URL - apiBaseUrl should now be clean (e.g., http://54.179.120.126/api)
-        const verifyUrl = `${apiBaseUrl}/verify-email/${encodedToken}/`;
+        // Construct the full verification URL
+        // Final result: http://54.179.120.126/api/verify-email/<token>/
+        const verifyUrl = `${finalApiBaseUrl}/verify-email/${encodedToken}/`;
         
         // Debug logging - always log in production to help diagnose issues
         console.log('🔍 Email Verification Debug:');
         console.log('  VITE_API_URL (raw):', import.meta.env.VITE_API_URL);
-        console.log('  API Base URL (cleaned):', apiBaseUrl);
+        console.log('  Base Origin:', baseOrigin);
+        console.log('  Final API Base URL:', finalApiBaseUrl);
         console.log('  Token (first 20 chars):', token.substring(0, 20));
         console.log('  Token length:', token.length);
         console.log('  Full Verification URL:', verifyUrl);
