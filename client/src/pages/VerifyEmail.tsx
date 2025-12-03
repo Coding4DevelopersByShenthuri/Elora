@@ -24,7 +24,7 @@ const VerifyEmail: React.FC = () => {
         
         // Clean up the URL: remove trailing slashes and fix double /api
         apiBaseUrl = apiBaseUrl.replace(/\/+$/, ''); // Remove trailing slashes
-        apiBaseUrl = apiBaseUrl.replace(/\/api\/api\/?$/, '/api'); // Fix double /api
+        // apiBaseUrl = apiBaseUrl.replace(/\/api\/api\/?$/, '/api'); // Fix double /api
         
         // Token from React Router is already decoded, and secrets.token_urlsafe() generates URL-safe tokens
         // But we'll encode it to be safe for any edge cases
