@@ -452,7 +452,7 @@ export default function VirtualAI() {
         () =>
           enqueueMessage(
             'intro',
-            "I'm Elora, your personalized AI Tutor. I will help you to learn a new language and improve your language skills.",
+            "I'm Elora, your personalized AI Tutor. I'll help you to learn spoken English and improve your language skills.",
             'bot',
             {},
           ),
@@ -460,7 +460,7 @@ export default function VirtualAI() {
       ),
       window.setTimeout(
         () => {
-          enqueueMessage('ask-name', 'What is your name?', 'bot', {});
+          enqueueMessage('ask-name', "What's your name?", 'bot', {});
           initialMessagesShownRef.current = true; // Mark as shown after all messages are queued
         },
         1800,
