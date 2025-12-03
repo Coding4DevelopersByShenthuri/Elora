@@ -254,17 +254,47 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # Email Configuration
-# For development: Use console backend to see emails in console
-# For production: Use SMTP backend
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Development - Emails print to console
-EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')  # Production - Sends real emails
+# Automatically choose backend based on configuration
+# If EMAIL_BACKEND is explicitly set in .env, use it
+# Otherwise, use SMTP if credentials are provided, console for local dev
+EMAIL_BACKEND_CONFIG = config('EMAIL_BACKEND', default=None)
 
 EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
 EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
-EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='').strip()
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='').strip()
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='').strip()
+
+# Smart backend selection:
+# 1. If EMAIL_BACKEND is explicitly set, use it
+# 2. If email credentials are provided, use SMTP
+# 3. Otherwise, use console backend for local development
+has_credentials = bool(EMAIL_HOST_USER and EMAIL_HOST_PASSWORD and DEFAULT_FROM_EMAIL)
+
+# Check .env file location for debugging
+env_file_path = BASE_DIR / '.env'
+if not env_file_path.exists():
+    logger.warning(f".env file not found at {env_file_path}. Using defaults.")
+
+if EMAIL_BACKEND_CONFIG:
+    EMAIL_BACKEND = EMAIL_BACKEND_CONFIG
+    logger.info(f"Using explicitly set EMAIL_BACKEND: {EMAIL_BACKEND}")
+    if 'console' in EMAIL_BACKEND.lower() and has_credentials:
+        logger.warning("⚠️  EMAIL_BACKEND is set to console but credentials are provided!")
+        logger.warning("⚠️  Emails will NOT be sent - remove EMAIL_BACKEND from .env to auto-detect SMTP")
+elif has_credentials:
+    # Credentials provided - use SMTP
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    logger.info("✓ Email credentials detected - using SMTP backend")
+    logger.info(f"  EMAIL_HOST_USER: {EMAIL_HOST_USER}")
+    logger.info(f"  DEFAULT_FROM_EMAIL: {DEFAULT_FROM_EMAIL}")
+else:
+    # No credentials - use console for local development
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    logger.info("⚠️  No email credentials detected - using console backend")
+    logger.info("  Emails will print to terminal, not be sent via SMTP")
+    logger.info("  To send real emails, set EMAIL_HOST_USER, EMAIL_HOST_PASSWORD, and DEFAULT_FROM_EMAIL in .env")
 
 # Logging configuration
 LOGGING = {

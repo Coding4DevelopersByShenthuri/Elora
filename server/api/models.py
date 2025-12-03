@@ -26,8 +26,9 @@ class EmailVerificationToken(models.Model):
         """Check if token is still valid (24 hours)"""
         if self.is_used:
             return False
-        expiry = timezone.now() - timedelta(hours=24)
-        return self.created_at > expiry
+        # Token is valid if it was created within the last 24 hours
+        expiry_time = timezone.now() - timedelta(hours=24)
+        return self.created_at > expiry_time
     
     @staticmethod
     def generate_token(user):

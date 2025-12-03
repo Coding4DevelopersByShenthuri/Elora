@@ -570,9 +570,17 @@ def create_or_update_user_notification(
 def send_verification_email(user, verification_token):
     """Send verification email to user"""
     try:
+        # Log current email backend for debugging
+        email_backend = getattr(settings, 'EMAIL_BACKEND', 'unknown')
+        logger.debug(f"send_verification_email: Using backend: {email_backend}")
+        
         # Create verification URL - dynamically determine frontend URL
         frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:5173')
+        # Remove trailing slash if present to avoid double slashes
+        frontend_url = frontend_url.rstrip('/')
         verification_url = f"{frontend_url}/verify-email/{verification_token.token}/"
+        
+        logger.debug(f"Verification URL will be: {verification_url}")
         
         # Email content
         subject = "Activate to learn with Elora"
@@ -602,23 +610,72 @@ This is an automated email. Please do not reply to this message.
             'verification_url': verification_url,
         })
         
+        # Check email backend being used
+        email_backend = getattr(settings, 'EMAIL_BACKEND', '')
+        is_console_backend = 'console' in email_backend.lower()
+        
+        # Determine from_email address
+        if is_console_backend:
+            # For console backend, use default if not set
+            from_email = settings.DEFAULT_FROM_EMAIL or 'noreply@elora.com'
+        else:
+            # For SMTP backend, credentials are required
+            if not settings.DEFAULT_FROM_EMAIL:
+                logger.error("DEFAULT_FROM_EMAIL is not configured. Cannot send verification email.")
+                logger.error("Please set DEFAULT_FROM_EMAIL in your .env file")
+                return False
+            
+            if not settings.EMAIL_HOST_USER:
+                logger.error("EMAIL_HOST_USER is not configured. Cannot send verification email.")
+                logger.error("Please set EMAIL_HOST_USER in your .env file")
+                return False
+            
+            if not settings.EMAIL_HOST_PASSWORD:
+                logger.error("EMAIL_HOST_PASSWORD is not configured. Cannot send verification email.")
+                logger.error("Please set EMAIL_HOST_PASSWORD in your .env file")
+                return False
+            
+            from_email = settings.DEFAULT_FROM_EMAIL
+        
         # Create email message with both plain text and HTML versions
         msg = EmailMultiAlternatives(
             subject=subject,
             body=plain_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
+            from_email=from_email,
             to=[user.email]
         )
         msg.attach_alternative(html_message, "text/html")
         
         # Send the email
-        result = msg.send(fail_silently=False)
-        
-        logger.info(f"Verification email sent successfully to {user.email}")
-        return True
+        try:
+            result = msg.send(fail_silently=False)
+            email_backend = getattr(settings, 'EMAIL_BACKEND', '')
+            
+            # Log success (only log if using SMTP, console backend logs automatically)
+            if 'console' not in email_backend.lower():
+                logger.info(f"Verification email sent successfully to {user.email}")
+            
+            return True
+        except Exception as send_error:
+            error_msg = str(send_error)
+            logger.error(f"Failed to send verification email to {user.email}: {error_msg}")
+            
+            # Check for common SMTP errors
+            if 'authentication failed' in error_msg.lower() or 'invalid credentials' in error_msg.lower():
+                logger.error("SMTP Authentication failed. Check EMAIL_HOST_USER and EMAIL_HOST_PASSWORD in .env")
+            elif 'connection refused' in error_msg.lower() or 'could not connect' in error_msg.lower():
+                logger.error(f"Could not connect to SMTP server {settings.EMAIL_HOST}:{settings.EMAIL_PORT}. Check network/firewall.")
+            elif 'ssl' in error_msg.lower() or 'tls' in error_msg.lower():
+                logger.error("SSL/TLS error. Check EMAIL_USE_TLS setting and SMTP server configuration.")
+            
+            import traceback
+            logger.error(traceback.format_exc())
+            return False
         
     except Exception as e:
         logger.error(f"Failed to send verification email to {user.email}: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
         return False
 
 
@@ -915,26 +972,34 @@ def login(request):
 def verify_email(request, token):
     """Verify user email with token"""
     try:
+        logger.info(f"Email verification attempt with token: {token[:10]}...")
+        
         # Find the token
         try:
             verification_token = EmailVerificationToken.objects.get(token=token, is_used=False)
         except EmailVerificationToken.DoesNotExist:
+            logger.warning(f"Verification token not found or already used: {token[:10]}...")
             return Response({
-                "message": "Invalid or expired verification token",
+                "message": "Invalid or expired verification token. The link may have already been used or expired.",
                 "success": False
             }, status=status.HTTP_400_BAD_REQUEST)
         
         # Check if token is still valid
         if not verification_token.is_valid():
+            logger.warning(f"Verification token expired for user {verification_token.user.email}")
             return Response({
-                "message": "Verification token has expired. Please request a new one.",
+                "message": "Verification token has expired. Please request a new verification email.",
                 "success": False
             }, status=status.HTTP_400_BAD_REQUEST)
         
         # Activate user account
         user = verification_token.user
-        user.is_active = True
-        user.save()
+        if user.is_active:
+            logger.info(f"User {user.email} is already active, marking token as used")
+        else:
+            user.is_active = True
+            user.save()
+            logger.info(f"User {user.email} account activated via email verification")
         
         # Mark token as used
         verification_token.is_used = True
@@ -944,15 +1009,21 @@ def verify_email(request, token):
         
         return Response({
             "message": "Email verified successfully! You can now log in.",
-            "success": True
+            "success": True,
+            "user": {
+                "email": user.email,
+                "is_active": user.is_active
+            }
         })
         
     except Exception as e:
         logger.error(f"Email verification error: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
         return Response({
-            "message": "An error occurred during verification",
+            "message": "An error occurred during verification. Please try again or contact support.",
             "success": False,
-            "error": str(e)
+            "error": str(e) if settings.DEBUG else None
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 

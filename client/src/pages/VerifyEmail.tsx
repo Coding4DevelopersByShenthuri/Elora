@@ -19,7 +19,17 @@ const VerifyEmail: React.FC = () => {
 
       try {
         // Call the backend API to verify the email
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/verify-email/${token}/`, {
+        // VITE_API_URL already includes /api, so we don't add it again
+        let apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+        
+        // Clean up the URL: remove trailing slashes and fix double /api
+        apiBaseUrl = apiBaseUrl.replace(/\/+$/, ''); // Remove trailing slashes
+        apiBaseUrl = apiBaseUrl.replace(/\/api\/api\/?$/, '/api'); // Fix double /api
+        
+        // Construct the full URL
+        const verifyUrl = `${apiBaseUrl}/verify-email/${token}/`;
+        
+        const response = await fetch(verifyUrl, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
