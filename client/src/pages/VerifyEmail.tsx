@@ -22,19 +22,19 @@ const VerifyEmail: React.FC = () => {
         // Target URL: http://54.179.120.126/api/verify-email/<token>/
         let apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
         
-        // Clean up the URL
-        apiBaseUrl = apiBaseUrl.trim().replace(/\/+$/, ''); // Remove trailing slashes
-        
-        // Fix any double /api/api patterns first
-        apiBaseUrl = apiBaseUrl.replace(/\/api\/api(\/|$)/g, '/api$1');
-        apiBaseUrl = apiBaseUrl.replace(/\/api\/api\//g, '/api/');
-        
         // Extract base origin (protocol + host, e.g., http://54.179.120.126)
+        // This is the most reliable way to ensure we don't have double /api/api
         const originMatch = apiBaseUrl.match(/^(https?:\/\/[^\/]+)/);
-        const baseOrigin = originMatch ? originMatch[1] : apiBaseUrl.split('/api')[0] || apiBaseUrl;
+        let baseOrigin = originMatch ? originMatch[1] : 'http://54.179.120.126';
         
-        // Ensure the URL ends with exactly one /api
-        // Strategy: Always rebuild from base origin + /api
+        // If VITE_API_URL is set incorrectly (e.g., contains /api/api), extract origin before any /api
+        if (!originMatch && apiBaseUrl.includes('/api')) {
+          const parts = apiBaseUrl.split('/api');
+          baseOrigin = parts[0] || 'http://54.179.120.126';
+        }
+        
+        // Always rebuild the API base URL from origin + /api
+        // This ensures we NEVER have double /api/api
         const finalApiBaseUrl = `${baseOrigin}/api`;
         
         // Token from React Router - encode it to be safe for URL
