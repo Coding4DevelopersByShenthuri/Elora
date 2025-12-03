@@ -16,12 +16,23 @@ export function AdminRouteGuard({ children }: AdminRouteGuardProps) {
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
+    // Set timeout to prevent infinite loading
+    const checkTimeout = setTimeout(() => {
+      if (isChecking) {
+        console.warn('Admin auth check timeout - redirecting to login');
+        setIsChecking(false);
+        navigate('/admin/login', { replace: true });
+      }
+    }, 3000); // 3 second timeout
+
     // Check if user is logged in
     const token = localStorage.getItem('speakbee_auth_token');
-    const isAdmin = localStorage.getItem('speakbee_is_admin') === 'true';
+    const isAdmin = sessionStorage.getItem('speakbee_is_admin') === 'true' || 
+                    localStorage.getItem('speakbee_is_admin') === 'true';
     
     // Check if we have authentication
     if (!token || token === 'local-token') {
+      clearTimeout(checkTimeout);
       setIsChecking(false);
       navigate('/admin/login', { replace: true });
       return;
@@ -29,6 +40,7 @@ export function AdminRouteGuard({ children }: AdminRouteGuardProps) {
 
     // If we have user from context, check admin status
     if (user) {
+      clearTimeout(checkTimeout);
       if (!user.is_staff && !user.is_superuser) {
         setIsChecking(false);
         navigate('/admin/login', { replace: true });
@@ -36,23 +48,33 @@ export function AdminRouteGuard({ children }: AdminRouteGuardProps) {
       }
       // User is admin, allow access
       setIsChecking(false);
-    } else if (!isAdmin) {
-      // If no user context but we have token, verify admin status
-      // This will be handled by the backend which will return 403 if not admin
-      // For now, trust the isAdmin flag
-      if (!isAdmin) {
-        setIsChecking(false);
-        navigate('/admin/login', { replace: true });
-        return;
-      }
+    } else if (isAdmin) {
+      // Has admin flag, allow access (will verify with backend on first API call)
+      clearTimeout(checkTimeout);
       setIsChecking(false);
     } else {
-      // Has admin flag, allow access (will verify with backend)
-      setIsChecking(false);
+      // No user context and no admin flag - wait a bit for AuthContext to load
+      // But don't wait forever
+      const waitForUser = setTimeout(() => {
+        clearTimeout(checkTimeout);
+        if (!user && !isAdmin) {
+          setIsChecking(false);
+          navigate('/admin/login', { replace: true });
+        }
+      }, 2000); // Wait 2 seconds for user to load
+      
+      return () => {
+        clearTimeout(waitForUser);
+        clearTimeout(checkTimeout);
+      };
     }
-  }, [user, isAuthenticated, navigate]);
 
-  // Show loading while checking authentication
+    return () => {
+      clearTimeout(checkTimeout);
+    };
+  }, [user, isAuthenticated, navigate, isChecking]);
+
+  // Show loading while checking authentication (with timeout protection)
   if (isChecking) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">

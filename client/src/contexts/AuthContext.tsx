@@ -91,18 +91,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // This will restore user data if userData was missing or invalid
       // Only sync once on mount, not on every online status change
       if (navigator.onLine && token !== 'local-token') {
-        // Add timeout to prevent hanging
+        // Add timeout to prevent hanging (reduced to 5 seconds)
         const syncTimeout = setTimeout(() => {
-          logger.warn('Server sync timed out - clearing potentially expired session');
-          // If sync takes too long, token might be expired
-          // Clear everything to prevent blank pages
-          setUser(null);
-          localStorage.removeItem('speakbee_auth_token');
-          localStorage.removeItem('speakbee_current_user');
-          sessionStorage.clear();
-          // Reload page to ensure clean state
-          window.location.href = '/';
-        }, 10000); // 10 second timeout
+          logger.warn('Server sync timed out - token may be expired');
+          // Don't clear user state immediately - let them use the app
+          // The next API call will handle 401 properly
+          // Just log the warning and continue
+        }, 5000); // 5 second timeout
         
         syncWithServerInternal()
           .then(() => {
@@ -112,11 +107,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             clearTimeout(syncTimeout);
             // Check if it's a 401 (token expired)
             if (err?.response?.status === 401 || err?.status === 401) {
-              logger.warn('Token expired on sync - logging out');
+              logger.warn('Token expired on sync - clearing auth state');
               setUser(null);
               localStorage.removeItem('speakbee_auth_token');
               localStorage.removeItem('speakbee_current_user');
+              sessionStorage.removeItem('speakbee_is_admin');
               sessionStorage.clear();
+              // Don't reload - let the app handle it gracefully
               window.location.href = '/';
             } else {
               logger.debug('Server sync failed - continuing with local data:', err);
@@ -317,8 +314,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       
       // Handle 401 errors - token expired, need to logout
       if (!response.success && 'status' in response && response.status === 401) {
-        logger.warn('Token expired during sync - logging out user');
-        // Token is expired, clear everything and logout
+        logger.warn('Token expired during sync - clearing auth state');
+        // Token is expired, clear everything
         setUser(null);
         localStorage.removeItem('speakbee_auth_token');
         localStorage.removeItem('speakbee_current_user');
@@ -326,10 +323,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         sessionStorage.removeItem('speakbee_survey_in_progress');
         sessionStorage.removeItem('speakbee_survey_step');
         sessionStorage.removeItem('speakbee_survey_data');
-        // Redirect to home page
-        if (typeof window !== 'undefined') {
-          window.location.href = '/';
-        }
+        sessionStorage.removeItem('speakbee_is_admin');
+        // Don't force reload - let the app handle it naturally
         return;
       }
       
@@ -546,6 +541,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  // Don't block rendering while initializing - render children immediately
+  // Components can check isAuthenticated to show appropriate UI
   return (
     <AuthContext.Provider value={{
       user,

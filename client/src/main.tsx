@@ -24,6 +24,23 @@ window.addEventListener('unhandledrejection', (event) => {
   // Don't prevent default - let components handle it
 });
 
+// Prevent blank pages from hanging - ensure app always renders
+let renderTimeout: ReturnType<typeof setTimeout> | null = null;
+const MAX_RENDER_WAIT = 10000; // 10 seconds
+
+// Monitor if root element is empty after a delay
+setTimeout(() => {
+  const rootElement = document.getElementById("root");
+  if (rootElement && rootElement.children.length === 0) {
+    console.warn('Root element is empty after timeout - forcing reload');
+    // Clear potentially corrupted state
+    localStorage.removeItem('speakbee_auth_token');
+    localStorage.removeItem('speakbee_current_user');
+    sessionStorage.clear();
+    window.location.reload();
+  }
+}, MAX_RENDER_WAIT);
+
 const rootElement = document.getElementById("root")!;
 createRoot(rootElement).render(<App />);
 
