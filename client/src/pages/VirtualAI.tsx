@@ -452,7 +452,7 @@ export default function VirtualAI() {
         () =>
           enqueueMessage(
             'intro',
-            "I'm Learna, your personalized AI Tutor. I will help you to learn a new language and improve your language skills.",
+            "I'm Elora, your personalized AI Tutor. I will help you to learn a new language and improve your language skills.",
             'bot',
             {},
           ),
