@@ -20,6 +20,7 @@ import { useAnimateIn } from '@/lib/animations';
 import { ManageSection } from '@/components/landing/ManageSection';
 import { DeploySection } from '@/components/landing/DeploySection';
 import UseCasesSection from '@/components/landing/UseCasesSection';
+import AICoachTeam from '@/components/landing/AICoachTeam';
 
 const Index = () => {
   const showManage = useAnimateIn(false, 700);
@@ -130,52 +131,9 @@ const Index = () => {
             </div>
 
             {/* Right Content - Hero Image */}
-            <div className="relative mt-8 lg:mt-0">
-              <div className="relative bg-gradient-to-br from-orange-400/10 via-orange-300/10 to-orange-200/10 rounded-2xl md:rounded-3xl p-6 md:p-8 backdrop-blur-sm shadow-xl">
-                <div className="bg-gradient-to-br from-white/30 via-white/25 to-white/20 backdrop-blur-md rounded-xl md:rounded-2xl p-4 md:p-6 shadow-2xl border border-orange-300/20">
-                  <div className="flex items-center justify-center mb-4 md:mb-6">
-                    <div className="relative w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-[#52b788] via-[#40916c] to-[#2d6a4f] rounded-full flex items-center justify-center shadow-lg">
-                      <Brain className="w-8 h-8 md:w-10 md:h-10 text-white" />
-                      <div className="absolute inset-0 bg-gradient-to-tr from-transparent to-white/20 rounded-full"></div>
-                    </div>
-                  </div>
-                  <h3 className="text-xl md:text-2xl font-bold text-center mb-3 md:mb-4 bg-gradient-to-r from-[#1b4332] to-[#1b4332] bg-clip-text text-transparent">
-                    Your AI <span className="relative inline-block text-teal-500 bg-clip-text" style={{ WebkitTextFillColor: 'currentColor' }}>
-                      English
-                      <svg className="absolute -bottom-0.5 left-0 w-full h-1 text-orange-500" viewBox="0 0 200 12" fill="none">
-                        <path d="M2 8C50 2 100 10 150 6C180 4 200 8 200 8" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
-                      </svg>
-                    </span> Coach
-                  </h3>
-                  <div className="space-y-2 md:space-y-3">
-                    <div className="flex items-center gap-3 p-2 md:p-3 bg-gradient-to-r from-[#d8f3dc] to-[#b7e4c7] rounded-lg border border-[#74c69d]/30 hover:shadow-md transition-all duration-300">
-                      <div className="w-8 h-8 bg-gradient-to-br from-[#52b788] to-[#40916c] rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Mic className="w-4 h-4 md:w-5 md:h-5 text-white" />
-                      </div>
-                      <span className="text-xs md:text-sm font-medium text-[#1b4332]">Speaking Practice</span>
-                    </div>
-                    <div className="flex items-center gap-3 p-2 md:p-3 bg-gradient-to-r from-[#b7e4c7] to-[#95d5b2] rounded-lg border border-[#52b788]/30 hover:shadow-md transition-all duration-300">
-                      <div className="w-8 h-8 bg-gradient-to-br from-[#40916c] to-[#2d6a4f] rounded-lg flex items-center justify-center flex-shrink-0">
-                        <BookOpen className="w-4 h-4 md:w-5 md:h-5 text-white" />
-                      </div>
-                      <span className="text-xs md:text-sm font-medium text-[#1b4332]">Interactive Lessons</span>
-                    </div>
-                    <div className="flex items-center gap-3 p-2 md:p-3 bg-gradient-to-r from-[#95d5b2] to-[#74c69d] rounded-lg border border-[#40916c]/30 hover:shadow-md transition-all duration-300">
-                      <div className="w-8 h-8 bg-gradient-to-br from-[#2d6a4f] to-[#1b4332] rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Award className="w-4 h-4 md:w-5 md:h-5 text-white" />
-                      </div>
-                      <span className="text-xs md:text-sm font-medium text-[#1b4332]">Progress Tracking</span>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Floating Elements */}
-                <div className="absolute -top-3 -right-3 md:-top-4 md:-right-4 w-6 h-6 md:w-8 md:h-8 bg-orange-400 rounded-full flex items-center justify-center animate-bounce shadow-lg">
-                  <Star className="w-3 h-3 md:w-4 md:h-4 text-white" />
-                </div>
-                <div className="absolute -bottom-3 -left-3 md:-bottom-4 md:-left-4 w-5 h-5 md:w-6 md:h-6 bg-yellow-400 rounded-full flex items-center justify-center animate-pulse">
-                  <Heart className="w-2 h-2 md:w-3 md:h-3 text-white" />
-                </div>
+            <div className="relative mt-8 lg:mt-0 flex items-center justify-center">
+              <div className="w-full max-w-md lg:max-w-lg xl:max-w-xl">
+                <AICoachTeam />
               </div>
             </div>
           </div>
