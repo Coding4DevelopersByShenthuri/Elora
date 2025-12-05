@@ -3,10 +3,11 @@ import {
   Play, Mic, CheckCircle, Clock, Users, 
   Target, BookOpen, MessageCircle, Repeat, Zap, TrendingUp,
   Brain, Languages, GitMerge, ThumbsUp, BarChart3,
-  Video, Headphones, PenTool, ArrowRight, Rocket, Star
+  Video, Headphones, PenTool, ArrowRight, Rocket, Shield,
+  Construction, Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -17,51 +18,11 @@ const IntermediatesPage = () => {
   const [streak] = useState(12);
   const [fluencyScore, setFluencyScore] = useState(72);
   const [isHovered, setIsHovered] = useState<number | null>(null);
-  const [stars, setStars] = useState<Array<{ x: number; y: number; size: number; delay: number; opacity: number }>>([]);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [scrollY, setScrollY] = useState(0);
 
-  // Generate animated stars with varying opacity - Performance optimized
-  useEffect(() => {
-    const generateStars = () => {
-      // Reduce star count on mobile for better performance
-      const isMobile = window.innerWidth < 768;
-      const starCount = isMobile ? 100 : 200;
-      
-      const newStars = Array.from({ length: starCount }, () => ({
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        size: Math.random() * 2 + 0.5,
-        delay: Math.random() * 3,
-        opacity: Math.random() * 0.8 + 0.2
-      }));
-      setStars(newStars);
-    };
-    generateStars();
-    
-    // Handle window resize for responsive star count
-    const handleResize = () => {
-      const isMobile = window.innerWidth < 768;
-      if ((isMobile && stars.length > 100) || (!isMobile && stars.length < 150)) {
-        generateStars();
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Page load fade-in and theme transition
+  // Page load fade-in
   useEffect(() => {
     setIsLoaded(true);
-  }, []);
-
-  // Parallax scroll effect for planets
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const modules = [
@@ -80,8 +41,8 @@ const IntermediatesPage = () => {
       focus: 'Professional Communication',
       completed: true,
       icon: '💼',
-      color: 'from-cyan-400 via-blue-500 to-indigo-600',
-      glowColor: 'rgba(34, 211, 238, 0.3)',
+      color: 'from-blue-500 via-cyan-500 to-teal-500',
+      glowColor: 'rgba(59, 130, 246, 0.3)',
       skills: ['Formal Language', 'Presentation Skills', 'Negotiation Tactics'],
       progress: 100
     },
@@ -93,7 +54,7 @@ const IntermediatesPage = () => {
       focus: 'Social Intelligence',
       completed: true,
       icon: '🎉',
-      color: 'from-purple-400 via-pink-500 to-rose-600',
+      color: 'from-purple-500 via-pink-500 to-rose-500',
       glowColor: 'rgba(168, 85, 247, 0.3)',
       skills: ['Small Talk Mastery', 'Storytelling', 'Cultural Context'],
       progress: 100
@@ -106,8 +67,8 @@ const IntermediatesPage = () => {
       focus: 'Analytical Communication',
       completed: false,
       icon: '🔧',
-      color: 'from-amber-400 via-orange-500 to-red-600',
-      glowColor: 'rgba(251, 191, 36, 0.3)',
+      color: 'from-amber-500 via-orange-500 to-red-500',
+      glowColor: 'rgba(249, 115, 22, 0.3)',
       skills: ['Analytical Dialogue', 'Solution Proposals', 'Decision Framing'],
       progress: 65
     },
@@ -119,8 +80,8 @@ const IntermediatesPage = () => {
       focus: 'Cultural Literacy',
       completed: false,
       icon: '🎬',
-      color: 'from-emerald-400 via-teal-500 to-cyan-600',
-      glowColor: 'rgba(52, 211, 153, 0.3)',
+      color: 'from-emerald-500 via-teal-500 to-cyan-500',
+      glowColor: 'rgba(16, 185, 129, 0.3)',
       skills: ['Opinion Expression', 'Critical Analysis', 'Comparative Discussion'],
       progress: 40
     }
@@ -135,7 +96,7 @@ const IntermediatesPage = () => {
       focus: 'Advanced Structures',
       completed: true,
       icon: '🔀',
-      color: 'from-indigo-400 via-purple-500 to-fuchsia-600',
+      color: 'from-indigo-500 via-purple-500 to-fuchsia-500',
       glowColor: 'rgba(99, 102, 241, 0.3)',
       skills: ['Hypotheticals', 'Probability', 'Complex Conditions'],
       progress: 100
@@ -148,7 +109,7 @@ const IntermediatesPage = () => {
       focus: 'Indirect Communication',
       completed: false,
       icon: '🗣️',
-      color: 'from-teal-400 via-cyan-500 to-blue-600',
+      color: 'from-teal-500 via-cyan-500 to-blue-500',
       glowColor: 'rgba(20, 184, 166, 0.3)',
       skills: ['Speech Reporting', 'Tense Shifting', 'Context Adaptation'],
       progress: 75
@@ -160,8 +121,9 @@ const IntermediatesPage = () => {
       title: "Role-Play Scenarios",
       description: "Professional simulations with AI-powered feedback",
       icon: Users,
-      color: "from-cyan-500 to-blue-600",
-      gradient: "from-cyan-500 to-blue-600",
+      color: "from-blue-500 to-cyan-600",
+      bgColor: "bg-blue-500/20",
+      textColor: "text-blue-500",
       time: "15-20 min",
       type: "Interactive",
       level: "Intermediate+"
@@ -171,7 +133,8 @@ const IntermediatesPage = () => {
       description: "Advanced argumentation and viewpoint development",
       icon: GitMerge,
       color: "from-purple-500 to-pink-600",
-      gradient: "from-purple-500 to-pink-600",
+      bgColor: "bg-purple-500/20",
+      textColor: "text-purple-500",
       time: "20-25 min",
       type: "Advanced",
       level: "Intermediate+"
@@ -181,7 +144,8 @@ const IntermediatesPage = () => {
       description: "Creative narrative development and delivery",
       icon: PenTool,
       color: "from-emerald-500 to-teal-600",
-      gradient: "from-emerald-500 to-teal-600",
+      bgColor: "bg-emerald-500/20",
+      textColor: "text-emerald-500",
       time: "15 min",
       type: "Creative",
       level: "All Levels"
@@ -191,7 +155,8 @@ const IntermediatesPage = () => {
       description: "Professional pronunciation and intonation refinement",
       icon: Headphones,
       color: "from-amber-500 to-orange-600",
-      gradient: "from-amber-500 to-orange-600",
+      bgColor: "bg-amber-500/20",
+      textColor: "text-amber-500",
       time: "10-15 min",
       type: "Technical",
       level: "Intermediate+"
@@ -203,23 +168,26 @@ const IntermediatesPage = () => {
       label: "Fluency Score", 
       value: `${fluencyScore}%`, 
       icon: TrendingUp, 
-      color: "text-cyan-400",
-      glowColor: "rgba(34, 211, 238, 0.2)",
+      color: "text-blue-500",
+      bgColor: "bg-blue-500/20",
+      glowColor: "rgba(59, 130, 246, 0.2)",
       description: "Speaking fluency and natural flow"
     },
     { 
       label: "Vocabulary Mastery", 
       value: "1,240", 
       icon: BookOpen, 
-      color: "text-emerald-400",
-      glowColor: "rgba(52, 211, 153, 0.2)",
+      color: "text-emerald-500",
+      bgColor: "bg-emerald-500/20",
+      glowColor: "rgba(16, 185, 129, 0.2)",
       description: "Active professional vocabulary"
     },
     { 
       label: "Grammar Accuracy", 
       value: "78%", 
       icon: Brain, 
-      color: "text-purple-400",
+      color: "text-purple-500",
+      bgColor: "bg-purple-500/20",
       glowColor: "rgba(168, 85, 247, 0.2)",
       description: "Complex structure proficiency"
     },
@@ -227,14 +195,15 @@ const IntermediatesPage = () => {
       label: "Learning Consistency", 
       value: `${streak} days`, 
       icon: Zap, 
-      color: "text-amber-400",
-      glowColor: "rgba(251, 191, 36, 0.2)",
+      color: "text-orange-500",
+      bgColor: "bg-orange-500/20",
+      glowColor: "rgba(249, 115, 22, 0.2)",
       description: "Continuous progress streak"
     },
   ];
 
   const skillsProgress = [
-    { skill: "Conversation Flow", progress: 75, color: "from-cyan-500 to-blue-600" },
+    { skill: "Conversation Flow", progress: 75, color: "from-blue-500 to-cyan-600" },
     { skill: "Grammar Accuracy", progress: 78, color: "from-purple-500 to-pink-600" },
     { skill: "Vocabulary Range", progress: 70, color: "from-emerald-500 to-teal-600" },
     { skill: "Pronunciation", progress: 65, color: "from-amber-500 to-orange-600" },
@@ -262,156 +231,233 @@ const IntermediatesPage = () => {
   };
 
   return (
-    <div className={`min-h-screen relative overflow-hidden bg-gradient-to-b from-slate-950 via-purple-950 to-slate-950 ${isLoaded ? 'space-fade-in' : 'opacity-0'}`}>
-      {/* Theme Transition Overlay */}
-      {!isLoaded && (
-        <div className="fixed inset-0 bg-gradient-to-b from-green-50 via-green-100 to-slate-950 z-50 transition-opacity duration-500" />
-      )}
+    <div className={`relative overflow-hidden min-h-screen ${isLoaded ? 'animate-fade-in' : 'opacity-0'}`}>
+      {/* Background Elements - Same as Adults Page */}
+      <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-primary/5 to-transparent -z-10"></div>
+      <div className="absolute top-1/4 right-0 w-[400px] h-[400px] rounded-full bg-secondary/10 blur-3xl -z-10"></div>
+      <div className="absolute bottom-1/4 left-0 w-[300px] h-[300px] rounded-full bg-accent/10 blur-3xl -z-10"></div>
 
-      {/* Deep Space Background with Stars */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {stars.map((star, index) => (
-          <div
-            key={index}
-            className="absolute rounded-full bg-white space-star"
-            style={{
-              left: `${star.x}%`,
-              top: `${star.y}%`,
-              width: `${star.size}px`,
-              height: `${star.size}px`,
-              animationDelay: `${star.delay}s`,
-              animationDuration: `${2 + Math.random() * 2}s`,
-              opacity: star.opacity || (0.6 + Math.random() * 0.4),
-              boxShadow: `0 0 ${(star.size || 2) * 2}px rgba(255, 255, 255, ${star.opacity || 0.6})`
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Nebula and Cosmic Effects */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-[800px] h-[800px] bg-gradient-radial from-purple-500/30 via-pink-500/20 to-transparent rounded-full blur-3xl nebula-effect animate-pulse" />
-        <div className="absolute top-1/4 right-0 w-[600px] h-[600px] bg-gradient-radial from-pink-500/25 via-rose-500/15 to-transparent rounded-full blur-3xl nebula-effect animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute bottom-0 left-1/3 w-[700px] h-[700px] bg-gradient-radial from-purple-500/20 via-indigo-500/10 to-transparent rounded-full blur-3xl nebula-effect animate-pulse" style={{ animationDelay: '2s' }} />
-      </div>
-
-      {/* Large Planet/Moon Spheres - Main Visual Elements */}
-      {/* Main Large Planet - Bottom Left - Reduced Size */}
-      <div className="fixed bottom-0 left-0 w-[100px] h-[100px] sm:w-[140px] sm:h-[140px] md:w-[180px] md:h-[180px] lg:w-[220px] lg:h-[220px] xl:w-[260px] xl:h-[260px] pointer-events-none opacity-60 sm:opacity-65 md:opacity-70 lg:opacity-75">
-        <div className="relative w-full h-full">
-          <img 
-            src="/planets/YZWPZTXZtvH1iH4rCX0Uh48wmtQ.avif" 
-            alt="Planet" 
-            className="absolute inset-0 rounded-full object-cover shadow-2xl"
-            style={{ filter: 'grayscale(0.2) brightness(0.85)' }}
-          />
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 blur-2xl" />
-        </div>
-      </div>
-
-      {/* Secondary Planet - Top Right */}
-      <div className="fixed top-20 right-2 sm:right-6 md:right-12 w-[120px] h-[120px] sm:w-[180px] sm:h-[180px] md:w-[240px] md:h-[240px] lg:w-[280px] lg:h-[280px] xl:w-[320px] xl:h-[320px] pointer-events-none opacity-45 sm:opacity-55 md:opacity-65 hidden sm:block">
-        <div className="relative w-full h-full">
-          <img 
-            src="/planets/FOIQJjlpuUktsmNqzA3QoB8f2oU.avif" 
-            alt="Planet" 
-            className="absolute inset-0 rounded-full object-cover shadow-xl"
-            style={{ filter: 'grayscale(0.3) brightness(0.75)' }}
-          />
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-pink-500/15 to-rose-500/15 blur-xl" />
-        </div>
-      </div>
-
-      {/* Tertiary Planet - Middle Right */}
-      <div className="fixed top-1/2 right-4 sm:right-12 md:right-24 w-[90px] h-[90px] sm:w-[140px] sm:h-[140px] md:w-[180px] md:h-[180px] lg:w-[210px] lg:h-[210px] xl:w-[240px] xl:h-[240px] pointer-events-none opacity-35 sm:opacity-45 md:opacity-55 hidden md:block">
-        <div className="relative w-full h-full">
-          <img 
-            src="/planets/axheyaAfqpR4fyF8ixffC9kL8kU.avif" 
-            alt="Planet" 
-            className="absolute inset-0 rounded-full object-cover shadow-xl"
-            style={{ filter: 'grayscale(0.3) brightness(0.7)' }}
-          />
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500/15 to-indigo-500/15 blur-xl" />
-        </div>
-      </div>
-
-      {/* Small Planet - Top Left */}
-      <div className="fixed top-28 left-2 sm:left-8 md:left-16 w-[80px] h-[80px] sm:w-[120px] sm:h-[120px] md:w-[160px] md:h-[160px] lg:w-[180px] lg:h-[180px] xl:w-[200px] xl:h-[200px] pointer-events-none opacity-30 sm:opacity-35 md:opacity-45 hidden lg:block">
-        <div className="relative w-full h-full">
-          <img 
-            src="/planets/3cNnbBNWbjHl4OiEl7rG5h7xczY.avif" 
-            alt="Planet" 
-            className="absolute inset-0 rounded-full object-cover shadow-lg"
-            style={{ filter: 'grayscale(0.4) brightness(0.65)' }}
-          />
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-pink-500/10 to-purple-500/10 blur-lg" />
-        </div>
-      </div>
-
-      <div className="relative z-10 pb-12 sm:pb-16 md:pb-20 pt-20 sm:pt-24 md:pt-32">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header Section */}
-          <div className="text-center mb-8 sm:mb-10 md:mb-12">
-            <div className="flex items-center justify-center gap-2 sm:gap-4 mb-4 sm:mb-6">
-            <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-500 rounded-xl blur-2xl opacity-50 animate-pulse"></div>
+      <main className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 xl:px-10 pt-24 pb-16 space-y-10">
+        {/* Coming Soon Section - Intermediate Professional Design with Unique Vertical Style */}
+        <section className="py-6 sm:py-8 md:py-10 lg:py-12">
+          <Card className="relative overflow-hidden border-2 border-emerald-500/25 dark:border-emerald-500/35 backdrop-blur-2xl bg-white/70 dark:bg-slate-900/70 shadow-2xl">
+            {/* Diagonal Glass Morphism Background Accents */}
+            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-emerald-500/6 via-transparent to-teal-500/6 dark:from-emerald-500/10 dark:via-transparent dark:to-teal-500/10"></div>
+            <div className="absolute top-1/2 left-0 w-96 h-96 bg-emerald-500/8 rounded-full blur-3xl -ml-48 -mt-48 dark:bg-emerald-500/12"></div>
+            <div className="absolute bottom-0 right-0 w-80 h-80 bg-teal-500/8 rounded-full blur-3xl -mr-40 -mb-40 dark:bg-teal-500/12"></div>
+            
+            <CardContent className="relative z-10 p-6 sm:p-8 md:p-10 lg:p-12 xl:p-14">
+              {/* Vertical Center-Aligned Layout */}
+              <div className="max-w-4xl mx-auto space-y-8 sm:space-y-10 md:space-y-12 text-center">
                 
-            </div>
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-rose-400 bg-clip-text text-transparent">
-              Intermediate Mastery
-            </h1>
-          </div>
-            <p className="text-sm sm:text-base md:text-lg text-purple-100/80 max-w-2xl mx-auto mb-4 sm:mb-6 leading-relaxed px-2">
-            Advance your English with complex conversations, professional vocabulary, and sophisticated communication skills
-          </p>
-            <div className="flex flex-wrap justify-center gap-2 sm:gap-3 px-2">
-              <Badge variant="secondary" className="bg-purple-500/20 backdrop-blur-sm text-purple-300 border-purple-400/30 px-2 sm:px-3 md:px-4 py-1 text-xs sm:text-sm">
-                <Brain className="w-3 h-3 mr-1 sm:mr-2" />
-              Advanced Grammar
-            </Badge>
-              <Badge variant="secondary" className="bg-pink-500/20 backdrop-blur-sm text-pink-300 border-pink-400/30 px-2 sm:px-3 md:px-4 py-1 text-xs sm:text-sm">
-                <MessageCircle className="w-3 h-3 mr-1 sm:mr-2" />
-              Professional Dialogue
-            </Badge>
-              <Badge variant="secondary" className="bg-emerald-500/20 backdrop-blur-sm text-emerald-300 border-emerald-400/30 px-2 sm:px-3 md:px-4 py-1 text-xs sm:text-sm">
-                <Languages className="w-3 h-3 mr-1 sm:mr-2" />
-              Expanded Vocabulary
-            </Badge>
-          </div>
-        </div>
+                {/* Top Badge with Line */}
+                <div className="flex flex-col items-center gap-4">
+                  <Badge className="px-4 py-1.5 sm:px-5 sm:py-2 text-xs sm:text-sm font-semibold bg-emerald-500/20 dark:bg-emerald-500/30 text-emerald-700 dark:text-emerald-300 border-2 border-emerald-500/40 dark:border-emerald-500/50 shadow-md">
+                    <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 animate-pulse" />
+                    In Development
+                  </Badge>
+                  <div className="w-16 h-px bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+                </div>
 
-          {/* Progress Overview */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-10 md:mb-12">
-            {/* Main Progress Card */}
-            <Card className="lg:col-span-2 bg-slate-800/40 backdrop-blur-xl border-purple-500/30 shadow-2xl">
-              <CardContent className="p-4 sm:p-6 md:p-8">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0 mb-6 sm:mb-8">
-                  <div>
-                    <h3 className="text-xl sm:text-2xl font-semibold text-white">Advanced Progress Tracking</h3>
-                    <p className="text-sm sm:text-base text-purple-100/70">Monitor your journey toward English mastery</p>
-                  </div>
-                  <div className="text-left sm:text-right">
-                    <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">{progress}%</div>
-                    <div className="text-sm sm:text-base text-purple-100/70">Overall Mastery</div>
+                {/* Main Heading - Split Design */}
+                <div className="space-y-3 sm:space-y-4">
+                  <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold leading-tight">
+                    <span className="block text-emerald-700 dark:text-emerald-400">Coming</span>
+                    <span className="block text-green-600 dark:text-green-400 -mt-2 sm:-mt-3">Soon</span>
+                  </h1>
+                  <div className="flex items-center justify-center gap-3 sm:gap-4">
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-emerald-500/50 to-emerald-500/50"></div>
+                    <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                    <div className="h-px flex-1 bg-gradient-to-l from-transparent via-emerald-500/50 to-emerald-500/50"></div>
                   </div>
                 </div>
 
-                <Progress value={progress} className="h-3 bg-slate-700/50 mb-8">
-                  <div className="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 rounded-full transition-all duration-500" />
+                {/* Subheading */}
+                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-slate-800 dark:text-white px-2">
+                  Intermediate English Mastery Program
+                </h2>
+
+                {/* Description */}
+                <p className="text-sm sm:text-base md:text-lg lg:text-xl text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl mx-auto px-2">
+                  We're building an advanced learning experience with complex conversations, professional vocabulary expansion, and sophisticated communication skills. Get ready for your next level of English proficiency!
+                </p>
+
+                {/* Icon with Vertical Timeline */}
+                <div className="relative flex flex-col items-center space-y-6 sm:space-y-8 py-6 sm:py-8">
+                  {/* Vertical Timeline Line */}
+                  <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-emerald-500/30 via-emerald-500/50 to-teal-500/30 transform -translate-x-1/2"></div>
+                  
+                  {/* Central Icon */}
+                  <div className="relative z-10">
+                    <div className="absolute inset-0 bg-emerald-500 rounded-full blur-2xl opacity-30 animate-pulse"></div>
+                    <div className="relative bg-emerald-600 dark:bg-emerald-500 p-6 sm:p-8 md:p-10 rounded-2xl shadow-2xl shadow-emerald-500/30 dark:shadow-emerald-500/20 transform transition-transform duration-500 hover:scale-105">
+                      <Construction className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 text-white drop-shadow-lg" />
+                    </div>
+                  </div>
+
+                  {/* Timeline Items */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 w-full max-w-3xl">
+                    <div className="relative flex flex-col items-center text-center space-y-3">
+                      <div className="relative z-10 w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-emerald-50/80 dark:bg-emerald-950/40 backdrop-blur-sm border-2 border-emerald-200/60 dark:border-emerald-800/60 flex items-center justify-center shadow-lg">
+                        <Brain className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                      <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-xl p-4 border border-emerald-200/50 dark:border-emerald-800/50 shadow-md">
+                        <h3 className="text-sm sm:text-base font-bold text-slate-800 dark:text-white mb-1">Advanced Grammar</h3>
+                        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">Complex structures</p>
+                      </div>
+                    </div>
+
+                    <div className="relative flex flex-col items-center text-center space-y-3">
+                      <div className="relative z-10 w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-teal-50/80 dark:bg-teal-950/40 backdrop-blur-sm border-2 border-teal-200/60 dark:border-teal-800/60 flex items-center justify-center shadow-lg">
+                        <MessageCircle className="w-8 h-8 sm:w-10 sm:h-10 text-teal-600 dark:text-teal-400" />
+                      </div>
+                      <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-xl p-4 border border-teal-200/50 dark:border-teal-800/50 shadow-md">
+                        <h3 className="text-sm sm:text-base font-bold text-slate-800 dark:text-white mb-1">Professional Dialogue</h3>
+                        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">Real-world scenarios</p>
+                      </div>
+                    </div>
+
+                    <div className="relative flex flex-col items-center text-center space-y-3">
+                      <div className="relative z-10 w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-green-50/80 dark:bg-green-950/40 backdrop-blur-sm border-2 border-green-200/60 dark:border-green-800/60 flex items-center justify-center shadow-lg">
+                        <Languages className="w-8 h-8 sm:w-10 sm:h-10 text-green-600 dark:text-green-400" />
+                      </div>
+                      <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-xl p-4 border border-green-200/50 dark:border-green-800/50 shadow-md">
+                        <h3 className="text-sm sm:text-base font-bold text-slate-800 dark:text-white mb-1">Expanded Vocabulary</h3>
+                        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">Rich expressions</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Progress Section */}
+                <div className="space-y-4 sm:space-y-5 pt-4 sm:pt-6">
+                  <div className="flex items-center justify-between px-2">
+                    <span className="text-xs sm:text-sm md:text-base font-semibold text-slate-700 dark:text-slate-300">Development Progress</span>
+                    <span className="text-xs sm:text-sm md:text-base font-bold text-emerald-600 dark:text-emerald-400">50%</span>
+                  </div>
+                  <div className="relative h-3 sm:h-4 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden border-2 border-slate-300 dark:border-slate-600 shadow-inner max-w-md mx-auto">
+                    <div className="h-full bg-emerald-600 dark:bg-emerald-500 rounded-full transition-all duration-1000 ease-out shadow-md" style={{ width: '50%' }}></div>
+                  </div>
+                </div>
+
+                {/* Notification CTA */}
+                <div className="pt-4 sm:pt-6">
+                  <div className="p-4 sm:p-5 md:p-6 rounded-2xl bg-gradient-to-r from-emerald-50/80 via-teal-50/80 to-green-50/80 dark:from-emerald-950/40 dark:via-teal-950/40 dark:to-green-950/40 backdrop-blur-sm border-2 border-emerald-200/60 dark:border-emerald-800/60 shadow-lg max-w-xl mx-auto">
+                    <p className="text-xs sm:text-sm md:text-base lg:text-lg font-semibold text-slate-700 dark:text-slate-200 flex items-center justify-center gap-2 flex-wrap">
+                      <Rocket className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-emerald-600 dark:text-emerald-400 animate-bounce" />
+                      <span>Stay tuned for updates on this exciting new program!</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+      </main>
+      {/* 
+        Old Content - Kept for future development
+        Uncomment and restore the sections below when ready to activate the page
+      */}
+      {false && (
+        <main className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 xl:px-10 pt-24 pb-16 space-y-10">
+        {/* Header Section */}
+        <section>
+          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-[#064e3b] via-[#047857] to-[#10b981] text-white shadow-xl dark:from-[#022c22] dark:via-[#065f46] dark:to-[#059669]">
+            <span className="absolute -right-24 -top-24 h-56 w-56 rounded-full bg-white/10 blur-3xl" aria-hidden />
+            <span className="absolute -left-28 bottom-0 h-48 w-48 rounded-full bg-white/10 blur-3xl" aria-hidden />
+            <CardHeader className="space-y-3 py-4 sm:py-5 md:py-6 relative z-10">
+              <div className="flex flex-col gap-3 sm:gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <div className="space-y-2 sm:space-y-3 lg:max-w-2xl">
+                  <Badge className="bg-white/25 text-white uppercase tracking-wide text-xs sm:text-sm px-2 py-0.5 sm:px-3 sm:py-1">
+                    Intermediate Level
+                  </Badge>
+                  <CardTitle className="text-xl sm:text-2xl md:text-3xl font-semibold text-white leading-tight">
+                    Advance your English with complex conversations, professional vocabulary, and sophisticated communication skills
+                  </CardTitle>
+                  <CardDescription className="text-white/85 text-sm sm:text-base leading-relaxed">
+                    Master intermediate English communication skills with personalized learning paths, AI-powered feedback, and real-world professional scenarios.
+                  </CardDescription>
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2 pt-1">
+                    <Badge variant="secondary" className="bg-white/20 backdrop-blur-sm text-white border-white/30 px-2 py-0.5 sm:px-2.5 sm:py-1 text-xs hover:bg-white/25">
+                      <Brain className="w-3 h-3 mr-1" />
+                      Advanced Grammar
+                    </Badge>
+                    <Badge variant="secondary" className="bg-white/20 backdrop-blur-sm text-white border-white/30 px-2 py-0.5 sm:px-2.5 sm:py-1 text-xs hover:bg-white/25">
+                      <MessageCircle className="w-3 h-3 mr-1" />
+                      Professional Dialogue
+                    </Badge>
+                    <Badge variant="secondary" className="bg-white/20 backdrop-blur-sm text-white border-white/30 px-2 py-0.5 sm:px-2.5 sm:py-1 text-xs hover:bg-white/25">
+                      <Languages className="w-3 h-3 mr-1" />
+                      Expanded Vocabulary
+                    </Badge>
+                    <Badge variant="secondary" className="bg-white/20 backdrop-blur-sm text-white border-white/30 px-2 py-0.5 sm:px-2.5 sm:py-1 text-xs hover:bg-white/25">
+                      <Shield className="w-3 h-3 mr-1" />
+                      Structured Learning
+                    </Badge>
+                    <Badge variant="secondary" className="bg-white/20 backdrop-blur-sm text-white border-white/30 px-2 py-0.5 sm:px-2.5 sm:py-1 text-xs hover:bg-white/25">
+                      <Rocket className="w-3 h-3 mr-1" />
+                      Accelerated Progress
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            </CardHeader>
+          </Card>
+        </section>
+
+        {/* Quick Stats Dashboard */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+          {stats.map((stat, index) => {
+            const Icon = stat.icon;
+            return (
+              <Card
+                key={index}
+                className="bg-card/80 backdrop-blur-xl border-primary/30 hover:border-primary/50 transition-all duration-300 dark:bg-slate-900/60 dark:border-emerald-500/30 dark:hover:border-emerald-400/50"
+              >
+                <CardContent className="p-4 sm:p-5">
+                  <div className={cn("p-2 sm:p-3 rounded-lg mb-2 sm:mb-3 w-fit", stat.bgColor, stat.color)}>
+                    <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </div>
+                  <div className="text-lg sm:text-xl md:text-2xl font-bold text-foreground mb-1 dark:text-white">{stat.value}</div>
+                  <div className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70">{stat.label}</div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+
+        {/* Progress Overview */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+          {/* Main Progress Card */}
+          <Card className="lg:col-span-2 bg-card/80 backdrop-blur-xl border-primary/30 hover:border-primary/50 transition-all duration-300 dark:bg-slate-900/60 dark:border-emerald-500/30 dark:hover:border-emerald-400/50">
+            <CardContent className="p-4 sm:p-6 md:p-8">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0 mb-6 sm:mb-8">
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-semibold text-foreground dark:text-white">Advanced Progress Tracking</h3>
+                  <p className="text-sm sm:text-base text-muted-foreground dark:text-cyan-100/70">Monitor your journey toward English mastery</p>
+                </div>
+                <div className="text-left sm:text-right">
+                  <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent dark:from-emerald-400 dark:via-green-400 dark:to-teal-400">{progress}%</div>
+                  <div className="text-sm sm:text-base text-muted-foreground dark:text-cyan-100/70">Overall Mastery</div>
+                </div>
+              </div>
+
+              <Progress value={progress} className="h-3 bg-muted dark:bg-slate-700/50 mb-8">
+                <div className="h-full bg-gradient-to-r from-primary via-secondary to-accent rounded-full transition-all duration-500 dark:from-emerald-500 dark:via-green-500 dark:to-teal-500" />
               </Progress>
               
               {/* Skills Progress */}
               <div className="space-y-4">
-                  <h4 className="font-semibold text-white mb-4">Skill Development</h4>
+                <h4 className="font-semibold text-foreground dark:text-white mb-4 text-base sm:text-lg">Skill Development</h4>
                 {skillsProgress.map((skill, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-purple-100/80">{skill.skill}</span>
-                    <div className="flex items-center gap-3">
-                        <Progress value={skill.progress} className="w-32 h-2 bg-slate-700/50">
+                  <div key={index} className="flex items-center justify-between gap-2 sm:gap-3">
+                    <span className="text-xs sm:text-sm font-medium text-muted-foreground dark:text-cyan-100/80 flex-shrink-0">{skill.skill}</span>
+                    <div className="flex items-center gap-2 sm:gap-3 flex-1">
+                      <Progress value={skill.progress} className="flex-1 h-2 bg-muted dark:bg-slate-700/50">
                         <div className={cn("h-full rounded-full bg-gradient-to-r", skill.color)} />
                       </Progress>
-                        <span className="text-sm font-medium text-white w-12">{skill.progress}%</span>
-                      </div>
+                      <span className="text-xs sm:text-sm font-medium text-foreground dark:text-white w-10 sm:w-12 text-right">{skill.progress}%</span>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -419,25 +465,25 @@ const IntermediatesPage = () => {
           </Card>
 
           {/* Stats & Achievements */}
-            <Card className="bg-slate-800/40 backdrop-blur-xl border-purple-500/30 shadow-2xl">
-            <CardContent className="p-8">
-                <h3 className="text-xl font-semibold text-white mb-6">Performance Metrics</h3>
+          <Card className="bg-card/80 backdrop-blur-xl border-primary/30 hover:border-primary/50 transition-all duration-300 dark:bg-slate-900/60 dark:border-emerald-500/30 dark:hover:border-emerald-400/50">
+            <CardContent className="p-4 sm:p-6 md:p-8">
+              <h3 className="text-lg sm:text-xl font-semibold text-foreground dark:text-white mb-4 sm:mb-6">Performance Metrics</h3>
 
               {/* Stats */}
-              <div className="space-y-6 mb-8">
+              <div className="space-y-4 sm:space-y-6 mb-6 sm:mb-8">
                 {stats.map((stat, index) => {
                   const Icon = stat.icon;
                   return (
-                      <div key={index} className="flex items-center gap-4 p-3 rounded-xl bg-slate-700/30 backdrop-blur-sm border border-purple-500/20 hover:border-purple-400/50 transition-all duration-300">
-                        <div className={cn("p-3 rounded-xl", stat.color)} style={{ backgroundColor: stat.glowColor }}>
-                        <Icon className="w-5 h-5" />
+                    <div key={index} className="flex items-center gap-3 sm:gap-4 p-3 rounded-xl bg-muted/50 backdrop-blur-sm border border-primary/20 hover:border-primary/50 transition-all duration-300 dark:bg-slate-700/30 dark:border-emerald-500/20 dark:hover:border-emerald-400/50">
+                      <div className={cn("p-2 sm:p-3 rounded-xl", stat.bgColor, stat.color)}>
+                        <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                       </div>
-                      <div className="flex-1">
-                        <div className="flex justify-between items-baseline">
-                            <span className="text-sm font-medium text-purple-100/80">{stat.label}</span>
-                            <span className="text-lg font-bold text-white">{stat.value}</span>
-                          </div>
-                          <p className="text-xs text-purple-100/60">{stat.description}</p>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-baseline gap-2">
+                          <span className="text-xs sm:text-sm font-medium text-muted-foreground dark:text-cyan-100/80 truncate">{stat.label}</span>
+                          <span className="text-base sm:text-lg font-bold text-foreground dark:text-white flex-shrink-0">{stat.value}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground dark:text-cyan-100/60 mt-1">{stat.description}</p>
                       </div>
                     </div>
                   );
@@ -446,29 +492,29 @@ const IntermediatesPage = () => {
 
               {/* Achievements */}
               <div>
-                  <h4 className="text-lg font-semibold text-white mb-4">Certifications</h4>
-                <div className="grid grid-cols-2 gap-3">
+                <h4 className="text-base sm:text-lg font-semibold text-foreground dark:text-white mb-3 sm:mb-4">Certifications</h4>
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
                   {achievements.map((achievement, index) => {
                     const Icon = achievement.icon;
                     const isEarned = achievement.earned;
 
                     return (
                       <div key={index} className={cn(
-                          "p-3 rounded-xl border transition-all duration-300 backdrop-blur-sm",
+                        "p-2 sm:p-3 rounded-xl border transition-all duration-300 backdrop-blur-sm",
                         isEarned
-                            ? "bg-gradient-to-br from-purple-500/30 to-pink-500/20 border-purple-400/50 text-purple-200"
-                            : "bg-slate-700/30 border-slate-600/50 text-purple-100/60"
+                          ? "bg-gradient-to-br from-primary/30 to-secondary/20 border-primary/50 text-foreground dark:from-emerald-500/30 dark:to-green-500/20 dark:border-emerald-400/50 dark:text-cyan-200"
+                          : "bg-muted/30 border-border text-muted-foreground dark:bg-slate-700/30 dark:border-slate-600/50 dark:text-cyan-100/60"
                       )}>
                         <Icon className={cn(
-                          "w-4 h-4 mb-2",
+                          "w-3 h-3 sm:w-4 sm:h-4 mb-1 sm:mb-2",
                           isEarned
-                              ? "text-purple-300"
-                              : "text-slate-500"
+                            ? "text-primary dark:text-emerald-300"
+                            : "text-muted-foreground dark:text-slate-500"
                         )} />
-                        <div className="text-sm font-medium mb-1">{achievement.name}</div>
+                        <div className="text-xs sm:text-sm font-medium mb-1">{achievement.name}</div>
                         {!isEarned && (
-                            <Progress value={achievement.progress} className="h-1 bg-slate-700/50">
-                              <div className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" />
+                          <Progress value={achievement.progress} className="h-1 bg-muted dark:bg-slate-700/50">
+                            <div className="h-full bg-gradient-to-r from-primary to-secondary rounded-full dark:from-emerald-500 dark:to-green-500" />
                           </Progress>
                         )}
                       </div>
@@ -481,47 +527,45 @@ const IntermediatesPage = () => {
         </div>
 
         {/* Practice Labs */}
-          <div className="mb-8 sm:mb-10 md:mb-12">
-            <div className="mb-6 sm:mb-8">
-            <div>
-                <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Advanced Practice Labs</h2>
-                <p className="text-sm sm:text-base text-purple-100/70">Interactive exercises for professional communication</p>
-              </div>
+        <div>
+          <div className="mb-6 sm:mb-8">
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2">Advanced Practice Labs</h2>
+            <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70">Interactive exercises for professional communication</p>
           </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {practiceActivities.map((activity, index) => {
               const Icon = activity.icon;
               return (
                 <Card 
                   key={index} 
-                    className="group cursor-pointer bg-slate-800/40 backdrop-blur-xl border-purple-500/30 hover:border-purple-400/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-purple-500/20"
+                  className="group cursor-pointer bg-card/80 backdrop-blur-xl border-primary/30 hover:border-primary/50 transition-all duration-300 shadow-xl hover:shadow-2xl dark:bg-slate-900/60 dark:border-emerald-500/30 dark:hover:border-emerald-400/50"
                   onMouseEnter={() => setIsHovered(index)}
                   onMouseLeave={() => setIsHovered(null)}
                 >
-                  <CardContent className="p-6 relative overflow-hidden">
+                  <CardContent className="p-4 sm:p-6 relative overflow-hidden">
                     <div className={cn(
-                        "absolute top-0 right-0 w-20 h-20 rounded-full -mr-6 -mt-6 transition-all duration-500 bg-gradient-to-r opacity-20",
+                      "absolute top-0 right-0 w-16 h-16 sm:w-20 sm:h-20 rounded-full -mr-6 -mt-6 transition-all duration-500 bg-gradient-to-r opacity-20",
                       activity.color,
-                        isHovered === index ? "opacity-30 scale-150" : ""
+                      isHovered === index ? "opacity-30 scale-150" : ""
                     )}></div>
                     
                     <div className={cn(
-                        "w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-white relative z-10 transition-transform duration-300 bg-gradient-to-r shadow-lg",
+                      "w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center mb-3 sm:mb-4 text-white relative z-10 transition-transform duration-300 bg-gradient-to-r shadow-lg",
                       activity.color,
                       isHovered === index && "scale-110"
                     )}>
-                      <Icon className="w-6 h-6" />
+                      <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
                     
-                      <h4 className="font-semibold text-white mb-3 text-lg">{activity.title}</h4>
-                      <p className="text-sm text-purple-100/70 mb-6 leading-relaxed">{activity.description}</p>
+                    <h4 className="font-semibold text-foreground dark:text-white mb-2 sm:mb-3 text-base sm:text-lg">{activity.title}</h4>
+                    <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70 mb-4 sm:mb-6 leading-relaxed">{activity.description}</p>
                     
-                    <div className="flex items-center justify-between mb-4">
-                        <Badge variant="secondary" className="text-xs bg-slate-700/50 text-purple-200">
+                    <div className="flex items-center justify-between mb-3 sm:mb-4 flex-wrap gap-2">
+                      <Badge variant="secondary" className="text-xs bg-muted/50 text-foreground dark:bg-slate-700/50 dark:text-cyan-200">
                         {activity.time}
                       </Badge>
-                        <Badge variant="outline" className="text-xs bg-purple-500/20 text-purple-300 border-purple-400/30">
+                      <Badge variant="outline" className="text-xs bg-primary/20 text-primary border-primary/30 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-400/30">
                         {activity.level}
                       </Badge>
                     </div>
@@ -529,7 +573,7 @@ const IntermediatesPage = () => {
                     <Button 
                       variant="outline" 
                       size="sm" 
-                        className="w-full border-purple-400/30 text-purple-500 hover:bg-purple-500/20 hover:border-purple-400/50 transition-all duration-300"
+                      className="w-full border-primary/30 text-foreground hover:bg-primary/20 hover:border-primary/50 transition-all duration-300 dark:border-emerald-500/30 dark:text-white dark:hover:bg-emerald-500/20 dark:hover:border-emerald-400/50"
                     >
                       Start Practice
                       <ArrowRight className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
@@ -542,32 +586,30 @@ const IntermediatesPage = () => {
         </div>
 
         {/* Learning Modules */}
-          <div className="mb-8 sm:mb-10 md:mb-12">
-            <div className="mb-6 sm:mb-8">
-            <div>
-                <h2 className="text-xl sm:text-2xl font-bold text-white">Advanced Learning Modules</h2>
-                <p className="text-sm sm:text-base text-purple-100/70">Master complex language structures and professional communication</p>
-              </div>
+        <div>
+          <div className="mb-6 sm:mb-8">
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white">Advanced Learning Modules</h2>
+            <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70">Master complex language structures and professional communication</p>
           </div>
 
           {/* Module Navigation */}
-            <div className="flex flex-wrap gap-2 sm:gap-3 mb-6 sm:mb-8">
+          <div className="flex flex-wrap gap-2 sm:gap-3 mb-6 sm:mb-8">
             {modules.map((module) => {
               const Icon = module.icon;
               return (
                 <Button
                   key={module.id}
                   variant={activeModule === module.id ? "default" : "outline"}
-                    size="sm"
+                  size="sm"
                   className={cn(
-                      "rounded-xl px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 text-xs sm:text-sm md:text-base font-medium transition-all duration-300 border-2 backdrop-blur-sm",
+                    "rounded-xl px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 text-xs sm:text-sm md:text-base font-medium transition-all duration-300 border-2 backdrop-blur-sm",
                     activeModule === module.id 
-                        ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg border-transparent" 
-                        : "bg-slate-800/40 border-purple-500/30 hover:border-purple-400/50 text-purple-200 hover:shadow-md"
+                      ? "bg-gradient-to-r from-primary via-secondary to-accent text-white shadow-lg border-transparent dark:from-emerald-500 dark:via-green-500 dark:to-teal-500" 
+                      : "bg-card/40 border-primary/30 hover:border-primary/50 text-foreground hover:shadow-md dark:bg-slate-800/40 dark:border-emerald-500/30 dark:hover:border-emerald-400/50 dark:text-cyan-200"
                   )}
                   onClick={() => setActiveModule(module.id)}
                 >
-                    <Icon className="w-3 h-3 sm:w-4 sm:h-4 mr-2 sm:mr-3" />
+                  <Icon className="w-3 h-3 sm:w-4 sm:h-4 mr-2 sm:mr-3" />
                   {module.label}
                 </Button>
               );
@@ -575,15 +617,15 @@ const IntermediatesPage = () => {
           </div>
 
           {/* Lessons Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {getCurrentLessons().map((lesson, index) => (
               <Card 
                 key={index} 
                 className={cn(
-                    "group cursor-pointer border-2 transition-all duration-500 bg-slate-800/40 backdrop-blur-xl hover:shadow-2xl overflow-hidden",
+                  "group cursor-pointer border-2 transition-all duration-500 bg-card/80 backdrop-blur-xl hover:shadow-2xl overflow-hidden",
                   lesson.completed 
-                      ? "border-emerald-400/50 hover:border-emerald-300/70" 
-                      : "border-purple-500/30 hover:border-purple-400/50"
+                    ? "border-emerald-400/50 hover:border-emerald-300/70 dark:border-emerald-500/50 dark:hover:border-emerald-400/70" 
+                    : "border-primary/30 hover:border-primary/50 dark:border-emerald-500/30 dark:hover:border-emerald-400/50"
                 )}
                 onMouseEnter={() => setIsHovered(index + 10)}
                 onMouseLeave={() => setIsHovered(null)}
@@ -591,25 +633,25 @@ const IntermediatesPage = () => {
                 <CardContent className="p-0 overflow-hidden">
                   {/* Header with Gradient */}
                   <div className={cn(
-                      "p-6 text-white relative overflow-hidden transition-all duration-500 bg-gradient-to-r",
+                    "p-4 sm:p-6 text-white relative overflow-hidden transition-all duration-500 bg-gradient-to-r",
                     lesson.color,
                     isHovered === index + 10 && "brightness-110"
-                    )} style={{ boxShadow: `0 0 30px ${lesson.glowColor}` }}>
+                  )} style={{ boxShadow: `0 0 30px ${lesson.glowColor}` }}>
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
                     <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12"></div>
                     
                     <div className="relative z-10">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="text-4xl transform transition-transform duration-300 group-hover:scale-110">
+                      <div className="flex items-start justify-between mb-3 sm:mb-4">
+                        <div className="text-3xl sm:text-4xl transform transition-transform duration-300 group-hover:scale-110">
                           {lesson.icon}
                         </div>
                         {lesson.completed && (
-                          <CheckCircle className="w-6 h-6 text-emerald-300 animate-pulse" />
+                          <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-300 animate-pulse" />
                         )}
                       </div>
-                      <h3 className="text-xl font-bold mb-3">{lesson.title}</h3>
-                      <p className="text-white/90 text-sm leading-relaxed mb-4">{lesson.description}</p>
-                      <div className="flex flex-wrap gap-2">
+                      <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3">{lesson.title}</h3>
+                      <p className="text-white/90 text-xs sm:text-sm leading-relaxed mb-3 sm:mb-4">{lesson.description}</p>
+                      <div className="flex flex-wrap gap-1 sm:gap-2">
                         {lesson.skills?.map((skill, skillIndex) => (
                           <Badge key={skillIndex} variant="secondary" className="bg-white/20 text-white border-0 text-xs backdrop-blur-sm">
                             {skill}
@@ -620,38 +662,38 @@ const IntermediatesPage = () => {
                   </div>
                   
                   {/* Content */}
-                    <div className="p-4 sm:p-6 bg-slate-800/60 backdrop-blur-sm">
-                      <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0 text-xs sm:text-sm text-purple-100/70 mb-3 sm:mb-4">
-                        <span className="flex items-center gap-1 sm:gap-2 font-medium">
-                          <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <div className="p-4 sm:p-6 bg-card/70 backdrop-blur-sm dark:bg-slate-900/70">
+                    <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0 text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70 mb-3 sm:mb-4">
+                      <span className="flex items-center gap-1 sm:gap-2 font-medium">
+                        <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
                         {lesson.duration}
                       </span>
-                        <span className="flex items-center gap-1 sm:gap-2 font-medium">
-                          <Target className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="flex items-center gap-1 sm:gap-2 font-medium">
+                        <Target className="w-3 h-3 sm:w-4 sm:h-4" />
                         {lesson.focus}
                       </span>
-                        <Badge variant="secondary" className="bg-purple-500/20 text-purple-300 border-purple-400/30 text-xs w-fit">
+                      <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30 text-xs w-fit dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-400/30">
                         {lesson.level}
                       </Badge>
                     </div>
 
                     {/* Progress */}
-                    <div className="space-y-2 mb-6">
-                      <div className="flex items-center justify-between text-sm">
-                          <span className="text-purple-100/70">Module Progress</span>
-                          <span className="font-medium text-white">{lesson.progress}%</span>
+                    <div className="space-y-2 mb-4 sm:mb-6">
+                      <div className="flex items-center justify-between text-xs sm:text-sm">
+                        <span className="text-muted-foreground dark:text-cyan-100/70">Module Progress</span>
+                        <span className="font-medium text-foreground dark:text-white">{lesson.progress}%</span>
                       </div>
-                        <Progress value={lesson.progress} className="h-2 bg-slate-700/50">
+                      <Progress value={lesson.progress} className="h-2 bg-muted dark:bg-slate-700/50">
                         <div className={cn("h-full rounded-full bg-gradient-to-r", lesson.color)} />
                       </Progress>
                     </div>
                     
                     <Button 
                       className={cn(
-                        "w-full font-semibold py-3 rounded-xl transition-all duration-300 group-hover:shadow-lg relative overflow-hidden",
+                        "w-full font-semibold py-2 sm:py-3 rounded-xl transition-all duration-300 group-hover:shadow-lg relative overflow-hidden",
                         lesson.completed
-                            ? "bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
-                            : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                          ? "bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
+                          : "bg-gradient-to-r from-primary via-secondary to-accent hover:from-primary/90 hover:via-secondary/90 hover:to-accent/90 text-white dark:from-emerald-500 dark:via-green-500 dark:to-teal-500 dark:hover:from-emerald-600 dark:hover:via-green-600 dark:hover:to-teal-600"
                       )}
                       onClick={handleStartLesson}
                     >
@@ -677,42 +719,41 @@ const IntermediatesPage = () => {
         </div>
 
         {/* Advanced Features Section */}
-          <Card className="bg-gradient-to-r from-purple-500/20 via-pink-500/30 to-rose-500/20 backdrop-blur-xl border-purple-400/50 text-white shadow-2xl overflow-hidden">
-          <CardContent className="p-8 relative">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12"></div>
-            
+        <Card className="bg-gradient-to-r from-primary/20 via-secondary/30 to-accent/20 backdrop-blur-xl border-primary/50 text-foreground shadow-2xl overflow-hidden relative dark:from-emerald-500/20 dark:via-green-500/30 dark:to-teal-500/20 dark:border-emerald-400/50 dark:text-white">
+          <span className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" aria-hidden />
+          <span className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12" aria-hidden />
+          <CardContent className="p-4 sm:p-6 md:p-8 relative">
             <div className="relative z-10 text-center max-w-4xl mx-auto">
-                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
-                <Rocket className="w-8 h-8 text-white" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 backdrop-blur-sm dark:bg-white/10">
+                <Rocket className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-foreground dark:text-white" />
               </div>
-              <h3 className="text-2xl font-bold mb-4 text-white">Ready for Advanced Challenges?</h3>
-                <p className="text-purple-100 text-lg mb-8 leading-relaxed">
+              <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-foreground dark:text-white">Ready for Advanced Challenges?</h3>
+              <p className="text-muted-foreground text-sm sm:text-base md:text-lg mb-6 sm:mb-8 leading-relaxed dark:text-cyan-100">
                 Elevate your English to professional levels with complex debates, executive presentations, and sophisticated cultural discussions
               </p>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                <div className="bg-white/10 rounded-xl p-6 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:bg-white/15">
-                  <Video className="w-8 h-8 mx-auto mb-3" />
-                  <h4 className="font-semibold mb-2">Video Analysis</h4>
-                    <p className="text-purple-200 text-sm">Analyze authentic professional conversations</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 text-center">
+                <div className="bg-white/10 rounded-xl p-4 sm:p-6 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:bg-white/15 dark:bg-white/10 dark:border-white/20">
+                  <Video className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 sm:mb-3 text-foreground dark:text-white" />
+                  <h4 className="font-semibold mb-1 sm:mb-2 text-foreground dark:text-white">Video Analysis</h4>
+                  <p className="text-muted-foreground text-xs sm:text-sm dark:text-cyan-200">Analyze authentic professional conversations</p>
                 </div>
-                <div className="bg-white/10 rounded-xl p-6 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:bg-white/15">
-                  <BarChart3 className="w-8 h-8 mx-auto mb-3" />
-                  <h4 className="font-semibold mb-2">Advanced Analytics</h4>
-                    <p className="text-purple-200 text-sm">Detailed performance insights and growth tracking</p>
+                <div className="bg-white/10 rounded-xl p-4 sm:p-6 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:bg-white/15 dark:bg-white/10 dark:border-white/20">
+                  <BarChart3 className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 sm:mb-3 text-foreground dark:text-white" />
+                  <h4 className="font-semibold mb-1 sm:mb-2 text-foreground dark:text-white">Advanced Analytics</h4>
+                  <p className="text-muted-foreground text-xs sm:text-sm dark:text-cyan-200">Detailed performance insights and growth tracking</p>
                 </div>
-                <div className="bg-white/10 rounded-xl p-6 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:bg-white/15">
-                  <ThumbsUp className="w-8 h-8 mx-auto mb-3" />
-                  <h4 className="font-semibold mb-2">Expert Feedback</h4>
-                    <p className="text-purple-200 text-sm">Professional coaching and community insights</p>
-                  </div>
+                <div className="bg-white/10 rounded-xl p-4 sm:p-6 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:bg-white/15 dark:bg-white/10 dark:border-white/20">
+                  <ThumbsUp className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 sm:mb-3 text-foreground dark:text-white" />
+                  <h4 className="font-semibold mb-1 sm:mb-2 text-foreground dark:text-white">Expert Feedback</h4>
+                  <p className="text-muted-foreground text-xs sm:text-sm dark:text-cyan-200">Professional coaching and community insights</p>
+                </div>
               </div>
             </div>
           </CardContent>
         </Card>
-        </div>
-      </div>
+        </main>
+      )}
     </div>
   );
 };

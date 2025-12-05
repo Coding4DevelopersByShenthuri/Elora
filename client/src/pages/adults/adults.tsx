@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  Play, Target, Award, BookOpen, MessageCircle,
-  Volume2, CheckCircle, TrendingUp, Zap, Lightbulb, Crown, BarChart3,
-  Clock, ThumbsUp, Shield, Rocket,
-  ArrowRight, GraduationCap, Brain, Languages, Star, Sparkles, Globe,
-  Flame, Calendar, Trophy, RefreshCw, FileText, Layers,
-  Speech, BookMarked, Flame as FireIcon, Gem, Headphones, PenTool, MessageSquare
+  Target, Award, BookOpen,
+  TrendingUp, Zap, BarChart3,
+  Clock, Shield, Rocket,
+  ArrowRight, GraduationCap,
+  Speech, BookMarked, Flame as FireIcon, Gem, Trophy
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -19,18 +18,10 @@ import {
   WeeklyChallenges,
   LearningGoals,
   PersonalizedRecommendations,
-  SpacedRepetition,
-  MicrolearningModules,
-  ProgressAnalytics,
-  QuickAccessToolbar,
-  DictionaryWidget,
-  DailyGoalsWidget,
-  BusinessEmailCoach,
-  CulturalIntelligence
+  ProgressAnalytics
 } from '@/components/adults';
 import { AdultsAPI } from '@/services/ApiService';
 import { useAuth } from '@/contexts/AuthContext';
-import { allMultiModeModules, getTotalModulesByMode, getModuleById } from '@/data/multi-mode-modules-config';
 import { logger } from '@/utils/logger';
 
 const AdultsPage = () => {
@@ -39,14 +30,12 @@ const AdultsPage = () => {
   const [progress, setProgress] = useState(42);
   const [streak, setStreak] = useState(7);
   const [fluencyScore, setFluencyScore] = useState(65);
-  const [isHovered, setIsHovered] = useState<number | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [dailyConversationProgress, setDailyConversationProgress] = useState<any>(null);
-  const [activeWidget, setActiveWidget] = useState<string | null>(null);
-  const [multiModeProgress, setMultiModeProgress] = useState<any>(null);
-  const [enrolledModules, setEnrolledModules] = useState<Set<string>>(new Set());
+  const [multiModePoints, setMultiModePoints] = useState(0);
+  const [dailyConversationPoints, setDailyConversationPoints] = useState(0);
+  const [totalPoints, setTotalPoints] = useState(0);
 
 
   // Load dashboard data
@@ -59,109 +48,28 @@ const AdultsPage = () => {
     }
     
     loadDashboardData();
-    loadDailyConversationProgress();
-    loadMultiModeProgress();
-    loadEnrolledModules();
+    loadMultiModePoints();
+    loadDailyConversationPoints();
   }, [user]);
 
-  // Load Multi-Mode Practice progress
-  const loadMultiModeProgress = async () => {
-    if (!user) return;
-    
-    // Check for valid token before making API call
-    const token = localStorage.getItem('speakbee_auth_token');
-    if (!token || token === 'local-token') {
-      return;
-    }
-    
-    try {
-      const result = await AdultsAPI.getMultiModePracticeHistory();
-      if (result.success && 'data' in result && result.data?.data) {
-        const sessions = result.data.data || [];
-        const totalPoints = sessions.reduce((sum: number, s: any) => sum + (s.points_earned || 0), 0);
-        const totalSessions = sessions.length;
-        const avgScore = sessions.length > 0 
-          ? sessions.reduce((sum: number, s: any) => sum + (s.score || 0), 0) / sessions.length 
-          : 0;
-        
-        // Track completed modules
-        // A module is considered completed if:
-        // 1. It has a completed session (completed_at is not null)
-        // 2. The session has a score > 0 (user actually completed exercises)
-        // 3. It has content_id (is a module, not just a mode practice)
-        const completedModules = new Set<string>();
-        sessions.forEach((session: any) => {
-          if (session.completed_at && session.score > 0 && session.content_id) {
-            // For listening modules, use content_id
-            // For other modes, this will work when modules are added
-            completedModules.add(session.content_id);
-          }
-        });
-        
-        setMultiModeProgress({
-          totalPoints,
-          totalSessions,
-          avgScore: Math.round(avgScore),
-          sessions,
-          completedModules: Array.from(completedModules)
-        });
-      }
-    } catch (error) {
-      logger.error('Failed to load multi-mode progress:', error);
-    }
-  };
-
-  // Load enrolled modules
-  const loadEnrolledModules = () => {
-    if (!user) return;
-    const stored = localStorage.getItem(`enrolled_modules_${user.id}`);
-    if (stored) {
-      setEnrolledModules(new Set(JSON.parse(stored)));
-    }
-  };
-
-  // Load daily conversation progress from localStorage
-  const loadDailyConversationProgress = () => {
-    try {
-      const progress = JSON.parse(
-        localStorage.getItem('dailyConversationProgress') || '{}'
-      );
-      setDailyConversationProgress(progress);
-    } catch (error) {
-      logger.error('Error loading daily conversation progress:', error);
-      setDailyConversationProgress({});
-    }
-  };
-
-  // Listen for storage changes to update progress in real-time
+  // Listen for updates
   useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'dailyConversationProgress') {
-        loadDailyConversationProgress();
-      }
-    };
-    
-    window.addEventListener('storage', handleStorageChange);
-    
-    // Also listen for custom events (for same-tab updates)
-    const handleCustomStorage = () => {
-      loadDailyConversationProgress();
-    };
-    window.addEventListener('dailyConversationProgressUpdated', handleCustomStorage);
-    
-    // Listen for Multi-Mode Practice updates
     const handleMultiModeUpdate = () => {
-      loadMultiModeProgress();
-      loadEnrolledModules();
+      loadMultiModePoints();
     };
+    const handleDailyConversationUpdate = () => {
+      loadDailyConversationPoints();
+    };
+    
     window.addEventListener('multiModeProgressUpdated', handleMultiModeUpdate);
+    window.addEventListener('dailyConversationProgressUpdated', handleDailyConversationUpdate);
     
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('dailyConversationProgressUpdated', handleCustomStorage);
       window.removeEventListener('multiModeProgressUpdated', handleMultiModeUpdate);
+      window.removeEventListener('dailyConversationProgressUpdated', handleDailyConversationUpdate);
     };
   }, []);
+
 
   const loadDashboardData = async () => {
     if (!user?.id) {
@@ -195,6 +103,11 @@ const AdultsPage = () => {
         if (result.data?.dashboard?.current_streak !== undefined) {
           setStreak(result.data.dashboard.current_streak);
         }
+
+        // Update fluency score from dashboard
+        if (result.data?.dashboard?.fluency_score !== undefined) {
+          setFluencyScore(result.data.dashboard.fluency_score);
+        }
       }
     } catch (error) {
       logger.error('Failed to load dashboard data:', error);
@@ -202,6 +115,55 @@ const AdultsPage = () => {
       setLoading(false);
     }
   };
+
+  const loadMultiModePoints = async () => {
+    if (!user) return;
+    const token = localStorage.getItem('speakbee_auth_token');
+    if (!token || token === 'local-token') return;
+    
+    try {
+      const result = await AdultsAPI.getMultiModePracticeHistory();
+      if (result.success && 'data' in result && result.data?.data) {
+        const sessions = result.data.data || [];
+        const totalPoints = sessions.reduce((sum: number, s: any) => sum + (s.points_earned || 0), 0);
+        setMultiModePoints(totalPoints);
+        calculateTotalPoints();
+      }
+    } catch (error) {
+      logger.error('Failed to load multi-mode points:', error);
+    }
+  };
+
+  const loadDailyConversationPoints = () => {
+    try {
+      const progress = JSON.parse(
+        localStorage.getItem('dailyConversationProgress') || '{}'
+      );
+      let totalPoints = 0;
+      Object.values(progress).forEach((topic: any) => {
+        if (topic && topic.scenario1 && topic.scenario2) {
+          totalPoints += (topic.scenario1.points || 0) + (topic.scenario2.points || 0);
+        }
+      });
+      setDailyConversationPoints(totalPoints);
+      calculateTotalPoints();
+    } catch (error) {
+      logger.error('Error loading daily conversation points:', error);
+      setDailyConversationPoints(0);
+      calculateTotalPoints();
+    }
+  };
+
+  const calculateTotalPoints = () => {
+    const dashboardPoints = dashboardData?.total_points || 0;
+    const total = dashboardPoints + multiModePoints + dailyConversationPoints;
+    setTotalPoints(total);
+  };
+
+  // Recalculate when dashboard data or points change
+  useEffect(() => {
+    calculateTotalPoints();
+  }, [dashboardData, multiModePoints, dailyConversationPoints]);
 
   // Page load fade-in
   useEffect(() => {
@@ -247,151 +209,6 @@ const AdultsPage = () => {
     }
   ];
 
-  // Calculate total points from all daily conversation topics
-  const getDailyConversationPoints = () => {
-    if (!dailyConversationProgress) return 0;
-    let totalPoints = 0;
-    Object.values(dailyConversationProgress).forEach((topic: any) => {
-      if (topic && topic.scenario1 && topic.scenario2) {
-        totalPoints += (topic.scenario1.points || 0) + (topic.scenario2.points || 0);
-      }
-    });
-    return totalPoints;
-  };
-
-  // Calculate total points from all enrolled components
-  const getAllOverPoints = () => {
-    let total = 0;
-    
-    // Daily Conversation points
-    total += getDailyConversationPoints();
-    
-    // Multi-Mode Practice points
-    if (multiModeProgress) {
-      total += multiModeProgress.totalPoints || 0;
-    }
-    
-    // Add other component points here as needed
-    
-    return total;
-  };
-
-  // Get Multi-Mode Practice progress percentage
-  const getMultiModeProgress = () => {
-    // Get total modules across all modes
-    const totalModules = getTotalModulesByMode();
-    
-    if (totalModules.total === 0) return null;
-    
-    // Count completed modules (modules with at least one completed session)
-    const completedModulesCount = multiModeProgress?.completedModules?.length || 0;
-    
-    // Calculate progress: (completed modules / total modules) * 100
-    const progress = Math.round((completedModulesCount / totalModules.total) * 100);
-    
-    return Math.min(100, Math.max(0, progress));
-  };
-
-  // Get progress breakdown by mode
-  const getProgressByMode = () => {
-    const totalModules = getTotalModulesByMode();
-    const completedModules = multiModeProgress?.completedModules || [];
-    
-    const breakdown = {
-      listening: {
-        total: totalModules.listening,
-        completed: completedModules.filter((id: string) => {
-          const module = getModuleById(id);
-          return module?.mode === 'listening';
-        }).length,
-        progress: totalModules.listening > 0 
-          ? Math.round((completedModules.filter((id: string) => {
-              const module = getModuleById(id);
-              return module?.mode === 'listening';
-            }).length / totalModules.listening) * 100)
-          : 0
-      },
-      speaking: {
-        total: totalModules.speaking,
-        completed: completedModules.filter((id: string) => {
-          const module = getModuleById(id);
-          return module?.mode === 'speaking';
-        }).length,
-        progress: totalModules.speaking > 0 
-          ? Math.round((completedModules.filter((id: string) => {
-              const module = getModuleById(id);
-              return module?.mode === 'speaking';
-            }).length / totalModules.speaking) * 100)
-          : 0
-      },
-      reading: {
-        total: totalModules.reading,
-        completed: completedModules.filter((id: string) => {
-          const module = getModuleById(id);
-          return module?.mode === 'reading';
-        }).length,
-        progress: totalModules.reading > 0 
-          ? Math.round((completedModules.filter((id: string) => {
-              const module = getModuleById(id);
-              return module?.mode === 'reading';
-            }).length / totalModules.reading) * 100)
-          : 0
-      },
-      writing: {
-        total: totalModules.writing,
-        completed: completedModules.filter((id: string) => {
-          const module = getModuleById(id);
-          return module?.mode === 'writing';
-        }).length,
-        progress: totalModules.writing > 0 
-          ? Math.round((completedModules.filter((id: string) => {
-              const module = getModuleById(id);
-              return module?.mode === 'writing';
-            }).length / totalModules.writing) * 100)
-          : 0
-      }
-    };
-    
-    return breakdown;
-  };
-
-  const getEnrolledSummaryByMode = () => {
-    const summary = {
-      listening: 0,
-      speaking: 0,
-      reading: 0,
-      writing: 0,
-    };
-
-    enrolledModules.forEach((moduleId) => {
-      const module = getModuleById(moduleId);
-      if (module) {
-        summary[module.mode]++;
-      }
-    });
-
-    return summary;
-  };
-
-  // Check if any topic is enrolled
-  const hasAnyEnrolledTopic = () => {
-    if (!dailyConversationProgress) return false;
-    return Object.values(dailyConversationProgress).some((topic: any) => topic?.enrolled === true);
-  };
-
-const getDailyConversationEnrollmentCount = () => {
-  if (!dailyConversationProgress) return 0;
-  return Object.values(dailyConversationProgress).filter((topic: any) => topic?.enrolled).length;
-};
-
-  // Get overall progress across all topics
-  const getOverallProgress = () => {
-    if (!dailyConversationProgress) return null;
-    const topics = Object.values(dailyConversationProgress).filter((topic: any) => topic?.average !== undefined);
-    if (topics.length === 0) return null;
-    const totalAverage = topics.reduce((sum: number, topic: any) => sum + (topic.average || 0), 0);
-    return Math.round(totalAverage / topics.length);
-  };
 
   const stats = [
     {
@@ -422,8 +239,8 @@ const getDailyConversationEnrollmentCount = () => {
       description: "Daily practice streak"
     },
     {
-      label: "All over points",
-      value: getAllOverPoints().toString(),
+      label: "Total Points",
+      value: totalPoints.toString(),
       icon: Gem,
       color: "text-purple-500",
       bgColor: "bg-purple-500/20",
@@ -432,33 +249,6 @@ const getDailyConversationEnrollmentCount = () => {
     },
   ];
 
-const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
-
-  const getScoreColor = (score: number) => {
-    if (score >= 90) return 'text-emerald-500';
-    if (score >= 80) return 'text-green-500';
-    if (score >= 70) return 'text-teal-500';
-    return 'text-emerald-600';
-  };
-
-  const handleToolbarClick = (tool: string) => {
-    setActiveWidget(tool);
-  };
-
-  const handleCloseWidget = () => {
-    setActiveWidget(null);
-  };
-
-  const renderWidget = () => {
-    switch (activeWidget) {
-      case 'dictionary':
-        return <DictionaryWidget onClose={handleCloseWidget} />;
-      case 'cultural':
-        return <CulturalIntelligence onClose={handleCloseWidget} />;
-      default:
-        return null;
-    }
-  };
 
   return (
     <div className={`relative overflow-hidden min-h-screen ${isLoaded ? 'animate-fade-in' : 'opacity-0'}`}>
@@ -467,23 +257,6 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
       <div className="absolute top-1/4 right-0 w-[400px] h-[400px] rounded-full bg-secondary/10 blur-3xl -z-10"></div>
       <div className="absolute bottom-1/4 left-0 w-[300px] h-[300px] rounded-full bg-accent/10 blur-3xl -z-10"></div>
 
-      {/* Quick Access Toolbar */}
-      {user && <QuickAccessToolbar onToolClick={handleToolbarClick} />}
-
-      {/* Widget Modals */}
-      {activeWidget && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-          onClick={handleCloseWidget}
-        >
-          <div 
-            className="w-full max-w-6xl max-h-[90vh] flex items-center justify-center animate-in fade-in-0 zoom-in-95 duration-200"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {renderWidget()}
-          </div>
-        </div>
-      )}
 
       <main className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 xl:px-10 pt-24 pb-16 space-y-10">
         <section>
@@ -557,8 +330,6 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                   className={cn(
                     "group relative bg-card/80 backdrop-blur-xl border-primary/30 hover:border-primary/50 transition-all duration-500 shadow-2xl overflow-hidden dark:bg-slate-900/60 dark:border-emerald-500/30 dark:hover:border-emerald-400/50"
                   )}
-                  onMouseEnter={() => setIsHovered(index)}
-                  onMouseLeave={() => setIsHovered(null)}
                 >
                   <CardContent className="p-4 sm:p-6 relative z-10">
                     <div className={cn("p-3 rounded-xl text-white bg-gradient-to-r shadow-lg mb-4 w-fit", level.color)}>
@@ -592,23 +363,73 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
             })}
           </div>
 
-          {/* Personalized Recommendations - Prominent */}
+          {/* Personalized Recommendations */}
           <div>
             <PersonalizedRecommendations />
           </div>
 
-          {/* Main Content Tabs - All Features Organized */}
+          {/* Progress Overview Section */}
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2">Your Learning Progress</h2>
+              <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70">Track your achievements across all proficiency levels</p>
+            </div>
+
+            {/* Overall Progress Card */}
+            <Card className="bg-gradient-to-br from-primary/20 via-secondary/30 to-accent/20 backdrop-blur-xl border-primary/50 shadow-2xl dark:from-emerald-500/20 dark:via-green-500/30 dark:to-teal-500/20 dark:border-emerald-400/50">
+              <CardContent className="p-6 sm:p-8">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                  <div>
+                    <h3 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2">Overall Learning Progress</h3>
+                    <p className="text-sm text-muted-foreground dark:text-cyan-100/70">Your journey across all levels</p>
+                  </div>
+                  <div className="text-center sm:text-right">
+                    <div className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent dark:from-emerald-400 dark:via-green-400 dark:to-teal-400">
+                      {progress}%
+                    </div>
+                    <div className="text-sm text-muted-foreground dark:text-cyan-100/70">Overall Mastery</div>
+                  </div>
+                </div>
+                <Progress value={progress} className="h-4 bg-muted dark:bg-slate-700/50 mb-6">
+                  <div className="h-full bg-gradient-to-r from-primary via-secondary to-accent rounded-full transition-all duration-500 dark:from-emerald-500 dark:via-green-500 dark:to-teal-500" />
+                </Progress>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="bg-card/50 backdrop-blur-sm p-4 rounded-lg border border-primary/20 dark:bg-slate-800/50 dark:border-emerald-500/20">
+                    <div className="text-sm text-muted-foreground dark:text-cyan-100/70 mb-1">Foundation Level</div>
+                    <div className="text-2xl font-bold text-foreground dark:text-white">{levels[0].progress}%</div>
+                    <Progress value={levels[0].progress} className="h-2 mt-2 bg-muted dark:bg-slate-700/50">
+                      <div className="h-full bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500 rounded-full" />
+                    </Progress>
+                  </div>
+                  <div className="bg-card/50 backdrop-blur-sm p-4 rounded-lg border border-primary/20 dark:bg-slate-800/50 dark:border-emerald-500/20">
+                    <div className="text-sm text-muted-foreground dark:text-cyan-100/70 mb-1">Intermediate Level</div>
+                    <div className="text-2xl font-bold text-foreground dark:text-white">{levels[1].progress}%</div>
+                    <Progress value={levels[1].progress} className="h-2 mt-2 bg-muted dark:bg-slate-700/50">
+                      <div className="h-full bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 rounded-full" />
+                    </Progress>
+                  </div>
+                  <div className="bg-card/50 backdrop-blur-sm p-4 rounded-lg border border-primary/20 dark:bg-slate-800/50 dark:border-emerald-500/20">
+                    <div className="text-sm text-muted-foreground dark:text-cyan-100/70 mb-1">Advanced Level</div>
+                    <div className="text-2xl font-bold text-foreground dark:text-white">{levels[2].progress}%</div>
+                    <Progress value={levels[2].progress} className="h-2 mt-2 bg-muted dark:bg-slate-700/50">
+                      <div className="h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 rounded-full" />
+                    </Progress>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Additional Resources Tab */}
           <div>
-            <Tabs defaultValue="practice" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-9 bg-card/80 border-primary/30 mb-6 h-auto dark:bg-slate-900/60 dark:border-emerald-500/30">
-                <TabsTrigger value="practice" className="text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary py-2 sm:py-3 dark:data-[state=active]:bg-emerald-500/20 dark:data-[state=active]:text-emerald-300">
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Quick Practice</span>
-                  <span className="sm:hidden">Practice</span>
+              <Tabs defaultValue="analytics" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 bg-card/80 border-primary/30 mb-6 h-auto dark:bg-slate-900/60 dark:border-emerald-500/30">
+                  <TabsTrigger value="analytics" className="text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary py-2 sm:py-3 dark:data-[state=active]:bg-emerald-500/20 dark:data-[state=active]:text-emerald-300">
+                    <BarChart3 className="w-4 h-4 mr-2" />
+                    Analytics
                 </TabsTrigger>
                 <TabsTrigger value="lessons" className="text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary py-2 sm:py-3 dark:data-[state=active]:bg-emerald-500/20 dark:data-[state=active]:text-emerald-300">
                   <BookOpen className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Common Lessons</span>
+                    <span className="hidden sm:inline">Lessons</span>
                   <span className="sm:hidden">Lessons</span>
                 </TabsTrigger>
                 <TabsTrigger value="challenges" className="text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary py-2 sm:py-3 dark:data-[state=active]:bg-emerald-500/20 dark:data-[state=active]:text-emerald-300">
@@ -619,242 +440,10 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
                   <Target className="w-4 h-4 mr-2" />
                   Goals
                 </TabsTrigger>
-                <TabsTrigger value="review" className="text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary py-2 sm:py-3 dark:data-[state=active]:bg-emerald-500/20 dark:data-[state=active]:text-emerald-300">
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  Review
-                </TabsTrigger>
-                <TabsTrigger value="multimode" className="text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary py-2 sm:py-3 dark:data-[state=active]:bg-emerald-500/20 dark:data-[state=active]:text-emerald-300">
-                  <Play className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Multi-Mode</span>
-                  <span className="sm:hidden">Practice</span>
-                </TabsTrigger>
-                <TabsTrigger value="email" className="text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary py-2 sm:py-3 dark:data-[state=active]:bg-emerald-500/20 dark:data-[state=active]:text-emerald-300">
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Email Coach</span>
-                  <span className="sm:hidden">Email</span>
-                </TabsTrigger>
-                <TabsTrigger value="cultural" className="text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary py-2 sm:py-3 dark:data-[state=active]:bg-emerald-500/20 dark:data-[state=active]:text-emerald-300">
-                  <Globe className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Cultural</span>
-                  <span className="sm:hidden">Culture</span>
-                </TabsTrigger>
-                <TabsTrigger value="analytics" className="text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary py-2 sm:py-3 dark:data-[state=active]:bg-emerald-500/20 dark:data-[state=active]:text-emerald-300">
-                  <BarChart3 className="w-4 h-4 mr-2" />
-                  Analytics
-                </TabsTrigger>
               </TabsList>
 
-              {/* Quick Practice Tab - Combined Daily Conversation + Microlearning */}
-              <TabsContent value="practice" className="mt-0">
-                <div className="space-y-6">
-                  <div>
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2">Quick Practice Sessions</h2>
-                    <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70 mb-4 sm:mb-6">Short, focused exercises for busy professionals</p>
-                </div>
-
-                  {/* Multi-Mode Practice */}
-                  <Card className="bg-gradient-to-br from-teal-500/20 via-emerald-500/25 to-teal-600/20 backdrop-blur-xl border-teal-400/50 shadow-2xl relative dark:from-teal-500/20 dark:via-emerald-500/25 dark:to-teal-600/20 dark:border-teal-400/50">
-                    <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10">
-                      <Badge className="bg-gradient-to-r from-teal-600 to-emerald-600 text-white border-0 shadow-lg px-2 sm:px-3 py-1 text-xs sm:text-sm dark:from-teal-500 dark:to-emerald-600">
-                        <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                        Enrolled: {enrolledModules.size}
-                      </Badge>
-                    </div>
-                    <CardContent className="p-4 sm:p-6 md:p-8">
-                      <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-                        <div className="p-4 sm:p-6 rounded-2xl text-white bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-700 shadow-lg flex-shrink-0">
-                          <Layers className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
-                        </div>
-                        <div className="flex-1 text-center sm:text-left w-full">
-                          <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
-                            <h3 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white">Multi-Mode Practice</h3>
-                            {getMultiModeProgress() !== null && (
-                              <Badge variant="outline" className="bg-teal-700/95 text-white font-semibold border-teal-600/90 text-xs dark:bg-teal-600/40 dark:text-white dark:border-teal-500/70">
-                                {getMultiModeProgress()}% Complete
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-sm sm:text-base text-muted-foreground dark:text-cyan-100/80 mb-3 sm:mb-4">
-                            Practice listening, speaking, reading, and writing skills with comprehensive exercises
-                          </p>
-                          {/* Mode Eligibility Badges */}
-                          {(() => {
-                            const summary = getEnrolledSummaryByMode();
-                            const badges = [
-                              { id: 'listening', label: 'Listening', count: summary.listening, color: 'bg-teal-600/30 text-gray-800 font-semibold border-teal-500/60 dark:bg-teal-500/30 dark:text-white dark:border-teal-400/50' },
-                              { id: 'speaking', label: 'Speaking', count: summary.speaking, color: 'bg-emerald-600/30 text-gray-800 font-semibold border-emerald-500/60 dark:bg-emerald-500/30 dark:text-white dark:border-emerald-400/50' },
-                              { id: 'reading', label: 'Reading', count: summary.reading, color: 'bg-teal-500/30 text-gray-800 font-semibold border-teal-400/60 dark:bg-teal-400/30 dark:text-white dark:border-teal-300/50' },
-                              { id: 'writing', label: 'Writing', count: summary.writing, color: 'bg-teal-700/30 text-gray-900 font-semibold border-teal-600/60 dark:bg-teal-600/30 dark:text-white dark:border-teal-500/50' },
-                            ];
-                            const hasAny = badges.some(badge => badge.count > 0);
-                            if (!hasAny) return null;
-                            return (
-                              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3 mb-3 sm:mb-4">
-                                {badges.map((badge) => (
-                                  badge.count > 0 && (
-                                    <Badge key={badge.id} variant="outline" className={`${badge.color} text-xs sm:text-sm`}>
-                                      {badge.label} • {badge.count}
-                                    </Badge>
-                                  )
-                                ))}
-                              </div>
-                            );
-                          })()}
-                          {/* Progress Display */}
-                          {getMultiModeProgress() !== null && (
-                            <div className="mb-3 sm:mb-4 space-y-2">
-                              <div className="flex items-center justify-between text-xs sm:text-sm text-muted-foreground dark:text-cyan-200/70 mb-1">
-                                <span>Overall Progress</span>
-                                <span className="font-semibold text-foreground dark:text-white">{getMultiModeProgress()}%</span>
-                              </div>
-                              <Progress 
-                                value={getMultiModeProgress() || 0} 
-                                className="h-2 bg-muted dark:bg-slate-700/50"
-                              />
-                              
-                              {/* Enrolled Modules Badges */}
-                              {enrolledModules.size > 0 && (
-                                <div className="flex flex-wrap gap-2 text-xs text-muted-foreground dark:text-cyan-200/60 mb-2">
-                                  {Array.from(enrolledModules).map((moduleId) => {
-                                    const module = getModuleById(moduleId);
-                                    return (
-                                      <Badge key={moduleId} variant="outline" className="bg-teal-600/30 text-gray-800 font-semibold border-teal-500/60 text-xs dark:bg-teal-500/30 dark:text-white dark:border-teal-400/50">
-                                        {module?.title || moduleId}
-                                      </Badge>
-                                    );
-                                  })}
-                                </div>
-                              )}
-                              {/* Points Display */}
-                              {multiModeProgress && multiModeProgress.totalPoints > 0 && (
-                                <div className="flex items-center justify-between p-2 sm:p-3 bg-gradient-to-r from-teal-500/30 to-emerald-500/30 border border-teal-500/60 rounded-lg dark:from-teal-500/30 dark:to-emerald-500/30 dark:border-teal-400/50">
-                                  <div className="flex items-center gap-2">
-                                    <Trophy className="w-4 h-4 text-gray-800 dark:text-white" />
-                                    <span className="text-xs sm:text-sm text-gray-800 font-semibold dark:text-white">Total Points</span>
-                                  </div>
-                                  <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
-                                    {multiModeProgress.totalPoints}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-4 mb-3 sm:mb-4">
-                            <Badge variant="outline" className="bg-teal-600/30 text-gray-800 font-semibold border-teal-500/60 text-xs dark:bg-teal-500/30 dark:text-white dark:border-teal-400/50">
-                              All Modes
-                            </Badge>
-                            <Badge variant="outline" className="bg-emerald-600/30 text-gray-800 font-semibold border-emerald-500/60 text-xs dark:bg-emerald-500/30 dark:text-white dark:border-emerald-400/50">
-                              Interactive
-                            </Badge>
-                          </div>
-                          <Button
-                            size="default"
-                            className="w-full sm:w-auto bg-gradient-to-r from-teal-600 to-emerald-600 text-white hover:from-teal-700 hover:to-emerald-700 font-semibold text-sm sm:text-base shadow-lg"
-                            onClick={() => navigate('/adults/practice/multi-mode')}
-                          >
-                            <Play className="w-4 h-4 mr-2" />
-                            {enrolledModules.size > 0 ? 'Continue Practice' : 'Start Practice'}
-                            <ArrowRight className="w-4 h-4 ml-2" />
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Daily Conversation - Prominent */}
-                  <Card className="bg-gradient-to-br from-emerald-600/20 to-emerald-600/20 backdrop-blur-xl border-emerald-500/50 shadow-2xl relative dark:from-emerald-600/20 dark:to-emerald-600/20 dark:border-emerald-500/50">
-                    <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10">
-                      <Badge className="bg-emerald-600 text-white border-0 shadow-lg px-2 sm:px-3 py-1 text-xs sm:text-sm">
-                        {dailyConversationEnrolledCount > 0 && (
-                          <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                        )}
-                        Enrolled: {dailyConversationEnrolledCount}
-                      </Badge>
-                    </div>
-                    <CardContent className="p-4 sm:p-6 md:p-8">
-                      <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-                        <div className="p-4 sm:p-6 rounded-2xl text-white bg-emerald-600 shadow-lg flex-shrink-0">
-                          <MessageCircle className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
-                        </div>
-                        <div className="flex-1 text-center sm:text-left w-full">
-                          <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
-                            <h3 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white">Daily Conversation</h3>
-                            {getOverallProgress() !== null && (
-                              <Badge variant="outline" className="bg-emerald-700/95 text-white font-semibold border-emerald-600/90 text-xs dark:bg-emerald-600/40 dark:text-white dark:border-emerald-500/70">
-                                {getOverallProgress()}% Complete
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-sm sm:text-base text-muted-foreground dark:text-cyan-100/80 mb-3 sm:mb-4">
-                            Practice professional speaking about everyday topics with AI-powered feedback
-                          </p>
-                          {/* Progress Display - Show if any topic has progress */}
-                          {getOverallProgress() !== null && (
-                            <div className="mb-3 sm:mb-4 space-y-2">
-                              <div className="flex items-center justify-between text-xs sm:text-sm text-muted-foreground dark:text-cyan-200/70 mb-1">
-                                <span>Overall Progress</span>
-                                <span className="font-semibold text-foreground dark:text-white">{getOverallProgress()}%</span>
-                              </div>
-                              <Progress 
-                                value={getOverallProgress() || 0} 
-                                className="h-2 bg-muted dark:bg-slate-700/50"
-                              />
-                              {/* Enrolled Topics Summary */}
-                              {dailyConversationProgress && Object.keys(dailyConversationProgress).length > 0 && (
-                                <div className="flex flex-wrap gap-2 text-xs text-muted-foreground dark:text-cyan-200/60 mb-2">
-                                  {Object.entries(dailyConversationProgress).map(([topicId, topic]: [string, any]) => {
-                                    if (topic?.enrolled) {
-                                      const topicName = topicId === 'greetings' ? 'Greetings' : 
-                                                       topicId === 'work' ? 'Work & Professional' : topicId;
-                                      return (
-                                        <Badge key={topicId} variant="outline" className="bg-emerald-600/30 text-gray-800 font-semibold border-emerald-500/60 text-xs dark:bg-emerald-600/30 dark:text-white dark:border-emerald-500/50">
-                                          {topicName}
-                                        </Badge>
-                                      );
-                                    }
-                                    return null;
-                                  })}
-                                </div>
-                              )}
-                              {/* Points Display */}
-                              {getDailyConversationPoints() > 0 && (
-                                <div className="flex items-center justify-between p-2 sm:p-3 bg-emerald-600/30 border border-emerald-500/60 rounded-lg dark:bg-emerald-600/30 dark:border-emerald-500/50">
-                                  <div className="flex items-center gap-2">
-                                    <Trophy className="w-4 h-4 text-gray-800 dark:text-white" />
-                                    <span className="text-xs sm:text-sm text-gray-800 font-semibold dark:text-white">Total Points</span>
-                                  </div>
-                                  <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
-                                    {getDailyConversationPoints()}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-4 mb-3 sm:mb-4">
-                            <Badge variant="outline" className="bg-emerald-600/30 text-gray-800 font-semibold border-emerald-500/60 text-xs dark:bg-emerald-600/30 dark:text-white dark:border-emerald-500/50">
-                              All Levels
-                            </Badge>
-                      </div>
-                          <Button
-                            size="default"
-                            className="w-full sm:w-auto bg-emerald-600 text-white hover:bg-emerald-700 font-semibold text-sm sm:text-base shadow-lg"
-                            onClick={() => navigate('/adults/practice/daily-conversation')}
-                          >
-                            <Play className="w-4 h-4 mr-2" />
-                            {hasAnyEnrolledTopic() ? 'Continue Practice' : 'Start Daily Conversation'}
-                            <ArrowRight className="w-4 h-4 ml-2" />
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Microlearning Modules */}
-              <div>
-        
-                    <MicrolearningModules />
-              </div>
-            </div>
+                <TabsContent value="analytics" className="mt-0">
+                  <ProgressAnalytics />
               </TabsContent>
 
               <TabsContent value="lessons" className="mt-0">
@@ -868,78 +457,8 @@ const dailyConversationEnrolledCount = getDailyConversationEnrollmentCount();
               <TabsContent value="goals" className="mt-0">
                 <LearningGoals />
               </TabsContent>
-
-              <TabsContent value="review" className="mt-0">
-                <SpacedRepetition />
-              </TabsContent>
-
-              <TabsContent value="multimode" className="mt-0">
-                <div className="space-y-6">
-                  <div>
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2">Multi-Mode Practice</h2>
-                    <p className="text-xs sm:text-sm text-muted-foreground dark:text-cyan-100/70 mb-4 sm:mb-6">Practice all language skills in one place</p>
-                  </div>
-                  <Card className="bg-gradient-to-br from-teal-500/20 via-emerald-500/25 to-teal-600/20 backdrop-blur-xl border-teal-400/50 shadow-2xl dark:from-teal-500/20 dark:via-emerald-500/25 dark:to-teal-600/20 dark:border-teal-400/50">
-                    <CardContent className="p-6">
-                      <div className="text-center">
-                        <p className="text-muted-foreground dark:text-cyan-100/80 mb-4">
-                          Access comprehensive practice for listening, speaking, reading, and writing skills
-                        </p>
-                        <Button
-                          size="default"
-                          className="bg-gradient-to-r from-teal-600 to-emerald-600 text-white hover:from-teal-700 hover:to-emerald-700 font-semibold shadow-lg"
-                          onClick={() => navigate('/adults/practice/multi-mode')}
-                        >
-                          <Play className="w-4 h-4 mr-2" />
-                          Open Multi-Mode Practice
-                          <ArrowRight className="w-4 h-4 ml-2" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="email" className="mt-0">
-                <BusinessEmailCoach onClose={() => {}} />
-              </TabsContent>
-
-              <TabsContent value="cultural" className="mt-0">
-                <CulturalIntelligence onClose={() => {}} />
-              </TabsContent>
-
-              <TabsContent value="analytics" className="mt-0">
-                <ProgressAnalytics />
-              </TabsContent>
             </Tabs>
           </div>
-
-          {/* Video Lessons - Separate Prominent Section */}
-          <div>
-            <Card className="bg-card/80 backdrop-blur-xl border-primary/30 shadow-2xl overflow-hidden dark:bg-slate-900/60 dark:border-emerald-500/30">
-                    <CardContent className="p-0">
-                <div className="h-auto min-h-[200px] sm:min-h-[240px] md:min-h-[280px] py-6 sm:py-8 md:py-10 bg-emerald-600 flex items-center justify-center relative overflow-hidden dark:bg-emerald-600">
-                  <div className="absolute inset-0 bg-black/20" />
-                  <div className="relative z-10 text-center px-4 sm:px-6 md:px-8 w-full max-w-4xl mx-auto">
-                    <Play className="h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 mx-auto mb-3 sm:mb-4 text-white" />
-                    <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2 sm:mb-3 px-2">
-                      Interactive Video Lessons
-                    </h2>
-                    <p className="text-white/90 text-xs sm:text-sm md:text-base max-w-2xl mx-auto mb-4 sm:mb-5 md:mb-6 px-2 leading-relaxed">
-                      Engage with native speakers in real-world scenarios. Practice pronunciation, learn idioms, and master professional communication.
-                    </p>
-                    <Button
-                      size="default"
-                      className="bg-white text-primary hover:bg-primary/10 font-semibold text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-2.5 dark:bg-white dark:text-emerald-600 dark:hover:bg-emerald-50"
-                      onClick={() => navigate('/adults/videos')}
-                    >
-                      Explore 150+ Video Lessons
-                      <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </div>
       </main>
 
