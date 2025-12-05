@@ -38,7 +38,7 @@ export function getMicrophonePermissionStatus(): MicrophonePermissionStatus {
   const isSecure = isSecureContext();
   
   const getUserMediaSupported = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-  const speechRecognitionSupported = !!(window.SpeechRecognition || (window as any).webkitSpeechRecognition);
+  const speechRecognitionSupported = !!((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
   
   let error: string | undefined;
   let errorType: MicrophonePermissionStatus['errorType'];
