@@ -239,6 +239,25 @@ export class SpeechService {
       recognition.onerror = (event: any) => {
         clearTimer();
         clearSilenceTimer();
+        
+        // Map error codes to user-friendly messages
+        let errorMessage = 'STT error';
+        const errorCode = event.error || '';
+        
+        if (errorCode === 'not-allowed' || errorCode === 'service-not-allowed') {
+          errorMessage = 'Microphone access denied. Please allow microphone access in your browser settings.';
+        } else if (errorCode === 'no-speech') {
+          errorMessage = 'No speech detected. Please try speaking again.';
+        } else if (errorCode === 'aborted') {
+          errorMessage = 'Speech recognition was aborted.';
+        } else if (errorCode === 'audio-capture') {
+          errorMessage = 'No microphone found. Please connect a microphone.';
+        } else if (errorCode === 'network') {
+          errorMessage = 'Network error. Please check your internet connection.';
+        } else {
+          errorMessage = event.error || 'Speech recognition error occurred.';
+        }
+        
         // If we have a transcript, return it instead of error
         if (finalTranscript.trim() && !resolved) {
           resolved = true;
@@ -248,7 +267,7 @@ export class SpeechService {
             durationMs: Date.now() - startTime 
           });
         } else {
-          reject(new Error(event.error || 'STT error'));
+          reject(new Error(errorMessage));
         }
       };
 

@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
-import { Mic, CheckCircle, Loader2, Sparkles } from 'lucide-react';
+import { Mic, CheckCircle, Loader2, Sparkles, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { WhisperService } from '@/services/WhisperService';
 import { AdvancedPronunciationScorer } from '@/services/AdvancedPronunciationScorer';
+import { requestMicrophonePermission, getMicrophonePermissionStatus, getSafariGuidance, checkSpeechRecognitionSupport, isSecureContext } from '@/utils/microphonePermission';
 
 interface KidsVoiceRecorderProps {
   targetWord: string; // The word the child should pronounce
@@ -37,6 +38,7 @@ const KidsVoiceRecorder = ({
   const [showSuccess, setShowSuccess] = useState(false);
   const [isTtsCooldown, setIsTtsCooldown] = useState(false);
   const [detectedText, setDetectedText] = useState<string>('');
+  const [permissionError, setPermissionError] = useState<{ message: string; guidance?: string } | null>(null);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -52,6 +54,20 @@ const KidsVoiceRecorder = ({
     return () => {
       cleanup();
     };
+  }, []);
+
+  // Check microphone permission status on mount
+  useEffect(() => {
+    const checkPermissions = async () => {
+      const status = getMicrophonePermissionStatus();
+      if (status.error) {
+        setPermissionError({
+          message: status.error,
+          guidance: status.userGuidance || ''
+        });
+      }
+    };
+    checkPermissions();
   }, []);
 
   // Stop recording immediately when TTS starts speaking (disabledWhileSpeaking becomes true)
@@ -307,6 +323,7 @@ const KidsVoiceRecorder = ({
       setFeedbackMessage('');
       setShowSuccess(false);
       setDetectedText(''); // Reset detected text display
+      setPermissionError(null); // Clear any previous permission errors
       skipFinalAnalysisRef.current = false;
       webSpeechTranscriptRef.current = ''; // Reset Web Speech transcript
       
@@ -382,28 +399,50 @@ const KidsVoiceRecorder = ({
         console.warn('Could not start Web Speech API (non-fatal):', err);
       }
       
-      // Audio constraints optimized for kids' voices with enhanced quality settings
-      // Kids have higher-pitched voices, so we need higher sample rate and better sensitivity
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true, // Important for kids who may speak quieter
-          // Optimize for kids' voices (higher frequency range, higher quality)
-          sampleRate: 48000, // Higher sample rate captures more detail
-          channelCount: 1, // Mono for better processing
-          // Sensitivity settings for kids (they may speak at different volumes)
-          volume: 1.0,
-          // Google-specific constraints for better quality (may be ignored in non-Chrome browsers)
-          googEchoCancellation: true,
-          googAutoGainControl: true, // Critical for kids - adjusts volume automatically
-          googNoiseSuppression: true,
-          googHighpassFilter: true, // Filters out low-frequency noise
-          googTypingNoiseDetection: true,
-          googAudioMirroring: false
-        } as any
-      });
+      // Request microphone permission with enhanced error handling
+      const audioConstraints = {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true, // Important for kids who may speak quieter
+        // Optimize for kids' voices (higher frequency range, higher quality)
+        sampleRate: 48000, // Higher sample rate captures more detail
+        channelCount: 1, // Mono for better processing
+        // Sensitivity settings for kids (they may speak at different volumes)
+        volume: 1.0,
+        // Google-specific constraints for better quality (may be ignored in non-Chrome browsers)
+        googEchoCancellation: true,
+        googAutoGainControl: true, // Critical for kids - adjusts volume automatically
+        googNoiseSuppression: true,
+        googHighpassFilter: true, // Filters out low-frequency noise
+        googTypingNoiseDetection: true,
+        googAudioMirroring: false
+      } as any;
+
+      const permissionResult = await requestMicrophonePermission({ audio: audioConstraints });
       
+      if (!permissionResult.success || !permissionResult.stream) {
+        let errorMessage = permissionResult.error || 'Could not access microphone.';
+        let guidance = permissionResult.userGuidance || '';
+        
+        // Add Safari-specific guidance if needed
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        if (isSafari && permissionResult.errorType === 'not-allowed') {
+          const safariGuidance = getSafariGuidance();
+          if (safariGuidance) {
+            guidance = safariGuidance + (guidance ? '<br/>' + guidance : '');
+          }
+        }
+        
+        setPermissionError({
+          message: errorMessage,
+          guidance: guidance
+        });
+        
+        setFeedbackMessage(`❌ ${errorMessage}`);
+        return;
+      }
+
+      const stream = permissionResult.stream;
       streamRef.current = stream;
       
       // Try to get the best available codec for kids' voices
@@ -517,9 +556,36 @@ const KidsVoiceRecorder = ({
         }, skipPronunciationCheck ? 300 : 500); // Check every 300ms for games, 500ms for pronunciation (MUCH faster for kids)
       }
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error accessing microphone:', error);
-      setFeedbackMessage('❌ Could not access microphone. Please allow permissions.');
+      
+      // Fallback error handling if permission check didn't catch it
+      let errorMessage = 'Could not access microphone. Please check your permissions.';
+      let guidance = '';
+      
+      // Check if it's a permission-related error
+      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+        errorMessage = 'Microphone access was denied. Please allow microphone access in your browser settings.';
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        if (isSafari) {
+          guidance = getSafariGuidance();
+        }
+      } else if (error.name === 'NotFoundError') {
+        errorMessage = 'No microphone found. Please connect a microphone.';
+      } else if (!isSecureContext() && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+        errorMessage = 'Microphone access requires HTTPS (secure connection).';
+        const status = getMicrophonePermissionStatus();
+        guidance = status.userGuidance || '';
+      }
+      
+      if (guidance) {
+        setPermissionError({
+          message: errorMessage,
+          guidance: guidance
+        });
+      }
+      
+      setFeedbackMessage(`❌ ${errorMessage}`);
     }
   };
 
@@ -662,8 +728,30 @@ const KidsVoiceRecorder = ({
         </div>
       )}
 
+      {/* Permission Error with Guidance */}
+      {permissionError && (
+        <div className="space-y-2 max-w-md mx-auto px-4">
+          <div className="bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 dark:border-amber-400 p-4 rounded-r-lg">
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-amber-800 dark:text-amber-200 mb-2">
+                  {permissionError.message}
+                </p>
+                {permissionError.guidance && (
+                  <div 
+                    className="text-xs text-amber-700 dark:text-amber-300 prose prose-sm dark:prose-invert max-w-none"
+                    dangerouslySetInnerHTML={{ __html: permissionError.guidance }}
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Feedback Message */}
-      {feedbackMessage && !showSuccess && (
+      {feedbackMessage && !showSuccess && !permissionError && (
         <div className="space-y-2">
           <p className="text-sm sm:text-base text-center text-gray-600 dark:text-gray-400 font-semibold max-w-xs px-4">
             {feedbackMessage}

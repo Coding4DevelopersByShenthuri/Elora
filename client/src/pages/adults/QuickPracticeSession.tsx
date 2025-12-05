@@ -16,6 +16,7 @@ import { IntegratedProgressService } from '@/services/IntegratedProgressService'
 import { useToast } from '@/hooks/use-toast';
 import OnlineTTS from '@/services/OnlineTTS';
 import SpeechService from '@/services/SpeechService';
+import { checkSpeechRecognitionSupport, getMicrophonePermissionStatus, getSafariGuidance } from '@/utils/microphonePermission';
 
 // Daily Conversation Topics
 const dailyConversationTopics = [
@@ -414,14 +415,20 @@ const QuickPracticeSession = () => {
         });
       }
 
-      // Check STT availability
-      const sttSupported = SpeechService.isSTTSupported();
-      setSttAvailable(sttSupported);
-      if (!sttSupported) {
+      // Check STT availability with enhanced permission checking
+      const speechCheck = checkSpeechRecognitionSupport();
+      setSttAvailable(speechCheck.supported);
+      if (!speechCheck.supported) {
+        const status = getMicrophonePermissionStatus();
+        let description = speechCheck.error || "Your browser doesn't support speech recognition.";
+        if (status.errorType === 'not-secure') {
+          description = "Speech recognition requires HTTPS (secure connection). Please use https:// to access this site.";
+        }
         toast({
           title: "Speech Recognition Not Available",
-          description: "Your browser doesn't support speech recognition. Please use Chrome or Edge for voice practice.",
-          variant: "default"
+          description: description,
+          variant: "default",
+          duration: 10000
         });
       }
     };
@@ -922,10 +929,31 @@ const QuickPracticeSession = () => {
     } catch (error: any) {
       console.error('Speech recognition error:', error);
       if (error.message !== 'STT timeout' && error.message !== 'No speech detected') {
+        let errorMessage = error.message || "Failed to recognize speech. Please try again.";
+        let duration = 5000;
+        
+        // Provide more helpful error messages
+        if (errorMessage.includes('denied') || errorMessage.includes('not-allowed')) {
+          errorMessage = "Microphone access denied. Please allow microphone access in your browser settings.";
+          duration = 8000;
+          
+          // Add Safari-specific guidance
+          const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+          if (isSafari) {
+            const safariGuidance = getSafariGuidance();
+            // Safari guidance is HTML, so we'll just mention it in the toast
+            errorMessage += " (Safari users: Check Settings > Safari > Camera & Microphone)";
+          }
+        } else if (errorMessage.includes('HTTPS') || errorMessage.includes('secure')) {
+          errorMessage = "Speech recognition requires HTTPS (secure connection). Please use https:// to access this site.";
+          duration = 8000;
+        }
+        
         toast({
           title: "Recognition Error",
-          description: error.message || "Failed to recognize speech. Please try again.",
-          variant: "destructive"
+          description: errorMessage,
+          variant: "destructive",
+          duration: duration
         });
       }
     } finally {
