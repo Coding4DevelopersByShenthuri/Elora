@@ -104,9 +104,11 @@ const Index = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
-                <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 md:px-8 md:py-4 text-base md:text-lg rounded-full shadow-lg hover:shadow-xl transition-shadow">
-                  <Play className="w-4 h-4 md:w-5 md:h-5 mr-2" />
-                  Start Learning Free
+                <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 md:px-8 md:py-4 text-base md:text-lg rounded-full shadow-lg hover:shadow-xl transition-shadow" asChild>
+                  <Link to="/pricing">
+                    <Play className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+                    Start Learning Free
+                  </Link>
                 </Button>
                 <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white px-4 py-2 md:px-8 md:py-4 text-base md:text-lg rounded-full">
                   <Volume2 className="w-4 h-4 md:w-5 md:h-5 mr-2" />
@@ -417,9 +419,11 @@ const Index = () => {
               Join thousands of learners who are already improving their English skills with our AI-powered platform.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
-              <Button size="lg" className="bg-white text-[#529641] hover:bg-white/90 px-6 py-3 md:px-8 md:py-4 text-base md:text-lg rounded-full shadow-lg hover:shadow-xl transition-all">
-                <Play className="w-4 h-4 md:w-5 md:h-5 mr-2" />
-                Start Your Journey
+              <Button size="lg" className="bg-white text-[#529641] hover:bg-white/90 px-6 py-3 md:px-8 md:py-4 text-base md:text-lg rounded-full shadow-lg hover:shadow-xl transition-all" asChild>
+                <Link to="/pricing">
+                  <Play className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+                  Start Your Journey
+                </Link>
               </Button>
               <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-[#529641] px-6 py-3 md:px-8 md:py-4 text-base md:text-lg rounded-full transition-all">
                 <Link to="/about" className="flex items-center text-green-600">
